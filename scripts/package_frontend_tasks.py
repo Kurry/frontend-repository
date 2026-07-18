@@ -1016,7 +1016,7 @@ TASK_TOML_TMPL = textwrap.dedent(
     timeout_sec = 14400.0
 
     [verifier.env]
-    OPENAI_API_KEY = "${{OPENAI_API_KEY}}"
+    OPENAI_API_KEY = "${{OPENAI_API_KEY:-}}"
     REWARDKIT_MODEL = "${{REWARDKIT_MODEL:-}}"
 
     [environment]

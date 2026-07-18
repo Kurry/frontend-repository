@@ -1,0 +1,22 @@
+# Single-task smoke of configs/sonnet5-codex-oauth.yaml (same seams, one task).
+jobs_dir: jobs
+n_attempts: 1
+n_concurrent_trials: 1
+
+environment:
+  type: docker
+  delete: true
+
+agents:
+  - name: claude-code
+    model_name: anthropic/claude-sonnet-5
+    env:
+      CLAUDE_FORCE_OAUTH: "1"
+
+verifier:
+  env:
+    CODEX_AUTH_JSON: "${CODEX_AUTH_JSON}"
+    REWARDKIT_MODEL: "${REWARDKIT_MODEL:-}"
+
+tasks:
+  - path: ./tasks/frontend-daily-planner-board

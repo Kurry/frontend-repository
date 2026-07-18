@@ -1,0 +1,26 @@
+# Full corpus run: claude-code builder on Sonnet 5 (Claude subscription OAuth),
+# codex judge on ChatGPT-plan OAuth (auth.json passed as CODEX_AUTH_JSON).
+# Usage:
+#   export CODEX_AUTH_JSON="$(cat ~/.codex/auth.json)"   # judge OAuth
+#   harbor run -y -c configs/sonnet5-codex-oauth.yaml    # CLAUDE_CODE_OAUTH_TOKEN from host env
+jobs_dir: jobs
+n_attempts: 1
+n_concurrent_trials: 2
+
+environment:
+  type: docker
+  delete: true
+
+agents:
+  - name: claude-code
+    model_name: anthropic/claude-sonnet-5
+    env:
+      CLAUDE_FORCE_OAUTH: "1"          # subscription token wins over any API key
+
+verifier:
+  env:
+    CODEX_AUTH_JSON: "${CODEX_AUTH_JSON}"   # rewardkit codex judge -> isolated temp CODEX_HOME
+    REWARDKIT_MODEL: "${REWARDKIT_MODEL:-}" # unset -> toml default gpt-5.6-sol
+
+datasets:
+  - path: ./tasks
