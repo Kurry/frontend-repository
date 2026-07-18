@@ -1,0 +1,61 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## What this repo is
+
+23 frontend-only Harbor eval tasks (`tasks/frontend-*`). Each task asks a builder agent to rebuild a reference web app from a PRD-style `instruction.md`; an LLM judge (codex, `gpt-5.6-sol`) then grades the built app in a real browser across four dimensions (core_features, technical, visual_design, motion). Everything under `tasks/` is **generated or vendored** — the source of truth for shared pieces lives in `scripts/`.
+
+## Commands
+
+```bash
+# Unit tests (MUST run from repo root — module discovery is cwd-relative)
+python3 -m unittest scripts.tests.test_webmcp_h3
+
+# Run a task end-to-end (builder + verifier)
+harbor run -p tasks/frontend-admin-analytics-dashboard -a claude-code -m sonnet
+
+# Re-score an existing trial's artifacts without re-running the builder.
+# `harbor score` exists ONLY in the local fork at ~/harbor (not in the
+# pip-installed harbor) — invoke it via uv from that checkout:
+cd ~/harbor && uv run harbor score <trial-or-job-dir> \
+  --task /Users/kurrytran/frontend-repository/tasks/<slug> \
+  --label my-label --action append
+
+# Cheap dev-tier judging (no file edits): export REWARDKIT_MODEL=gpt-5.6-luna
+# Production judging uses the toml default (gpt-5.6-sol). Verifier needs
+# OPENAI_API_KEY in the host env; the builder agent needs CLAUDE_CODE_OAUTH_TOKEN.
+
+# Capture reference screenshots from every task's solution/app oracle
+# (also a 23-oracle smoke validation: serve + zero console/page errors)
+node scripts/capture_reference_screenshots.mjs [slug ...]
+python3 scripts/install_reference_screenshots.py [slug ...]   # install into task envs
+
+# Regenerate tests/<dim>/<dim>.toml from authoring rubric.json + checklist
+python3 scripts/regen_dimension_tomls.py [slug ...]
+```
+
+**Authoring sources are archived, not in the repo.** The per-task authoring folders (`DaisyUI/`, `variants/…`, etc. — `rubric.json`, `verifier_checklist.json`, content-only `instruction.md`, reference implementations) were moved to `~/Documents/frontend-repository-authoring-backup-2026-07-18`. `regen_dimension_tomls.py` and `package_frontend_tasks.py` need them restored to run. The mapping slug→source lives in `schemas/webmcp-task-sources.json` and `TASK_SPECS` in `scripts/package_frontend_tasks.py`.
+
+## Architecture
+
+### Generation pipeline (edit generators, never the 23 copies)
+
+`scripts/package_frontend_tasks.py` is the single source of truth for everything replicated across tasks: `TEST_SH` (tests/test.sh), `TASK_TOML_TMPL` + `ARTIFACT_EXCLUDES` (task.toml), `DOCKERFILE`, the judge `[judge]` header, and `rubric_to_tomls()` which turns authoring rubric+checklist JSON into the four dimension tomls. `scripts/canonical/` holds the authored templates it inlines: `system_prompt.md` (judge prompt), `mcp/reward_mcp_servers.toml` (judge MCP servers fragment), `mcp/webmcp_stdio_server.mjs` (vendored per task into `tests/mcp/`), `test.sh`. All 24 `test.sh` copies and 23 `task.toml`s are byte-identical products of these templates — a unit test enforces the artifact-exclude set, so a drive-by edit to one copy will fail CI-style checks.
+
+### Task anatomy
+
+- `instruction.md` — PRD the builder sees. Content sections (`<summary>`, `<core_features>`, `<visual_design>`, `<motion>`, `<requirements>`) are written as observable behaviors (action → expected evidence, quantifiers resolved). Protected sections (`<integrity>`, `<delivery>`, `<webmcp_action_contract>`, `<reference_screenshots>`) are contract/plumbing — the webmcp block is rendered by `scripts/webmcp_h3.py` from `schemas/webmcp-assignments.json` and module specs in `packages/webmcp-contracts`.
+- `environment/` — Dockerfile + `reference-screenshots/` (copied to `/reference-screenshots` in the builder container; images are advisory, instruction text wins).
+- `solution/app` — the oracle (mostly static). Used by `solve.sh`, by the screenshot capture script, and validated to serve with zero console/page errors.
+- `tests/` — `test.sh` (verifier entry), `system_prompt.md`, `mcp/webmcp_stdio_server.mjs`, and four `<dim>/<dim>.toml` rubrics (31–42 criteria per task).
+
+### Verifier / judge stack
+
+`tests/test.sh` installs pinned deps (`tasks/_pins.py`; rewardkit is pinned to a SHA of the Kurry/harbor fork on GitHub — bump `HARBOR_REWARDKIT_GIT_SHA` and regenerate test.sh copies together), launches a **shared headless Chrome** with `--remote-debugging-port` and blink pointer-capability flags (without them headless Linux reports `hover: none` and Tailwind v4 strips every `hover:` style — motion criteria then false-fail), exports `WEBMCP_CDP_PORT`/`WEBMCP_CDP_ENDPOINT`, serves the app on port 3000, and runs `rewardkit /tests`.
+
+The judge gets two MCP servers attached to that same Chrome: **playwright** (`@playwright/mcp`, observation + gesture mechanics) and **webmcp** (the task-local CDP bridge), which calls the app's contract-mandated `window.webmcp_session_info/list_tools/invoke_tool` on the *same page* playwright drives — apps are client-side-state SPAs, so a second page would be a different app instance. The judge prompt mandates WebMCP-first for state-changing setup and playwright for anything a criterion grades mechanically, plus accuracy guards (hover verdicts via computed-style-while-hovering, desktop-viewport before layout judgments, count deltas measured immediately around the action).
+
+### Rubric conventions (from `.cursor/skills/frontend-good-app-eval/`)
+
+Rubric entries: `{id, title, annotations:{type: "positive|negative hli verifier", importance: "must have|nice to have", criterion: "Core Features|Technical Implementation|Visual Design|Motion"}}`. Checklist entries become numbered 1.x core criteria ahead of the remaining HLIs. Rules that matter: every dimension keeps ≥1 positive and ≥1 negative (negatives are anti-cheat, phrased as the bad condition being present); titles must be browser-observable — internal-implementation claims ("uses Redux Toolkit") are banned because judges cannot verify them; criteria that grade an animation/gesture must require the real UI control path (a WebMCP state shortcut would snap the state and falsely show no animation); `nice to have` maps to weight 0.5, `must have` to 1.0. Keep instruction, checklist, and rubric mutually consistent.

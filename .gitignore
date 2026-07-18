@@ -38,7 +38,9 @@ yarn-error.log*
 
 # OS / editor
 .DS_Store
-.cursor/
+.cursor/*
+!.cursor/skills/
+
 .idea/
 *.swp
 
