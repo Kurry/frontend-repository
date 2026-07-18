@@ -21,7 +21,7 @@ class TestWebmcpContract(unittest.TestCase):
         import package_frontend_tasks as pft
 
         tomls = sorted(ROOT.glob("tasks/*/task.toml"))
-        self.assertGreaterEqual(len(tomls), 23)
+        self.assertGreaterEqual(len(tomls), 24)
         for f in tomls:
             data = tomllib.loads(f.read_text())
             artifacts = data.get("artifacts") or []
@@ -74,10 +74,10 @@ class TestWebmcpContract(unittest.TestCase):
             self.assertIn("@playwright/mcp@0.0.76", pw_args)
             self.assertIn("$WEBMCP_CDP_ENDPOINT", pw_args)
 
-    def test_assignment_map_covers_23(self) -> None:
+    def test_assignment_map_covers_24(self) -> None:
         data = json.loads((ROOT / "schemas/webmcp-assignments.json").read_text())
         self.assertEqual(data["contract_version"], "zto-webmcp-v1")
-        self.assertEqual(len(data["assignments"]), 23)
+        self.assertEqual(len(data["assignments"]), 24)
         for entry in data["assignments"]:
             contract = webmcp_h3.render_contract(entry)
             self.assertIn("<webmcp_action_contract>", contract)

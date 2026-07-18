@@ -949,6 +949,39 @@
       "mechanics_exclusions": [
         "Map pan/zoom / marker drag stays Playwright"
       ]
+    },
+    {
+      "task": "frontend-daily-planner-board",
+      "modules": [
+        "browse-query-v1",
+        "entity-collection-v1"
+      ],
+      "bindings": {
+        "browsable_entity": "tasks",
+        "destinations": [
+          "board",
+          "calendar-day-panel"
+        ],
+        "entity": "task",
+        "entity_operations": [
+          "create",
+          "select",
+          "update",
+          "delete",
+          "toggle"
+        ],
+        "entity_fields": [
+          "title",
+          "done",
+          "channel",
+          "planned-time",
+          "day",
+          "start-time"
+        ]
+      },
+      "mechanics_exclusions": [
+        "Calendar panel day-scroll / hour-grid gestures stay Playwright-observed"
+      ]
     }
   ]
 }

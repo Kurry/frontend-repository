@@ -300,6 +300,21 @@ TASK_SPECS: dict[str, dict] = {
         },
         "mechanics_exclusions": ["Map pan/zoom / marker drag stays Playwright"],
     },
+    "frontend-daily-planner-board": {
+        "source": "DailyPlannerBoard",
+        "description": "Cadence multi-day daily planner board good-app eval.",
+        "modules": ["browse-query-v1", "entity-collection-v1"],
+        "bindings": {
+            "Browsable entity": "tasks",
+            "Destinations": "board; calendar-day-panel",
+            "Entity": "task",
+            "Entity operations": "create; select; update; delete; toggle",
+            "Entity fields": "title; done; channel; planned-time; day; start-time",
+        },
+        "mechanics_exclusions": [
+            "Calendar panel day-scroll / hour-grid gestures stay Playwright-observed",
+        ],
+    },
 }
 
 CRITERION_MAP = {
@@ -314,6 +329,7 @@ SKIP_NAMES = {
     "rubric.json",
     "verifier_checklist.json",
     "README.md",
+    "INVENTORY.md",
     "rubric.md",
     "build_capture.py",
     "generate_scenes.py",

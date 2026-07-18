@@ -113,5 +113,10 @@
     "source": "variants/TravelItineraryPlanner",
     "instruction": "variants/TravelItineraryPlanner/instruction.md",
     "description": "French Riviera trip itinerary planner variant."
+  },
+  "frontend-daily-planner-board": {
+    "source": "DailyPlannerBoard",
+    "instruction": "DailyPlannerBoard/instruction.md",
+    "description": "Cadence multi-day daily planner board good-app eval."
   }
 }
