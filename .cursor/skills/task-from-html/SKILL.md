@@ -2,117 +2,164 @@
 name: task-from-html
 description: >-
   Turn a saved/captured source HTML page (SavePage capture, e.g.
-  ~/Downloads/Sunsama.html) into a complete frontend Harbor eval task without
-  losing any visible detail: exhaustive UI inventory, strict visible-vs-chrome
-  scoping, debranded oracle repair, detail-preserving PRD + instruction, and
-  rubrics whose criteria cite the page's exact seeded content. Use whenever the
-  user hands over an .html capture (or a folder of capture assets) and wants a
-  task made from it, or says "make a task from this page/screenshot/capture".
+  ~/Downloads/Sunsama.html) into a complete frontend Harbor eval task: exhaustive
+  detail inventory, strict visible-vs-chrome-vs-absent scoping, capture repair,
+  a fully WORKING oracle solution (CRUD + WebMCP surface, self-tested in a real
+  browser), detail-preserving PRD + instruction, rubrics that cite the page's
+  exact seeded strings, registration/packaging, and validation. Use whenever the
+  user hands over an .html capture (or capture folder) and wants a task made
+  from it — "make a task from this page/capture/screenshot".
 ---
 
 # Create a task from a source HTML capture
 
-Pipeline: capture → inventory → scope → oracle → PRD/instruction → rubrics →
-package. Steps 5–7 delegate to the sibling skills `frontend-good-app-eval`
-(content register, rubric conventions) and `create-task` (registration,
-packaging, screenshots, validation). This skill owns what those don't: not
-losing detail, and not inventing what the page doesn't show.
+Nine stages. The sibling skills own the generics — `frontend-good-app-eval`
+(instruction register, checklist and rubric conventions) and `create-task`
+(registration, packaging, validation mechanics). This skill owns what only a
+capture-sourced task needs: losing zero detail, refusing to invent unshown
+product, and turning a dead capture into a living oracle.
 
-## Step 1 — Exhaustive inventory (the no-detail-lost contract)
+Two invariants run through every stage:
 
-Read the raw HTML (it will be large; work region by region) and write
-`<Source>/INVENTORY.md` before any authoring. Enumerate, with exact strings:
+- **No detail lost.** Every visible element ends up in the inventory, and every
+  inventory line ends up traceable to the instruction, a chrome-only line, or
+  an explicit "absent" entry (stage 9 enforces this with a diff).
+- **Nothing invented.** Knowledge of the real product is inadmissible. If the
+  page doesn't show it, the task doesn't have it.
 
-- Layout regions and their order (e.g. left nav / central board / right rail).
-- Every seeded record verbatim: titles, dates, times, counts, labels, badges
-  ("Set up Sunsama", "Automatic Bill Payment - Sallie Mae", work-time totals
-  "0:20" / "1:00", date range "Jul 6–26", zoom "1x"). These become rubric
-  anchors — a criterion that can cite an exact string is a criterion a judge
-  cannot misread.
-- Every control, per region: label, kind (button/link/input/toggle), and
-  whether the capture shows it doing anything.
-- All states present in the DOM: checked/unchecked, expanded subtasks, active
-  nav item, open panels, empty slots.
-- Icons/connectors by name (GitHub etc.), help/chat widgets, footers.
+## Stage 1 — Inventory (`<Source>/INVENTORY.md`)
 
-Nothing visible on the page may be absent from the inventory. When in doubt,
-inventory it — scoping (step 2) decides what to do with it, not omission.
+Read the raw HTML region by region (captures run to megabytes — work in
+slices) and write the inventory BEFORE any authoring:
 
-## Step 2 — Scope: visible UI vs chrome-only vs absent
+- Layout regions in order (left nav / board / right rail, etc.).
+- Every seeded record verbatim, with exact strings: task titles, dates, times,
+  totals, badges, counts ("Set up Sunsama", "Automatic Bill Payment - Sallie
+  Mae", "0:20", "Jul 6–26", zoom "1x"). Exact strings become rubric anchors —
+  a criterion citing a literal string cannot be misread by a judge.
+- Every control per region: label, kind, and whether the capture shows any
+  behavior for it.
+- Every state present in the DOM: checked/unchecked, expanded/collapsed,
+  active nav item, open panels, empty slots.
+- Named icons/connectors, help/chat widgets, footers, version strings.
 
-Classify every inventory item into exactly one bucket:
+When unsure whether something matters: inventory it. Scoping decides its fate.
 
-1. **Visible UI (full spec)** — rendered and populated on this page. Gets full
-   behavioral treatment in the PRD and instruction. Sunsama example: the
-   multi-day board (day columns Jul 6–26, Add task, Today/Filter/Board
-   controls, work-time totals), the task model as far as shown (titles,
-   checkboxes, #work channel, subtasks, planned time, fixed 9:00 am start),
-   the calendar rail (Calendars panel, 1x zoom, the all-day event).
-2. **Chrome-only (inert, specified as chrome)** — present as controls/labels
-   but their screens or flows are NOT on this page. Spec them as visible,
-   interactive-feeling, non-navigating chrome (demo toast or no-op), never as
-   features. Sunsama example: Home/Today/Focus/Daily planning/shutdown/
-   highlights/Weekly planning/review/Backlog nav links; Filter + Search;
-   Add folder; Backlog · Archive · Objectives tabs; integration connector
-   icons; the Intercom/chat button.
-3. **Absent** — anything you know about the real product that the page does
-   not show. It does not exist for this task. Do not spec it, do not rubric
-   it, do not let "the real app does X" leak in.
+## Stage 2 — Scope every inventory line into one bucket
 
-The classification goes into the PRD explicitly (a "what this page is / is
-not" section) so future editors don't promote chrome into features.
+1. **Visible UI (full spec):** rendered AND populated on this page → full
+   behavioral treatment.
+2. **Chrome-only:** a control or nav label exists but its screen/flow is not
+   on this page → spec as visible, interactive-feeling, non-navigating chrome
+   (demo toast or no-op). Never promote chrome to a feature.
+3. **Absent:** everything else the real product has → does not exist for this
+   task. Not specced, not rubriced, not implemented.
 
-## Step 3 — Repair the capture into the oracle
+Record the classification in the PRD as a "what this page is / is not"
+section so later editors can't silently promote buckets.
 
-Copy the capture into `<Source>/` as the reference implementation and fix the
-standard capture defects (all seen in real captures in this repo):
+## Stage 3 — Repair the capture
 
-- Replace entity-encoded attribute delimiters (`=&quot;` → `="`), scoped so
-  legitimate `&quot;` inside CSS strings (font-family values) survives — this
-  class alone caused 25+ console errors per page in past oracles.
-- Remove or stub every external `<script src="https://…">` (analytics, chat
-  widgets, CDNs); vendor genuinely needed libraries locally under `vendor/`.
-- Neutralize all outbound `href`s: chrome controls become non-navigating
-  buttons per the chrome-only spec.
-- Debrand: generic product name, synthetic personal data. Keep seeded content
-  strings that the rubric will cite (or replace them consistently in capture,
-  PRD, checklist, and rubric together — never let them drift apart).
-- Local assets only; no network at runtime.
+Copy the capture into `<Source>/` and fix the standard defect classes (all
+observed in this repo's real captures):
 
-Acceptance: `node scripts/capture_reference_screenshots.mjs <slug>` reports
-`OK … consoleErr=0 pageErr=0` once packaged. The oracle must render the full
-inventoried page.
+- `=&quot;` entity-encoded attribute delimiters → `="`, protecting legitimate
+  `&quot;` inside CSS strings (font-family). Unfixed, this class alone throws
+  20+ console errors per page.
+- Remove/stub every external `<script src>` (analytics, chat widgets, CDNs);
+  vendor genuinely needed libraries under `vendor/`.
+- Neutralize outbound `href`s into non-navigating controls.
+- Debrand product strings to the assigned brand, consistently across capture,
+  PRD, instruction, checklist, and rubric (they must never drift apart).
+  Synthetic personal/billing seed strings may stay.
+- Local assets only; the page must render fully offline.
 
-## Step 4 — PRD (`<Source>/README.md`)
+## Stage 4 — Build the WORKING oracle solution
 
-Write the PRD from the inventory, not from memory of the product. Include the
-original page provenance/URL, the scope classification from step 2, exact
-seeded data tables, and per-region specs. The bar: someone with only this PRD
-recreates the page; someone with the page finds every visible detail in the
-PRD.
+The repaired capture is a screenshot that happens to be HTML. The oracle must
+be a working application. Corpus precedent: oracles are static, self-contained
+apps (plain HTML+JS, in-memory state) — the instruction's framework stack
+binds only the BUILDER; the oracle is never stack-judged, only observed.
 
-## Step 5 — Instruction, checklist, rubric
+Enhance the repaired capture with a JS layer implementing EVERY behavior the
+instruction will demand:
+
+- Full CRUD on the visible primary collection (create/edit/complete/delete),
+  with derived values recomputing live — inventory anchors like per-column
+  totals must be real computed values, not baked strings.
+- Domain state beyond CRUD as specced (filters, states, badges, empty states,
+  validation on invalid create).
+- Chrome-only controls wired to demo toasts; zero navigation.
+- In-memory state only — no localStorage/sessionStorage.
+- **The WebMCP surface**: `window.webmcp_session_info()`,
+  `window.webmcp_list_tools()`, `window.webmcp_invoke_tool(name, args)`, one
+  tool per permitted operation in the task's module specs, bound to the
+  Bindings values, handlers calling the same logic as the visible UI.
+- `package.json` with scripts named exactly `start` (port 3000; the
+  `npx serve` pattern is fine for static) and `verify:build`.
+
+**Self-test in a real browser before calling it done** (playwright is in repo
+`node_modules`): exercise create/edit/complete/delete, watch derived totals
+recompute, invoke at least one `webmcp_invoke_tool` and confirm the UI
+reflects it, and verify zero console errors DURING the workflows — not just
+on load. An oracle bug becomes a permanent false signal in every future
+scoring run; this repo has shipped four of those and paid to find them later.
+
+## Stage 5 — PRD (`<Source>/README.md`)
+
+Written from the inventory, not from product memory: provenance/URL, the
+stage-2 scope classification, exact seed tables, per-region specs. Bar: the
+PRD alone recreates the page; the page alone finds every detail in the PRD.
+
+## Stage 6 — Instruction, checklist, rubric
 
 Follow `frontend-good-app-eval` for register and conventions. Capture-specific
-requirements on top:
+additions:
 
-- The good-app CRUD layer must grow out of a **visible** collection (Sunsama:
-  tasks within day columns — create/edit/complete/delete tasks, planned-time
-  totals recomputing per column), never out of a chrome-only feature.
-- Chrome-only items get their own instruction lines ("clicking X shows a demo
-  toast and never navigates") and at least one negative rubric criterion
-  (outbound navigation from chrome = fail).
-- Rubric criteria cite the inventory's exact strings and quantities wherever
-  possible ("the Jul 6 column shows a work-time total of 0:20 that updates
-  when a task's planned time changes"). Prefer one criterion per inventoried
-  behavior over collapsed compound criteria.
-- WebMCP bindings (destinations, filters, entity fields) must name only values
-  that exist on the page — bindings drift is a known failure mode.
+- The CRUD layer grows from a **visible** collection only.
+- Chrome-only items get instruction lines (demo-toast contract) AND at least
+  one negative criterion (outbound navigation from chrome = fail).
+- Criteria cite exact inventoried strings and quantities ("the Jul 6 column
+  shows a work-time total of 0:20 that updates when a task's planned time
+  changes"). One criterion per inventoried behavior; no compound collapses.
+- WebMCP bindings name only values that exist on the page. A chrome-only
+  Filter control does NOT justify a filter binding.
 
-## Step 6 — Package and validate
+## Stage 7 — Register and package
 
-Hand off to `create-task` steps 2–6 (register in TASK_SPECS + schemas,
-package, capture/install screenshots, unit + schema validation, luna smoke
-run). Final check unique to this skill: diff the packaged instruction against
-`INVENTORY.md` — every inventory line must be traceable to an instruction
-line, a chrome-only line, or an explicit "absent" entry in the PRD.
+Per `create-task`: add the slug to `TASK_SPECS` mirroring the existing entry
+archetype (source, house-style description "<Brand> <domain> good-app eval.",
+modules, bindings, mechanics_exclusions), plus `schemas/webmcp-task-sources.json`
+and `schemas/webmcp-assignments.json`. Package ONLY the new slug (call
+`package_task(slug, spec)` directly — full `main()` requires every archived
+authoring source). Check `copy_solution_app`/`should_skip` so INVENTORY.md,
+README.md, and rubric/checklist files stay out of `solution/app`.
+
+Growing the corpus breaks count assertions: update
+`test_assignment_map_covers_23`-style hard counts in
+`scripts/tests/test_webmcp_h3.py`.
+
+## Stage 8 — Screenshots + validation
+
+```bash
+node scripts/capture_reference_screenshots.mjs <slug>       # must be OK consoleErr=0 pageErr=0
+python3 scripts/install_reference_screenshots.py <slug>
+python3 -m unittest scripts.tests.test_webmcp_h3            # from repo root
+python3 scripts/regen_dimension_tomls.py <slug>             # must be ok
+cd ~/harbor && uv run python -c "import tomllib; from harbor.models.task.config import TaskConfig; TaskConfig.model_validate(tomllib.load(open('<abs task.toml>','rb'))); print('ok')"
+```
+
+Screenshots now show the working oracle — they double as the builder's visual
+reference and the oracle's rendered proof.
+
+## Stage 9 — Traceability + smoke
+
+- Diff INVENTORY.md against the packaged instruction: every line traceable to
+  an instruction line, a chrome-only line, or a PRD "absent" entry. Report any
+  orphans.
+- Smoke-score the oracle with the dev tier
+  (`REWARDKIT_MODEL=gpt-5.6-luna`, `harbor score` from the ~/harbor fork —
+  see `create-task`). The oracle should score near-ceiling; hand-adjudicate
+  every failed criterion against the running app before blaming rubric or
+  judge — a failed criterion here means either an oracle bug or a rubric bug,
+  and both must be fixed before the task ships.
