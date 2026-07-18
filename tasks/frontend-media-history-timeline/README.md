@@ -1,59 +1,39 @@
-# MediaHistoryTimeline — Product Requirements Document
+# Media History Timeline
 
-## Product
+Media history timeline explorer variant.
 
-**MediaHistoryTimeline** is a frontend-only interactive timeline explorer for the history of media and communication (writing systems → print → telecom → broadcast → networked platforms).
+A frontend-only Harbor eval task. A builder agent recreates the application
+described in `instruction.md` (an observable-behavior PRD for an opaque
+reference app), delivering a self-contained SPA in `/app` with npm scripts
+named exactly `start` (serves on port 3000) and `verify:build`, plus the
+in-page WebMCP tool surface defined by the instruction's action contract.
 
-## Goals
+## Judging
 
-- Scrub a multi-millennium year window and discover dense milestone events.
-- Filter/search without leaving the page.
-- Preserve timeline interaction feel: pan, zoom, dual-handle range, hover labels, detail panel.
-- Run locally via static files with no backend.
+The verifier serves the built app and grades it in a real browser across
+four weighted dimensions — core_features, technical, visual_design, motion
+— with `pass` at reward >= 0.7. The judge observes via Playwright MCP and
+drives state-changing setup through the app's registered WebMCP tools (a
+task-local CDP bridge in `tests/mcp/`). Criteria live in
+`tests/<dimension>/<dimension>.toml`.
 
-## Non-goals
-
-- No Mapbox/globe, analytics, or outbound navigational links.
-- Not a scholarly corpus; event text is illustrative.
-- No authentication, database, or CMS.
-
-## Structure
-
-```
-MediaHistoryTimeline/
-  index.html
-  css/styles.css
-  js/data.js
-  js/app.js
-  assets/favicon.svg
-  README.md
-```
-
-## Visual contract
-
-| Token | Value |
-| --- | --- |
-| Product name | `MediaHistoryTimeline` |
-| Tagline | History of Media & Communication |
-| Display | Fraunces |
-| Body | Sora |
-| Accent | Teal `#0d7c8f` with warm `#c45c26` |
-
-## Interactions
-
-1. Timeline stage with canvas axis and event pins
-2. Pointer pan; wheel zoom; Shift+wheel scrub
-3. Dual-handle year scrubber with BCE/CE readout
-4. Category filters, search, year fields
-5. Detail panel with Previous/Next and ←/→; Escape closes
-6. About modal (no external links)
-7. Empty state when filters yield zero events
-8. Reduced-motion CSS respect
-
-## Local verify
+## Running
 
 ```bash
-cd variants/MediaHistoryTimeline
-python3 -m http.server 9309
-# open http://127.0.0.1:9309/
+# full trial (builder + verifier); needs CLAUDE_CODE_OAUTH_TOKEN + OPENAI_API_KEY
+harbor run -p tasks/frontend-media-history-timeline -a claude-code -m sonnet
+
+# re-score an existing trial (harbor fork at ~/harbor)
+cd ~/harbor && uv run harbor score <trial-dir> --task <abs-path-to>/tasks/frontend-media-history-timeline \
+  --label rescore --action append
 ```
+
+Set `REWARDKIT_MODEL=gpt-5.6-luna` in the environment for cheap dev-tier
+judging; production uses the toml default.
+
+## Layout
+
+- `instruction.md` — the builder's complete specification
+- `environment/` — container image + reference screenshots shown to the builder
+- `solution/` — working oracle app + `solve.sh` (verifier-side only)
+- `tests/` — verifier entrypoint, judge prompt, dimension rubrics, WebMCP bridge

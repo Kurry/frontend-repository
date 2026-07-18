@@ -1,24 +1,39 @@
 # Admin Analytics Dashboard
 
-Clean-room rebuild of the Pineapple Tech commerce operations dashboard (DaisyUI drawer shell).
+Commerce ops admin analytics dashboard variant.
 
-## Stack
+A frontend-only Harbor eval task. A builder agent recreates the application
+described in `instruction.md` (an observable-behavior PRD for an opaque
+reference app), delivering a self-contained SPA in `/app` with npm scripts
+named exactly `start` (serves on port 3000) and `verify:build`, plus the
+in-page WebMCP tool surface defined by the instruction's action contract.
 
-- DaisyUI 5 + Tailwind CSS 4 (CDN)
-- `@weblogin/trendchart-elements` charts (`tc-column`, `tc-pie`, `tc-line`)
-- `external-svg-loader` + local Heroicons SVGs
-- `theme-change` light/dark toggle
-- Authored `styles.css` / `app.js` (no compiled `tw-*` monolith)
+## Judging
 
-## Constraints
+The verifier serves the built app and grades it in a real browser across
+four weighted dimensions — core_features, technical, visual_design, motion
+— with `pass` at reward >= 0.7. The judge observes via Playwright MCP and
+drives state-changing setup through the app's registered WebMCP tools (a
+task-local CDP bridge in `tests/mcp/`). Criteria live in
+`tests/<dimension>/<dimension>.toml`.
 
-- Zero navigational `<a href>` — inert `button` controls only
-- Sidebar FOUC guard + scroll restore via `sessionStorage`
-- Normative copy/metrics match the source demo PRD
-
-## Serve
+## Running
 
 ```bash
-cd variants/AdminAnalyticsDashboard && python3 -m http.server 9301
-# open http://127.0.0.1:9301/
+# full trial (builder + verifier); needs CLAUDE_CODE_OAUTH_TOKEN + OPENAI_API_KEY
+harbor run -p tasks/frontend-admin-analytics-dashboard -a claude-code -m sonnet
+
+# re-score an existing trial (harbor fork at ~/harbor)
+cd ~/harbor && uv run harbor score <trial-dir> --task <abs-path-to>/tasks/frontend-admin-analytics-dashboard \
+  --label rescore --action append
 ```
+
+Set `REWARDKIT_MODEL=gpt-5.6-luna` in the environment for cheap dev-tier
+judging; production uses the toml default.
+
+## Layout
+
+- `instruction.md` — the builder's complete specification
+- `environment/` — container image + reference screenshots shown to the builder
+- `solution/` — working oracle app + `solve.sh` (verifier-side only)
+- `tests/` — verifier entrypoint, judge prompt, dimension rubrics, WebMCP bridge

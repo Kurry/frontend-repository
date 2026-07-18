@@ -1,41 +1,39 @@
-# TravelItineraryPlanner — PRD
+# Travel Itinerary Planner
 
-Clean-room static demo of a multi-day **French Riviera — Côte d'Azur** trip planner.
+French Riviera trip itinerary planner variant.
 
-## Goal
+A frontend-only Harbor eval task. A builder agent recreates the application
+described in `instruction.md` (an observable-behavior PRD for an opaque
+reference app), delivering a self-contained SPA in `/app` with npm scripts
+named exactly `start` (serves on port 3000) and `verify:build`, plus the
+in-page WebMCP tool surface defined by the instruction's action contract.
 
-Single-page itinerary planner with sidebar (Explore / Notes / Places / Budget + day list), plan body (hero, title, guides, recommended places, day sections), and a right map pane with place detail tabs (About / Book / Reviews / Photos / Mentions). Branding is generic **Trip** / **Travel Planner**.
+## Judging
 
-## Non-goals
+The verifier serves the built app and grades it in a real browser across
+four weighted dimensions — core_features, technical, visual_design, motion
+— with `pass` at reward >= 0.7. The judge observes via Playwright MCP and
+drives state-changing setup through the app's registered WebMCP tools (a
+task-local CDP bridge in `tests/mcp/`). Criteria live in
+`tests/<dimension>/<dimension>.toml`.
 
-No backend, auth, booking APIs, Google Maps JS API, chat widgets, analytics, or original host branding.
-
-## Hard constraints
-
-- Zero navigational `<a href>` elements; controls are `button.inert-nav` (or demo buttons) with toast feedback (`#capture-toast`).
-- No case-insensitive `wanderlog` substrings.
-- Local assets only for logo/favicon; Source Sans Pro via Google Fonts allowed.
-
-## Stack / layout
-
-| Path | Role |
-|---|---|
-| `index.html` | Page shell |
-| `css/styles.css` | Layout + polish |
-| `js/app.js` | Itinerary data, map pins, place detail, toast, inert nav |
-| `assets/logo.svg` / `favicon.svg` | Generic Trip marks |
-| `README.md` | This PRD |
-
-Serve:
+## Running
 
 ```bash
-cd variants/TravelItineraryPlanner && python3 -m http.server 9310
-# open http://127.0.0.1:9310/
+# full trial (builder + verifier); needs CLAUDE_CODE_OAUTH_TOKEN + OPENAI_API_KEY
+harbor run -p tasks/frontend-travel-itinerary-planner -a claude-code -m sonnet
+
+# re-score an existing trial (harbor fork at ~/harbor)
+cd ~/harbor && uv run harbor score <trial-dir> --task <abs-path-to>/tasks/frontend-travel-itinerary-planner \
+  --label rescore --action append
 ```
 
-## Acceptance
+Set `REWARDKIT_MODEL=gpt-5.6-luna` in the environment for cheap dev-tier
+judging; production uses the toml default.
 
-1. Page renders sidebar + plan + map on port 9310.
-2. Day nav / map pins / place rows open place detail; tabs switch content.
-3. Inert controls show toast; URL does not navigate away.
-4. French Riviera places (Nice, Monaco, Cannes, Antibes / Musée Picasso, Èze, Saint-Tropez, Menton) remain visible.
+## Layout
+
+- `instruction.md` — the builder's complete specification
+- `environment/` — container image + reference screenshots shown to the builder
+- `solution/` — working oracle app + `solve.sh` (verifier-side only)
+- `tests/` — verifier entrypoint, judge prompt, dimension rubrics, WebMCP bridge

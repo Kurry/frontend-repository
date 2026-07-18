@@ -1,6 +1,6 @@
-# Design Portfolio
+# L1 Network Marketing
 
-CLI terminal product designer portfolio good-app eval.
+Layer-1 blockchain network marketing site good-app eval.
 
 A frontend-only Harbor eval task. A builder agent recreates the application
 described in `instruction.md` (an observable-behavior PRD for an opaque
@@ -21,10 +21,10 @@ task-local CDP bridge in `tests/mcp/`). Criteria live in
 
 ```bash
 # full trial (builder + verifier); needs CLAUDE_CODE_OAUTH_TOKEN + OPENAI_API_KEY
-harbor run -p tasks/frontend-design-portfolio -a claude-code -m sonnet
+harbor run -p tasks/frontend-l1-network-marketing -a claude-code -m sonnet
 
 # re-score an existing trial (harbor fork at ~/harbor)
-cd ~/harbor && uv run harbor score <trial-dir> --task <abs-path-to>/tasks/frontend-design-portfolio \
+cd ~/harbor && uv run harbor score <trial-dir> --task <abs-path-to>/tasks/frontend-l1-network-marketing \
   --label rescore --action append
 ```
 

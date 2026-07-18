@@ -1,44 +1,39 @@
-# ExpenseBreakdownReports — PRD
+# Expense Breakdown Reports
 
-Clean-room rebuild of the Ledger personal-finance **Reports** demo (source: `FinanceReports/`). Sidebar + summary cards + sankey/pie toggle + transaction list. No SavePage/vendor capture reuse.
+Personal finance expense breakdown reports variant.
 
-## Goal
+A frontend-only Harbor eval task. A builder agent recreates the application
+described in `instruction.md` (an observable-behavior PRD for an opaque
+reference app), delivering a self-contained SPA in `/app` with npm scripts
+named exactly `start` (serves on port 3000) and `verify:build`, plus the
+in-page WebMCP tool surface defined by the instruction's action contract.
 
-Single-page reports UI branded **Ledger**. Users view income/expense metrics, switch **Breakdown** (sankey) vs **Trends** (pie), and browse sample transactions. All former outbound links are inert controls with demo toasts.
+## Judging
 
-## Non-goals
+The verifier serves the built app and grades it in a real browser across
+four weighted dimensions — core_features, technical, visual_design, motion
+— with `pass` at reward >= 0.7. The judge observes via Playwright MCP and
+drives state-changing setup through the app's registered WebMCP tools (a
+task-local CDP bridge in `tests/mcp/`). Criteria live in
+`tests/<dimension>/<dimension>.toml`.
 
-- No backend, auth, bank linking, or live APIs
-- No Monarch / original-brand restoration
-- No edits to `FinanceReports/` or sibling variants
-
-## Hard constraints
-
-- Zero navigational `<a href>` elements
-- Inert controls use `<button type="button">` (class `inert-nav` or `data-demo-action`)
-- Synthetic demo data only (Alex Rivera, Northwind Labs, generic payees)
-- Title: `Ledger | Reports`
-
-## Stack & layout
-
-| Path | Role |
-|---|---|
-| `index.html` | Page shell |
-| `css/styles.css` | Layout + chrome |
-| `js/app.js` | Tabs, sankey SVG, Chart.js pie, toasts, tx table |
-| `assets/logo.svg` / `favicon.svg` | Ledger marks |
-
-CDN: Chart.js 4 for Trends doughnut.
-
-## Serve
+## Running
 
 ```bash
-cd variants/ExpenseBreakdownReports && python3 -m http.server 9311
-# open http://127.0.0.1:9311/
+# full trial (builder + verifier); needs CLAUDE_CODE_OAUTH_TOKEN + OPENAI_API_KEY
+harbor run -p tasks/frontend-expense-breakdown-reports -a claude-code -m sonnet
+
+# re-score an existing trial (harbor fork at ~/harbor)
+cd ~/harbor && uv run harbor score <trial-dir> --task <abs-path-to>/tasks/frontend-expense-breakdown-reports \
+  --label rescore --action append
 ```
 
-## Acceptance
+Set `REWARDKIT_MODEL=gpt-5.6-luna` in the environment for cheap dev-tier
+judging; production uses the toml default.
 
-- Breakdown sankey + Trends pie toggle works
-- Filters/Save/Sort/Columns/Export/sidebar show demo toasts and do not navigate
-- Summary cards and transactions show synthetic amounts/labels
+## Layout
+
+- `instruction.md` — the builder's complete specification
+- `environment/` — container image + reference screenshots shown to the builder
+- `solution/` — working oracle app + `solve.sh` (verifier-side only)
+- `tests/` — verifier entrypoint, judge prompt, dimension rubrics, WebMCP bridge

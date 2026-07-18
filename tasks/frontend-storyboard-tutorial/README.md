@@ -1,45 +1,39 @@
-# StoryboardTutorial — Product Requirements Document (PRD)
+# Storyboard Tutorial
 
-Clean-room rebuild of the StoryDocs getting-started storyboard tutorial UI.
+Storyboard getting-started tutorial variant.
 
-## Goal
+A frontend-only Harbor eval task. A builder agent recreates the application
+described in `instruction.md` (an observable-behavior PRD for an opaque
+reference app), delivering a self-contained SPA in `/app` with npm scripts
+named exactly `start` (serves on port 3000) and `verify:build`, plus the
+in-page WebMCP tool surface defined by the instruction's action contract.
 
-Single-page storyboard getting-started guide with:
+## Judging
 
-1. Product header (generic mark, **Demo Projects**, **1. Getting Started**)
-2. Grid of tutorial scenes (8 imaged + placeholders + Add Scene)
-3. Tile / List / Slide view modes
-4. Debranded Docs copy (no product brand strings)
+The verifier serves the built app and grades it in a real browser across
+four weighted dimensions — core_features, technical, visual_design, motion
+— with `pass` at reward >= 0.7. The judge observes via Playwright MCP and
+drives state-changing setup through the app's registered WebMCP tools (a
+task-local CDP bridge in `tests/mcp/`). Criteria live in
+`tests/<dimension>/<dimension>.toml`.
 
-## Hard constraints
-
-- Zero navigational `<a href>` elements
-- Resource loads only: `./assets/app.css`, `./assets/app.js`, `./assets/favicon.svg`, `./assets/scenes/scene-0N.webp`, fonts under `./assets/fonts/`
-- Inert controls use `button.inert-nav`; clicks toast “demo only”
-- Title: **1. Getting Started — Docs**; welcome line: **Welcome to Docs!**
-
-## File layout
-
-| Path | Role |
-|---|---|
-| `index.html` | Page shell + storyboard DOM |
-| `assets/app.css` | Authored layout, chrome, polish |
-| `assets/app.js` | Toast, view modes, description focus, enter motion |
-| `assets/scenes/scene-01.webp` … `scene-08.webp` | Instructional thumbnails |
-| `assets/fonts/gabarito-400.woff2` (+ ext) | Gabarito |
-| `assets/favicon.svg` | Generic clapperboard-style mark |
-
-## Serve
+## Running
 
 ```bash
-cd variants/StoryboardTutorial && python3 -m http.server 9307
-# open http://127.0.0.1:9307/
+# full trial (builder + verifier); needs CLAUDE_CODE_OAUTH_TOKEN + OPENAI_API_KEY
+harbor run -p tasks/frontend-storyboard-tutorial -a claude-code -m sonnet
+
+# re-score an existing trial (harbor fork at ~/harbor)
+cd ~/harbor && uv run harbor score <trial-dir> --task <abs-path-to>/tasks/frontend-storyboard-tutorial \
+  --label rescore --action append
 ```
 
-## Acceptance
+Set `REWARDKIT_MODEL=gpt-5.6-luna` in the environment for cheap dev-tier
+judging; production uses the toml default.
 
-- [ ] Title **1. Getting Started — Docs**
-- [ ] No navigational `<a href>`; no StoryBoom strings
-- [ ] Eight scene images render; generic logo mark
-- [ ] Tile / List / Slide toggles; toast on inert controls
-- [ ] Scene hover lift; description editing affordance
+## Layout
+
+- `instruction.md` — the builder's complete specification
+- `environment/` — container image + reference screenshots shown to the builder
+- `solution/` — working oracle app + `solve.sh` (verifier-side only)
+- `tests/` — verifier entrypoint, judge prompt, dimension rubrics, WebMCP bridge

@@ -1,33 +1,39 @@
-# CSS Theme Builder — PRD
+# Css Theme Builder
 
-Single-page theme builder (clean-room rebuild of the DaisyUI theme-generator demo).
+CSS theme builder variant.
 
-## Goal
+A frontend-only Harbor eval task. A builder agent recreates the application
+described in `instruction.md` (an observable-behavior PRD for an opaque
+reference app), delivering a self-contained SPA in `/app` with npm scripts
+named exactly `start` (serves on port 3000) and `verify:build`, plus the
+in-page WebMCP tool surface defined by the instruction's action contract.
 
-Edit semantic color/radius/depth/noise/size tokens, preview DaisyUI components live, export theme CSS, and share via compressed `#theme=` URL hash.
+## Judging
 
-## Stack
+The verifier serves the built app and grades it in a real browser across
+four weighted dimensions — core_features, technical, visual_design, motion
+— with `pass` at reward >= 0.7. The judge observes via Playwright MCP and
+drives state-changing setup through the app's registered WebMCP tools (a
+task-local CDP bridge in `tests/mcp/`). Criteria live in
+`tests/<dimension>/<dimension>.toml`.
 
-- `index.html` + `css/app.css` + `js/*`
-- DaisyUI 5 + Tailwind browser CDN
-- pako (zlib) for `#theme=` encode/decode
+## Running
+
+```bash
+# full trial (builder + verifier); needs CLAUDE_CODE_OAUTH_TOKEN + OPENAI_API_KEY
+harbor run -p tasks/frontend-css-theme-builder -a claude-code -m sonnet
+
+# re-score an existing trial (harbor fork at ~/harbor)
+cd ~/harbor && uv run harbor score <trial-dir> --task <abs-path-to>/tasks/frontend-css-theme-builder \
+  --label rescore --action append
+```
+
+Set `REWARDKIT_MODEL=gpt-5.6-luna` in the environment for cheap dev-tier
+judging; production uses the toml default.
 
 ## Layout
 
-1. Chrome: announce strip, brand, version/theme/language dropdowns (inert / no navigation)
-2. Left: hold-to-add, My themes, Built-in themes (35)
-3. Center: name, Random, CSS export, color/radius/effects/sizes/options
-4. Right: Components Demo / Component Variants / Color Palette
-
-## Contracts
-
-- Hash: JSON → UTF-8 → zlib deflate → URL-safe Base64 (no padding) → `#theme=<payload>`
-- localStorage: `gen-themes-0.2`, `gen-theme-id`, `theme`
-- Zero navigational `<a href>` after load; same-document `#theme=` allowed
-
-## Serve
-
-```bash
-cd variants/CssThemeBuilder && python3 -m http.server 9302
-# http://127.0.0.1:9302/
-```
+- `instruction.md` — the builder's complete specification
+- `environment/` — container image + reference screenshots shown to the builder
+- `solution/` — working oracle app + `solve.sh` (verifier-side only)
+- `tests/` — verifier entrypoint, judge prompt, dimension rubrics, WebMCP bridge
