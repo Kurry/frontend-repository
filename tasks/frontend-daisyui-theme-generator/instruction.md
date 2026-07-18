@@ -2,23 +2,45 @@
 Build a daisyUI theme generator using Svelte, Svelte stores, and Tailwind CSS.
 </summary>
 
+<reference_screenshots>
+Screenshots of the reference application are provided in-container at
+`/reference-screenshots/`: `overview.png` is a full-page desktop-layout
+overview (downscaled); `segment-NN.png` are full-resolution 1440x900 sections
+in top-to-bottom order with slight overlap. They are part of this instruction:
+recreate what they show. Where a screenshot and the text conflict, the text
+wins. Do not copy the images into `/app` or ship them as app assets.
+</reference_screenshots>
+
 <core_features>
-Core features:
-- Site chrome: announce strip, brand mark, version control, theme picker, language control, and stars control — interactive in appearance but must not navigate away
-- Themes sidebar with press-and-hold Hold to add theme (~3s progress fill), My themes list (primary collection), and a full built-in theme catalog (~35 presets with 4-swatch previews; selecting a preset applies name + tokens + preview)
-- Primary collection — custom/saved themes: create (hold-to-add or New), edit (name + tokens), and delete/remove custom themes; built-ins cannot be removed; editing a built-in forks a custom copy
-- Theme editor with required anatomy: name field, Random, CSS export, Change Colors (base + semantic face/content swatches with live pickers), Radius (box / field / selector), Effects (Depth / Noise), Sizes (field / selector scales + border width), and Options (default / default dark / dark color scheme; Remove / Reset as applicable)
-- At least two interaction modes: Editor/Generator mode (token controls) and Live Preview mode with tabs Components Demo, Component Variants, and Color Palette — re-themes immediately as tokens change
-- Domain behavior beyond CRUD: active theme selection, Random token mutation, live preview re-theme, CSS export copy confirmation, shareable compressed hash theme payload encode/decode, empty My themes state after removing all custom themes while built-ins remain
-- Invalid create: empty or whitespace-only theme name must not add a custom theme; show visible validation feedback
-- Zero real navigation after settle — same-document hash theme payload allowed; chrome anchors become inert buttons after hydration
+Core features (each line is an observable behavior the finished app must exhibit):
+- The top site chrome renders a daisyUI brand wordmark, a version control reading 5.6.18, a GitHub-stars control reading ~41k, a theme picker, a language control, and an announcement strip reading "daisyUI v5.6 is now available!"; each looks interactive but clicking it never navigates away from the page
+- Clicking the version, theme, or language chrome control opens its dropdown in place without leaving the page; clicking the brand wordmark or stars control performs no navigation
+- The left Themes panel lists exactly 35 built-in daisyUI themes (light, dark, cupcake, bumblebee, emerald, corporate, synthwave, retro, cyberpunk, valentine, halloween, garden, forest, aqua, lofi, pastel, fantasy, wireframe, black, luxury, dracula, cmyk, autumn, business, acid, lemonade, night, coffee, winter, dim, nord, sunset, caramellatte, abyss, silk), each row showing a four-swatch color preview beside its name
+- Selecting any built-in theme row highlights it as the active theme and applies its name plus color / radius / size tokens to the editor and live preview without a page reload
+- A "Hold to add theme" control requires a press-and-hold (~3s) that fills a visible inset progress indicator; completing the hold adds a new theme to My themes and selects it, while releasing early cancels and adds nothing
+- The My themes list holds user-created themes; each can be renamed and token-edited, and removed via a Remove control; built-in themes cannot be removed, and editing a built-in forks an editable custom copy into My themes
+- Submitting a custom-theme create with an empty or whitespace-only name does not increase the My themes count and shows visible validation feedback
+- Removing every custom theme leaves My themes showing an empty state while all 35 built-ins stay listed
+- The editor Name field (placeholder "mytheme") renames the active theme and updates its label live in the My themes list and preview
+- The Change Colors section exposes base tokens (--color-base-100 / -200 / -300 and --color-base-content) plus eight semantic face/content pairs — primary, secondary, accent, neutral, info, success, warning, error; opening a swatch picker and choosing a color updates the matching CSS variable and immediately recolors the live preview
+- The Radius controls set --radius-box (card / modal / alert), --radius-field (button / input / select / tab), and --radius-selector (checkbox / toggle / badge), each chosen from 0rem / 0.25rem / 0.5rem / 1rem / 2rem, and changing one restyles the corresponding preview components' corners
+- The Depth (--depth 0/1) and Noise (--noise 0/1) toggles switch a 3D depth and a noise texture on fields and selectors in the preview
+- The Sizes controls set --size-field and --size-selector on an xs / sm / md / lg / xl scale plus a --border border-width, and changing them resizes or re-borders the preview's fields and selectors
+- The Options section toggles Default theme, Default dark theme, and Dark color scheme, and a Reset control reverts token edits on the active theme
+- Clicking Random mutates the active theme's tokens to new values and re-themes the live preview
+- The live preview offers three tabs switched by a segmented control without reload — Components Demo (default), Component Variants, and Color Palette; Components Demo renders a dense composition (filter tags, a calendar with events, tabs, a range slider, a product card, search, a registration form, stats, radial progress, recent orders, chat bubbles, a mock terminal, and pricing)
+- Any color, radius, effect, or size edit re-themes the visible preview immediately within whichever tab is active
+- Clicking CSS opens/exports the active theme's CSS whose declarations reflect the current color / radius / size / effect tokens, and a Copy-to-clipboard action shows a brief copied confirmation before resetting
+- The theme serializes into a same-document #theme= URL hash (compressed, URL-safe) that updates as the theme is edited; loading a page whose hash contains theme= decodes it and applies that name plus tokens to the editor and preview without reload
+- After hydration/settle the interactive document contains zero navigational outbound anchors; chrome links behave as inert buttons and only same-document #theme= hash updates are allowed
 </core_features>
 
 <visual_design>
 - Dense tool-studio composition: sticky top navbar chrome above a three-panel workspace (themes | editor | live preview) — not a marketing landing or equal-width card stack
 - Desktop layout: left themes (~14rem) / center editor (~17rem) / right live preview fills remaining width; stacks toward one column on smaller viewports
-- Surfaces driven by active data-theme / theme tokens; preview demos use cards, stats, forms, chat, mockups, radial-progress, and palette grids
+- Surfaces driven by active data-theme / theme tokens; the Components Demo preview packs cards, stats, a registration form, a calendar with events, chat bubbles, a product card, a range slider, radial progress, recent orders, a mock terminal, and pricing, while Color Palette renders a token swatch grid
 - Typography: Outfit (or equivalent) for chrome; preview text follows the active theme
+- The center editor is a dense stack: a Name field (placeholder "mytheme"), a base-plus-eight-pair color swatch grid, radius icon-button rows, xs / sm / md / lg / xl size selectors, Depth/Noise toggles, and Random / CSS actions — not a sparse form
 - Theme rows show four-swatch chips; radius/size/effect controls use compact icon/toggle selection states; Hold-to-add shows a visible inset progress fill
 - Version / theme / language dropdowns open in the top chrome without leaving the page
 </visual_design>
@@ -27,6 +49,7 @@ Core features:
 - Hold-to-add: press-and-hold Hold to add theme for ~3s with a visible progress fill; early release cancels; success adds a custom theme with brief enter feedback
 - New theme enter: the newly added My themes row pops in (brief scale/fade)
 - Random: each click advances the Random control icon with a short rotate ease
+- Editing controls animate their selected state: opening a color swatch reveals its picker, radius icon buttons and xs–xl size selectors snap to an active fill/border, and Depth/Noise toggles slide between on/off
 - Live preview: preview chrome/background colors ease across token and tab changes so re-theming reads as a smooth shift
 - Hover animations (required): announce strip and chrome controls take short color/background transitions on hover; theme-list rows and swatch chips show hover wash; buttons and radius/size selectors change fill/border with ~0.15–0.2s ease; dropdown menus open with brief opacity/scale; focus-visible outlines on interactive controls
 - CSS export Copy to clipboard shows a short copied confirmation before resetting
@@ -39,20 +62,25 @@ State contracts (behavioral, not storage keys):
 - Editing name or tokens updates that same theme everywhere (list swatches, editor, live preview)
 - Deleting/removing a custom theme removes it from My themes and from active selection if it was active
 - Selecting a built-in or custom theme applies tokens to preview without reload; editing a built-in forks a custom copy
+- Editing any color/radius/effect/size control updates the corresponding CSS variable and re-themes the live preview from shared state; the CSS export text reflects the current tokens
+- Loading a page whose URL hash contains theme= decodes the payload and applies that name + tokens to the editor and preview
 - Preview tab switches and Random mutate shared state; they do not invent a disconnected theme copy
 Stack: Svelte + Svelte stores + Tailwind CSS (SvelteKit or Vite). DaisyUI / Tailwind theme tokens are allowed for data-theme and CSS variables. No additional external component libraries beyond DaisyUI (Google Fonts CDN for chrome typefaces is allowed).
-- Built-in themes seeded so first load is non-empty; document title reflects daisyUI and Tailwind CSS theme generator
+- All 35 built-in themes seeded so the Themes panel is non-empty on first load; document title reflects daisyUI and Tailwind CSS theme generator
 - Empty required theme name on create must not increase custom themes count; show visible validation feedback
 - After removing all custom themes, My themes shows an empty state while built-ins remain
 - Zero navigational outbound links after settle; same-document hash theme payload allowed
 - Three-panel desktop workspace MUST remain (themes / editor / preview)
 </requirements>
 
-## Delivery and integrity
+<integrity>
+- Work only from this instruction and `/app`; do not use `/solution`, `/tests`, or verifier artifacts.
+</integrity>
 
-- Integrity: work only from this instruction and `/app`; do not use `/solution`, `/tests`, or verifier artifacts.
-- Delivery: produce an original self-contained app in `/app`; scaffold under `/app` as needed for the stack in `<summary>`; run `npm start` on port 3000; do not iframe, proxy, or fetch the product from another origin.
-- WebMCP: required delivery step, not a scoring criterion; implement exactly the `<webmcp_action_contract>` below; register tools yourself from `<module_spec>` + Bindings using the same handlers as the visible UI; honor mechanics exclusions; optional self-test via `webmcp_session_info` / `webmcp_list_tools` / `webmcp_invoke_tool` only.
+<delivery>
+- Produce an original self-contained app in `/app`; scaffold under `/app` as needed for the stack in `<summary>`; `/app/package.json` MUST define npm scripts named exactly `start` (serves the app on port 3000) and `verify:build` (exits 0 when the app entry/build is present and succeeds); run via `npm start` on port 3000; do not iframe, proxy, or fetch the product from another origin.
+- WebMCP is a required delivery step, not a scoring criterion; implement exactly the `<webmcp_action_contract>` below; register tools yourself from `<module_spec>` + Bindings using the same handlers as the visible UI; honor mechanics exclusions; optional self-test via `webmcp_session_info` / `webmcp_list_tools` / `webmcp_invoke_tool` only.
+</delivery>
 
 <webmcp_action_contract>
 Contract version: zto-webmcp-v1

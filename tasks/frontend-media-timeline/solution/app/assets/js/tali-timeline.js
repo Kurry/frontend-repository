@@ -2645,13 +2645,13 @@ class App {
       const fps = 60; // פריימים לשנייה
       const frame = (sec) => Math.round(fps * sec); // פונקציית עזר
     
-      const animation = lottie.loadAnimation({
+      const animation = ( 'lottie' in window ) ? lottie.loadAnimation({
         container: document.getElementById('lottie-logo'),
         renderer: 'svg',
         loop: false,
         autoplay: false,
         path: rootUrl + '/assets/data/' + (document.documentElement.dir === 'ltr' ? 'English_Logo.json' : 'tali-logo.json')
-      });
+      }) : null;
 
       $(document).on("mouseover", ".remove-bookmark", function (e) {
         const $btn = $(this);
@@ -2670,7 +2670,7 @@ class App {
       $(document).on("mouseout", ".remove-bookmark", () => {
         $(".remove-bookmark-hover").removeClass('show-remove-bookmark-hover');
       });
-      animation.addEventListener('DOMLoaded', function () {
+      if (animation) animation.addEventListener('DOMLoaded', function () {
         animation.setSpeed(1.8);
         const introStart = frame(0);
         const introEnd = frame(4);        // שניות 0–4

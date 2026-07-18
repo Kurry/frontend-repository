@@ -2,11 +2,20 @@
 Build a camera exposure control lab using Vue 3, Pinia, and Tailwind CSS.
 </summary>
 
+<reference_screenshots>
+Screenshots of the reference application are provided in-container at
+`/reference-screenshots/`: `overview.png` is a full-page desktop-layout
+overview (downscaled); `segment-NN.png` are full-resolution 1440x900 sections
+in top-to-bottom order with slight overlap. They are part of this instruction:
+recreate what they show. Where a screenshot and the text conflict, the text
+wins. Do not copy the images into `/app` or ship them as app assets.
+</reference_screenshots>
+
 <core_features>
 Core features:
 - Direct simulator entry: full-viewport photo preview with overlaid dials — no login, admin gate, or multi-page shell
-- Three steppers with discrete stop lists and live dial labels: APERTURE (f/N), SPEED (1/N), ISO (integer)
-- Live preview stack updates together on each step: container brightness, depth-of-field blur on depth plate + motion stack, shutter motion-frame opacity swap (10 local frames), tiled ISO noise overlay opacity, and vertical exposure meter indicator
+- Three up/down steppers over discrete stop lists with live dial labels: APERTURE f/N, SPEED 1/N, ISO integer; the APERTURE up control narrows the aperture (raises the f-number) while its down control widens it, and each dial value updates the instant a stepper is pressed
+- Live preview stack updates together on each step: the whole preview brightens as the aperture widens, the shutter slows, or ISO rises (and darkens for the opposite moves); depth-of-field blur increases as the aperture widens (lower f-number), softening both the depth plate and the motion stack; the visible motion frame swaps to the one matching the current shutter stop (10 local frames, one per shutter stop); the tiled ISO noise overlay grows more opaque as ISO climbs; and the vertical exposure meter dot climbs toward OVER EXPOSED when overexposed and drops toward UNDER EXPOSED when underexposed, clamping within the track at the extremes
 - Primary collection — saved exposure presets/looks: seed at least 6 presets; each has name, aperture, shutter, ISO, and a note or look tag; the list supports create, edit, and delete
 - At least two interaction modes: Meter/Lab mode (live dials + meter on the preview) and Presets/Compare mode (browse saved looks, apply a preset to the dials, optional side-by-side compare of two presets)
 - Domain behavior beyond CRUD: apply preset to dials; mark a preset as favorite; filter presets by look tag or favorites; exposure meter position derived from current stops; empty presets list state
@@ -14,7 +23,7 @@ Core features:
 - At each stop-list edge, the corresponding up/down stepper fades out and becomes non-interactive
 - Invalid create: empty preset name must not add a row; show visible validation feedback
 - Inert brand chip label Camera Exposure Simulator (not a link)
-- Default stops: aperture 22…1.8 (default 16), shutter 2…1000 as 1/N (default 60), ISO 50…3200 (default 100)
+- Default stops (exact discrete lists): aperture f/22, 16, 11, 8, 5.6, 4, 2.8, 1.8 (8 stops, default f/16); shutter 1/2, 1/4, 1/8, 1/15, 1/30, 1/60, 1/125, 1/250, 1/500, 1/1000 (10 stops, default 1/60); ISO 50, 100, 200, 400, 800, 1600, 3200 (7 stops, default 100)
 </core_features>
 
 <visual_design>
@@ -51,11 +60,14 @@ Stack: Vue 3 + Pinia + Tailwind CSS (Vite or equivalent SPA). No external compon
 - All imagery loads from local assets; document title: Camera Exposure Simulator
 </requirements>
 
-## Delivery and integrity
+<integrity>
+- Work only from this instruction and `/app`; do not use `/solution`, `/tests`, or verifier artifacts.
+</integrity>
 
-- Integrity: work only from this instruction and `/app`; do not use `/solution`, `/tests`, or verifier artifacts.
-- Delivery: produce an original self-contained app in `/app`; scaffold under `/app` as needed for the stack in `<summary>`; run `npm start` on port 3000; do not iframe, proxy, or fetch the product from another origin.
-- WebMCP: required delivery step, not a scoring criterion; implement exactly the `<webmcp_action_contract>` below; register tools yourself from `<module_spec>` + Bindings using the same handlers as the visible UI; honor mechanics exclusions; optional self-test via `webmcp_session_info` / `webmcp_list_tools` / `webmcp_invoke_tool` only.
+<delivery>
+- Produce an original self-contained app in `/app`; scaffold under `/app` as needed for the stack in `<summary>`; `/app/package.json` MUST define npm scripts named exactly `start` (serves the app on port 3000) and `verify:build` (exits 0 when the app entry/build is present and succeeds); run via `npm start` on port 3000; do not iframe, proxy, or fetch the product from another origin.
+- WebMCP is a required delivery step, not a scoring criterion; implement exactly the `<webmcp_action_contract>` below; register tools yourself from `<module_spec>` + Bindings using the same handlers as the visible UI; honor mechanics exclusions; optional self-test via `webmcp_session_info` / `webmcp_list_tools` / `webmcp_invoke_tool` only.
+</delivery>
 
 <webmcp_action_contract>
 Contract version: zto-webmcp-v1

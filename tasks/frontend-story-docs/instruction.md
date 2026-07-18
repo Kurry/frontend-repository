@@ -2,21 +2,33 @@
 Build a storyboard getting-started tutorial using React, Jotai, and Tailwind CSS.
 </summary>
 
+<reference_screenshots>
+Screenshots of the reference application are provided in-container at
+`/reference-screenshots/`: `overview.png` is a full-page desktop-layout
+overview (downscaled); `segment-NN.png` are full-resolution 1440x900 sections
+in top-to-bottom order with slight overlap. They are part of this instruction:
+recreate what they show. Where a screenshot and the text conflict, the text
+wins. Do not copy the images into `/app` or ship them as app assets.
+</reference_screenshots>
+
 <core_features>
 Core features:
-- Direct tutorial entry — first load opens the storyboard workspace (header + scene grid); no login or admin gate
-- Product header — logo mark, project label (Demo Projects), storyboard title (1. Getting Started), kebab menu, and inert utility tools
-- Primary collection — scenes/frames: seed at least 8 imaged scenes; each has number, title/description, image, and optional camera note; the list supports create (Add Scene), edit (description/title), and delete
+- Direct tutorial entry — first load opens the storyboard workspace (header + left storyboard nav + scene grid); no login or admin gate
+- Product header — logo mark, project label (Demo Projects), storyboard title (1. Getting Started), kebab menu, and inert utility tools (notifications bell, dashboard, account) that toast demo only instead of navigating
+- Left sidebar — a storyboard list showing the active Getting Started row plus sibling demo storyboards, an Add Storyboard control, and a footer Help control; every row is inert and toasts demo only on click
+- Primary collection — scenes/frames: seed at least 8 imaged scenes; each has a number, title/description, image, an optional camera note, and a per-scene kebab menu (edit/delete actions); the list supports create (Add Scene), edit (description/title), and delete
+- Scene copy teaches the product itself: header tools, notifications, view modes, scene menus, and add-scene flows
 - At least two interaction modes: Board mode (Tile / List layouts of the scene set) and Tutorial/Slide mode (single centered active scene with prev/next)
 - Domain behavior beyond CRUD: Tile/List/Slide view toggles; reorder or renumber after delete; empty board state; description focus/edit affordance; drawers for notifications/account may remain demo chrome
 - Invalid create: empty scene title/description when required must not add a scene; show visible validation feedback
-- Inert chrome — non-navigational controls toast demo only instead of leaving the page
+- Inert chrome — every non-navigational control toasts demo only instead of leaving the page; zero outbound navigation
 - Right drawers for notifications and account/storyboards may remain as demo chrome with seeded rows
 </core_features>
 
 <visual_design>
 - Light workspace with Gabarito UI type and yellow accent
 - Top header: logo mark, Demo Projects + 1. Getting Started titles, kebab menu, utility tools
+- Left storyboard sidebar listing the current and sibling storyboards with an Add Storyboard control and a footer Help control
 - Storyboard nav bar with Tile / List / Slide toggles; scene cards in a multi-column grid
 - Welcome line Welcome to Docs!; product chrome density of a docs/storyboard app — not a marketing landing
 - Empty board state is visually clear when no scenes remain
@@ -45,11 +57,14 @@ Stack: React + Jotai + Tailwind CSS (Vite or equivalent SPA); frontend-only. Loc
 - Document title 1. Getting Started — Docs; welcome line Welcome to Docs!
 </requirements>
 
-## Delivery and integrity
+<integrity>
+- Work only from this instruction and `/app`; do not use `/solution`, `/tests`, or verifier artifacts.
+</integrity>
 
-- Integrity: work only from this instruction and `/app`; do not use `/solution`, `/tests`, or verifier artifacts.
-- Delivery: produce an original self-contained app in `/app`; scaffold under `/app` as needed for the stack in `<summary>`; run `npm start` on port 3000; do not iframe, proxy, or fetch the product from another origin.
-- WebMCP: required delivery step, not a scoring criterion; implement exactly the `<webmcp_action_contract>` below; register tools yourself from `<module_spec>` + Bindings using the same handlers as the visible UI; honor mechanics exclusions; optional self-test via `webmcp_session_info` / `webmcp_list_tools` / `webmcp_invoke_tool` only.
+<delivery>
+- Produce an original self-contained app in `/app`; scaffold under `/app` as needed for the stack in `<summary>`; `/app/package.json` MUST define npm scripts named exactly `start` (serves the app on port 3000) and `verify:build` (exits 0 when the app entry/build is present and succeeds); run via `npm start` on port 3000; do not iframe, proxy, or fetch the product from another origin.
+- WebMCP is a required delivery step, not a scoring criterion; implement exactly the `<webmcp_action_contract>` below; register tools yourself from `<module_spec>` + Bindings using the same handlers as the visible UI; honor mechanics exclusions; optional self-test via `webmcp_session_info` / `webmcp_list_tools` / `webmcp_invoke_tool` only.
+</delivery>
 
 <webmcp_action_contract>
 Contract version: zto-webmcp-v1

@@ -1,29 +1,17 @@
 [judge]
-judge = "claude-code"
+judge = "codex"
+model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
 cwd = "/app"
 mode = "batched"
 timeout = 3000
 
 [[judge.mcp_servers]]
-name = "stagehand-webmcp"
+name = "webmcp"
 transport = "stdio"
-command = "npx"
+command = "node"
 args = [
-  "-y",
-  "@browserbasehq/stagehand@3.7.0",
-  "mcp",
-  "--env",
-  "LOCAL",
-  "--chrome-version",
-  "151.0.7922.34",
-  "--enable-webmcp",
-  "--tools",
-  "webmcp_session_info,webmcp_list_tools,webmcp_invoke_tool",
-  "--disable-tools",
-  "act,observe,extract,agent",
-  "--cdp-port",
-  "$WEBMCP_CDP_PORT",
+  "/tests/mcp/webmcp_stdio_server.mjs",
 ]
 allowed_tools = [
   "webmcp_session_info",
@@ -98,6 +86,21 @@ negate = true
 id = "2.4"
 name = "2_4"
 description = "Manages the boards collection only in component-local signals only rather than Solid stores"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.5"
+name = "2_5"
+description = "The QR mask is generated client-side from a locally shipped QRious (or equivalent) under vendor/, encoding the fixed festival URL with no network calls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "2_6"
+description = "The QR mask or image is fetched from an external QR service or other network endpoint instead of generated locally"
 type = "binary"
 weight = 1.0
 negate = true

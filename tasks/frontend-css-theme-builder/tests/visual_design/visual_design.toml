@@ -1,29 +1,17 @@
 [judge]
-judge = "claude-code"
+judge = "codex"
+model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
 cwd = "/app"
 mode = "batched"
 timeout = 3000
 
 [[judge.mcp_servers]]
-name = "stagehand-webmcp"
+name = "webmcp"
 transport = "stdio"
-command = "npx"
+command = "node"
 args = [
-  "-y",
-  "@browserbasehq/stagehand@3.7.0",
-  "mcp",
-  "--env",
-  "LOCAL",
-  "--chrome-version",
-  "151.0.7922.34",
-  "--enable-webmcp",
-  "--tools",
-  "webmcp_session_info,webmcp_list_tools,webmcp_invoke_tool",
-  "--disable-tools",
-  "act,observe,extract,agent",
-  "--cdp-port",
-  "$WEBMCP_CDP_PORT",
+  "/tests/mcp/webmcp_stdio_server.mjs",
 ]
 allowed_tools = [
   "webmcp_session_info",
@@ -93,3 +81,18 @@ description = "Collapses into a single-column equal-card marketing layout with n
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "3.4"
+name = "3_4"
+description = "The Themes sidebar lists a built-in catalog of about 35 presets, each row a four-swatch chip (primary / secondary / accent / neutral) plus the theme name, with the active row highlighted"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "3_5"
+description = "The Change Colors editor shows 11 semantic rows each with a face color picker and a round content \"A\" badge, and radius, size, and effect controls appear as compact segmented choices with an active selection state"
+type = "binary"
+weight = 0.5
+optional = true

@@ -42,7 +42,11 @@ CANONICAL_MODULES = frozenset(
 
 XML_OPEN = "<webmcp_action_contract>"
 XML_CLOSE = "</webmcp_action_contract>"
-DELIVERY_HEADING = "## Delivery and integrity"
+INTEGRITY_OPEN = "<integrity>"
+INTEGRITY_CLOSE = "</integrity>"
+DELIVERY_OPEN = "<delivery>"
+DELIVERY_CLOSE = "</delivery>"
+LEGACY_DELIVERY_HEADING = "## Delivery and integrity"
 LEGACY_H3_TITLE = "### WebMCP Action Contract"
 PRODUCT_REQ = "## Product Requirements"
 
@@ -92,10 +96,25 @@ XML_BLOCK_RE = re.compile(
     r"<webmcp_action_contract>\n?[\s\S]*?</webmcp_action_contract>\n?"
 )
 
-# Delivery preamble (optional) + contract — sole agent-facing WebMCP section.
+# Delivery/integrity preamble (optional) + contract — sole agent-facing WebMCP section.
+# Matches legacy markdown H2 or current <integrity>/<delivery> XML tags.
 INSTRUCTION_WEBMCP_SECTION_RE = re.compile(
-    r"(?:## Delivery and integrity\n[\s\S]*?\n)?"
+    r"(?:"
+    r"## Delivery and integrity\n[\s\S]*?\n"
+    r"|"
+    r"<integrity>\n[\s\S]*?</integrity>\n+"
+    r"<delivery>\n[\s\S]*?</delivery>\n+"
+    r")?"
     r"<webmcp_action_contract>\n?[\s\S]*?</webmcp_action_contract>\n?"
+)
+
+PREAMBLE_STRIP_RE = re.compile(
+    r"(?:"
+    r"## Delivery and integrity\n[\s\S]*?(?=\n## |\n</|\n<webmcp_action_contract>|\Z)"
+    r"|"
+    r"<integrity>\n[\s\S]*?</integrity>\n+"
+    r"<delivery>\n[\s\S]*?</delivery>\n*"
+    r")"
 )
 
 
@@ -133,18 +152,23 @@ def load_module_spec_text(module_id: str) -> str:
 def render_instruction_preamble() -> str:
     """Compact integrity/delivery/WebMCP language for instruction.md (no Baseline)."""
     return (
-        f"{DELIVERY_HEADING}\n"
+        f"{INTEGRITY_OPEN}\n"
+        "- Work only from this instruction and `/app`; do not use `/solution`, `/tests`, or "
+        "verifier artifacts.\n"
+        f"{INTEGRITY_CLOSE}\n"
         "\n"
-        "- Integrity: work only from this instruction and `/app`; do not use `/solution`, "
-        "`/tests`, or verifier artifacts.\n"
-        "- Delivery: produce an original self-contained app in `/app`; scaffold under `/app` "
-        "as needed for the stack in `<summary>`; run `npm start` on port 3000; do not iframe, "
-        "proxy, or fetch the product from another origin.\n"
-        "- WebMCP: required delivery step, not a scoring criterion; implement exactly the "
+        f"{DELIVERY_OPEN}\n"
+        "- Produce an original self-contained app in `/app`; scaffold under `/app` as needed "
+        "for the stack in `<summary>`; `/app/package.json` MUST define npm scripts named "
+        "exactly `start` (serves the app on port 3000) and `verify:build` (exits 0 when the "
+        "app entry/build is present and succeeds); run via `npm start` on port 3000; do not "
+        "iframe, proxy, or fetch the product from another origin.\n"
+        "- WebMCP is a required delivery step, not a scoring criterion; implement exactly the "
         "`<webmcp_action_contract>` below; register tools yourself from `<module_spec>` + "
         "Bindings using the same handlers as the visible UI; honor mechanics exclusions; "
         "optional self-test via `webmcp_session_info` / `webmcp_list_tools` / "
         "`webmcp_invoke_tool` only.\n"
+        f"{DELIVERY_CLOSE}\n"
     )
 
 
@@ -242,17 +266,18 @@ def upsert_contract(text: str, block: str) -> str:
     """Idempotently insert or replace delivery preamble + contract after </requirements>."""
     text = strip_legacy_markdown_webmcp(text)
     block = block.rstrip() + "\n"
-    if XML_OPEN in text or DELIVERY_HEADING in text:
+    has_preamble = (
+        XML_OPEN in text
+        or INTEGRITY_OPEN in text
+        or DELIVERY_OPEN in text
+        or LEGACY_DELIVERY_HEADING in text
+    )
+    if has_preamble:
         replaced, n = INSTRUCTION_WEBMCP_SECTION_RE.subn(block, text, count=1)
         if n:
             return replaced.rstrip() + "\n"
         # Tag/heading present but regex missed — strip coarsely then append
-        text = re.sub(
-            r"(?:## Delivery and integrity\n[\s\S]*?\n)?"
-            r"<webmcp_action_contract>[\s\S]*?</webmcp_action_contract>",
-            "",
-            text,
-        )
+        text = PREAMBLE_STRIP_RE.sub("", text)
         text = XML_BLOCK_RE.sub("", text)
     if "</requirements>" in text:
         return text.replace("</requirements>", f"</requirements>\n\n{block}", 1).rstrip() + "\n"
@@ -323,7 +348,9 @@ def contract_matches(text: str, expected: str) -> bool:
         return False
     if "Baseline Quality Bar" in text or "/opt/webmcp-contracts" in text:
         return False
-    if DELIVERY_HEADING not in text:
+    if INTEGRITY_OPEN not in text or DELIVERY_OPEN not in text:
+        return False
+    if LEGACY_DELIVERY_HEADING in text:
         return False
     for line in expected.splitlines():
         if line.startswith("- ") and not line.startswith("- TODO"):

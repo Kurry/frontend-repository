@@ -1,7 +1,7 @@
 """Pinned toolchain versions for frontend Harbor tasks (m0 freeze).
 
 Authors: keep these pins aligned across environment/Dockerfile, judge MCP
-args, and any Stagehand / Chrome-for-Testing install steps. Do not weaken
+args, and any Chrome-for-Testing install steps. Do not weaken
 existing instruction.md / authoring rubric.json / verifier_checklist.json
 semantics when packaging — map authoring rubrics and checklists into Reward Kit
 TOML without changing HLI ids or criterion meaning (packaged tasks keep TOMLs
@@ -17,11 +17,9 @@ WebMCP never adds a scoring criterion.
 
 from __future__ import annotations
 
-# Chrome for Testing (Playwright MCP / Stagehand shared page)
+# Chrome for Testing (shared judge browser)
 CHROME_FOR_TESTING = "151.0.7922.34"
 
-# Stagehand WebMCP (list/invoke only; no act/observe/extract/agent)
-STAGEHAND = "3.7.0"
 
 # Playwright MCP used by Reward Kit agent judges
 PLAYWRIGHT_MCP = "@playwright/mcp@0.0.76"
@@ -29,7 +27,7 @@ PLAYWRIGHT_MCP = "@playwright/mcp@0.0.76"
 # harbor-rewardkit: single source of truth for tests/test.sh installs (not Dockerfile).
 # Same Kurry/harbor fork SHA as zto-phase2-prds (pyproject.toml + canonical test.sh).
 # Do not vendor packages/rewardkit into task environment/ trees.
-HARBOR_REWARDKIT_GIT_SHA = "c00ee52302debcdcff1869135abd4b67ac2cb0f4"
+HARBOR_REWARDKIT_GIT_SHA = "49ac88859e31cd5561f98249aaf4b9ca03c90f7e"
 HARBOR_REWARDKIT_PACKAGE = (
     "harbor-rewardkit @ "
     f"git+https://github.com/Kurry/harbor@{HARBOR_REWARDKIT_GIT_SHA}"

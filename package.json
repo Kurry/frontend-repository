@@ -8,5 +8,8 @@
     "build:webmcp-contracts": "npm run build -w @zto/webmcp-contracts",
     "test:webmcp-contracts": "npm run test -w @zto/webmcp-contracts",
     "typecheck:webmcp-contracts": "npm run typecheck -w @zto/webmcp-contracts"
+  },
+  "devDependencies": {
+    "playwright": "^1.61.0"
   }
 }

@@ -2,15 +2,24 @@
 Build a French Riviera trip itinerary planner using Vue 3, Pinia, and UnoCSS.
 </summary>
 
+<reference_screenshots>
+Screenshots of the reference application are provided in-container at
+`/reference-screenshots/`: `overview.png` is a full-page desktop-layout
+overview (downscaled); `segment-NN.png` are full-resolution 1440x900 sections
+in top-to-bottom order with slight overlap. They are part of this instruction:
+recreate what they show. Where a screenshot and the text conflict, the text
+wins. Do not copy the images into `/app` or ship them as app assets.
+</reference_screenshots>
+
 <core_features>
 Core features:
 - Direct planner entry — trip plan workspace (sidebar + plan column + map); no marketing landing, login, signup, or booking gate
 - Top plan chrome — Trip / Travel Planner brand mark, Trip plan / Trip journal mode labels, Share and edit toolbar affordances as in-app chrome
-- Left nav sidebar — Overview, Itinerary day list for Sun 7/5–Sat 7/11 with day-colored dots, Budget row, Support and Hide sidebar
+- Left nav sidebar — inert AI Assistant control, Overview group (Explore / Notes / Places), Itinerary day list for Sun 7/5–Sat 7/11 with day-colored dots, Budget row, and Support / Hide sidebar controls
 - Primary collection — itinerary stops (places): seed at least 8 stops across days; each has name, day assignment, time/note optional, and category; the list supports create, edit, and delete
 - At least two interaction modes: Plan List mode (day sections + stop rows) and Map mode (map pane focus with pin selection / layers)
 - Domain behavior beyond CRUD: day filter; select a stop to open place detail tabs (About / Book / Reviews / Photos / Mentions); Optimize route and layers as demo chrome that may toast; empty day/list state when all stops deleted or filtered to none
-- Plan hero — cover image, editable title Trip to the French Riviera - Cote d'Azur, date range 7/5–7/11
+- Plan hero — cover image, editable title Trip to the French Riviera - Cote d'Azur, date range 7/5–7/11, a Browse all control, guide/hotel suggestion cards, and a place-suggestion strip
 - Invalid create: empty stop name must not add a stop; show visible validation feedback
 - Demo toasts for inert actions; zero outbound navigation
 - Map pane is static snapshot chrome with Export / Optimize / layers affordances; place detail seeded open example (Musée Picasso or equivalent)
@@ -47,11 +56,14 @@ Stack: Vue 3 + Pinia + UnoCSS (Vite or equivalent SPA); frontend-only. Leaflet/l
 - Document title references the French Riviera trip; desktop layout: sidebar + plan + map
 </requirements>
 
-## Delivery and integrity
+<integrity>
+- Work only from this instruction and `/app`; do not use `/solution`, `/tests`, or verifier artifacts.
+</integrity>
 
-- Integrity: work only from this instruction and `/app`; do not use `/solution`, `/tests`, or verifier artifacts.
-- Delivery: produce an original self-contained app in `/app`; scaffold under `/app` as needed for the stack in `<summary>`; run `npm start` on port 3000; do not iframe, proxy, or fetch the product from another origin.
-- WebMCP: required delivery step, not a scoring criterion; implement exactly the `<webmcp_action_contract>` below; register tools yourself from `<module_spec>` + Bindings using the same handlers as the visible UI; honor mechanics exclusions; optional self-test via `webmcp_session_info` / `webmcp_list_tools` / `webmcp_invoke_tool` only.
+<delivery>
+- Produce an original self-contained app in `/app`; scaffold under `/app` as needed for the stack in `<summary>`; `/app/package.json` MUST define npm scripts named exactly `start` (serves the app on port 3000) and `verify:build` (exits 0 when the app entry/build is present and succeeds); run via `npm start` on port 3000; do not iframe, proxy, or fetch the product from another origin.
+- WebMCP is a required delivery step, not a scoring criterion; implement exactly the `<webmcp_action_contract>` below; register tools yourself from `<module_spec>` + Bindings using the same handlers as the visible UI; honor mechanics exclusions; optional self-test via `webmcp_session_info` / `webmcp_list_tools` / `webmcp_invoke_tool` only.
+</delivery>
 
 <webmcp_action_contract>
 Contract version: zto-webmcp-v1

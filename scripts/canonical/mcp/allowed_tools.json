@@ -1,10 +1,5 @@
 {
-  "$comment": "Flattened into Claude --allowedTools / Reward Kit MCPServerConfig.allowed_tools. Stagehand: list/invoke/session only. Playwright: evidence + fallback interaction.",
-  "stagehand-webmcp": [
-    "webmcp_session_info",
-    "webmcp_list_tools",
-    "webmcp_invoke_tool"
-  ],
+  "$comment": "Flattened into Claude --allowedTools / Reward Kit MCPServerConfig.allowed_tools. webmcp: list/invoke/session only (task-local CDP bridge). Playwright: evidence + fallback interaction.",
   "playwright": [
     "browser_navigate",
     "browser_navigate_back",
@@ -29,7 +24,11 @@
   ],
   "pins": {
     "chrome_for_testing": "151.0.7922.34",
-    "stagehand": "3.7.0",
     "playwright_mcp": "@playwright/mcp@0.0.76"
-  }
+  },
+  "webmcp": [
+    "webmcp_session_info",
+    "webmcp_list_tools",
+    "webmcp_invoke_tool"
+  ]
 }

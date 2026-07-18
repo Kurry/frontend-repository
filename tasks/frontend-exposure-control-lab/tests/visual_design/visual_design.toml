@@ -1,29 +1,17 @@
 [judge]
-judge = "claude-code"
+judge = "codex"
+model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
 cwd = "/app"
 mode = "batched"
 timeout = 3000
 
 [[judge.mcp_servers]]
-name = "stagehand-webmcp"
+name = "webmcp"
 transport = "stdio"
-command = "npx"
+command = "node"
 args = [
-  "-y",
-  "@browserbasehq/stagehand@3.7.0",
-  "mcp",
-  "--env",
-  "LOCAL",
-  "--chrome-version",
-  "151.0.7922.34",
-  "--enable-webmcp",
-  "--tools",
-  "webmcp_session_info,webmcp_list_tools,webmcp_invoke_tool",
-  "--disable-tools",
-  "act,observe,extract,agent",
-  "--cdp-port",
-  "$WEBMCP_CDP_PORT",
+  "/tests/mcp/webmcp_stdio_server.mjs",
 ]
 allowed_tools = [
   "webmcp_session_info",
@@ -93,3 +81,10 @@ description = "Replaces the lab with a marketing card grid and no live exposure 
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "3.4"
+name = "3_4"
+description = "Three circular dial controls (APERTURE / SPEED / ISO) with up/down steppers and a vertical exposure meter captioned UNDER EXPOSED / OVER EXPOSED overlay the full-viewport photo preview"
+type = "binary"
+weight = 1.0

@@ -1,28 +1,18 @@
 # Fragment for Harbor Reward Kit judge TOML. Reward Kit ClaudeCodeCLI materializes
 # these as an ephemeral --strict-mcp-config (no persistent `claude mcp add`).
-# Pins: Chrome for Testing 151.0.7922.34; Stagehand 3.7.0; @playwright/mcp@0.0.76.
-# Orchestrator must start Stagehand Chrome first and export WEBMCP_CDP_ENDPOINT /
-# WEBMCP_CDP_PORT before the judge process. WebMCP is never a scoring criterion.
+# Pins: @playwright/mcp@0.0.76; playwright 1.61.0.
+# tests/test.sh starts the shared headless Chrome and exports WEBMCP_CDP_ENDPOINT /
+# WEBMCP_CDP_PORT before the judge process. The webmcp server is the task-local
+# CDP bridge (tests/mcp/webmcp_stdio_server.mjs): playwright-core attaches over
+# CDP and calls the app's registered window.webmcp_* surface on the SAME page
+# the Playwright MCP drives. WebMCP is never a scoring criterion.
 
 [[judge.mcp_servers]]
-name = "stagehand-webmcp"
+name = "webmcp"
 transport = "stdio"
-command = "npx"
+command = "node"
 args = [
-  "-y",
-  "@browserbasehq/stagehand@3.7.0",
-  "mcp",
-  "--env",
-  "LOCAL",
-  "--chrome-version",
-  "151.0.7922.34",
-  "--enable-webmcp",
-  "--tools",
-  "webmcp_session_info,webmcp_list_tools,webmcp_invoke_tool",
-  "--disable-tools",
-  "act,observe,extract,agent",
-  "--cdp-port",
-  "$WEBMCP_CDP_PORT",
+  "/tests/mcp/webmcp_stdio_server.mjs",
 ]
 allowed_tools = [
   "webmcp_session_info",

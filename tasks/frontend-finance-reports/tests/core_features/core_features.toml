@@ -1,29 +1,17 @@
 [judge]
-judge = "claude-code"
+judge = "codex"
+model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
 cwd = "/app"
 mode = "batched"
 timeout = 3000
 
 [[judge.mcp_servers]]
-name = "stagehand-webmcp"
+name = "webmcp"
 transport = "stdio"
-command = "npx"
+command = "node"
 args = [
-  "-y",
-  "@browserbasehq/stagehand@3.7.0",
-  "mcp",
-  "--env",
-  "LOCAL",
-  "--chrome-version",
-  "151.0.7922.34",
-  "--enable-webmcp",
-  "--tools",
-  "webmcp_session_info,webmcp_list_tools,webmcp_invoke_tool",
-  "--disable-tools",
-  "act,observe,extract,agent",
-  "--cdp-port",
-  "$WEBMCP_CDP_PORT",
+  "/tests/mcp/webmcp_stdio_server.mjs",
 ]
 allowed_tools = [
   "webmcp_session_info",
@@ -75,148 +63,208 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "1_1"
-description = "Every checklist-* criterion in this Core Features dimension passes during the agent verifier run"
+description = "On load, the transactions list shows at least 8 seeded rows with payee, category, and amount visible"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
 name = "1_2"
-description = "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session"
+description = "After creating a transaction with payee 'Ada Books' and a valid amount, the text 'Ada Books' is visible in the transactions list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
 name = "1_3"
-description = "Transactions collection supports create, edit, and delete with list rows and derived counts updating from shared application state"
+description = "After adding 3 new transactions on top of the seed set, the list shows exactly 3 more rows than the initial seeded count"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
 name = "1_4"
-description = "At least two distinct views or interaction modes are switchable without full page navigation"
+description = "After creating an expense transaction, Total Expenses (or Net) KPI updates to reflect the new amount"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
 name = "1_5"
-description = "Domain state beyond CRUD is implemented (filters, bulk categorize or bulk delete on selected rows, or equivalent) and recomputes visible results from the shared collection"
+description = "After editing a payee from the seeded value to 'Evening Market', the text 'Evening Market' is visible and the previous payee is not"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
 name = "1_6"
-description = "Renders visible validation feedback when create is submitted with empty required fields, and the collection count does not increase"
+description = "After deleting a transaction, that payee is no longer visible in the transactions list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
 name = "1_7"
+description = "After deleting all transactions, an empty state message is visible and no transaction rows remain"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "1_8"
+description = "After submitting create with an empty required payee or amount, the transactions count does not increase and validation feedback is visible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "1_9"
+description = "After filtering transactions by a category (with mixed categories present), only matching rows remain visible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "1_10"
+description = "After switching between Breakdown and Trends chart tabs, the chart panel swaps without full page navigation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "1_11"
+description = "After focusing the transactions list versus the chart panel (list vs chart interaction modes), both remain usable without leaving the page"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "1_12"
+description = "When hovering sidebar items, transaction rows, or primary buttons, a visible hover wash or shadow change appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "1_13"
+description = "After selecting multiple transaction rows and running bulk categorize or bulk delete, the selected rows update category together or disappear from the list and KPIs/charts reflect the change"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "1_14"
+description = "After creating an expense, the summary strip below the table (count, largest, average, date range) updates to reflect the new transaction"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "1_15"
+description = "The Savings Rate card equals net income divided by total income for the current transactions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "1_16"
+description = "Clicking a non-active sidebar nav item (e.g. Accounts) shows a demo toast and the Reports view stays visible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "1_17"
+description = "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "1_18"
+description = "Transactions collection supports create, edit, and delete with list rows and derived counts updating from shared application state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "1_19"
+description = "At least two distinct views or interaction modes are switchable without full page navigation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "1_20"
+description = "Domain state beyond CRUD is implemented (filters, bulk categorize or bulk delete on selected rows, or equivalent) and recomputes visible results from the shared collection"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "1_21"
+description = "Renders visible validation feedback when create is submitted with empty required fields, and the collection count does not increase"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "1_22"
 description = "Transactions list is static HTML only with no working create/edit/delete against shared state"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
-id = "1.8"
-name = "1_8"
+id = "1.23"
+name = "1_23"
 description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
-id = "checklist-1"
-name = "checklist_1"
-description = "On load, the transactions list shows at least 8 seeded rows with payee, category, and amount visible"
+id = "1.24"
+name = "1_24"
+description = "The four summary cards (Total Income, Total Expenses, Net Income, Savings Rate) recompute after create, edit, and delete, with Savings Rate shown as net income divided by income"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "checklist-2"
-name = "checklist_2"
-description = "After creating a transaction with payee 'Ada Books' and a valid amount, the text 'Ada Books' is visible in the transactions list"
+id = "1.25"
+name = "1_25"
+description = "A summary strip below the table reports transaction count, largest transaction, average amount, and covered date range, each recomputed from the current transactions"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "checklist-3"
-name = "checklist_3"
-description = "After adding 3 new transactions on top of the seed set, the list shows exactly 3 more rows than the initial seeded count"
+id = "1.26"
+name = "1_26"
+description = "Clicking a non-active sidebar nav item shows a transient demo toast and keeps the current Reports view without navigating away"
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
-id = "checklist-4"
-name = "checklist_4"
-description = "After creating an expense transaction, Total Expenses (or Net) KPI updates to reflect the new amount"
+id = "1.27"
+name = "1_27"
+description = "Demo chrome controls (Save, Export CSV, Sort, Bulk edit) replace or disable the working create/edit/delete flow instead of showing a transient toast"
 type = "binary"
 weight = 1.0
+negate = true
 
 [[criterion]]
-id = "checklist-5"
-name = "checklist_5"
-description = "After editing a payee from the seeded value to 'Evening Market', the text 'Evening Market' is visible and the previous payee is not"
+id = "1.28"
+name = "1_28"
+description = "The summary strip shows a hardcoded caption that does not change when transactions are added or deleted"
 type = "binary"
-weight = 1.0
+weight = 0.5
+negate = true
+optional = true
 
 [[criterion]]
-id = "checklist-6"
-name = "checklist_6"
-description = "After deleting a transaction, that payee is no longer visible in the transactions list"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "checklist-7"
-name = "checklist_7"
-description = "After deleting all transactions, an empty state message is visible and no transaction rows remain"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "checklist-8"
-name = "checklist_8"
-description = "After submitting create with an empty required payee or amount, the transactions count does not increase and validation feedback is visible"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "checklist-9"
-name = "checklist_9"
-description = "After filtering transactions by a category (with mixed categories present), only matching rows remain visible"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "checklist-10"
-name = "checklist_10"
-description = "After switching between Breakdown and Trends chart tabs, the chart panel swaps without full page navigation"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "checklist-11"
-name = "checklist_11"
-description = "After focusing the transactions list versus the chart panel (list vs chart interaction modes), both remain usable without leaving the page"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "checklist-12"
-name = "checklist_12"
-description = "When hovering sidebar items, transaction rows, or primary buttons, a visible hover wash or shadow change appears"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "checklist-13"
-name = "checklist_13"
-description = "After selecting multiple transaction rows and running bulk categorize or bulk delete, the selected rows update category together or disappear from the list and KPIs/charts reflect the change"
+id = "1.29"
+name = "1_29"
+description = "Breakdown renders the sankey flow graph structure: named income-source nodes (Paychecks, Business Income, Interest, Other Income or equivalents) feed a central Income hub that splits into a Net Income node plus one node per expense category, with link thickness proportional to amount and node labels showing name and amount"
 type = "binary"
 weight = 1.0

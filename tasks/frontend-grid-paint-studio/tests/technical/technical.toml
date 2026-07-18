@@ -1,29 +1,17 @@
 [judge]
-judge = "claude-code"
+judge = "codex"
+model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
 cwd = "/app"
 mode = "batched"
 timeout = 3000
 
 [[judge.mcp_servers]]
-name = "stagehand-webmcp"
+name = "webmcp"
 transport = "stdio"
-command = "npx"
+command = "node"
 args = [
-  "-y",
-  "@browserbasehq/stagehand@3.7.0",
-  "mcp",
-  "--env",
-  "LOCAL",
-  "--chrome-version",
-  "151.0.7922.34",
-  "--enable-webmcp",
-  "--tools",
-  "webmcp_session_info,webmcp_list_tools,webmcp_invoke_tool",
-  "--disable-tools",
-  "act,observe,extract,agent",
-  "--cdp-port",
-  "$WEBMCP_CDP_PORT",
+  "/tests/mcp/webmcp_stdio_server.mjs",
 ]
 allowed_tools = [
   "webmcp_session_info",
@@ -101,3 +89,10 @@ description = "Manages the boards collection only in component-local variables r
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "2.5"
+name = "2_5"
+description = "Each completed pointer stroke pushes exactly one undo step and Undo (or Backspace) reverts the whole most-recent stroke rather than a single cell"
+type = "binary"
+weight = 1.0

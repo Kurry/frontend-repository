@@ -1,29 +1,17 @@
 [judge]
-judge = "claude-code"
+judge = "codex"
+model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
 cwd = "/app"
 mode = "batched"
 timeout = 3000
 
 [[judge.mcp_servers]]
-name = "stagehand-webmcp"
+name = "webmcp"
 transport = "stdio"
-command = "npx"
+command = "node"
 args = [
-  "-y",
-  "@browserbasehq/stagehand@3.7.0",
-  "mcp",
-  "--env",
-  "LOCAL",
-  "--chrome-version",
-  "151.0.7922.34",
-  "--enable-webmcp",
-  "--tools",
-  "webmcp_session_info,webmcp_list_tools,webmcp_invoke_tool",
-  "--disable-tools",
-  "act,observe,extract,agent",
-  "--cdp-port",
-  "$WEBMCP_CDP_PORT",
+  "/tests/mcp/webmcp_stdio_server.mjs",
 ]
 allowed_tools = [
   "webmcp_session_info",
@@ -91,6 +79,21 @@ optional = true
 id = "4.3"
 name = "4_3"
 description = "Omits hover feedback on pins or list rows so the stage feels static on pointer hover"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.4"
+name = "4_4"
+description = "Dragging the stage pans the pins and wheel-zoom narrows or widens the visible year window about its midpoint, live and without reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "4_5"
+description = "Dragging or wheel-scrolling the stage does nothing because pins are rendered at fixed positions rather than from the visible year window"
 type = "binary"
 weight = 1.0
 negate = true

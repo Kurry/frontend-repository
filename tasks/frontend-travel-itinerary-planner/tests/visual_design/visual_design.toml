@@ -1,29 +1,17 @@
 [judge]
-judge = "claude-code"
+judge = "codex"
+model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
 cwd = "/app"
 mode = "batched"
 timeout = 3000
 
 [[judge.mcp_servers]]
-name = "stagehand-webmcp"
+name = "webmcp"
 transport = "stdio"
-command = "npx"
+command = "node"
 args = [
-  "-y",
-  "@browserbasehq/stagehand@3.7.0",
-  "mcp",
-  "--env",
-  "LOCAL",
-  "--chrome-version",
-  "151.0.7922.34",
-  "--enable-webmcp",
-  "--tools",
-  "webmcp_session_info,webmcp_list_tools,webmcp_invoke_tool",
-  "--disable-tools",
-  "act,observe,extract,agent",
-  "--cdp-port",
-  "$WEBMCP_CDP_PORT",
+  "/tests/mcp/webmcp_stdio_server.mjs",
 ]
 allowed_tools = [
   "webmcp_session_info",
@@ -90,6 +78,21 @@ weight = 1.0
 id = "3.3"
 name = "3_3"
 description = "Collapses into a static brochure itinerary with no interactive stops collection"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.4"
+name = "3_4"
+description = "The map shows one numbered pin per stop colored by its day, the selected pin is enlarged with a popup reading the place name and its Day N label, and unscheduled ideas stops use a neutral non-day marker"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "3_5"
+description = "Map pins are unnumbered or share a single color regardless of day, or the selected pin is not enlarged relative to the others"
 type = "binary"
 weight = 1.0
 negate = true

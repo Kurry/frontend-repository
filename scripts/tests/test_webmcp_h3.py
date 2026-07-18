@@ -14,6 +14,26 @@ import webmcp_h3  # noqa: E402
 
 
 class TestWebmcpContract(unittest.TestCase):
+    def test_task_toml_artifact_excludes(self) -> None:
+        """Every task.toml must carry the full canonical artifact-exclude set
+        (build outputs like dist/ must never be collected into artifacts)."""
+        import tomllib
+        import package_frontend_tasks as pft
+
+        tomls = sorted(ROOT.glob("tasks/*/task.toml"))
+        self.assertGreaterEqual(len(tomls), 23)
+        for f in tomls:
+            data = tomllib.loads(f.read_text())
+            artifacts = data.get("artifacts") or []
+            self.assertTrue(artifacts, f"{f} has no [[artifacts]]")
+            for art in artifacts:
+                excludes = set(art.get("exclude") or [])
+                missing = set(pft.ARTIFACT_EXCLUDES) - excludes
+                self.assertFalse(
+                    missing,
+                    f"{f} artifact {art.get('source')} missing excludes: {sorted(missing)}",
+                )
+
     def test_canonical_prompts_policy(self) -> None:
         builder = ROOT / "scripts/canonical/agent_system_prompt.md"
         self.assertFalse(
@@ -36,23 +56,20 @@ class TestWebmcpContract(unittest.TestCase):
             (ROOT / "scripts/canonical/mcp/allowed_tools.json").read_text()
         )
         self.assertEqual(
-            allowed["stagehand-webmcp"],
+            allowed["webmcp"],
             ["webmcp_session_info", "webmcp_list_tools", "webmcp_invoke_tool"],
         )
         for name in ("act", "observe", "extract", "agent"):
-            self.assertNotIn(name, allowed["stagehand-webmcp"])
-        self.assertEqual(allowed["pins"]["chrome_for_testing"], "151.0.7922.34")
-        self.assertEqual(allowed["pins"]["stagehand"], "3.7.0")
+            self.assertNotIn(name, allowed["webmcp"])
         self.assertEqual(allowed["pins"]["playwright_mcp"], "@playwright/mcp@0.0.76")
 
         for fname in ("builder.mcp.json", "judge.mcp.json"):
             payload = json.loads((ROOT / "scripts/canonical/mcp" / fname).read_text())
             servers = payload["mcpServers"]
-            self.assertIn("stagehand-webmcp", servers)
+            self.assertIn("webmcp", servers)
             self.assertIn("playwright", servers)
-            sh_args = " ".join(servers["stagehand-webmcp"]["args"])
-            self.assertIn("webmcp_session_info,webmcp_list_tools,webmcp_invoke_tool", sh_args)
-            self.assertIn("act,observe,extract,agent", sh_args)
+            self.assertEqual(servers["webmcp"]["command"], "node")
+            self.assertIn("webmcp_stdio_server.mjs", " ".join(servers["webmcp"]["args"]))
             pw_args = " ".join(servers["playwright"]["args"])
             self.assertIn("@playwright/mcp@0.0.76", pw_args)
             self.assertIn("$WEBMCP_CDP_ENDPOINT", pw_args)
@@ -79,10 +96,30 @@ class TestWebmcpContract(unittest.TestCase):
             self.assertTrue(1 <= len(entry["modules"]) <= 4)
 
             section = webmcp_h3.render_instruction_webmcp_section(entry)
-            self.assertIn("## Delivery and integrity", section)
+            self.assertIn("<integrity>", section)
+            self.assertIn("</integrity>", section)
+            self.assertIn("<delivery>", section)
+            self.assertIn("</delivery>", section)
+            self.assertNotIn("## Delivery and integrity", section)
+            self.assertIn("`verify:build`", section)
+            self.assertIn("`start`", section)
+            self.assertIn("port 3000", section)
             self.assertIn("webmcp_session_info", section)
             self.assertNotIn("Baseline Quality Bar", section)
             self.assertNotIn("/opt/webmcp-contracts", section)
+
+    def test_delivery_requires_package_json_scripts(self) -> None:
+        preamble = webmcp_h3.render_instruction_preamble()
+        self.assertIn("<integrity>", preamble)
+        self.assertIn("<delivery>", preamble)
+        self.assertIn("/app/package.json", preamble)
+        self.assertIn("`start`", preamble)
+        self.assertIn("`verify:build`", preamble)
+        self.assertIn("port 3000", preamble)
+        self.assertIn("app entry/build is present and succeeds", preamble)
+        self.assertNotIn("## Delivery and integrity", preamble)
+        self.assertNotIn("index.html", preamble)
+        self.assertNotIn("Dashboard.html", preamble)
 
     def test_upsert_idempotent(self) -> None:
         assignment = json.loads(
@@ -95,11 +132,14 @@ class TestWebmcpContract(unittest.TestCase):
         # Preamble mentions the tag name in prose; count real open/close tags only.
         self.assertEqual(once.count("<webmcp_action_contract>\n"), 1)
         self.assertEqual(once.count("</webmcp_action_contract>"), 1)
-        self.assertEqual(once.count("## Delivery and integrity"), 1)
+        self.assertEqual(once.count("<integrity>"), 1)
+        self.assertEqual(once.count("<delivery>"), 1)
         self.assertEqual(twice.count("<webmcp_action_contract>\n"), 1)
         self.assertEqual(twice.count("</webmcp_action_contract>"), 1)
-        self.assertEqual(twice.count("## Delivery and integrity"), 1)
+        self.assertEqual(twice.count("<integrity>"), 1)
+        self.assertEqual(twice.count("<delivery>"), 1)
         self.assertEqual(once, twice)
+        self.assertNotIn("## Delivery and integrity", once)
         self.assertNotIn("### WebMCP Action Contract", once)
         self.assertNotIn("## Product Requirements", once)
         self.assertIn("<module_spec", once)
@@ -120,8 +160,29 @@ class TestWebmcpContract(unittest.TestCase):
         updated = webmcp_h3.upsert_contract(legacy, section)
         self.assertNotIn("## Product Requirements", updated)
         self.assertNotIn("### WebMCP Action Contract", updated)
+        self.assertNotIn("## Delivery and integrity", updated)
         self.assertIn("<webmcp_action_contract>", updated)
-        self.assertIn("## Delivery and integrity", updated)
+        self.assertIn("<integrity>", updated)
+        self.assertIn("<delivery>", updated)
+
+    def test_upsert_replaces_legacy_delivery_heading(self) -> None:
+        assignment = json.loads(
+            (ROOT / "schemas/webmcp-assignments.json").read_text()
+        )["assignments"][0]
+        section = webmcp_h3.render_instruction_webmcp_section(assignment)
+        legacy = (
+            "<requirements>\nStack\n</requirements>\n\n"
+            "## Delivery and integrity\n\n"
+            "- Integrity: old markdown bullet\n"
+            "- Delivery: old markdown bullet\n\n"
+            "<webmcp_action_contract>\nold</webmcp_action_contract>\n"
+        )
+        updated = webmcp_h3.upsert_contract(legacy, section)
+        self.assertNotIn("## Delivery and integrity", updated)
+        self.assertNotIn("old markdown bullet", updated)
+        self.assertEqual(updated.count("<integrity>"), 1)
+        self.assertEqual(updated.count("<delivery>"), 1)
+        self.assertEqual(updated.count("<webmcp_action_contract>\n"), 1)
 
     def test_reject_unknown_module(self) -> None:
         with self.assertRaises(ValueError):

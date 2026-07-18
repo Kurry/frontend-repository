@@ -1,29 +1,17 @@
 [judge]
-judge = "claude-code"
+judge = "codex"
+model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
 cwd = "/app"
 mode = "batched"
 timeout = 3000
 
 [[judge.mcp_servers]]
-name = "stagehand-webmcp"
+name = "webmcp"
 transport = "stdio"
-command = "npx"
+command = "node"
 args = [
-  "-y",
-  "@browserbasehq/stagehand@3.7.0",
-  "mcp",
-  "--env",
-  "LOCAL",
-  "--chrome-version",
-  "151.0.7922.34",
-  "--enable-webmcp",
-  "--tools",
-  "webmcp_session_info,webmcp_list_tools,webmcp_invoke_tool",
-  "--disable-tools",
-  "act,observe,extract,agent",
-  "--cdp-port",
-  "$WEBMCP_CDP_PORT",
+  "/tests/mcp/webmcp_stdio_server.mjs",
 ]
 allowed_tools = [
   "webmcp_session_info",
@@ -73,13 +61,6 @@ allowed_tools = [
 aggregation = "weighted_mean"
 
 [[criterion]]
-id = "2.1"
-name = "2_1"
-description = "Pinia holds stops, day selection, mode, and place detail — shared across components"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "2.2"
 name = "2_2"
 description = "Implemented with Vue 3, Pinia, and UnoCSS; no browser storage APIs for persistence"
@@ -101,3 +82,10 @@ description = "Manages the stops collection only in component-local refs rather 
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "2.1"
+name = "2_1"
+description = "Stops, active day, mode, detail tab, and map selection behave as one shared state: a change made through any control (sidebar day, list row, map pin, detail tab) is immediately reflected in the sidebar, map, and detail panel without a reload"
+type = "binary"
+weight = 1.0

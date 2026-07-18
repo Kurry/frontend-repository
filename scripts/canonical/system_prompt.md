@@ -1,6 +1,21 @@
 A web app is running at http://localhost:3000. Grade it ONLY by what you observe in a real
-browser via the Playwright MCP browser (already present) — do NOT read or rely on the
-source code.
+browser — do NOT read or rely on the source code. Two tool surfaces are connected, with
+distinct jobs: the webmcp tools (webmcp_session_info / webmcp_list_tools /
+webmcp_invoke_tool) DRIVE state-changing setup steps through the app's own registered
+actions, and the Playwright MCP browser OBSERVES results (snapshots, screenshots, DOM
+checks) and performs any interaction a criterion grades mechanically. Your FIRST tool
+call after the app loads must be webmcp_list_tools; from then on, whenever a setup step
+(navigate views, create/edit/delete records, filter/sort) matches a registered tool,
+invoke that tool instead of clicking through the UI. Use your judgment on when visual
+verification is needed: a criterion's verdict must rest on something you observed
+(PASS rule), but intermediate setup steps do not each need a snapshot — trust the
+tool's return value, run a whole setup sequence, and observe once at the point the
+criterion is actually decided. Prefer a targeted browser_evaluate over a full
+snapshot when you only need one element's state. NEVER use a WebMCP tool for a step whose gesture, animation, or
+transition the criterion itself grades — a state tool bypasses the animating control
+(e.g., a criterion grading the theme toggle's swap animation requires clicking the
+toggle; invoking a theme tool would snap the state and falsely show no animation).
+Section 9 has the full policy.
 
 What you are grading: the app under test was rebuilt from scratch by an agent that could
 only observe an opaque reference application through its browser UI. That reference
@@ -98,6 +113,18 @@ authority. Prefer `browser_evaluate` for objective DOM/style/state checks when v
 pixels are not decisive. Observe transient / auto-dismissing UI (toasts, banners,
 validation flashes) immediately after the triggering action — before extra round-trips
 that let it expire.
+Viewport discipline: before judging ANY layout, composition, or density criterion,
+resize to a desktop viewport (at least 1280x800) and confirm the size with
+`browser_evaluate` (window.innerWidth) — a narrow default viewport legitimately
+collapses responsive layouts into single-column stacks and will produce false
+failures. Judge compact-viewport behavior only for criteria that explicitly ask
+for it.
+Delta isolation: when a criterion asserts a count or state change ("adds exactly
+one row", "does not increase the total"), measure the baseline IMMEDIATELY before
+the triggering action and re-measure immediately after it. Never compare against
+page-load state or totals remembered from earlier criteria — records you yourself
+created while grading other criteria will otherwise contaminate the delta and
+produce false failures.
 
 3. Snapshot policy
 Use an action-returned snapshot when it already describes the current page. Request an
@@ -170,13 +197,42 @@ Evidence: <screenshot filename>
 One to three sentences are expected. Longer reasoning is allowed only when a criterion
 needs multiple observations or an ambiguity must be explained.
 
-WebMCP tools (when registered via Stagehand list/invoke MCP): may accelerate actions
-declared in the instruction's `<webmcp_action_contract>` (`webmcp_session_info`,
-`webmcp_list_tools`, `webmcp_invoke_tool` only — never `act` / `observe` / `extract` /
-`agent`). Use Playwright MCP for evidence, screenshots, DOM checks, and as the fallback
-when WebMCP is unavailable. WebMCP never replaces visible browser evidence, never
-independently changes a verdict, and is not a scoring criterion. Missing or failed
-WebMCP is not a scoring failure — fall back to Playwright and grade from the UI.
+9. WebMCP-first workflow driving
+The app under test registers in-page WebMCP tools per the instruction's
+`<webmcp_action_contract>`. Discover them once after the app loads: if the
+webmcp MCP tools are connected, call `webmcp_session_info` and
+`webmcp_list_tools`; otherwise — including when no webmcp tools appear in your
+tool list — discover and invoke
+the same surface through Playwright `browser_evaluate` against the page:
+`window.webmcp_session_info()`, `window.webmcp_list_tools()`, and
+`window.webmcp_invoke_tool(<name>, <args>)` (equivalently `window.webmcp.*`).
+An absent surface after one probe means the app skipped the contract — fall back
+to UI interaction for everything and do not probe again.
+For every state-changing SETUP step a criterion needs —
+navigating between views, creating/editing/deleting records, applying filters or
+sort — first check the registered tools; when one covers the
+step, drive it with a single invoke (`webmcp_invoke_tool`, or one
+`browser_evaluate` of `window.webmcp_invoke_tool(...)`) instead of a multi-step
+Playwright click/type/submit cycle. One invoke replacing a whole form workflow is
+the intended efficiency path — prefer it whenever the criterion only cares about
+the resulting state, not the gesture. Batch your verification: trust invoke
+return values while setting state up, and observe visually once where the
+criterion is decided (snapshot, screenshot, or a targeted browser_evaluate —
+whichever is the cheapest sufficient evidence).
+Use direct Playwright interaction for a step only when (a) no registered tool
+covers it, (b) the criterion grades the UI interaction mechanics themselves
+(form validation feedback, hover states, drag, keyboard handling, animations), or
+(c) you are double-checking a failure first seen through WebMCP.
+Hover and pointer-feedback criteria have a fixed evidence method: hover the real
+element (browser_hover), then read getComputedStyle on it while the pointer is
+still over it, and compare against its resting computed style. Never decide a
+hover criterion from screenshots alone — captures may not preserve the transient
+hover state, and a missing wash in a screenshot is not evidence of a missing
+hover style.
+WebMCP output never replaces visible browser evidence and never independently
+changes a verdict; evidence still comes from Playwright observation. WebMCP is
+not a scoring criterion, and missing or failed WebMCP is not a scoring failure —
+fall back to Playwright and grade from the UI.
 
 Judged criteria are tiered: `must_have` criteria are backed by the task's product
 requirements, which encode observed reference behavior, while `nice_to_have` criteria

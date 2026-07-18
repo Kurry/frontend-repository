@@ -2,19 +2,28 @@
 Build a user management admin dashboard using React, Zustand, and Tailwind CSS.
 </summary>
 
+<reference_screenshots>
+Screenshots of the reference application are provided in-container at
+`/reference-screenshots/`: `overview.png` is a full-page desktop-layout
+overview (downscaled); `segment-NN.png` are full-resolution 1440x900 sections
+in top-to-bottom order with slight overlap. They are part of this instruction:
+recreate what they show. Where a screenshot and the text conflict, the text
+wins. Do not copy the images into `/app` or ship them as app assets.
+</reference_screenshots>
+
 <core_features>
-Core features:
-- Drawer shell with branded sidebar (Pineapple Tech), collapsible nav groups (at least 14 groups including Users with All Users, Add User, Roles, Permissions, User Logs, User Stats, User Payments, User Products), top-level Dashboard item, and sticky account footer (online avatar, name, role) with upward popover
-- In-app view switching with no backend routes: sidebar items change the main canvas between Operations Overview and the Users module views
-- Utility header with search (can filter the All Users list), light/dark theme toggle, notifications popover (4 seeded avatar rows + error indicator on the bell), and profile popover (Profile / Inbox with badge / Settings / Logout)
-- Primary collection — Users: seed at least 8 users; each has name, email, role, status (Active | Invited | Suspended), payments total, products count, and last-active label; the list supports create, edit, and delete
-- All Users view: KPI strip (Total / Active / Paying / Suspended), role filter, status filter, sort (Last active / Newest / Highest spend / Name A-Z), bulk actions (Export / Change status / Change role / Delete), data table (User / Role / Status / Payments / Products / Last active + row actions), and pagination chrome
-- Add User view: form with Profile (first name, last name, email, phone, notes), Access (temporary password, account segment, send invitation), Account settings (status, role, 2FA / product-access toggles), and Permissions checkboxes; Cancel and Create user; invalid create does not add a row; successful create appears on All Users
-- Edit and delete from All Users: edit opens prefilled fields and save updates that row; delete removes the user from the list and from counts/filters
-- Domain behavior beyond CRUD: status badges (Active / Invited / Suspended), role changes, filters and sort that change which rows are visible, bulk status/role/delete on selected rows, empty list when filters match nothing or when all users are deleted
-- At least two additional Users modes from: User Roles, User Permissions, User Logs, User Stats, User Payments, User Products (each with filters/tables), reachable from the Users sidebar
-- Operations Overview as a distinct view: breadcrumbs and actions; KPI stats; chart cards (revenue/demand column, order-status pie, revenue run-rate primary inverse column, acquisition mix pie, marketing line, fulfillment line); operational panels (activity table, governance radial + progress, priority queue, promotions, uptime bars, satisfaction, inventory, plugins, automation, security watch, cash movement). Overview metrics may be seeded; Users remain fully interactive
-- Zero outbound navigation — in-app controls only (no backend auth)
+Core features (each line is an observable behavior the finished app must exhibit):
+- The app opens into a drawer shell: a branded sidebar (Pineapple Tech) with at least 14 collapsible nav groups — including a Users group containing All Users, Add User, Roles, Permissions, User Logs, User Stats, User Payments, User Products — a top-level Dashboard item, and a sticky account footer (online avatar, name "Ari Lane", role "Admin") whose click opens a popover upward listing Profile settings / Docs / API settings / Logout
+- Clicking sidebar items swaps the main canvas between Operations Overview and the Users module views without a full page reload; no backend routes exist, and the active sidebar item reflects the current view
+- Expanding a sidebar nav group opens it as an accordion where only one group stays open at a time and its chevron rotates
+- The utility header shows: a search field that filters the All Users list, a light/dark theme toggle that recolors the app, a notifications popover seeded with 4 avatar rows (New message, Reminder, and two New payment entries) plus an error indicator on the bell, and a profile popover listing Profile / Inbox (with badge) / Settings / Logout
+- All Users opens non-empty with at least 8 seeded users; every seeded user is reachable in the table (paging through the pagination chrome counts as reachable), and each row shows name, email, role badge, status badge (Active | Invited | Suspended), payments total, products count, and last-active label
+- The All Users view shows a KPI strip (Total / Active / Paying / Suspended) whose numbers track the collection, role and status filters, a sort control (Last active / Newest / Highest spend / Name A-Z), bulk actions (Export / Change status / Change role / Delete) that apply to checkbox-selected rows, a data table (User / Role / Status / Payments / Products / Last active + row actions), and pagination chrome
+- Submitting Add User with valid fields — Profile (first name, last name, email, phone, notes), Access (temporary password, account segment, send invitation), Account settings (status, role, 2FA / product-access toggles), Permissions checkboxes — adds the user: the new row appears on All Users and counts update. Submitting with empty required fields shows visible validation messages and adds no row; Cancel leaves the collection unchanged
+- Choosing a row's Edit action opens the form prefilled with that user's data; saving updates the row everywhere it appears. Choosing Delete removes the user from the list, selection, counts, and filtered views
+- Changing a user's status or role updates its badge and its filter membership; applying filters or sort recomputes which rows are visible from the shared collection; running a bulk status/role/delete affects every checkbox-selected row; emptying the list (delete all, or filters matching nothing) shows an empty state in the list region
+- At least two additional Users modes from Roles, Permissions, Logs, Stats, Payments, Products open from the Users sidebar group, each rendering its own filters/table
+- Operations Overview renders as a distinct view: breadcrumbs (Dashboard › Operations Overview) and header actions (New product / Export / System health), a KPI stats strip (Revenue / Orders / Active users / Support SLA), chart cards (revenue/demand column, order-status pie, revenue run-rate primary inverse column, acquisition mix pie, marketing line, fulfillment line), and operational panels (activity table, governance radial + progress, priority queue, promotions, uptime bars, satisfaction, inventory, plugins, automation, security watch, cash movement). Overview metrics may be seeded; Users stays fully interactive
 </core_features>
 
 <visual_design>
@@ -56,11 +65,14 @@ Stack: React + Zustand + Tailwind CSS (Vite or equivalent SPA). DaisyUI 5 allowe
 - Operations Overview mosaic must stay asymmetric with mixed card spans; Users tables/forms must match DaisyUI admin density
 </requirements>
 
-## Delivery and integrity
+<integrity>
+- Work only from this instruction and `/app`; do not use `/solution`, `/tests`, or verifier artifacts.
+</integrity>
 
-- Integrity: work only from this instruction and `/app`; do not use `/solution`, `/tests`, or verifier artifacts.
-- Delivery: produce an original self-contained app in `/app`; scaffold under `/app` as needed for the stack in `<summary>`; run `npm start` on port 3000; do not iframe, proxy, or fetch the product from another origin.
-- WebMCP: required delivery step, not a scoring criterion; implement exactly the `<webmcp_action_contract>` below; register tools yourself from `<module_spec>` + Bindings using the same handlers as the visible UI; honor mechanics exclusions; optional self-test via `webmcp_session_info` / `webmcp_list_tools` / `webmcp_invoke_tool` only.
+<delivery>
+- Produce an original self-contained app in `/app`; scaffold under `/app` as needed for the stack in `<summary>`; `/app/package.json` MUST define npm scripts named exactly `start` (serves the app on port 3000) and `verify:build` (exits 0 when the app entry/build is present and succeeds); run via `npm start` on port 3000; do not iframe, proxy, or fetch the product from another origin.
+- WebMCP is a required delivery step, not a scoring criterion; implement exactly the `<webmcp_action_contract>` below; register tools yourself from `<module_spec>` + Bindings using the same handlers as the visible UI; honor mechanics exclusions; optional self-test via `webmcp_session_info` / `webmcp_list_tools` / `webmcp_invoke_tool` only.
+</delivery>
 
 <webmcp_action_contract>
 Contract version: zto-webmcp-v1

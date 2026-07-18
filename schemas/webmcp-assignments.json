@@ -292,8 +292,7 @@
           "filters"
         ],
         "filters": [
-          "era",
-          "type"
+          "category"
         ],
         "entity": "event",
         "entity_operations": [
@@ -327,8 +326,7 @@
           "search"
         ],
         "filters": [
-          "artist",
-          "era"
+          "period"
         ],
         "entity": "palette",
         "entity_operations": [
@@ -547,8 +545,7 @@
           "filters"
         ],
         "filters": [
-          "era",
-          "artist"
+          "period"
         ],
         "entity": "palette",
         "entity_operations": [
@@ -815,8 +812,7 @@
           "filters"
         ],
         "filters": [
-          "era",
-          "type"
+          "category"
         ],
         "entity": "event",
         "entity_operations": [

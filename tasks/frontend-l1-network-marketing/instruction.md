@@ -2,6 +2,15 @@
 Build a Layer-1 blockchain network marketing site using React, Zustand, and Tailwind CSS.
 </summary>
 
+<reference_screenshots>
+Screenshots of the reference application are provided in-container at
+`/reference-screenshots/`: `overview.png` is a full-page desktop-layout
+overview (downscaled); `segment-NN.png` are full-resolution 1440x900 sections
+in top-to-bottom order with slight overlap. They are part of this instruction:
+recreate what they show. Where a screenshot and the text conflict, the text
+wins. Do not copy the images into `/app` or ship them as app assets.
+</reference_screenshots>
+
 <core_features>
 Core features:
 - Sticky top chrome: Ridge wordmark + geometric mark (left); light/dark theme toggle pill; oversized hamburger that opens a full-screen / drawer mega-menu — no traditional horizontal link row in the header
@@ -31,10 +40,10 @@ Core features:
 <motion>
 - Theme toggle: sun/moon swap with short rotate/fade; surfaces recolor via theme tokens
 - Mega-menu: drawer/full-screen panel slides or fades in; light-dismiss closes it
-- Initial page-load entrance (REQUIRED): chrome from above; bento cells via clip-path/opacity/translate; hero plane settles; ease-in or ease-in-out; primary moves ~1500–2000ms with stagger; one-shot mount class — not IntersectionObserver. prefers-reduced-motion skips the load entrance
-- Why Ridge sticky card pile (REQUIRED on desktop): progressive sticky stack with peek shelves; mobile and reduced-motion use static vertical list
-- Get started trio enter motion (REQUIRED below lg): staggered rise from translateY(50%) with ease-out; reduced-motion skips
-- Ridge Global Events text animation (REQUIRED): per-character scramble/flash decode into RIDGE GLOBAL EVENTS plus clipped line-mask blurb reveal on enter-view; reduced-motion shows final text immediately
+- Initial page-load entrance (REQUIRED): a one-shot mount class (added after mount via double requestAnimationFrame, NOT an IntersectionObserver) drives the sticky chrome down from translateY(-100%), the two bento cells in via clip-path inset expansion plus a short translateY settle, and the hero plane in last; the sequence uses an ease-in-out curve (~cubic-bezier(0.8,0,0.2,1)), primary moves last ~1.7–1.9s each, and cells stagger behind the chrome (chrome ~0.85s delay, bento cells ~0.9s/1.05s, hero plane ~1.35s). prefers-reduced-motion skips the load entrance and paints settled
+- Why Ridge sticky card pile (REQUIRED at ≥768px): the four pillars are position:sticky with progressively larger top offsets (each pillar peeks ~24–32px below the previous, later cards covering earlier ones) and the chapter title pins above them; below 768px and under reduced-motion they fall back to a static vertical list
+- Get started trio enter motion (REQUIRED below lg / <1024px): each of the three cards rises from translateY(50%) to 0 with an ease-out-soft curve (~cubic-bezier(0.165,0.84,0.44,1)) and a per-card stagger of ~0.4s (roughly 2.0s / 2.4s / 2.8s); at ≥1024px the translate is suppressed and reduced-motion shows them static
+- Ridge Global Events text animation (REQUIRED): on enter-view, each character of RIDGE GLOBAL EVENTS flashes through decoy glyphs before settling to its final letter (per-character start delay ~index×60ms, duration ~50ms+(index+1)×75ms, a few decoy steps) while the supporting blurb reveals line-by-line from translateY(-100%) inside overflow-hidden wrappers (~2s ease, per-line delay ~0.15s×(line+1)); it runs once and reduced-motion shows the final text immediately
 - Events Manager mode switches without full reload; list rows update on create/edit/delete
 - Hover animations (required): notched CTAs brighten + arrow nudge; tiles ease lift/brightness while preserving notch silhouette; event rows take hover wash; theme toggle animates; focus-visible rings on interactive controls
 </motion>
@@ -57,11 +66,14 @@ Stack: React + Zustand + Tailwind CSS (Vite or equivalent SPA); frontend-only. N
 - Intentionally out of scope: real wallet connect, live chain RPC, auth, CMS, or payment flows
 </requirements>
 
-## Delivery and integrity
+<integrity>
+- Work only from this instruction and `/app`; do not use `/solution`, `/tests`, or verifier artifacts.
+</integrity>
 
-- Integrity: work only from this instruction and `/app`; do not use `/solution`, `/tests`, or verifier artifacts.
-- Delivery: produce an original self-contained app in `/app`; scaffold under `/app` as needed for the stack in `<summary>`; run `npm start` on port 3000; do not iframe, proxy, or fetch the product from another origin.
-- WebMCP: required delivery step, not a scoring criterion; implement exactly the `<webmcp_action_contract>` below; register tools yourself from `<module_spec>` + Bindings using the same handlers as the visible UI; honor mechanics exclusions; optional self-test via `webmcp_session_info` / `webmcp_list_tools` / `webmcp_invoke_tool` only.
+<delivery>
+- Produce an original self-contained app in `/app`; scaffold under `/app` as needed for the stack in `<summary>`; `/app/package.json` MUST define npm scripts named exactly `start` (serves the app on port 3000) and `verify:build` (exits 0 when the app entry/build is present and succeeds); run via `npm start` on port 3000; do not iframe, proxy, or fetch the product from another origin.
+- WebMCP is a required delivery step, not a scoring criterion; implement exactly the `<webmcp_action_contract>` below; register tools yourself from `<module_spec>` + Bindings using the same handlers as the visible UI; honor mechanics exclusions; optional self-test via `webmcp_session_info` / `webmcp_list_tools` / `webmcp_invoke_tool` only.
+</delivery>
 
 <webmcp_action_contract>
 Contract version: zto-webmcp-v1

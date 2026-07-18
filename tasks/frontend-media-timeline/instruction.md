@@ -2,16 +2,31 @@
 Build a media history timeline explorer using Solid.js, Solid stores, and Tailwind CSS.
 </summary>
 
+<reference_screenshots>
+Screenshots of the reference application are provided in-container at
+`/reference-screenshots/`: `overview.png` is a full-page desktop-layout
+overview (downscaled); `segment-NN.png` are full-resolution 1440x900 sections
+in top-to-bottom order with slight overlap. They are part of this instruction:
+recreate what they show. Where a screenshot and the text conflict, the text
+wins. Do not copy the images into `/app` or ship them as app assets.
+</reference_screenshots>
+
 <core_features>
 Core features:
-- Direct timeline entry — exploration stage plus year scrubber/controls; no marketing landing, login, or backend
-- Primary collection — timeline events (clips): seed a non-empty corpus (on the order of dozens of events); each event has title, year (negative for BCE), place, category/band, and summary; the collection supports create, edit, and delete of user-managed events (seeded corpus may remain read-only alongside user events, or all events may be editable — but create/edit/delete of at least the user-managed set is required)
-- At least two interaction modes: Scrub/Explore mode (pan, year window, pins on the stage) and Library/Filter mode (searchable/filterable event list with create/edit forms)
-- Domain behavior beyond CRUD: year-window scrubbing that changes which pins are in view; category/band filters; selection opens in-page detail; empty state when filters match nothing or when all user-managed events are deleted; BCE/CE year display
-- Event detail opens in-page (popup or panel); close returns to the stage without leaving the page
-- Invalid create: empty title or invalid year must not add an event; show visible validation feedback
+- The app opens directly onto the timeline exploration stage (axis, era bands, event pins) with a year scrubber and filter controls; no marketing landing, login, or backend
+- Primary collection is timeline events: seed a dense corpus on the order of ~60 events spanning at least 10 categories and at least 5 named eras, each event carrying title, year (negative for BCE), place, one or more categories, and a summary/detail; create, edit, and delete are supported for at least the user-managed events (the seeded corpus may stay read-only alongside them)
+- Two interaction modes: Scrub/Explore mode (drag to pan the stage, wheel to zoom the year window around its midpoint, Shift+wheel or a dominant horizontal wheel to translate the window) and Library/Filter mode (search + category filters + create/edit forms)
+- A dual-handle year scrubber sets the from/to window with a formatted BCE/CE readout; numeric year from/to inputs set the same window; a fit-all/reset control returns to the full span or the default window
+- Category filters (all enabled by default) plus a free-text search over title/place/summary recompute which events are in view; a clear-filters control restores every category and the default range
+- Named era bands (at least 5) wash the stage behind the axis, and a current-era label reflects the era at the window midpoint and updates as the window moves
+- Event pins carry their category color at year positions; hovering an unclustered pin reveals a label with title, place, and BCE/CE year, and same-year or overlapping pins offset so each stays individually clickable
+- Clicking a pin opens an in-page detail (panel/popup) showing kicker (year · place), title, category, and body; Previous/Next controls and the ←/→ arrow keys step through the currently filtered events, and Escape or a close control returns to the stage without leaving the page
+- An event-count readout ("N events in view") and a result note ("Showing N of M catalogued events", or a search-matched count) track the visible set
+- An About/help overlay opens in-page with how-to copy and no outbound links
+- Invalid create: empty title or invalid year shows visible validation feedback and adds no event
+- Editing a user event updates it in the list, its pin, and any open detail; deleting removes it from the list, stage, selection, and counts
+- An empty state appears in the list/stage region when filters or the year window match nothing, or when all user-managed events are deleted
 - Zero outbound navigation — exploration stays on the local app
-- Four horizontal timeline bands with named titles; dual-handle year scrubber; cluster menus for overlapping pins; hover labels for unclustered pins
 </core_features>
 
 <visual_design>
@@ -39,17 +54,21 @@ State contracts (behavioral, not storage keys):
 - Filters and year window recompute visible events from the shared collection
 - Active mode and selection are shared client state; switching modes does not reload the document
 Stack: Solid.js + Solid stores + Tailwind CSS (Vite or equivalent SPA). Paper.js (or equivalent vector canvas) plus client helpers (e.g. GSAP/Draggable, particles) are allowed for pan, scrubber, labels, and popup transitions.
-- Seed a non-empty corpus so first load is useful; seed enough user-editable events or allow create from empty user set with clear empty state
+- Seed a dense corpus on the order of ~60 events across at least 10 categories and at least 5 named eras so first load is useful across zoom levels; seed enough user-editable events or allow create from an empty user set with a clear empty state
+- Wheel zoom and Shift/horizontal-wheel pan recompute the year window; the current-era label and event-count readout follow the shared window and filters
 - Empty required fields on create must not increase the events count; show visible validation feedback
 - After deleting all user-managed events (or filtering to zero matches), show an empty state in the list region
 - Zero outbound navigational links; document title reflects MediaTimeline
 </requirements>
 
-## Delivery and integrity
+<integrity>
+- Work only from this instruction and `/app`; do not use `/solution`, `/tests`, or verifier artifacts.
+</integrity>
 
-- Integrity: work only from this instruction and `/app`; do not use `/solution`, `/tests`, or verifier artifacts.
-- Delivery: produce an original self-contained app in `/app`; scaffold under `/app` as needed for the stack in `<summary>`; run `npm start` on port 3000; do not iframe, proxy, or fetch the product from another origin.
-- WebMCP: required delivery step, not a scoring criterion; implement exactly the `<webmcp_action_contract>` below; register tools yourself from `<module_spec>` + Bindings using the same handlers as the visible UI; honor mechanics exclusions; optional self-test via `webmcp_session_info` / `webmcp_list_tools` / `webmcp_invoke_tool` only.
+<delivery>
+- Produce an original self-contained app in `/app`; scaffold under `/app` as needed for the stack in `<summary>`; `/app/package.json` MUST define npm scripts named exactly `start` (serves the app on port 3000) and `verify:build` (exits 0 when the app entry/build is present and succeeds); run via `npm start` on port 3000; do not iframe, proxy, or fetch the product from another origin.
+- WebMCP is a required delivery step, not a scoring criterion; implement exactly the `<webmcp_action_contract>` below; register tools yourself from `<module_spec>` + Bindings using the same handlers as the visible UI; honor mechanics exclusions; optional self-test via `webmcp_session_info` / `webmcp_list_tools` / `webmcp_invoke_tool` only.
+</delivery>
 
 <webmcp_action_contract>
 Contract version: zto-webmcp-v1
@@ -105,7 +124,7 @@ Module specs:
 Bindings:
 - Browsable entity: timeline-events
 - Destinations: timeline; event-detail; filters
-- Filters: era; type
+- Filters: category
 - Entity: event
 - Entity operations: create; select; update; delete
 - Entity fields: title; era; type; summary

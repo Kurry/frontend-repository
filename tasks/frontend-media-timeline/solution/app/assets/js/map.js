@@ -30,7 +30,8 @@ class TaliMap {
         this.disableEventsToggle = false;
         this.$mapCountryName = $( "#map-country-name" );
         // this.$closeClsUpBtn = $( "#exit-close-up-btn" );
-        this.$markerTemplate = $( document.getElementById( "map_marker_template" ).content ).find( ".map-marker" );
+        const markerTemplateEl = document.getElementById( "map_marker_template" );
+        this.$markerTemplate = markerTemplateEl ? $( markerTemplateEl.content ).find( ".map-marker" ) : $();
 
         this.initialMapCenter = [ 31.046, 34.8516 ];
         this.initialZoom = 2;

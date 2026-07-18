@@ -2,28 +2,41 @@
 Build a Material theme design studio using React, Redux Toolkit, and Tailwind CSS.
 </summary>
 
+<reference_screenshots>
+Screenshots of the reference application are provided in-container at
+`/reference-screenshots/`: `overview.png` is a full-page desktop-layout
+overview (downscaled); `segment-NN.png` are full-resolution 1440x900 sections
+in top-to-bottom order with slight overlap. They are part of this instruction:
+recreate what they show. Where a screenshot and the text conflict, the text
+wins. Do not copy the images into `/app` or ship them as app assets.
+</reference_screenshots>
+
 <core_features>
-Core features:
-- App header with product title Material-UI Theme Creator, inert version chip, Tutorial control (in-page modal), and inert GitHub icon
-- Main tabs: Preview / Components / Saved Themes (in-app only; never leave the page)
-- Monaco editor showing ThemeOptions TypeScript, bi-synced with Palette / Fonts / Typography / Snippets tool panels
-- Editor actions: Editor Settings, Copy theme code, undo/redo, save control with save-status text
-- Light/Dark palette Type toggle that updates preview surfaces and editor source
-- Device-framed sample sites (Phone / Tablet / Desktop) with sample templates containing internal anatomy
-- Searchable component gallery themed by the active options
-- Primary collection — saved themes: seed at least 3 saved themes; each has name, palette type (light/dark), and ThemeOptions payload; the list supports create (New Theme), edit (rename + save options), and delete
-- At least two interaction modes: Preview/Editor mode (device preview + Monaco + tools) and Saved Themes mode (collection management + load into editor)
-- Domain behavior beyond CRUD: load a saved theme into the editor/preview; Light/Dark type toggle; save-status feedback; empty saved-themes state after deleting all; filters or search over saved theme names
-- Invalid create: empty theme name must not add a saved theme; show visible validation feedback
-- Inert former external affordances — interactive look, no navigation
+Core features (each line is an observable behavior the finished app must exhibit):
+- The header shows the product title Material-UI Theme Creator, an inert version chip (e.g. @material-ui/core@^4.11.0), a Tutorial control that opens an in-page modal, and an inert GitHub icon that never navigates
+- A main tab bar switches between three panels — Preview, Components, and Saved Themes — entirely in-app, swapping the workspace without a document navigation
+- Preview panel puts a device-framed sample site on one side and a Monaco editor over stacked tool panels on the other; Phone / Tablet / Desktop toggles reframe the sample chrome to roughly 375px / 768px / full width without reload
+- The device frame cycles through at least six sample templates (e.g. Instructions, Sign Up, Dashboard, Blog, Pricing, Checkout), each with its own internal anatomy and recolored live by the active theme options
+- The Monaco editor shows the theme as ThemeOptions TypeScript and stays bi-synced with the tool panels: editing a tool rewrites the source, editing valid source updates the tools and preview, and invalid source surfaces an invalid-options status instead of applying
+- Editor actions row: Editor Settings (toggles the Monaco color theme), Copy theme code (copies the generated TypeScript to the clipboard with a toast), Undo and Redo over the bounded edit history, and a Save control whose status text reflects saved / unsaved / editing state
+- The Palette tool lists expandable accordion rows — a Light/Dark Type toggle, Background, Text, Divider, and the six intent colors primary, secondary, error, warning, info, success — and each intent row expands to main / light / dark / contrastText color fields kept live with the editor
+- Toggling Type between Light and Dark recolors the preview surfaces (background, paper, text, divider) and updates the editor source immediately, without reload
+- The Fonts tool adds a Google font by name (loading the family), rejects a duplicate with feedback, and removes a font — while keeping the base Roboto family protected from removal
+- The Typography tool sets the font family from the loaded fonts and a base font size within a bounded numeric range; the Snippets tool offers a small fixed set of one-click presets (e.g. Dense spacing, Rounded shapes, Button casing) that patch the options and toast confirmation
+- The Components panel renders a searchable gallery of roughly two dozen themed component demos (App Bar, Buttons, Card, Chip, Slider, Table, and the like) with a filterable drawer nav that jumps to a section via same-document anchors only
+- Primary collection — saved themes: seed at least three saved themes (e.g. a default light theme, a dark starter, and a colored variant), each with a name, palette type (light/dark), and a ThemeOptions payload; Saved Themes lists them as cards showing swatches with load and delete controls and marks the active theme
+- Saved Themes supports create (New Theme), edit (rename plus save-options), and delete; deleting a theme removes it from the list and from active selection when it was loaded, and deleting every theme shows an empty saved-themes state
+- Loading a saved theme — from its card or Load control — writes its options into the shared editor/preview state and resets the dirty/undo state
+- Domain behavior beyond CRUD: load a saved theme into the editor/preview; the Light/Dark type toggle; save-status feedback; and a search/filter over saved theme names that recomputes the visible cards from the collection
+- Invalid create: an empty theme name must not add a saved theme and must surface visible validation feedback
 </core_features>
 
 <visual_design>
 - Dark studio shell (near-black surfaces, light shell text, indigo/Material primary accent) with Roboto and Material iconography
-- Header brand lockup above main tabs; full-viewport tool density — not a marketing landing
-- Preview tab: device toggles + framed sample site on one side; Monaco plus stacked tool panels on the other
-- Saved Themes mode: dense list/cards of saved themes with load/delete actions and empty state
-- Sample sites and component demos reflect live ThemeOptions
+- Header brand lockup above a three-tab bar (Preview / Components / Saved Themes) carrying a cyan Material logo mark; full-viewport tool density — not a marketing landing
+- Preview tab: device toggles + framed sample site on one side; Monaco plus stacked Palette / Fonts / Typography / Snippets tool panels on the other, with a bottom tool-nav to switch panels
+- Saved Themes mode: dense cards, each previewing the theme's swatches (e.g. primary / secondary / paper) with a type-and-updated meta line and load/delete actions; a visible empty state when the collection is emptied
+- Sample sites and component demos recolor from the live ThemeOptions via CSS variables, so palette/typography edits are reflected across every preview surface
 - Layout and chrome styled with Tailwind utility classes
 </visual_design>
 
@@ -52,11 +65,14 @@ Stack: React + Redux Toolkit + Tailwind CSS (Vite or equivalent SPA); frontend-o
 - Document title Material UI Theme Creator; product header shows Material-UI Theme Creator
 </requirements>
 
-## Delivery and integrity
+<integrity>
+- Work only from this instruction and `/app`; do not use `/solution`, `/tests`, or verifier artifacts.
+</integrity>
 
-- Integrity: work only from this instruction and `/app`; do not use `/solution`, `/tests`, or verifier artifacts.
-- Delivery: produce an original self-contained app in `/app`; scaffold under `/app` as needed for the stack in `<summary>`; run `npm start` on port 3000; do not iframe, proxy, or fetch the product from another origin.
-- WebMCP: required delivery step, not a scoring criterion; implement exactly the `<webmcp_action_contract>` below; register tools yourself from `<module_spec>` + Bindings using the same handlers as the visible UI; honor mechanics exclusions; optional self-test via `webmcp_session_info` / `webmcp_list_tools` / `webmcp_invoke_tool` only.
+<delivery>
+- Produce an original self-contained app in `/app`; scaffold under `/app` as needed for the stack in `<summary>`; `/app/package.json` MUST define npm scripts named exactly `start` (serves the app on port 3000) and `verify:build` (exits 0 when the app entry/build is present and succeeds); run via `npm start` on port 3000; do not iframe, proxy, or fetch the product from another origin.
+- WebMCP is a required delivery step, not a scoring criterion; implement exactly the `<webmcp_action_contract>` below; register tools yourself from `<module_spec>` + Bindings using the same handlers as the visible UI; honor mechanics exclusions; optional self-test via `webmcp_session_info` / `webmcp_list_tools` / `webmcp_invoke_tool` only.
+</delivery>
 
 <webmcp_action_contract>
 Contract version: zto-webmcp-v1

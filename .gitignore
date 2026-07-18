@@ -49,3 +49,6 @@ trials/
 # Python virtualenvs
 .venv/
 venv/
+
+# Regenerable capture output at repo root (installed copies in tasks/*/environment/ ARE tracked)
+/reference-screenshots/

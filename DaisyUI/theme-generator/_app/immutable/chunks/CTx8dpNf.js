@@ -1,1 +1,0 @@
-var e=`https://api.daisyui.com`;export{e as t};

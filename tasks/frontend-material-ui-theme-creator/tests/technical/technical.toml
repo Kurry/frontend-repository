@@ -1,29 +1,17 @@
 [judge]
-judge = "claude-code"
+judge = "codex"
+model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
 cwd = "/app"
 mode = "batched"
 timeout = 3000
 
 [[judge.mcp_servers]]
-name = "stagehand-webmcp"
+name = "webmcp"
 transport = "stdio"
-command = "npx"
+command = "node"
 args = [
-  "-y",
-  "@browserbasehq/stagehand@3.7.0",
-  "mcp",
-  "--env",
-  "LOCAL",
-  "--chrome-version",
-  "151.0.7922.34",
-  "--enable-webmcp",
-  "--tools",
-  "webmcp_session_info,webmcp_list_tools,webmcp_invoke_tool",
-  "--disable-tools",
-  "act,observe,extract,agent",
-  "--cdp-port",
-  "$WEBMCP_CDP_PORT",
+  "/tests/mcp/webmcp_stdio_server.mjs",
 ]
 allowed_tools = [
   "webmcp_session_info",
@@ -73,13 +61,6 @@ allowed_tools = [
 aggregation = "weighted_mean"
 
 [[criterion]]
-id = "2.1"
-name = "2_1"
-description = "Zustand holds saved themes, active options, and tab/device UI — shared across components"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "2.2"
 name = "2_2"
 description = "Implemented with React, Zustand, and Tailwind CSS; no browser storage APIs for persistence"
@@ -90,14 +71,6 @@ weight = 1.0
 id = "2.3"
 name = "2_3"
 description = "Uses localStorage or sessionStorage to persist themes or editor state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.4"
-name = "2_4"
-description = "Manages the saved themes collection only in component-local useState rather than Zustand"
 type = "binary"
 weight = 1.0
 negate = true

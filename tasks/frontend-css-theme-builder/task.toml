@@ -1,25 +1,22 @@
 schema_version = "1.3"
 
 [task]
-name = "local/frontend-css-theme-builder"
+name = "mercor-intelligence/frontend-css-theme-builder"
 description = "CSS theme builder variant."
-keywords = ["frontend", "good-app", "playwright", "rewardkit", "webmcp"]
-
-[metadata]
-difficulty = "hard"
-category = "frontend"
-tags = ["frontend", "good-app", "webmcp", "rewardkit"]
-source_folder = "variants/CssThemeBuilder"
 
 [agent]
 timeout_sec = 3600.0
+
+[agent.env]
+CLAUDE_FORCE_OAUTH = "1"
+CLAUDE_CODE_OAUTH_TOKEN = "${CLAUDE_CODE_OAUTH_TOKEN}"
 
 [verifier]
 timeout_sec = 14400.0
 
 [verifier.env]
-ANTHROPIC_API_KEY = "${ANTHROPIC_API_KEY}"
-CLAUDE_CODE_OAUTH_TOKEN = "${CLAUDE_CODE_OAUTH_TOKEN}"
+OPENAI_API_KEY = "${OPENAI_API_KEY}"
+REWARDKIT_MODEL = "${REWARDKIT_MODEL:-}"
 
 [environment]
 workdir = "/app"
@@ -32,10 +29,23 @@ source = "/app"
 destination = "app"
 exclude = [
     "node_modules",
-    ".cache",
+    ".git",
+    ".DS_Store",
     "dist",
     "build",
     "out",
-    ".DS_Store",
-    ".git",
+    ".next",
+    ".nuxt",
+    ".svelte-kit",
+    "storybook-static",
+    ".cache",
+    ".vite",
+    ".turbo",
+    ".parcel-cache",
+    ".pnpm-store",
+    ".yarn",
+    ".npm",
+    "coverage",
+    "playwright-report",
+    "test-results",
 ]

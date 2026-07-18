@@ -1,0 +1,193 @@
+#!/usr/bin/env node
+// Capture standardized reference screenshots from each task's oracle
+// (tasks/<slug>/solution/app), doubling as an oracle smoke-validation pass.
+//
+// Per task:
+//   1. Serve solution/app on a local port (npm start if the package defines it,
+//      else `npx serve`). Fail loudly if it never responds — that alone
+//      validates the oracle is runnable.
+//   2. Load it in headless Chromium at a 1440x900 desktop viewport, recording
+//      console errors and page errors (oracle validation signal).
+//   3. Capture:
+//      - overview.png — full-page DESKTOP layout rendered at 768px width via
+//        deviceScaleFactor (a shrunken desktop render, NOT a responsive
+//        tablet reflow). Fits any model's image budget; shows composition.
+//      - segment-NN.png — 1440x900 viewport captures stepping down the page
+//        with 100px overlap. Each is fully legible under Claude's ~1568px
+//        long-edge budget and cheap for GPT-style 512px tiling.
+//   4. Write validation.json (served, console/page errors, page height,
+//      segment count) next to the images.
+//
+// Output: reference-screenshots/<slug>/ at the repo root — intentionally
+// OUTSIDE tasks/ so screenshots can never bloat task packages or artifacts.
+//
+// Usage: node scripts/capture_reference_screenshots.mjs [slug ...]
+//        (no args = every tasks/*/solution/app)
+
+import { createRequire } from 'node:module';
+import { execSync, spawn } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const requireCjs = createRequire(import.meta.url);
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const OUT_ROOT = path.join(ROOT, 'reference-screenshots');
+const PORT = 45871;
+const VIEWPORT = { width: 1440, height: 900 };
+const OVERLAP = 100;
+const OVERVIEW_WIDTH = 768;
+const SETTLE_MS = 1500;
+
+function resolvePlaywright() {
+  const candidates = [
+    'playwright',
+    path.join(ROOT, 'node_modules', 'playwright'),
+    '/private/tmp/claude-501/-Users-kurrytran-frontend-repository/0a2c5e5d-30a3-4e80-a8b2-fc368a34c16a/scratchpad/node_modules/playwright',
+  ];
+  for (const c of candidates) {
+    try { return requireCjs(c); } catch { /* next */ }
+  }
+  throw new Error('playwright not resolvable; npm install playwright first');
+}
+
+const { chromium } = resolvePlaywright();
+
+function taskSlugs() {
+  return fs.readdirSync(path.join(ROOT, 'tasks'))
+    .filter((d) => fs.existsSync(path.join(ROOT, 'tasks', d, 'solution', 'app')))
+    .sort();
+}
+
+async function waitForServer(url, timeoutMs = 30000) {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    try {
+      const res = await fetch(url);
+      if (res.ok) return true;
+    } catch { /* not up yet */ }
+    await new Promise((r) => setTimeout(r, 500));
+  }
+  return false;
+}
+
+function startServer(appDir) {
+  const pkgPath = path.join(appDir, 'package.json');
+  let cmd, args;
+  if (fs.existsSync(pkgPath)) {
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+    const start = pkg.scripts?.start || '';
+    if (start && !start.includes('serve')) {
+      // real app server (e.g. vite): needs deps
+      if (!fs.existsSync(path.join(appDir, 'node_modules'))) {
+        execSync('npm install --no-audit --no-fund', { cwd: appDir, stdio: 'ignore' });
+      }
+      // rewrite any hardcoded port via PORT env; vite-style scripts use --port 3000
+      const patched = start.replace(/--port\s+\d+/, `--port ${PORT}`).replace(/-l\s+\d+/, `-l ${PORT}`);
+      return spawn('sh', ['-c', patched.includes(String(PORT)) ? patched : `${start} --port ${PORT}`], {
+        cwd: appDir, stdio: 'ignore', detached: true,
+      });
+    }
+  }
+  // static folder
+  return spawn('npx', ['-y', 'serve', '-l', String(PORT), '-n', '.'], {
+    cwd: appDir, stdio: 'ignore', detached: true,
+  });
+}
+
+function stopServer(proc) {
+  try { process.kill(-proc.pid, 'SIGKILL'); } catch { try { proc.kill('SIGKILL'); } catch { /* gone */ } }
+}
+
+async function captureTask(slug) {
+  const appDir = path.join(ROOT, 'tasks', slug, 'solution', 'app');
+  const outDir = path.join(OUT_ROOT, slug);
+  fs.rmSync(outDir, { recursive: true, force: true });
+  fs.mkdirSync(outDir, { recursive: true });
+
+  const result = {
+    slug, served: false, consoleErrors: [], pageErrors: [],
+    pageHeight: null, segments: 0, capturedAt: null,
+  };
+
+  const url = `http://localhost:${PORT}`;
+  // the port must be FREE before we start — otherwise we'd screenshot whatever
+  // unrelated service already lives there and call it the oracle
+  try {
+    await fetch(url);
+    throw new Error(`port ${PORT} is already in use by another service`);
+  } catch (err) {
+    if (String(err).includes('already in use')) throw err; // fetch succeeded = occupied
+  }
+  const server = startServer(appDir);
+  try {
+    result.served = await waitForServer(url);
+    if (!result.served) return result;
+
+    const browser = await chromium.launch({ headless: true });
+    try {
+      // segments + validation at desktop viewport
+      const ctx = await browser.newContext({ viewport: VIEWPORT });
+      const page = await ctx.newPage();
+      page.on('console', (m) => { if (m.type() === 'error') result.consoleErrors.push(m.text().slice(0, 300)); });
+      page.on('pageerror', (e) => result.pageErrors.push(String(e).slice(0, 300)));
+      await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+      await page.waitForTimeout(SETTLE_MS);
+
+      const height = await page.evaluate(() =>
+        Math.max(document.body.scrollHeight, document.documentElement.scrollHeight));
+      result.pageHeight = height;
+
+      const step = VIEWPORT.height - OVERLAP;
+      let idx = 0;
+      for (let y = 0; y === 0 || y < height - OVERLAP; y += step) {
+        await page.evaluate((top) => window.scrollTo(0, top), y);
+        await page.waitForTimeout(300);
+        idx += 1;
+        await page.screenshot({
+          path: path.join(outDir, `segment-${String(idx).padStart(2, '0')}.png`),
+        });
+        if (idx >= 30) break; // safety bound for infinite-scroll pages
+      }
+      result.segments = idx;
+      await ctx.close();
+
+      // overview: desktop layout downscaled to 768px width
+      const scale = OVERVIEW_WIDTH / VIEWPORT.width;
+      const octx = await browser.newContext({ viewport: VIEWPORT, deviceScaleFactor: scale });
+      const opage = await octx.newPage();
+      await opage.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+      await opage.waitForTimeout(SETTLE_MS);
+      await opage.screenshot({
+        path: path.join(outDir, 'overview.png'), fullPage: true, scale: 'device',
+      });
+      await octx.close();
+    } finally {
+      await browser.close();
+    }
+  } finally {
+    stopServer(server);
+    await new Promise((r) => setTimeout(r, 500));
+  }
+  result.capturedAt = new Date().toISOString();
+  fs.writeFileSync(path.join(outDir, 'validation.json'), JSON.stringify(result, null, 2));
+  return result;
+}
+
+const slugs = process.argv.slice(2).length ? process.argv.slice(2) : taskSlugs();
+let failures = 0;
+for (const slug of slugs) {
+  try {
+    const r = await captureTask(slug);
+    const status = !r.served ? 'SERVE-FAIL'
+      : r.pageErrors.length ? 'PAGE-ERRORS'
+      : r.consoleErrors.length ? 'CONSOLE-ERRORS' : 'OK';
+    if (status !== 'OK') failures += 1;
+    console.log(`${slug}: ${status} height=${r.pageHeight} segments=${r.segments} consoleErr=${r.consoleErrors.length} pageErr=${r.pageErrors.length}`);
+  } catch (err) {
+    failures += 1;
+    console.log(`${slug}: CAPTURE-FAIL ${String(err).slice(0, 200)}`);
+  }
+}
+console.log(`done: ${slugs.length - failures}/${slugs.length} clean`);
+process.exit(failures ? 1 : 0);

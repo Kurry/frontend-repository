@@ -2,17 +2,31 @@
 Build a fine-art color palette library using Vue 3, Pinia, and UnoCSS.
 </summary>
 
+<reference_screenshots>
+Screenshots of the reference application are provided in-container at
+`/reference-screenshots/`: `overview.png` is a full-page desktop-layout
+overview (downscaled); `segment-NN.png` are full-resolution 1440x900 sections
+in top-to-bottom order with slight overlap. They are part of this instruction:
+recreate what they show. Where a screenshot and the text conflict, the text
+wins. Do not copy the images into `/app` or ship them as app assets.
+</reference_screenshots>
+
 <core_features>
 Core features:
-- Direct library entry with editorial intro and a browsable palette section — no login, cart checkout, or multi-page routing
-- Sticky chrome: script / O&A lockup, centered MENU, and CART; empty cart drawer chrome may open but never checks out
-- Primary collection — saved palettes (and/or curated color sets): seed at least 6 user-manageable palettes; each has name, period tag, and a set of hex swatches; the list supports create, edit, and delete
-- At least two interaction modes: Browse mode (Nomenclature / Palette / Swatch library views with period filter) and Detail/Editor mode (open a palette to edit name, period, and swatches)
-- Domain behavior beyond CRUD: period filter across views; hex copy with brief copied feedback; favorite or featured flag; empty state when filters match nothing or all user palettes deleted
-- Three library layouts remain: Nomenclature (default), Palette, and Swatch, with a filled circular indicator on the active view
-- Invalid create: empty palette name or fewer than required swatches must not add a palette; show visible validation feedback
-- Optional subscribe popup after idle/deep scroll (dismiss in memory — no real network subscribe)
-- Inert chrome (logo, menu, cart, painting titles, footer) — never navigates away
+- The app opens directly onto the O&A Palette Library — editorial intro plus a browsable palette section — with no login, cart checkout, or multi-page routing
+- The sticky header carries the O&A script lockup ("THE O&A PALETTE LIBRARY"), a centered MENU control, and a right CART control; opening the cart drawer shows empty-cart chrome but never checks out, and header/menu/cart/footer/painting-title controls never navigate away
+- The intro presents a serif lead about browsing color across paintings and centuries over a two-column monospace body that names historical color sources (Werner's Nomenclature of Colours, Winsor & Newton, Cennini) and the ongoing/open dataset framing
+- A controls row places the three view toggles on the left (Nomenclature default, Palette, Swatch — each with a circular indicator that fills on the active view) and a "Filter by Period" select on the right offering All Periods plus named art-historical periods (e.g. Baroque to Neoclassical, Expressionism, Fauvism, Old Masters, Post-Impressionism, Realism, Romanticism, Symbolism, Tonalism)
+- Nomenclature view (default) renders rows with a swatch, hex, an italic historical color name, notes, and a painting-title control; rows are ordered by hue and deduped by hex so no two rows repeat a hex
+- Palette view renders a responsive card grid where each card shows a set of swatches (about five) plus painting meta; Swatch view renders large color tiles whose hex/name/title text flips dark or light by the tile's perceived luminance and reveals on hover
+- Primary collection is user-manageable palettes: seed at least 6 (alongside any historical dataset) so first load is non-empty; each has a name, a period tag, and a set of hex swatches, and the list supports create, edit, and delete
+- Two interaction modes: Browse mode (Nomenclature / Palette / Swatch views with the period filter) and Detail/Editor mode (open a palette to edit its name, period, and swatches)
+- Selecting a period hides items whose period tag does not match across all three views; All Periods restores the full set; switching views shows exactly one library layout at a time
+- Clicking a swatch (not a painting title) copies its hex to the clipboard and shows a brief on-swatch "copied" confirmation (~1s) that then clears; a favorite/featured flag can be toggled on a palette
+- Invalid create: an empty palette name or fewer than the required swatches shows visible validation feedback and adds no palette
+- Editing a palette updates that record everywhere it appears; deleting removes it from lists, selection, and filters
+- An empty state appears in the library region when the period filter matches nothing or all user palettes are deleted
+- A subscribe popup stays hidden on first paint and appears after ~45s idle or once scrolled past ~50%; closing or submitting dismisses it in memory with no real network subscribe
 </core_features>
 
 <visual_design>
@@ -38,7 +52,8 @@ State contracts (behavioral, not storage keys):
 - Creating a valid palette increases the collection and shows it in Browse layouts
 - Editing a palette updates that same record (name, period, swatches) everywhere it appears
 - Deleting a palette removes it from lists, selection, and filters
-- Period filter and view mode recompute visible items from the shared collection
+- Period filter and view mode recompute visible items from the shared collection; nomenclature ordering (hue sort + hex dedupe) derives from the shared collection
+- Copy feedback and subscribe-popup dismissal are ephemeral in-memory state; the popup stays hidden on first paint and appears only after idle (~45s) or deep scroll (~50%)
 Stack: Vue 3 + Pinia + UnoCSS (Vite or equivalent SPA); frontend-only. Lenis + GSAP ScrollTrigger and a nearest-name color helper are allowed. No MUI/Chakra/Ant Design.
 - Seed at least 6 user-manageable palettes plus any historical dataset so first load is non-empty
 - Empty required fields on create must not increase the palettes count; show visible validation feedback
@@ -47,11 +62,14 @@ Stack: Vue 3 + Pinia + UnoCSS (Vite or equivalent SPA); frontend-only. Lenis + G
 - Document title includes Palette Library; brand reads as Object and Archive / o+a
 </requirements>
 
-## Delivery and integrity
+<integrity>
+- Work only from this instruction and `/app`; do not use `/solution`, `/tests`, or verifier artifacts.
+</integrity>
 
-- Integrity: work only from this instruction and `/app`; do not use `/solution`, `/tests`, or verifier artifacts.
-- Delivery: produce an original self-contained app in `/app`; scaffold under `/app` as needed for the stack in `<summary>`; run `npm start` on port 3000; do not iframe, proxy, or fetch the product from another origin.
-- WebMCP: required delivery step, not a scoring criterion; implement exactly the `<webmcp_action_contract>` below; register tools yourself from `<module_spec>` + Bindings using the same handlers as the visible UI; honor mechanics exclusions; optional self-test via `webmcp_session_info` / `webmcp_list_tools` / `webmcp_invoke_tool` only.
+<delivery>
+- Produce an original self-contained app in `/app`; scaffold under `/app` as needed for the stack in `<summary>`; `/app/package.json` MUST define npm scripts named exactly `start` (serves the app on port 3000) and `verify:build` (exits 0 when the app entry/build is present and succeeds); run via `npm start` on port 3000; do not iframe, proxy, or fetch the product from another origin.
+- WebMCP is a required delivery step, not a scoring criterion; implement exactly the `<webmcp_action_contract>` below; register tools yourself from `<module_spec>` + Bindings using the same handlers as the visible UI; honor mechanics exclusions; optional self-test via `webmcp_session_info` / `webmcp_list_tools` / `webmcp_invoke_tool` only.
+</delivery>
 
 <webmcp_action_contract>
 Contract version: zto-webmcp-v1
@@ -107,7 +125,7 @@ Module specs:
 Bindings:
 - Browsable entity: palettes
 - Destinations: library-grid; palette-detail; search
-- Filters: artist; era
+- Filters: period
 - Entity: palette
 - Entity operations: create; select; update; delete; toggle
 - Entity fields: name; swatches; favorite

@@ -334,7 +334,12 @@ _LEGACY_WEBMCP_MD_RE = re.compile(
     r"(?=\n## |\n</|\Z)"
 )
 _XML_WEBMCP_RE = re.compile(
-    r"(?:## Delivery and integrity\n[\s\S]*?\n)?"
+    r"(?:"
+    r"## Delivery and integrity\n[\s\S]*?\n"
+    r"|"
+    r"<integrity>\n[\s\S]*?</integrity>\n+"
+    r"<delivery>\n[\s\S]*?</delivery>\n+"
+    r")?"
     r"<webmcp_action_contract>\n?[\s\S]*?</webmcp_action_contract>\n?"
 )
 
@@ -345,6 +350,11 @@ def _strip_webmcp_from_readme(text: str) -> str:
     text = re.sub(r"\n*## Product Requirements\n+", "\n", text)
     text = _XML_WEBMCP_RE.sub("", text)
     text = re.sub(r"\n*## Delivery and integrity\n[\s\S]*?(?=\n## |\Z)", "\n", text)
+    text = re.sub(
+        r"\n*<integrity>\n[\s\S]*?</integrity>\n*<delivery>\n[\s\S]*?</delivery>\n*",
+        "\n",
+        text,
+    )
     return re.sub(r"\n{3,}", "\n\n", text).rstrip() + "\n"
 
 
@@ -378,7 +388,7 @@ def assignment_for_slug(slug: str) -> dict:
 
 
 def judge_mcp_servers_block() -> str:
-    """Inline Stagehand WebMCP + Playwright CDP from canonical fragment."""
+    """Inline webmcp bridge + Playwright CDP from canonical fragment."""
     path = ROOT / "scripts" / "canonical" / "mcp" / "reward_mcp_servers.toml"
     text = path.read_text()
     idx = text.find("[[judge.mcp_servers]]")
@@ -391,14 +401,24 @@ def toml_escape(s: str) -> str:
     return s.replace("\\", "\\\\").replace('"', '\\"')
 
 
-def checklist_criterion_id(item_id: str | int) -> str:
-    """Stable judge criterion id for a verifier_checklist.json item."""
-    return f"checklist-{item_id}"
+CHECKLIST_AGGREGATE_TITLE = (
+    "Every checklist-* criterion in this Core Features dimension passes "
+    "during the agent verifier run"
+)
 
 
-def checklist_criterion_name(item_id: str | int) -> str:
+def is_checklist_aggregate(item: dict) -> bool:
+    """True for the obsolete meta rollup HLI (must not be emitted)."""
+    return item.get("title") == CHECKLIST_AGGREGATE_TITLE
+
+
+def numbered_criterion_id(major: int, minor: int) -> str:
+    return f"{major}.{minor}"
+
+
+def numbered_criterion_name(major: int, minor: int) -> str:
     """Criterion.name must match ^[a-zA-Z0-9_-]{1,64}$."""
-    return f"checklist_{item_id}"
+    return f"{major}_{minor}"
 
 
 def emit_criterion_lines(
@@ -424,22 +444,75 @@ def emit_criterion_lines(
     lines.append("")
 
 
-def append_checklist_criteria(lines: list[str], checklist: list[dict]) -> list[str]:
-    """Append one positive HLI [[criterion]] per verifier_checklist.json item."""
+def append_checklist_criteria(
+    lines: list[str], checklist: list[dict], *, start_minor: int = 1
+) -> list[str]:
+    """Append one positive [[criterion]] per checklist item as 1.{n} IDs."""
     emitted: list[str] = []
+    minor = start_minor
     for item in checklist:
         if "id" not in item or "title" not in item:
             raise ValueError(f"checklist item missing id/title: {item!r}")
-        cid = checklist_criterion_id(item["id"])
+        cid = numbered_criterion_id(1, minor)
         emit_criterion_lines(
             lines,
             cid=cid,
-            name=checklist_criterion_name(item["id"]),
+            name=numbered_criterion_name(1, minor),
             description=item["title"],
             weight=1.0,
         )
         emitted.append(cid)
+        minor += 1
     return emitted
+
+
+def emit_rubric_hli(
+    lines: list[str],
+    item: dict,
+    *,
+    cid: str | None = None,
+) -> str:
+    """Emit one rubric HLI criterion; return the criterion id used."""
+    ann = item["annotations"]
+    is_neg = "negative" in ann["type"].lower()
+    optional = "nice" in ann.get("importance", "").lower()
+    weight = 0.5 if optional else 1.0
+    resolved = cid if cid is not None else item["id"]
+    emit_criterion_lines(
+        lines,
+        cid=resolved,
+        name=resolved.replace(".", "_"),
+        description=item["title"],
+        weight=weight,
+        negate=is_neg,
+        optional=optional,
+    )
+    return resolved
+
+
+def expected_criterion_ids(rubric: list[dict], checklist: list[dict] | None = None) -> set[str]:
+    """Criterion ids that packaging must emit (checklist as 1.x; no meta rollup)."""
+    checklist = checklist or []
+    by_dim: dict[str, list[dict]] = {v: [] for v in CRITERION_MAP.values()}
+    for item in rubric:
+        if is_checklist_aggregate(item):
+            continue
+        crit = item["annotations"]["criterion"]
+        if crit not in CRITERION_MAP:
+            raise ValueError(f"unknown rubric criterion {crit!r} for id={item.get('id')!r}")
+        by_dim[CRITERION_MAP[crit]].append(item)
+
+    ids: set[str] = set()
+    for dim, items in by_dim.items():
+        if dim == "core_features" and checklist:
+            for minor in range(1, len(checklist) + 1):
+                ids.add(numbered_criterion_id(1, minor))
+            for offset, _ in enumerate(items):
+                ids.add(numbered_criterion_id(1, len(checklist) + 1 + offset))
+        else:
+            for item in items:
+                ids.add(item["id"])
+    return ids
 
 
 def rubric_to_tomls(
@@ -447,12 +520,14 @@ def rubric_to_tomls(
 ) -> dict[str, str]:
     """Emit judge-only dimension TOMLs covering every rubric HLI (no programmatic checks).
 
-    Core Features also expands authoring verifier_checklist.json into one
-    [[criterion]] per checklist item (ids checklist-{{id}}), in addition to
-    rubric HLIs (including any aggregate checklist-pass row).
+    Core Features expands authoring verifier_checklist.json into numbered 1.x
+    [[criterion]] rows (1.1..1.N), then emits remaining Core Features HLIs as
+    1.(N+1)+. The obsolete checklist-aggregate meta row is never emitted.
     """
     by_dim: dict[str, list[dict]] = {v: [] for v in CRITERION_MAP.values()}
     for item in rubric:
+        if is_checklist_aggregate(item):
+            continue
         crit = item["annotations"]["criterion"]
         if crit not in CRITERION_MAP:
             raise ValueError(f"unknown rubric criterion {crit!r} for id={item.get('id')!r}")
@@ -466,7 +541,8 @@ def rubric_to_tomls(
     for dim, items in by_dim.items():
         lines = [
             "[judge]",
-            'judge = "claude-code"',
+            'judge = "codex"',
+            'model = "gpt-5.6-sol"',
             'prompt_template = "../system_prompt.md"',
             'cwd = "/app"',
             'mode = "batched"',
@@ -478,39 +554,31 @@ def rubric_to_tomls(
             'aggregation = "weighted_mean"',
             "",
         ]
-        for item in items:
-            ann = item["annotations"]
-            is_neg = "negative" in ann["type"].lower()
-            optional = "nice" in ann.get("importance", "").lower()
-            weight = 0.5 if optional else 1.0
-            cid = item["id"]
-            # Criterion.name must match ^[a-zA-Z0-9_-]{1,64}$ — use id with underscores
-            safe_name = cid.replace(".", "_")
-            emit_criterion_lines(
-                lines,
-                cid=cid,
-                name=safe_name,
-                description=item["title"],
-                weight=weight,
-                negate=is_neg,
-                optional=optional,
-            )
         if dim == "core_features" and checklist:
-            checklist_ids = append_checklist_criteria(lines, checklist)
+            # Checklist items occupy 1.1..1.N; remaining HLIs shift to 1.(N+1)+.
+            checklist_ids = append_checklist_criteria(lines, checklist, start_minor=1)
+            next_minor = len(checklist) + 1
+            for item in items:
+                emit_rubric_hli(
+                    lines,
+                    item,
+                    cid=numbered_criterion_id(1, next_minor),
+                )
+                next_minor += 1
+        else:
+            for item in items:
+                emit_rubric_hli(lines, item)
         out[dim] = "\n".join(lines)
 
-    # Fail fast if any rubric HLI was dropped (empty dims still get a header-only TOML).
-    # Checklist-derived criteria are expected extras on core_features only.
     emitted_ids: list[str] = []
     for body in out.values():
         emitted_ids.extend(re.findall(r'^id\s*=\s*"([^"]+)"', body, re.M))
-    rubric_ids = [item["id"] for item in rubric]
-    expected_ids = set(rubric_ids) | set(checklist_ids)
+    expected_ids = expected_criterion_ids(rubric, checklist)
     if len(emitted_ids) != len(expected_ids) or set(emitted_ids) != expected_ids:
         missing = sorted(expected_ids - set(emitted_ids))
         extra = sorted(set(emitted_ids) - expected_ids)
         raise ValueError(
-            f"rubric/checklist→TOML criterion mismatch: rubric={len(rubric_ids)} "
+            f"rubric/checklist→TOML criterion mismatch: "
             f"checklist={len(checklist_ids)} toml={len(emitted_ids)} "
             f"missing={missing} extra={extra}"
         )
@@ -569,7 +637,7 @@ def load_authoring_checklist(slug: str) -> list[dict]:
     """Load authoring-folder verifier_checklist.json; empty list only when absent.
 
     Packaged tasks/frontend-* trees do not keep a copy — checklist items are
-    emitted into tests/core_features/core_features.toml as checklist-* criteria.
+    emitted into tests/core_features/core_features.toml as numbered 1.x criteria.
     """
     path = authoring_checklist_path(slug)
     if not path.is_file():
@@ -590,7 +658,9 @@ def sync_criteria_from_task_rubrics() -> dict[str, list[str]]:
             errors[slug] = [f"missing authoring rubric {rubric_path}"]
             continue
         rubric = json.loads(rubric_path.read_text())
-        pol = verify_polarity(rubric)
+        # Meta aggregate must not affect polarity / packaging.
+        rubric_for_pack = [i for i in rubric if not is_checklist_aggregate(i)]
+        pol = verify_polarity(rubric_for_pack)
         if pol:
             errors[slug] = [f"polarity fail: {pol}"]
             continue
@@ -599,7 +669,7 @@ def sync_criteria_from_task_rubrics() -> dict[str, list[str]]:
             if not checklist:
                 errors[slug] = [f"missing authoring checklist {authoring_checklist_path(slug)}"]
                 continue
-            write_dimension_tomls(task_dir, rubric, checklist=checklist)
+            write_dimension_tomls(task_dir, rubric_for_pack, checklist=checklist)
         except ValueError as exc:
             errors[slug] = [str(exc)]
     return errors
@@ -621,9 +691,7 @@ def verify_task_criteria_coverage(task_dir: Path, *, slug: str | None = None) ->
         return [str(exc)]
     if not checklist:
         return [f"missing authoring checklist {authoring_checklist_path(task_slug)}"]
-    expected_ids = {item["id"] for item in rubric} | {
-        checklist_criterion_id(item["id"]) for item in checklist
-    }
+    expected_ids = expected_criterion_ids(rubric, checklist)
     toml_ids: set[str] = set()
     for dim in CRITERION_MAP.values():
         toml_path = task_dir / "tests" / dim / f"{dim}.toml"
@@ -636,7 +704,10 @@ def verify_task_criteria_coverage(task_dir: Path, *, slug: str | None = None) ->
         for block in blocks:
             mid = re.search(r'^id\s*=\s*"([^"]+)"', block, re.M)
             if mid:
-                toml_ids.add(mid.group(1))
+                cid = mid.group(1)
+                toml_ids.add(cid)
+                if cid.startswith("checklist-") or cid.startswith("checklist_"):
+                    errors.append(f"{dim} still uses obsolete checklist id {cid}")
             if re.search(r"^\s*negate\s*=\s*true", block, re.M):
                 neg += 1
             else:
@@ -644,8 +715,10 @@ def verify_task_criteria_coverage(task_dir: Path, *, slug: str | None = None) ->
         if pos < 1 or neg < 1:
             errors.append(f"{dim} polarity +{pos} -{neg}")
     cf_text = (task_dir / "tests" / "core_features" / "core_features.toml").read_text()
-    for item in checklist:
-        cid = checklist_criterion_id(item["id"])
+    if CHECKLIST_AGGREGATE_TITLE in cf_text:
+        errors.append("core_features still contains checklist-aggregate meta criterion")
+    for idx, item in enumerate(checklist, start=1):
+        cid = numbered_criterion_id(1, idx)
         if f'id = "{cid}"' not in cf_text:
             errors.append(f"core_features missing checklist criterion {cid}")
         elif item["title"] not in cf_text:
@@ -701,7 +774,7 @@ JUDGE_SYSTEM_PROMPT = textwrap.dedent(
     4. Screenshot decisive end states per criterion.
     5. Reset shared session state when a criterion needs a fresh start.
 
-    WebMCP tools (when registered via Stagehand list/invoke): may accelerate actions
+    WebMCP tools (webmcp_session_info / webmcp_list_tools / webmcp_invoke_tool): may accelerate actions
     declared in the instruction's <webmcp_action_contract>, but NEVER replace visible
     Playwright browser evidence and NEVER affect scoring — there is no WebMCP criterion.
     If WebMCP is missing or fails, fall back to Playwright; that is not a scoring failure.
@@ -748,6 +821,36 @@ TEST_SH = textwrap.dedent(
     uv tool install "{HARBOR_REWARDKIT_PACKAGE}" \\
      && ln -sf /root/.local/bin/rewardkit /usr/local/bin/rewardkit
 
+    # Shared headless Chrome for the judge's MCP servers (contract in
+    # scripts/canonical/mcp/reward_mcp_servers.toml): Playwright MCP and the
+    # webmcp bridge (tests/mcp) both attach via $WEBMCP_CDP_ENDPOINT. rewardkit
+    # expands these with os.path.expandvars, so they must be exported here.
+    WEBMCP_CDP_PORT=9222
+    CHROME_BIN="$(find /ms-playwright -type f \\( -name chrome -o -name chromium \\) -not -path '*headless*' 2>/dev/null | head -n1)"
+    if [ -n "$CHROME_BIN" ]; then
+      # blink-settings force (hover: hover)/(pointer: fine): headless Linux has no
+      # pointing device, which would strip every Tailwind v4 hover: style.
+      "$CHROME_BIN" --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage \\
+        --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 \\
+        --remote-debugging-address=127.0.0.1 --remote-debugging-port="$WEBMCP_CDP_PORT" \\
+        --user-data-dir=/tmp/webmcp-chrome-profile about:blank \\
+        > /logs/verifier/chrome.log 2>&1 &
+      for _ in $(seq 1 60); do
+        curl -fsS "http://127.0.0.1:$WEBMCP_CDP_PORT/json/version" > /dev/null 2>&1 && break
+        sleep 1
+      done
+    else
+      echo "[test] no Chrome binary found under /ms-playwright; judge browser will fail" >&2
+    fi
+    export WEBMCP_CDP_PORT
+    export WEBMCP_CDP_ENDPOINT="http://127.0.0.1:$WEBMCP_CDP_PORT"
+
+    # Requires /app/package.json scripts named exactly: verify:build (exit 0), start (port 3000).
+    # When grading restored artifacts (harbor score), node_modules is excluded — reinstall.
+    if [ -f /app/package.json ] && [ ! -d /app/node_modules ]; then
+      (cd /app && npm install --no-audit --no-fund) \\
+        || {{ echo "[test] npm install failed; leaving safety reward" >&2; exit 0; }}
+    fi
     npm run verify:build || {{ echo "[test] build failed; leaving safety reward" >&2; exit 0; }}
     exec start-server-and-test 'npm start' tcp:localhost:3000 \\
       'rewardkit /tests --workspace /app --output /logs/verifier/reward.json'
@@ -795,30 +898,57 @@ REWARD_TOML = textwrap.dedent(
     """
 )
 
+# Canonical artifact excludes: build outputs, dependency trees, caches, and
+# tooling byproducts that must never be collected into trial artifacts.
+# tar --exclude semantics: each pattern matches path components at ANY depth.
+# test_webmcp_h3 asserts every tasks/*/task.toml carries this exact set.
+ARTIFACT_EXCLUDES: list[str] = [
+    "node_modules",
+    ".git",
+    ".DS_Store",
+    # build outputs
+    "dist",
+    "build",
+    "out",
+    ".next",
+    ".nuxt",
+    ".svelte-kit",
+    "storybook-static",
+    # caches / tool state
+    ".cache",
+    ".vite",
+    ".turbo",
+    ".parcel-cache",
+    ".pnpm-store",
+    ".yarn",
+    ".npm",
+    # test/report byproducts
+    "coverage",
+    "playwright-report",
+    "test-results",
+]
+
 TASK_TOML_TMPL = textwrap.dedent(
     """\
     schema_version = "1.3"
 
     [task]
-    name = "local/{slug}"
+    name = "mercor-intelligence/{slug}"
     description = "{description}"
-    keywords = ["frontend", "good-app", "playwright", "rewardkit", "webmcp"]
-
-    [metadata]
-    difficulty = "hard"
-    category = "frontend"
-    tags = ["frontend", "good-app", "webmcp", "rewardkit"]
-    source_folder = "{source}"
 
     [agent]
     timeout_sec = 3600.0
+
+    [agent.env]
+    CLAUDE_FORCE_OAUTH = "1"
+    CLAUDE_CODE_OAUTH_TOKEN = "${{CLAUDE_CODE_OAUTH_TOKEN}}"
 
     [verifier]
     timeout_sec = 14400.0
 
     [verifier.env]
-    ANTHROPIC_API_KEY = "${{ANTHROPIC_API_KEY}}"
-    CLAUDE_CODE_OAUTH_TOKEN = "${{CLAUDE_CODE_OAUTH_TOKEN}}"
+    OPENAI_API_KEY = "${{OPENAI_API_KEY}}"
+    REWARDKIT_MODEL = "${{REWARDKIT_MODEL:-}}"
 
     [environment]
     workdir = "/app"
@@ -830,16 +960,20 @@ TASK_TOML_TMPL = textwrap.dedent(
     source = "/app"
     destination = "app"
     exclude = [
-        "node_modules",
-        ".cache",
-        "dist",
-        "build",
-        "out",
-        ".DS_Store",
-        ".git",
+    {artifact_excludes}
     ]
     """
 )
+
+
+def render_task_toml(slug: str, description: str) -> str:
+    """Render task.toml from the template with the canonical artifact excludes."""
+    excludes = "\n".join(f'    "{e}",' for e in ARTIFACT_EXCLUDES)
+    return TASK_TOML_TMPL.format(
+        slug=slug,
+        description=toml_escape(description),
+        artifact_excludes=excludes,
+    )
 
 
 def should_skip(name: str, *, is_daisy_parent: bool) -> bool:
@@ -900,7 +1034,11 @@ def package_task(slug: str, spec: dict) -> list[str]:
     if not (src / "rubric.json").exists():
         return [f"missing rubric.json in {src}"]
 
-    rubric = json.loads((src / "rubric.json").read_text())
+    rubric = [
+        i
+        for i in json.loads((src / "rubric.json").read_text())
+        if not is_checklist_aggregate(i)
+    ]
     pol = verify_polarity(rubric)
     if pol:
         errors.append(f"polarity fail: {pol}")
@@ -931,7 +1069,7 @@ def package_task(slug: str, spec: dict) -> list[str]:
         (out / "README.md").write_text(readme)
 
     # Authoring verifier_checklist.json is the source for core_features
-    # checklist-* criteria; it is NOT copied into tasks/frontend-*.
+    # numbered 1.x criteria; it is NOT copied into tasks/frontend-*.
     # rubric.json likewise stays in the authoring folder only — both are
     # emitted into tests/**/*.toml at package/sync time.
     checklist_path = src / "verifier_checklist.json"
@@ -943,13 +1081,7 @@ def package_task(slug: str, spec: dict) -> list[str]:
         errors.append("authoring verifier_checklist.json must be a non-empty JSON array")
         return errors
 
-    (out / "task.toml").write_text(
-        TASK_TOML_TMPL.format(
-            slug=slug,
-            description=toml_escape(spec["description"]),
-            source=spec["source"],
-        )
-    )
+    (out / "task.toml").write_text(render_task_toml(slug, spec["description"]))
 
     is_daisy_parent = spec["source"] == "DaisyUI"
     copy_solution_app(src, out / "solution" / "app", is_daisy_parent=is_daisy_parent)
@@ -963,6 +1095,13 @@ def package_task(slug: str, spec: dict) -> list[str]:
     solve.write_text(SOLVE_SH)
     solve.chmod(0o755)
 
+    # Reference screenshots are opt-in builder input: when captures exist under
+    # reference-screenshots/<slug>/ (see capture_reference_screenshots.mjs),
+    # re-install them after the rebuild wiped the task dir.
+    from install_reference_screenshots import install as install_ref_screenshots
+
+    install_ref_screenshots(slug)
+
     test_sh = out / "tests" / "test.sh"
     test_sh.write_text(TEST_SH)
     test_sh.chmod(0o755)
@@ -974,7 +1113,14 @@ def package_task(slug: str, spec: dict) -> list[str]:
     (out / "tests" / "system_prompt.md").write_text(judge_prompt)
 
     # MCP servers are inlined into dimension TOMLs via judge_mcp_servers_block()
-    # from scripts/canonical/mcp/reward_mcp_servers.toml — no task-local tests/mcp/.
+    # from scripts/canonical/mcp/reward_mcp_servers.toml. The webmcp entry runs the
+    # task-local CDP bridge below (vendored per task; playwright-core only).
+    mcp_dir = out / "tests" / "mcp"
+    mcp_dir.mkdir(exist_ok=True)
+    shutil.copy2(
+        ROOT / "scripts" / "canonical" / "mcp" / "webmcp_stdio_server.mjs",
+        mcp_dir / "webmcp_stdio_server.mjs",
+    )
 
     try:
         write_dimension_tomls(out, rubric, checklist=checklist)
@@ -1094,7 +1240,9 @@ def _verify_all_tasks(order: list[str], *, check_webmcp: bool) -> dict[str, list
                 and "</webmcp_action_contract>" in text
                 and "<module_spec" in text
                 and "Implementation:" in text
-                and "## Delivery and integrity" in text
+                and "<integrity>" in text
+                and "<delivery>" in text
+                and "## Delivery and integrity" not in text
                 and "### WebMCP Action Contract" not in text
                 and "## Product Requirements" not in text
                 and "Baseline Quality Bar" not in text
@@ -1131,12 +1279,12 @@ def _verify_all_tasks(order: list[str], *, check_webmcp: bool) -> dict[str, list
                 )
             for dim in CRITERION_MAP.values():
                 toml_text = (task_dir / "tests" / dim / f"{dim}.toml").read_text()
-                has_sh = 'name = "stagehand-webmcp"' in toml_text
+                has_sh = 'name = "webmcp"' in toml_text
                 has_pw = 'name = "playwright"' in toml_text
                 mcp_ok = has_sh and has_pw
                 print(f"{slug}/{dim}/mcp: {'PASS' if mcp_ok else 'FAIL'}")
                 if not mcp_ok:
-                    all_errors.setdefault(slug, []).append(f"{dim} missing stagehand/playwright MCP")
+                    all_errors.setdefault(slug, []).append(f"{dim} missing webmcp/playwright MCP")
     return all_errors
 
 

@@ -2,25 +2,38 @@
 Build a French Riviera trip itinerary planner using Qwik, Qwik stores, and Tailwind CSS.
 </summary>
 
+<reference_screenshots>
+Screenshots of the reference application are provided in-container at
+`/reference-screenshots/`: `overview.png` is a full-page desktop-layout
+overview (downscaled); `segment-NN.png` are full-resolution 1440x900 sections
+in top-to-bottom order with slight overlap. They are part of this instruction:
+recreate what they show. Where a screenshot and the text conflict, the text
+wins. Do not copy the images into `/app` or ship them as app assets.
+</reference_screenshots>
+
 <core_features>
-Core features:
-- Direct planner entry — trip plan workspace (sidebar + plan column + map); no marketing landing, login, signup, or booking gate
-- Top plan chrome — Trip / Travel Planner brand mark, Trip plan / Trip journal mode labels, Share and edit toolbar affordances as in-app chrome
-- Left nav sidebar — Overview, Itinerary day list for Sun 7/5–Sat 7/11 with day-colored dots, Budget row, Support and Hide sidebar
-- Primary collection — itinerary stops (places): seed at least 8 stops across days; each has name, day assignment, time/note optional, and category; the list supports create, edit, and delete
-- At least two interaction modes: Plan List mode (day sections + stop rows) and Map mode (map pane focus with pin selection / layers)
-- Domain behavior beyond CRUD: day filter; select a stop to open place detail tabs (About / Book / Reviews / Photos / Mentions); Optimize route and layers as demo chrome that may toast; empty day/list state when all stops deleted or filtered to none
-- Plan hero — cover image, editable title Trip to the French Riviera - Cote d'Azur, date range 7/5–7/11
-- Invalid create: empty stop name must not add a stop; show visible validation feedback
-- Demo toasts for inert actions; zero outbound navigation
-- Interactive map via vendored Leaflet + OSM tiles; day nav and place selection must move/focus the map; pin and list sync required
+Core features (each line is an observable behavior the finished app must exhibit):
+- Direct planner entry — the trip plan workspace (left sidebar + center plan column + right map pane) loads immediately with no marketing landing, login, signup, or booking gate
+- Top plan chrome — a Trip / Travel Planner brand mark, Trip plan / Trip journal mode labels, and Share and edit toolbar affordances rendered as inert in-app chrome
+- Left nav sidebar — Overview, an Itinerary day list for Sun 7/5 through Sat 7/11 with a distinct day-color dot per day, a Budget row, and Support and Hide sidebar controls
+- Primary collection — itinerary stops (places): seed at least 8 stops distributed across the seven days (the reference spreads roughly four to five stops per day) plus a few unscheduled ideas stops not tied to a day; each stop has a name, day assignment, optional time/note, and category; the list supports create, edit, and delete
+- Plan hero — a cover image, an editable title Trip to the French Riviera - Cote d'Azur, and the date range 7/5–7/11
+- An interactive map (vendored Leaflet + OSM tiles) renders one numbered pin per stop colored by its day; the selected pin enlarges and opens a popup showing the place name and its Day N · Côte d'Azur label; unscheduled ideas use a neutral marker
+- At least two interaction modes: Plan List mode (day sections + stop rows) and Map mode (map pane focus with pin selection / layers); switching modes updates without a full reload
+- Selecting a stop opens a place-detail card over the map with About / Book / Reviews / Photos / Mentions tabs that swap panels in place; a dismiss control closes the card
+- Pin and list stay in sync both ways: clicking a stop row flies the map to that pin and highlights the row; clicking a pin selects the stop and scrolls the list to it
+- Day navigation focuses the map on that day (fly to the day's center/zoom) and selects the day's first stop; the day filter and active mode recompute the visible stops from the shared collection
+- Domain behavior beyond CRUD: Optimize route and map layers act as demo chrome that may toast; an empty day/list state appears when all stops are deleted or filtered to none
+- Invalid create: an empty stop name must not add a stop; show visible validation feedback
+- Inert actions raise demo toasts; zero outbound navigation
 </core_features>
 
 <visual_design>
 - Product name Trip / Travel Planner with French Riviera — Côte d'Azur as the trip signal; first viewport is the planner workspace
 - Soft coastal UI: cool blue-gray page wash, Source Sans Pro, navy accent
 - Three-pane desktop composition: left sidebar / center plan column / right map pane — planner density
-- Day colors on sidebar dots and place pins; place detail card over the map with tab row
+- Each day carries its own color, shared by its sidebar dot and its numbered map pins; unscheduled ideas use a neutral marker; the selected pin is enlarged
+- Place detail card floats over the map with a tab row (About / Book / Reviews / Photos / Mentions) and a dismiss control
 - Empty list state is clear when no stops remain
 </visual_design>
 
@@ -28,6 +41,7 @@ Core features:
 - Hover animations (required): sidebar items ease hover opacity and brief press scale; place and carousel cards lift slightly on hover; map chrome buttons use the same hover/press microfeedback
 - Place detail: tab switches swap panels without page navigation; detail overlays the map
 - Mode emphasis between Plan List and Map updates without full reload; day selection may toast or focus the map
+- Selecting a stop or a day eases/flies the map to the target and animates the chosen pin into its enlarged active state
 - Demo toasts slide/fade in then auto-dismiss
 - Respect prefers-reduced-motion by disabling toast/control transitions where practical
 </motion>
@@ -40,18 +54,21 @@ State contracts (behavioral, not storage keys):
 - Deleting a stop removes it from day lists, selection, and map pins
 - Day filter and mode are shared client state; they recompute visible stops from the shared collection
 Stack: Qwik + Qwik stores + Tailwind CSS; frontend-only. Leaflet CSS/JS vendored locally as a product map library.
-- Seed a multi-day French Riviera plan (Nice, Monaco, Cannes, Antibes / Musée Picasso, Èze, Saint-Tropez, Menton) with at least 8 stops
+- Seed a multi-day French Riviera plan (Nice, Monaco, Cannes, Antibes / Musée Picasso, Èze, Saint-Tropez, Menton) with at least 8 stops spread across the seven days Sun 7/5–Sat 7/11, each day in its own color, plus a few unscheduled ideas stops
 - Empty required fields on create must not increase the stops count; show visible validation feedback
 - After deleting all stops, show an empty state in the plan list region
 - Zero navigational outbound links; no live booking APIs or chat widgets
 - Document title references the French Riviera trip; desktop layout: sidebar + plan + map
 </requirements>
 
-## Delivery and integrity
+<integrity>
+- Work only from this instruction and `/app`; do not use `/solution`, `/tests`, or verifier artifacts.
+</integrity>
 
-- Integrity: work only from this instruction and `/app`; do not use `/solution`, `/tests`, or verifier artifacts.
-- Delivery: produce an original self-contained app in `/app`; scaffold under `/app` as needed for the stack in `<summary>`; run `npm start` on port 3000; do not iframe, proxy, or fetch the product from another origin.
-- WebMCP: required delivery step, not a scoring criterion; implement exactly the `<webmcp_action_contract>` below; register tools yourself from `<module_spec>` + Bindings using the same handlers as the visible UI; honor mechanics exclusions; optional self-test via `webmcp_session_info` / `webmcp_list_tools` / `webmcp_invoke_tool` only.
+<delivery>
+- Produce an original self-contained app in `/app`; scaffold under `/app` as needed for the stack in `<summary>`; `/app/package.json` MUST define npm scripts named exactly `start` (serves the app on port 3000) and `verify:build` (exits 0 when the app entry/build is present and succeeds); run via `npm start` on port 3000; do not iframe, proxy, or fetch the product from another origin.
+- WebMCP is a required delivery step, not a scoring criterion; implement exactly the `<webmcp_action_contract>` below; register tools yourself from `<module_spec>` + Bindings using the same handlers as the visible UI; honor mechanics exclusions; optional self-test via `webmcp_session_info` / `webmcp_list_tools` / `webmcp_invoke_tool` only.
+</delivery>
 
 <webmcp_action_contract>
 Contract version: zto-webmcp-v1

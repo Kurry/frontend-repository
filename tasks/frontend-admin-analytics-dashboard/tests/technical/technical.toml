@@ -1,29 +1,17 @@
 [judge]
-judge = "claude-code"
+judge = "codex"
+model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
 cwd = "/app"
 mode = "batched"
 timeout = 3000
 
 [[judge.mcp_servers]]
-name = "stagehand-webmcp"
+name = "webmcp"
 transport = "stdio"
-command = "npx"
+command = "node"
 args = [
-  "-y",
-  "@browserbasehq/stagehand@3.7.0",
-  "mcp",
-  "--env",
-  "LOCAL",
-  "--chrome-version",
-  "151.0.7922.34",
-  "--enable-webmcp",
-  "--tools",
-  "webmcp_session_info,webmcp_list_tools,webmcp_invoke_tool",
-  "--disable-tools",
-  "act,observe,extract,agent",
-  "--cdp-port",
-  "$WEBMCP_CDP_PORT",
+  "/tests/mcp/webmcp_stdio_server.mjs",
 ]
 allowed_tools = [
   "webmcp_session_info",
@@ -75,14 +63,14 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.1"
 name = "2_1"
-description = "Redux Toolkit holds the users collection, active view, filters/selection, and theme — shared across components"
+description = "All views derive from one shared collection: a status/role edit, create, or delete made in any view is immediately reflected in every other place it appears (table rows, badges, KPI counts, filtered views) without a reload, and filters/sort/bulk actions recompute the same visible list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
 name = "2_2"
-description = "Implemented with Stack: React + Redux Toolkit + Tailwind CSS; no browser storage APIs for persistence"
+description = "No browser storage is used: localStorage and sessionStorage remain empty after seeding, creating, editing, and deleting users and toggling theme, and a page reload returns the app to its seeded state"
 type = "binary"
 weight = 1.0
 
@@ -90,14 +78,6 @@ weight = 1.0
 id = "2.3"
 name = "2_3"
 description = "Uses localStorage or sessionStorage to persist users, theme, or filters"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.4"
-name = "2_4"
-description = "Manages the users collection only in component-local useState rather than Redux Toolkit shared store"
 type = "binary"
 weight = 1.0
 negate = true

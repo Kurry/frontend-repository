@@ -1,29 +1,17 @@
 [judge]
-judge = "claude-code"
+judge = "codex"
+model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
 cwd = "/app"
 mode = "batched"
 timeout = 3000
 
 [[judge.mcp_servers]]
-name = "stagehand-webmcp"
+name = "webmcp"
 transport = "stdio"
-command = "npx"
+command = "node"
 args = [
-  "-y",
-  "@browserbasehq/stagehand@3.7.0",
-  "mcp",
-  "--env",
-  "LOCAL",
-  "--chrome-version",
-  "151.0.7922.34",
-  "--enable-webmcp",
-  "--tools",
-  "webmcp_session_info,webmcp_list_tools,webmcp_invoke_tool",
-  "--disable-tools",
-  "act,observe,extract,agent",
-  "--cdp-port",
-  "$WEBMCP_CDP_PORT",
+  "/tests/mcp/webmcp_stdio_server.mjs",
 ]
 allowed_tools = [
   "webmcp_session_info",
@@ -75,155 +63,148 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "1_1"
-description = "Every checklist-* criterion in this Core Features dimension passes during the agent verifier run"
+description = "On load, All Users (or the default Users list) contains at least 8 seeded user rows with name, role, and status visible per row; rows reachable by paging through the table's pagination controls count as present"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
 name = "1_2"
-description = "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session"
+description = "After creating a user with first name 'Ada', last name 'Lovelace', and a valid email, the text 'Ada Lovelace' (or equivalent full name) is visible in the All Users list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
 name = "1_3"
-description = "Users collection supports create, edit, and delete with list rows and KPI counts updating from shared application state"
+description = "After adding 3 new users on top of the seed set, the All Users table shows exactly 3 more rows than the initial seeded count"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
 name = "1_4"
-description = "At least two distinct views exist (Operations Overview and All Users) switchable from the sidebar without full page navigation"
+description = "After changing a user's status from Active to Suspended, that user shows a Suspended badge/state that is visually distinct from Active users"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
 name = "1_5"
-description = "Domain state beyond CRUD is implemented: status badges, role assignment, list filters/sort that recompute visible users, and bulk status/role/delete on selected rows"
+description = "After editing a user's name from the seeded value to 'Evening Runner', the text 'Evening Runner' is visible in the list and the previous name is not"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
 name = "1_6"
-description = "Renders visible validation/feedback when Create user is submitted with empty required fields, and the users count does not increase"
+description = "After deleting a user, that user's name is no longer visible anywhere in the All Users list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
 name = "1_7"
+description = "After deleting all users, an empty state message is visible and no user data rows remain in the list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "1_8"
+description = "After submitting Create user with an empty required name or email field, the users count in the list does not increase and validation feedback is visible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "1_9"
+description = "After filtering All Users by status Suspended (with at least one Suspended and one Active user present), only Suspended users remain visible in the list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "1_10"
+description = "After switching from Operations Overview to All Users via the sidebar, the main canvas shows the users table/KPIs (not the overview mosaic), and switching back restores Operations Overview without a full page navigation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "1_11"
+description = "After opening at least two additional Users modes from Roles, Permissions, User Logs, User Stats, User Payments, or User Products via the sidebar, each opened mode shows its domain UI (filters/tables) and the URL does not navigate to an external origin"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "1_12"
+description = "After clicking the sun/moon theme swap, data-theme flips between light and dark and surfaces recolor without reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "1_13"
+description = "When hovering primary buttons, table rows, or sidebar nav items, a visible hover wash, underline, or shadow change appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "1_14"
+description = "After selecting multiple All Users rows and running a bulk action (Change status, Change role, or Delete), the selected users update or disappear together in the list and KPIs reflect the change"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "1_15"
+description = "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "1_16"
+description = "Users collection supports create, edit, and delete with list rows and KPI counts updating from shared application state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "1_17"
+description = "At least two distinct views exist (Operations Overview and All Users) switchable from the sidebar without full page navigation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "1_18"
+description = "Domain state beyond CRUD is implemented: status badges, role assignment, list filters/sort that recompute visible users, and bulk status/role/delete on selected rows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "1_19"
+description = "Renders visible validation/feedback when Create user is submitted with empty required fields, and the users count does not increase"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "1_20"
 description = "Users list is static HTML only with no working create/edit/delete against shared state"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
-id = "1.8"
-name = "1_8"
+id = "1.21"
+name = "1_21"
 description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
 type = "binary"
 weight = 1.0
 negate = true
-
-[[criterion]]
-id = "checklist-1"
-name = "checklist_1"
-description = "On load, All Users (or the default Users list) shows at least 8 seeded user rows with name, role, and status visible in the table"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "checklist-2"
-name = "checklist_2"
-description = "After creating a user with first name 'Ada', last name 'Lovelace', and a valid email, the text 'Ada Lovelace' (or equivalent full name) is visible in the All Users list"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "checklist-3"
-name = "checklist_3"
-description = "After adding 3 new users on top of the seed set, the All Users table shows exactly 3 more rows than the initial seeded count"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "checklist-4"
-name = "checklist_4"
-description = "After changing a user's status from Active to Suspended, that user shows a Suspended badge/state that is visually distinct from Active users"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "checklist-5"
-name = "checklist_5"
-description = "After editing a user's name from the seeded value to 'Evening Runner', the text 'Evening Runner' is visible in the list and the previous name is not"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "checklist-6"
-name = "checklist_6"
-description = "After deleting a user, that user's name is no longer visible anywhere in the All Users list"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "checklist-7"
-name = "checklist_7"
-description = "After deleting all users, an empty state message is visible and no user data rows remain in the list"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "checklist-8"
-name = "checklist_8"
-description = "After submitting Create user with an empty required name or email field, the users count in the list does not increase and validation feedback is visible"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "checklist-9"
-name = "checklist_9"
-description = "After filtering All Users by status Suspended (with at least one Suspended and one Active user present), only Suspended users remain visible in the list"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "checklist-10"
-name = "checklist_10"
-description = "After switching from Operations Overview to All Users via the sidebar, the main canvas shows the users table/KPIs (not the overview mosaic), and switching back restores Operations Overview without a full page navigation"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "checklist-11"
-name = "checklist_11"
-description = "After opening at least two additional Users modes from Roles, Permissions, User Logs, User Stats, User Payments, or User Products via the sidebar, each opened mode shows its domain UI (filters/tables) and the URL does not navigate to an external origin"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "checklist-12"
-name = "checklist_12"
-description = "After clicking the sun/moon theme swap, data-theme flips between light and dark and surfaces recolor without reload"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "checklist-13"
-name = "checklist_13"
-description = "When hovering primary buttons, table rows, or sidebar nav items, a visible hover wash, underline, or shadow change appears"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "checklist-14"
-name = "checklist_14"
-description = "After selecting multiple All Users rows and running a bulk action (Change status, Change role, or Delete), the selected users update or disappear together in the list and KPIs reflect the change"
-type = "binary"
-weight = 1.0

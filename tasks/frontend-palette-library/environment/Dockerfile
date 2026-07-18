@@ -14,3 +14,6 @@ RUN npm install -g \
 
 WORKDIR /app
 EXPOSE 3000
+
+# Reference screenshots for the builder (never shipped in /app)
+COPY reference-screenshots/ /reference-screenshots/
