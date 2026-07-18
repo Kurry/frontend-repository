@@ -1,0 +1,947 @@
+[
+  {
+    "task": "frontend-daisyui-admin-dashboard",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1",
+      "form-workflow-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "users",
+      "destinations": [
+        "operations-overview",
+        "all-users",
+        "add-user",
+        "roles",
+        "permissions",
+        "user-logs",
+        "user-stats",
+        "user-payments",
+        "user-products"
+      ],
+      "filters": [
+        "role",
+        "status"
+      ],
+      "sorts": [
+        "last-active",
+        "newest",
+        "highest-spend",
+        "name-az"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "entity": "user",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "name",
+        "email",
+        "role",
+        "status",
+        "payments",
+        "products",
+        "last-active"
+      ],
+      "form_fields": [
+        "first-name",
+        "last-name",
+        "email",
+        "phone",
+        "role",
+        "status"
+      ],
+      "form_operations": [
+        "validate",
+        "submit",
+        "cancel"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Chart hover/tooltip mechanics stay Playwright-only",
+      "Drawer overlay slide on small viewports stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-daisyui-theme-generator",
+    "modules": [
+      "structured-editor-v1",
+      "entity-collection-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "editor_object_types": [
+        "theme"
+      ],
+      "editor_properties": [
+        "color",
+        "radius",
+        "font"
+      ],
+      "editor_operations": [
+        "select",
+        "update_property",
+        "preview"
+      ],
+      "entity": "theme",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "name",
+        "tokens"
+      ],
+      "artifact_operations": [
+        "export",
+        "import",
+        "copy"
+      ],
+      "export_formats": [
+        "css",
+        "json"
+      ],
+      "import_modes": [
+        "declared-theme"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Raw file path / base64 blobs must not appear in WebMCP args",
+      "Color-picker drag gestures stay Playwright when mechanism matters"
+    ]
+  },
+  {
+    "task": "frontend-camera-exposure",
+    "modules": [
+      "command-session-v1",
+      "structured-editor-v1"
+    ],
+    "bindings": {
+      "session_operations": [
+        "start",
+        "stop",
+        "restart",
+        "advance"
+      ],
+      "editor_object_types": [
+        "exposure"
+      ],
+      "editor_properties": [
+        "stop",
+        "brightness"
+      ],
+      "editor_operations": [
+        "select",
+        "update_property",
+        "preview"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Continuous hold-to-repeat on edge buttons stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-design-portfolio",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "projects",
+      "destinations": [
+        "terminal-home",
+        "project-detail",
+        "about"
+      ],
+      "entity": "project",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "title",
+        "summary",
+        "tags"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Terminal typing animation timing stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-finance-reports",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "expenses",
+      "destinations": [
+        "reports-overview",
+        "category-breakdown",
+        "transaction-list"
+      ],
+      "filters": [
+        "category",
+        "range"
+      ],
+      "sorts": [
+        "amount",
+        "date"
+      ],
+      "entity": "expense",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "label",
+        "amount",
+        "category",
+        "date"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Chart geometry / pie segment hover stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-material-ui-theme-creator",
+    "modules": [
+      "structured-editor-v1",
+      "entity-collection-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "editor_object_types": [
+        "material-theme"
+      ],
+      "editor_properties": [
+        "palette",
+        "typography",
+        "shape"
+      ],
+      "editor_operations": [
+        "select",
+        "update_property",
+        "preview",
+        "switch_mode"
+      ],
+      "entity": "theme",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "name",
+        "palette"
+      ],
+      "artifact_operations": [
+        "export",
+        "import",
+        "copy"
+      ],
+      "export_formats": [
+        "json",
+        "css"
+      ],
+      "import_modes": [
+        "declared-theme"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Raw file paths/blobs forbidden in WebMCP args",
+      "Color picker drag stays Playwright when mechanism matters"
+    ]
+  },
+  {
+    "task": "frontend-media-timeline",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "timeline-events",
+      "destinations": [
+        "timeline",
+        "event-detail",
+        "filters"
+      ],
+      "filters": [
+        "era",
+        "type"
+      ],
+      "entity": "event",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "title",
+        "era",
+        "type",
+        "summary"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Scroll-linked parallax / scrub timing stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-palette-library",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "palettes",
+      "destinations": [
+        "library-grid",
+        "palette-detail",
+        "search"
+      ],
+      "filters": [
+        "artist",
+        "era"
+      ],
+      "entity": "palette",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete",
+        "toggle"
+      ],
+      "entity_fields": [
+        "name",
+        "swatches",
+        "favorite"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Scroll reveal / hover wash timing stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-shapeshift-grid",
+    "modules": [
+      "structured-editor-v1",
+      "command-session-v1"
+    ],
+    "bindings": {
+      "editor_object_types": [
+        "grid-cell"
+      ],
+      "editor_properties": [
+        "color"
+      ],
+      "editor_modes": [
+        "paint",
+        "erase"
+      ],
+      "editor_operations": [
+        "select",
+        "update_property",
+        "switch_mode",
+        "preview"
+      ],
+      "session_operations": [
+        "start",
+        "stop",
+        "restart",
+        "trigger_demo"
+      ],
+      "demos": [
+        "fill-demo"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Drag-paint / brush stroke geometry stays Playwright (gesture mechanics)"
+    ]
+  },
+  {
+    "task": "frontend-story-docs",
+    "modules": [
+      "browse-query-v1",
+      "form-workflow-v1",
+      "entity-collection-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "scenes",
+      "destinations": [
+        "scene-list",
+        "scene-detail",
+        "tutorial-steps"
+      ],
+      "entity": "scene",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete",
+        "reorder"
+      ],
+      "entity_fields": [
+        "title",
+        "body",
+        "order"
+      ],
+      "form_fields": [
+        "title",
+        "body"
+      ],
+      "form_operations": [
+        "validate",
+        "submit",
+        "cancel",
+        "advance",
+        "return"
+      ],
+      "workflow_steps": [
+        "intro",
+        "edit",
+        "review"
+      ]
+    },
+    "mechanics_exclusions": []
+  },
+  {
+    "task": "frontend-trip-itinerary",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1",
+      "form-workflow-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "activities",
+      "destinations": [
+        "overview",
+        "day-detail",
+        "activity-form"
+      ],
+      "filters": [
+        "day",
+        "type"
+      ],
+      "entity": "activity",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete",
+        "reorder"
+      ],
+      "entity_fields": [
+        "title",
+        "day",
+        "location",
+        "notes"
+      ],
+      "form_fields": [
+        "title",
+        "day",
+        "location",
+        "notes"
+      ],
+      "form_operations": [
+        "validate",
+        "submit",
+        "cancel"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Map pan/zoom / marker drag stays Playwright"
+    ]
+  },
+  {
+    "task": "frontend-admin-analytics-dashboard",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "users",
+      "destinations": [
+        "operations-overview",
+        "all-users",
+        "add-user",
+        "roles",
+        "permissions",
+        "user-logs",
+        "user-stats",
+        "user-payments",
+        "user-products"
+      ],
+      "filters": [
+        "role",
+        "status"
+      ],
+      "sorts": [
+        "last-active",
+        "newest",
+        "highest-spend",
+        "name-az"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "entity": "user",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "name",
+        "email",
+        "role",
+        "status",
+        "payments",
+        "products",
+        "last-active"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Chart hover tooling stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-color-palette-archive",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "palettes",
+      "destinations": [
+        "archive-grid",
+        "palette-detail",
+        "filters"
+      ],
+      "filters": [
+        "era",
+        "artist"
+      ],
+      "entity": "palette",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete",
+        "toggle"
+      ],
+      "entity_fields": [
+        "name",
+        "swatches",
+        "favorite"
+      ]
+    },
+    "mechanics_exclusions": []
+  },
+  {
+    "task": "frontend-css-theme-builder",
+    "modules": [
+      "structured-editor-v1",
+      "entity-collection-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "editor_object_types": [
+        "css-theme"
+      ],
+      "editor_properties": [
+        "token",
+        "value"
+      ],
+      "editor_operations": [
+        "select",
+        "update_property",
+        "preview"
+      ],
+      "entity": "theme",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "name",
+        "tokens"
+      ],
+      "artifact_operations": [
+        "export",
+        "import",
+        "copy"
+      ],
+      "export_formats": [
+        "css"
+      ],
+      "import_modes": [
+        "declared-theme"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Raw file paths/blobs forbidden in WebMCP args"
+    ]
+  },
+  {
+    "task": "frontend-expense-breakdown-reports",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "expenses",
+      "destinations": [
+        "breakdown-overview",
+        "expense-list",
+        "category-filter"
+      ],
+      "filters": [
+        "category"
+      ],
+      "sorts": [
+        "amount",
+        "date"
+      ],
+      "entity": "expense",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "label",
+        "amount",
+        "category"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Chart hover stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-exposure-control-lab",
+    "modules": [
+      "command-session-v1",
+      "structured-editor-v1"
+    ],
+    "bindings": {
+      "session_operations": [
+        "start",
+        "stop",
+        "restart",
+        "advance"
+      ],
+      "editor_object_types": [
+        "exposure"
+      ],
+      "editor_properties": [
+        "stop",
+        "brightness"
+      ],
+      "editor_operations": [
+        "select",
+        "update_property",
+        "preview"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Hold-to-repeat control timing stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-grid-paint-studio",
+    "modules": [
+      "structured-editor-v1",
+      "command-session-v1"
+    ],
+    "bindings": {
+      "editor_object_types": [
+        "grid-cell"
+      ],
+      "editor_properties": [
+        "color"
+      ],
+      "editor_modes": [
+        "paint",
+        "erase"
+      ],
+      "editor_operations": [
+        "select",
+        "update_property",
+        "switch_mode",
+        "preview"
+      ],
+      "session_operations": [
+        "start",
+        "stop",
+        "restart"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Drag-paint gestures stay Playwright"
+    ]
+  },
+  {
+    "task": "frontend-l1-network-marketing",
+    "modules": [
+      "browse-query-v1",
+      "form-workflow-v1",
+      "entity-collection-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "features",
+      "destinations": [
+        "marketing-home",
+        "feature-detail",
+        "waitlist"
+      ],
+      "entity": "feature",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "title",
+        "summary"
+      ],
+      "form_fields": [
+        "email",
+        "name"
+      ],
+      "form_operations": [
+        "validate",
+        "submit",
+        "cancel"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Outbound marketing CTAs must remain in-app (no origin navigation)"
+    ]
+  },
+  {
+    "task": "frontend-material-theme-studio",
+    "modules": [
+      "structured-editor-v1",
+      "entity-collection-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "editor_object_types": [
+        "material-theme"
+      ],
+      "editor_properties": [
+        "palette",
+        "typography",
+        "shape"
+      ],
+      "editor_operations": [
+        "select",
+        "update_property",
+        "preview"
+      ],
+      "entity": "theme",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "name",
+        "palette"
+      ],
+      "artifact_operations": [
+        "export",
+        "import",
+        "copy"
+      ],
+      "export_formats": [
+        "json",
+        "css"
+      ],
+      "import_modes": [
+        "declared-theme"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Raw file paths/blobs forbidden in WebMCP args"
+    ]
+  },
+  {
+    "task": "frontend-media-history-timeline",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "timeline-events",
+      "destinations": [
+        "timeline",
+        "event-detail",
+        "filters"
+      ],
+      "filters": [
+        "era",
+        "type"
+      ],
+      "entity": "event",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "title",
+        "era",
+        "type"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Scroll/scrub timing stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-storyboard-tutorial",
+    "modules": [
+      "browse-query-v1",
+      "form-workflow-v1",
+      "entity-collection-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "scenes",
+      "destinations": [
+        "scene-list",
+        "scene-editor",
+        "tutorial-steps"
+      ],
+      "entity": "scene",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "title",
+        "body"
+      ],
+      "form_fields": [
+        "title",
+        "body"
+      ],
+      "form_operations": [
+        "validate",
+        "submit",
+        "cancel",
+        "advance",
+        "return"
+      ],
+      "workflow_steps": [
+        "intro",
+        "edit",
+        "review"
+      ]
+    },
+    "mechanics_exclusions": []
+  },
+  {
+    "task": "frontend-terminal-portfolio",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "projects",
+      "destinations": [
+        "terminal-home",
+        "project-detail",
+        "about"
+      ],
+      "entity": "project",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "title",
+        "summary"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Terminal typing animation timing stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-travel-itinerary-planner",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1",
+      "form-workflow-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "activities",
+      "destinations": [
+        "overview",
+        "day-detail",
+        "activity-form"
+      ],
+      "filters": [
+        "day"
+      ],
+      "entity": "activity",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete",
+        "reorder"
+      ],
+      "entity_fields": [
+        "title",
+        "day",
+        "location"
+      ],
+      "form_fields": [
+        "title",
+        "day",
+        "location",
+        "notes"
+      ],
+      "form_operations": [
+        "validate",
+        "submit",
+        "cancel"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Map pan/zoom / marker drag stays Playwright"
+    ]
+  }
+]

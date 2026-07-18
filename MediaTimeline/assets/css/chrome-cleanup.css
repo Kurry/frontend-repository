@@ -1,0 +1,81 @@
+/* MediaTimeline chrome cleanup — hide nav/junk, keep timeline tool */
+.mobile-message,
+.mobile-message-thankyou,
+.mobile-language-switcher,
+.mobile-form-error,
+.about-menu-bg,
+.about-menu,
+.pedagogy-links-menu,
+.onboarding,
+.header-right,
+.header-nav-wrap,
+.ai-li,
+.bookmarks-li,
+.language-switcher,
+.tali-site-link,
+.map-axis-toggle,
+.map-container,
+.small-globe,
+.map-loader,
+.map-instructions,
+.map-instruction,
+.zoom-controls,
+.events-index {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Keep particles behind timeline if present */
+#particles-js {
+  pointer-events: none !important;
+  opacity: 0.35;
+}
+
+.site-header,
+.header-tags-wrap,
+.header-tags,
+.header-search-tags-form,
+.search-btn-wrap,
+.header-nav-wrap,
+.header-right {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+
+
+
+
+
+
+
+
+body.home-page {
+  overflow: hidden;
+}
+
+.years-range-select,
+.page-content {
+  z-index: 40;
+}
+
+.event-popup {
+  z-index: 60;
+}
+
+/* timeline contrast — bands were washing out on beige */
+#main_timeline {
+  filter: contrast(1.15) saturate(1.1);
+}
+.years-range-select {
+  display: block !important;
+  visibility: visible !important;
+}

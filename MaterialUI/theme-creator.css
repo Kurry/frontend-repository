@@ -1,0 +1,55 @@
+/* MaterialUI Theme Creator — local polish + inert-nav support */
+
+html, body, #___gatsby, #gatsby-focus-wrapper {
+  height: 100%;
+}
+
+button.inert-nav,
+button.MuiLink-root,
+span.inert-nav {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+button.inert-nav:hover,
+button.MuiLink-root:hover,
+a.MuiLink-underlineHover:hover {
+  text-decoration: underline;
+}
+
+/* Preserve IconButton / ButtonBase look when demoted from <a> */
+button.MuiIconButton-root.inert-nav,
+button.MuiButtonBase-root.inert-nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  text-decoration: none;
+}
+
+button.MuiIconButton-root.inert-nav:hover {
+  text-decoration: none;
+}
+
+/* Slight hover polish matching Material interactive affordances */
+.MuiButtonBase-root:not(:disabled):hover {
+  filter: brightness(1.04);
+}
+
+.MuiTab-root {
+  transition: opacity 120ms ease, background-color 120ms ease;
+}
+
+/* Color swatch rows feel clickable */
+.MuiAccordionSummary-root:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}

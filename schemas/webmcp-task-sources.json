@@ -1,0 +1,117 @@
+{
+  "frontend-daisyui-admin-dashboard": {
+    "source": "DaisyUI",
+    "instruction": "DaisyUI/instruction.md",
+    "description": "DaisyUI admin user-management dashboard good-app eval."
+  },
+  "frontend-daisyui-theme-generator": {
+    "source": "DaisyUI/theme-generator",
+    "instruction": "DaisyUI/theme-generator/instruction.md",
+    "description": "daisyUI theme generator good-app eval."
+  },
+  "frontend-camera-exposure": {
+    "source": "CameraExposure",
+    "instruction": "CameraExposure/instruction.md",
+    "description": "Camera exposure simulator good-app eval."
+  },
+  "frontend-design-portfolio": {
+    "source": "DesignPortfolio",
+    "instruction": "DesignPortfolio/instruction.md",
+    "description": "CLI terminal product designer portfolio good-app eval."
+  },
+  "frontend-finance-reports": {
+    "source": "FinanceReports",
+    "instruction": "FinanceReports/instruction.md",
+    "description": "Personal finance reports page good-app eval."
+  },
+  "frontend-material-ui-theme-creator": {
+    "source": "MaterialUI",
+    "instruction": "MaterialUI/instruction.md",
+    "description": "Material UI theme creator good-app eval."
+  },
+  "frontend-media-timeline": {
+    "source": "MediaTimeline",
+    "instruction": "MediaTimeline/instruction.md",
+    "description": "Media history timeline explorer good-app eval."
+  },
+  "frontend-palette-library": {
+    "source": "PaletteLibrary",
+    "instruction": "PaletteLibrary/instruction.md",
+    "description": "Fine-art color palette library good-app eval."
+  },
+  "frontend-shapeshift-grid": {
+    "source": "Shapeshift",
+    "instruction": "Shapeshift/instruction.md",
+    "description": "SHAPESHIFT QR color grid painter good-app eval."
+  },
+  "frontend-story-docs": {
+    "source": "StoryDocs",
+    "instruction": "StoryDocs/instruction.md",
+    "description": "Storyboard getting-started tutorial good-app eval."
+  },
+  "frontend-trip-itinerary": {
+    "source": "TripItinerary",
+    "instruction": "TripItinerary/instruction.md",
+    "description": "French Riviera trip itinerary planner good-app eval."
+  },
+  "frontend-admin-analytics-dashboard": {
+    "source": "variants/AdminAnalyticsDashboard",
+    "instruction": "variants/AdminAnalyticsDashboard/instruction.md",
+    "description": "Commerce ops admin analytics dashboard variant."
+  },
+  "frontend-color-palette-archive": {
+    "source": "variants/ColorPaletteArchive",
+    "instruction": "variants/ColorPaletteArchive/instruction.md",
+    "description": "Fine-art color palette archive variant."
+  },
+  "frontend-css-theme-builder": {
+    "source": "variants/CssThemeBuilder",
+    "instruction": "variants/CssThemeBuilder/instruction.md",
+    "description": "CSS theme builder variant."
+  },
+  "frontend-expense-breakdown-reports": {
+    "source": "variants/ExpenseBreakdownReports",
+    "instruction": "variants/ExpenseBreakdownReports/instruction.md",
+    "description": "Personal finance expense breakdown reports variant."
+  },
+  "frontend-exposure-control-lab": {
+    "source": "variants/ExposureControlLab",
+    "instruction": "variants/ExposureControlLab/instruction.md",
+    "description": "Camera exposure control lab variant."
+  },
+  "frontend-grid-paint-studio": {
+    "source": "variants/GridPaintStudio",
+    "instruction": "variants/GridPaintStudio/instruction.md",
+    "description": "QR color grid paint studio variant."
+  },
+  "frontend-l1-network-marketing": {
+    "source": "variants/L1NetworkMarketing",
+    "instruction": "variants/L1NetworkMarketing/instruction.md",
+    "description": "Layer-1 blockchain network marketing site good-app eval."
+  },
+  "frontend-material-theme-studio": {
+    "source": "variants/MaterialThemeStudio",
+    "instruction": "variants/MaterialThemeStudio/instruction.md",
+    "description": "Material theme design studio variant."
+  },
+  "frontend-media-history-timeline": {
+    "source": "variants/MediaHistoryTimeline",
+    "instruction": "variants/MediaHistoryTimeline/instruction.md",
+    "description": "Media history timeline explorer variant."
+  },
+  "frontend-storyboard-tutorial": {
+    "source": "variants/StoryboardTutorial",
+    "instruction": "variants/StoryboardTutorial/instruction.md",
+    "description": "Storyboard getting-started tutorial variant."
+  },
+  "frontend-terminal-portfolio": {
+    "source": "variants/TerminalPortfolio",
+    "instruction": "variants/TerminalPortfolio/instruction.md",
+    "description": "CLI terminal product designer portfolio variant."
+  },
+  "frontend-travel-itinerary-planner": {
+    "source": "variants/TravelItineraryPlanner",
+    "instruction": "variants/TravelItineraryPlanner/instruction.md",
+    "description": "French Riviera trip itinerary planner variant."
+  }
+}

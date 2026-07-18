@@ -1,0 +1,16 @@
+{
+  "id": "structured-editor-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Structured editor",
+  "purpose": "Document, diagram, canvas, configuration, and property editors.",
+  "permitted_operations": ["select", "add", "delete", "update_property", "set_content", "switch_mode", "preview"],
+  "binding_keys": {
+    "required_any_of": [["editor_operations"], ["editor_object_types"]],
+    "optional": ["editor_properties", "editor_modes", "value_bounds", "visible_postconditions"]
+  },
+  "restrictions": [
+    "No arbitrary coordinate, DOM, or storage mutation via WebMCP.",
+    "Drag, resize, drawing, snapping, and keyboard movement remain Playwright-driven when mechanism matters."
+  ],
+  "tool_name_prefix": "editor"
+}

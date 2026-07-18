@@ -1,0 +1,128 @@
+[
+  {
+    "id": "1.1",
+    "title": "Every checklist-* criterion in this Core Features dimension passes during the agent verifier run",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Core Features"
+    }
+  },
+  {
+    "id": "1.2",
+    "title": "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Core Features"
+    }
+  },
+  {
+    "id": "1.3",
+    "title": "Exposure presets list is static HTML only with no working create/edit/delete against shared state",
+    "annotations": {
+      "type": "negative hli verifier",
+      "importance": "must have",
+      "criterion": "Core Features"
+    }
+  },
+  {
+    "id": "1.4",
+    "title": "App chrome navigates via real outbound links to other origins instead of in-app view state",
+    "annotations": {
+      "type": "negative hli verifier",
+      "importance": "must have",
+      "criterion": "Core Features"
+    }
+  },
+  {
+    "id": "2.1",
+    "title": "Pinia holds dial stops, presets collection, active mode, and filters \u2014 shared across components",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Technical Implementation"
+    }
+  },
+  {
+    "id": "2.2",
+    "title": "Implemented with Vue 3, Pinia, and Tailwind CSS; no browser storage APIs for persistence",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Technical Implementation"
+    }
+  },
+  {
+    "id": "2.3",
+    "title": "Uses localStorage or sessionStorage to persist presets or dial state",
+    "annotations": {
+      "type": "negative hli verifier",
+      "importance": "must have",
+      "criterion": "Technical Implementation"
+    }
+  },
+  {
+    "id": "2.4",
+    "title": "Manages the presets collection only in component-local refs rather than Pinia",
+    "annotations": {
+      "type": "negative hli verifier",
+      "importance": "must have",
+      "criterion": "Technical Implementation"
+    }
+  },
+  {
+    "id": "3.1",
+    "title": "Full-viewport lab composition with overlaid dials and a dense presets list/panel remains tool-like",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Visual Design"
+    }
+  },
+  {
+    "id": "3.2",
+    "title": "Empty presets state is visually present when the collection is empty",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Visual Design"
+    }
+  },
+  {
+    "id": "3.3",
+    "title": "Replaces the lab with a marketing card grid and no live exposure preview",
+    "annotations": {
+      "type": "negative hli verifier",
+      "importance": "must have",
+      "criterion": "Visual Design"
+    }
+  },
+  {
+    "id": "4.1",
+    "title": "Required hover animations are present; dial/meter/preview and mode switches animate as specified",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Motion"
+    }
+  },
+  {
+    "id": "4.2",
+    "title": "Mode switches update without full reload and keep hover feedback",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "nice to have",
+      "criterion": "Motion"
+    }
+  },
+  {
+    "id": "4.3",
+    "title": "Omits hover feedback on steppers or preset rows so controls feel static on pointer hover",
+    "annotations": {
+      "type": "negative hli verifier",
+      "importance": "must have",
+      "criterion": "Motion"
+    }
+  }
+]

@@ -1,0 +1,529 @@
+/* Exposure Control Lab — layout, dials, meter, help */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #1a1d20;
+  color: #333;
+  font-family: "Oswald", system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+button {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+}
+
+.lab {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* --- Preview stack --- */
+
+.noise-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.noise-overlay {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  mix-blend-mode: multiply;
+  background-image: url("../assets/iso-noise.jpg");
+  background-position: 50%;
+  background-size: 200px 200px;
+  transition: opacity 0.2s ease;
+}
+
+.preview {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: filter 0.25s ease;
+}
+
+.motion-stack {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  overflow: hidden;
+  transition: filter 0.25s ease;
+}
+
+.motion-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+  display: block;
+}
+
+.motion-frame.is-active {
+  opacity: 1;
+  z-index: 2;
+}
+
+.depth-plate {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  width: 100vw;
+  height: 105vh;
+  background-image: url("../assets/background.jpg");
+  background-position: 50%;
+  background-size: cover;
+  transition: filter 0.25s ease;
+}
+
+/* --- Right-side controls --- */
+
+.controls {
+  position: absolute;
+  right: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 360px;
+}
+
+.dial-control {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 180px;
+  height: 100px;
+}
+
+.dial-ring {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 20px;
+  background: #5b6770;
+  z-index: 1;
+}
+
+.dial-face {
+  position: relative;
+  z-index: 4;
+  width: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+}
+
+.dial-label {
+  color: #cdd0c3;
+  letter-spacing: 1px;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.dial-value {
+  color: #fff;
+  font-size: 22px;
+  font-weight: 300;
+  line-height: 26px;
+  width: 80px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step {
+  position: relative;
+  z-index: 2;
+  width: 40px;
+  height: 100px;
+  background-position: 50%;
+  background-repeat: no-repeat;
+  background-size: 28px;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.step--down {
+  background-image: url("../assets/arrow.svg");
+}
+
+.step--up {
+  background-image: url("../assets/arrow-up.svg");
+  background-size: 30px;
+}
+
+.step:focus-visible,
+.help-btn:focus-visible {
+  outline: 2px solid #ef3e23;
+  outline-offset: 2px;
+}
+
+/* --- Help trigger --- */
+
+.help-btn {
+  position: absolute;
+  right: 70px;
+  top: -100px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #ef3e23;
+  color: #cdd0c3;
+  opacity: 0.8;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: opacity 0.5s;
+  cursor: pointer;
+}
+
+.help-btn:hover {
+  opacity: 1;
+}
+
+.help-btn__icon {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: 300;
+  pointer-events: none;
+  transition: transform 0.35s ease;
+}
+
+.help-btn.is-open .help-btn__icon:first-child {
+  transform: translateY(-40px);
+}
+
+.help-btn--mobile {
+  display: none;
+  position: absolute;
+  right: auto;
+  left: 50%;
+  top: 64px;
+  transform: translateX(-50%);
+  margin: 0;
+  z-index: 1000;
+  width: 44px;
+  height: 44px;
+  opacity: 1;
+  background: rgba(239, 62, 35, 0.6);
+}
+
+.help-btn--mobile .help-btn__icon {
+  width: 44px;
+  height: 44px;
+}
+
+/* --- Exposure meter --- */
+
+.meter {
+  position: absolute;
+  left: 80px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+  width: 20px;
+  height: 360px;
+  border-radius: 10px;
+  background: #5b6770;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.meter__track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.meter__dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ef3e23;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  transition: top 0.35s ease;
+}
+
+.meter__center {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.meter__caption {
+  position: absolute;
+  width: 180px;
+  text-align: center;
+  letter-spacing: 2px;
+  color: #cdd0c3;
+  font-size: 12px;
+  font-weight: 500;
+  transform: rotate(-90deg);
+}
+
+.meter__caption--over {
+  top: 80px;
+}
+
+.meter__caption--under {
+  bottom: 80px;
+}
+
+/* --- Help panel --- */
+
+.help-panel {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translate3d(630px, -50%, 0);
+  z-index: 100;
+  width: 630px;
+  height: 420px;
+  padding-left: 20px;
+  border-radius: 20px 0 0 20px;
+  background: rgba(205, 208, 195, 0.9);
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform 0.45s cubic-bezier(0.645, 0.045, 0.355, 1),
+    opacity 0.35s ease;
+}
+
+.help-panel.is-open {
+  transform: translate3d(0, -50%, 0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.help-panel__inner {
+  width: 382px;
+  height: 360px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+
+.help-panel p {
+  margin: 0;
+  color: #ef3e23;
+  font-size: 14px;
+  line-height: 16px;
+  font-weight: 400;
+}
+
+.help-panel strong {
+  font-weight: 600;
+}
+
+/* --- Brand chip --- */
+
+.brand-chip {
+  position: absolute;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  z-index: 200;
+  pointer-events: none;
+  padding: 6px 20px;
+  border-radius: 8px;
+  background: rgba(239, 62, 35, 0.4);
+  color: #cccec3;
+  font-size: 14px;
+  font-weight: 300;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* --- Responsive --- */
+
+@media screen and (max-width: 767px) {
+  .controls {
+    right: 20px;
+  }
+
+  .meter {
+    left: 5%;
+  }
+
+  .help-panel {
+    width: 560px;
+  }
+
+  .help-panel__inner {
+    width: 332px;
+  }
+
+  .help-panel p {
+    font-size: 13px;
+    line-height: 15px;
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .depth-plate {
+    background-position: 36%;
+  }
+
+  .motion-frame {
+    object-position: 30% 50%;
+  }
+
+  .controls {
+    flex-direction: row;
+    width: 280px;
+    height: 140px;
+    right: auto;
+    left: 50%;
+    top: auto;
+    bottom: 30px;
+    transform: translateX(-50%);
+  }
+
+  .dial-control {
+    flex-direction: column;
+    justify-content: space-between;
+    width: 72px;
+    height: 140px;
+  }
+
+  .dial-ring {
+    display: none;
+  }
+
+  .dial-face {
+    background: #5b6770;
+    border-radius: 10px;
+    width: 72px;
+    height: 72px;
+  }
+
+  .dial-label {
+    font-size: 12px;
+  }
+
+  .dial-value {
+    width: 72px;
+  }
+
+  .step {
+    width: 100%;
+    height: 30px;
+    background-size: cover;
+  }
+
+  .step--down {
+    order: 1;
+    background-image: url("../assets/arrow-mob-down.svg");
+  }
+
+  .step--up {
+    order: -1;
+    background-image: url("../assets/arrow-mob-up.svg");
+  }
+
+  .meter {
+    top: 80px;
+    left: 50%;
+    bottom: auto;
+    transform: translate(-50%, -60%) rotate(90deg);
+  }
+
+  .help-btn:not(.help-btn--mobile) {
+    display: none;
+  }
+
+  .help-btn--mobile {
+    display: flex;
+  }
+
+  .help-panel {
+    top: 86px;
+    left: 50%;
+    right: auto;
+    width: 360px;
+    height: 360px;
+    margin-bottom: 60px;
+    padding: 20px 0 0;
+    border-radius: 10px;
+    flex-direction: column;
+    justify-content: center;
+    transform: translate3d(0, -20px, 0);
+    opacity: 0;
+  }
+
+  .help-panel.is-open {
+    transform: translate3d(-50%, 0, 0);
+    left: 50%;
+  }
+
+  .help-panel__inner {
+    width: 330px;
+    height: 280px;
+  }
+
+  .help-panel p {
+    text-align: center;
+  }
+
+  .brand-chip {
+    display: none;
+  }
+}

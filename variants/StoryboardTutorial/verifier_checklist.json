@@ -1,0 +1,50 @@
+[
+  {
+    "id": "1",
+    "title": "On load, Board mode shows at least 8 seeded scene cards with images and descriptions"
+  },
+  {
+    "id": "2",
+    "title": "After creating a scene titled 'Harbor Opening' with valid required fields, the text 'Harbor Opening' is visible on the board"
+  },
+  {
+    "id": "3",
+    "title": "After adding 3 new scenes on top of the seed set, the board shows exactly 3 more scenes than the initial seeded count"
+  },
+  {
+    "id": "4",
+    "title": "After switching to Slide (Tutorial) mode, a single centered active scene is visible with navigation affordances"
+  },
+  {
+    "id": "5",
+    "title": "After editing a scene description/title to 'Evening Cutaway', the text 'Evening Cutaway' is visible and the previous text is not"
+  },
+  {
+    "id": "6",
+    "title": "After deleting a scene, that scene's title/description is no longer visible on the board"
+  },
+  {
+    "id": "7",
+    "title": "After deleting all scenes, an empty state is visible on the board"
+  },
+  {
+    "id": "8",
+    "title": "After submitting create with an empty required title/description, the scenes count does not increase and validation feedback is visible"
+  },
+  {
+    "id": "9",
+    "title": "After switching among Tile, List, and Slide view modes, the scene set re-layouts without full page navigation"
+  },
+  {
+    "id": "10",
+    "title": "After advancing prev/next in Slide mode (when multiple scenes exist), the active scene index changes and the centered scene updates"
+  },
+  {
+    "id": "11",
+    "title": "When hovering scene cards, mode toggles, or header controls, a visible hover lift, wash, or shadow change appears"
+  },
+  {
+    "id": "12",
+    "title": "Welcome to Docs! is visible in the workspace chrome on load"
+  }
+]

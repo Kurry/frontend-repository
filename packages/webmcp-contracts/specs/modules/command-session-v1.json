@@ -1,0 +1,17 @@
+{
+  "id": "command-session-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Command / session",
+  "purpose": "Media, games, presentations, simulations, demos, and remote-control shells.",
+  "permitted_operations": ["start", "pause", "resume", "stop", "restart", "advance", "trigger_demo", "connect", "disconnect"],
+  "binding_keys": {
+    "required_any_of": [["session_operations"]],
+    "optional": ["demos", "visible_postconditions"]
+  },
+  "restrictions": [
+    "No batching or replay of gameplay.",
+    "Timing, animation, collision, repeated input, and transient UI require immediate Playwright observation.",
+    "Tool output cannot prove successful playback or connection."
+  ],
+  "tool_name_prefix": "session"
+}

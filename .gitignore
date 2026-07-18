@@ -1,0 +1,51 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+!.env*.example
+*.pem
+credentials.json
+*.key
+
+# Caches and build outputs
+.pytest_cache/
+__pycache__/
+*.py[cod]
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage/
+.turbo/
+.next/
+.nuxt/
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# Package manager / tooling
+.pnpm-store/
+.vercel/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# OS / editor
+.DS_Store
+.cursor/
+.idea/
+*.swp
+
+# Local job / trial outputs
+jobs/
+trials/
+
+# Python virtualenvs
+.venv/
+venv/

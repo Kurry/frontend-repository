@@ -1,0 +1,50 @@
+[
+  {
+    "id": "1",
+    "title": "On load, Plan List mode shows multi-day itinerary sections with at least 8 seeded stops and place names visible"
+  },
+  {
+    "id": "2",
+    "title": "After creating a stop named 'Harbor Lookout' on a day with valid required fields, the text 'Harbor Lookout' is visible in the plan list"
+  },
+  {
+    "id": "3",
+    "title": "After adding 3 new stops on top of the seed set, the plan list shows exactly 3 more stops than the initial seeded count"
+  },
+  {
+    "id": "4",
+    "title": "After selecting a stop, the place detail overlay or panel shows that stop's name and tab chrome (About or equivalent)"
+  },
+  {
+    "id": "5",
+    "title": "After editing a stop name to 'Evening Promenade', the text 'Evening Promenade' is visible and the previous name is not"
+  },
+  {
+    "id": "6",
+    "title": "After deleting a stop, that stop name is no longer visible in the plan list"
+  },
+  {
+    "id": "7",
+    "title": "After deleting all stops, an empty state is visible in the plan list region"
+  },
+  {
+    "id": "8",
+    "title": "After submitting create with an empty required stop name, the stops count does not increase and validation feedback is visible"
+  },
+  {
+    "id": "9",
+    "title": "After filtering or focusing a single day (with multi-day stops present), only that day's stops remain emphasized or visible in the filtered list"
+  },
+  {
+    "id": "10",
+    "title": "After switching emphasis between Plan List and Map modes (or Trip plan / map focus), the workspace shows the other mode without full page navigation"
+  },
+  {
+    "id": "11",
+    "title": "After switching place detail tabs (About / Reviews or equivalent), the panel content swaps without leaving the page"
+  },
+  {
+    "id": "12",
+    "title": "When hovering place rows, sidebar items, or map chrome controls, a visible hover lift, wash, or press feedback appears"
+  }
+]

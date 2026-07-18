@@ -1,0 +1,22 @@
+{
+  "contract_version": "zto-webmcp-v1",
+  "package": "@zto/webmcp-contracts",
+  "policy": {
+    "semver": "Package minor/patch may tighten validation and add optional binding keys. Major package bumps are required for breaking runtime schema or tool-name changes.",
+    "contract_version_freeze": "The string zto-webmcp-v1 identifies the six-module catalog. A new catalog (added/removed/renamed modules or changed permitted ops) MUST bump to zto-webmcp-v2 (or later) and must not silently reinterpret v1 assignments.",
+    "module_ids": [
+      "browse-query-v1",
+      "entity-collection-v1",
+      "form-workflow-v1",
+      "structured-editor-v1",
+      "command-session-v1",
+      "artifact-transfer-v1"
+    ],
+    "module_count": 6,
+    "selection": {
+      "min_modules": 1,
+      "max_modules": 4
+    },
+    "no_seventh_module": "Task-specific behavior is expressed only as validated bindings and mechanics_exclusions. Custom JSON Schema and task-private modules are forbidden."
+  }
+}

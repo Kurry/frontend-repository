@@ -1,0 +1,12 @@
+{
+  "name": "frontend-repository",
+  "private": true,
+  "workspaces": [
+    "packages/webmcp-contracts"
+  ],
+  "scripts": {
+    "build:webmcp-contracts": "npm run build -w @zto/webmcp-contracts",
+    "test:webmcp-contracts": "npm run test -w @zto/webmcp-contracts",
+    "typecheck:webmcp-contracts": "npm run typecheck -w @zto/webmcp-contracts"
+  }
+}

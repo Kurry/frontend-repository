@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Name | Product Designer &amp; Design Systems Lead</title>
+  <meta name="description" content="Product designer and Design Systems Lead. Interfaces, design systems, dashboards, and brand work. Generic portfolio demo.">
+  <link rel="icon" type="image/png" href="./favicon.svg" sizes="96x96" />
+  <link rel="shortcut icon" href="./favicon.svg" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./favicon.svg" />
+  <meta name="apple-mobile-web-app-title" content="Your Name" />
+  
+      
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="./" />
+  <meta property="og:title" content="Your Name | Product Designer & Design Systems Lead" />
+  <meta property="og:description" content="Product designer and Design Systems Lead. Interfaces, design systems, and brands." />
+  
+  <meta property="og:site_name" content="Your Name" />
+  <meta property="og:locale" content="en_US" />
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Your Name | Product Designer & Design Systems Lead" />
+  <meta name="twitter:description" content="Product designer and Design Systems Lead. Interfaces, design systems, and brands." />
+  
+  <link rel="preload" as="image" href="./dark-theme-blur.avif" type="image/avif" fetchpriority="high">
+  <link rel="preload" as="font" type="font/woff2" href="./assets/fonts/jetbrains-mono.woff2" crossorigin>
+  <link rel="stylesheet" href="./assets/app.css">
+  <script src="./assets/app.js" defer></script>
+</head>
+<body data-route="">
+<div class="wallpaper" id="wallpaper">
+  <picture class="wallpaper-blur" id="wallpaper-picture">
+    <source srcset="dark-theme-blur.avif" type="image/avif">
+    <source srcset="dark-theme-blur.webp" type="image/webp">
+    <img src="dark-theme-blur.webp" alt="" loading="eager" width="1920" height="1080" fetchpriority="high">
+  </picture>
+  <picture class="wallpaper-sharp" id="wallpaper-sharp">
+    <source data-srcset="dark-theme.avif" type="image/avif">
+    <source data-srcset="dark-theme.webp" type="image/webp">
+    <img data-src="dark-theme.png" alt="" width="1920" height="1080" decoding="async">
+  </picture>
+</div>
+
+<!-- Matrix Rain -->
+<canvas id="matrixCanvas"></canvas>
+<!-- Confetti -->
+<canvas id="confettiCanvas"></canvas>
+
+<!-- Close Overlay -->
+<div class="close-overlay" id="closeOverlay">
+  <div class="close-window">
+    <div class="titlebar">
+      <div class="titlebar-dot red" title="Close"></div>
+      <div class="titlebar-dot yellow" title="Minimize"></div>
+      <div class="titlebar-dot green" title="Maximize"></div>
+      <div class="titlebar-title">designer@portfolio ~ /exit</div>
+    </div>
+    <div class="close-body">
+      <div class="output-line red">$ kill -9 portfolio</div>
+      <div class="output-line red">✗ Process terminated.</div>
+      <div class="output-line"></div>
+      <div class="output-line dim">  But great design never really stops.</div>
+      <div class="output-line accent">  Let's keep the conversation going.</div>
+      <div class="close-actions">
+        <span class="output-line accent" style="margin-right:4px">></span>
+        <button type="button" class="close-btn primary inert-nav">LinkedIn</button>
+        <button type="button" class="close-btn primary inert-nav">Instagram</button>
+        <button class="close-btn" id="closeReopen">Reopen terminal</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Terminal Window -->
+<!-- psst... try typing /secrets, or sudo hire designer, or the konami code -->
+<div class="terminal-window booting" id="terminal">
+  <div class="titlebar">
+    <div class="titlebar-dot red" title="Close"></div>
+    <div class="titlebar-dot yellow" title="Minimize"></div>
+    <div class="titlebar-dot green" title="Maximize"></div>
+    <div class="titlebar-title">designer@portfolio ~ /portfolio</div>
+  </div>
+
+  <div class="terminal-body" id="terminalBody">
+    <!-- Boot Sequence (shown only while .booting) -->
+    <div class="boot-text" id="bootText"></div>
+    <!-- Semantic heading for SEO (visually hidden, rendered as ASCII art) -->
+    <h1 class="sr-only">Your Name — Product Designer, Design Lead & Strategist</h1>
+    <!-- ASCII Name -->
+    <pre class="ascii-name" id="asciiName" aria-hidden="true"></pre>
+
+    <!-- Welcome Box (Claude Code style) -->
+    <div class="welcome-box" id="welcomeBox">
+      <div class="welcome-left">
+        <h2 class="greeting">Welcome, visitor.</h2>
+        <pre class="pixel-rocket">*********++++++++++++++++++++++++++++*#%@%#**+++++++++++++++++++++++**#%%@%%#**+++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++*#%@@%**++++++++++++++++++++++*##%@%%#**+++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++*%@@%#*++++++++++++++++++++**#%@@%#**+++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++*#%@%**+++++++++++++++++++*#%%@%%#*+++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++*###+=--=====++++++++++++*#%@@%#**++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++=---:.:---=========+++++**#%@%#**++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++==--------------=======+++*##%@%#*++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++=--------------------=====+++*%@%#*+++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++=-----------------------====+++++*#*++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++=--------::::------------====++++++**++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++=-------:::::::::::--------===++++=++*++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++=-------::::::::::::::------====+++++++*+++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++=-------::::::::::--::-------===+++++++++*++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++==--------::::::::---::------=====+++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++==+=======--------::::::::::--:-------=====++++++++++==+++++++++++++++++++++++++++++
++++++++++==================------::::::::::----:------=====++++++++++====================++==+++++++
+++++=======================-------::::::------------========++++++++++==============================
+===========================---------======-------==+********++++++++++==============================
+===========================-----==++*####*+=---==+*#%%%%####**++++++++==============================
+===========================----==+*#####%##+-::-+#%%%#####*****+++++++==============================
+===========================---==+##*##%***+=--:-+####=*%%*#%##**++++++++============================
+======================--==-----=+++=-======-----=*#**++++***#**++++++*++*===========================
+======================*+-=---------==+++=------=++***+++**+++===+++++++##===========================
+=======================+-==----::--------------=++++++==========++++*++%#===========================
+========================-==----::::------------=+++++===--=====+++++#**#+===========================
+=======================--===------::::::----:---=+++*+==---===++++++*#**============================
+========================--===-----:::::---======+*****=======++++++*#**=============================
+=========================--+==---------=---=+*#%%###*++=====+++++++*+*+=============================
+=======================+*=-===-------==----++*#*###*+++++++++++*++*+*+==============================
+=====================+*#%*:-===----===-====++++++******+*++++++*++*++===============================
+===================+*#%@%*+=+====---==+++++*#***########**++****+*==================================
+=================+*#%@%#*+===+=++=--=++*+++=====++***###**++*##**+==================================
+===============++*%@%#*+======++++=-=+=-----====++++++++**+*##***===================================
+=============++*%@%#*+=========#*++===---===++*******++++***###*+===================================
+===========++*%@%#*+===========+##++==-------=+++===+++++****##++===================================
+=========++*%@@#*+===============##*++=------=======+++*#####**++===================================
+=======++*#%%#*+==================*%#%##*+++=++++++**##%%%%#**+++===================================
+======+*#%%#*+=====================*#%%%%##**##***###%%%%%#***+++===================================
+====+*#%@#*+=======================+*%%%%%#%########%%%%%#***++++++=================================
+==+*#%@%*+==========================+*%%%%%%%%%%%%@@@@%%#***++++++++++**+===========================
++*#%@%*+======================++==-==+*#%%%%%%%%%%@@%%#******+++++++++*#%###*=======================
+#%@%*+====================*#**-------==+*#%%%%%%%%%#####****+++++++++*#%%%%##%#*=-==================
+@%#++==================+#####*--------==++***#########*******++++++**%%%%%%%%%%%###*+===============
+#*+=================+#########=----------==++*#####***********++++*#%%%%%%%%%%%%%%%%%##+============
++===============+*#############+----------===+++**************++*#%%%%%%%%%%%%%%%%%%%#####*+========
+============+*###################----------====++++**++++++++**%%%%%%%%%%%%%%%%%%%%%%%%#######*+====
+=========*#########################---------====++++++++++**#%%%%%%%%%%%%%%%%%%%%%%%%%#%##########**
+====+*############################%%%#+-----====+++====+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%############
+++*#################################%%%%%%%##****##%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#%###############
+########################################%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%##################
+##################################################%%%%%%%%%%%%%%%%%%%%%%%%%%%%######################
+################################################%%%#%#%%%%%%%%%%%%%%%%%%%#%%########################
+##########################################################%%%%####%##########################%%%%###
+#########################################################################################%##%%%####%
+#########################################################################################%#%%%%####%</pre>
+        <div class="subtitle">Product Designer &bull; Your City, Country</div>
+        <div class="subtitle" id="emailSubtitle"></div>
+      </div>
+      <div class="welcome-right">
+        <div class="welcome-section">
+          <h2 class="welcome-section-title">Capabilities</h2>
+          <div class="item"><span class="label">Design</span><span>Systems, UX/UI, Strategy</span></div>
+          <div class="item"><span class="label">Lead</span><span>Teams, Workshops, Mentoring</span></div>
+          <div class="item"><span class="label">Build</span><span>Web, Mobile, Branding</span></div>
+          <div class="item"><span class="label">Ship</span><span>SaaS, Enterprise, Consumer</span></div>
+        </div>
+        <div class="welcome-section">
+          <h2 class="welcome-section-title">Navigation</h2>
+          <div class="item"><span>/about</span></div>
+          <div class="item"><span>/work</span></div>
+          <div class="item"><span>/clients</span></div>
+          <div class="item"><span>/skills</span></div>
+          <div class="command-hint">... /help for all commands</div>
+          <div class="command-hint" style="margin-top:6px;opacity:0.5">Try /themes to change the vibe</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Command output appears here -->
+    <div class="output-area" id="outputArea"></div>
+  </div>
+
+  <!-- Input -->
+  <div class="input-area">
+    <span class="input-prompt">&gt;</span>
+    <div class="input-wrapper">
+      <div class="autocomplete" id="autocomplete"></div>
+      <input
+        type="text"
+        class="input-field"
+        id="cmdInput"
+        placeholder='Type a command... try "/help"'
+        autocomplete="off"
+        spellcheck="false"
+      >
+    </div>
+  </div>
+</div>
+
+<!-- Semantic content: always in DOM for AI crawlers, visually hidden when JS runs -->
+<div class="seo-fallback" id="seoFallback">
+  <h1>Your Name — Product Designer, Design Lead & Strategist</h1>
+  <p>Your Name is a product designer and design lead with 15+ years of experience building intuitive interfaces, design systems, and digital experiences. They co-founded Design Studio, serving clients across multiple markets.</p>
+  <p>I turn complexity into clarity. Whether it's an enterprise dashboard or a consumer mobile app, I'm always asking the same question: "Does this remove friction?" Complexity is fine. Confusion is the problem.</p>
+
+  <h2>Expertise</h2>
+  <ul>
+    <li>Product Design & UX/UI</li>
+    <li>Design Systems — atomic design, design tokens, component libraries</li>
+    <li>UX Research & Strategy</li>
+    <li>UI & Visual Design</li>
+    <li>Data Visualization & Dashboard UX</li>
+    <li>Brand & Identity</li>
+    <li>Design Leadership</li>
+    <li>Accessibility — WCAG compliance</li>
+    <li>Prototyping & Motion</li>
+    <li>Workshop Facilitation</li>
+  </ul>
+
+  <h2>Selected Work</h2>
+  <h3>Signals (2024) — Research Integrity Platform</h3>
+  <p>Academic institutions use these dashboards to monitor research integrity. Three weeks of analytics told us researchers were spending 60% of their time scrolling, not analyzing. We switched to tabbed navigation with sticky metrics and dynamic filtering. Information retrieval got 60% faster, WCAG compliance hit 100%, scrolling dropped 5x. <button type="button" class="inert-nav">Full case study</button>.</p>
+
+  <h3>Anylyze (2024) — Analytics Data Platform</h3>
+  <p>Users didn't trust the data. That was the core problem. I rebuilt the visualization layer with a three-tiered typography system and five component states so you could always tell what the data was doing. Tasks got 38% faster, errors dropped 71%, and user confidence hit 9.4/10. <button type="button" class="inert-nav">Full case study</button>.</p>
+
+  <h3>LiveU (2024) — Signa Design System</h3>
+  <p>120+ components for a global live video broadcasting platform. Atomic design, dual-typeface system (Plus Jakarta Sans + Inter), 8px grid. The system now runs across multiple products and regions. Design velocity went up 60% and cross-platform consistency hit 100%. <button type="button" class="inert-nav">Full case study</button>.</p>
+
+  <h3>TUIASI (2023) — University Website Redesign</h3>
+  <p>The university's website was a decade old, slow, and hemorrhaging prospective students. We had four weeks. Stripped the IA down, killed the bloat, optimized everything. That year they got +4,200 new students (a record), pages got 91% smaller, loading went 10x faster. <button type="button" class="inert-nav">Full case study</button>.</p>
+
+  <h3>ResNet AI (2023) — Hospitality Design System</h3>
+  <p>1,300+ scattered design variants. No documentation, no governance, no consistency. I consolidated the whole thing into a token-based system with proper docs and component governance. 60% fewer components, 40% faster handoff, 100% accessibility compliance. <button type="button" class="inert-nav">Full case study</button>.</p>
+
+  <h3>Socyal (2023) — HR Mobile Platform</h3>
+  <p>Took an HR tool from concept to an investor-ready standalone mobile product in 5 months. Designed the complete mobile experience — onboarding flows, performance management, feedback loops, and team dynamics dashboards. Launched as <button type="button" class="inert-nav">#3 Product of the Day on Product Hunt</button>. Worked on this project for 6+ years alongside the founding team. <button type="button" class="inert-nav">Full case study</button>.</p>
+
+  <h3>App4Home (2024) — Smart Home IoT App</h3>
+  <p>The existing smart home app was cluttered and confusing. I redesigned it with a time-aware dashboard that adapts to daily routines, room-based navigation for grouping devices, and AI-powered recommendations. Visual clutter dropped 40%, onboarding got 2x faster. <button type="button" class="inert-nav">Full case study</button>.</p>
+
+  <h3>CyberGhost VPN (2018) — Consumer Privacy App</h3>
+  <p>The interface was built by engineers, for engineers. I made it work for everyone else. Dark-mode-first, a slide-to-connect interaction that felt physical, and a 3-step onboarding you could finish in 30 seconds. <button type="button" class="inert-nav">Full case study</button>.</p>
+
+  <h3>CognitiveSEO (2017) — SEO Dashboard</h3>
+  <p>Feature-heavy dashboard where power users thrived and everyone else drowned. I broke it into three modules with progressive disclosure. Power users kept everything; marketers could finally navigate without a manual. Tasks got 40% faster, retention went up 30%, cognitive load dropped 45%. <button type="button" class="inert-nav">Full case study</button>.</p>
+
+  <h3>Big5 American Diner (2020) — Restaurant Brand Identity</h3>
+  <p>Five founding recipes, one brand. Mid-century American diner aesthetic across logo, menus, packaging, signage, and digital. Big5 American Diner became #1 Hospitality Brand locally within its first year. No paid ads, purely organic. <button type="button" class="inert-nav">Full case study</button>.</p>
+
+  <h3>Darnic for Education (2024) — NGO Campaign</h3>
+  <p>"Generosity builds futures." A Christmas gift-giving campaign for underserved children in underserved communities. I designed the logo, campaign materials, social templates, and volunteer kits. Kit production went 3x faster once everything was templated and consistent. <button type="button" class="inert-nav">Full case study</button>.</p>
+
+  <h3>Crafting Social Stories (2024) — Workshop Brand</h3>
+  <p>Educational workshops for children in underserved communities. The brand had to work for two very different audiences: kids (playful) and corporate donors (credible). Getting that balance right drove volunteer sign-ups and donor engagement. <button type="button" class="inert-nav">Full case study</button>.</p>
+
+  <h2>Clients</h2>
+  <p>CyberGhost VPN, LiveU, CognitiveSEO, Signals, Anylyze, ResNet AI, Socyal, App4Home, Comodo, Dribbble, GlobalAI, Golden Path, Optymyze, SkyControl, Nestle, WHO, FameUp, Horexa, Digitail, BrandMentions, SedCom Libris, Portokal, Big5 American Diner, Katiusa, TUIASI, Holy Cow, Ideate Plus, Wawsome, Local Happinez, Uzina de Zambete — across Europe, US, Israel, and UAE.</p>
+
+  <h2>Contact</h2>
+  <p>
+    Email: <button type="button" class="inert-nav">hello@example.com</button><br>
+    Phone: <button type="button" class="inert-nav">+1 (555) 000-0000</button><br>
+    Location: Your City, Country<br>
+    Agency: <button type="button" class="inert-nav">Design Studio — designstudio.example</button>
+  </p>
+  <p>Open to: design leadership roles, consulting, design system engagements, workshops & talks.</p>
+
+  <h2>Social Profiles</h2>
+  <p>
+    LinkedIn: <button type="button" class="inert-nav">linkedin.com/in/yourname</button><br>
+    Facebook: <button type="button" class="inert-nav">facebook.com/yourname</button><br>
+    Instagram: <button type="button" class="inert-nav">instagram.com/yourname</button><br>
+    Agency: <button type="button" class="inert-nav">designstudio.example</button>
+  </p>
+
+  <h2>Published Articles</h2>
+  <p>17 articles on design systems, UX, branding, and product strategy, published on <button type="button" class="inert-nav">Design Studio</button>.</p>
+
+  <h3>Design Systems</h3>
+  <ul>
+    <li><button type="button" class="inert-nav">The complete guide to Design Systems in 2026</button></li>
+    <li><button type="button" class="inert-nav">Design System 101: Building a scalable Design System from scratch</button></li>
+    <li><button type="button" class="inert-nav">Design tokens: the complete technical guide</button></li>
+    <li><button type="button" class="inert-nav">Design system governance: who owns what and how decisions get made</button></li>
+    <li><button type="button" class="inert-nav">Design System vs. style guide vs. pattern library</button></li>
+    <li><button type="button" class="inert-nav">Glossary of scalable Design Systems</button></li>
+  </ul>
+
+  <h3>UX & Product</h3>
+  <ul>
+    <li><button type="button" class="inert-nav">UX design guide: best practices, metrics, and modern workflows</button></li>
+    <li><button type="button" class="inert-nav">Design-led development: How to truly blend UX and Agile</button></li>
+    <li><button type="button" class="inert-nav">AI in UX: Best practices for designing with artificial intelligence</button></li>
+  </ul>
+
+  <h3>Branding & Strategy</h3>
+  <ul>
+    <li><button type="button" class="inert-nav">Branding for digital products: A strategy blueprint</button></li>
+    <li><button type="button" class="inert-nav">Strategic storytelling: a practical guide for business growth</button></li>
+    <li><button type="button" class="inert-nav">Beyond the slogan: Mastering brand messaging through story</button></li>
+  </ul>
+
+  <h3>SEO & Content</h3>
+  <ul>
+    <li><button type="button" class="inert-nav">Content marketing for SaaS and product companies: what actually works</button></li>
+    <li><button type="button" class="inert-nav">SEO and content strategy for product companies</button></li>
+    <li><button type="button" class="inert-nav">Technical SEO checklist for product websites</button></li>
+    <li><button type="button" class="inert-nav">How to build topical authority (and why it beats keyword chasing)</button></li>
+    <li><button type="button" class="inert-nav">Storytelling formats that win: How to get featured in AI answers</button></li>
+  </ul>
+
+
+  <h2>Testimonials</h2>
+
+  <blockquote>
+    <p>"They were one of the original mentors for the Design Systems course. As a clear expert in his field, They sculpted each lesson with clarity and precision, transforming complexity into teachability — which is an incredible skill. His influence didn't stop at imparting knowledge; it permeated the very fabric of the mentorship program, shaping it into a nurturing environment where budding designers could flourish. What sets them apart is his exceptional ability to forge personal connections with his students. His classes aren't just about teaching design principles; they're about fostering meaningful relationships and creating an environment where everyone feels valued and inspired."</p>
+    <cite>— Jessica Ibbotson, Education Support at Dribbble (managed the designer directly, 2021–2022)</cite>
+  </blockquote>
+
+  <blockquote>
+    <p>"He's a top-notch Product Design expert whose work really makes a difference in every project he touches. What's impressive about them is not just his skill in making things look good, but also how he thinks about the whole user experience from start to finish. This kind of thinking is crucial for creating successful apps. They are also great at communicating. He really listens to what everyone has to say, takes the time to analyze things before making decisions, and always comes up with smart solutions to any problem. This is a rare quality that I really appreciate."</p>
+    <cite>— Adrian Banu, VP Product at Optymyze</cite>
+  </blockquote>
+
+  <blockquote>
+    <p>"They possess a rare combination of creativity, technical expertise, and leadership skills that make him stand out in the field of UX design. His deep understanding of design principles and methodologies enables him to consistently deliver intuitive and user-centric solutions. Whether it's crafting wireframes, conducting user research, or refining prototypes, They approach each task with meticulous attention to detail and a relentless pursuit of excellence. They foster a collaborative work environment where ideas are freely exchanged, and everyone feels empowered to contribute their best work."</p>
+    <cite>— the designer Hilitanu, Lead Experience Designer at EPAM Systems</cite>
+  </blockquote>
+
+  <blockquote>
+    <p>"I highly recommend this designer for his outstanding skills in UI/UX design. Throughout our collaboration, he showcased exemplary leadership qualities and demonstrated a proactive approach to every task. It was a pleasure working with them, and I'm confident he will continue to excel in his future endeavors."</p>
+    <cite>— Ionut Patrascoiu, CEO & Founder at FameUp (client)</cite>
+  </blockquote>
+
+  <blockquote>
+    <p>"What truly sets them apart is his knack for thinking outside the box and bringing innovative solutions to the table. Whether it's his UX expertise or his inventive approach to problem-solving, They consistently impresses. They are a dedicated and hardworking individual who isn't afraid to take initiative and go the extra mile to ensure project success. His open-mindedness and willingness to listen make him not only a great manager but also an invaluable teammate. I've always appreciated how They foster a collaborative environment where everyone's ideas are valued and respected."</p>
+    <cite>— Earl Carvalho, Product Solutions Manager, Mobile Apps</cite>
+  </blockquote>
+
+  <blockquote>
+    <p>"His designs are consistently intuitive, creating an effortless experience for end-users. I appreciate his collaborative approach to design. He is open to suggestions, actively listening to feedback and engaging in constructive dialogue. Their capacity to grasp technical aspects, despite his non-technical background, is impressive. This proficiency not only facilitates smoother collaboration with technical teams but also enables him to envision innovative solutions that seamlessly integrate with technical needs."</p>
+    <cite>— Lavinia Gherasim, Senior Java Software Engineer at Socyal</cite>
+  </blockquote>
+
+  <blockquote>
+    <p>"They are among the best of the design mentors I've worked with, and I learned a lot from him. His patience and determination to make a design system work smarter rather than harder is something all Product Designers and engineers truly value. They demonstrated a brilliant technical mindset and a particularly sophisticated visual design aesthetic."</p>
+    <cite>— Elena Levy, UX UI / Product / Design Systems Designer (Dribbble mentee)</cite>
+  </blockquote>
+
+  <p>View all recommendations on <button type="button" class="inert-nav">LinkedIn</button>.</p>
+
+</div>
+<!-- Noscript: make semantic content visible when JS is disabled -->
+<noscript><style>.seo-fallback { position:static; width:auto; height:auto; padding:32px; margin:40px auto; max-width:720px; overflow:visible; clip:auto; white-space:normal; font-family:'JetBrains Mono',monospace; color:var(--text); line-height:1.7; } .seo-fallback h1 { color:var(--accent); font-size:1.5rem; margin-bottom:8px; } .seo-fallback h2 { color:var(--accent); font-size:1.1rem; margin:24px 0 8px; } .seo-fallback h3 { color:var(--text); font-size:0.95rem; margin:16px 0 4px; } .seo-fallback p,.seo-fallback li { color:var(--text-dim); font-size:0.85rem; } .seo-fallback ul { padding-left:20px; } .seo-fallback a, .seo-fallback button.inert-nav { color:var(--accent); cursor:pointer; background:none; border:none; font:inherit; padding:0; text-decoration:underline; }</style></noscript>
+
+
+</body>
+</html>

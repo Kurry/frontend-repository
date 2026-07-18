@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <title>Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Pineapple Tech dashboard for commerce operations, orders, products, customers, analytics, and system tools." />
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@5/themes.css" rel="stylesheet" type="text/css" />
+  <link href="./styles.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@weblogin/trendchart-elements@1.1.0/dist/index.js/+esm" async></script>
+  <script src="https://cdn.jsdelivr.net/npm/external-svg-loader@1.6.10/svg-loader.min.js" async></script>
+  <script src="https://cdn.jsdelivr.net/npm/theme-change@3/index.js"></script>
+</head>
+<body class="drawer lg:drawer-open dashboard-shell bg-base-200">
+  <input id="my-drawer" type="checkbox" class="drawer-toggle" aria-label="Toggle sidebar" />
+
+  <main class="drawer-content bg-base-100 main-canvas">
+    <div class="dashboard-grid">
+      <!-- Utility header -->
+      <header class="span-12 flex items-center gap-3">
+        <label for="my-drawer" class="btn btn-square btn-ghost drawer-button drawer-button-desktop-hidden" aria-label="Open sidebar">
+          <svg data-src="./assets/icons/bars-3.svg" class="icon-sm"></svg>
+        </label>
+        <div class="grow">
+          <h1 class="page-title">Dashboard</h1>
+        </div>
+        <div>
+          <input type="text" placeholder="Search" class="input input-sm search-pill" aria-label="Search" />
+        </div>
+        <label class="btn btn-circle btn-sm btn-ghost swap swap-rotate" aria-label="Toggle theme">
+          <input type="checkbox" value="light" data-set-theme aria-label="Toggle theme" />
+          <svg class="swap-on icon-sm fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M5.64,17l-.71.71a1,1,0,0,0,0,1.41,1,1,0,0,0,1.41,0l.71-.71A1,1,0,0,0,5.64,17ZM5,12a1,1,0,0,0-1-1H3a1,1,0,0,0,0,2H4A1,1,0,0,0,5,12Zm7-7a1,1,0,0,0,1-1V3a1,1,0,0,0-2,0V4A1,1,0,0,0,12,5ZM5.64,7.05a1,1,0,0,0,.7.29,1,1,0,0,0,.71-.29,1,1,0,0,0,0-1.41l-.71-.71A1,1,0,0,0,4.93,6.34Zm12,.29a1,1,0,0,0,.7-.29l.71-.71a1,1,0,1,0-1.41-1.41L17,5.64a1,1,0,0,0,0,1.41A1,1,0,0,0,17.66,7.34ZM21,11H20a1,1,0,0,0,0,2h1a1,1,0,0,0,0-2Zm-9,8a1,1,0,0,0-1,1v1a1,1,0,0,0,2,0V20A1,1,0,0,0,12,19ZM18.36,17A1,1,0,0,0,17,18.36l.71.71a1,1,0,0,0,1.41,0,1,1,0,0,0,0-1.41ZM12,6.5A5.5,5.5,0,1,0,17.5,12,5.51,5.51,0,0,0,12,6.5Zm0,9A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z" />
+          </svg>
+          <svg class="swap-off icon-sm fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Zm-9.5,6.69A8.14,8.14,0,0,1,7.08,5.22v.27A10.15,10.15,0,0,0,17.22,15.63a9.79,9.79,0,0,0,2.1-.22A8.11,8.11,0,0,1,12.14,19.73Z" />
+          </svg>
+        </label>
+        <div class="relative">
+          <button type="button" class="btn btn-circle btn-sm btn-ghost" aria-label="Open notifications" popovertarget="header-notifications-dropdown" style="anchor-name: --header-notifications-anchor">
+            <div class="indicator">
+              <span class="status indicator-item status-error"></span>
+              <svg data-src="./assets/icons/bell.svg" class="icon-sm"></svg>
+            </div>
+          </button>
+          <ul class="menu dropdown rounded-box bg-base-100 shadow-lg popover-menu" popover id="header-notifications-dropdown" style="position-anchor: --header-notifications-anchor">
+            <li>
+              <button type="button" class="inert-nav gap-3">
+                <div class="avatar">
+                  <div class="avatar-sm rounded-full">
+                    <img src="./assets/avatar-1.jpg" alt="Alice avatar" />
+                  </div>
+                </div>
+                <span><b>New message</b><br />Alice: Hi, did you get my files?</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="inert-nav gap-3">
+                <div class="avatar">
+                  <div class="avatar-sm rounded-full">
+                    <img src="./assets/avatar-2.jpg" alt="Reminder notification avatar" />
+                  </div>
+                </div>
+                <span><b>Reminder</b><br />Your meeting is at 10am</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="inert-nav gap-3">
+                <div class="avatar">
+                  <div class="avatar-sm rounded-full">
+                    <img src="./assets/avatar-3.jpg" alt="John Doe avatar" />
+                  </div>
+                </div>
+                <span><b>New payment</b><br />Received $2500 from John Doe</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="inert-nav gap-3">
+                <div class="avatar">
+                  <div class="avatar-sm rounded-full">
+                    <img src="./assets/avatar-4.jpg" alt="Alice payment avatar" />
+                  </div>
+                </div>
+                <span><b>New payment</b><br />Received $1900 from Alice</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+        <div class="relative">
+          <button type="button" class="avatar btn btn-sm btn-circle btn-ghost" aria-label="Open profile menu" popovertarget="header-profile-dropdown" style="anchor-name: --header-profile-anchor">
+            <div class="avatar-md rounded-full">
+              <img src="./assets/avatar-5.jpg" alt="Current user avatar" />
+            </div>
+          </button>
+          <ul class="menu dropdown rounded-box bg-base-100 shadow-lg popover-menu" popover id="header-profile-dropdown" style="position-anchor: --header-profile-anchor">
+            <li><button type="button" class="inert-nav">Profile</button></li>
+            <li><button type="button" class="inert-nav">Inbox <span class="badge badge-xs">12</span></button></li>
+            <li><button type="button" class="inert-nav">Settings</button></li>
+            <li><button type="button" class="inert-nav">Logout</button></li>
+          </ul>
+        </div>
+      </header>
+
+      <!-- Context header -->
+      <header class="span-12 flex flex-wrap items-center justify-between gap-3">
+        <div class="grow">
+          <div class="breadcrumbs text-sm">
+            <ul>
+              <li><button type="button" class="inert-nav">Dashboard</button></li>
+              <li><h1 class="text-xl font-semibold">Operations Overview</h1></li>
+            </ul>
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button type="button" class="btn btn-sm btn-primary">
+            <svg data-src="./assets/icons/plus.svg" class="icon-sm"></svg>
+            New product
+          </button>
+          <button type="button" class="btn btn-sm">
+            <svg data-src="./assets/icons/arrow-down-tray.svg" class="icon-sm"></svg>
+            Export
+          </button>
+          <button type="button" class="btn btn-sm">
+            <svg data-src="./assets/icons/server.svg" class="icon-sm"></svg>
+            System health
+          </button>
+        </div>
+      </header>
+
+      <!-- Stats strip -->
+      <section class="stats stats-vertical bg-base-200 xl:stats-horizontal span-12 soft-card rounded-box">
+        <div class="stat">
+          <div class="stat-figure">
+            <svg data-src="./assets/icons/banknotes.svg" class="icon-lg"></svg>
+          </div>
+          <div class="stat-title">Revenue</div>
+          <div class="stat-value metric-value stat-value-soft">$842K</div>
+          <div class="stat-desc">+12.8% vs prior period</div>
+        </div>
+        <div class="stat">
+          <div class="stat-figure">
+            <svg data-src="./assets/icons/shopping-cart.svg" class="icon-lg"></svg>
+          </div>
+          <div class="stat-title">Orders</div>
+          <div class="stat-value metric-value stat-value-soft">18.2K</div>
+          <div class="stat-desc">624 awaiting fulfillment</div>
+        </div>
+        <div class="stat">
+          <div class="stat-figure">
+            <svg data-src="./assets/icons/users.svg" class="icon-lg"></svg>
+          </div>
+          <div class="stat-title">Active users</div>
+          <div class="stat-value metric-value stat-value-soft">284K</div>
+          <div class="stat-desc">24.8K new this month</div>
+        </div>
+        <div class="stat">
+          <div class="stat-figure">
+            <svg data-src="./assets/icons/chat-bubble-left-right.svg" class="icon-lg"></svg>
+          </div>
+          <div class="stat-title">Support SLA</div>
+          <div class="stat-value metric-value stat-value-soft">94.2%</div>
+          <div class="stat-desc">7 high-priority threads</div>
+        </div>
+      </section>
+
+      <!-- Revenue and demand -->
+      <section class="card bg-base-200 soft-card span-8">
+        <div class="card-body pb-2">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div class="grow">
+              <h2 class="card-title">
+                <svg data-src="./assets/icons/chart-bar.svg" class="icon-md"></svg>
+                Revenue and demand
+              </h2>
+              <p class="text-base-content/60">Commerce revenue, product demand, and checkout activity</p>
+            </div>
+            <button type="button" class="btn btn-sm">Open sales analytics</button>
+          </div>
+        </div>
+        <div class="px-6 pb-6">
+          <tc-column
+            class="rounded-box chart-tall"
+            values="[42,48,52,49,61,68,74,78,84,92,88,101,112,118,124,132,141,148]"
+            labels='["Jan 1","Jan 3","Jan 5","Jan 7","Jan 9","Jan 11","Jan 13","Jan 15","Jan 17","Jan 19","Jan 21","Jan 23","Jan 25","Jan 27","Jan 29","Jan 31","Feb 2","Feb 4"]'
+            shape-gap="8"
+            shape-radius="4"
+            min="0"
+          ></tc-column>
+          <div class="mt-4 grid grid-cols-3 gap-4 text-sm">
+            <div>
+              <div class="metric-value">$842K</div>
+              <div class="metric-muted">Revenue</div>
+            </div>
+            <div>
+              <div class="metric-value">18.2K</div>
+              <div class="metric-muted">Orders</div>
+            </div>
+            <div>
+              <div class="metric-value">4.8%</div>
+              <div class="metric-muted">Checkout lift</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Order status -->
+      <section class="card bg-base-200 soft-card span-4">
+        <div class="card-body">
+          <h2 class="card-title">
+            <svg data-src="./assets/icons/shopping-bag.svg" class="icon-md"></svg>
+            Order status
+          </h2>
+          <p class="text-base-content/60">Current order volume by fulfillment stage</p>
+          <div class="grid place-items-center py-2">
+            <tc-pie
+              class="chart-pie order-pie"
+              values="[9482,1820,1240,864]"
+              labels='["Delivered","In Progress","In distribution","Returned"]'
+              shape-size="34"
+              shape-gap="5"
+            ></tc-pie>
+          </div>
+          <ul class="flex flex-col gap-2 text-sm">
+            <li>
+              <div>Delivered</div>
+              <div class="metric-muted">9,482 orders</div>
+            </li>
+            <li>
+              <div>In Progress</div>
+              <div class="metric-muted">1,820 orders</div>
+            </li>
+          </ul>
+          <div class="card-actions justify-end">
+            <button type="button" class="btn btn-sm">Open orders</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Recent commerce activity -->
+      <section class="card bg-base-200 soft-card span-7">
+        <div class="card-body">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <h2 class="card-title grow">
+              <svg data-src="./assets/icons/table-cells.svg" class="icon-md"></svg>
+              Recent commerce activity
+            </h2>
+            <button type="button" class="btn btn-sm">All orders</button>
+          </div>
+          <div class="table-scroll">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Record</th>
+                  <th>Customer</th>
+                  <th>Status</th>
+                  <th>Amount</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Order #12092</td>
+                  <td>Mina Park</td>
+                  <td><span class="badge badge-sm">Refund review</span></td>
+                  <td>$124,735</td>
+                  <td class="text-right"><button type="button" class="btn btn-ghost btn-xs">Open</button></td>
+                </tr>
+                <tr>
+                  <td>Transaction #TRX-8842</td>
+                  <td>Arman Bell</td>
+                  <td><span class="badge badge-sm">Paid</span></td>
+                  <td>$8,180</td>
+                  <td class="text-right"><button type="button" class="btn btn-ghost btn-xs">Open</button></td>
+                </tr>
+                <tr>
+                  <td>Return #RET-221</td>
+                  <td>Nora Quinn</td>
+                  <td><span class="badge badge-sm">Received</span></td>
+                  <td>$640</td>
+                  <td class="text-right"><button type="button" class="btn btn-ghost btn-xs">Open</button></td>
+                </tr>
+                <tr>
+                  <td>Checkout #CHK-492</td>
+                  <td>Tessa Cole</td>
+                  <td><span class="badge badge-error badge-sm">Abandoned</span></td>
+                  <td>$420</td>
+                  <td class="text-right"><button type="button" class="btn btn-ghost btn-xs">Open</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Governance and risk -->
+      <section class="card bg-base-200 soft-card span-5">
+        <div class="card-body">
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div class="grow">
+              <h2 class="card-title">
+                <svg data-src="./assets/icons/shield-check.svg" class="icon-md"></svg>
+                Governance and risk
+              </h2>
+              <p class="text-base-content/60">Payment, data access, security, and compliance posture</p>
+            </div>
+            <div class="grid place-items-center">
+              <div class="radial-progress" style="--value: 91; --size: 7rem; --thickness: 0.65rem" aria-label="Governance and risk score" aria-valuenow="91" role="progressbar">
+                <span class="metric-value text-xl">91%</span>
+              </div>
+            </div>
+          </div>
+          <div class="grid gap-3">
+            <div>
+              <div class="mb-1 flex justify-between text-sm"><span>Gateway verification</span><span>96%</span></div>
+              <progress class="progress" value="96" max="100"></progress>
+            </div>
+            <div>
+              <div class="mb-1 flex justify-between text-sm"><span>Admin permission review</span><span>84%</span></div>
+              <progress class="progress" value="84" max="100"></progress>
+            </div>
+            <div>
+              <div class="mb-1 flex justify-between text-sm"><span>Webhook signing coverage</span><span>78%</span></div>
+              <progress class="progress" value="78" max="100"></progress>
+            </div>
+          </div>
+          <div class="card-actions justify-end">
+            <button type="button" class="btn btn-sm">Review controls</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Priority queue -->
+      <section class="card bg-base-200 soft-card span-6">
+        <div class="card-body">
+          <div class="flex items-center gap-2">
+            <h2 class="card-title grow">
+              <svg data-src="./assets/icons/exclamation-triangle.svg" class="icon-md"></svg>
+              Priority queue
+            </h2>
+            <span class="badge badge-soft">7 queued</span>
+          </div>
+          <ul class="list bg-base-100 rounded-box">
+            <li>
+              <button type="button" class="list-row">
+                <div class="icon-box">
+                  <svg data-src="./assets/icons/chat-bubble-left-right.svg" class="icon-sm"></svg>
+                </div>
+                <div>
+                  <div class="metric-value">Refund review: order #PS5-248</div>
+                  <div class="text-sm metric-muted">Accidental 248 PlayStation 5 order, partial refund ready</div>
+                </div>
+                <div class="badge badge-soft badge-sm">Support</div>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="list-row">
+                <div class="icon-box">
+                  <svg data-src="./assets/icons/cpu-chip.svg" class="icon-sm"></svg>
+                </div>
+                <div>
+                  <div class="metric-value">Media processor backlog</div>
+                  <div class="text-sm metric-muted">5K derivatives waiting, storage is healthy</div>
+                </div>
+                <div class="badge badge-soft badge-sm">Ops</div>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="list-row">
+                <div class="icon-box">
+                  <svg data-src="./assets/icons/puzzle-piece.svg" class="icon-sm"></svg>
+                </div>
+                <div>
+                  <div class="metric-value">Plugin updates</div>
+                  <div class="text-sm metric-muted">6 updates available, 2 security related</div>
+                </div>
+                <div class="badge badge-soft badge-sm">Platform</div>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="list-row">
+                <div class="icon-box">
+                  <svg data-src="./assets/icons/truck.svg" class="icon-sm"></svg>
+                </div>
+                <div>
+                  <div class="metric-value">Warehouse cutoff risk</div>
+                  <div class="text-sm metric-muted">West dock needs 84 labels before 5 PM</div>
+                </div>
+                <div class="badge badge-soft badge-sm">Orders</div>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Revenue run rate -->
+      <section class="card bg-primary text-primary-content soft-card span-6">
+        <div class="card-body pb-2">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div class="grow">
+              <h2 class="card-title">
+                <svg data-src="./assets/icons/presentation-chart-bar.svg" class="icon-md"></svg>
+                Revenue run rate
+              </h2>
+              <p class="text-primary-content/70">Daily booked revenue across storefront, invoices, and subscriptions</p>
+            </div>
+            <div class="badge badge-lg bg-primary-content text-primary border-primary-content">$1.04M forecast</div>
+          </div>
+        </div>
+        <div class="px-6">
+          <tc-column
+            class="chart-mid"
+            values="[58,64,71,62,79,88,92,96,104,112,121,118,127,136]"
+            shape-gap="7"
+            shape-radius="4"
+            min="0"
+          ></tc-column>
+        </div>
+        <div class="card-body pt-4">
+          <div class="grid grid-cols-3 gap-4 text-sm">
+            <div>
+              <div class="metric-value">$842K</div>
+              <div class="text-primary-content/70">Booked</div>
+            </div>
+            <div>
+              <div class="metric-value">$197K</div>
+              <div class="text-primary-content/70">Pipeline</div>
+            </div>
+            <div>
+              <div class="metric-value">18.6%</div>
+              <div class="text-primary-content/70">Margin lift</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Acquisition mix -->
+      <section class="card bg-base-200 soft-card span-4">
+        <div class="card-body">
+          <h2 class="card-title">
+            <svg data-src="./assets/icons/chart-pie.svg" class="icon-md"></svg>
+            Acquisition mix
+          </h2>
+          <p class="text-base-content/60">Sessions by top marketing channel</p>
+          <div class="flex items-center gap-6 py-2">
+            <tc-pie class="chart-pie-sm channel-teal" values="[42,24,18,16]" shape-size="30" shape-gap="6"></tc-pie>
+            <div class="grid gap-2 text-sm">
+              <span class="flex items-center gap-2"><span class="status legend-dot-teal"></span> Organic</span>
+              <span class="flex items-center gap-2"><span class="status legend-dot-amber"></span> Direct</span>
+              <span class="flex items-center gap-2"><span class="status legend-dot-sky"></span> Email</span>
+              <span class="flex items-center gap-2"><span class="status legend-dot-rose"></span> Referral</span>
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm">Traffic analytics</button>
+        </div>
+      </section>
+
+      <!-- Marketing performance -->
+      <section class="card bg-base-200 soft-card span-4">
+        <div class="card-body pb-2">
+          <h2 class="card-title">
+            <svg data-src="./assets/icons/envelope.svg" class="icon-md"></svg>
+            Marketing performance
+          </h2>
+          <p class="text-base-content/60">Email and automation revenue movement</p>
+        </div>
+        <tc-line class="px-4 chart-mid" values="[12,18,24,21,28,35,40,38,46,52,49,58,66,62,71,78]" shape-size="3" min="0"></tc-line>
+        <div class="card-body pt-2">
+          <div class="grid grid-cols-2 gap-4 text-sm mb-3">
+            <div>
+              <div class="metric-value">42.8%</div>
+              <div class="metric-muted">Open rate</div>
+            </div>
+            <div>
+              <div class="metric-value">$118K</div>
+              <div class="metric-muted">Attributed</div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm">Open email studio</button>
+        </div>
+      </section>
+
+      <!-- Promotions health -->
+      <section class="card bg-base-200 soft-card span-4">
+        <div class="card-body">
+          <h2 class="card-title">
+            <svg data-src="./assets/icons/receipt-percent.svg" class="icon-md"></svg>
+            Promotions health
+          </h2>
+          <div class="grid gap-3">
+            <div>
+              <div class="mb-1 flex justify-between text-sm"><span>Coupon margin</span><span>72%</span></div>
+              <progress class="progress" value="72" max="100"></progress>
+            </div>
+            <div>
+              <div class="mb-1 flex justify-between text-sm"><span>Gift card redemption</span><span>56%</span></div>
+              <progress class="progress" value="56" max="100"></progress>
+            </div>
+            <div>
+              <div class="mb-1 flex justify-between text-sm"><span>Fraud pressure</span><span>11%</span></div>
+              <progress class="progress" value="11" max="100"></progress>
+            </div>
+            <div>
+              <div class="mb-1 flex justify-between text-sm"><span>Offer health</span><span>88%</span></div>
+              <progress class="progress" value="88" max="100"></progress>
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm mt-2">Manage offers</button>
+        </div>
+      </section>
+
+      <!-- Infrastructure uptime -->
+      <section class="card bg-base-200 soft-card span-4">
+        <div class="card-body">
+          <h2 class="card-title">
+            <svg data-src="./assets/icons/globe-alt.svg" class="icon-md"></svg>
+            Infrastructure uptime
+          </h2>
+          <p class="text-base-content/60">Last 24 hours across public services</p>
+          <div class="grid gap-4">
+            <div>
+              <div class="mb-2 flex justify-between text-sm"><span>Storefront</span><span>100%</span></div>
+              <div class="uptime-bars">
+                <div class="bg-base-content/20 bar-h-70"></div>
+                <div class="bg-base-content/20 bar-h-85"></div>
+                <div class="bg-base-content/20 bar-h-55"></div>
+                <div class="bg-base-content/20 bar-h-100"></div>
+                <div class="bg-base-content/20 bar-h-70"></div>
+                <div class="bg-base-content/20 bar-h-85"></div>
+                <div class="bg-base-content/20 bar-h-100"></div>
+                <div class="bg-base-content/20 bar-h-70"></div>
+                <div class="bg-base-content/20 bar-h-85"></div>
+                <div class="bg-base-content/20 bar-h-100"></div>
+                <div class="bg-base-content/20 bar-h-70"></div>
+                <div class="bg-base-content/20 bar-h-85"></div>
+              </div>
+            </div>
+            <div>
+              <div class="mb-2 flex justify-between text-sm"><span>API</span><span>99.9%</span></div>
+              <div class="uptime-bars">
+                <div class="bg-base-content/20 bar-h-70"></div>
+                <div class="bg-base-content/20 bar-h-85"></div>
+                <div class="bg-error bar-h-30"></div>
+                <div class="bg-base-content/20 bar-h-100"></div>
+                <div class="bg-base-content/20 bar-h-70"></div>
+                <div class="bg-base-content/20 bar-h-85"></div>
+                <div class="bg-base-content/20 bar-h-100"></div>
+                <div class="bg-base-content/20 bar-h-70"></div>
+                <div class="bg-base-content/20 bar-h-85"></div>
+                <div class="bg-base-content/20 bar-h-100"></div>
+                <div class="bg-base-content/20 bar-h-70"></div>
+                <div class="bg-base-content/20 bar-h-85"></div>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm mt-2">Open uptime</button>
+        </div>
+      </section>
+
+      <!-- Satisfaction -->
+      <section class="card bg-base-200 soft-card span-4">
+        <div class="card-body">
+          <div class="flex flex-wrap items-start gap-4">
+            <div class="grid place-items-center">
+              <div class="radial-progress" style="--value: 86; --size: 7rem; --thickness: 0.65rem" aria-label="Customer satisfaction score" aria-valuenow="86" role="progressbar">
+                <span class="metric-value text-xl">86%</span>
+              </div>
+            </div>
+            <div class="grow">
+              <h2 class="card-title">
+                <svg data-src="./assets/icons/heart.svg" class="icon-md"></svg>
+                Satisfaction
+              </h2>
+              <p class="text-base-content/60">Retention, refunds, satisfaction, and service workload</p>
+            </div>
+          </div>
+          <div class="mt-3 grid gap-2 text-sm">
+            <div class="flex justify-between"><span>Net revenue retention</span><span class="metric-value">112%</span></div>
+            <div class="flex justify-between"><span>Refund pressure</span><span class="metric-value">3.8%</span></div>
+            <div class="flex justify-between"><span>VIP escalations</span><span class="metric-value">14</span></div>
+            <div class="flex justify-between"><span>Stock on hand</span><span class="metric-value">42800</span></div>
+          </div>
+          <button type="button" class="btn btn-sm mt-3">Customer center</button>
+        </div>
+      </section>
+
+      <!-- Inventory pressure -->
+      <section class="card bg-base-200 soft-card span-4">
+        <div class="card-body">
+          <h2 class="card-title">
+            <svg data-src="./assets/icons/archive-box.svg" class="icon-md"></svg>
+            Inventory pressure
+          </h2>
+          <div class="grid gap-3">
+            <div class="bg-base-100 rounded-box p-3">
+              <div class="mb-1 flex items-center justify-between gap-2 text-sm">
+                <span class="font-medium">Low stock</span>
+                <span class="badge badge-xs">42 SKUs</span>
+              </div>
+              <progress class="progress" value="42" max="100"></progress>
+            </div>
+            <div class="bg-base-100 rounded-box p-3">
+              <div class="mb-1 flex items-center justify-between gap-2 text-sm">
+                <span class="font-medium">Oversold</span>
+                <span class="badge badge-xs">7 SKUs</span>
+              </div>
+              <progress class="progress" value="7" max="100"></progress>
+            </div>
+            <div class="bg-base-100 rounded-box p-3">
+              <div class="mb-1 flex items-center justify-between gap-2 text-sm">
+                <span class="font-medium">Healthy stock</span>
+                <span class="badge badge-xs">1,284 SKUs</span>
+              </div>
+              <progress class="progress" value="92" max="100"></progress>
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm mt-2">Inventory board</button>
+        </div>
+      </section>
+
+      <!-- Plugin and tool status -->
+      <section class="card bg-base-200 soft-card span-6">
+        <div class="card-body">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <h2 class="card-title grow">
+              <svg data-src="./assets/icons/puzzle-piece.svg" class="icon-md"></svg>
+              Plugin and tool status
+            </h2>
+            <button type="button" class="btn btn-sm">Plugins</button>
+          </div>
+          <div class="table-scroll">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Component</th>
+                  <th>Status</th>
+                  <th>Signal</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Fraud Shield</td>
+                  <td><span class="badge badge-xs">Active</span></td>
+                  <td>426 coupon blocks</td>
+                </tr>
+                <tr>
+                  <td>Media Optimizer</td>
+                  <td><span class="badge badge-xs">Update</span></td>
+                  <td>Backlog impact</td>
+                </tr>
+                <tr>
+                  <td>Backup Vault</td>
+                  <td><span class="badge badge-xs">Active</span></td>
+                  <td>Last snapshot 18m ago</td>
+                </tr>
+                <tr>
+                  <td>Import queue</td>
+                  <td><span class="badge badge-xs">Ready</span></td>
+                  <td>3 validated files</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Fulfillment throughput -->
+      <section class="card bg-base-200 soft-card span-6">
+        <div class="card-body pb-2">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div class="grow">
+              <h2 class="card-title">
+                <svg data-src="./assets/icons/truck.svg" class="icon-md"></svg>
+                Fulfillment throughput
+              </h2>
+              <p class="text-base-content/60">Packed, shipped, returned, and delayed order movement</p>
+            </div>
+            <span class="badge badge-xs">94% on time</span>
+          </div>
+        </div>
+        <tc-line class="px-4 chart-mid" values="[34,38,44,42,51,58,63,59,66,72,78,74,82,88,91]" shape-size="3" min="0"></tc-line>
+        <div class="card-body pt-2">
+          <div class="grid grid-cols-3 gap-4 text-sm">
+            <div>
+              <div class="metric-value">9,482</div>
+              <div class="metric-muted">Packed</div>
+            </div>
+            <div>
+              <div class="metric-value">624</div>
+              <div class="metric-muted">Queued</div>
+            </div>
+            <div>
+              <div class="metric-value">118</div>
+              <div class="metric-muted">Returns</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Automation coverage -->
+      <section class="card bg-base-200 soft-card span-4">
+        <div class="card-body">
+          <h2 class="card-title">
+            <svg data-src="./assets/icons/bolt.svg" class="icon-md"></svg>
+            Automation coverage
+          </h2>
+          <p class="text-base-content/60">Campaigns, refunds, imports, and fulfillment tasks handled automatically</p>
+          <div class="grid gap-3 mt-2">
+            <div>
+              <div class="mb-1 flex justify-between text-sm"><span>Email flows</span><span>82%</span></div>
+              <progress class="progress" value="82" max="100"></progress>
+            </div>
+            <div>
+              <div class="mb-1 flex justify-between text-sm"><span>Scheduled jobs</span><span>68%</span></div>
+              <progress class="progress" value="68" max="100"></progress>
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm mt-2">Automation center</button>
+        </div>
+      </section>
+
+      <!-- Security watch -->
+      <section class="card bg-base-200 soft-card span-4">
+        <div class="card-body">
+          <h2 class="card-title">
+            <svg data-src="./assets/icons/lock-closed.svg" class="icon-md"></svg>
+            Security watch
+          </h2>
+          <div class="stats stats-vertical bg-base-100 w-full rounded-box">
+            <div class="stat">
+              <div class="stat-title">
+                <div class="inline-grid">
+                  <div class="status status-success status-ping"></div>
+                  <div class="status status-success"></div>
+                </div>
+                Blocked attempts
+              </div>
+              <div class="stat-value metric-value text-2xl">1,284</div>
+              <div class="stat-desc">-8% from yesterday</div>
+              <div class="stat-desc">-2% from last week</div>
+              <div class="stat-desc">-5.5% from last 14 days</div>
+            </div>
+            <div class="stat">
+              <div class="stat-title">
+                <div class="inline-grid">
+                  <div class="status status-error status-ping"></div>
+                  <div class="status status-error"></div>
+                </div>
+                Risky sessions
+              </div>
+              <div class="stat-value metric-value text-2xl">4</div>
+              <div class="stat-desc">4 need review</div>
+              <div class="stat-desc">1 suspicious</div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm mt-2">Audit logs</button>
+        </div>
+      </section>
+
+      <!-- Cash movement -->
+      <section class="card bg-base-200 soft-card span-4">
+        <div class="card-body">
+          <h2 class="card-title">
+            <svg data-src="./assets/icons/credit-card.svg" class="icon-md"></svg>
+            Cash movement
+          </h2>
+          <ul class="list">
+            <li class="list-row">
+              <div class="badge badge-sm">In</div>
+              <div>
+                <div class="metric-value">$428K captured</div>
+                <div class="text-sm metric-muted">Card, wallet, and invoice payments</div>
+              </div>
+            </li>
+            <li class="list-row">
+              <div class="badge badge-sm">Hold</div>
+              <div>
+                <div class="metric-value">$22K under review</div>
+                <div class="text-sm metric-muted">Gateway disputes and fraud checks</div>
+              </div>
+            </li>
+            <li class="list-row">
+              <div class="badge badge-sm">Out</div>
+              <div>
+                <div class="metric-value">$18K refunds</div>
+                <div class="text-sm metric-muted">Approved returns and adjustments</div>
+              </div>
+            </li>
+          </ul>
+          <button type="button" class="btn btn-sm mt-2">Transactions</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <aside class="drawer-side z-40">
+    <label for="my-drawer" class="drawer-overlay" aria-label="Close sidebar"></label>
+    <nav class="bg-base-200 sidebar-nav">
+      <div class="brand-row">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-sm">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418" />
+        </svg>
+        Pineapple Tech
+      </div>
+      <ul class="menu sidebar-menu w-full">
+        <li>
+          <button type="button" class="inert-nav">
+            <svg data-src="./assets/icons/home.svg" class="icon-sm"></svg>
+            Dashboard
+          </button>
+        </li>
+        <li>
+          <details name="sidebar-group">
+            <summary>
+              <svg data-src="./assets/icons/user-group.svg" class="icon-sm"></svg>
+              Users
+            </summary>
+            <ul>
+              <li><button type="button" class="inert-nav">All Users</button></li>
+              <li><button type="button" class="inert-nav">Add User</button></li>
+              <li><button type="button" class="inert-nav">Roles</button></li>
+              <li><button type="button" class="inert-nav">Permissions</button></li>
+              <li><button type="button" class="inert-nav">User Logs</button></li>
+              <li><button type="button" class="inert-nav">User Stats</button></li>
+              <li><button type="button" class="inert-nav">User Payments</button></li>
+              <li><button type="button" class="inert-nav">User Products</button></li>
+            </ul>
+          </details>
+        </li>
+        <li>
+          <details name="sidebar-group">
+            <summary>
+              <svg data-src="./assets/icons/squares-2x2.svg" class="icon-sm"></svg>
+              Products
+            </summary>
+            <ul>
+              <li><button type="button" class="inert-nav">All Products</button></li>
+              <li><button type="button" class="inert-nav">Add Product</button></li>
+              <li><button type="button" class="inert-nav">Categories</button></li>
+              <li><button type="button" class="inert-nav">Tags</button></li>
+              <li><button type="button" class="inert-nav">Inventory</button></li>
+              <li><button type="button" class="inert-nav">Product Logs</button></li>
+              <li><button type="button" class="inert-nav">Product Stats</button></li>
+            </ul>
+          </details>
+        </li>
+        <li>
+          <details name="sidebar-group">
+            <summary>
+              <svg data-src="./assets/icons/credit-card.svg" class="icon-sm"></svg>
+              Transactions
+            </summary>
+            <ul>
+              <li><button type="button" class="inert-nav">All Transactions</button></li>
+              <li><button type="button" class="inert-nav">Transaction Detail</button></li>
+              <li><button type="button" class="inert-nav">Refunds</button></li>
+              <li><button type="button" class="inert-nav">Transaction Logs</button></li>
+            </ul>
+          </details>
+        </li>
+        <li>
+          <details name="sidebar-group">
+            <summary>
+              <svg data-src="./assets/icons/shopping-bag.svg" class="icon-sm"></svg>
+              Orders
+            </summary>
+            <ul>
+              <li><button type="button" class="inert-nav">All Orders</button></li>
+              <li><button type="button" class="inert-nav">Order Detail</button></li>
+              <li><button type="button" class="inert-nav">Fulfillment</button></li>
+              <li><button type="button" class="inert-nav">Returns</button></li>
+              <li><button type="button" class="inert-nav">Abandoned Checkouts</button></li>
+            </ul>
+          </details>
+        </li>
+        <li>
+          <details name="sidebar-group">
+            <summary>
+              <svg data-src="./assets/icons/users.svg" class="icon-sm"></svg>
+              Customers
+            </summary>
+            <ul>
+              <li><button type="button" class="inert-nav">All Customers</button></li>
+              <li><button type="button" class="inert-nav">Customer Detail</button></li>
+              <li><button type="button" class="inert-nav">Segments</button></li>
+              <li><button type="button" class="inert-nav">Customer Notes</button></li>
+            </ul>
+          </details>
+        </li>
+        <li>
+          <details name="sidebar-group">
+            <summary>
+              <svg data-src="./assets/icons/inbox.svg" class="icon-sm"></svg>
+              Messages
+              <span class="badge badge-xs">12</span>
+            </summary>
+            <ul>
+              <li><button type="button" class="inert-nav">Conversations</button></li>
+              <li><button type="button" class="inert-nav">Conversation Detail</button></li>
+              <li><button type="button" class="inert-nav">Support Agents</button></li>
+              <li><button type="button" class="inert-nav">Canned Replies</button></li>
+              <li><button type="button" class="inert-nav">Departments</button></li>
+            </ul>
+          </details>
+        </li>
+        <li>
+          <details name="sidebar-group">
+            <summary>
+              <svg data-src="./assets/icons/photo.svg" class="icon-sm"></svg>
+              Media
+            </summary>
+            <ul>
+              <li><button type="button" class="inert-nav">Library</button></li>
+              <li><button type="button" class="inert-nav">Upload</button></li>
+              <li><button type="button" class="inert-nav">Folders</button></li>
+              <li><button type="button" class="inert-nav">Media Settings</button></li>
+            </ul>
+          </details>
+        </li>
+        <li>
+          <details name="sidebar-group">
+            <summary>
+              <svg data-src="./assets/icons/document-duplicate.svg" class="icon-sm"></svg>
+              Pages
+            </summary>
+            <ul>
+              <li><button type="button" class="inert-nav">All Pages</button></li>
+              <li><button type="button" class="inert-nav">Page Editor</button></li>
+              <li><button type="button" class="inert-nav">Revisions</button></li>
+            </ul>
+          </details>
+        </li>
+        <li>
+          <details name="sidebar-group">
+            <summary>
+              <svg data-src="./assets/icons/newspaper.svg" class="icon-sm"></svg>
+              Blog
+            </summary>
+            <ul>
+              <li><button type="button" class="inert-nav">Posts</button></li>
+              <li><button type="button" class="inert-nav">Add Post</button></li>
+              <li><button type="button" class="inert-nav">Categories</button></li>
+              <li><button type="button" class="inert-nav">Tags</button></li>
+              <li><button type="button" class="inert-nav">Comments</button></li>
+            </ul>
+          </details>
+        </li>
+        <li>
+          <details name="sidebar-group">
+            <summary>
+              <svg data-src="./assets/icons/receipt-percent.svg" class="icon-sm"></svg>
+              Promotions
+            </summary>
+            <ul>
+              <li><button type="button" class="inert-nav">Coupons</button></li>
+              <li><button type="button" class="inert-nav">Discounts</button></li>
+              <li><button type="button" class="inert-nav">Campaigns</button></li>
+              <li><button type="button" class="inert-nav">Gift Cards</button></li>
+            </ul>
+          </details>
+        </li>
+        <li>
+          <details name="sidebar-group">
+            <summary>
+              <svg data-src="./assets/icons/chart-pie.svg" class="icon-sm"></svg>
+              Analytics
+            </summary>
+            <ul>
+              <li><button type="button" class="inert-nav">Overview</button></li>
+              <li><button type="button" class="inert-nav">Sales</button></li>
+              <li><button type="button" class="inert-nav">Users</button></li>
+              <li><button type="button" class="inert-nav">Products</button></li>
+              <li><button type="button" class="inert-nav">Support</button></li>
+              <li><button type="button" class="inert-nav">Traffic</button></li>
+              <li><button type="button" class="inert-nav">Reports</button></li>
+            </ul>
+          </details>
+        </li>
+        <li>
+          <details name="sidebar-group">
+            <summary>
+              <svg data-src="./assets/icons/megaphone.svg" class="icon-sm"></svg>
+              Marketing
+            </summary>
+            <ul>
+              <li><button type="button" class="inert-nav">Campaigns</button></li>
+              <li><button type="button" class="inert-nav">Email</button></li>
+              <li><button type="button" class="inert-nav">Automations</button></li>
+              <li><button type="button" class="inert-nav">Audiences</button></li>
+            </ul>
+          </details>
+        </li>
+        <li>
+          <details name="sidebar-group">
+            <summary>
+              <svg data-src="./assets/icons/puzzle-piece.svg" class="icon-sm"></svg>
+              Plugins
+            </summary>
+            <ul>
+              <li><button type="button" class="inert-nav">Installed Plugins</button></li>
+              <li><button type="button" class="inert-nav">Add Plugin</button></li>
+              <li><button type="button" class="inert-nav">Plugin Settings</button></li>
+              <li><button type="button" class="inert-nav">Plugin Logs</button></li>
+            </ul>
+          </details>
+        </li>
+        <li>
+          <details name="sidebar-group">
+            <summary>
+              <svg data-src="./assets/icons/wrench-screwdriver.svg" class="icon-sm"></svg>
+              Tools
+            </summary>
+            <ul>
+              <li><button type="button" class="inert-nav">Import</button></li>
+              <li><button type="button" class="inert-nav">Export</button></li>
+              <li><button type="button" class="inert-nav">Scheduled Jobs</button></li>
+              <li><button type="button" class="inert-nav">System Health</button></li>
+              <li><button type="button" class="inert-nav">Audit Logs</button></li>
+            </ul>
+          </details>
+        </li>
+        <li>
+          <details name="sidebar-group">
+            <summary>
+              <svg data-src="./assets/icons/adjustments-vertical.svg" class="icon-sm"></svg>
+              Settings
+            </summary>
+            <ul>
+              <li><button type="button" class="inert-nav">General</button></li>
+              <li><button type="button" class="inert-nav">Commerce</button></li>
+              <li><button type="button" class="inert-nav">Payments</button></li>
+              <li><button type="button" class="inert-nav">Shipping</button></li>
+              <li><button type="button" class="inert-nav">Taxes</button></li>
+              <li><button type="button" class="inert-nav">Notifications</button></li>
+              <li><button type="button" class="inert-nav">Integrations</button></li>
+              <li><button type="button" class="inert-nav">Security</button></li>
+            </ul>
+          </details>
+        </li>
+      </ul>
+      <div class="account-footer">
+        <button type="button" class="btn btn-ghost w-full justify-start gap-2 h-auto py-2" aria-label="Open account menu" popovertarget="sidebar-account-dropdown" style="anchor-name: --sidebar-account-anchor">
+          <div class="avatar avatar-online">
+            <div class="w-10 rounded-full">
+              <img src="./assets/avatar-5.jpg" alt="Ari Lane avatar" />
+            </div>
+          </div>
+          <span class="grid grow text-left min-w-0">
+            <span class="truncate metric-value">Ari Lane</span>
+            <span class="truncate text-xs metric-muted">Admin</span>
+          </span>
+          <svg data-src="./assets/icons/chevron-up.svg" class="icon-sm"></svg>
+        </button>
+        <ul class="menu dropdown dropdown-top bg-base-100 rounded-box shadow-lg popover-menu" popover id="sidebar-account-dropdown" style="position-anchor: --sidebar-account-anchor">
+          <li>
+            <button type="button" class="inert-nav">
+              <svg data-src="./assets/icons/user-circle.svg" class="icon-sm"></svg>
+              Profile settings
+            </button>
+          </li>
+          <li>
+            <button type="button" class="inert-nav">
+              <svg data-src="./assets/icons/book-open.svg" class="icon-sm"></svg>
+              Docs
+            </button>
+          </li>
+          <li>
+            <button type="button" class="inert-nav">
+              <svg data-src="./assets/icons/code-bracket.svg" class="icon-sm"></svg>
+              API settings
+            </button>
+          </li>
+          <li>
+            <button type="button" class="inert-nav">
+              <svg data-src="./assets/icons/arrow-right-on-rectangle.svg" class="icon-sm"></svg>
+              Logout
+            </button>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </aside>
+
+  <script src="./app.js"></script>
+</body>
+</html>

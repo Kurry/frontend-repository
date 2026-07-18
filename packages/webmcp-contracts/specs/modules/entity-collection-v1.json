@@ -1,0 +1,20 @@
+{
+  "id": "entity-collection-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Entity collection",
+  "purpose": "Carts, records, favorites, calendar events, list items, and local entities.",
+  "permitted_operations": ["create", "select", "update", "delete", "toggle", "quantity", "reorder"],
+  "binding_keys": {
+    "required_any_of": [["entity"], ["entity_operations"]],
+    "optional": ["entity_fields", "value_bounds", "visible_postconditions"]
+  },
+  "restrictions": [
+    "Closed entity and field enums only.",
+    "Bounded string and numeric values.",
+    "No generic state setter or arbitrary patch object.",
+    "Invokes the same domain command used by the visible control.",
+    "Delete requires explicit confirm=true.",
+    "Reorder only when gesture mechanics are not being evaluated."
+  ],
+  "tool_name_prefix": "entity"
+}

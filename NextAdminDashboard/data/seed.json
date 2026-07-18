@@ -1,0 +1,186 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "imageUrl": "https://uwja77bygk2kgfqe.public.blob.vercel-storage.com/smartphone-gaPvyZW6aww0IhD3dOpaU6gBGILtcJ.webp",
+      "name": "Smartphone X Pro",
+      "status": "active",
+      "price": "999.00",
+      "stock": 150,
+      "availableAt": "2024-01-15"
+    },
+    {
+      "id": 2,
+      "imageUrl": "https://uwja77bygk2kgfqe.public.blob.vercel-storage.com/earbuds-3rew4JGdIK81KNlR8Edr8NBBhFTOtX.webp",
+      "name": "Wireless Earbuds Ultra",
+      "status": "active",
+      "price": "199.00",
+      "stock": 300,
+      "availableAt": "2024-02-01"
+    },
+    {
+      "id": 3,
+      "imageUrl": "https://uwja77bygk2kgfqe.public.blob.vercel-storage.com/home-iTeNnmKSMnrykOS9IYyJvnLFgap7Vw.webp",
+      "name": "Smart Home Hub",
+      "status": "active",
+      "price": "149.00",
+      "stock": 200,
+      "availableAt": "2024-02-10"
+    },
+    {
+      "id": 4,
+      "imageUrl": "https://uwja77bygk2kgfqe.public.blob.vercel-storage.com/tv-H4l26crxtm9EQHLWc0ddrsXZ0V0Ofw.webp",
+      "name": "4K Ultra HD Smart TV",
+      "status": "active",
+      "price": "799.00",
+      "stock": 50,
+      "availableAt": "2024-03-05"
+    },
+    {
+      "id": 5,
+      "imageUrl": "https://uwja77bygk2kgfqe.public.blob.vercel-storage.com/laptop-9bgUhjY491hkxiMDeSgqb9R5I3lHNL.webp",
+      "name": "Gaming Laptop Pro",
+      "status": "active",
+      "price": "1299.00",
+      "stock": 75,
+      "availableAt": "2024-03-20"
+    },
+    {
+      "id": 6,
+      "imageUrl": "https://uwja77bygk2kgfqe.public.blob.vercel-storage.com/headset-lYnRnpjDbZkB78lS7nnqEJFYFAUDg6.webp",
+      "name": "VR Headset Plus",
+      "status": "active",
+      "price": "349.00",
+      "stock": 120,
+      "availableAt": "2024-04-01"
+    },
+    {
+      "id": 7,
+      "imageUrl": "https://uwja77bygk2kgfqe.public.blob.vercel-storage.com/watch-S2VeARK6sEM9QFg4yNQNjHFaHc3sXv.webp",
+      "name": "Smartwatch Elite",
+      "status": "active",
+      "price": "249.00",
+      "stock": 250,
+      "availableAt": "2024-04-15"
+    },
+    {
+      "id": 8,
+      "imageUrl": "https://uwja77bygk2kgfqe.public.blob.vercel-storage.com/speaker-4Zk0Ctx5AvxnwNNTFWVK4Gtpru4YEf.webp",
+      "name": "Bluetooth Speaker Max",
+      "status": "active",
+      "price": "99.00",
+      "stock": 400,
+      "availableAt": "2024-05-01"
+    },
+    {
+      "id": 9,
+      "imageUrl": "https://uwja77bygk2kgfqe.public.blob.vercel-storage.com/charger-GzRr0NSkCj0ZYWkTMvxXGZQu47w9r5.webp",
+      "name": "Portable Charger Super",
+      "status": "draft",
+      "price": "59.00",
+      "stock": 500,
+      "availableAt": "2024-05-12"
+    },
+    {
+      "id": 10,
+      "imageUrl": "https://uwja77bygk2kgfqe.public.blob.vercel-storage.com/thermostat-8GnK2LDE3lZAjUVtiBk61RrSuqSTF7.webp",
+      "name": "Smart Thermostat Pro",
+      "status": "archived",
+      "price": "199.00",
+      "stock": 175,
+      "availableAt": "2024-06-01"
+    },
+    {
+      "id": 11,
+      "imageUrl": "https://uwja77bygk2kgfqe.public.blob.vercel-storage.com/smartphone-gaPvyZW6aww0IhD3dOpaU6gBGILtcJ.webp",
+      "name": "Phone Case Magnetic",
+      "status": "draft",
+      "price": "29.00",
+      "stock": 800,
+      "availableAt": "2024-06-15"
+    },
+    {
+      "id": 12,
+      "imageUrl": "https://uwja77bygk2kgfqe.public.blob.vercel-storage.com/earbuds-3rew4JGdIK81KNlR8Edr8NBBhFTOtX.webp",
+      "name": "Noise Cancelling Buds",
+      "status": "archived",
+      "price": "179.00",
+      "stock": 0,
+      "availableAt": "2023-11-01"
+    }
+  ],
+  "customers": [
+    {
+      "id": 1,
+      "name": "Ava Martinez",
+      "email": "ava.martinez@example.com",
+      "orders": 12,
+      "totalSpent": "4280.50",
+      "status": "active",
+      "joinedAt": "2023-08-14"
+    },
+    {
+      "id": 2,
+      "name": "Liam Chen",
+      "email": "liam.chen@example.com",
+      "orders": 5,
+      "totalSpent": "1199.00",
+      "status": "active",
+      "joinedAt": "2023-11-02"
+    },
+    {
+      "id": 3,
+      "name": "Sofia Patel",
+      "email": "sofia.patel@example.com",
+      "orders": 21,
+      "totalSpent": "8750.25",
+      "status": "active",
+      "joinedAt": "2022-04-19"
+    },
+    {
+      "id": 4,
+      "name": "Noah Williams",
+      "email": "noah.williams@example.com",
+      "orders": 2,
+      "totalSpent": "348.00",
+      "status": "inactive",
+      "joinedAt": "2024-01-08"
+    },
+    {
+      "id": 5,
+      "name": "Emma Johansson",
+      "email": "emma.j@example.com",
+      "orders": 9,
+      "totalSpent": "2140.75",
+      "status": "active",
+      "joinedAt": "2023-06-30"
+    },
+    {
+      "id": 6,
+      "name": "Lucas Kim",
+      "email": "lucas.kim@example.com",
+      "orders": 0,
+      "totalSpent": "0.00",
+      "status": "inactive",
+      "joinedAt": "2024-05-22"
+    },
+    {
+      "id": 7,
+      "name": "Mia Rossi",
+      "email": "mia.rossi@example.com",
+      "orders": 15,
+      "totalSpent": "5620.00",
+      "status": "active",
+      "joinedAt": "2022-12-11"
+    },
+    {
+      "id": 8,
+      "name": "Ethan Brooks",
+      "email": "ethan.brooks@example.com",
+      "orders": 7,
+      "totalSpent": "1899.40",
+      "status": "active",
+      "joinedAt": "2023-09-03"
+    }
+  ]
+}

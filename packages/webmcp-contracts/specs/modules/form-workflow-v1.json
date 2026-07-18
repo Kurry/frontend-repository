@@ -1,0 +1,18 @@
+{
+  "id": "form-workflow-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Form workflow",
+  "purpose": "Forms, setup flows, authentication shells, and multi-step workflows.",
+  "permitted_operations": ["validate", "submit", "cancel", "reset", "advance", "return"],
+  "binding_keys": {
+    "required_any_of": [["form_fields"], ["form_operations"]],
+    "optional": ["workflow_steps", "value_bounds", "visible_postconditions"]
+  },
+  "restrictions": [
+    "Declared fields only.",
+    "Normal validation and visible errors remain active.",
+    "Cannot manufacture authentication or bypass guarded routes.",
+    "Backend-free apps must surface honest unavailable state through product handlers."
+  ],
+  "tool_name_prefix": "form"
+}

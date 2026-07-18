@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html class="js" lang="en" style="--header-height: 72px;">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Palette Library</title>
+  <meta name="description" content="Explore our interactive Palette Library. Browse hundreds of fine art color palettes from famous paintings, searchable by specific artist or art movement." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=IBM+Plex+Mono:ital,wght@0,300;0,400;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Pinyon+Script&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/styles.css" />
+</head>
+<body class="gradient template-page title-palette-library">
+  <div class="announcement-bar" aria-hidden="true">
+    <span>Fine art color archives · historical naming · open dataset</span>
+  </div>
+
+  <header class="site-header" id="SiteHeader">
+    <div class="site-header__inner">
+      <button type="button" class="site-header__logo inert-nav" aria-label="Palette Library">
+        <span class="site-header__logo-script">Palette</span>
+        <span class="site-header__logo-lockup">THE PALETTE LIBRARY</span>
+      </button>
+      <button type="button" class="site-header__menu inert-nav">Menu</button>
+      <button type="button" class="site-header__cart inert-nav">Cart</button>
+    </div>
+  </header>
+
+  <main id="MainContent">
+    <section class="intro" data-scroll-reveal>
+      <div class="intro__lead" data-reveal>
+        <p class="intro__eyebrow">The o+a palette library</p>
+        <h1 class="intro__headline">
+          The palette library brings together the color palettes of every work in our collection. You can browse by painting, move through individual swatches, or filter by color to see how certain colors are used across centuries of image-making.
+        </h1>
+      </div>
+      <div class="intro__columns" data-reveal-group>
+        <p>
+          Each color is paired with the closest historical name we can find, drawn from pigment catalogues, dye records, and naturalist guides—sources like Werner’s <em>Nomenclature of Colours</em> (1821), the Winsor &amp; Newton pigment archive, and earlier texts like Cennini’s <em>Il Libro dell’Arte</em>. These names are matched computationally to the nearest documented colour, then listed alongside the painting they come from.
+        </p>
+        <p>
+          This resource is less a fixed system than a way of seeing. Colors that feel contemporary often have long histories, and combinations that seem intuitive tend to repeat. The library is open source and ongoing—we add to it as the collection grows, and the full dataset is freely available.
+        </p>
+      </div>
+    </section>
+
+    <section class="palette-library" id="PaletteLibrary" data-scroll-reveal>
+      <div class="palette-library__controls">
+        <div class="palette-library__toggle" id="PaletteToggle" role="tablist" aria-label="Library views">
+          <button type="button" class="palette-library__toggle-option active" data-view="nomenclature" role="tab" aria-selected="true">
+            <span class="palette-library__toggle-indicator" aria-hidden="true">
+              <svg viewBox="0 0 8 8"><circle cx="4" cy="4" r="3.2" fill="currentColor" stroke="currentColor" stroke-width="1"></circle></svg>
+            </span>
+            <span>Nomenclature View</span>
+          </button>
+          <button type="button" class="palette-library__toggle-option" data-view="palette" role="tab" aria-selected="false">
+            <span class="palette-library__toggle-indicator" aria-hidden="true">
+              <svg viewBox="0 0 8 8"><circle cx="4" cy="4" r="3.2" fill="transparent" stroke="currentColor" stroke-width="1"></circle></svg>
+            </span>
+            <span>Palette View</span>
+          </button>
+          <button type="button" class="palette-library__toggle-option" data-view="swatch" role="tab" aria-selected="false">
+            <span class="palette-library__toggle-indicator" aria-hidden="true">
+              <svg viewBox="0 0 8 8"><circle cx="4" cy="4" r="3.2" fill="transparent" stroke="currentColor" stroke-width="1"></circle></svg>
+            </span>
+            <span>Swatch View</span>
+          </button>
+        </div>
+        <div class="palette-library__filter">
+          <label class="palette-library__filter-label" for="PeriodFilter">Filter by Period:</label>
+          <select id="PeriodFilter" class="palette-library__filter-select">
+            <option value="">All Periods</option>
+            <option>Abstract + Geometric</option>
+            <option>Americana</option>
+            <option>Baroque to Neoclassical</option>
+            <option>Expressionism</option>
+            <option>Fauvism</option>
+            <option>Impressionism</option>
+            <option>Medieval</option>
+            <option>Modern</option>
+            <option>Old Masters</option>
+            <option>Post-Impressionism</option>
+            <option>Primitive + Folk</option>
+            <option>Realism</option>
+            <option>Romanticism</option>
+            <option>Symbolism</option>
+            <option>Tonalism</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="nomenclature-view" class="palette-library__view palette-library__view--nomenclature active" role="tabpanel"></div>
+      <div id="palette-view" class="palette-library__view palette-library__view--palette" role="tabpanel"></div>
+      <div id="swatch-view" class="palette-library__view palette-library__view--swatch" role="tabpanel"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer shopify-section-group-footer-group" data-parallax>
+    <div class="site-footer__links">
+      <div class="site-footer__col">
+        <h4>Shop</h4>
+        <ul>
+          <li><button type="button" class="inert-nav">Shop All Art</button></li>
+          <li><button type="button" class="inert-nav">New Arrivals</button></li>
+          <li><button type="button" class="inert-nav">Gift Card</button></li>
+        </ul>
+      </div>
+      <div class="site-footer__col">
+        <h4>Info</h4>
+        <ul>
+          <li><button type="button" class="inert-nav">About Us</button></li>
+          <li><button type="button" class="inert-nav">Print + Frame Guide</button></li>
+          <li><button type="button" class="inert-nav">FAQ</button></li>
+          <li><button type="button" class="inert-nav">Shipping &amp; Returns</button></li>
+        </ul>
+      </div>
+      <div class="site-footer__col">
+        <h4>Connect</h4>
+        <ul>
+          <li><button type="button" class="inert-nav">Contact Us</button></li>
+          <li><button type="button" class="inert-nav">Instagram</button></li>
+          <li><button type="button" class="inert-nav">Newsletter</button></li>
+        </ul>
+      </div>
+      <div class="site-footer__col">
+        <h4>Etc.</h4>
+        <ul>
+          <li><button type="button" class="inert-nav">Terms</button></li>
+          <li><button type="button" class="inert-nav">Privacy Policy</button></li>
+        </ul>
+      </div>
+    </div>
+    <div class="site-footer__brand" aria-hidden="true">Palette Library</div>
+  </footer>
+
+  <div id="oa-popup" class="oa-popup" aria-hidden="true">
+    <div class="oa-popup__panel">
+      <button type="button" class="oa-popup__close" aria-label="Close">×</button>
+      <p class="oa-popup__title">Subscribe and receive 10% off your first piece</p>
+      <form id="oa-popup-form" class="oa-popup__form">
+        <input type="email" name="email" placeholder="email" required autocomplete="email" />
+        <input type="text" name="name" placeholder="name" autocomplete="name" />
+        <button type="submit">subscribe →</button>
+      </form>
+      <p id="oa-popup-success" class="oa-popup__success">you're on the list.</p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
+  <script src="./js/color-names.js" defer></script>
+  <script src="./js/palette-library.js" defer></script>
+  <script src="./js/scroll-effects.js" defer></script>
+  <script src="./js/popup.js" defer></script>
+  <script src="./js/app.js" defer></script>
+</body>
+</html>

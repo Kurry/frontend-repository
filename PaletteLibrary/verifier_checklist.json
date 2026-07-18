@@ -1,0 +1,50 @@
+[
+  {
+    "id": "1",
+    "title": "On load, Browse mode shows a non-empty palette library (nomenclature, palette cards, or swatches) with multiple seeded items"
+  },
+  {
+    "id": "2",
+    "title": "On load (or after opening the manage/detail list), at least 6 user-manageable palettes are available with names visible"
+  },
+  {
+    "id": "3",
+    "title": "After creating a palette named 'Harbor Coastal' with valid swatches, the text 'Harbor Coastal' is visible in the library"
+  },
+  {
+    "id": "4",
+    "title": "After adding 3 new palettes on top of the seed set, the manage/list count shows exactly 3 more than the initial seeded count"
+  },
+  {
+    "id": "5",
+    "title": "After filtering by a period tag (with mixed periods present), only matching palettes/swatches remain visible"
+  },
+  {
+    "id": "6",
+    "title": "After editing a palette name to 'Evening Ochre', the text 'Evening Ochre' is visible and the previous name is not"
+  },
+  {
+    "id": "7",
+    "title": "After deleting a palette, that palette name is no longer visible in the library"
+  },
+  {
+    "id": "8",
+    "title": "After deleting all user-manageable palettes, an empty state is visible in the library region"
+  },
+  {
+    "id": "9",
+    "title": "After submitting create with an empty required palette name, the palettes count does not increase and validation feedback is visible"
+  },
+  {
+    "id": "10",
+    "title": "After switching among Nomenclature, Palette, and Swatch browse layouts, the active view indicator updates without full page navigation"
+  },
+  {
+    "id": "11",
+    "title": "After opening Detail/Editor for a palette and returning to Browse, both modes work without leaving the page"
+  },
+  {
+    "id": "12",
+    "title": "When hovering swatches, palette cards, or view toggles, a visible hover outline, wash, or label fade appears"
+  }
+]

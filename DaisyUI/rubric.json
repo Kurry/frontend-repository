@@ -1,0 +1,173 @@
+[
+  {
+    "id": "1.1",
+    "title": "Every checklist-* criterion in this Core Features dimension passes during the agent verifier run",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Core Features"
+    }
+  },
+  {
+    "id": "1.2",
+    "title": "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Core Features"
+    }
+  },
+  {
+    "id": "1.3",
+    "title": "Users collection supports create, edit, and delete with list rows and KPI counts updating from shared application state",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Core Features"
+    }
+  },
+  {
+    "id": "1.4",
+    "title": "At least two distinct views exist (Operations Overview and All Users) switchable from the sidebar without full page navigation",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Core Features"
+    }
+  },
+  {
+    "id": "1.5",
+    "title": "Domain state beyond CRUD is implemented: status badges, role assignment, list filters/sort that recompute visible users, and bulk status/role/delete on selected rows",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Core Features"
+    }
+  },
+  {
+    "id": "1.6",
+    "title": "Renders visible validation/feedback when Create user is submitted with empty required fields, and the users count does not increase",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Core Features"
+    }
+  },
+  {
+    "id": "1.7",
+    "title": "Users list is static HTML only with no working create/edit/delete against shared state",
+    "annotations": {
+      "type": "negative hli verifier",
+      "importance": "must have",
+      "criterion": "Core Features"
+    }
+  },
+  {
+    "id": "1.8",
+    "title": "App chrome navigates via real outbound links to other origins instead of in-app view state",
+    "annotations": {
+      "type": "negative hli verifier",
+      "importance": "must have",
+      "criterion": "Core Features"
+    }
+  },
+  {
+    "id": "2.1",
+    "title": "Zustand holds the users collection, active view, filters/selection, and theme \u2014 shared across components",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Technical Implementation"
+    }
+  },
+  {
+    "id": "2.2",
+    "title": "Implemented with Stack: React + Zustand + Tailwind CSS; no browser storage APIs for persistence",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Technical Implementation"
+    }
+  },
+  {
+    "id": "2.3",
+    "title": "Uses localStorage or sessionStorage to persist users, theme, or filters",
+    "annotations": {
+      "type": "negative hli verifier",
+      "importance": "must have",
+      "criterion": "Technical Implementation"
+    }
+  },
+  {
+    "id": "2.4",
+    "title": "Manages the users collection only in component-local useState rather than Zustand shared store",
+    "annotations": {
+      "type": "negative hli verifier",
+      "importance": "must have",
+      "criterion": "Technical Implementation"
+    }
+  },
+  {
+    "id": "2.5",
+    "title": "Imports or uses a disallowed external component library beyond DaisyUI / trendchart for core UI",
+    "annotations": {
+      "type": "negative hli verifier",
+      "importance": "must have",
+      "criterion": "Technical Implementation"
+    }
+  },
+  {
+    "id": "3.1",
+    "title": "Operations Overview keeps an asymmetric 12-column mosaic with a primary inverse Revenue run rate card; Users views use dense admin tables/forms",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Visual Design"
+    }
+  },
+  {
+    "id": "3.2",
+    "title": "Role and status use distinct badge treatments; empty list state is visually present when the collection or filter result is empty",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Visual Design"
+    }
+  },
+  {
+    "id": "3.3",
+    "title": "Lays out Operations Overview as a uniform equal-width single-column card stack with no mixed mosaic spans",
+    "annotations": {
+      "type": "negative hli verifier",
+      "importance": "must have",
+      "criterion": "Visual Design"
+    }
+  },
+  {
+    "id": "4.1",
+    "title": "Required hover animations are present on buttons, table/list rows, and sidebar nav; theme swap and popovers animate as specified",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Motion"
+    }
+  },
+  {
+    "id": "4.2",
+    "title": "View switches update the main canvas without full reload and keep interactive chrome hover feedback",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "nice to have",
+      "criterion": "Motion"
+    }
+  },
+  {
+    "id": "4.3",
+    "title": "Omits hover washes on buttons, rows, or sidebar items so interactive chrome feels static on pointer hover",
+    "annotations": {
+      "type": "negative hli verifier",
+      "importance": "must have",
+      "criterion": "Motion"
+    }
+  }
+]

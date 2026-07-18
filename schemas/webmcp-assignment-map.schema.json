@@ -1,0 +1,185 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://zto.dev/schemas/webmcp/assignment-map.schema.json",
+  "title": "WebMCP contract assignment map entry",
+  "description": "Migration input for zto-webmcp-v1. Selects 1–4 canonical modules and product bindings only. No custom JSON Schema fragments.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["task", "modules", "bindings", "mechanics_exclusions"],
+  "properties": {
+    "task": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^frontend-[a-z0-9-]+$",
+      "description": "Harbor task slug without local/ prefix."
+    },
+    "modules": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "browse-query-v1",
+          "entity-collection-v1",
+          "form-workflow-v1",
+          "structured-editor-v1",
+          "command-session-v1",
+          "artifact-transfer-v1"
+        ]
+      }
+    },
+    "bindings": {
+      "type": "object",
+      "description": "Product-facing vocabulary compiled by selected module factories. Keys are optional and module-specific; unknown keys are rejected by runtime validation.",
+      "additionalProperties": true,
+      "properties": {
+        "browsable_entity": { "type": "string" },
+        "destinations": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "filters": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "sorts": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "locales": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "themes": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "entity": { "type": "string" },
+        "entity_operations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "create",
+              "select",
+              "update",
+              "delete",
+              "toggle",
+              "quantity",
+              "reorder"
+            ]
+          }
+        },
+        "entity_fields": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "form_fields": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "form_operations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["validate", "submit", "cancel", "reset", "advance", "return"]
+          }
+        },
+        "workflow_steps": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "editor_object_types": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "editor_properties": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "editor_modes": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "editor_operations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "select",
+              "add",
+              "delete",
+              "update_property",
+              "set_content",
+              "switch_mode",
+              "preview"
+            ]
+          }
+        },
+        "session_operations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "start",
+              "pause",
+              "resume",
+              "stop",
+              "restart",
+              "advance",
+              "trigger_demo",
+              "connect",
+              "disconnect"
+            ]
+          }
+        },
+        "demos": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "import_modes": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "export_formats": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "conversion_modes": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "artifact_operations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["import", "export", "copy", "print_preview", "convert"]
+          }
+        },
+        "visible_postconditions": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "value_bounds": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "min": { "type": "number" },
+              "max": { "type": "number" },
+              "maxLength": { "type": "integer", "minimum": 1 }
+            }
+          }
+        }
+      }
+    },
+    "mechanics_exclusions": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Interaction-mechanism exemptions that remain Playwright-driven (gesture, timing, auth UI, file picker, etc.)."
+    }
+  }
+}

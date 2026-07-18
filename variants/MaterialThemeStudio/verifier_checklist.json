@@ -1,0 +1,50 @@
+[
+  {
+    "id": "1",
+    "title": "On load, Saved Themes (or the saved list after opening that tab) shows at least 3 seeded theme rows with names visible"
+  },
+  {
+    "id": "2",
+    "title": "After creating a saved theme named 'Harbor Indigo' with valid required fields, the text 'Harbor Indigo' is visible under Saved Themes"
+  },
+  {
+    "id": "3",
+    "title": "After adding 3 new saved themes on top of the seed set, Saved Themes shows exactly 3 more rows than the initial seeded count"
+  },
+  {
+    "id": "4",
+    "title": "After loading a saved theme, the Preview surfaces and/or Monaco editor reflect that theme's options"
+  },
+  {
+    "id": "5",
+    "title": "After editing a saved theme name to 'Evening Paper', the text 'Evening Paper' is visible and the previous name is not"
+  },
+  {
+    "id": "6",
+    "title": "After deleting a saved theme, that theme name is no longer visible under Saved Themes"
+  },
+  {
+    "id": "7",
+    "title": "After deleting all saved themes, an empty state message is visible in the Saved Themes region"
+  },
+  {
+    "id": "8",
+    "title": "After submitting create with an empty required theme name, the saved themes count does not increase and validation feedback is visible"
+  },
+  {
+    "id": "9",
+    "title": "After toggling Light/Dark palette Type, preview surfaces recolor without full page navigation"
+  },
+  {
+    "id": "10",
+    "title": "After switching from Preview to Saved Themes (or Components), the main canvas shows the other mode without full page navigation"
+  },
+  {
+    "id": "11",
+    "title": "After switching among Phone / Tablet / Desktop device frames, the preview chrome reframes without leaving the page"
+  },
+  {
+    "id": "12",
+    "title": "When hovering buttons, saved theme rows, or tabs, a visible hover wash, underline, or brightness change appears"
+  }
+]

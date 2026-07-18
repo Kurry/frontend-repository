@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 48" fill="none">
+  <rect x="2" y="8" width="32" height="32" rx="8" fill="#00838f"/>
+  <path d="M8 18h20M8 24h14M8 30h10" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+  <circle cx="28" cy="30" r="3" fill="#e6a817"/>
+  <text x="44" y="31" font-family="Georgia, 'Times New Roman', serif" font-size="20" font-weight="700" fill="#101820">MediaTimeline</text>
+</svg>

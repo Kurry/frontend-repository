@@ -1,0 +1,17 @@
+{
+  "id": "browse-query-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Browse / query",
+  "purpose": "Content sites, catalogs, feeds, dashboards, and navigation.",
+  "permitted_operations": ["open", "search", "apply_filter", "clear_filter", "sort", "set_locale", "set_theme"],
+  "binding_keys": {
+    "required_any_of": [["destinations"]],
+    "optional": ["browsable_entity", "filters", "sorts", "locales", "themes", "visible_postconditions"]
+  },
+  "restrictions": [
+    "No arbitrary URL, selector, or undeclared route.",
+    "Destinations and filters come from bounded PRD declarations.",
+    "Visible navigation state must update via the same handlers as UI controls."
+  ],
+  "tool_name_prefix": "browse"
+}

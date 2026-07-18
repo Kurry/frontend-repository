@@ -1,0 +1,54 @@
+[
+  {
+    "id": "1",
+    "title": "On load, the first viewport shows Ridge brand chrome, mission/clock bento cells, and the hero visual plane (marketing scroll mode)"
+  },
+  {
+    "id": "2",
+    "title": "After opening Events Manager (from View all events or equivalent), at least 6 seeded events are visible with titles"
+  },
+  {
+    "id": "3",
+    "title": "After creating an event titled 'Harbor Builder Summit' with a valid date, the text 'Harbor Builder Summit' is visible in the events list"
+  },
+  {
+    "id": "4",
+    "title": "After adding 3 new events on top of the seed set, the events list shows exactly 3 more rows than the initial seeded count"
+  },
+  {
+    "id": "5",
+    "title": "After filtering events by status (e.g. upcoming) with mixed statuses present, only matching events remain visible"
+  },
+  {
+    "id": "6",
+    "title": "After editing an event title to 'Evening Validator Meetup', the text 'Evening Validator Meetup' is visible and the previous title is not"
+  },
+  {
+    "id": "7",
+    "title": "After deleting an event, that event title is no longer visible in the events list"
+  },
+  {
+    "id": "8",
+    "title": "After deleting all events, an empty state is visible in Events Manager"
+  },
+  {
+    "id": "9",
+    "title": "After submitting create with an empty required event title, the events count does not increase and validation feedback is visible"
+  },
+  {
+    "id": "10",
+    "title": "After switching between Marketing Scroll mode and Events Manager mode, the main canvas shows the other mode without full page navigation"
+  },
+  {
+    "id": "11",
+    "title": "After clicking the sun/moon theme toggle, surfaces recolor between light and dark without reload"
+  },
+  {
+    "id": "12",
+    "title": "When hovering notched CTAs, event rows, or interactive tiles, a visible hover wash, brightness, or arrow nudge appears"
+  },
+  {
+    "id": "13",
+    "title": "On desktop width, scrolling Why Ridge pins pillars into a progressive sticky stack (or reduced-motion/mobile shows the vertical-list fallback)"
+  }
+]

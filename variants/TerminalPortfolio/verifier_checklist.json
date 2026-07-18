@@ -1,0 +1,50 @@
+[
+  {
+    "id": "1",
+    "title": "On load after dismissing boot, the terminal shows a live command prompt and welcome/output chrome"
+  },
+  {
+    "id": "2",
+    "title": "After opening Projects Board or running /work, at least 6 seeded projects are visible with names"
+  },
+  {
+    "id": "3",
+    "title": "After creating a project named 'Harbor Atlas' with valid required fields, the text 'Harbor Atlas' is visible in the projects list or board"
+  },
+  {
+    "id": "4",
+    "title": "After adding 3 new projects on top of the seed set, the projects list shows exactly 3 more items than the initial seeded count"
+  },
+  {
+    "id": "5",
+    "title": "After filtering projects by status (e.g. wip) with mixed statuses present, only matching projects remain visible"
+  },
+  {
+    "id": "6",
+    "title": "After editing a project name to 'Evening Terminal', the text 'Evening Terminal' is visible and the previous name is not"
+  },
+  {
+    "id": "7",
+    "title": "After deleting a project, that project name is no longer visible in the projects list or board"
+  },
+  {
+    "id": "8",
+    "title": "After deleting all projects, an empty state is visible in Projects Board or /work output"
+  },
+  {
+    "id": "9",
+    "title": "After submitting create with an empty required project name, the projects count does not increase and validation feedback is visible"
+  },
+  {
+    "id": "10",
+    "title": "After switching between Terminal CLI mode and Projects Board mode, the main canvas shows the other mode without full page navigation"
+  },
+  {
+    "id": "11",
+    "title": "After running a theme command (/dark, /light, /retro, or /glass), documentElement theme classes update without reload"
+  },
+  {
+    "id": "12",
+    "title": "When hovering project rows/cards, autocomplete rows, or titlebar controls, a visible hover wash or highlight appears"
+  }
+]

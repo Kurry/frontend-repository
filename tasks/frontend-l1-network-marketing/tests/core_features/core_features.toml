@@ -1,0 +1,194 @@
+[judge]
+judge = "claude-code"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "stagehand-webmcp"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@browserbasehq/stagehand@3.7.0",
+  "mcp",
+  "--env",
+  "LOCAL",
+  "--chrome-version",
+  "151.0.7922.34",
+  "--enable-webmcp",
+  "--tools",
+  "webmcp_session_info,webmcp_list_tools,webmcp_invoke_tool",
+  "--disable-tools",
+  "act,observe,extract,agent",
+  "--cdp-port",
+  "$WEBMCP_CDP_PORT",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "1_1"
+description = "Every checklist-* criterion in this Core Features dimension passes during the agent verifier run"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "1_2"
+description = "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "1_3"
+description = "Events list is static HTML only with no working create/edit/delete against shared state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.4"
+name = "1_4"
+description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "checklist-1"
+name = "checklist_1"
+description = "On load, the first viewport shows Ridge brand chrome, mission/clock bento cells, and the hero visual plane (marketing scroll mode)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "checklist-2"
+name = "checklist_2"
+description = "After opening Events Manager (from View all events or equivalent), at least 6 seeded events are visible with titles"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "checklist-3"
+name = "checklist_3"
+description = "After creating an event titled 'Harbor Builder Summit' with a valid date, the text 'Harbor Builder Summit' is visible in the events list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "checklist-4"
+name = "checklist_4"
+description = "After adding 3 new events on top of the seed set, the events list shows exactly 3 more rows than the initial seeded count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "checklist-5"
+name = "checklist_5"
+description = "After filtering events by status (e.g. upcoming) with mixed statuses present, only matching events remain visible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "checklist-6"
+name = "checklist_6"
+description = "After editing an event title to 'Evening Validator Meetup', the text 'Evening Validator Meetup' is visible and the previous title is not"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "checklist-7"
+name = "checklist_7"
+description = "After deleting an event, that event title is no longer visible in the events list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "checklist-8"
+name = "checklist_8"
+description = "After deleting all events, an empty state is visible in Events Manager"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "checklist-9"
+name = "checklist_9"
+description = "After submitting create with an empty required event title, the events count does not increase and validation feedback is visible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "checklist-10"
+name = "checklist_10"
+description = "After switching between Marketing Scroll mode and Events Manager mode, the main canvas shows the other mode without full page navigation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "checklist-11"
+name = "checklist_11"
+description = "After clicking the sun/moon theme toggle, surfaces recolor between light and dark without reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "checklist-12"
+name = "checklist_12"
+description = "When hovering notched CTAs, event rows, or interactive tiles, a visible hover wash, brightness, or arrow nudge appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "checklist-13"
+name = "checklist_13"
+description = "On desktop width, scrolling Why Ridge pins pillars into a progressive sticky stack (or reduced-motion/mobile shows the vertical-list fallback)"
+type = "binary"
+weight = 1.0

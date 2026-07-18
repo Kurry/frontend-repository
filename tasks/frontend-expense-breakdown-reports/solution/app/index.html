@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ledger | Reports</title>
+  <meta name="description" content="Anonymized personal finance reports demo — income, spending breakdown, trends, and transaction summary.">
+  <meta name="theme-color" content="#0F3D3E">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Ledger | Reports">
+  <meta property="og:description" content="Personal finance reports demo with spending breakdown and trends.">
+  <meta property="og:site_name" content="Ledger">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Ledger | Reports">
+  <meta name="twitter:description" content="Personal finance reports demo with spending breakdown and trends.">
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/styles.css">
+  <script src="./vendor/chart.umd.min.js" defer></script>
+  <script src="./js/app.js" defer></script>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" aria-label="Primary">
+      <div class="sidebar-top">
+        <button type="button" class="brand inert-nav" aria-label="Ledger home">
+          <img src="./assets/logo.svg" width="28" height="28" alt="Ledger" class="brand-mark">
+          <span class="brand-name">Ledger</span>
+        </button>
+        <div class="sidebar-icons">
+          <button type="button" class="icon-btn inert-nav" aria-label="Notifications">🔔</button>
+          <button type="button" class="icon-btn inert-nav" aria-label="Settings">⚙️</button>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="App">
+        <button type="button" class="nav-item inert-nav">Dashboard</button>
+        <button type="button" class="nav-item inert-nav">Accounts</button>
+        <button type="button" class="nav-item inert-nav">Transactions</button>
+        <button type="button" class="nav-item inert-nav">Cash Flow</button>
+        <button type="button" class="nav-item is-active inert-nav" aria-current="page">Reports</button>
+        <button type="button" class="nav-item inert-nav">Budget</button>
+        <button type="button" class="nav-item inert-nav">Recurring</button>
+        <button type="button" class="nav-item inert-nav">Goals</button>
+        <button type="button" class="nav-item inert-nav">Investments</button>
+        <button type="button" class="nav-item inert-nav">Forecasting</button>
+        <button type="button" class="nav-item inert-nav">Advice</button>
+      </nav>
+
+      <div class="sidebar-foot">
+        <div class="demo-chips">
+          <span class="chip">Demo mode</span>
+          <span class="chip">Sample data</span>
+        </div>
+        <button type="button" class="nav-item subtle inert-nav">Assistant</button>
+        <button type="button" class="nav-item subtle inert-nav">Help (demo)</button>
+        <button type="button" class="nav-item subtle inert-nav">Invite teammates (demo)</button>
+        <button type="button" class="profile inert-nav" aria-label="Profile">
+          <span class="avatar" aria-hidden="true">AR</span>
+          <span>Alex Rivera</span>
+        </button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="page-header">
+        <div>
+          <p class="eyebrow">Shared demo report</p>
+          <h1>Reports</h1>
+        </div>
+        <div class="header-actions">
+          <button type="button" class="btn ghost" data-demo-action>Filters</button>
+          <button type="button" class="btn ghost" data-demo-action>Date · All time</button>
+          <button type="button" class="btn primary" data-demo-action>Save</button>
+        </div>
+      </header>
+
+      <section class="stats" aria-label="Summary metrics">
+        <article class="stat-card">
+          <p class="stat-label">Total Income</p>
+          <p class="stat-value">$128,450.00</p>
+        </article>
+        <article class="stat-card">
+          <p class="stat-label">Total Expenses</p>
+          <p class="stat-value">$31,820.40</p>
+        </article>
+        <article class="stat-card">
+          <p class="stat-label">Total Net Income</p>
+          <p class="stat-value">$96,629.60</p>
+        </article>
+        <article class="stat-card">
+          <p class="stat-label">Savings Rate</p>
+          <p class="stat-value">75.2%</p>
+        </article>
+      </section>
+
+      <section class="chart-card" aria-label="Category charts">
+        <div class="chart-card-head">
+          <div>
+            <h2>Spending</h2>
+            <p class="chart-sub">By category &amp; group</p>
+          </div>
+          <div class="pill-tabs" role="tablist" aria-label="Chart mode">
+            <button type="button" class="pill is-active" role="tab" aria-selected="true" data-tab="breakdown" id="tab-breakdown">Breakdown</button>
+            <button type="button" class="pill" role="tab" aria-selected="false" data-tab="trends" id="tab-trends">Trends</button>
+          </div>
+        </div>
+
+        <div id="demo-breakdown-panel" class="chart-panel" role="tabpanel" aria-labelledby="tab-breakdown">
+          <div class="sankey-wrap">
+            <svg id="sankey-svg" viewBox="0 0 960 420" role="img" aria-label="Income to category group sankey diagram"></svg>
+          </div>
+          <ul class="flow-legend" id="breakdown-legend"></ul>
+        </div>
+
+        <div id="demo-trends-panel" class="chart-panel" role="tabpanel" aria-labelledby="tab-trends" hidden>
+          <div class="pie-layout">
+            <div class="pie-canvas-wrap">
+              <canvas id="trends-pie" width="360" height="360" aria-label="Spending trends pie chart"></canvas>
+            </div>
+            <ul class="pie-legend" id="trends-legend"></ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="tx-card" aria-label="Transactions">
+        <div class="tx-head">
+          <h2>Transactions</h2>
+          <div class="tx-actions">
+            <button type="button" class="btn ghost" data-demo-action>Bulk edit (demo)</button>
+            <button type="button" class="btn ghost" data-demo-action>Sort</button>
+            <button type="button" class="btn ghost" data-demo-action>Columns</button>
+            <button type="button" class="btn ghost" data-demo-action>Export CSV (demo)</button>
+          </div>
+        </div>
+
+        <div class="tx-table-wrap">
+          <table class="tx-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Payee</th>
+                <th>Category</th>
+                <th>Account</th>
+                <th class="num">Amount</th>
+              </tr>
+            </thead>
+            <tbody id="tx-body"></tbody>
+          </table>
+        </div>
+
+        <div class="tx-summary" aria-label="Transaction summary">
+          <div><span>Total transactions</span><strong>842</strong></div>
+          <div><span>Largest transaction</span><strong>+$18,400.00</strong></div>
+          <div><span>Average transaction</span><strong>+$42.15</strong></div>
+          <div><span>Total income</span><strong>+$128,450.00</strong></div>
+          <div><span>First transaction</span><strong>Jan 05, 2024</strong></div>
+          <div><span>Last transaction</span><strong>Mar 16, 2025</strong></div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

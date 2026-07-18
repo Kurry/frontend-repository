@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="CSS theme builder: edit colors, radius, depth, noise, and sizes; preview components; copy CSS; share via #theme= hash."
+    />
+    <title>CSS Theme Builder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+      media="(min-width: 520px)"
+    />
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="./css/app.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <div class="announce">
+        <button type="button" class="inert-nav">Theme toolkit v5.6 is now available!</button>
+      </div>
+
+      <header class="topnav">
+        <button type="button" class="brand inert-nav" aria-label="Home">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span>Theme Builder</span>
+        </button>
+
+        <div class="dropdown" data-dropdown>
+          <button type="button" class="nav-chip" data-dropdown-trigger>5.6.18</button>
+          <div class="dropdown-panel">
+            <button type="button">5.6.18</button>
+            <button type="button">5.5.x</button>
+            <button type="button">4.x</button>
+          </div>
+        </div>
+
+        <div class="nav-spacer"></div>
+
+        <div class="dropdown" data-dropdown>
+          <button type="button" class="nav-chip" data-dropdown-trigger>Theme</button>
+          <div class="dropdown-panel">
+            <button type="button" data-chrome-theme="light">light</button>
+            <button type="button" data-chrome-theme="dark" class="active">dark</button>
+            <button type="button" data-chrome-theme="cupcake">cupcake</button>
+            <button type="button" data-chrome-theme="synthwave">synthwave</button>
+          </div>
+        </div>
+
+        <div class="dropdown" data-dropdown>
+          <button type="button" class="nav-chip" data-dropdown-trigger>EN</button>
+          <div class="dropdown-panel">
+            <button type="button">EN</button>
+            <button type="button">ES</button>
+            <button type="button">FR</button>
+            <button type="button">JA</button>
+          </div>
+        </div>
+
+        <button type="button" class="nav-chip inert-nav">★ 41k</button>
+        <button type="button" class="nav-chip inert-nav">Docs</button>
+        <button type="button" class="nav-chip inert-nav">Components</button>
+      </header>
+
+      <main class="workspace">
+        <aside class="panel" aria-label="Themes">
+          <div class="panel-head">
+            <h2>Themes</h2>
+            <button type="button" class="btn" title="Options">⋯</button>
+          </div>
+          <div class="panel-body">
+            <button type="button" class="hold-btn" id="hold-add">
+              <span>Hold to add theme</span>
+            </button>
+
+            <p class="section-label">My themes</p>
+            <div class="theme-list" id="my-themes"></div>
+
+            <p class="section-label">Built-in themes</p>
+            <div class="theme-list" id="builtin-themes"></div>
+          </div>
+        </aside>
+
+        <section class="panel" aria-label="Theme editor">
+          <div class="panel-head">
+            <h2>Editor</h2>
+          </div>
+          <div class="panel-body">
+            <div class="editor-toolbar">
+              <label class="name-field">
+                <span aria-hidden="true">✎</span>
+                <input id="theme-name" type="text" placeholder="mytheme" autocomplete="off" />
+              </label>
+              <button type="button" class="btn" id="btn-random">Random</button>
+              <button type="button" class="btn btn-primary" id="btn-css">{ }</button>
+            </div>
+
+            <div class="editor-block">
+              <h3>Change Colors</h3>
+              <div class="color-grid" id="color-controls"></div>
+            </div>
+
+            <div class="editor-block">
+              <h3>Radius</h3>
+              <div id="radius-controls"></div>
+            </div>
+
+            <div class="editor-block">
+              <h3>Effects</h3>
+              <div id="effect-controls"></div>
+            </div>
+
+            <div class="editor-block">
+              <h3>Sizes</h3>
+              <div id="size-controls"></div>
+            </div>
+
+            <div class="editor-block">
+              <h3>Options</h3>
+              <label class="toggle-row"
+                >Default theme <input type="checkbox" id="opt-default"
+              /></label>
+              <label class="toggle-row"
+                >Default dark theme <input type="checkbox" id="opt-prefersdark"
+              /></label>
+              <label class="toggle-row"
+                >Dark color scheme <input type="checkbox" id="opt-darkscheme"
+              /></label>
+              <div class="row" style="margin-top: 0.65rem">
+                <button type="button" class="btn" id="btn-reset">Reset theme</button>
+                <button type="button" class="btn" id="btn-remove">Remove theme</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel preview-panel" aria-label="Live preview">
+          <div class="panel-head">
+            <h2>Preview</h2>
+            <div class="preview-tabs">
+              <label
+                ><input type="radio" name="preview-tab" value="demo" checked /> Components
+                Demo</label
+              >
+              <label
+                ><input type="radio" name="preview-tab" value="variants" /> Component
+                Variants</label
+              >
+              <label
+                ><input type="radio" name="preview-tab" value="palette" /> Color Palette</label
+              >
+            </div>
+          </div>
+          <div class="preview-stage">
+            <div id="preview-frame" class="preview-frame" data-theme="light">
+              <div id="pane-demo" class="preview-pane active">
+                <div class="demo-grid">
+                  <div class="demo-card stack">
+                    <h4>Filters</h4>
+                    <div class="row">
+                      <div class="badge badge-primary">New</div>
+                      <div class="badge badge-secondary">Sale</div>
+                      <div class="badge badge-accent">Featured</div>
+                      <div class="badge badge-outline">Archive</div>
+                    </div>
+                    <div class="join">
+                      <input class="input input-bordered join-item input-sm" placeholder="Search" />
+                      <button class="btn btn-primary btn-sm join-item" type="button">Go</button>
+                    </div>
+                  </div>
+
+                  <div class="demo-card stack">
+                    <h4>Calendar</h4>
+                    <div class="row">
+                      <button class="btn btn-sm" type="button">Today</button>
+                      <button class="btn btn-sm btn-primary" type="button">Add event</button>
+                    </div>
+                    <ul class="list bg-base-100 rounded-box">
+                      <li class="list-row text-sm">09:00 Design sync</li>
+                      <li class="list-row text-sm">13:30 Theme review</li>
+                      <li class="list-row text-sm">16:00 Ship preview</li>
+                    </ul>
+                  </div>
+
+                  <div class="demo-card stack">
+                    <h4>Tabs & range</h4>
+                    <div role="tablist" class="tabs tabs-boxed">
+                      <button type="button" class="tab tab-active">Overview</button>
+                      <button type="button" class="tab">Details</button>
+                      <button type="button" class="tab">Settings</button>
+                    </div>
+                    <input type="range" min="0" max="100" value="62" class="range range-primary" />
+                  </div>
+
+                  <div class="demo-card stack">
+                    <h4>Product</h4>
+                    <div class="card bg-base-100 shadow">
+                      <div class="card-body p-4">
+                        <h2 class="card-title text-base">Soft shell jacket</h2>
+                        <p class="text-sm opacity-80">Breathable layers for cool evenings.</p>
+                        <div class="card-actions justify-end">
+                          <button class="btn btn-secondary btn-sm" type="button">Wishlist</button>
+                          <button class="btn btn-primary btn-sm" type="button">Buy</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="demo-card stack">
+                    <h4>Registration</h4>
+                    <label class="form-control w-full">
+                      <span class="label-text text-xs mb-1">Email</span>
+                      <input type="email" class="input input-bordered input-sm" placeholder="you@example.com" />
+                    </label>
+                    <label class="form-control w-full">
+                      <span class="label-text text-xs mb-1">Password</span>
+                      <input type="password" class="input input-bordered input-sm" value="••••••••" />
+                    </label>
+                    <label class="label cursor-pointer justify-start gap-2">
+                      <input type="checkbox" class="checkbox checkbox-sm checkbox-primary" checked />
+                      <span class="label-text text-sm">Email me updates</span>
+                    </label>
+                    <button class="btn btn-primary btn-sm" type="button">Create account</button>
+                  </div>
+
+                  <div class="demo-card stack">
+                    <h4>Stats</h4>
+                    <div class="stats stats-vertical lg:stats-horizontal shadow bg-base-100">
+                      <div class="stat py-3 px-4">
+                        <div class="stat-title">Downloads</div>
+                        <div class="stat-value text-primary text-2xl">31K</div>
+                        <div class="stat-desc">Jan 1st - Feb 1st</div>
+                      </div>
+                      <div class="stat py-3 px-4">
+                        <div class="stat-title">New Users</div>
+                        <div class="stat-value text-secondary text-2xl">4,200</div>
+                        <div class="stat-desc">+400 (22%)</div>
+                      </div>
+                    </div>
+                    <div
+                      class="radial-progress text-primary"
+                      style="--value: 70"
+                      aria-valuenow="70"
+                      role="progressbar"
+                    >
+                      70%
+                    </div>
+                  </div>
+
+                  <div class="demo-card stack">
+                    <h4>Orders</h4>
+                    <div class="overflow-x-auto">
+                      <table class="table table-sm">
+                        <thead>
+                          <tr>
+                            <th>Order</th>
+                            <th>Status</th>
+                            <th>Total</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>#1042</td>
+                            <td><span class="badge badge-success badge-sm">Paid</span></td>
+                            <td>$48</td>
+                          </tr>
+                          <tr>
+                            <td>#1043</td>
+                            <td><span class="badge badge-warning badge-sm">Hold</span></td>
+                            <td>$126</td>
+                          </tr>
+                          <tr>
+                            <td>#1044</td>
+                            <td><span class="badge badge-error badge-sm">Failed</span></td>
+                            <td>$19</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <div class="demo-card stack">
+                    <h4>Chat</h4>
+                    <div class="chat chat-start">
+                      <div class="chat-bubble">Can we tighten the radius?</div>
+                    </div>
+                    <div class="chat chat-end">
+                      <div class="chat-bubble chat-bubble-primary">Done — preview updates live.</div>
+                    </div>
+                    <div class="mockup-code text-sm bg-neutral text-neutral-content">
+                      <pre data-prefix="$"><code>npm i theme-kit</code></pre>
+                      <pre data-prefix=">" class="text-success"><code>export ready</code></pre>
+                    </div>
+                  </div>
+
+                  <div class="demo-card stack">
+                    <h4>Pricing</h4>
+                    <div class="row">
+                      <input type="radio" name="plan" class="radio radio-primary" checked />
+                      <span class="text-sm">Starter</span>
+                      <input type="radio" name="plan" class="radio radio-secondary" />
+                      <span class="text-sm">Pro</span>
+                      <input type="checkbox" class="toggle toggle-accent" checked />
+                    </div>
+                    <div class="alert alert-info text-sm">
+                      <span>Share themes with the #theme= URL hash.</span>
+                    </div>
+                    <button class="btn btn-accent" type="button">Upgrade</button>
+                  </div>
+                </div>
+              </div>
+
+              <div id="pane-variants" class="preview-pane">
+                <div class="variants-grid">
+                  <div class="demo-card stack">
+                    <h4>Buttons</h4>
+                    <div class="row">
+                      <button class="btn" type="button">Neutral</button>
+                      <button class="btn btn-primary" type="button">Primary</button>
+                      <button class="btn btn-secondary" type="button">Secondary</button>
+                      <button class="btn btn-accent" type="button">Accent</button>
+                      <button class="btn btn-info" type="button">Info</button>
+                      <button class="btn btn-success" type="button">Success</button>
+                      <button class="btn btn-warning" type="button">Warning</button>
+                      <button class="btn btn-error" type="button">Error</button>
+                    </div>
+                  </div>
+                  <div class="demo-card stack">
+                    <h4>Form controls</h4>
+                    <div class="row">
+                      <input type="checkbox" class="checkbox" />
+                      <input type="checkbox" class="checkbox checkbox-primary" checked />
+                      <input type="radio" name="v" class="radio" />
+                      <input type="radio" name="v" class="radio radio-secondary" checked />
+                      <input type="checkbox" class="toggle" />
+                      <input type="checkbox" class="toggle toggle-accent" checked />
+                    </div>
+                    <select class="select select-bordered select-sm w-full max-w-xs">
+                      <option>Select option</option>
+                      <option>Option A</option>
+                      <option>Option B</option>
+                    </select>
+                  </div>
+                  <div class="demo-card stack">
+                    <h4>Alerts</h4>
+                    <div class="alert alert-success text-sm"><span>Success message</span></div>
+                    <div class="alert alert-warning text-sm"><span>Warning message</span></div>
+                    <div class="alert alert-error text-sm"><span>Error message</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="pane-palette" class="preview-pane">
+                <div class="palette-grid" id="palette-grid"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="modal-backdrop" id="css-modal" role="dialog" aria-modal="true" aria-label="Theme CSS">
+      <div class="modal">
+        <header>
+          <strong>Theme CSS</strong>
+          <button type="button" class="btn" id="css-close">Close</button>
+        </header>
+        <pre id="css-output"></pre>
+        <footer>
+          <span class="hint">Copy into your stylesheet or daisyUI theme config.</span>
+          <button type="button" class="btn btn-primary" id="css-copy">Copy CSS</button>
+        </footer>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" role="status"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
+    <script type="module" src="./js/app.js"></script>
+  </body>
+</html>

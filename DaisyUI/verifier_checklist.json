@@ -1,0 +1,58 @@
+[
+  {
+    "id": "1",
+    "title": "On load, All Users (or the default Users list) shows at least 8 seeded user rows with name, role, and status visible in the table"
+  },
+  {
+    "id": "2",
+    "title": "After creating a user with first name 'Ada', last name 'Lovelace', and a valid email, the text 'Ada Lovelace' (or equivalent full name) is visible in the All Users list"
+  },
+  {
+    "id": "3",
+    "title": "After adding 3 new users on top of the seed set, the All Users table shows exactly 3 more rows than the initial seeded count"
+  },
+  {
+    "id": "4",
+    "title": "After changing a user's status from Active to Suspended, that user shows a Suspended badge/state that is visually distinct from Active users"
+  },
+  {
+    "id": "5",
+    "title": "After editing a user's name from the seeded value to 'Evening Runner', the text 'Evening Runner' is visible in the list and the previous name is not"
+  },
+  {
+    "id": "6",
+    "title": "After deleting a user, that user's name is no longer visible anywhere in the All Users list"
+  },
+  {
+    "id": "7",
+    "title": "After deleting all users, an empty state message is visible and no user data rows remain in the list"
+  },
+  {
+    "id": "8",
+    "title": "After submitting Create user with an empty required name or email field, the users count in the list does not increase and validation feedback is visible"
+  },
+  {
+    "id": "9",
+    "title": "After filtering All Users by status Suspended (with at least one Suspended and one Active user present), only Suspended users remain visible in the list"
+  },
+  {
+    "id": "10",
+    "title": "After switching from Operations Overview to All Users via the sidebar, the main canvas shows the users table/KPIs (not the overview mosaic), and switching back restores Operations Overview without a full page navigation"
+  },
+  {
+    "id": "11",
+    "title": "After opening at least two additional Users modes from Roles, Permissions, User Logs, User Stats, User Payments, or User Products via the sidebar, each opened mode shows its domain UI (filters/tables) and the URL does not navigate to an external origin"
+  },
+  {
+    "id": "12",
+    "title": "After clicking the sun/moon theme swap, data-theme flips between light and dark and surfaces recolor without reload"
+  },
+  {
+    "id": "13",
+    "title": "When hovering primary buttons, table rows, or sidebar nav items, a visible hover wash, underline, or shadow change appears"
+  },
+  {
+    "id": "14",
+    "title": "After selecting multiple All Users rows and running a bulk action (Change status, Change role, or Delete), the selected users update or disappear together in the list and KPIs reflect the change"
+  }
+]

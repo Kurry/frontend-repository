@@ -1,0 +1,110 @@
+
+/* ── Capture polish + debrand chrome ── */
+button.inert-nav,
+span.inert-nav {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: inherit;
+  text-decoration: none;
+  display: inline;
+  max-width: 100%;
+}
+
+a.SiteNavbarBrand.inert-nav,
+button.SiteNavbarBrand.inert-nav,
+button.navbar-brand.inert-nav {
+  display: inline-flex;
+  align-items: center;
+}
+
+button.inert-nav:focus-visible {
+  outline: 2px solid #1B4D6E;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+button.inert-nav:hover {
+  opacity: 0.92;
+}
+
+button.Button:active:not(:disabled),
+button.inert-nav:active {
+  transform: scale(0.98);
+  transition: transform 120ms ease;
+}
+
+.Logo__logoMd,
+img[alt="Trip"].Logo__logoMd {
+  height: 28px;
+  width: auto;
+  max-width: 120px;
+  object-fit: contain;
+}
+
+/* Hide chat / support / marketing chrome that is brand-heavy or non-functional offline */
+[class*="tiledesk"],
+[class*="Tiledesk"],
+[class*="chat21"],
+[class*="Chat21"],
+[id*="tiledesk"],
+[id*="chat21"],
+[class*="assistantFloating"],
+.PlanPageOrPlacesList__assistantFloatingButtonContainer,
+iframe,
+#c21-launcher-button,
+.start-animation {
+  display: none !important;
+}
+
+#capture-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(120%);
+  background: #1B4D6E;
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-family: "Source Sans Pro", system-ui, sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.01em;
+  box-shadow: 0 8px 28px rgba(27, 77, 110, 0.35);
+  z-index: 99999;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 280ms cubic-bezier(.2,.8,.2,1), opacity 280ms ease;
+}
+
+#capture-toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* Soften map empty tiles when Google Maps JS is absent */
+.gm-style {
+  background: linear-gradient(160deg, #d7e8ef 0%, #f4f7f9 55%, #e8f0f4 100%) !important;
+}
+
+/* Demote paywall / PRO marketing chrome in the static demo */
+.Badge__yellowWithWhiteText,
+[class*="ProBadge"],
+[class*="proBadge"],
+[class*="Upgrade"],
+.Badge__pro {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #capture-toast,
+  button.Button,
+  button.inert-nav {
+    transition: none !important;
+  }
+}

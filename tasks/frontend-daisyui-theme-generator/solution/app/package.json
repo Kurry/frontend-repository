@@ -1,0 +1,8 @@
+{
+  "name": "oracle-static",
+  "private": true,
+  "scripts": {
+    "verify:build": "node -e \"require('fs').accessSync('index.html')\"",
+    "start": "npx --yes serve -l 3000 -n"
+  }
+}

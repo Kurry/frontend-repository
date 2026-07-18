@@ -1,0 +1,50 @@
+[
+  {
+    "id": "1",
+    "title": "On load, Paint mode shows the canvas stage with the floating toolbar and brush/palette controls"
+  },
+  {
+    "id": "2",
+    "title": "On load (or after opening Gallery), at least 4 seeded saved boards are visible with names"
+  },
+  {
+    "id": "3",
+    "title": "After saving/creating a board named 'Harbor Signal' with a valid name, the text 'Harbor Signal' is visible in Gallery"
+  },
+  {
+    "id": "4",
+    "title": "After adding 3 new boards on top of the seed set, Gallery shows exactly 3 more items than the initial seeded count"
+  },
+  {
+    "id": "5",
+    "title": "After loading a seeded board from Gallery, the paint canvas cells update to that board's snapshot"
+  },
+  {
+    "id": "6",
+    "title": "After editing a board name to 'Evening Grid', the text 'Evening Grid' is visible and the previous name is not"
+  },
+  {
+    "id": "7",
+    "title": "After deleting a board, that board name is no longer visible in Gallery"
+  },
+  {
+    "id": "8",
+    "title": "After deleting all boards, an empty state is visible in Gallery"
+  },
+  {
+    "id": "9",
+    "title": "After submitting save/create with an empty required board name, the boards count does not increase and validation feedback is visible"
+  },
+  {
+    "id": "10",
+    "title": "After filtering Gallery by a tag or favorites (with mixed items present), only matching boards remain visible"
+  },
+  {
+    "id": "11",
+    "title": "After switching between Paint and Gallery modes, the main canvas shows the other mode without full page navigation"
+  },
+  {
+    "id": "12",
+    "title": "When hovering toolbar buttons, swatches, or gallery rows, a visible hover wash or fill change appears"
+  }
+]

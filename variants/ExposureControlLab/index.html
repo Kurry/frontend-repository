@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Camera Exposure Simulator</title>
+  <meta name="description" content="Interactive camera exposure simulator for aperture, shutter speed, and ISO. Adjust the exposure triangle and see brightness, depth of field, motion blur, and noise update live.">
+  <meta property="og:title" content="Camera Exposure Simulator">
+  <meta property="og:description" content="Interactive camera exposure simulator for aperture, shutter speed, and ISO.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Camera Exposure Simulator">
+  <meta name="twitter:description" content="Interactive camera exposure simulator for aperture, shutter speed, and ISO.">
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+  <div class="lab" id="lab">
+    <div class="noise-layer" aria-hidden="true">
+      <div class="noise-overlay" id="noise-overlay"></div>
+    </div>
+
+    <div class="preview" id="image-container">
+      <div class="motion-stack" id="motion-container">
+        <img class="motion-frame is-active" src="./assets/motion-01.jpg" alt="" width="1600" height="1000" data-frame="0">
+        <img class="motion-frame" src="./assets/motion-02.jpg" alt="" width="1600" height="1000" data-frame="1">
+        <img class="motion-frame" src="./assets/motion-03.jpg" alt="" width="1600" height="1000" data-frame="2">
+        <img class="motion-frame" src="./assets/motion-04.jpg" alt="" width="1600" height="1000" data-frame="3">
+        <img class="motion-frame" src="./assets/motion-05.jpg" alt="" width="1600" height="1000" data-frame="4">
+        <img class="motion-frame" src="./assets/motion-06.jpg" alt="" width="1600" height="1000" data-frame="5">
+        <img class="motion-frame" src="./assets/motion-07.jpg" alt="" width="1600" height="1000" data-frame="6">
+        <img class="motion-frame" src="./assets/motion-08.jpg" alt="" width="1600" height="1000" data-frame="7">
+        <img class="motion-frame" src="./assets/motion-09.jpg" alt="" width="1600" height="1000" data-frame="8">
+        <img class="motion-frame" src="./assets/motion-10.jpg" alt="" width="1600" height="1000" data-frame="9">
+      </div>
+      <div class="depth-plate" id="depth-image" aria-hidden="true"></div>
+    </div>
+
+    <div class="controls">
+      <div class="help-btn" id="help-btn" role="button" tabindex="0" aria-expanded="false" aria-controls="help-panel" aria-label="Toggle exposure help">
+        <span class="help-btn__icon">?</span>
+        <span class="help-btn__icon">X</span>
+      </div>
+
+      <div class="dial-control" data-control="aperture">
+        <button type="button" class="step step--down" id="aperture-down" aria-label="Widen aperture (lower f-number)"></button>
+        <div class="dial-face">
+          <span class="dial-label">APERTURE</span>
+          <span class="dial-value" id="aperture-value">f/16</span>
+        </div>
+        <button type="button" class="step step--up" id="aperture-up" aria-label="Narrow aperture (higher f-number)"></button>
+        <div class="dial-ring" aria-hidden="true"></div>
+      </div>
+
+      <div class="dial-control" data-control="shutter">
+        <button type="button" class="step step--down" id="shutter-down" aria-label="Decrease shutter speed"></button>
+        <div class="dial-face">
+          <span class="dial-label">SPEED</span>
+          <span class="dial-value" id="shutter-value">1/60</span>
+        </div>
+        <button type="button" class="step step--up" id="shutter-up" aria-label="Increase shutter speed"></button>
+        <div class="dial-ring" aria-hidden="true"></div>
+      </div>
+
+      <div class="dial-control" data-control="iso">
+        <button type="button" class="step step--down" id="iso-down" aria-label="Decrease ISO"></button>
+        <div class="dial-face">
+          <span class="dial-label">ISO</span>
+          <span class="dial-value" id="iso-value">100</span>
+        </div>
+        <button type="button" class="step step--up" id="iso-up" aria-label="Increase ISO"></button>
+        <div class="dial-ring" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <div class="meter" aria-label="Exposure meter">
+      <div class="meter__track" id="exposure-bar">
+        <div class="meter__dot" id="exposure-dot"></div>
+      </div>
+      <span class="meter__caption meter__caption--under">UNDER EXPOSED</span>
+      <span class="meter__caption meter__caption--over">OVER EXPOSED</span>
+      <span class="meter__center" aria-hidden="true"></span>
+    </div>
+
+    <aside class="help-panel" id="help-panel" aria-hidden="true">
+      <div class="help-panel__inner">
+        <p><strong>Aperture</strong> refers to the opening in a lens through which light enters. A lower f-number means a wider opening, more light, and a shallow depth of field (blurry background). A higher f-number means less light and more depth of field (more in focus). Aperture affects both exposure and how much of your image appears sharp.</p>
+        <p><strong>Shutter Speed</strong> is how long your camera’s sensor is exposed to light. Fast shutter speeds (like 1/1000s) freeze motion, while slower speeds (like 1/10s or longer) blur movement, useful for light trails or motion effects. It’s key for controlling motion and exposure. Slower speeds need a tripod to avoid camera shake and blurriness in your photos.</p>
+        <p><strong>ISO</strong> controls your camera’s sensitivity to light. Lower ISO values (like 100 or 200) produce clean images in bright conditions. Higher ISOs (like 1600 or 3200) help in low light but can add digital noise. Balancing ISO with aperture and shutter speed is essential for well-exposed photos. Try to keep ISO low for the best image quality.</p>
+      </div>
+    </aside>
+
+    <div class="help-btn help-btn--mobile" id="help-btn-mob" role="button" tabindex="0" aria-expanded="false" aria-controls="help-panel" aria-label="Toggle exposure help">
+      <span class="help-btn__icon">?</span>
+      <span class="help-btn__icon">X</span>
+    </div>
+
+    <div class="brand-chip">Camera Exposure Simulator</div>
+  </div>
+
+  <script src="./js/lab.js"></script>
+</body>
+</html>

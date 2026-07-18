@@ -1,0 +1,164 @@
+[
+  {
+    "id": "1.1",
+    "title": "Every checklist-* criterion in this Core Features dimension passes during the agent verifier run",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Core Features"
+    }
+  },
+  {
+    "id": "1.2",
+    "title": "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Core Features"
+    }
+  },
+  {
+    "id": "1.3",
+    "title": "Projects collection supports create, edit, and delete with list rows and derived counts updating from shared application state",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Core Features"
+    }
+  },
+  {
+    "id": "1.4",
+    "title": "At least two distinct views or interaction modes are switchable without full page navigation",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Core Features"
+    }
+  },
+  {
+    "id": "1.5",
+    "title": "Domain state beyond CRUD is implemented (filters, status/priority/mode, or equivalent) and recomputes visible results from the shared collection",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Core Features"
+    }
+  },
+  {
+    "id": "1.6",
+    "title": "Renders visible validation feedback when create is submitted with empty required fields, and the collection count does not increase",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Core Features"
+    }
+  },
+  {
+    "id": "1.7",
+    "title": "Projects list is static HTML only with no working create/edit/delete against shared state",
+    "annotations": {
+      "type": "negative hli verifier",
+      "importance": "must have",
+      "criterion": "Core Features"
+    }
+  },
+  {
+    "id": "1.8",
+    "title": "App chrome navigates via real outbound links to other origins instead of in-app view state",
+    "annotations": {
+      "type": "negative hli verifier",
+      "importance": "must have",
+      "criterion": "Core Features"
+    }
+  },
+  {
+    "id": "2.1",
+    "title": "NgRx holds projects, command history, theme, and mode \u2014 shared across components",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Technical Implementation"
+    }
+  },
+  {
+    "id": "2.2",
+    "title": "Implemented with Angular, NgRx, and Angular Material; no browser storage APIs for persistence",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Technical Implementation"
+    }
+  },
+  {
+    "id": "2.3",
+    "title": "Uses localStorage or sessionStorage to persist projects, theme, or history",
+    "annotations": {
+      "type": "negative hli verifier",
+      "importance": "must have",
+      "criterion": "Technical Implementation"
+    }
+  },
+  {
+    "id": "2.4",
+    "title": "Manages the projects collection only in component-local component state rather than NgRx",
+    "annotations": {
+      "type": "negative hli verifier",
+      "importance": "must have",
+      "criterion": "Technical Implementation"
+    }
+  },
+  {
+    "id": "3.1",
+    "title": "Terminal-over-wallpaper composition with CLI and Projects Board density remains tool-like",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Visual Design"
+    }
+  },
+  {
+    "id": "3.2",
+    "title": "Empty projects state is visually present when the collection is empty",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Visual Design"
+    }
+  },
+  {
+    "id": "3.3",
+    "title": "Replaces the terminal with a static marketing portfolio and no command shell",
+    "annotations": {
+      "type": "negative hli verifier",
+      "importance": "must have",
+      "criterion": "Visual Design"
+    }
+  },
+  {
+    "id": "4.1",
+    "title": "Required hover animations are present; boot/CLI reveal and mode switches animate as specified",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "must have",
+      "criterion": "Motion"
+    }
+  },
+  {
+    "id": "4.2",
+    "title": "CLI/Board mode switches update without full reload and keep hover feedback",
+    "annotations": {
+      "type": "positive hli verifier",
+      "importance": "nice to have",
+      "criterion": "Motion"
+    }
+  },
+  {
+    "id": "4.3",
+    "title": "Omits hover washes on project rows or chrome so the terminal feels static on pointer hover",
+    "annotations": {
+      "type": "negative hli verifier",
+      "importance": "must have",
+      "criterion": "Motion"
+    }
+  }
+]
