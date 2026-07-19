@@ -37,8 +37,10 @@ from .validate import TaskValidation, validate_task
 app = typer.Typer(help="Check-only certification for the frontend task corpus.", no_args_is_help=True, add_completion=False)
 record_app = typer.Typer(help="Record external certification evidence.", no_args_is_help=True)
 baseline_app = typer.Typer(help="Manage accepted static-check waivers.", no_args_is_help=True)
+reliability_app = typer.Typer(help="Judge-reliability analysis over ingested trial artifacts.", no_args_is_help=True)
 app.add_typer(record_app, name="record")
 app.add_typer(baseline_app, name="baseline")
+app.add_typer(reliability_app, name="reliability")
 console = Console()
 err = Console(stderr=True)
 DEFAULT_ROOT = str(default_tasks_root())
@@ -613,6 +615,132 @@ window.webmcp_invoke_tool = () => ({ok: false, error: 'nop'});
     (output / "index.html").write_text(index)
     (output / "package.json").write_text(json.dumps(package, indent=2) + "\n")
     console.print(f"[green]NOP scaffold written:[/green] {output}")
+
+
+@reliability_app.command("ingest")
+def reliability_ingest(
+    slug: str,
+    trial: str = typer.Option(..., "--trial", help="trial directory containing verifier/reward-details.json"),
+    label: str = typer.Option(..., "--label", help="name distinguishing this judged run"),
+    db: str = typer.Option(DEFAULT_DB_PATH, "--db"),
+) -> None:
+    """Ingest an existing trial's per-criterion verdicts under a label."""
+    from .reliability import RewardDetailsError, ingest_trial
+
+    with _connection(db) as connection:
+        try:
+            count = ingest_trial(connection, slug, label, trial)
+        except RewardDetailsError as exc:
+            err.print(f"[red]{exc}[/red]")
+            raise typer.Exit(2) from exc
+    console.print(f"[green]ingested[/green] {slug}/{label}: {count} criteria")
+
+
+@reliability_app.command("flips")
+def reliability_flips(
+    slug: str = typer.Argument(None, help="frontend-* task name (omit with --all)"),
+    all_slugs: bool = typer.Option(False, "--all", help="corpus rollup across all ingested slugs"),
+    min_labels: int = typer.Option(2, "--min-labels", min=2),
+    db: str = typer.Option(DEFAULT_DB_PATH, "--db"),
+) -> None:
+    """Report per-criterion pass/fail flip rates across ingested labels."""
+    from .reliability import corpus_flip_rates, flip_rates, mean_flip_rate
+
+    if bool(slug) == all_slugs:
+        err.print("[red]provide a slug or --all (not both)[/red]")
+        raise typer.Exit(2)
+    with _connection(db) as connection:
+        if all_slugs:
+            rows = corpus_flip_rates(connection, min_labels)
+            table = Table(title=f"Corpus flip rates ({len(rows)} criteria)")
+            for heading in ("dimension", "criterion", "slugs", "pairs", "disagreements", "flip-rate"):
+                table.add_column(heading, justify="right" if heading not in ("dimension", "criterion") else "left")
+            for row in rows:
+                table.add_row(row["dimension"], row["criterion_id"], str(row["slugs"]), str(row["pairs"]), str(row["disagreements"]), f"{row['flip_rate']:.3f}")
+            console.print(table)
+            return
+        rows = flip_rates(connection, slug, min_labels)
+    if not rows:
+        err.print(f"[red]{slug}: fewer than {min_labels} ingested labels share any criterion[/red]")
+        raise typer.Exit(1)
+    table = Table(title=f"Flip rates: {slug} ({len(rows)} criteria)")
+    for heading in ("dimension", "criterion", "labels", "pairs", "disagreements", "flip-rate"):
+        table.add_column(heading, justify="right" if heading not in ("dimension", "criterion") else "left")
+    for row in rows:
+        table.add_row(row["dimension"], row["criterion_id"], str(row["labels"]), str(row["pairs"]), str(row["disagreements"]), f"{row['flip_rate']:.3f}")
+    console.print(table)
+    console.print(f"mean flip rate: {mean_flip_rate(rows):.3f}")
+
+
+@app.command("judge-accuracy")
+def judge_accuracy_cmd(db: str = typer.Option(DEFAULT_DB_PATH, "--db")) -> None:
+    """Score the judge against readiness-anchored oracle and NOP trials."""
+    from .reliability import compute_judge_accuracy
+
+    with _connection(db) as connection:
+        results = compute_judge_accuracy(connection)
+    for message in results["errors"]:
+        err.print(f"[red]{message}[/red]")
+    if not results["oracle"] and not results["nop"]:
+        console.print("no readiness rows carry an oracle or NOP trial path")
+        return
+    for slug, per_dimension in sorted(results["oracle"].items()):
+        console.print(f"[bold]{slug}[/bold] (oracle false negatives)")
+        for dimension, entry in sorted(per_dimension.items()):
+            rate = len(entry["criteria"]) / entry["total"] if entry["total"] else 0.0
+            console.print(f"  {dimension}: {len(entry['criteria'])}/{entry['total']} FN (rate {rate:.3f})")
+            for criterion_id in entry["criteria"]:
+                console.print(f"    - {criterion_id}")
+    for slug, per_dimension in sorted(results["nop"].items()):
+        console.print(f"[bold]{slug}[/bold] (vacuous on NOP)")
+        for dimension, entry in sorted(per_dimension.items()):
+            console.print(f"  {dimension}: {len(entry['criteria'])}/{entry['total']} vacuous")
+            for criterion_id in entry["criteria"]:
+                console.print(f"    - {criterion_id}")
+
+
+@reliability_app.command("report")
+def reliability_report(
+    top: int = typer.Option(15, "--top", min=1, help="noisiest criteria to show"),
+    min_labels: int = typer.Option(2, "--min-labels", min=2),
+    db: str = typer.Option(DEFAULT_DB_PATH, "--db"),
+) -> None:
+    """Markdown-style summary: noisy criteria, oracle FN rates, vacuous list, BLOCKED counts."""
+    from .reliability import blocked_counts, corpus_flip_rates, oracle_failing_ids, oracle_fn_rows, vacuous_criteria
+
+    with _connection(db) as connection:
+        noisy = [row for row in corpus_flip_rates(connection, min_labels) if row["flip_rate"] > 0][:top]
+        fn_rows = oracle_fn_rows(connection)
+        failing = {row["slug"]: oracle_failing_ids(connection, row["slug"]) for row in fn_rows if row["fail_count"]}
+        vacuous = vacuous_criteria(connection)
+        blocked = blocked_counts(connection)
+    console.print("# Judge reliability report\n")
+    console.print(f"## Noisiest criteria (flip rate across labels, min {min_labels})")
+    if noisy:
+        for row in noisy:
+            console.print(f"- {row['dimension']}/{row['criterion_id']}: {row['flip_rate']:.3f} ({row['disagreements']}/{row['pairs']} pairs, {row['slugs']} slugs)")
+    else:
+        console.print("- none (no multi-label disagreement ingested)")
+    console.print("\n## Oracle false-negative rates (per dimension)")
+    if fn_rows:
+        for row in fn_rows:
+            console.print(f"- {row['slug']} {row['dimension']}: {row['fail_count']}/{row['total']}")
+        for slug, ids in sorted(failing.items()):
+            console.print(f"  failing on oracle ({slug}): {', '.join(ids)}")
+    else:
+        console.print("- none recorded (run judge-accuracy first)")
+    console.print("\n## Vacuous criteria (pass on the NOP app)")
+    if vacuous:
+        for row in vacuous:
+            console.print(f"- {row['slug']} {row['dimension']}/{row['criterion_id']} (value {row['value']:g})")
+    else:
+        console.print("- none")
+    console.print("\n## BLOCKED verdicts by task (Blocked-vs-Fail taxonomy)")
+    if blocked:
+        for row in blocked:
+            console.print(f"- {row['slug']}: {row['blocked']} BLOCKED of {row['total']} verdicts")
+    else:
+        console.print("- none")
 
 
 if __name__ == "__main__":

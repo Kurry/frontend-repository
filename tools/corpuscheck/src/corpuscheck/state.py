@@ -59,7 +59,27 @@ CREATE TABLE IF NOT EXISTS readiness(
     updated_at TEXT NOT NULL,
     evidence_json TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS verdicts(
+    slug TEXT NOT NULL,
+    label TEXT NOT NULL,
+    dimension TEXT NOT NULL,
+    criterion_id TEXT NOT NULL,
+    value REAL NOT NULL,
+    blocked INTEGER NOT NULL DEFAULT 0,
+    ingested_at TEXT NOT NULL,
+    PRIMARY KEY(slug, label, dimension, criterion_id)
+);
+CREATE TABLE IF NOT EXISTS judge_accuracy(
+    slug TEXT NOT NULL,
+    dimension TEXT NOT NULL,
+    run_kind TEXT NOT NULL CHECK(run_kind IN ('oracle','nop')),
+    fail_count INTEGER NOT NULL,
+    total INTEGER NOT NULL,
+    computed_at TEXT NOT NULL,
+    PRIMARY KEY(slug, dimension, run_kind)
+);
 CREATE INDEX IF NOT EXISTS results_run_slug_idx ON results(run_id, slug);
+CREATE INDEX IF NOT EXISTS verdicts_dim_crit_idx ON verdicts(dimension, criterion_id);
 CREATE INDEX IF NOT EXISTS runs_command_idx ON runs(command, id);
 """
 

@@ -43,7 +43,18 @@ async function appPage() {
       'No open page at http://localhost:3000 — navigate there with the Playwright browser first, then retry.'
     );
   }
-  return matches[matches.length - 1];
+  if (matches.length === 1) return matches[0];
+  // Multiple matching tabs exist (e.g. an app-launched tab plus the judge's
+  // isolated Playwright tab). Tools MUST run on the tab the judge observes,
+  // or state mutates an unobserved twin of the app. Prefer the visible/
+  // focused document; fall back to the most recently opened match.
+  const states = await Promise.all(matches.map(async (p) => {
+    try { return await p.evaluate(() => document.visibilityState); }
+    catch { return 'hidden'; }
+  }));
+  const visible = matches.filter((_, i) => states[i] === 'visible');
+  const pool = visible.length ? visible : matches;
+  return pool[pool.length - 1];
 }
 
 async function callSurface(fn, args) {

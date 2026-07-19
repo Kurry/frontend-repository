@@ -13,6 +13,11 @@ corpuscheck drift --all
 corpuscheck status --all
 corpuscheck advance frontend-workflow-docuseal
 corpuscheck history frontend-workflow-docuseal --limit 10
+corpuscheck reliability ingest SLUG --trial /path/to/trial --label rerun-1
+corpuscheck reliability flips SLUG --min-labels 2
+corpuscheck reliability flips --all
+corpuscheck judge-accuracy
+corpuscheck reliability report
 ```
 
 Every command accepts `--db PATH`. The default database is
@@ -69,6 +74,34 @@ criteria that passed on the empty app.
 
 The NOP scaffold contains an empty body, WebMCP contract stubs, and exactly the
 `start` and `verify:build` scripts needed for a normal Harbor trial.
+
+## Judge reliability
+
+The reliability harness derives ground truth from machine artifacts only — it
+ingests existing trial directories and never launches judged runs or asks for
+human labels. `reliability ingest SLUG --trial DIR --label NAME` parses
+`DIR/verifier/reward-details.json` into the `verdicts` table (one row per
+slug/label/dimension/criterion, replaced on re-ingest); a verdict whose
+reasoning starts with `BLOCKED:` is flagged blocked. Values are treated as
+already normalized: `value < 1` means the criterion failed.
+
+`reliability flips SLUG` reports each criterion's flip rate — the fraction of
+ingested label pairs that disagree on the pass/fail verdict at `value >= 1` —
+requiring at least `--min-labels` (default 2) labels per criterion.
+`reliability flips --all` rolls disagreements up corpus-wide per
+dimension + criterion id.
+
+`judge-accuracy` reuses readiness evidence: an `oracle_certified` slug's stored
+trial path is ingested under the `oracle-anchor` label (if absent) and scored
+for per-dimension oracle false negatives (criteria failing on the known-good
+oracle, with failing ids listed); a `nop_certified`/`trial_ready` slug's stored
+NOP trial is ingested under `nop-anchor` and scored for vacuous criteria
+(criteria passing on the empty app). Summaries persist in the `judge_accuracy`
+table keyed by slug/dimension/run kind.
+
+`reliability report` prints a markdown-style summary: noisiest criteria,
+per-dimension oracle false-negative rates, the vacuous-criteria list, and
+BLOCKED verdict counts by task (the Blocked-vs-Fail taxonomy).
 
 ## Check-only guarantee
 

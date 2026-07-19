@@ -86,6 +86,24 @@
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
   }
 
+  // Cross-tab coherence: the WebMCP bridge attaches to the LAST open tab at the
+  // app origin, while the observing (Playwright-driven) tab may be an earlier
+  // one. Without this, a tool invocation can succeed in one tab while the
+  // observed tab keeps rendering stale state — and later clobber the invoked
+  // tab's fields when it persists. Adopting the persisted state whenever
+  // another same-origin tab writes it keeps every tab rendering the same app
+  // instance.
+  window.addEventListener("storage", function (ev) {
+    if (ev.key !== STORAGE_KEY || !ev.newValue) return;
+    if (drag) return; // never yank the DOM out from under an in-flight drag gesture
+    try {
+      var incoming = JSON.parse(ev.newValue);
+      if (!incoming || !Array.isArray(incoming.templates) || !Array.isArray(incoming.fields)) return;
+      state = incoming;
+      if (els.canvas) render();
+    } catch (e) { /* ignore malformed writes */ }
+  });
+
   // ---------------------------------------------------------------- selectors
   function activeTemplate() {
     return state.templates.filter(function (t) { return t.id === state.activeTemplateId; })[0] || state.templates[0];
@@ -124,10 +142,18 @@
     // Accept type labels case-insensitively ("Text" -> "text") so the WebMCP
     // path and the palette path resolve to the same declared type enum.
     type = String(type || "").toLowerCase();
-    if (VALID_TYPES.indexOf(type) === -1) return { ok: false, error: "Unknown field type" };
+    if (VALID_TYPES.indexOf(type) === -1) {
+      return { ok: false, error: "Unknown field type" + (type ? " '" + type + "'" : "") + ". Valid types: " + VALID_TYPES.join(", ") };
+    }
     var t = activeTemplate();
-    var subId = opts.submitterId && submitterById(opts.submitterId) ? opts.submitterId : state.activeSubmitterId;
-    var page = typeof opts.page === "number" ? Math.max(0, Math.min(opts.page, t.pages - 1)) : 0;
+    // Resolve submitter by id or by visible name; unknown values fall back to the active submitter.
+    var subRef = opts.submitterId;
+    var subMatch = subRef ? (submitterById(subRef) || state.submitters.filter(function (s) { return s.name === subRef; })[0]) : null;
+    var subId = subMatch ? subMatch.id : state.activeSubmitterId;
+    // Coerce page defensively: accept numeric strings, clamp NaN/negatives/out-of-range
+    // to a page that actually renders on the current template.
+    var pageNum = Number(opts.page);
+    var page = isFinite(pageNum) ? Math.max(0, Math.min(Math.round(pageNum), t.pages - 1)) : 0;
     var n = templateFields(t.id).length;
     var field = {
       id: uid("fld"),
@@ -145,6 +171,15 @@
     state.fields.push(field);
     state.selectedFieldId = field.id;
     render();
+    // Postcondition: ok:true must mean the field is visibly rendered on the
+    // current template's canvas. If it is not, roll back and report failure.
+    var rendered = els.canvas && els.canvas.querySelector('.field[data-field-id="' + field.id + '"]');
+    if (!rendered) {
+      state.fields = state.fields.filter(function (x) { return x.id !== field.id; });
+      if (state.selectedFieldId === field.id) state.selectedFieldId = null;
+      render();
+      return { ok: false, error: "Field could not be rendered on the active template" };
+    }
     announce(TYPE_LABEL[type] + " field added");
     return { ok: true, fieldId: field.id, type: type, submitter: (submitterById(subId) || {}).name };
   }
@@ -626,7 +661,7 @@
   var TOOLS = [
     { name: "editor_add", module: "structured-editor-v1", op: "add",
       description: "Place a new form field of a declared type on the active template, assigned to the active or a named submitter.",
-      run: function (a) { return placeField(a.type || a.object_type, { submitterId: a.submitter, page: a.page, name: a.name }); } },
+      run: function (a) { return placeField(a.type || a.object_type || a.field_type || a.fieldType, { submitterId: a.submitter || a.submitterId, page: a.page, name: a.name || a.field_name || a.label }); } },
     { name: "editor_select", module: "structured-editor-v1", op: "select",
       description: "Select a placed field by id (or null to clear selection).",
       run: function (a) { return selectField(a.fieldId || null); } },
@@ -686,10 +721,41 @@
     };
   };
   window.webmcp_list_tools = function () { return TOOLS.map(toolSchema); };
+
+  // Normalise the argument shapes MCP clients actually send: a JSON string,
+  // or the payload nested one level under "arguments"/"args"/"input"/"params"
+  // (e.g. { arguments: { type: "text" } }). Nested keys win over outer ones.
+  function normalizeArgs(args) {
+    var a = args;
+    if (typeof a === "string") {
+      try { a = JSON.parse(a); } catch (e) { return null; }
+    }
+    if (!a || typeof a !== "object" || Array.isArray(a)) return a ? null : {};
+    var WRAPPERS = ["arguments", "args", "input", "params"];
+    for (var depth = 0; depth < 3; depth++) {
+      var unwrapped = false;
+      for (var i = 0; i < WRAPPERS.length; i++) {
+        var w = a[WRAPPERS[i]];
+        if (w && typeof w === "object" && !Array.isArray(w)) {
+          var merged = {};
+          Object.keys(a).forEach(function (k) { if (k !== WRAPPERS[i]) merged[k] = a[k]; });
+          Object.keys(w).forEach(function (k) { merged[k] = w[k]; });
+          a = merged;
+          unwrapped = true;
+          break;
+        }
+      }
+      if (!unwrapped) break;
+    }
+    return a;
+  }
+
   window.webmcp_invoke_tool = function (name, args) {
     var t = TOOLS.filter(function (x) { return x.name === name; })[0];
     if (!t) return { ok: false, error: "Unknown tool: " + name };
-    try { return t.run(args || {}); }
+    var a = normalizeArgs(args == null ? {} : args);
+    if (a === null) return { ok: false, error: "Tool arguments must be a JSON object" };
+    try { return t.run(a); }
     catch (e) { return { ok: false, error: String(e && e.message || e) }; }
   };
   // Optional modelContext mirror
