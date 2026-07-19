@@ -9,3 +9,4 @@ RUN apt-get update && apt-get install -y --no-install-recommends build-essential
 
 WORKDIR /app
 EXPOSE 3000
+COPY reference-screenshots/ /reference-screenshots/

@@ -198,11 +198,17 @@ def validate_shared_shape(task_dir: Path) -> CheckResult:
         comparisons["task.toml"] = package.render_task_toml(
             task_dir.name, description
         ).encode()
+    screenshot_copy = b"COPY reference-screenshots/ /reference-screenshots/\n"
     for rel, expected in comparisons.items():
         path = task_dir / rel
         if not path.is_file():
             continue  # layout owns missing-file reporting
-        if path.read_bytes() != expected:
+        actual = path.read_bytes()
+        if rel == "environment/Dockerfile" and (
+            task_dir / "environment/reference-screenshots"
+        ).is_dir():
+            expected = expected + screenshot_copy
+        if actual != expected:
             messages.append(f"{rel} differs from its canonical renderer/template")
 
     task_toml = task_dir / "task.toml"
