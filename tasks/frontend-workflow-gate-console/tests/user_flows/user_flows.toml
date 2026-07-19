@@ -131,6 +131,27 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "6.11"
+name = "valid_import_reconstructs_every_run_surface"
+description = "Import a valid Acceptance Package JSON whose stage results, certificates, notes, and timeline differ from the selected run, then confirm the stage strip, chain visualization, suite outcomes, gate evidence notes, timeline, and next Export preview all reconstruct the imported document in the same session."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "certificate_markdown_contains_complete_chain"
+description = "Open Certificate Chain Markdown for the selected run and confirm it names the same runId, lists all 5 pipeline stages with their current statuses, and for every passed stage includes its fingerprint plus one gate bullet naming id, severity, and state for each gate."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "invalid_import_names_field_and_preserves_run"
+description = "Attempt to import malformed JSON and a field-invalid acceptance package, then confirm visible validation names the payload or offending field while the selected run's stage statuses, note count, certificates, and timeline remain unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "6.n1"
 name = "primary_flows_unavailable_from_ui"
 description = "Add note, Export acceptance package, Import acceptance package, what-if, or stage re-run controls are missing or non-operable from the UI."

@@ -225,6 +225,48 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "6.13"
+name = "move_note_updates_both_badges_and_folder_id"
+description = "Move a note through its Move to Folder dropdown from one folder to another; the source direct-note badge decreases by one, the destination badge increases by one, the destination view shows the note, All Notes keeps it visible throughout, and Nest JSON updates that note's folderId"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "pin_and_unpin_echo_across_all_notes_and_folder"
+description = "Pin a note in All Notes and confirm it appears in the Pinned section there and in its home-folder view; unpin it from the folder view and confirm it leaves the Pinned section in All Notes while the note itself remains, with Nest JSON pinned false"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "delete_restore_round_trip_updates_badge_and_export_arrays"
+description = "Delete a note from a folder, confirm its folder badge decreases by one and Trash gains exactly one entry, then Restore it; the note returns to its prior folder, the badge returns to its prior count, and Nest JSON moves the record from trash back to notes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.16"
+name = "color_label_edge_bar_matches_every_view"
+description = "Assign a color label to a note and confirm the same colored left-edge bar appears on its folder row, All Notes row, Pinned row when pinned, and matching search result without a reload; Nest JSON records the same color enum"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.17"
+name = "artifact_pipeline_exposes_folder_pin_color_and_round_trip"
+description = "Create a folder and a distinctively titled note inside it, pin the note, set color blue, and open Export Nest; Nest JSON shows schemaVersion notenest-v1 plus that folder and note with pinned true and color blue, Markdown vault shows the title under the folder path, Copy confirms, and downloading then importing that Nest JSON reconstructs the same tree, note, pin, color, and previews"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.18"
+name = "reload_returns_complete_seeded_workspace_baseline"
+description = "After workspace, Trash, selection, and history mutations, a full page reload restores the first-paint seed-only folders and notes, seed-only Trash, empty Undo/Redo, no multi-selection, All Notes selected, and export previews matching that baseline with no partially surviving facet"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "user_flows.catchall"
 name = "user_flows_catchall"
 description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
