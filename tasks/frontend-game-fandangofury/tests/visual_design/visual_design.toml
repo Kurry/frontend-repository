@@ -83,8 +83,8 @@ weight = 1.0
 
 [[criterion]]
 id = "3.4"
-name = "3_4"
-description = "The game uses a dark festival-night arena aesthetic with warm fiesta accent hues, and the Victory screen uses a celebratory treatment clearly differentiated from the ordinary in-combat HUD"
+name = "festival_night_aesthetic_and_end_screens"
+description = "The game uses a dark festival-night arena aesthetic with warm fiesta accent hues, the Victory screen uses a celebratory treatment clearly differentiated from the ordinary in-combat HUD, and the Derrota screen reads as a clear defeat state"
 type = "binary"
 weight = 0.5
 optional = true
@@ -108,6 +108,52 @@ negate = true
 id = "3.7"
 name = "3_7"
 description = "The Mask states or the Stage-map nodes render identically, with no visual distinction between locked, unlocked, and equipped or completed states"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.8"
+name = "cantina_cost_hierarchy_legible"
+description = "The Cantina shows each upgrade's current level and its escalating cost with a clear visual hierarchy so the current tier and the next-tier cost are easy to tell apart at a glance"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.9"
+name = "overlay_chrome_consistent"
+description = "The Cantina, Masks, History, Fighter Settings, and reset-confirmation surfaces share one consistent overlay chrome — panel surface, title treatment, and close control are styled the same way across all five"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "history_panel_regions_distinct"
+description = "The History panel presents the snapshot list, the labelled History state region, the Undo/Redo controls, the Apply Scenario Change action, and any alternate branch as visually distinguishable regions that do not overlap the primary controls"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.11"
+name = "consistent_icon_style"
+description = "Menu and HUD controls use one consistent vector icon style throughout, and the Cantina, Masks, Settings, History, and Reset controls each carry a recognizable icon alongside their label"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.12"
+name = "narrow_overlays_and_buttons_fit"
+description = "At approximately 375px wide the Cantina, Masks, History, Fighter Settings, and reset-confirmation overlays fit within the viewport without horizontal scrolling, and the on-screen action buttons (Strike, Smash, Block, Dodge, Fiesta Fury) stay large enough to tap without overlapping the combat scene's visible enemies or meters"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

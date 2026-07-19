@@ -76,15 +76,8 @@ weight = 1.0
 
 [[criterion]]
 id = "2.3"
-name = "2_3"
-description = "Fonts resolve to the self-hosted families Signifier, Founders Grotesk, and IBM Plex Mono with no request to a web font service"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "2.4"
-name = "2_4"
-description = "The category cover backgrounds compute to the exact colors rgb(30, 75, 215), rgb(12, 120, 102), rgb(88, 30, 112), and rgb(215, 30, 30), which are hex #1E4BD7, #0C7866, #581E70, and #D71E1E, each with white text rgb(255, 255, 255)"
+name = "self_hosted_open_license_fonts"
+description = "Fonts resolve to three self-hosted families — a condensed grotesque display face, a serif text face, and IBM Plex Mono — loaded from the candidate origin with no request to a web font service"
 type = "binary"
 weight = 1.0
 
@@ -110,3 +103,75 @@ description = "A route issues a request to a.storyblok.com, a Vercel Blob host, 
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "2.8"
+name = "hydration_clean_console"
+description = "The console shows no hydration mismatch errors or warnings on first load of any of the ten routes, and none after client-side navigation between routes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "deep_link_parity_all_routes"
+description = "Loading each of the ten routes directly by its URL renders the same view as reaching it through in-app navigation, including the same header or sub-header state and the same exact document title, with no route 404ing or rendering a half-empty shell"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "post_hydration_content_flash"
+description = "Server-rendered content visibly flashes and is replaced by different client content after hydration: text, folders, or media regions re-render visibly or shift the layout as the client takes over"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.11"
+name = "routes_interactive_within_two_seconds"
+description = "Every route becomes interactive within roughly 2 seconds of a local cold load"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.12"
+name = "smooth_frames_and_rapid_navigation"
+description = "Continuous scrolling and the folder open and close transitions hold a smooth frame rate with no visible hitching, and rapid repeated navigation between cases stays responsive with no hangs or stuck transition states"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.13"
+name = "split_headings_keep_accessible_label"
+description = "The character-split display headings (hero title and case architect names) keep their full phrase available to assistive technology through a label on the heading container while the individual character spans stay out of the accessibility tree"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.14"
+name = "keyboard_operability_visible_focus"
+description = "The header wordmark and About item, the architect tags, the sibling tags, the overscroll affordance, and every red circular close button are reachable and operable with the keyboard alone, each showing a visible focus indicator"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.15"
+name = "popup_focus_moves_and_returns"
+description = "Opening a media popup moves keyboard focus into the popup, and closing it returns focus to the element that opened it"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.16"
+name = "single_store_surface_coherence"
+description = "The header hidden state, the case sub-header category name, and the document title all follow the same active case the route shows: after any navigation path (tag, sibling, overscroll, deep link) no surface displays a stale or different case's value"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect (console, network, storage, hydration, performance, or accessibility) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

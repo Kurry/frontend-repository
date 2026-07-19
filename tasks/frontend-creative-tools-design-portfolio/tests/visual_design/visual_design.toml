@@ -62,22 +62,73 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
-description = "Terminal-over-wallpaper composition with CLI and Projects Board density remains tool-like"
+name = "terminal_wallpaper_composition"
+description = "A full-bleed atmospheric wallpaper frames one centered terminal window with macOS traffic lights and the title designer@portfolio ~ /portfolio, reading as a terminal tool rather than a multi-section marketing page"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
-description = "Empty projects state is visually present when the collection is empty"
+name = "terminal_content_hierarchy"
+description = "JetBrains Mono styling, ASCII art, the two-column welcome box, echoed prompts, headings, skill bars, testimonials, awards, and project detail chips form a legible dense hierarchy inside the terminal"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "four_coherent_themes"
+description = "Dark, light, retro, and glass themes restyle the complete terminal coherently; retro visibly uses CRT scanline/glow cues and glass uses translucent surfaces while text remains readable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "material_style_dense_controls"
+description = "Buttons, overlay controls, feedback banners or snackbars, tooltips, forms, and dense controls share a polished component treatment that fits the terminal chrome rather than browser-default styling"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "projects_board_visual_structure"
+description = "Projects Board uses dense cards or rows with consistent status badges, tag chips, stat chips, aligned controls, and a clearly styled empty state inside the terminal body"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "overlay_visual_fidelity"
+description = "The exit overlay changes titlebar text to an exit path and shows red kill lines plus reconnect controls, while matrix and confetti canvases visibly cover the viewport without displacing terminal layout"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "responsive_terminal_layout"
+description = "At roughly 375px wide the terminal remains readable, welcome content and project rows adapt without clipped text or page-level horizontal overflow, and all prompt and overlay controls remain reachable"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
-description = "Replaces the terminal with a static marketing portfolio and no command shell"
+name = "marketing_layout_replaces_terminal"
+description = "A conventional marketing hero, navigation, and stacked promotional sections replace or visually overwhelm the required single terminal-over-wallpaper composition"
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "3.9"
+name = "theme_or_content_visual_breakage"
+description = "A required theme, welcome column, project board, overlay, or dense control surface has unreadable contrast, overlapping content, clipped controls, or visibly default inconsistent styling"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable visual-design defect that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence that demonstrates it. If the defect is already covered even partially by another criterion, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

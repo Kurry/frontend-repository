@@ -62,8 +62,8 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
-description = "Loading the app and performing a core workflow of setup, draw, Done, Skip, and adding a custom card produces no uncaught JavaScript errors in the console."
+name = "console_clean_no_hydration_issues"
+description = "Loading the app and performing a full workflow of setup, draw, Done, Skip, adding a custom card, and exercising the live event feed produces a console free of errors, warnings, and hydration mismatch messages."
 type = "binary"
 weight = 1.0
 
@@ -127,3 +127,40 @@ description = "The app renders or behaves differently depending on whether it is
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "4.10"
+name = "keyboard_operability_complete"
+description = "Every interactive control on the setup and play screens is reachable and operable with the keyboard alone, with a visible focus indicator shown on each control as Tab moves through them."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "dialog_focus_management"
+description = "Confirmation dialogs trap Tab focus while open, close on Escape, and return focus to the control that opened them."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "selected_state_exposed_to_at"
+description = "Category chips and intensity buttons expose their selected state in the accessibility tree rather than through color alone, and inline validation errors are rendered next to the field they describe and announced to assistive technology when they appear."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "interactive_within_two_seconds"
+description = "On a local cold load the setup screen renders and responds to input within 2 seconds, and controls stay responsive while the round timer runs and the live event feed stream is active."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, console message, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

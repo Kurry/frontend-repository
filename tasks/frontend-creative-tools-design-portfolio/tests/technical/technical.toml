@@ -62,30 +62,74 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "2.1"
-name = "2_1"
-description = "NgRx holds projects, command history, theme, and mode — shared across components"
+name = "shared_state_surface_coherence"
+description = "Project mutations, command history, output, autocomplete, theme, active mode, filters, and consent remain mutually coherent across every visible terminal and board surface during interleaved interactions"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
-name = "2_2"
-description = "Implemented with Angular, NgRx, and Angular Material; no browser storage APIs for persistence"
+name = "local_assets_and_theme_tokens"
+description = "Computed styles expose the required theme-token behavior and locally rendered component styling, while the browser network log shows scripts, styles, fonts, icons, and animation assets loading from the app origin with no third-party CDN requests"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "in_memory_reload_reset"
+description = "After creating and filtering a project, changing mode and theme, building command history, and setting consent, a full reload coherently resets all facets to the seeded session baseline with browser localStorage and sessionStorage empty"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "console_clean_primary_flows"
+description = "Initial load and the boot, command, project CRUD, filter, theme, window, consent, form-validation, and easter-egg flows produce no uncaught exception, unhandled rejection, hydration-style mismatch warning, or failed same-origin asset request"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "single_page_route_coherence"
+description = "Section-title changes, theme changes, mode switches, inert controls, and close/reopen behavior keep the same URL and mounted single-page state without a blank screen or content flash"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "form_error_state_integrity"
+description = "Invalid and extreme project form input produces specific inline per-field feedback before submit, preserves the last valid state, and repeated identical submissions do not create duplicate records"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
-name = "2_3"
-description = "Uses localStorage or sessionStorage to persist projects, theme, or history"
+name = "forbidden_browser_storage"
+description = "Project, command, theme, mode, filter, output, autocomplete, or consent data appears in localStorage, sessionStorage, IndexedDB, or another persistent browser storage surface after exercise"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "2.4"
-name = "2_4"
-description = "Manages the projects collection only in component-local component state rather than NgRx"
+name = "visible_state_desynchronization"
+description = "A project, theme, consent status, active mode, filter result, command history entry, or output datum visibly disagrees between two surfaces during the same session"
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "2.9"
+name = "cdn_or_outbound_dependency"
+description = "The browser requests a script, stylesheet, font, icon, component asset, analytics endpoint, or animation dependency from a third-party origin during load or interaction"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence that demonstrates it. If the defect is already covered even partially by another criterion, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

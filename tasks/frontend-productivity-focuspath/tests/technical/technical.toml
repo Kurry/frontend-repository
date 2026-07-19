@@ -90,8 +90,8 @@ weight = 1.0
 
 [[criterion]]
 id = "2.5"
-name = "2_5"
-description = "Creating a goal, adding a milestone, and toggling steps produces no uncaught JavaScript errors or unhandled promise rejections in the console."
+name = "console_clean_full_exercise"
+description = "A full exercise of the app — creating, editing, reordering, focusing, completing, deleting, and driving the live stream controls — produces no console errors or warnings, uncaught JavaScript exceptions, or unhandled promise rejections."
 type = "binary"
 weight = 1.0
 
@@ -112,8 +112,8 @@ weight = 1.0
 
 [[criterion]]
 id = "2.8"
-name = "2_8"
-description = "No hidden element, attribute, or window global exposes internal ground-truth state (computed answers, completion, or focus state) unreachable through normal visible interaction."
+name = "hidden_ground_truth_state"
+description = "A hidden element, attribute, or unexpected window global exposes internal ground-truth state (computed answers, completion, or focus state) unreachable through normal visible interaction."
 type = "binary"
 weight = 1.0
 negate = true
@@ -138,6 +138,57 @@ negate = true
 id = "2.11"
 name = "2_11"
 description = "The app renders or behaves differently depending on whether it is driven by automation (keys behavior on navigator.webdriver or automation signals)."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.12"
+name = "keyboard_operable_visible_focus"
+description = "Every interactive control (buttons, checkboxes, reorder arrows, Focus Today toggles, stream controls) is reachable and operable with the keyboard alone, showing a visible focus indicator as it is reached."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.13"
+name = "labeled_fields_adjacent_errors"
+description = "Form fields carry visible labels, and inline validation messages are rendered in the DOM adjacent to the field they describe."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.14"
+name = "state_distinguishable_without_color"
+description = "Checked versus unchecked step states, disabled reorder controls, and the read-only completed path are each distinguishable without relying on color alone (e.g. via icons, strikethrough, borders, or text)."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.15"
+name = "interactive_within_2s"
+description = "The app is interactive within 2 seconds of a local cold load."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.16"
+name = "cross_view_state_coherence"
+description = "A change made in one view (a step toggle, an inline edit, a focus toggle) is immediately reflected in every other view showing that datum — overview card, detail path, and Today's Focus panel — without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.17"
+name = "external_network_requests"
+description = "The network log shows outbound requests to external origins (CDN scripts, fonts, icons, or APIs) during load or a full exercise of the app."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, console line, network entry, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

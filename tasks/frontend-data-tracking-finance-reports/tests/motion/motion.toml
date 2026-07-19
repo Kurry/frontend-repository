@@ -62,8 +62,8 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
-description = "Required hover animations are present; chart tab and toast motion behave as specified"
+name = "hover_states_via_real_pointer"
+description = "Verified through real pointer hover: sidebar/nav items and action controls show a pointer cursor and a hover wash, transaction rows take a light mint wash, chart sectors keep a pointer cursor, and interactive controls show focus-visible rings"
 type = "binary"
 weight = 1.0
 
@@ -82,3 +82,39 @@ description = "Omits hover washes on rows or nav so the reports chrome feels sta
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "4.4"
+name = "pill_toggle_swaps_panel_in_place"
+description = "Clicking the Breakdown/Trends pill toggle swaps the chart panel in place with no page reload, and the active pill gains visibly stronger weight"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "row_add_remove_animates"
+description = "Driven through the real UI controls (never a state shortcut): a newly created transaction row animates into the table, a deleted row animates out, and bulk delete animates each removed row rather than snapping the list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "toast_enters_holds_exits"
+description = "A demo toast (e.g. from clicking Export CSV or a non-active nav item) enters from below with a short ease, holds briefly, then exits and clears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "reduced_motion_instant_and_reachable"
+description = "With prefers-reduced-motion enabled, entry/exit animations are removed and state changes apply instantly, while every feature stays reachable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

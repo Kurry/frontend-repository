@@ -1,14 +1,14 @@
 <summary>
-Build a PaneCraft dashboard builder using Svelte 5 in runes mode, shared runes state ($state/$derived), and Tailwind CSS.
+Build a PaneCraft dashboard builder using Svelte 5 in runes mode, shared runes state ($state/$derived), Tailwind CSS 4.3.2, and shadcn-svelte.
 </summary>
 
 <reference_screenshots>
 Screenshots of the reference application are provided in-container at
-`/reference-screenshots/`: `overview.png` is a full-page desktop-layout
-overview (downscaled); `segment-NN.png` are full-resolution 1440x900 sections
+/reference-screenshots/: overview.png is a full-page desktop-layout
+overview (downscaled); segment-NN.png are full-resolution 1440x900 sections
 in top-to-bottom order with slight overlap. They are part of this instruction:
 recreate what they show. Where a screenshot and the text conflict, the text
-wins. Do not copy the images into `/app` or ship them as app assets.
+wins. Do not copy the images into /app or ship them as app assets.
 </reference_screenshots>
 
 <core_features>
@@ -52,7 +52,7 @@ Status pill badges and the size-toggle selected state give an at-a-glance visual
 </motion>
 
 <requirements>
-Framework and state: Svelte 5 components in runes mode; shared application state lives in a single runes-based store module using $state and $derived (pages, active page, panes, date range, dialog visibility, and the collaboration offline flag), imported by every component so all views stay coherent. Style with Tailwind CSS and its Vite plugin. Charts are hand-rolled inline SVG with no charting library. d3 is available for scales and helpers and yjs for collaboration merge helpers; no other component or charting libraries may be added.
+Framework and state: Svelte 5 components in runes mode; shared application state lives in a single runes-based store module using $state and $derived (pages, active page, panes, date range, dialog visibility, and the collaboration offline flag), imported by every component so all views stay coherent. Styling is Tailwind CSS 4.3.2 (pinned), with design tokens in @theme and its Vite plugin. Use shadcn-svelte components for dialogs, the pane wizard, tabs, toggles, selects, tables, confirmations, and transient feedback; no other external component library. Use LayerChart for line, bar, donut, and other chart panes, with d3 available for scales and helpers, and yjs for collaboration merge helpers; no other charting or collaboration libraries may be added. svelte-motion is allowed for pane, control-row, tab, feedback, and state-change transitions; no other animation libraries. Phosphor icons via phosphor-svelte only; no raw pasted SVG icon sets and no icon CDNs. All forms, including pane create/edit, page naming, saved analyses, and collaboration conflict resolution, validate through a Zod schema driven by Felte or TanStack Form for Svelte and render inline per-field errors before submit. All libraries are installed via npm and bundled locally; no CDN imports.
 Persistence: user-configured state persists to localStorage under the key panecraft-state — the list of pages, and for each page its panes with their type, source, metric, dimension, size, order, and refresh-interval, plus the active page id. Saved analyses persist under panecraft-saved-analyses and the collaboration shared content under panecraft-collaboration. A full page reload restores the exact configuration. The three bundled mock data sources are always present from the app's source and are never persisted; localStorage access is guarded so the build does not crash when storage is unavailable.
 Create/edit/delete: creating a pane appends it to the active page; editing updates it in place preserving grid position; deleting removes it after a confirmation. Pages can be created, renamed, and deleted (with confirmation, never the last one). Panes reorder through Move controls within a four-column grid with boundary controls disabled, and resize through the Small/Medium/Large toggle.
 Filtering and views: the shared date-range control filters every time-series pane on the current page at once; the data-source preview has its own independent row filter; the saved-analysis workspace offers two views and combined search/filter/sort/selection with a clear action.

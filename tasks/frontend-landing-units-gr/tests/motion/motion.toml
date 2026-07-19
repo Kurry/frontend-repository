@@ -62,21 +62,21 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "mo-fouc"
-name = "mo-fouc"
+name = "body_opacity_gate_no_fouc"
 description = "The body is opacity-gated at load (starts hidden) and is revealed after scripting runs rather than flashing unstyled content"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "mo-skeleton"
-name = "mo-skeleton"
+name = "skeleton_intro_hero_height_reveal"
 description = "On first load a skeleton intro plays and the hero image-wrap reveals via a height animation from 0 to full, after which the skeleton container is removed"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "mo-herostagger"
-name = "mo-herostagger"
+name = "hero_headline_cta_stagger_in"
 description = "The hero headline and CTA stagger into place from a lower, faded start as the intro completes"
 type = "binary"
 weight = 0.5
@@ -84,14 +84,14 @@ optional = true
 
 [[criterion]]
 id = "mo-marquee-red"
-name = "mo-marquee-red"
+name = "red_marquee_constant_linear_loop"
 description = "In the settled state the red marquee (rgb(234, 55, 55)) continuously loops its phrases horizontally: its track translateX advances measurably (roughly 100px per second) between two samples with no easing"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "mo-marquee-blue"
-name = "mo-marquee-blue"
+name = "blue_marquee_constant_loop"
 description = "In the settled state the blue marquee (rgb(0, 114, 227)) is continuously looping its phrases horizontally at a constant speed"
 type = "binary"
 weight = 0.5
@@ -99,7 +99,7 @@ optional = true
 
 [[criterion]]
 id = "mo-menu"
-name = "mo-menu"
+name = "menu_overlay_fade_open_close"
 description = "Clicking the hamburger control opens the full-screen menu overlay with an opacity fade and adds a menu-open state, and the close control fades it back out"
 type = "binary"
 weight = 0.5
@@ -107,15 +107,15 @@ optional = true
 
 [[criterion]]
 id = "mo-swiper-motion"
-name = "mo-swiper-motion"
-description = "Clicking the living Swiper next control produces a visible slide transition (roughly 800ms) rather than an instant jump"
+name = "carousel_slide_transition_visible"
+description = "Clicking the living carousel next control produces a visible slide transition (roughly 800ms) rather than an instant jump"
 type = "binary"
 weight = 0.5
 optional = true
 
 [[criterion]]
 id = "mo-cursor-press"
-name = "mo-cursor-press"
+name = "cursor_press_scale_down_release_restore"
 description = "On a desktop viewport, pressing the mouse button scales the custom block cursor down and releasing restores it"
 type = "binary"
 weight = 0.5
@@ -123,7 +123,7 @@ optional = true
 
 [[criterion]]
 id = "mo-arrows"
-name = "mo-arrows"
+name = "arrows_bands_repeating_bounce"
 description = "The arrows-header bands animate their arrow groups with a repeating bounce"
 type = "binary"
 weight = 0.5
@@ -131,24 +131,62 @@ optional = true
 
 [[criterion]]
 id = "mo-hover"
-name = "mo-hover"
+name = "hover_feedback_on_interactive_chrome"
 description = "Hovering nav items, buttons, and CTAs produces clear color/fill/underline or wash feedback, and keyboard focus remains visible on interactive controls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "mo-neg-static"
-name = "mo-neg-static"
-description = "The marquee bands are static and do not loop in the settled state (their track transform does not change between samples)"
+name = "marquees_static_in_settled_state"
+description = "The marquee bands sit static in the settled state, their track transform unchanged between two samples taken a second apart"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "mo-neg-cursor"
-name = "mo-neg-cursor"
+name = "custom_cursor_shown_on_mobile"
 description = "The custom block cursor is shown at a 390px-wide mobile viewport instead of being hidden below 1024px"
 type = "binary"
 weight = 0.5
 negate = true
 optional = true
+
+[[criterion]]
+id = "mo-scrollreveal"
+name = "scroll_reveal_fade_rise_once"
+description = "On a fresh page load, scrolling a section info block into view for the first time fades and rises it into place from a lower, transparent start, and the reveal plays only once per load (verified by real scrolling, never a state shortcut)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "mo-reducedmotion"
+name = "reduced_motion_disables_loops_keeps_content"
+description = "With prefers-reduced-motion emulated on a fresh load, the skeleton intro, marquee loops, cursor motion, and scroll reveals are disabled while all page content remains present and readable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "mo-shapeoverlay"
+name = "hover_shape_overlay_morph"
+description = "Hovering a menu or color button fills it with a shape overlay whose paths morph from closed toward open over roughly a second, drawing from the brand overlay color family (#EA3737, #004E9B, #FFB200, #FF5C38, #0072E3)"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "mo-bodytransition"
+name = "body_background_transition_token"
+description = "getComputedStyle on the body reports a background transition of 1.8s with cubic-bezier(0.19, 1, 0.22, 1) easing"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "motion.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

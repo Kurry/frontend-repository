@@ -62,14 +62,14 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
+name = "hover_states_visible"
 description = "Hovering (without clicking) a toolbar button, a board tab, and a placed canvas object each produces a visible hover change distinct from the resting state."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "4_2"
+name = "pressed_scale_feedback"
 description = "Pressing and holding a primary button shows an immediate pressed response (a slight scale-down) before its action completes."
 type = "binary"
 weight = 0.5
@@ -77,15 +77,15 @@ optional = true
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
-description = "Dragging a placed object with the pointer shows a lift/ghost affordance while dragging, and pressing Escape mid-drag returns it to its starting position."
+name = "drag_lift_ghost_escape"
+description = "Dragging a placed object with the pointer shows a lift affordance and a dashed ghost outline at its origin while dragging, and pressing Escape mid-drag returns it to its starting position."
 type = "binary"
 weight = 0.5
 optional = true
 
 [[criterion]]
 id = "4.4"
-name = "4_4"
+name = "connect_preview_line_follows"
 description = "In connect mode, after clicking the first object a dashed preview line follows the cursor toward the second object before the connector is completed."
 type = "binary"
 weight = 0.5
@@ -93,15 +93,60 @@ optional = true
 
 [[criterion]]
 id = "4.5"
-name = "4_5"
+name = "focus_ring_distinct_from_hover"
 description = "Pressing Tab moves keyboard focus through the non-canvas controls with a clearly visible focus ring on each, distinct from the hover state."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "4_7"
-description = "Interactive controls (buttons, tool toggles, board tabs, canvas objects) show no visible hover or focus response, so the interface feels inert to pointer and keyboard."
+name = "hover_focus_inert"
+description = "Hovering or focusing interactive controls (buttons, tool toggles, board tabs, canvas objects) leaves them visually identical to their resting state, so the interface feels inert to pointer and keyboard."
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "4.8"
+name = "object_entrance_exit_animates"
+description = "A new object created through its real toolbar control animates in with a brief scale-and-fade entrance, and a deleted object animates out before disappearing rather than vanishing instantly."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "outline_rows_animate_moves"
+description = "In the Outline view, rows animate smoothly to their new positions when objects are added, removed, or restacked through the visible controls, rather than snapping."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.10"
+name = "flip_transition_and_search_glow"
+description = "Activating a flashcard's Flip control plays a visible flip transition between Front and Back rather than an instant swap, and matching objects during a search show an animated-feeling outer glow."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "dialog_popover_fade_scale"
+description = "Modal dialogs (delete confirmation, export) and popovers (rename, shape menu) enter with a short fade-and-scale transition over a dimmed backdrop and exit the same way."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "reduced_motion_instant_usable"
+description = "With prefers-reduced-motion set, entrance, flip, and list animations are removed and state changes apply instantly, while every feature stays fully usable."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or interaction feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, gesture, observed transition) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

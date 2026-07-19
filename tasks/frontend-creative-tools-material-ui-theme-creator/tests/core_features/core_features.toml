@@ -111,8 +111,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
-description = "After submitting create with an empty required theme name, the saved themes count does not increase and validation feedback is visible"
+name = "empty_name_create_rejected_inline"
+description = "With the New Theme name field empty, the submit control is disabled; attempting submission surfaces an inline validation message naming the name field, and the saved themes count does not increase"
 type = "binary"
 weight = 1.0
 
@@ -194,13 +194,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.20"
-name = "1_20"
-description = "Renders visible validation feedback when create is submitted with empty required fields, and the collection count does not increase"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.21"
 name = "1_21"
 description = "Saved themes list is static HTML only with no working create/edit/delete against shared state"
@@ -240,11 +233,10 @@ optional = true
 
 [[criterion]]
 id = "1.26"
-name = "1_26"
-description = "Loading a saved theme writes its options into the Monaco source, tool controls, and preview, and deleting the loaded theme clears it from active selection"
+name = "delete_loaded_theme_clears_active"
+description = "Starting with a saved theme loaded: note the saved themes count, delete that same theme, and confirm its card disappears, the list count decreases by exactly one measured immediately around the delete, and no surface (editor toolbar, saved list, preview) still marks it as the active/loaded theme"
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "1.27"
@@ -262,3 +254,102 @@ type = "binary"
 weight = 0.5
 negate = true
 optional = true
+
+[[criterion]]
+id = "1.29"
+name = "create_theme_multi_surface_flow"
+description = "Scripted probe: note the saved themes count, submit New Theme with the valid name 'Harbor Indigo', and confirm the count increases by exactly one measured immediately around the submit, the new card shows 'Harbor Indigo', and after switching to Preview and back to Saved Themes the card is still present without a page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "load_theme_reflected_across_tabs"
+description = "Scripted probe: load a seeded saved theme with a visibly distinct palette, then confirm the editor source, tool controls, and framed sample site all reflect its options immediately, the Components tab demos show the same theme without a reload, and the theme stays active after cycling through Preview, Components, and Saved Themes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "palette_change_echoes_in_components_tab"
+description = "Scripted probe: change the primary color from the Palette tool to a clearly different value, confirm the preview surfaces recolor and the matching value is rewritten in the editor source, then open the Components tab and confirm the same new color is visible in the component demos without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "palette_type_persists_across_tabs"
+description = "Scripted probe: toggle the palette type from light to dark (or dark to light), confirm preview surfaces and the editor source recolor immediately, then switch through Preview, Components, and Saved Themes and confirm the chosen type remains applied in each"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "rename_and_save_options_roundtrip"
+description = "Scripted probe: rename a saved theme to 'Evening Paper Two' and confirm the same card updates with no duplicate created; then edit the active options, use the save control, load a different theme, reload 'Evening Paper Two', and confirm it reproduces the edited options"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "invalid_source_diagnostics_shell_usable"
+description = "After editing the theme source into invalid TypeScript, diagnostics are surfaced in the editor region while the main tabs, preview, and tool controls keep working with the last valid options"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "saved_theme_search_no_match_and_reset"
+description = "Typing in the saved-themes search narrows the list to matching names, a query matching nothing shows an empty result state, and clearing the search restores the full list to exactly its prior contents"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "undo_redo_disabled_at_boundaries"
+description = "Undo and redo toolbar controls are disabled when their history direction is empty, and activating them at a history boundary produces no console error or crash"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "double_submit_creates_single_theme"
+description = "Scripted probe: note the saved themes count, double-activate the New Theme submit control with a valid name, and confirm exactly one new card appears and the count increases by exactly one"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "editor_toolbar_copy_and_save_status"
+description = "The editor toolbar exposes Editor Settings, a Copy theme code control that gives visible feedback when activated, undo/redo, and a save control whose status reads 'All changes saved' when the source matches the active theme"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "fonts_typography_snippets_tools_work"
+description = "The Fonts tool adds a font by name from the locally bundled set so it becomes available to Typography and preview text, the Typography tool changes font family/size of preview variants, and the Snippets tool visibly applies a built-in snippet into the theme source"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "tutorial_opens_in_page_modal"
+description = "Activating the Tutorial control opens an in-page modal/flow without navigating away, and the modal can be closed to return to the workspace"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.41"
+name = "inert_affordances_never_navigate"
+description = "The version chip, GitHub icon, and per-component Docs affordances look interactive but activating them never navigates away from the app"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered - even partially - by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

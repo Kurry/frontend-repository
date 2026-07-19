@@ -62,21 +62,21 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
+name = "docs_tool_density"
 description = "Storyboard workspace with Tile/List/Slide density remains a docs tool, not a marketing landing"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
-description = "Empty board state is visually present when no scenes remain"
+name = "empty_board_state_visible"
+description = "When no scenes remain, the board shows a clearly visible empty state whose copy explains that no scenes remain and how to add one"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
+name = "static_poster_only"
 description = "Shows only a static tutorial poster with no editable scene collection"
 type = "binary"
 weight = 1.0
@@ -84,8 +84,74 @@ negate = true
 
 [[criterion]]
 id = "3.4"
-name = "3_4"
+name = "sidebar_beside_scene_grid"
 description = "A left storyboard sidebar with Add Storyboard and a Help footer sits beside a multi-column scene grid, giving docs/storyboard chrome density rather than a marketing landing"
 type = "binary"
 weight = 0.5
 optional = true
+
+[[criterion]]
+id = "3.5"
+name = "light_yellow_gabarito_theme"
+description = "The workspace uses a light theme with a yellow accent color and one consistent rounded sans-serif UI typeface (Gabarito-style) applied across header, sidebar, cards, and forms"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "consistent_icon_set"
+description = "Icons across header tools, kebab menus, view-mode toggles, and drawers come from one consistent icon set with a matching visual style"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "component_state_treatments"
+description = "Buttons, toggles, and form fields show distinct default, hover, focus (visible ring), disabled, and error treatments"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "sidebar_collapses_to_drawer"
+description = "At desktop widths the left sidebar is open beside the scene grid; at 1024px width and below it collapses behind a toggle that opens it as an overlay drawer"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "grid_columns_step_down"
+description = "The scene grid shows multiple columns at desktop width, fewer columns at tablet widths, and a single column at 375px width"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "mobile_overflow_or_unreachable"
+description = "At 375px width, content clips or overflows the viewport, horizontal scrolling appears, or header tools and view-mode toggles become unreachable"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.11"
+name = "placeholder_copy_present"
+description = "Lorem ipsum, TODO, or other placeholder text is visible somewhere in the shipped UI"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.12"
+name = "consistent_copy_conventions"
+description = "Headings, buttons, and toasts follow one consistent capitalization convention, and demo-only toasts use consistent wording across all inert controls"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

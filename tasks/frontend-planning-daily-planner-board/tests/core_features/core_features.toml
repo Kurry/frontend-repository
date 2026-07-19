@@ -62,140 +62,119 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
-description = "On load, the board shows day columns from Monday July 6 through Sunday July 26, with the July 18 column labeled Shutdown and future columns labeled Plan"
+name = "board_shows_21_day_columns_with_action_labels"
+description = "On load, the central board renders 21 day columns from Monday July 6 through Sunday July 26, horizontally scrollable, with each column header showing its weekday and date, and per-column action labels reading Reflect for July 6 through 17, Shutdown for July 18, and Plan for July 19 through 26"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
-description = "On load, the July 18 column shows the seeded tasks Set up Cadence and Weekly planning, each with an unchecked checkbox and a #work channel tag"
+name = "july18_seeded_tasks_with_checkbox_and_channel_tag"
+description = "On load, the July 18 column shows the seeded tasks Set up Cadence and Weekly planning, each with an unchecked completion checkbox and a #work channel tag"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
-description = "On load, the Set up Cadence task shows a 0:20 planned-time chip and an expanded subtask list containing Add a task, Complete daily planning, Add integrations, Add channels, and Add recurring tasks"
+name = "setup_cadence_chip_notes_and_subtasks"
+description = "On load, the Set up Cadence task shows a 0:20 planned-time chip, a notes indicator, and an expanded subtask checklist containing Add a task, Complete daily planning, Add integrations, Add channels, and Add recurring tasks"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
+name = "work_task_start_time_and_column_total"
 description = "On load, the July 20 column shows the Work task with a 9:00 am scheduled start and a 1:00 planned-time chip, and the July 20 column footer reads a planned total of 1:00"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
+name = "july18_footer_total_reads_0_20"
 description = "On load, the July 18 column footer reads a planned total of 0:20"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
+name = "add_task_appends_card_to_column"
 description = "After adding a task titled Review inbox to the July 21 column via its Add task control, the text Review inbox is visible in that column"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
+name = "added_planned_time_updates_footer_total"
 description = "After adding a task with a planned time of 0:30 to the July 21 column, that column's planned-time footer total updates from 0:00 to reflect the new task"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
-description = "After submitting Add task with an empty title, no new task is added to the column and visible validation feedback appears"
+name = "empty_title_rejected_without_state_change"
+description = "Submitting Add task with an empty required title shows visible validation feedback naming the title field, adds no task, and leaves that column's card count and planned-time footer total unchanged"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
+name = "edit_title_updates_board_card"
 description = "After editing the Daily planning task title to Plan the week, the text Plan the week is visible and Daily planning is not"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
+name = "delete_removes_card_from_column"
 description = "After deleting the Weekly planning task from the July 18 column, Weekly planning is no longer visible in that column"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
+name = "checkbox_marks_task_completed"
 description = "After clicking the Work task's completion checkbox, the task renders in a completed state and remains listed"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
-description = "The right calendar panel titled Calendars shows a 1x control, a Sat 18 day header, an all-day event reading Automatic Bill Payment - Sallie Mae, and an hour ruler from 12 AM through 11 PM"
+name = "calendar_panel_content_matches_spec"
+description = "The right calendar panel titled Calendars shows a 1x zoom control, a Sat 18 day header, an all-day event reading Automatic Bill Payment - Sallie Mae, and an hour ruler listing every hour from 12 AM through 11 PM"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "1_13"
-description = "When clicking a non-active left-nav item such as Focus or the board Filter control, a demo toast appears and the multi-day board stays in view without navigating away"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.14"
-name = "1_14"
-description = "When hovering nav items, task cards, or right-rail buttons, a visible hover wash, border, or shadow change appears"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.15"
-name = "1_15"
-description = "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session"
+name = "chrome_controls_show_demo_toast_in_place"
+description = "Clicking a non-active left-nav item (for example Focus), the board Filter control, a right-rail Search, GitHub, Backlog, Archive, or Objectives button, Add folder, Invite someone, or the bottom-corner help button shows a brief demo toast and keeps the board in view without navigating anywhere"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.16"
-name = "1_16"
-description = "Tasks are a working collection: a task can be created in a day column via Add task, edited, completed via its checkbox, and deleted, with the board updating from shared application state and no full page reload"
+name = "task_crud_works_from_shared_state"
+description = "Tasks are a working collection: a task can be created in a day column via Add task, opened and edited (title, channel, planned time, scheduled start), completed via its checkbox, and deleted, with the board updating from shared application state and no full page reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.17"
-name = "1_17"
+name = "footer_totals_derived_and_recompute"
 description = "Each day column's planned-time footer total is derived from that column's tasks: it reads 0:20 for July 18 and 1:00 for July 20 on load, and recomputes when a task's planned time changes or a task is added or deleted in that column"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.18"
-name = "1_18"
+name = "board_and_calendar_read_same_collection"
 description = "Two interaction modes read from the same tasks collection: the multi-day board and the right calendar day panel, and selecting a different day updates the calendar panel in place without a full page reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.19"
-name = "1_19"
-description = "Submitting Add task with an empty required title shows visible validation feedback and does not append a task to the column"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.20"
-name = "1_20"
+name = "seed_is_exactly_four_tasks"
 description = "The board seeds exactly the four tasks Set up Cadence and Weekly planning (July 18), Daily planning (July 19), and Work (July 20), and Set up Cadence carries the five subtasks Add a task, Complete daily planning, Add integrations, Add channels, and Add recurring tasks"
 type = "binary"
 weight = 0.5
@@ -203,7 +182,7 @@ optional = true
 
 [[criterion]]
 id = "1.21"
-name = "1_21"
+name = "static_board_without_working_crud"
 description = "The day columns are static HTML with no working Add task, edit, complete, or delete against shared task state"
 type = "binary"
 weight = 1.0
@@ -211,7 +190,7 @@ negate = true
 
 [[criterion]]
 id = "1.22"
-name = "1_22"
+name = "chrome_control_navigates_offsite"
 description = "A chrome-only control (a non-active left-nav item such as Focus, the board Filter control, or a right-rail button such as Search, GitHub, Backlog, Archive, or Objectives) navigates via a real outbound link to another origin instead of showing a demo toast and keeping the board in view"
 type = "binary"
 weight = 1.0
@@ -219,9 +198,101 @@ negate = true
 
 [[criterion]]
 id = "1.23"
-name = "1_23"
+name = "hardcoded_footer_total_never_changes"
 description = "The per-column planned-time footer shows a hardcoded value that does not change when a task is added to or deleted from that column"
 type = "binary"
 weight = 0.5
 negate = true
 optional = true
+
+[[criterion]]
+id = "1.24"
+name = "inline_validation_disables_submit_until_valid"
+description = "In the Add task and task edit forms, an invalid field shows an inline error message naming that field before submit, and the submit control stays disabled until every required field is valid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "nav_rail_groups_and_account_footer"
+description = "The left nav rail shows the Cadence wordmark; primary items Home (rendered active), Today, and Focus; a Daily rituals group (Daily planning, Daily shutdown, Daily highlights); a Weekly rituals group (Weekly planning, Weekly review); Backlog; Add folder and Invite someone controls; and an account footer reading Alex Rivera and alex.rivera@example.com"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "utility_strip_and_board_header_controls"
+description = "The right rail shows a utility strip of Search, GitHub, Backlog, Archive, Objectives, and Calendar buttons, and the board header shows Today, Filter, and Board controls"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.27"
+name = "scheduled_start_gates_hour_grid_presence"
+description = "A task that carries a scheduled start appears as a block on the selected day's hour grid in the calendar panel, while a task without a scheduled start stays off the hour grid, and a task without a planned time contributes nothing to its column's footer total"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "calendar_drag_updates_scheduled_start"
+description = "On the July 20 calendar day panel, dragging the Work task's block to a different hour slot updates that task's scheduled start, and the task's board card shows the new start time without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "add_task_chain_board_footer_calendar"
+description = "Starting from the seeded state, submit Add task on the July 19 column with a valid title, a planned time, and a scheduled start: exactly one new card appears in that column (card count measured immediately before and after increases by exactly one), the column's planned-time footer total increases by the entered planned time, and the same task appears on the July 19 calendar day panel without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "completion_toggle_round_trips_across_views"
+description = "Clicking the Work task's checkbox on the board marks that card completed and the same task's block on the July 20 calendar day reflects the completed state without a reload; clicking the checkbox again clears the completed state in both places"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "edit_chain_updates_card_total_and_calendar"
+description = "Editing the Work task's title and planned time from its edit form updates the board card text, recomputes the July 20 column's planned-time footer total to the new value, and updates the task's block on the July 20 calendar day panel, all without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "delete_chain_removes_card_block_and_total"
+description = "Deleting the Work task removes its card from the July 20 column, removes its block from the July 20 calendar day panel, and reduces that column's planned-time footer total by the deleted task's 1:00 planned time to 0:00"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "reload_restores_seeded_state_coherently"
+description = "After creating, editing, completing, and deleting tasks, a page reload returns the app to its seeded baseline: exactly the four seeded tasks, the July 18 column total reading 0:20, the July 20 column total reading 1:00, and the other 18 columns empty at 0:00 — every facet resets coherently, never a mix of stale and seeded state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "double_submit_creates_exactly_one_task"
+description = "Double-activating a valid Add task submit in quick succession creates exactly one task: the column's card count, measured immediately before and after, increases by exactly one"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "emptied_column_still_offers_add_task"
+description = "After deleting every task in the July 18 column, the column shows an empty state that still offers its Add task control and a planned-time footer reading 0:00, and adding a new task there afterwards works"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "A specified core behavior of the app is broken or missing in a significant, browser-observable way that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

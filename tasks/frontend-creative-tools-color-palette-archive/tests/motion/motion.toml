@@ -62,22 +62,22 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
-description = "Required hover animations are present on swatches and chrome; view switches stay snappy"
+name = "required_hover_animations"
+description = "Verified by real pointer hover: nomenclature swatches outline on hover, palette-card swatches outline and fade in their hex labels, swatch tiles fade in overlays, view-toggle inactive options show a brief indicator fill, and palette list rows in Detail mode take a hover wash"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "4_2"
-description = "Browse/Detail mode switches update without full reload and keep hover feedback"
+name = "mode_switch_no_reload"
+description = "Browse/Detail mode switches and switches among the three Browse layouts update without a full reload and keep hover feedback working"
 type = "binary"
 weight = 0.5
 optional = true
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
+name = "hover_feedback_missing"
 description = "Omits hover feedback on swatches or cards so the library feels static on pointer hover"
 type = "binary"
 weight = 1.0
@@ -85,8 +85,59 @@ negate = true
 
 [[criterion]]
 id = "4.4"
-name = "4_4"
+name = "subscribe_popup_fade"
 description = "The subscribe popup fades in after idle time or scrolling past roughly half the page, and dismissing or submitting it fades it out and keeps it dismissed for the session"
 type = "binary"
 weight = 0.5
 optional = true
+
+[[criterion]]
+id = "4.5"
+name = "create_delete_card_animation"
+description = "Driven through the real UI controls (not a state shortcut): creating a palette animates its card into the Palette view and deleting one animates it out rather than snapping instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "editor_swatch_row_animates"
+description = "Adding or removing a swatch inside the create/edit form, via the real UI controls, animates the swatch row to its new arrangement rather than snapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "favorite_toggle_animates"
+description = "Clicking the favorite/featured flag control animates the flag's state change rather than swapping instantly"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.8"
+name = "copy_confirmation_transitions"
+description = "The on-swatch copied confirmation appears with a brief transition and then clears on its own, rather than popping in and lingering"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.9"
+name = "scroll_reveals_pause_for_overlays"
+description = "On a fresh page load, scroll-driven reveals or smooth scrolling pace the editorial page, and while an overlay that needs native scroll locking (the subscribe popup or a modal editor panel) is open, smooth-scroll is paused so the overlay scrolls natively"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.10"
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion set, scroll reveals and list animations are removed and state changes apply instantly, while every feature stays reachable and usable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions (jank, jarring or missing transitions, animation-induced layout shifts) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (control path exercised, element, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

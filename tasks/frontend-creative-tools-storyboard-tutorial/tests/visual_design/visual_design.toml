@@ -62,21 +62,21 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
+name = "docs_tool_chrome_density"
 description = "Storyboard workspace with Tile/List/Slide density remains a docs tool, not a marketing landing"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
+name = "empty_board_state_visible"
 description = "Empty board state is visually present when no scenes remain"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
+name = "static_poster_no_editable_collection"
 description = "Shows only a static tutorial poster with no editable scene collection"
 type = "binary"
 weight = 1.0
@@ -84,15 +84,109 @@ negate = true
 
 [[criterion]]
 id = "3.4"
-name = "3_4"
+name = "nav_toggles_and_camera_placeholders"
 description = "The storyboard nav bar exposes Tile, List, and Slide toggles with the currently active toggle visibly pressed, and placeholder scenes render a centered camera add-image button"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "3_5"
+name = "no_active_toggle_state"
 description = "The Tile/List/Slide toggle bar shows no visibly pressed or active state distinguishing the current view mode"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.6"
+name = "header_composition_complete"
+description = "The top header shows a logo mark, a Demo Projects project label, the storyboard title 1. Getting Started, a kebab menu, and utility tools (notifications bell, dashboard, account)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "light_workspace_yellow_accent"
+description = "The workspace renders a light theme with a rounded geometric sans-serif UI face and a yellow accent color on primary affordances"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "control_state_treatments_distinct"
+description = "Buttons, toggles, and form fields show distinct default, hover, focus (visible ring), disabled, and error treatments"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "consistent_icon_set_and_size"
+description = "Icons across the header, nav bar, and scene actions come from one visually consistent set rendered at a consistent size"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "mode_layout_shapes_match_spec"
+description = "Tile mode arranges scene cards in a multi-column grid, List mode stacks the same scenes in a single vertical column, and Slide mode presents one centered scene with a previous/next control pair and an N / total counter"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "tablet_reflow_at_768"
+description = "At viewport widths of 768 pixels and below, the Tile grid reflows to fewer columns and the header condenses without losing the storyboard title or utility tools"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.12"
+name = "mobile_375_overflow_or_clipping"
+description = "At a 375 pixel viewport width, content clips or overflows the viewport, or horizontal scrolling appears in any view mode"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.13"
+name = "tutorial_copy_instructional_sentences"
+description = "Scene descriptions carry the sequential getting-started tutorial copy as complete instructional sentences"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.14"
+name = "placeholder_text_in_ui"
+description = "Lorem ipsum or placeholder text ('TODO', 'asdf', template variable names like '{{title}}') is visible somewhere in the shipped UI"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.15"
+name = "consistent_capitalization"
+description = "Headings, buttons, and toggles use one consistent capitalization convention throughout the app"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.16"
+name = "messages_name_problem_and_fix"
+description = "The empty-board state and the create-form validation messages name the problem and the fix in plain language"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.17"
+name = "hover_reveals_three_dot_actions"
+description = "Hovering an imaged scene card with the real pointer reveals a three-dot actions button on that card"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

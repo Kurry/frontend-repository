@@ -84,8 +84,67 @@ optional = true
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
+name = "overview_flat_equal_width_stack"
 description = "Lays out Operations Overview as a uniform equal-width single-column card stack with no mixed mosaic spans"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.5"
+name = "card_surfaces_and_density_elements"
+description = "Cards across the app show subtle layered shadows and hairline borders, and the views use dense admin building blocks — stat blocks, badges, progress and radial-progress indicators, tables, and list rows — rather than sparse plain panels"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.6"
+name = "icon_family_avatars_header_chrome"
+description = "One consistent line-style icon family appears across the sidebar, header, and tables; avatar images render locally without broken-image placeholders; the utility header shows a search pill and circular ghost icon buttons"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "responsive_drawer_breakpoints"
+description = "At a large desktop viewport the drawer sidebar is open by default; after resizing to a small viewport a hamburger control appears and opens the sidebar as an overlay drawer"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "mobile_content_clips_or_overflows"
+description = "At 375px viewport width, content clips, the page scrolls horizontally, or a wide data table overflows the viewport instead of scrolling within its own region"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.9"
+name = "copy_capitalization_and_verb_labels"
+description = "Headings, buttons, and menu items follow one consistent capitalization convention throughout the app, and action labels are specific verbs such as 'Add user' and 'Export' rather than generic labels where a specific one is possible"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.10"
+name = "validation_and_empty_state_copy"
+description = "Where the app renders validation messages they name the field and the fix, and where it renders empty states the copy explains what belongs in the region and how to add it"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.11"
+name = "placeholder_text_in_shipped_ui"
+description = "Placeholder text (lorem ipsum, 'TODO', 'asdf', or template variable names like '{{title}}') is visible anywhere in the shipped UI"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

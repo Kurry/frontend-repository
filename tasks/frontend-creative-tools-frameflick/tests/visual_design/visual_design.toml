@@ -62,28 +62,28 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
-description = "The interface uses the warm amber-and-brown palette: a deep brown header bar with yellow FrameFlick branding, a cream page background, and off-white panel cards with hairline amber borders."
+name = "warm_amber_brown_palette"
+description = "The interface uses the warm amber-and-brown palette: a deep brown (#713F12) header bar with yellow (#FDE047) FrameFlick branding, a cream page background, and off-white panel cards with hairline amber borders."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
-description = "On a desktop viewport the editor uses a three-column layout (left tools, center canvas stage, right controls) and collapses to a single stacked column on a narrow viewport."
+name = "three_column_desktop_layout"
+description = "On a desktop viewport the editor uses a three-column layout (fixed left tools column, flexible center canvas stage on a warm tint, fixed right controls column) and collapses to a single stacked column on a narrow viewport with upload, canvas, and controls all reachable by scrolling."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
-description = "Primary buttons are fully pill-shaped with a yellow (#FDE047) fill and layered depth shadow, and the selected background swatch, active frame option, and active toggle show a persistent accent highlight."
+name = "pill_buttons_and_accent_highlights"
+description = "Primary buttons are fully pill-shaped with a yellow (#FDE047) fill, #713F12 text, and a layered depth shadow, and the selected background swatch, active frame option, and active toggle show a persistent yellow accent ring."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.4"
-name = "3_4"
+name = "canvas_container_and_placeholder"
 description = "The canvas preview sits in a rounded container with a soft drop shadow and shows an Upload an image to get started placeholder before any image is loaded."
 type = "binary"
 weight = 0.5
@@ -91,8 +91,59 @@ optional = true
 
 [[criterion]]
 id = "3.5"
-name = "3_5"
+name = "unstyled_default_layout_shipped"
 description = "At desktop width the layout is a single unstyled column with default browser fonts and none of the specified color tokens applied, so controls appear clipped, overlapping, or unreachable."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.6"
+name = "color_tokens_exposed_as_custom_properties"
+description = "The document exposes CSS custom properties resolving to --color-primary #FDE047, --color-accent #FDE047, --color-background #FFFFFF, --color-text-primary #713F12, and --color-link #713F12, and the rendered UI colors visibly agree with those token values."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.7"
+name = "system_font_stack_and_16px_headings"
+description = "Headings and body text render in the specified system ui-sans-serif font stack with no external webfont request in the network log, and the primary heading and section headings render at 16px."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.8"
+name = "consistent_icon_set_across_controls"
+description = "Panel section headers, the move controls, the export buttons, and the Collaboration connection controls all carry icons drawn from one consistent icon set used across the whole app."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.9"
+name = "mobile_375_no_overflow_usable"
+description = "At a 375px-wide viewport, no content clips or overflows the viewport, no horizontal scrolling appears, and the sliders, background swatches, and both header tabs remain visible and fully usable."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "consistent_capitalization_specific_labels"
+description = "Headings and buttons use one consistent capitalization convention throughout the app, and action labels are specific verbs (such as Save preset, Apply to canvas, Download PNG) rather than generic labels like Submit or OK where a specific one is possible."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.11"
+name = "placeholder_or_unhelpful_copy_shipped"
+description = "Placeholder or lorem text (Lorem, TODO, template variable names) is visible somewhere in the shipped UI, or an error message merely rejects input without naming the problem and the fix, or an empty state gives no explanation of what belongs there and how to add it."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

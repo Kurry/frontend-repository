@@ -62,140 +62,140 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
+name = "seeded_users_present"
 description = "On load, All Users (or the default Users list) contains at least 8 seeded user rows with name, role, and status visible per row; rows reachable by paging through the table's pagination controls count as present"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
+name = "create_user_appears_in_list"
 description = "After creating a user with first name 'Ada', last name 'Lovelace', and a valid email, the text 'Ada Lovelace' (or equivalent full name) is visible in the All Users list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
+name = "create_count_delta_matches"
 description = "After adding 3 new users on top of the seed set, the All Users table shows exactly 3 more rows than the initial seeded count"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
+name = "status_change_updates_badge"
 description = "After changing a user's status from Active to Suspended, that user shows a Suspended badge/state that is visually distinct from Active users"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
+name = "edit_updates_name_in_list"
 description = "After editing a user's name from the seeded value to 'Evening Runner', the text 'Evening Runner' is visible in the list and the previous name is not"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
+name = "delete_removes_user_row"
 description = "After deleting a user, that user's name is no longer visible anywhere in the All Users list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
+name = "empty_state_after_delete_all"
 description = "After deleting all users, an empty state message is visible and no user data rows remain in the list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
+name = "invalid_submit_adds_no_row"
 description = "After submitting Create user with an empty required name or email field, the users count in the list does not increase and validation feedback is visible"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
+name = "status_filter_narrows_list"
 description = "After filtering All Users by status Suspended (with at least one Suspended and one Active user present), only Suspended users remain visible in the list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
+name = "sidebar_view_switch_no_reload"
 description = "After switching from Operations Overview to All Users via the sidebar, the main canvas shows the users table/KPIs (not the overview mosaic), and switching back restores Operations Overview without a full page navigation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
+name = "additional_users_modes_render"
 description = "After opening at least two additional Users modes from Roles, Permissions, User Logs, User Stats, User Payments, or User Products via the sidebar, each opened mode shows its domain UI (filters/tables) and the URL does not navigate to an external origin"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
+name = "theme_toggle_recolors"
 description = "After clicking the sun/moon theme swap, data-theme flips between light and dark and surfaces recolor without reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "1_13"
+name = "hover_feedback_on_chrome"
 description = "When hovering primary buttons, table rows, or sidebar nav items, a visible hover wash, underline, or shadow change appears"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.14"
-name = "1_14"
+name = "bulk_action_applies_to_selection"
 description = "After selecting multiple All Users rows and running a bulk action (Change status, Change role, or Delete), the selected users update or disappear together in the list and KPIs reflect the change"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.15"
-name = "1_15"
+name = "console_clean_during_session"
 description = "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.16"
-name = "1_16"
+name = "crud_updates_kpis_from_shared_state"
 description = "Users collection supports create, edit, and delete with list rows and KPI counts updating from shared application state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.17"
-name = "1_17"
+name = "two_views_switchable"
 description = "At least two distinct views exist (Operations Overview and All Users) switchable from the sidebar without full page navigation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.18"
-name = "1_18"
+name = "domain_state_beyond_crud"
 description = "Domain state beyond CRUD is implemented: status badges, role assignment, list filters/sort that recompute visible users, and bulk status/role/delete on selected rows"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.19"
-name = "1_19"
+name = "empty_required_fields_validation"
 description = "Renders visible validation/feedback when Create user is submitted with empty required fields, and the users count does not increase"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.20"
-name = "1_20"
+name = "static_list_without_crud"
 description = "Users list is static HTML only with no working create/edit/delete against shared state"
 type = "binary"
 weight = 1.0
@@ -203,8 +203,142 @@ negate = true
 
 [[criterion]]
 id = "1.21"
-name = "1_21"
+name = "outbound_links_in_chrome"
 description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.22"
+name = "sidebar_nav_structure_complete"
+description = "The sidebar shows Pineapple Tech branding, at least 14 collapsible nav groups including a Users group containing All Users, Add User, Roles, Permissions, User Logs, User Stats, User Payments, and User Products, a top-level Dashboard item, and a sticky account footer (online avatar, name, role) whose click opens a popover that expands upward"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "header_utilities_functional"
+description = "The utility header contains a search field that narrows the All Users list as text is typed, a notifications popover seeded with 4 avatar rows plus an error indicator on the bell icon, and a profile popover listing Profile, Inbox (with a badge), Settings, and Logout entries"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "user_row_columns_complete"
+description = "Each All Users row shows name, email, a role badge, a status badge (Active, Invited, or Suspended), a payments total, a products count, a last-active label, and row actions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "all_users_toolbar_chrome"
+description = "The All Users view shows a KPI strip (Total / Active / Paying / Suspended), role and status filters, a sort control offering Last active, Newest, Highest spend, and Name A-Z, bulk action controls (Export / Change status / Change role / Delete), and pagination chrome"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "add_user_form_groups_inline_validation"
+description = "The Add User form presents grouped sections — Profile (first name, last name, email, phone, notes), Access (temporary password, account segment, send invitation), Account settings (status, role, 2FA / product-access toggles), and Permissions checkboxes — and validates inline: each invalid field shows a per-field message naming that field before submit, and the submit control stays disabled until required fields are valid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "edit_form_prefilled"
+description = "Choosing a row's Edit action opens the user form prefilled with that user's existing name, email, role, and status values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "overview_sections_seeded"
+description = "Operations Overview renders breadcrumbs and actions, KPI stats, chart cards (revenue/demand column, order-status pie, a primary inverse revenue run-rate column card, acquisition mix pie, marketing line, fulfillment line), and operational panels (activity table, governance radial and progress, priority queue, promotions, uptime bars, satisfaction, inventory, plugins, automation, security watch, cash movement), all non-empty from seeded data"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "chart_tooltip_on_hover"
+description = "Hovering a column, pie slice, or line point on an overview chart with the real pointer shows a tooltip containing the underlying value from that chart's seeded series"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "charts_recolor_on_theme_toggle"
+description = "Toggling the theme through the header control redraws every overview chart in the new theme's accent colors without a page reload, and toggling back restores the original accents"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "create_flow_kpi_search_chain"
+description = "Scripted probe: on All Users, record the visible row count and the KPI Total; submit Add User with valid fields for a new Active user named 'Nora Quinn'; confirm All Users gains exactly one row, the KPI Total increases by exactly one, the Active KPI increases by exactly one, and typing 'Nora' into the header search narrows the table to that row — all without a page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "status_change_kpi_filter_chain"
+description = "Scripted probe: record the Active and Suspended KPI values, change one user's status from Active to Suspended, and confirm in the same session that the row's badge flips to Suspended, the Active KPI decreases by one, the Suspended KPI increases by one, and applying the Active status filter no longer shows that row — all without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "delete_flow_selection_kpi_chain"
+description = "Scripted probe: select a user's row checkbox, record the visible row count and KPI Total, then delete that user; confirm the row disappears, the checkbox selection no longer includes it, the KPI Total decreases by one, and the visible row count decreases by exactly one in the same interaction"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "sort_round_trip_restores_order"
+description = "Scripted probe: note the row order, switch the sort control to Name A-Z, confirm the same rows reorder without any change in visible row count, then switch to Newest and back; the ordering under each sort is consistent and differs between the two options, proving sort derives from live data rather than fixed markup"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "bulk_status_three_rows_kpi_delta"
+description = "Scripted probe: select exactly three rows by checkbox and run a bulk Change status; all three rows' status badges update in one action and the affected status KPIs shift by exactly three"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "edit_propagates_all_surfaces"
+description = "Scripted probe: save the Edit form with a changed name and status for one user, then confirm the table row, the KPI strip counts, and a role/status-filtered view where that user appears all show the updated values in the same session without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "double_submit_creates_one_user"
+description = "Rapidly double-activating the Add User submit control creates exactly one user: the visible count increases by one and exactly one new row appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "cancel_leaves_collection_unchanged"
+description = "Using Cancel on the Add User or Edit form leaves the users collection unchanged: the row count and KPI values are identical before and after"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "empty_state_on_no_match"
+description = "When filters and search combine to match zero users, the list region shows an empty state message instead of an empty or broken table"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

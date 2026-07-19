@@ -62,222 +62,151 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
-description = "On load with empty storage the workspace opens directly at the root with a PaneCraft header, a Dashboard page tab, a Data Source Library listing Website Analytics, Sales Sheet, and Support Tickets, and three default panes already present"
+name = "seeded_workspace_baseline"
+description = "With task storage empty, the root opens without login to PaneCraft, Dashboard, the three bundled source cards, and three populated default panes: Traffic trend, Revenue by category, and Open support volume"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
-description = "After clicking Sales Sheet in the Data Source Library a preview modal opens listing raw rows in a table, and typing Hardware into its Filter preview rows input narrows the table to only matching rows"
+name = "source_preview_filter_flow"
+description = "Opening Sales Sheet shows its raw table and headers with a total count; typing Hardware narrows rows and updates the match count, and clearing the input restores the full 60-row source"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
-description = "After using Create Pane and stepping through choose-source (Website Analytics), choose-type (all five of Line Chart, Bar Chart, Donut Chart, Data Table, Counter are offered; pick Line Chart), and configure (pick a metric column and a separate dimension column), the finished line chart pane appears on the current page"
+name = "pane_wizard_creation_flow"
+description = "Starting from the current pane count, Create Pane steps through source, exactly five offered types, and valid metric plus chart dimension; completing a Line Chart increases the count by exactly one and renders source-dependent marks on the active page"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
-description = "After clicking a pane's Edit control and changing its metric to a different column, the pane updates in place to the new metric without losing its grid position or being recreated"
+name = "pane_edit_in_place_chart_sensitivity"
+description = "Editing a chart pane to a different valid source, metric, or dimension changes its title or values and rendered marks meaningfully while preserving pane identity, size, grid position, and page membership"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
-description = "After clicking a pane's Delete control, cancelling the confirmation keeps the pane, and triggering Delete again and confirming removes the pane from the page"
+name = "pane_delete_confirmation_flow"
+description = "Cancelling pane deletion preserves the same pane and count; confirming a second attempt decreases the count by exactly one and removes it from the active page"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
-description = "After Add Page creates a new active tab, adding a pane to it and switching back to the original page confirms the new pane does not appear there, and renaming the new page updates its tab label"
+name = "page_independence_lifecycle"
+description = "Add Page creates and activates a named tab; adding a pane there keeps it absent from Dashboard, renaming updates the tab, cancelling page deletion keeps it, confirming removes it, and the last remaining page cannot be deleted"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
-description = "After using a pane's Move Right (or Move Down) control the layout updates, its Small/Medium/Large toggle resizes it, and the move controls disable when the pane reaches a grid boundary"
+name = "pane_grid_move_and_resize"
+description = "Move Up, Down, Left, and Right visibly reposition a pane within the four-column grid and disable at their boundaries; Small, Medium, and Large immediately span one, two, and four columns respectively"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
-description = "After setting a pane's Refresh dropdown to Every 30s a Last updated Xs ago label appears and counts up, and the pane's displayed value changes by a small deterministic jitter on each simulated tick; returning it to Off stops the label and the value changes"
+name = "deterministic_refresh_flow"
+description = "Setting Every 30s shows a self-advancing Last updated label and each simulated tick changes the displayed value according to the documented deterministic jitter; returning to Off stops both the label and self-updates"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
-description = "After adding two Website Analytics time-series panes and changing the shared date-range control from its default to Last 7 Days and then Last 90 Days, both panes update simultaneously to reflect each range"
+name = "shared_date_range_chart_sensitivity"
+description = "With at least two time-series panes visible, switching Today Only, Last 7 Days, Last 30 Days, and Last 90 Days recomputes every affected pane together, and at least two windows produce meaningfully different marks or values"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
-description = "After configuring a pane so its combination yields zero rows for the current range the pane shows No data for this range, and widening the range back to Last 90 Days restores real chart data in the same pane"
+name = "no_data_chart_recovery"
+description = "A zero-row pane shows No data for this range instead of blank chart chrome; widening to a range with rows restores source-dependent chart marks in the same pane without recreation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
-description = "After creating a page, adding a pane with a non-default refresh interval, reordering and resizing it, and performing a full page reload, the page, the pane's type/source/metric/size/order, and its refresh-interval are all restored exactly"
+name = "workspace_persistence_flow"
+description = "After creating and renaming a page, adding and editing a pane, moving and resizing it, setting a non-Off refresh interval, and selecting that page, a full reload restores page, active tab, pane type/source/metric/dimension/size/order, and refresh interval together"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
-description = "After opening the Collaboration Scenario, queueing two independently authored non-conflicting changes and applying them in either offered order (Apply A then B, Apply B then A) both appear in the converged Shared content with neither dropped, and a conflicting change surfaces an explicit resolution choice"
+name = "collaboration_convergence_flow"
+description = "Offline changes from Author A and B both appear after reconnect in either offered delivery order, both orders converge to identical Shared content, replaying an applied operation adds nothing, and a conflict waits for Keep A, Keep B, or Merge Both before resolving"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "1_13"
-description = "After opening the Share panel it shows a monospace read-only panecraft.local/view link and a Public/Private toggle, and clicking Copy Link shows a transient Copied! confirmation"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.14"
-name = "1_14"
-description = "After exercising the create, edit, delete, refresh, date-range, and collaboration workflows no uncaught console errors or unhandled promise rejections have appeared"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.15"
-name = "1_15"
-description = "On load with empty storage the workspace opens at the root with a PaneCraft header, a Dashboard page tab, a Data Source Library listing Website Analytics, Sales Sheet, and Support Tickets, and three default panes already present"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.16"
-name = "1_16"
-description = "Clicking a Data Source Library entry opens a preview modal listing that source's raw rows in a table, and typing into its Filter preview rows input narrows the table to only rows matching the typed text"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.17"
-name = "1_17"
-description = "Create Pane steps through choose-source, choose-type offering exactly Line Chart, Bar Chart, Donut Chart, Data Table, and Counter, and configure with a metric column plus a separate dimension column for charts, then adds the finished pane to the current page"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.18"
-name = "1_18"
-description = "A pane's Edit control reopens its configuration and changing the metric updates the pane in place without losing its grid position or recreating it"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.19"
-name = "1_19"
-description = "A pane's Delete control asks for confirmation; cancelling keeps the pane and confirming removes it from the page"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.20"
-name = "1_20"
-description = "Add Page creates a new active tab whose panes are independent of other pages, switching pages keeps each page's panes separate, and a page can be renamed inline"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.21"
-name = "1_21"
-description = "A pane's Move Up/Down/Left/Right controls reposition it within the grid and each direction's control disables when the pane is at that grid boundary"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.22"
-name = "1_22"
-description = "A pane's Small/Medium/Large size toggle immediately changes how many grid columns the pane spans"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.23"
-name = "1_23"
-description = "Setting a pane's Refresh dropdown to Every 30s shows a Last updated Xs ago label that counts up and recomputes the value by a small deterministic jitter each simulated tick, and returning it to Off stops the label and the self-updating value"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.24"
-name = "1_24"
-description = "Changing the shared date-range control updates every time-series pane on the current page simultaneously to reflect the new window rather than a single pane in isolation"
+name = "share_panel_clipboard_flow"
+description = "Share opens a monospace read-only panecraft.local/view/<page-id> value and Public/Private toggle; Copy Link writes that link and immediately shows a transient Copied confirmation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.25"
-name = "1_25"
-description = "A page with zero panes shows Create your first pane to build this page, a pane whose combination yields zero rows shows No data for this range, and widening the range restores real chart data in the same pane"
+name = "page_and_pane_empty_states"
+description = "A zero-pane page says Create your first pane to build this page, while a zero-row pane independently says No data for this range and can recover when its inputs widen"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "1.26"
-name = "1_26"
-description = "The Collaboration Scenario merges two independently authored non-conflicting changes so both appear in the converged Shared content whether applied A-then-B or B-then-A, and a conflicting change surfaces an explicit resolution choice instead of silently overwriting"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.27"
-name = "1_27"
-description = "The Share panel shows a read-only panecraft.local/view mock link and a Public/Private access toggle and Copy Link copies the link"
-type = "binary"
-weight = 0.5
-optional = true
 
 [[criterion]]
 id = "1.28"
-name = "1_28"
-description = "The Saved analysis collection supports creating, editing, and deleting named analyses with Overview and Table views and combined search/filter/sort/selection and a clear-controls action, rejecting duplicate names without corrupting the bundled data"
+name = "saved_analysis_collection_flow"
+description = "Starting from its count, creating a valid named saved analysis increases it by one and shows the same item in Overview and Table; editing updates both, combined search/source/sort/selection derives one coherent result, Clear restores all, delete removes it, and a duplicate name leaves count and bundled data unchanged with inline feedback"
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "seed_data_volume_and_shape"
+description = "Source previews expose 90 Website Analytics daily rows with required fields, 60 Sales orders across Hardware, Software, and Services, and 50 Support Tickets across required categories and statuses with resolution hours only on resolved rows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "form_inline_validation"
+description = "Invalid pane, page-name, saved-analysis, or conflict-resolution input shows a specific inline per-field error before submit and preserves the last valid visible state"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "1.29"
-name = "1_29"
-description = "The app starts empty or requires connecting an external service before panes are usable instead of shipping the three bundled sources and a default page of panes"
+name = "missing_seeded_workspace"
+description = "The workspace starts empty, requires login or an external connection, omits a bundled source, or lacks one of the three populated default panes"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "1.30"
-name = "1_30"
-description = "Changing the shared date range updates only one pane, or the Create Pane wizard omits one of the five required pane types"
+name = "insensitive_chart_or_incomplete_wizard"
+description = "Changing source, metric, dimension, or date range leaves affected chart marks and values identical, updates only one eligible pane, or the wizard omits a required pane type"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "1.31"
-name = "1_31"
-description = "The two collaboration delivery orders diverge to different visible results, drop a non-conflicting change, or a conflict silently overwrites without offering a resolution choice"
+name = "collaboration_divergence_or_overwrite"
+description = "Delivery orders converge to different Shared content, a non-conflicting change is dropped, replay duplicates content, or a conflict overwrites silently without a visible resolution choice"
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable core-feature defect that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence that demonstrates it. If the defect is already covered even partially by another criterion, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

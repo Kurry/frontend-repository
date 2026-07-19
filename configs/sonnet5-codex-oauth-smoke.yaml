@@ -19,4 +19,4 @@ verifier:
     REWARDKIT_MODEL: "${REWARDKIT_MODEL:-}"
 
 tasks:
-  - path: ./tasks/frontend-planning-daily-planner-board
+  - path: ./tasks/frontend-landing-avax-network

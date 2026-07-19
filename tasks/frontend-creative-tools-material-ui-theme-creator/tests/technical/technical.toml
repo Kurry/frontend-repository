@@ -62,8 +62,8 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "2.2"
-name = "2_2"
-description = "Implemented with React, Zustand, and Tailwind CSS; no browser storage APIs for persistence"
+name = "shared_state_coherence_without_storage"
+description = "A change made in one view (palette edit, theme create/delete, type toggle) is immediately reflected in every other view showing that data without a reload, while localStorage and sessionStorage remain empty after a full exercise of the app"
 type = "binary"
 weight = 1.0
 
@@ -74,3 +74,76 @@ description = "Uses localStorage or sessionStorage to persist themes or editor s
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "2.4"
+name = "reload_restores_seeded_baseline"
+description = "Scripted probe: create a theme, edit a palette color, and switch tabs, then reload the page; the app returns to its seeded state with the seeded saved themes present and the unsaved edits gone - all facets reset coherently, never a mix"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "keyboard_operability_with_focus_ring"
+description = "Every interactive control (main tabs, device toggles, Palette accordion rows, editor toolbar, saved theme actions) is reachable and operable with the keyboard alone, showing a visible focus indicator at each stop"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "tutorial_modal_dialog_semantics"
+description = "The Tutorial modal exposes role='dialog' with aria-modal='true', traps focus while open, closes on Escape, and returns focus to the Tutorial control on close"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "accordion_exposes_expanded_state"
+description = "Palette accordion rows expose their expanded/collapsed state to assistive technology (e.g. aria-expanded) and toggle with Enter or Space"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.8"
+name = "validation_announced_via_live_region"
+description = "New Theme validation messages are shown visually and announced through an aria-live region"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.9"
+name = "interactive_within_two_seconds"
+description = "The app is interactive within 2 seconds of a local cold load"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "console_errors_during_full_exercise"
+description = "Console errors or warnings appear during a full exercise of the app (tab switches, palette edits, source edits, saved theme create/load/delete)"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "rapid_input_stays_responsive"
+description = "Rapid successive palette changes and continuous typing in the source editor stay responsive with no hangs, freezes, or dropped interactions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.12"
+name = "outbound_network_requests_present"
+description = "After settle and a full exercise of the app, devtools shows outbound network requests to other origins (font CDNs, analytics, remote assets) beyond the app's own origin"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, console line, network entry, page state) that demonstrates it. If the defect is already covered - even partially - by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

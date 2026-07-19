@@ -62,8 +62,8 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
-description = "Required hover animations are present on buttons, table/list rows, and sidebar nav; theme swap and popovers animate as specified"
+name = "hover_and_theme_toggle_animation"
+description = "Verified through real pointer interaction: buttons ease background/border/shadow with a slight press, table rows, list rows, and sidebar items take a full-width hover wash, and clicking the theme toggle cross-fades and rotates the sun/moon icons (roughly 0.2s) while surfaces and chart accents recolor with the theme"
 type = "binary"
 weight = 1.0
 
@@ -84,8 +84,51 @@ weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
+name = "static_chrome_no_hover_feedback"
 description = "Omits hover washes on buttons, rows, or sidebar items so interactive chrome feels static on pointer hover"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.5"
+name = "popover_enter_exit_animation"
+description = "Opened through real clicks on their triggers, the notifications, profile, and sidebar account popovers appear anchored to the trigger with a short opacity + scale enter/exit transition (not an instant snap), the account menu opens upward, and menu rows highlight on hover and keyboard focus"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "list_add_remove_reorder_animation"
+description = "Driven through the real UI controls (never a state shortcut): a newly created user's row animates into the All Users table, a deleted row animates out, and rows animate to their new positions when a sort or filter change reorders the visible list, rather than snapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "drawer_slide_overlay_small_viewport"
+description = "After resizing to a small viewport, activating the hamburger slides the sidebar in over an overlay with a visible transition, and dismissing it slides it back out; on large viewports the sidebar stays open"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "chart_hover_and_trend_redraw"
+description = "Overview chart cards show hover/tooltip feedback on their seeded series, KPI inline trend charts redraw when their numbers change (e.g. after adding or deleting a user through the UI), security-watch status dots show a ping animation, and the notification bell keeps a static error indicator"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.9"
+name = "breadcrumb_underline_and_focus_rings"
+description = "Breadcrumb links underline on hover and form controls show visible focus rings when focused"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

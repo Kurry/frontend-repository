@@ -1,28 +1,58 @@
 <summary>
-Build a frontend-only ATC-client theme and icon patcher using SolidJS, Solid stores, and Tailwind CSS v4.
+Build a frontend-only ATC-client theme and icon patcher using SolidJS, Solid stores, Tailwind CSS 4.3.2, and Kobalte.
 </summary>
 
 <reference_screenshots>
 Screenshots of the reference application are provided in-container at
-`/reference-screenshots/`: `overview.png` is a full-page desktop-layout
-overview (downscaled); `segment-NN.png` are full-resolution 1440x900 sections
+/reference-screenshots/: overview.png is a full-page desktop-layout
+overview (downscaled); segment-NN.png are full-resolution 1440x900 sections
 in top-to-bottom order with slight overlap. They are part of this instruction:
 recreate what they show. Where a screenshot and the text conflict, the text
-wins. Do not copy the images into `/app` or ship them as app assets.
+wins. Do not copy the images into /app or ship them as app assets.
 </reference_screenshots>
 
 <core_features>
 Core features (each line is an observable behavior the finished app must exhibit):
+
+Feature: Patching wizard shell —
 - The app opens directly into a four-step patching wizard for a EuroScope air-traffic-control client, recognisable as a colour and icon patcher and not a generic dashboard or starter page. A progress bar shows the four ordered stages by name: Upload EuroScope executable, Update theme colours, Update embedded bitmaps, Download new executable. The current stage is highlighted with its full text label, completed stages show a check mark, and upcoming stages show a muted number
+- The wizard supports moving forward and backward between adjacent steps. Every step past the first shows a Back control that returns to the previous step; every step before the last shows a Continue or Generate control that advances
+
+Feature: Upload step —
 - A sample scope is seeded so the workflow is non-empty on first load. Step one (Upload EuroScope executable) shows the loaded sample by name (EuroScope.exe), an optional file input that accepts .exe, and a Continue button. Continue always advances to step two without requiring the user to pick a file
-- Step two (Update theme colours) lets the user choose a replacement colour set from a Base theme control listing exactly five named sets in order: EuroScope, Grey, Primer, Ayu, Solarised. Selecting a base set replaces all six working colours with that set's palette and updates a live Preview immediately. Six named swatch rows (Backdrop darkest, Backdrop darker, Backdrop main, Backdrop lighter, Backdrop lightest, Foreground secondary) each expose a colour picker; editing one swatch updates the Preview live and leaves the other five swatches unchanged
+
+Feature: Theme colours step —
+- Step two (Update theme colours) lets the user choose a replacement colour set from a Base theme control listing exactly five named sets in order: EuroScope, Grey, Primer, Ayu, Solarised. Selecting a base set replaces all six working colours with that set's palette and updates a live Preview immediately
+- Six named swatch rows (Backdrop darkest, Backdrop darker, Backdrop main, Backdrop lighter, Backdrop lightest, Foreground secondary) each expose a colour picker and a hex text field showing the current value; editing one swatch updates the Preview live and leaves the other five swatches unchanged
+- Typing an invalid value into a swatch's hex field (for example, not-a-colour) shows an inline validation message naming that swatch before any submit or step change, and the Preview keeps its last valid colour; correcting the value clears the message and applies the colour
+
+Feature: Embedded bitmaps step —
 - Step three (Update embedded bitmaps) lets the user choose a replacement icon set from a Base icon set control with two options: None (keep as-is) and Vector. A preview grid of at least ten seeded bitmap tiles recolours to the chosen theme when Vector is selected and shows muted originals when None is selected. Changing the icon set updates every tile immediately and does not reset the colour choice made in step two. A status line reports how many bitmaps are set to Vector (for example, 10 of 10)
-- Choosing a replacement colour set and then advancing through the steps to the final stage generates the patched result: step four (Download new executable) shows a Patched result generated confirmation plus a summary of the chosen replacements (the selected colour set name, a swatch strip, a live preview, and the selected icon set with its replaced count). The current wizard step and the chosen visual replacements together make completion apparent. A Download control writes an EuroScope.exe file and its label reflects that the download occurred
-- The wizard supports moving forward and backward between adjacent steps. Every step past the first shows a Back control that returns to the previous step; every step before the last shows a Continue or Generate control that advances. Moving backward one step shows the earlier replacement choice still selected exactly as it was left
-- Revising an earlier choice is supported: after generating the patched result the user can return to an earlier step, pick a different colour set or icon set, and the revised choice replaces the earlier preview at that step and in the final summary. Changing an icon in step three updates the icon preview without resetting the colour choice
-- Moving backward and forward through the wizard repeatedly shows each step exactly once and each step retains its own choices; no step is duplicated and no selection is lost
-- The whole flow is frontend-only: no backend, no authentication wall, and no outbound navigation. Every control drives shared client state in place, and reloading the page restores the exact step and all chosen replacements
+
+Feature: Download step —
+- Choosing a replacement colour set and then advancing through the steps to the final stage generates the patched result: step four (Download new executable) shows a Patched result generated confirmation plus a summary of the chosen replacements (the selected colour set name, a swatch strip, a live preview, and the selected icon set with its replaced count). The current wizard step and the chosen visual replacements together make completion apparent
+- A Download control writes an EuroScope.exe file and its label reflects that the download occurred
+
+Feature: Frontend-only operation —
+- The whole flow is frontend-only: no backend, no authentication wall, and no outbound navigation. Every control drives shared client state in place
 </core_features>
+
+<user_flows>
+- Selecting the Ayu base theme in step two replaces all six swatch values at once, retints both live Preview panels immediately, and after advancing to step three with Vector selected the bitmap tiles render in the Ayu colours; the step four summary names Ayu as the selected colour set — all without a reload
+- Editing a single swatch in step two changes that swatch row, retints the live Preview, leaves the other five swatch rows unchanged, and the edited colour appears in the step four swatch strip after advancing to the final stage
+- Switching the icon set in step three between None and Vector updates every preview tile and the replaced-count status line immediately, leaves the step two colour choice intact when returning via Back, and the step four summary reports the currently selected icon set with its replaced count
+- Moving backward one step shows the earlier replacement choice still selected exactly as it was left; moving backward and forward through the wizard repeatedly shows each step exactly once with its own choices retained
+- Revising an earlier choice is supported: after generating the patched result the user can return to an earlier step, pick a different colour set or icon set, and the revised choice replaces the earlier preview at that step and in the final summary
+- Reloading the page restores the exact wizard step and all chosen replacements: the progress bar highlights the same stage, the base theme control shows the same selection, all six swatches hold their edited values, and the icon set choice and replaced count match their pre-reload state
+</user_flows>
+
+<edge_cases>
+- Continuing from step one without picking a file advances to step two using the seeded EuroScope.exe sample; no error appears
+- Moving backward and forward through the wizard repeatedly shows each step exactly once and each step retains its own choices; no step is duplicated and no selection is lost
+- Submitting or advancing while a swatch hex field holds an invalid value does not apply the invalid colour; the inline message naming the swatch remains until the value is corrected
+- Double-activating the Generate control produces exactly one patched result: one confirmation block and one summary appear, not two
+- With the icon set on None, the step four summary reports zero replaced bitmaps while the colour set summary still reflects the chosen theme
+</edge_cases>
 
 <visual_design>
 - A single centered column, roughly 600 pixels wide on desktop, holding a compact header (a squared EuroScope badge, the title Custom EuroScope, and a theme and icon patcher caption), the progress bar, and the active step body stacked with consistent spacing
@@ -30,21 +60,54 @@ Core features (each line is an observable behavior the finished app must exhibit
 - Light neutral surfaces with a single blue accent for the active progress step and primary buttons, plus a soft radial accent wash behind the content. Bordered white boxes group each control cluster with hairline borders and subtle shadow on hover
 - The colour Preview renders two side-by-side panels (Primary and Secondary) tinted live from the working swatches. The bitmap preview renders a grid of tiles that fill with the chosen theme colours when the Vector icon set is active and show muted grey placeholders when None is active
 - Information, Caution, and Warning alert blocks are colour-coded (blue, amber, red) with a leading icon and a bold heading, used for the patcher's guidance copy
-- Responsive: on a narrow viewport (around 375 pixels) the controls needed to choose a colour set and generate the patched result stay reachable without horizontal scrolling, the layout reflows to a single stacked column, and the progress bar keeps its numbered steps visible while the active label truncates rather than overflowing
+- Icons come from one consistent set used throughout the chrome: the same stroke weight and style on the header badge, alert icons, check marks, and control icons
+- Component states: buttons and form controls show distinct default, hover, focus (visible ring), and disabled treatments
 </visual_design>
 
 <motion>
 - Progress circles transition their fill colour when a step becomes active or complete
 - Buttons ease their border, shadow, and scale on hover, focus, and press: hovering a button shifts its border and adds a slight shadow, and pressing it nudges it down slightly. Every interactive control shows a visible focus ring when focused by keyboard
 - Swatch rows and per-bitmap rows take a hover wash across their full width
-- Advancing or returning between steps swaps the active step body in place without a full page reload; the progress bar updates to match the current step
+- Advancing or returning between steps swaps the active step body in place with a brief eased transition of roughly 200 to 300 milliseconds, without a full page reload; the progress bar updates to match the current step
 - The live colour Preview and the bitmap tiles recolour immediately as swatches or the icon set change, with no reload
-- Revealing the advanced per-bitmap options expands the list in place
+- Revealing the advanced per-bitmap options expands the list in place with an animated height change rather than an instant jump
+- The Patched result generated confirmation on step four enters with a short fade-and-rise transition when the result is generated
+- With prefers-reduced-motion set, transitions are removed and state changes apply instantly
 </motion>
 
+<responsiveness>
+- On a narrow viewport (around 375 pixels) the controls needed to choose a colour set and generate the patched result stay reachable without horizontal scrolling, the layout reflows to a single stacked column, and the progress bar keeps its numbered steps visible while the active label truncates rather than overflowing
+- No content clips or overflows the viewport at 375 pixel width; the two Preview panels and the bitmap grid reflow to fit the column
+</responsiveness>
+
+<accessibility>
+- Every interactive control — the base theme control, icon set control, swatch pickers and hex fields, Back, Continue, Generate, and Download — is reachable and operable with the keyboard alone, with a visible focus indicator
+- The Base theme and Base icon set controls are operable with arrow keys and Enter or Space, and expose their selected option to assistive technology
+- Each swatch colour picker and hex field is labelled with its swatch role name (for example, Backdrop darkest) so the label is programmatically associated with the control
+- Inline validation messages and the replaced-count status line are announced via an aria-live polite region as well as shown visually
+- The progress bar conveys the current step to assistive technology, not only by colour
+</accessibility>
+
+<performance>
+- The app is interactive within 2 seconds of a local cold load
+- No console errors or warnings appear during a full exercise of the wizard, including generating and downloading the patched result
+- Rapidly editing swatches or toggling the icon set keeps the Preview and tile grid responsive with no hangs or dropped updates
+</performance>
+
+<writing>
+- Headings, stage names, and button labels use one consistent capitalization convention throughout the app
+- Action labels are specific verbs matching the wizard vocabulary (Continue, Back, Generate, Download) rather than generic labels
+- The Information, Caution, and Warning alert copy names the situation and what the user should do; no placeholder text appears anywhere in the shipped UI
+</writing>
+
 <requirements>
-- Use SolidJS, Solid stores, and Tailwind CSS v4.
-- Shared application state (the current wizard step, the loaded file name, the selected base colour set, the six working swatch colours, the selected icon set, per-bitmap overrides, and whether the patched result has been generated) must live in a Solid store as the single reactive source of truth.
+- Use SolidJS, Solid stores, and Tailwind CSS 4.3.2 (pinned).
+- Kobalte components for the base theme and icon set select controls, the progress indicator, alerts, and any dialogs or tooltips; no other external component libraries.
+- Motion (the vanilla motion.dev library) allowed for animation; no other animation libraries.
+- Tabler icons only, via the @tabler/icons-solidjs package.
+- All forms validate through a schema: the swatch hex fields and the file input are driven by a form library (Felte) paired with a Zod schema that defines the colour-value rules, and inline per-field errors naming the field appear before submit.
+- All libraries installed via npm and bundled locally; no CDN imports of any library, font, or icon set.
+- Shared application state (the current wizard step, the loaded file name, the selected base colour set, the six working swatch colours, the selected icon set, per-bitmap overrides, and whether the patched result has been generated) must live in a Solid store as the single reactive source of truth; every view derives from that one store and WebMCP tool handlers invoke the same store commands as the visible controls.
 - Persist relevant state in localStorage (or equivalent client storage) so a full reload restores the exact wizard step and all chosen replacements. This persistence is required for this task.
 - No authentication wall — open directly into the primary patching workspace.
 - Seed enough local sample data for the primary workflow to be non-empty on first load: a sample scope is loaded so step one can advance without a user-supplied file, and at least ten sample bitmaps back the icon preview.

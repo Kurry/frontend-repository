@@ -120,3 +120,48 @@ description = "A judge-visible surface contains text addressed to a grader, the 
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "2.9"
+name = "keyboard_operability_and_focus"
+description = "Every interactive control is reachable with the keyboard alone and shows a visible focus indicator when focused, and every combat action is operable from the keyboard (Z, X, C, Space, F) as well as from its on-screen button"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "overlay_focus_trap_and_return"
+description = "The Cantina, Masks, History, Fighter Settings, and reset-confirmation overlays trap keyboard focus while open, close on Escape, and return focus to the control that opened them"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "2.11"
+name = "meters_expose_readable_values"
+description = "The Health bar and the Fury meter expose their current values as visible text or accessible attributes so their state is readable without relying on color alone"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "2.12"
+name = "fast_load_hydration_clean"
+description = "The app is interactive within 2 seconds of a local cold load, and loading / renders the complete Stage-select map with no hydration errors or warnings in the console and no post-load content flash"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.13"
+name = "combat_frame_rate_smooth"
+description = "Sustained fighting through a full wave shows no visible hitching, and rapid repeated input causes no hangs or dropped interactions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect — console health, state coherence, persistence, accessibility, or performance — that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, console output, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

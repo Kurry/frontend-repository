@@ -62,147 +62,140 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
-description = "On load, Board mode shows at least 8 seeded scene cards with images and descriptions"
+name = "seeded_scene_grid"
+description = "On first load, Tile mode shows at least 8 seeded scene cards, each with a scene number, an image, and a title/description"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
+name = "created_scene_visible"
 description = "After creating a scene titled 'Harbor Opening' with valid required fields, the text 'Harbor Opening' is visible on the board"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
+name = "count_delta_after_creates"
 description = "After adding 3 new scenes on top of the seed set, the board shows exactly 3 more scenes than the initial seeded count"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
-description = "After switching to Slide (Tutorial) mode, a single centered active scene is visible with navigation affordances"
+name = "slide_mode_single_scene"
+description = "After switching to Slide mode, the board collapses to a single centered active scene with prev and next controls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
-description = "After editing a scene description/title to 'Evening Cutaway', the text 'Evening Cutaway' is visible and the previous text is not"
+name = "edited_text_replaces_old"
+description = "After focusing a scene's description and editing it in place to 'Evening Cutaway', the text 'Evening Cutaway' is visible on the board and the previous text is not"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
-description = "After deleting a scene, that scene's title/description is no longer visible on the board"
+name = "deleted_scene_removed"
+description = "After deleting a scene via its kebab menu delete action, that scene's title/description is no longer visible on the board"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
-description = "After deleting all scenes, an empty state is visible on the board"
+name = "empty_state_after_last_delete"
+description = "After deleting the last remaining scene, the board shows a clearly visible empty state with a message and an Add Scene path back into the create flow"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
-description = "After submitting create with an empty required title/description, the scenes count does not increase and validation feedback is visible"
+name = "invalid_create_blocked"
+description = "After submitting create with a required title/description field empty, the visible scene count is unchanged and validation feedback is visible"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
-description = "After switching among Tile, List, and Slide view modes, the scene set re-layouts without full page navigation"
+name = "mode_toggles_relayout"
+description = "The storyboard nav bar offers Tile, List, and Slide toggles; Tile and List re-lay the same scene set as a card grid and a stacked list respectively, without full page navigation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
-description = "After advancing prev/next in Slide mode (when multiple scenes exist), the active scene index changes and the centered scene updates"
+name = "slide_prev_next_advance"
+description = "After advancing prev/next in Slide mode (when multiple scenes exist), the active scene changes and the centered scene updates"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
+name = "hover_feedback_visible"
 description = "When hovering scene cards, mode toggles, or header controls, a visible hover lift, wash, or shadow change appears"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
+name = "welcome_line_visible"
 description = "Welcome to Docs! is visible in the workspace chrome on load"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "1_13"
-description = "On load, a left storyboard sidebar shows the active Getting Started row plus sibling storyboards with an Add Storyboard control and a Help footer control"
+name = "sidebar_rows_and_controls"
+description = "On load, a left storyboard sidebar shows the active Getting Started row plus sibling demo storyboards with an Add Storyboard control and a footer Help control"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.14"
-name = "1_14"
+name = "kebab_edit_delete_operate"
 description = "After opening a scene's kebab menu, edit and delete actions for that scene are available and operate on that scene"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.15"
-name = "1_15"
-description = "After clicking an inert control (a sidebar storyboard row, a header utility tool, or Help), a demo-only toast appears and the page does not navigate away"
+name = "inert_controls_toast_demo"
+description = "After clicking an inert control (a sidebar storyboard row, a header utility tool, Add Storyboard, or Help), a demo-only toast appears and the page does not navigate away"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.16"
-name = "1_16"
+name = "console_clean_session"
 description = "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.17"
-name = "1_17"
-description = "Scenes collection supports create, edit, and delete with list rows and derived counts updating from shared application state"
+name = "crud_updates_shared_state"
+description = "Scenes collection supports create, edit, and delete with cards and derived counts updating from shared application state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.18"
-name = "1_18"
+name = "multiple_view_modes_switchable"
 description = "At least two distinct views or interaction modes are switchable without full page navigation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.19"
-name = "1_19"
-description = "Domain state beyond CRUD is implemented (filters, status/priority/mode, or equivalent) and recomputes visible results from the shared collection"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.20"
-name = "1_20"
-description = "Renders visible validation feedback when create is submitted with empty required fields, and the collection count does not increase"
+name = "view_mode_flow_chain"
+description = "Starting in Tile mode, toggling Tile to List to Slide and back re-lays the same scene set with an identical scene count in each mode; no mode switch reloads the document"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.21"
-name = "1_21"
+name = "static_board_no_crud"
 description = "Scenes list is static HTML only with no working create/edit/delete against shared state"
 type = "binary"
 weight = 1.0
@@ -210,45 +203,94 @@ negate = true
 
 [[criterion]]
 id = "1.22"
-name = "1_22"
+name = "outbound_link_navigation"
 description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
-id = "1.23"
-name = "1_23"
-description = "A left storyboard sidebar lists the active Getting Started row plus sibling demo storyboards, with an Add Storyboard control and a footer Help control"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.24"
-name = "1_24"
+name = "product_header_composition"
 description = "The product header shows a logo mark, the Demo Projects project label, the 1. Getting Started storyboard title, a kebab menu, and utility tools (notifications bell, dashboard, account)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.25"
-name = "1_25"
-description = "Each scene card exposes a per-scene kebab menu offering edit and delete actions for that scene"
+id = "1.27"
+name = "kebab_menu_decorative_only"
+description = "Scene edit and delete are unreachable from any per-scene control; the scene kebab menu is decorative and triggers no edit or delete action"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.28"
+name = "create_flow_chain"
+description = "Starting from the seeded board in Tile mode, submitting a valid new scene from Add Scene closes the create form, adds exactly one new card so the visible scene count increases by one, assigns the next scene number in sequence, and switching to List mode and then Slide mode shows the same new scene without a reload, with the Slide prev/next range extended to include it"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.26"
-name = "1_26"
-description = "Inert non-navigational controls (sidebar storyboard rows, header utility tools, Add Storyboard, Help) surface a demo-only toast instead of navigating"
+id = "1.29"
+name = "edit_flow_cross_mode"
+description = "After editing a scene's description in Tile mode, switching to List mode shows the edited text on the same scene, and Slide mode shows the edited text when that scene is the active slide, all without a reload"
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
-id = "1.27"
-name = "1_27"
-description = "Scene edit and delete are not reachable from a per-scene control; the scene kebab menu is decorative and triggers no edit or delete action"
+id = "1.30"
+name = "delete_flow_renumber_chain"
+description = "After deleting a scene through its kebab menu, the visible scene count decreases by exactly one (measured immediately before and after), the remaining scenes are renumbered so numbering stays contiguous, and the Slide-mode prev/next range shrinks so navigation never lands on the deleted scene"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "double_submit_single_scene"
+description = "Double-activating a valid create submit in quick succession adds exactly one scene: the count increases by one and exactly one new card appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "slide_bounds_no_wrap"
+description = "In Slide mode the prev control is disabled on the first scene and the next control is disabled on the last scene; neither control wraps around"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "delete_active_slide_neighbor"
+description = "Deleting the scene currently shown in Slide mode moves the active slide to a valid neighboring scene rather than showing a blank slide"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "inline_validation_names_field"
+description = "Submitting the create form with a required field empty shows an inline per-field validation message naming the empty field, and the submit control stays disabled until the required fields are valid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "drawers_open_seeded_rows"
+description = "The notifications and account/storyboards right drawers open as demo chrome showing seeded rows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "scene_tutorial_copy"
+description = "Scene descriptions carry tutorial copy about the product itself (header tools, notifications, view modes, scene menus, add-scene flows) rather than generic filler"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core functionality or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

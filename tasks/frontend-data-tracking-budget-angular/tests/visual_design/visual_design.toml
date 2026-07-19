@@ -69,8 +69,8 @@ weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
-description = "The Dashboard's category rows show a filled progress bar with the spent/limit amount overlaid, and a consistent single accent color is used for the top bar, the floating add button, the active nav item, and the progress fill"
+name = "pink_accent_used_consistently"
+description = "The Dashboard's category rows show a filled progress bar with the '$spent / $limit' amount overlaid, and a single pink/magenta brand accent color is used consistently for the top bar, the floating add button, the active bottom-nav item, the progress-bar fill, and primary buttons, with light neutral surfaces elsewhere and cards with subtle elevation and rounded corners"
 type = "binary"
 weight = 1.0
 
@@ -108,9 +108,60 @@ negate = true
 
 [[criterion]]
 id = "3.7"
-name = "3_7"
+name = "narrow_viewport_clips_or_overflows"
 description = "At a 375px-wide viewport the content clips, controls overlap, or the page requires horizontal scrolling to reach the expense table or its actions"
 type = "binary"
 weight = 0.5
 negate = true
 optional = true
+
+[[criterion]]
+id = "3.8"
+name = "chart_card_labeled_consistent_colors"
+description = "The spending-breakdown chart sits in a card alongside the summary and category cards, uses one consistent color per category, and labels or legends each category so segments are identifiable without any interaction"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "single_icon_style_throughout"
+description = "One consistent icon style is used across the app: bottom-nav items, table row actions, dialog controls, and the floating action button all draw from the same icon set with no mixed styles or missing glyphs"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.10"
+name = "desktop_column_centered_capped"
+description = "On a desktop-width viewport the single-column layout stays centered and capped at a readable width, with the top bar and fixed bottom navigation spanning the app column rather than stretching content edge to edge"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "dialog_fits_narrow_viewport"
+description = "At a 375px-wide viewport the add/edit expense dialog fits within the viewport with all four fields and both actions reachable without content being cut off"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.12"
+name = "validation_copy_names_field_and_fix"
+description = "Inline validation messages in the add/edit expense dialog name the offending field and the problem (e.g. that the amount must be a positive number) rather than a bare 'Invalid' or generic rejection"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.13"
+name = "placeholder_text_shipped"
+description = "Lorem ipsum, 'TODO', template variable names, or other placeholder text is visible somewhere in the shipped UI"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design (layout, palette, typography, density, alignment, or rendered copy) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

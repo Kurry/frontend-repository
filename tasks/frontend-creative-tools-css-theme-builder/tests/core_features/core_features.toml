@@ -62,119 +62,119 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
-description = "On load, the Themes sidebar lists My themes and a built-in theme catalog with swatch preview chips, and the three-panel workspace (themes | editor | preview) is visible at a wide viewport"
+name = "initial_theme_workspace"
+description = "On a wide first load, the app shows the Themes sidebar, theme editor, and live-preview pane, with My themes plus exactly 35 named built-in presets from light through silk and a four-swatch chip on every theme row"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
-description = "After creating a custom theme named 'Harbor Dawn' with valid required fields (hold-to-add or New), the text 'Harbor Dawn' is visible under My themes"
+name = "create_custom_theme"
+description = "After creating a valid custom theme named 'Harbor Dawn' through a visible New action, My themes increases by exactly one, 'Harbor Dawn' is selected, and its name and tokens appear in both the editor and live preview without reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
-description = "After adding 3 new custom themes on top of any existing custom set, My themes shows exactly 3 more rows than before those creates"
+name = "create_count_delta"
+description = "After recording the My themes count and creating three valid, uniquely named themes through the UI, the count is exactly three greater and all three names are visible without duplicates"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
-description = "After changing a semantic color or radius control on the active custom theme, the live preview re-themes to match the new tokens without reload"
+name = "token_edits_retheme_preview"
+description = "Changing each kind of editable token through its visible control—a color, radius, field or selector size, border width, depth, noise, and dark-color-scheme option—immediately changes the corresponding editor state and live-preview styling without reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
-description = "After editing a custom theme name to 'Evening Tide', the text 'Evening Tide' is visible in My themes and the previous name is not"
+name = "rename_updates_all_surfaces"
+description = "After renaming the selected custom theme to 'Evening Tide', that name replaces the old name in My themes, the editor, and exported CSS without reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
-description = "After deleting/removing a custom theme, that theme name is no longer visible under My themes"
+name = "remove_custom_theme"
+description = "After removing the active custom theme through the visible Remove action, My themes decreases by exactly one, the removed name disappears, and the editor and preview move to a valid remaining selection"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
+name = "empty_custom_theme_state"
 description = "After removing all custom themes, My themes shows an empty state while built-in catalog themes remain available"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
-description = "After submitting create with an empty required theme name, the custom themes count does not increase and validation feedback is visible"
+name = "invalid_theme_name_validation"
+description = "Submitting theme creation with an empty and then a whitespace-only name leaves the custom-theme count unchanged both times and shows visible inline validation feedback at the name field"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
-description = "After switching from Components Demo to Color Palette (or Component Variants) preview tab, the preview pane swaps dense demos without leaving the page"
+name = "preview_tabs_swap_content"
+description = "Switching among Components Demo, Component Variants, and Color Palette swaps the preview pane in place: the first shows the specified dense component examples, the second shows button/form/alert variants, and the third shows 16 labelled token swatches with values"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
-description = "After switching focus between Themes list selection and Editor/Generator controls, both modes remain usable and the active theme stays in sync across panels"
+name = "theme_selection_cross_panel_sync"
+description = "Selecting a different built-in or custom theme row updates the active highlight, editable name and tokens, and current live-preview tab to that same theme without reload or stale values"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
-description = "After clicking Random on a custom (or forked) theme, editor color tokens and the live preview change"
+name = "random_changes_live_theme"
+description = "Two successive clicks on Random produce two fresh, visibly different OKLCH color-token sets and light/dark schemes, with the editor and live preview matching each result and a confirmation toast appearing after each click"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
-description = "When hovering theme rows, chrome controls, swatch chips, or primary buttons, a visible hover wash, tilt, or fill/border transition appears"
+name = "complete_editor_controls"
+description = "The editor exposes an editable name, Random and CSS-export controls, all 11 semantic face/content color pairs, three five-choice radius groups, Depth and Noise toggles, two five-step size groups, four border-width choices, three option checkboxes, Reset theme, and Remove theme"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "1_13"
+name = "chrome_theme_picker"
 description = "After choosing a chrome theme option (light / dark / cupcake / synthwave), the app shell recolors and that option is marked active"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.14"
-name = "1_14"
-description = "After opening the CSS-export control, a modal shows a [data-theme] CSS block and Copy shows a brief copied confirmation"
+name = "css_export_copy_and_dismiss"
+description = "Opening CSS export shows a [data-theme=\"name\"] CSS block containing the active values; Copy writes that block to the clipboard and confirms the copy, and each of Close, backdrop click, and Escape can dismiss a freshly opened modal"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.15"
-name = "1_15"
-description = "After editing a built-in preset, an editable custom copy is created and the built-in preset itself is unchanged"
+name = "builtin_edit_forks_copy"
+description = "After recording a built-in preset's name and swatches and editing one of its tokens, My themes gains exactly one selected editable copy while reselecting the built-in shows its original name and swatches unchanged"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.16"
-name = "1_16"
-description = "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session"
+name = "share_hash_updates_and_loads"
+description = "After renaming and recoloring the active theme, the same-document URL contains an updated #theme= payload; opening that exact URL in a fresh page applies the same name and token values on first paint"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.17"
-name = "1_17"
+name = "static_theme_controls"
 description = "Saved themes list is static HTML only with no working create/edit/delete against shared state"
 type = "binary"
 weight = 1.0
@@ -182,7 +182,7 @@ negate = true
 
 [[criterion]]
 id = "1.18"
-name = "1_18"
+name = "outbound_navigation"
 description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
 type = "binary"
 weight = 1.0
@@ -190,50 +190,65 @@ negate = true
 
 [[criterion]]
 id = "1.19"
-name = "1_19"
+name = "chrome_dropdowns_stay_in_place"
 description = "Choosing a chrome theme option (light / dark / cupcake / synthwave) recolors the app shell and marks that option active, and the version, chrome-theme, and language dropdowns open in place without navigating"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.20"
-name = "1_20"
+name = "hold_to_add_success_and_cancel"
 description = "Pressing and holding the Hold to add theme control for its full duration completes a progress fill and adds a new custom theme, while releasing early adds nothing"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.21"
-name = "1_21"
+name = "builtin_removal_protection"
 description = "Editing a built-in preset forks an editable custom copy rather than mutating the preset, and attempting to remove a built-in preset surfaces a notice instead of deleting it"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.22"
-name = "1_22"
-description = "The CSS-export control opens a modal previewing a [data-theme=\"name\"] { … } CSS block, Copy writes it to the clipboard with a brief copied confirmation, and Close, the backdrop, or Escape dismiss the modal"
+name = "reset_restores_selected_theme"
+description = "After changing multiple tokens on a custom theme, Reset theme restores that theme's prior/default token values coherently in the editor, list swatches, and live preview without changing the selected theme"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.23"
-name = "1_23"
-description = "Clicking Random replaces the theme's color tokens with a fresh randomized set, re-themes the live preview, and shows a brief confirmation toast"
+name = "content_color_picker_updates_preview"
+description = "Opening a semantic row's content 'A' picker and choosing a different content color updates that paired content token and the corresponding preview text color without reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.24"
-name = "1_24"
-description = "Submitting create with an empty or whitespace-only theme name does not add a custom theme and shows visible validation feedback"
+name = "create_edit_preview_export_flow"
+description = "Starting from the initial My themes count: create 'Harbor Dawn', change its primary color and box radius, switch to Color Palette, then open CSS export; the count is exactly one higher, the selected row swatches, editor values, 16-swatch palette, preview styling, and exported CSS all show the same changed theme without reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.25"
-name = "1_25"
+name = "builtin_mutated_in_place"
 description = "Editing a built-in preset mutates the preset in place instead of forking an editable custom copy"
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "1.26"
+name = "remove_all_then_repopulate_flow"
+description = "Starting with at least one custom theme, remove every custom theme and observe the empty My themes hint while all 35 built-ins remain, then create a valid replacement and observe the hint disappear, the count become one, and the replacement become active in the editor and preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in a specified core behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence (control, action sequence, or resulting page state) that demonstrates it. If the defect is already covered—even partially—by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

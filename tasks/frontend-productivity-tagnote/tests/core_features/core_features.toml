@@ -153,78 +153,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.14"
-name = "1_14"
-description = "After creating several visible changes then undoing and making a different change, the History panel exposes a History state region and a separately selectable branch that restores its exact prior visible state"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.15"
-name = "1_15"
-description = "Sending a note through the composer appends exactly one note under a Today date header with the exact typed text and clears the input"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.16"
-name = "1_16"
-description = "Inline hash-word tokens in a note become tag chips beneath it: call mom #family #todo yields exactly two chips family and todo"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.17"
-name = "1_17"
-description = "Case-insensitive tag dedup: #Work and #work resolve to one work tag counted 2 in the rail, and filtering by it shows both notes"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.18"
-name = "1_18"
-description = "A note containing an http(s) URL automatically gains a link tag and renders the URL as a clickable anchor inside the bubble"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.19"
-name = "1_19"
-description = "Clicking a tag in the rail filters the timeline to notes carrying it and shows a Clear filter affordance; clicking it again clears the filter"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.20"
-name = "1_20"
-description = "Marking a tag as a TODO tag adds a checkbox to its notes and splits that tag's filtered view into Open (unchecked) and Done (checked) sections"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.21"
-name = "1_21"
-description = "Pin moves a note into a Pinned section above the chronological timeline and Unpin returns it to its original chronological position"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.22"
-name = "1_22"
-description = "Archive moves a note into a separate Archived view and Unarchive restores it to its original chronological position in the main timeline"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.23"
-name = "1_23"
-description = "Editing a note re-derives tags and links entirely from the new text: a removed token drops its tag and a newly typed tag or URL is added"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.24"
-name = "1_24"
-description = "Delete requires a confirmation step: canceling keeps the note, confirming permanently removes it from the timeline and tag counts"
+name = "undo_redo_adjacent_states"
+description = "After making two visible changes, activating Undo restores the immediately previous visible state and activating Redo re-applies the undone change, while Apply Scenario Change commits a new visible transition, without disturbing unrelated notes"
 type = "binary"
 weight = 1.0
 
@@ -276,6 +206,84 @@ negate = true
 id = "1.31"
 name = "1_31"
 description = "Editing a note accumulates tags instead of re-deriving them, so a tag removed from the text still shows as a chip"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.32"
+name = "single_page_shell_layout"
+description = "The app opens at / into a single-column shell showing a sticky top bar titled TagNote with Calendar, Archived, History, Apply Scenario Change, Undo, and Redo controls, a search field, a horizontal tag rail, the note timeline, and a composer pinned to the bottom, and exercising these controls never navigates away from the page"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "composer_bold_italic_toggle_roundtrip"
+description = "Selecting text in the composer and activating Bold renders that span bold in the composer and in the sent note bubble, Italic works the same way, activating the same toggle again on the same span removes the formatting, and a formatted note parses exactly the same hash-word tag chips as its unformatted plain text would"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "composer_local_undo_shortcut"
+description = "Pressing the standard undo keyboard shortcut while typing in the composer reverts the last typing or formatting change inside the composer only, leaving the timeline's own Undo/Redo history and existing notes untouched"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "edit_mode_save_cancel_formatting"
+description = "Activating Edit on a note loads its text with bold/italic formatting preserved into the composer, which switches to an Editing note mode with Save and Cancel controls; Cancel discards the edit and leaves the note unchanged while Save applies the new text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "blank_submit_blocked_with_inline_error"
+description = "Activating Send with a blank or whitespace-only composer appends no note and shows a visible inline error message naming the note text field (a silently disabled Send control alone is insufficient), and the last valid timeline state stays intact"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "double_send_appends_exactly_one"
+description = "Double-activating Send in rapid succession on the same composer text appends exactly one note: the visible note count increases by exactly one and exactly one new bubble appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "send_flow_rail_counts_reload_chain"
+description = "Starting from a loaded timeline, type call mom #family #todo and send: exactly one new bubble appears under the Today header, the visible note count measured immediately before and after differs by exactly one, the tag rail's family and todo chips each increase their usage count by one (appearing with count 1 when new), and a full page reload restores the note, its two chips, and the same rail counts exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "bold_format_edit_reload_chain"
+description = "Bold a word in the composer and send, confirm the sent bubble renders the word bold, then edit that note, toggle the bold off, and save, confirming the saved bubble renders it plain; a page reload after each of the two steps shows the same rendered formatting state as before the reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "archive_rail_counts_multisurface_chain"
+description = "Archiving a note removes its bubble from the main timeline (visible count down by exactly one), immediately decreases its tags' usage counts in the rail with a tag used only by that note leaving the rail entirely, and the Archived view lists the note; Unarchive then returns it to its original chronological position and restores the rail counts, all without a page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "todo_done_split_reload_chain"
+description = "Marking work as a TODO tag adds a checkbox to every timeline note carrying work; checking one of those notes inside the work filtered view moves it from the Open section to the Done section immediately, and after a full page reload the tag's TODO designation and that note's Done placement are restored exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "A specified core behavior of the app is broken or missing in a significant way that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence (element, action sequence, resulting state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

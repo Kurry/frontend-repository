@@ -62,14 +62,14 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
+name = "rival_thinking_visibly_animated"
 description = "During real play the Rival's thinking delay is visibly animated (a pulsing thinking indicator for roughly a second) before its tile resolves, rather than an instant silent jump"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "4_2"
+name = "tile_hover_lift_response"
 description = "Hovering an actionable covered tile with the pointer produces a visible lift or brightness response"
 type = "binary"
 weight = 0.5
@@ -77,7 +77,7 @@ optional = true
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
+name = "round_result_overlay_eases_in"
 description = "The Round Result overlay eases in over a blurred backdrop rather than appearing instantly"
 type = "binary"
 weight = 0.5
@@ -85,7 +85,7 @@ optional = true
 
 [[criterion]]
 id = "4.4"
-name = "4_4"
+name = "rival_move_snaps_instantly"
 description = "When the Rival's move resolves via real play, it appears instantly with no visible thinking animation or turn transition"
 type = "binary"
 weight = 1.0
@@ -93,9 +93,74 @@ negate = true
 
 [[criterion]]
 id = "4.5"
-name = "4_5"
+name = "reduced_motion_ignored"
 description = "Animations ignore the prefers-reduced-motion setting and keep playing full-length transitions when reduced motion is requested"
 type = "binary"
 weight = 0.5
 negate = true
 optional = true
+
+[[criterion]]
+id = "4.6"
+name = "turn_change_color_glow_transitions"
+description = "When the active side changes during real play, the turn banner and each side's score panel transition their color and glow rather than snapping between states"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "tile_reveal_background_transition"
+description = "A tile resolving from covered to revealed through a real click shows a short background transition rather than an instant swap"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.8"
+name = "strike_fill_animates"
+description = "Strike icons animate their fill as strikes accrue through real play, with a distinct filled state and a distinct warning treatment at 2 strikes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "history_entries_animate_in_out"
+description = "History panel entries animate in as new states are appended and animate out when a branch is discarded, rather than the list snapping between lengths"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "match_win_confetti_burst"
+description = "Winning the match as the Player through real play triggers a brief celebratory particle burst over the Match Complete screen"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "celebration_fires_without_player_win"
+description = "A celebratory particle or confetti effect fires on a match loss, on the setup screen, or ambiently without the Player having won the match through play"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.12"
+name = "rejection_feedback_fades"
+description = "Rejection feedback for an illegal action animates in briefly and fades out, rather than appearing and vanishing instantly"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.13"
+name = "button_hover_active_feedback"
+description = "Primary buttons lift on hover and secondary buttons take a tinted wash on hover, with visible pressed/active feedback on both"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

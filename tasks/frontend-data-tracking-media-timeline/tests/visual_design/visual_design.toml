@@ -81,3 +81,76 @@ description = "Replaces the timeline with a static brochure layout and no scrub/
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "3.4"
+name = "expressive_typography_and_paper_stage"
+description = "Typography is expressive rather than Inter, Roboto, or system default fonts, and the stage carries a warm or cool paper atmosphere rather than a plain default-white background"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "category_color_and_detail_hierarchy"
+description = "Event pins or list rows show their category color, and the detail surface presents a clear hierarchy of kicker (year · place), title, and body"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "single_consistent_icon_set"
+description = "Chrome controls (mode switch, filters, close, navigation) share one consistent icon set with no visibly mixed icon styles"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "narrow_layout_stacks_and_stays_usable"
+description = "At 768px viewport width and below, the stage and Library/Filter stack or the library becomes a drawer/sheet, and both modes stay reachable and usable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "mobile_overflow_or_inoperable_scrubber"
+description = "At 375px viewport width, content clips or overflows the viewport, horizontal page scrolling appears, or the year scrubber cannot be operated"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.9"
+name = "bce_ce_year_format_consistent"
+description = "Years render in a consistent BCE/CE format everywhere they appear: the scrubber readout, pin hover labels, the detail kicker, and list rows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "validation_and_empty_copy_actionable"
+description = "Validation messages name the field and the fix, empty states explain what matched nothing and how to recover, and the About/help copy explains both interaction modes in complete sentences"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "placeholder_text_visible_in_ui"
+description = "Placeholder or filler text (lorem ipsum, 'TODO', 'asdf', unrendered template variables) is visible anywhere in the shipped UI"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.12"
+name = "mediatimeline_brand_and_tool_first_viewport"
+description = "The product name MediaTimeline appears with History of Media and Communication as the brand signal, and the first viewport is the timeline tool itself rather than a marketing hero"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

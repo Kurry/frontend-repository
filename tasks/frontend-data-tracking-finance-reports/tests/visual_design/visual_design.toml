@@ -89,3 +89,83 @@ description = "Breakdown renders a category sankey/flow and Trends renders a cat
 type = "binary"
 weight = 0.5
 optional = true
+
+[[criterion]]
+id = "3.5"
+name = "soft_mint_palette_with_ledger_mark"
+description = "The UI reads as a soft mint finance workspace: light page and sidebar washes, a brand teal, mint accents, and a branded Ledger lockup in the sidebar"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "sidebar_main_column_layout_order"
+description = "A persistent left sidebar sits beside a main column ordered as page chrome actions, a row of four statistic cards, the chart card, the transactions table, and a summary strip beneath the table"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "single_icon_set_inline_sizes"
+description = "Sidebar, chrome actions, and table controls share one consistent icon set rendered inline at text-compatible sizes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "component_states_visibly_distinct"
+description = "Buttons and inputs show visibly distinct default, hover, focus (visible ring), disabled, and error treatments"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "sidebar_persistent_at_desktop_widths"
+description = "At 1024px viewport width and above, the left sidebar stays persistently visible beside the main reports column"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "sidebar_collapses_to_drawer_below_1024"
+description = "Below 1024px viewport width, the sidebar collapses behind a visible toggle control that opens it as an overlay drawer, with all nav items still reachable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "mobile_375_content_clips_or_scrolls"
+description = "At 375px viewport width, content clips or overflows the viewport, or a page-level horizontal scrollbar appears (the transactions table scrolling inside its own container is allowed)"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.12"
+name = "consistent_capitalization_convention"
+description = "Headings, nav items, and buttons use one consistent capitalization convention throughout the app"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.13"
+name = "actionable_validation_and_empty_state_copy"
+description = "Validation messages name the field and the fix, and empty states explain what belongs in the region and how to add it"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.14"
+name = "placeholder_or_filler_text_shipped"
+description = "Placeholder or filler text (lorem ipsum, 'TODO', template variables, keyboard-mash strings) is visible somewhere in the shipped UI, or seeded payees, categories, or amounts read as implausible junk rather than plausible synthetic finance data"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

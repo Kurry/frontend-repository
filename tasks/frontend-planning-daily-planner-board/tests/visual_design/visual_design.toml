@@ -62,14 +62,14 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
-description = "The layout reads as a planner workspace: a left nav rail with the Cadence wordmark, a central horizontally scrollable board of day columns July 6 through July 26, and a right calendar rail with the Calendars panel and hour ruler"
+name = "planner_workspace_three_region_layout"
+description = "The layout reads as a calm planner workspace on a light surface: a fixed left nav rail with the Cadence wordmark, a central horizontally scrollable board of dense day columns July 6 through July 26, and a fixed right calendar rail with the Calendars panel and hour ruler — density reads as a workspace, not a marketing landing"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
+name = "empty_column_keeps_add_task_and_zero_total"
 description = "A column with no tasks shows an empty column that still offers Add task and reads a 0:00 planned-time total"
 type = "binary"
 weight = 0.5
@@ -77,8 +77,88 @@ optional = true
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
+name = "single_day_mock_instead_of_multi_day_board"
 description = "The page renders as a single-day or marketing-style mock rather than the multi-day board of 21 dated columns from July 6 through July 26"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.4"
+name = "single_accent_color_system"
+description = "One single accent color is used consistently for the active nav item, the Today control, planned-time chips, and channel tags, rather than several unrelated accent hues"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "day_column_anatomy_and_today_marker"
+description = "Day columns are narrow, equal-height cards with a header (weekday, date, action label), a scrollable task area, an Add task affordance, and a planned-time footer, and the July 18 column is visually marked as today"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "compact_task_card_anatomy"
+description = "Task cards are compact with a circular completion checkbox at left, the title, a #work channel tag, and — where the task carries them — scheduled-start and planned-time chips, a notes indicator, and a subtask checklist"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.7"
+name = "calendar_panel_visual_treatment"
+description = "The calendar panel uses a titled header with a 1x zoom pill, a visually highlighted all-day event row, and a full 24-row hour ruler from 12 AM to 11 PM"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.8"
+name = "consistent_icon_set_uniform_weight"
+description = "Icons across the nav rail, the right utility strip (Search, GitHub, Backlog, Archive, Objectives, Calendar), the board header, and task chips come from one consistent icon set with a uniform visual weight"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.9"
+name = "three_regions_visible_at_1440"
+description = "At a 1440 pixel wide viewport, the fixed left nav rail, the central multi-day board, and the fixed right calendar rail are all visible at once, and the board scrolls horizontally inside its own region"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "body_horizontal_scroll_or_clipping"
+description = "At desktop widths, the page body scrolls horizontally, or content clips outside the viewport, or the nav rail or calendar rail overlaps board content"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.11"
+name = "narrow_desktop_board_shrinks_gracefully"
+description = "At narrower desktop widths, the central board region shrinks while remaining horizontally scrollable, with the nav rail and calendar rail intact and readable"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.12"
+name = "consistent_capitalization_convention"
+description = "Headings, buttons, and nav labels keep one consistent capitalization convention throughout the app, and validation and empty-state messages name the problem and the fix in plain language"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.13"
+name = "placeholder_or_lorem_text_visible"
+description = "Lorem ipsum, placeholder text (TODO, asdf, template variable names like {{title}}), or leftover scaffolding copy is visible somewhere in the shipped UI"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

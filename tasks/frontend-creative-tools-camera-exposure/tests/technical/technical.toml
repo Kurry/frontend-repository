@@ -74,3 +74,75 @@ description = "Uses localStorage or sessionStorage to persist presets or dial st
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "2.4"
+name = "reload_resets_all_facets_to_seed"
+description = "After changing several independent facets (step two dials off default, create a valid preset, mark one favorite, open Presets/Compare), a page reload returns the app coherently to its seeded state: default dials (f/16, 1/60, ISO 100), centered meter, and exactly the seeded presets — never a mix of reverted and surviving facets"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "keyboard_reachable_with_focus_ring"
+description = "Every stepper, mode switch, help trigger, reset, and preset control is reachable and operable with the keyboard alone (Tab/Shift+Tab plus Enter/Space), each showing a visible focus indicator when focused"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "help_panel_dialog_focus_management"
+description = "The help panel is exposed as a dialog or complementary region in the accessibility tree; opening it moves keyboard focus into the panel and closing it returns focus to the trigger"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "dial_readouts_are_real_text"
+description = "Each dial's current value (f/16, 1/60, 100 at defaults) is rendered as real DOM text readable by assistive technology, not baked into an image or canvas"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "validation_messages_programmatically_associated"
+description = "Preset form validation messages are shown visually and are programmatically associated with their fields (e.g. described-by or live-region wiring observable in the accessibility tree) so assistive technology announces them"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "interactive_within_two_seconds"
+description = "On a local cold load the app renders and responds to a first dial press within 2 seconds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "rapid_stepper_presses_stay_coherent"
+description = "Rapid repeated stepper presses stay responsive: every press lands, the readouts never desynchronize from the preview and meter, and the UI never hangs or freezes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "external_network_requests_for_assets"
+description = "Devtools network activity shows outbound requests to other origins (CDN scripts, remote fonts, or remote imagery) — the depth plate, motion frames, noise texture, fonts, and libraries must all load from local assets"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.12"
+name = "document_title_camera_exposure_simulator"
+description = "The browser tab's document title reads 'Camera Exposure Simulator'"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect (console health, state coherence, storage rule, load stability) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, console line, network entry, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

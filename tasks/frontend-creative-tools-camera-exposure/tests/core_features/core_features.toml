@@ -110,13 +110,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.8"
-name = "1_8"
-description = "After applying a seeded preset, the dial labels update to that preset's aperture/shutter/ISO and the preview meter/brightness respond"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.9"
 name = "1_9"
 description = "After editing a preset name to 'Night Street Grain', the text 'Night Street Grain' is visible in the list and the previous name is not"
@@ -180,23 +173,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.18"
-name = "1_18"
-description = "At least two distinct views or interaction modes are switchable without full page navigation"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.19"
 name = "1_19"
 description = "Domain state beyond CRUD is implemented (filters, status/priority/mode, or equivalent) and recomputes visible results from the shared collection"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.20"
-name = "1_20"
-description = "Renders visible validation feedback when create is submitted with empty required fields, and the collection count does not increase"
 type = "binary"
 weight = 1.0
 
@@ -271,6 +250,79 @@ weight = 1.0
 id = "1.30"
 name = "1_30"
 description = "Pressing the dial steppers changes the readout number but the photo preview (brightness, blur, noise, or exposure meter) does not respond"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.31"
+name = "preset_lifecycle_cross_mode_chain"
+description = "Starting in Presets/Compare with the seeded list: create a valid preset and confirm the form closes and the visible preset row count increases by exactly one (measured immediately before and after); switch to Meter/Lab and back and confirm the same new preset row is still present without a reload; edit that preset's name and confirm the same row shows the new name (and any compare panel showing it updates); delete it and confirm the row count decreases by exactly one and the preset no longer appears in the list, in any selection, or in favorites/tag filter results"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "apply_look_cross_mode_chain"
+description = "Applying a preset from Presets/Compare then switching to Meter/Lab shows, without a reload: all three dial readouts at the preset's values, the preview stack (brightness, blur, motion frame, grain) matching those stops, and the exposure meter at the corresponding position"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "dial_meter_round_trip_preserved_across_modes"
+description = "From the defaults (f/16, 1/60, ISO 100): stepping aperture one stop toward open brightens the frame, strengthens the blur, and moves the meter one increment toward over-exposed; stepping back one stop returns the frame, blur, and meter to the default state; then switching to Presets/Compare and back preserves the current dial values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "favorites_echo_filter_chain"
+description = "Marking a preset favorite shows its favorite badge in the list immediately; switching the filter to favorites-only shows that preset among the results; unmarking it while the favorites-only filter is active removes it from the visible list on the same action"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "double_submit_creates_exactly_one_preset"
+description = "Double-activating the preset create submit control in quick succession creates exactly one preset: the visible row count increases by exactly one and exactly one new row appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "inline_field_errors_disable_submit"
+description = "In the preset create or edit form, an invalid field shows an error message naming that field next to it before submit, and the submit control stays disabled until every required field is valid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "direct_entry_default_dial_values"
+description = "On first load the full-viewport photo preview with overlaid dials renders immediately with APERTURE at f/16, SPEED at 1/60, and ISO at 100"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "login_gate_or_multipage_shell_blocks_simulator"
+description = "A login screen, admin gate, or multi-page shell must be traversed before the simulator preview and dials appear"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.39"
+name = "iso_grain_capped_at_max"
+description = "Stepping ISO to its maximum stop (3200) makes the tiled grain overlay clearly more visible than at ISO 100, yet the underlying photo remains discernible (the grain never fully hides it)"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

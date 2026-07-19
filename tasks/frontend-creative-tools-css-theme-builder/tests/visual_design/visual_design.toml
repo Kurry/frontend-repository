@@ -62,21 +62,21 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
-description = "Three-panel themes/editor/preview workspace remains dense and tool-like, not a marketing card stack"
+name = "dense_three_panel_studio"
+description = "At 1440×900, a sticky announce/navbar area sits above a dense tool-studio workspace with an approximately 14rem Themes sidebar, 17rem editor, and live preview filling the remaining width"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
-description = "Empty My themes state is visually present when no custom themes remain"
+name = "responsive_panel_reflow"
+description = "Across desktop and narrow mobile viewports, the three workspace regions remain identifiable and usable, reflowing toward one column without clipped controls, unreadable text, or page-wide horizontal overflow"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
+name = "generic_equal_card_layout"
 description = "Collapses into a single-column equal-card marketing layout with no distinct themes/editor/preview panels"
 type = "binary"
 weight = 1.0
@@ -84,15 +84,54 @@ negate = true
 
 [[criterion]]
 id = "3.4"
-name = "3_4"
-description = "The Themes sidebar lists a built-in catalog of about 35 presets, each row a four-swatch chip (primary / secondary / accent / neutral) plus the theme name, with the active row highlighted"
+name = "theme_row_visual_anatomy"
+description = "Every theme row has a clearly ordered four-swatch primary/secondary/accent/neutral chip and name, with a visually distinct active row; the empty My themes hint remains legible when no custom rows exist"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "3_5"
-description = "The Change Colors editor shows 11 semantic rows each with a face color picker and a round content \"A\" badge, and radius, size, and effect controls appear as compact segmented choices with an active selection state"
+name = "compact_editor_visual_anatomy"
+description = "The Change Colors editor presents 11 aligned face-swatch rows with round content 'A' badges, while radius, size, effect, and border controls use compact segmented choices with an unambiguous active state and Hold to add has a visible inset progress track"
 type = "binary"
 weight = 0.5
 optional = true
+
+[[criterion]]
+id = "3.6"
+name = "token_driven_preview_surfaces"
+description = "The active theme produces a coherent palette across preview cards, stats, forms, chat, code mockup, radial progress, controls, and the 16 labelled palette swatches, with readable face/content color pairings"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "studio_typography_and_grouping"
+description = "Chrome typography has a consistent rounded display character comparable to Outfit, and hierarchy, spacing, borders, and grouping keep the dense catalog, editor sections, and preview labels scannable"
+type = "likert"
+points = 5
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.8"
+name = "export_modal_and_dropdown_layout"
+description = "The CSS export opens as a centered modal with a scrollable code block, copy affordance, and hint line, while version, theme, and language menus align to their chrome triggers without clipping or leaving the viewport"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "token_contrast_failure"
+description = "A selectable built-in theme or edited token combination makes essential editor or preview text visibly unreadable against its active surface because the paired face/content styling is not applied coherently"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick or taste disagreement. If present, name the defect and cite the concrete browser evidence (element, page state, viewport, or screenshot) that demonstrates it. If the defect is already covered—even partially—by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

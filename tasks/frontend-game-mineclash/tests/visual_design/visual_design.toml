@@ -62,14 +62,14 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
+name = "dark_stone_theme_identity_colors"
 description = "The interface uses the dark stone theme with amber ore accents, a sky-blue You panel, and a warm-orange Rival panel"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
+name = "active_panel_glow_in_identity_color"
 description = "The active side's score panel is outlined and softly glows in that side's identity color while the other side's panel is muted"
 type = "binary"
 weight = 0.5
@@ -77,21 +77,21 @@ optional = true
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
+name = "mine_tile_red_tinted_marking"
 description = "A revealed mine tile is marked with a distinct mine icon and a red-tinted background that persists for the rest of the round"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.4"
-name = "3_4"
+name = "strike_states_visibly_distinct"
 description = "Each side's row of 3 Strike icons shows a visibly distinct 0, 1, 2, and 3 state, with the 2-strike near-loss state in a warning color"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "3_5"
+name = "grid_scales_and_stacks_at_375"
 description = "At roughly a 375px-wide viewport the grid scales down and stays tappable without horizontal scrolling while the score and strike panels stack above the grid"
 type = "binary"
 weight = 0.5
@@ -99,7 +99,7 @@ optional = true
 
 [[criterion]]
 id = "3.6"
-name = "3_6"
+name = "flag_mode_visually_indistinct"
 description = "Flag Mode being active is not visually distinguishable from normal reveal mode, so the player cannot tell which mode is active"
 type = "binary"
 weight = 1.0
@@ -107,8 +107,81 @@ negate = true
 
 [[criterion]]
 id = "3.7"
-name = "3_7"
+name = "turn_indicator_ambiguous"
 description = "Whose turn it is is not visually unmistakable (no clear active-turn indicator distinguishing the Player's turn from the Rival's)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.8"
+name = "semantic_status_colors"
+description = "Success green marks safe hints and round wins, warning yellow marks the 2-strike near-loss state and mine hints, and error red marks mine hits and round losses"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "sans_headings_mono_grid_numbers"
+description = "Headings render in a sans-serif stack with an h1 near 30px and h2 near 22px over 16px sans-serif body text, while grid numbers, coordinates, and scores render in a monospace stack"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "radii_and_button_treatments"
+description = "Grid tiles use a small (about 4px) corner radius, buttons about 8px, and panels about 12px; primary buttons (Start match, Rematch, Apply Scenario Change) are amber with near-black text and a soft drop shadow, while secondary buttons (Flag mode, Hint, Pause, New match) are transparent with an amber border and amber text and no shadow"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "consistent_icon_set"
+description = "The ore, mine, flag, strike, sound, and empty-state icons share one consistent icon style with uniform stroke and weight, with no mismatched glyph styles across the app"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.12"
+name = "stats_empty_state_composition"
+description = "The Stats empty state shows an icon plus the heading 'No matches played yet' and an explanatory line telling the player how to start a match, rather than blank zero rows"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.13"
+name = "control_labels_consistent_verbs"
+description = "Control labels use one consistent capitalization convention and specific verbs (Start match, Apply Scenario Change, Rematch) rather than generic labels like Submit or OK"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.14"
+name = "rejection_and_result_copy_clear"
+description = "Rejection messages for illegal actions name what was attempted and why it is unavailable, and the Round Result overlay states the winner and the reason in plain language"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.15"
+name = "placeholder_text_visible"
+description = "Lorem ipsum, 'TODO', template variable names, or other placeholder text is visible somewhere in the shipped UI"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.16"
+name = "content_overflows_at_375"
+description = "At a 375px-wide viewport, the setup screen, HUD, history panel, overlays, or Stats view clips content, overflows the viewport, or requires horizontal scrolling"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

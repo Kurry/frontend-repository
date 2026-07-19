@@ -1,20 +1,21 @@
 <summary>
-Build a dueling minefield puzzle game called MineClash using Qwik, Qwik stores, and Tailwind CSS.
+Build a dueling minefield puzzle game called MineClash using Qwik, Qwik stores, Tailwind CSS 4.3.2, and DaisyUI.
 </summary>
 
 <reference_screenshots>
 Screenshots of the reference application are provided in-container at
-`/reference-screenshots/`: `overview.png` is a full-page desktop-layout
-overview (downscaled); `segment-NN.png` are full-resolution 1440x900 sections
+/reference-screenshots/: overview.png is a full-page desktop-layout
+overview (downscaled); segment-NN.png are full-resolution 1440x900 sections
 in top-to-bottom order with slight overlap. They are part of this instruction:
 recreate what they show. Where a screenshot and the text conflict, the text
-wins. Do not copy the images into `/app` or ship them as app assets.
+wins. Do not copy the images into /app or ship them as app assets.
 </reference_screenshots>
 
 <core_features>
 Core features (each line is an observable behavior the finished app must exhibit):
 - Direct entry: the app opens at / into a setup screen titled MineClash with a difficulty selector and a Start match control — no login, no admin gate, no routing shell
 - Difficulty selector on setup offers exactly three choices: Easy (8x8 grid, 10 mines), Medium (10x10 grid, 16 mines), and Hard (12x12 grid, 24 mines); the chosen difficulty is highlighted and applies to every round of the match that is started
+- The setup screen is a validating form: Start match stays disabled until a difficulty is selected, and attempting to start without a selection shows an inline message that names the difficulty field rather than starting a match
 - Starting a match resets both sides to score 0 and 0 strikes, builds a fresh board at the selected difficulty, and opens Round 1 of a best-of-3 match in the playing phase
 - Shared board: one grid of covered tiles is shared by both sides; hidden mines and per-tile ore values sit under the tiles; the Player and the Rival AI alternate turns and the current turn is always shown unambiguously (a "Your turn" indicator when it is the Player's turn, a "Rival's turn" / "Rival is thinking" indicator during the Rival's turn)
 - Reveal mechanic: on the Player's turn the Player reveals exactly one covered tile; a safe tile shows a mined ore icon with an ore value of 1, 2, or 3 and that value is added directly to the revealing side's score, and the tile also shows its count of adjacent mines (standard minesweeper adjacency, 0 through 8) when that count is greater than 0
@@ -28,10 +29,29 @@ Core features (each line is an observable behavior the finished app must exhibit
 - Match structure: a match is best-of-3 rounds; the first side to win 2 rounds wins the match; from the Round Result overlay the Player advances to the next round until a side reaches 2 round wins, at which point a Match Complete screen shows the round-by-round scores, the overall winner, and Rematch and New match controls
 - Rematch restarts the match at the same difficulty with scores and strikes reset to 0 for Round 1; New match returns to the setup screen
 - Pause and Resume: during a round a Pause control freezes the round — the board stops accepting reveals, the Rival does not take its turn, and a paused indicator is shown — and the control toggles to Resume, which unfreezes the round and lets play continue
-- Stats view: a Stats view shows, broken down by each of the three difficulties, the matches played, matches won (with win rate), total ore mined, and best single-round score; all four figures persist; before any match has been played the Stats view shows a friendly "No matches played yet" message rather than blank or zero rows
-- Sound toggle: a Sound on/off control (default on) mutes and unmutes the reveal, mine-hit, and round-end tones, which are generated with the Web Audio API; the setting persists across sessions
+- Stats view: a Stats view shows, broken down by each of the three difficulties, the matches played, matches won (with win rate), total ore mined, and best single-round score; all four figures persist across sessions
+- Sound toggle: a Sound on/off control (default on) mutes and unmutes the synthesized reveal, mine-hit, and round-end tones; the setting persists across sessions
 - Branching move history: during a round a history panel exposes Undo and Redo controls and a visible list of history states; a normal visible "Apply Scenario Change" action re-applies a selected history state; a region labelled "History state" shows the snapshot (both sides' score and strikes and whose turn it is) for the selected node; undoing and then making a different change creates a new selectable branch rather than silently flattening or corrupting history; invalid transitions are disabled (Undo is disabled at the root, Redo is disabled with no child, Apply is disabled when the selected node is already current); selecting a branch node and applying it restores the exact prior visible board and score state
 </core_features>
+
+<user_flows>
+End-to-end flows the finished app must support, with state tracked across surfaces at every step:
+- Safe-reveal flow: on the Player's turn, revealing a safe tile increases the You score in the score panel by exactly the ore value shown on the tile, the turn banner hands over to the Rival without a reload, and the history panel appends a new selectable state whose "History state" snapshot shows the updated score and the Rival as the side to move
+- Mine-hit flow: revealing a mine drops the revealing side's score by 5 (never below 0) in that side's score panel, fills exactly one more Strike icon in that side's strike row, passes the turn banner to the other side, and the newest history snapshot shows the increased strike count — all without a reload
+- Match-completion flow: winning 2 rounds opens the Match Complete screen with the round-by-round scores and overall winner; opening the Stats view afterwards shows matches played for the played difficulty increased by exactly one, total ore mined increased by the ore earned in that match, and best single-round score updated when it was beaten — all reflecting the match just played without a reload
+- Persistence round-trip: after completing at least one match, changing the Sound setting, and selecting a difficulty, a full page refresh restores the exact previously committed Stats figures for every difficulty, the same Sound on/off state, and the remembered difficulty selection on the setup screen; figures that were never earned do not appear after the refresh
+- Undo-and-branch flow: revealing a tile, using Undo, and then revealing a different tile creates a new branch in the history panel; selecting the earlier branch node and using Apply Scenario Change restores the exact prior visible board, both scores, both strike rows, and the turn indicator to that snapshot
+</user_flows>
+
+<edge_cases>
+- Illegal or unavailable actions — acting out of turn, revealing an already-revealed or flagged tile, using a hint past the limit, or revealing while paused — are rejected with specific visible feedback naming why, and the board, scores, strikes, and history are left unchanged
+- A flagged tile cannot be revealed by a normal reveal click until it is unflagged; unflagging restores it to a normal covered tile that can be revealed
+- The Hint control is disabled once 2 hints have been spent in the round, and using a hint at a score below 3 floors the score at 0 rather than going negative
+- When every non-mine tile has been revealed with both sides on an equal score, the Round Result overlay declares a draw rather than naming a winner
+- While paused, the board accepts no reveals, flags, or hints and the Rival does not act; Resume returns play exactly where it left off
+- Stale input from an earlier phase or round (for example a Rival move scheduled before a pause, undo, or round end) never mutates the current round's state
+- Before any match has been played the Stats view shows a friendly "No matches played yet" message rather than blank or zero rows
+</edge_cases>
 
 <visual_design>
 - Dark stone theme throughout: page background is a dark stone (#1C1917), panels and the grid sit on a slightly lighter surface (#292524), and text is near-white (#FAFAF9) with muted secondary text (#A8A29E)
@@ -41,10 +61,10 @@ Core features (each line is an observable behavior the finished app must exhibit
 - Grid tiles use a small 4px radius for a sharp mine-grid feel, buttons use an 8px radius, and panels use a 12px radius; base spacing is a 4px unit
 - Primary buttons (Start match, Rematch, Apply Scenario Change) have an amber background, near-black text, 8px radius, and a soft drop shadow; secondary buttons (Flag mode, Hint, Pause, New match) are transparent with an amber border and amber text and no shadow
 - The two score panels (You and Rival) each show the side label, the live score against the target, and a row of 3 Strike icons; the active side's panel is outlined and softly glows in that side's identity color
+- Icons across the app (ore, mine, flag, strike, sound, and empty-state icons) come from one consistent icon set with a uniform stroke and weight — no mismatched glyph styles
 - Whose turn it is is unmistakable at all times via a dedicated turn banner; the Rival's thinking state shows an animated thinking indicator rather than an instant silent jump
 - A revealed mine tile is visibly marked with a distinct mine icon and a red-tinted background for the rest of the round; Flag Mode being active changes the tile cursor so it is never confused with normal reveal mode
 - The Stats empty state shows an icon plus the heading "No matches played yet" and an explanatory line, not blank zero rows
-- At a narrow viewport around 375px wide the grid scales down (smaller tiles, roughly a 28px minimum) and stays tappable without horizontal scrolling, with the score and strike panels stacking above the grid
 </visual_design>
 
 <motion>
@@ -52,20 +72,52 @@ Core features (each line is an observable behavior the finished app must exhibit
 - The Rival's thinking delay is visibly animated: a pulsing "Rival is thinking" indicator is shown for roughly 0.9 to 1.6 seconds before the Rival's tile resolves, so its move never appears as an instant silent jump
 - Tiles have a hover response while they are actionable (a lift and brightness change on hover) and a short background transition when they resolve from covered to revealed
 - Strike icons animate their fill as they accrue, with a distinct filled state and a distinct warning state at 2 strikes
+- History panel entries animate in as new states are appended and animate out when a branch is discarded, rather than the list snapping between lengths
 - The Round Result overlay slides in over a blurred backdrop rather than appearing instantly
-- Buttons show hover and active feedback (primary buttons lift on hover, secondary buttons take a tinted wash) and focus-visible outlines
+- Winning the match triggers a brief celebratory particle burst over the Match Complete screen; it fires only when the Player actually wins the match through play — never on a loss, on setup, or ambiently
+- Rejection feedback for illegal actions animates in briefly and fades out rather than appearing and vanishing instantly
+- Buttons show hover and active feedback (primary buttons lift on hover, secondary buttons take a tinted wash)
 - Animations must respect prefers-reduced-motion by collapsing to near-instant
 </motion>
 
+<responsiveness>
+- At a narrow viewport around 375px wide the grid scales down (smaller tiles, roughly a 28px minimum) and stays tappable without horizontal scrolling, with the score and strike panels stacking above the grid
+- No content clips or overflows the viewport at 375px width: the setup screen, HUD, history panel, overlays, and Stats view all reflow to a single column without horizontal scrolling
+</responsiveness>
+
+<accessibility>
+- Every button and toggle (Start match, Flag Mode, Hint, Pause/Resume, Sound, Undo, Redo, Apply Scenario Change, Rematch, New match) is reachable and operable with the keyboard alone, with a visible focus indicator on every focused control
+- The Round Result overlay and Match Complete screen present as dialogs: they take focus when they open and return focus to the game controls when play continues
+- Turn changes are announced through a polite live region so the active side is conveyed without relying on color alone; strike counts are also exposed as text, not only as filled icons
+- The "History state" region exposes its snapshot as readable text, and disabled controls (Undo at the root, Redo with no child, a spent Hint) are exposed as disabled rather than silently ignoring activation
+</accessibility>
+
+<performance>
+- The app is interactive within 2 seconds of a local cold load, opening directly into the setup screen
+- No console errors or uncaught exceptions appear during a full exercise of the app: setup, several rounds, pause/resume, hints, flags, undo/redo, match completion, and the Stats view
+- The game withstands at least 25 rapid deterministic reveal/turn repetitions through the normal controls with an exact final visible state, responsive controls, and no blank screen, uncaught error, or sustained freeze
+- The board, score panels, and history panel stay responsive during the Rival's thinking delay; queued Player input never fires during the Rival's turn
+</performance>
+
+<writing>
+- Control labels use one consistent capitalization convention and specific verbs (Start match, Apply Scenario Change, Rematch) rather than generic labels
+- Rejection messages for illegal actions name what was attempted and why it is unavailable; the Round Result overlay states the winner and the reason in plain language
+- The Stats empty state explains that no matches have been played yet and how to start one; no placeholder or lorem text appears anywhere in the shipped UI
+</writing>
+
 <requirements>
-- Stack: Qwik (client-rendered Vite SPA, resumable event handlers) with shared app state held in Qwik stores, styled with Tailwind CSS; Node 20 runtime. The state-machine library xstate 5.32.4 is available if used for lifecycle logic. Do not add a component library, a separate state-management library, an AI or game-engine library, or an audio-asset library.
+- Stack: Qwik (client-rendered Vite SPA, resumable event handlers) with shared app state held in Qwik stores, styled with Tailwind CSS 4.3.2 (pinned) with design tokens defined in the Tailwind theme; Node 20 runtime. The state-machine library xstate 5.32.4 is available if used for lifecycle logic. Do not add a separate state-management library, an AI or game-engine library, or an audio-asset library.
+- Component library: DaisyUI provides the game chrome — the setup panel and difficulty form, the HUD score panels, the Flag Mode / Sound / Pause toggles, the Round Result and Match Complete overlays, the history panel, and the Stats view. The play grid itself is custom-built. No other component library.
+- Animation: AutoAnimate and canvas-confetti are the only animation libraries allowed (AutoAnimate for list and panel microinteractions, canvas-confetti for the match-win celebration); CSS transitions may supplement; no other animation libraries.
+- Icons: one Iconify icon set delivered through the @iconify/tailwind4 plugin only — no raw copy-pasted SVGs, no other icon packages, no icon CDN.
+- Forms: every form validates through a schema — the setup form is driven by Modular Forms for Qwik with a Valibot schema that requires a difficulty selection, surfacing inline per-field errors before submit and keeping Start match disabled until the form is valid.
+- All libraries are installed via npm and bundled locally; no CDN imports of any script, style, font, or icon asset.
 - The Rival AI turn-taking heuristic must be hand-written in TypeScript (no AI or game-engine library) and paced with setTimeout or requestAnimationFrame for its thinking delay.
 - Reveal, mine-hit, and round-end feedback tones must be produced with the Web Audio API (an AudioContext oscillator), not external audio files; guard AudioContext creation so the build does not crash where it is unavailable.
-- Persistence uses localStorage and must be guarded so the production build does not crash when storage is unavailable. The following must all survive a full page refresh: the per-difficulty match win/loss record (matches played and matches won per difficulty), the total ore mined per difficulty, the best single-round score per difficulty, the Sound on/off setting, and the remembered Difficulty selection for the next match. After a refresh the Stats view must show the exact previously committed figures, and stats that were never earned must not appear.
+- Persistence uses localStorage and must be guarded so the production build does not crash when storage is unavailable. The following must all survive a full page refresh: the per-difficulty match win/loss record (matches played and matches won per difficulty), the total ore mined per difficulty, the best single-round score per difficulty, the Sound on/off setting, and the remembered Difficulty selection for the next match. After a refresh the Stats view must show the exact previously committed figures, and stats that were never earned must not appear. All other game state (the live board, scores, strikes, history) lives in the shared client-side stores.
 - Difficulty applies to every round of a match: Easy is an 8x8 grid with 10 mines, Medium a 10x10 grid with 16 mines, Hard a 12x12 grid with 24 mines.
 - Exact scoring and lifecycle constants: safe tiles are worth ore of 1, 2, or 3 added to the revealing side's score; a mine hit subtracts 5 points floored at 0 and adds 1 Strike; 3 Strikes ends the round as a loss for that side; the Target Score is 50 ore; a Hint costs 3 points floored at 0 and is limited to 2 uses per round.
 - Turn discipline: only the side whose turn it is may act; the Player cannot reveal, flag, or hint during the Rival's turn or thinking delay or while paused; a covered flagged tile cannot be revealed by a normal reveal click until unflagged; starting a new match always resets both sides' score and strikes to 0 for Round 1; only one match is active at a time.
-- Adversarial and rapid-use robustness: illegal or unavailable actions (acting out of turn, revealing an already-revealed or flagged tile, using a hint past the limit, revealing while paused) must be rejected with specific visible feedback and must not mutate the current run; the game must withstand at least 25 rapid deterministic reveal/turn repetitions through the normal controls with an exact final visible state, responsive controls, and no blank screen, uncaught error, or sustained freeze; stale input from an earlier phase or round must never mutate the current round.
 - Branching history contract: game moves are modelled as explicit history transitions with Undo and Redo controls and a visible history panel; the current snapshot is exposed in a region labelled "History state"; a normal visible "Apply Scenario Change" action re-applies a selected node; undoing and then making a different change creates a new selectable branch rather than silently flattening history; invalid transitions are disabled; and applying a branch restores the exact prior visible board and score state.
 - Routing: the app runs entirely at / with no other routes required; setup, playing, round result, match complete, and stats are in-app views, not separate URLs.
 </requirements>

@@ -118,8 +118,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
-description = "After submitting save/create with an empty required board name, the boards count does not increase and validation feedback is visible"
+name = "invalid_save_blocked_with_field_error"
+description = "Submitting the Save board form with an empty or whitespace-only name adds no board: the gallery count stays the same, an inline validation message naming the name field appears before submit, and the save control stays disabled until the name is valid"
 type = "binary"
 weight = 1.0
 
@@ -194,13 +194,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.20"
-name = "1_20"
-description = "Renders visible validation feedback when create is submitted with empty required fields, and the collection count does not increase"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.21"
 name = "1_21"
 description = "Saved boards list is static HTML only with no working create/edit/delete against shared state"
@@ -267,3 +260,88 @@ description = "Resizing the cell-size slider clears the existing painting instea
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "1.30"
+name = "save_flow_multi_surface_probe"
+description = "Starting from a blank canvas: paint several cells, open Save board, and submit the name 'Flow Probe' with a tag. Measured immediately around the submit, the gallery collection count increases by exactly one; the new card appears in Gallery mode with a thumbnail matching the painted cells and its tag; and switching Paint -> Gallery -> Paint shows the same new board both times without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "load_flow_paint_undo_chain"
+description = "From Gallery mode, load a saved board: its cells appear on the paint canvas immediately and the app switches to Paint mode showing the loaded art; painting one further cell changes only that cell, and pressing Undo reverts exactly that one change while the rest of the loaded board stays intact"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "rename_delete_filter_integrity_chain"
+description = "Renaming a board updates that same card's name in Gallery without changing the collection count; then deleting a board decreases the count by exactly one (measured immediately around the delete), removes its card, clears it from any current selection, and the deleted board's name appears under no tag filter afterwards"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "favorite_filter_recompute_chain"
+description = "Marking a board as favorite updates its indicator on the card immediately; choosing a tag filter recomputes the visible gallery to only boards with that tag; clearing the filter restores the full collection with the favorite indicator still shown on the same board"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "reload_resets_all_facets_to_seed"
+description = "After saving a new board, painting cells (locking the slider), and applying a tag filter, a page reload coherently returns every facet to the seeded baseline: a blank canvas, an unlocked cell-size slider, and exactly the seeded boards in Gallery with the board saved before the reload gone — never a mix of reset and surviving facets"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "tag_filter_no_match_empty_state"
+description = "A tag filter that matches no boards shows the gallery empty state rather than a blank region, and clearing the filter restores the full list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "undo_without_history_safe_noop"
+description = "Pressing Undo (or Backspace) with no paint history leaves the canvas unchanged and surfaces no error message or console exception"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "camera_cancel_leaves_canvas_untouched"
+description = "Choosing Cancel in the camera overlay closes it without altering the canvas cells and leaves the cell-size slider unlocked"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "drag_stroke_records_cell_once"
+description = "Dragging a paint stroke back and forth over the same cell with the same brush and color paints continuously across cells, records that cell to undo history only once, and a single Undo reverts it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "grid_toggle_label_flips"
+description = "Clicking the grid-overlay toggle flips its button label between 'Grid On' and 'Grid Off' and correspondingly shows or hides the hairline grid between cells"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.40"
+name = "color_brush_fill_and_eraser_clear"
+description = "Color Brush fills a painted cell solid with the active swatch color, and Eraser clears a painted cell back to blank"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

@@ -159,76 +159,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.15"
-name = "1_15"
-description = "Creating a root task then using Add Child twice renders three visibly nested, indented levels (root, child, grandchild)"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.16"
-name = "1_16"
-description = "Collapsing a node with children hides its entire subtree, and that collapsed state persists across a full page refresh"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.17"
-name = "1_17"
-description = "A parent's completion is computed automatically as complete only once every descendant leaf is complete, updating live as leaves toggle"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.18"
-name = "1_18"
-description = "A branch progress ring fills proportionally as leaves are toggled and reaches a distinct complete treatment only at 100 percent"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.19"
-name = "1_19"
-description = "Zoom In makes a node the temporary root, hides everything outside its branch, and a breadcrumb trail returns to exactly the clicked ancestor level"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.20"
-name = "1_20"
-description = "Creating a tag and attaching it to a node shows a chip in that tag's color, and a 6th tag on a node already holding 5 is rejected"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.21"
-name = "1_21"
-description = "Toggling a tag filter chip narrows the visible tree to matching branches with ancestors auto-expanded, and toggling it off restores the full tree"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.22"
-name = "1_22"
-description = "Smart Search highlights matching node text, auto-expands its ancestor chain, and dims (never removes) non-matching branches"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.23"
-name = "1_23"
-description = "Move To re-parents a node together with its whole subtree under a chosen target and removes it from its prior location"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.24"
-name = "1_24"
-description = "Archive is gated on full branch completion; using it moves the branch to the Archive panel, and Restore returns it to the main tree with its structure and tags intact"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.25"
 name = "1_25"
 description = "Export as Text downloads that node's branch as an indented plain-text outline, one line per node with deeper children indented further"
@@ -248,6 +178,77 @@ negate = true
 id = "1.27"
 name = "1_27"
 description = "An Archive control appears on a branch that still has an incomplete descendant leaf"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.28"
+name = "create_children_complete_chain_flow"
+description = "Starting from an empty tree: create a root task via the footer input and confirm exactly one new tree appears, the empty-state message disappears, and a confirmation toast shows; add two children via Add Child and confirm both render indented beneath the root and the root grows a progress ring at 0 percent; toggle both children complete and confirm the ring rises live through the intermediate percentage to the 100 percent checkmark treatment and the parent is marked complete automatically, all without any page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "archive_refresh_restore_chain_flow"
+description = "With a branch fully complete: activate Archive and confirm the branch leaves the main tree, exactly one entry titled by its root appears in the Archive panel, and a toast shows; after a full page refresh the branch is still in the Archive panel and still absent from the main tree; activate Restore and confirm the branch returns to the main tree as a top-level root with its structure and tags intact while the Archive panel loses that entry"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "tag_lifecycle_filter_refresh_chain_flow"
+description = "Create a tag in the Tag manager and confirm one chip appears in the manager's list and one matching filter chip appears in the toolbar row; attach it to a node and confirm the node's row shows the chip in the same color; toggle the toolbar filter chip on and confirm the tree narrows to branches containing that node with ancestors auto-expanded, then toggle it off and confirm the full tree returns; after a full page refresh the tag still exists in the manager, on the node's row, and in the filter row with the same color"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "zoomed_add_child_roundtrip_flow"
+description = "Zoom into a grandchild node and confirm only that node's branch is visible with a breadcrumb naming each ancestor down to the true root; add a child while zoomed and confirm the new node appears inside the zoomed view; zoom back out via the breadcrumb and confirm the same new node is present in the full tree"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "move_up_down_swap_and_boundary_noop"
+description = "Move Down on the first of three siblings swaps it with the next sibling and the new order stays stable across re-renders; Move Up on a first sibling and Move Down on a last sibling do nothing, with no error and no reorder"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "tag_manager_blank_name_validation"
+description = "In the Tag manager's tag-creation form, a blank tag name shows an inline error message naming the name field before submit, the submit control stays inactive until the name is non-blank, and no blank-named tag is added"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "double_submit_creates_single_task"
+description = "Double-activating a task submit control in quick succession creates exactly one task: exactly one new node appears in the tree"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "theme_control_cycles_three_themes"
+description = "Clicking the toolbar Theme control cycles through Light, Dark, and Forest, each click swapping the app's full color palette instantly with no page reload and the app staying fully readable in each theme"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "filter_search_no_results_messages"
+description = "When active tag filters match no branch, the tree area shows an explicit no-results message instead of a blank area; a search query matching nothing also shows an explicit no-results message while branches stay dimmed on the page rather than removed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

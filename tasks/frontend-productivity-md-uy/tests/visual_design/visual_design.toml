@@ -62,21 +62,21 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
+name = "editor_surface_has_primary_emphasis"
 description = "The layout gives primary visual emphasis to the Markdown editing surface (source and preview) over global navigation and secondary metadata"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
+name = "toolbar_grouped_with_editor"
 description = "The controls needed to edit the source (mode toggle, copy, download, share) are visually grouped in a toolbar with the editor pane they affect"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
+name = "single_column_alignment_consistency"
 description = "The editor panes align the Markdown source, the rendered preview, the room identity, and the sync/connection status consistently in a single-column workspace with hairline card borders and a light/dark theme with a primary accent"
 type = "binary"
 weight = 0.5
@@ -84,7 +84,7 @@ optional = true
 
 [[criterion]]
 id = "3.4"
-name = "3_4"
+name = "active_mode_and_focus_hover_distinct"
 description = "The active editor mode is visually distinct from inactive modes, and interactive controls render focus and hover as different visual treatments rather than one identical highlight"
 type = "binary"
 weight = 0.5
@@ -92,7 +92,7 @@ optional = true
 
 [[criterion]]
 id = "3.5"
-name = "3_5"
+name = "mobile_reflow_stays_reachable"
 description = "At 375 by 667 pixels the source pane, the preview, and their controls reflow and stay reachable without clipped text, overlapping controls, or horizontal page scrolling"
 type = "binary"
 weight = 0.5
@@ -100,7 +100,7 @@ optional = true
 
 [[criterion]]
 id = "3.6"
-name = "3_6"
+name = "unstyled_flat_dump"
 description = "The workspace is an unstyled or flat dump with no visual hierarchy — the editor is not emphasized over chrome, or source and preview are not distinguishable"
 type = "binary"
 weight = 1.0
@@ -108,9 +108,93 @@ negate = true
 
 [[criterion]]
 id = "3.7"
-name = "3_7"
+name = "mobile_layout_clips_or_scrolls"
 description = "At a 375px-wide viewport the content clips, controls overlap, or the page requires horizontal scrolling to reach the editor or its controls"
 type = "binary"
 weight = 0.5
 negate = true
 optional = true
+
+[[criterion]]
+id = "3.8"
+name = "single_column_workspace_frame"
+description = "The workspace is a centered single column at a readable max width, framed top to bottom by a thin top bar, a toolbar row, the bordered editor or preview card filling the remaining height, a status row, and a monospace footer"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "top_bar_composition"
+description = "The top bar shows the md.uy brand plus the slash-separated monospace room id on the left, and groups the theme toggle, a monospace document-id join field with an arrow open button, and a filled plus button for a new document on the right"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "toolbar_button_treatments"
+description = "In the toolbar row the active mode button reads as a filled secondary button while the inactive modes are ghost buttons, and the right side groups ghost Copy and Download buttons with an outlined Share button"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "monospace_source_prose_preview"
+description = "The source pane is a monospace, line-wrapped code editor on a card surface, while the preview renders typographic prose — styled headings, lists, quotes, and code — in a readable prose style"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.12"
+name = "themed_tokens_blue_accent"
+description = "Both the light and the dark theme present coherent token-driven surfaces with a primary blue accent; cards use hairline borders and a small radius, and badges, dots, and buttons stay compact and dense"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.13"
+name = "consistent_icons_and_favicon"
+description = "Icons across the chrome come from one consistent icon set shipped with the app, the page has a local favicon, and the profile chip shows a small colored dot next to the name"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.14"
+name = "desktop_centered_readable_width"
+description = "At a desktop width around 1440 pixels the workspace stays centered at its readable max width with the editor card filling the remaining vertical space"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.15"
+name = "resize_keeps_toolbar_operable"
+description = "Resizing between desktop and narrow (375-wide) viewports keeps the mode group, Copy, Download, and Share visible and operable at both extremes, with no clipped toolbar controls (the document-id join field may hide on narrow viewports)"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.16"
+name = "consistent_capitalization_and_copy"
+description = "Buttons, tabs, dialog titles, and status text use one consistent capitalization convention, and confirmations name the completed action while the sync indicator states the real number of connected users"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.17"
+name = "lorem_or_unexplained_empty_state"
+description = "Placeholder or lorem-ipsum filler text appears somewhere in the shipped UI, or an empty state is left blank with nothing explaining what belongs there"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

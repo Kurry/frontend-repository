@@ -62,175 +62,119 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
+name = "opens_at_root_with_deal_prompt"
 description = "On load, the app opens directly at / with no login or error page and the table shows a \"Deal first hand\" prompt rather than an empty board"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
+name = "deal_first_hand_seats_four"
 description = "After clicking \"Deal first hand\", the table seats the human plus 3 AI opponents (4 seats) each starting at 1000 chips and a hand begins with hole cards dealt and blinds posted"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
-description = "When it is the human's turn, Fold, Check or Call, Raise, and All-in are all visible, and \"1/2 pot\" and \"Pot\" populate the raise amount to distinct values (half vs full current pot)"
+name = "betting_controls_and_quick_bets"
+description = "When it is the human's turn, Fold, Check or Call, Raise, and All-in are all visible along with a raise-amount input plus slider, and \"1/2 pot\" and \"Pot\" populate the raise amount to distinct values (half vs full current pot)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
+name = "raise_moves_exact_chip_amount"
 description = "After raising a specific chip amount, the pot increases by that amount and the human's stack decreases by the same amount with no page reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
+name = "equity_recalculates_each_street"
 description = "After advancing from preflop to the flop and from the flop to the turn, the hand-equity percentage next to the human's hole cards recalculates to a new value at each street"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
+name = "ai_style_badges_visible"
 description = "On load each of the 3 AI seats shows a labeled play-style badge (Aggressive, Tight, or Bluffer) that is visually distinct, not distinguishable by text label alone"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
+name = "blind_level_advances_after_eight_hands"
 description = "After playing 8 completed hands, the blind-level indicator advances to the next level and both the small and big blind amounts increase, while the stats panel and hand history are not reset"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
+name = "session_stats_update_per_hand"
 description = "After completing a hand, the Session stats panel updates hands played, hands won, win rate, and biggest pot, and the win rate stays consistent with hands won divided by hands played"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
+name = "showdown_reveals_and_labels_winner"
 description = "When a hand reaches showdown with two or more players, every remaining player's hole cards are revealed face-up and the winning 5-card hand is highlighted with its hand-type label"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
+name = "hand_history_lists_recent_first"
 description = "After completing two hands, the toggleable Hand history panel lists both with pot size, winner, and winning hand type most-recent-first, and shows \"No hands played yet\" before any hand"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
+name = "rebuy_restores_stack"
 description = "When the human's stack reaches 0 a Rebuy control appears, and using it resets the stack to 1000 and increments the rebuys counter by 1"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
+name = "badge_toast_then_panel_listing"
 description = "After earning an achievement badge a transient toast appears at that moment and the badge is then listed in the Badges panel without removing earlier badges"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "1_13"
+name = "collab_offline_merge_and_conflict"
 description = "In the Collaboration scenario, queuing two non-conflicting changes offline and reconnecting via \"Go Online\" converges the \"Shared content\" to the same result in either delivery order, and a same-note conflict surfaces an explicit keep-mine / keep-peer choice"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.14"
-name = "1_14"
+name = "full_session_reload_restores_all"
 description = "After playing several hands so chips, blind level, stats, hand history, and badges have changed, a full page refresh restores all of them exactly"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.15"
-name = "1_15"
-description = "Clicking \"Deal first hand\" seats the human plus 3 AI opponents (4 seats), each starting at 1000 chips, and deals a hand with hole cards and posted blinds"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.16"
-name = "1_16"
-description = "During the human's turn Fold, Check or Call, Raise, and All-in are all visible, and \"1/2 pot\" and \"Pot\" populate the raise amount to distinct values matching half and full pot"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.17"
-name = "1_17"
-description = "Raising a specific chip amount increases the pot by exactly that amount and decreases the human's stack by the same amount with no page reload"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.18"
-name = "1_18"
-description = "The hand-equity percentage next to the human's hole cards recalculates to a new value after the flop and again after the turn, reflecting the current board"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.19"
-name = "1_19"
+name = "ai_styles_influence_behavior"
 description = "The 3 AI seats each show a play-style badge (Aggressive, Tight, Bluffer) whose labeled behavior differs: the Aggressive seat raises noticeably more often than the Tight seat over several hands"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.20"
-name = "1_20"
-description = "The blind-level indicator shows the level number with the current small/big blind amounts and advances to the next level with higher blinds after 8 completed hands"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.21"
-name = "1_21"
-description = "The Session stats panel updates hands played, hands won, win rate, and biggest pot after each completed hand, and win rate stays consistent with hands won divided by hands played"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.22"
-name = "1_22"
-description = "At showdown with two or more players remaining, every remaining player's hole cards are revealed face-up and the winning 5-card hand is highlighted with its hand-type label"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.23"
-name = "1_23"
-description = "The Hand history panel lists completed hands most-recent-first with pot size, winner, and winning hand type, prepending each new hand rather than replacing earlier entries"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.24"
-name = "1_24"
+name = "second_rebuy_increments_counter"
 description = "When the human's stack reaches 0 a Rebuy control appears and resets the stack to 1000 while incrementing the rebuys counter, and it increments again to 2 on a second rebuy rather than sticking at 1"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.25"
-name = "1_25"
+name = "second_badge_keeps_first"
 description = "Earning a second, different achievement badge lists both badges in the Badges panel — the first is not overwritten or lost"
 type = "binary"
 weight = 0.5
@@ -238,21 +182,14 @@ optional = true
 
 [[criterion]]
 id = "1.26"
-name = "1_26"
-description = "\"Start new session\" shows a confirmation prompt; cancelling leaves the table, stats, and history unchanged, and confirming resets table, chip stacks, stats, hand history, and badges to their initial state"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.27"
-name = "1_27"
-description = "In the Collaboration scenario two non-conflicting offline changes converge to identical \"Shared content\" whether delivered mine-first or peer-first, and a same-note conflict surfaces an explicit keep-mine / keep-peer choice instead of silently overwriting"
+name = "new_session_confirm_and_cancel"
+description = "\"Start new session\" shows a confirmation prompt; cancelling leaves the table, stats, and history unchanged, and confirming resets table, chip stacks, stats, hand history, and badges to their initial state across every panel at once"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.28"
-name = "1_28"
+name = "static_mockup_table"
 description = "The table renders a static, non-interactive poker mockup: \"Deal first hand\" does not seat players or deal cards, or betting controls do not change the pot and stacks"
 type = "binary"
 weight = 1.0
@@ -260,8 +197,51 @@ negate = true
 
 [[criterion]]
 id = "1.29"
-name = "1_29"
+name = "level_up_resets_stats_or_never_advances"
 description = "Advancing 8 hands resets or clears the Session stats or Hand history, or the blind level never advances despite hands completing"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.30"
+name = "raise_bounds_inline_validation"
+description = "Entering a raise amount below the legal minimum raise or above the human's stack shows an inline validation message next to the raise-amount input naming the violated limit, and the raise confirm control stays disabled until the amount is legal"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "raise_completion_history_chain"
+description = "Starting on the human's turn mid-hand: raise a specific chip amount and confirm exactly that amount moves from the human's visible stack into the pot; then let the hand complete and confirm, without any reload, that the Session stats hands-played count increases by exactly one and the completed hand appears at the top of the Hand history panel with the pot size, winner, and winning hand type of the hand just played"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "rebuy_reload_roundtrip"
+description = "Drive the human's stack to 0 and use the Rebuy control: the stack display returns to 1000 and the rebuys counter in the stats panel increases by exactly 1; after a full page reload the restored stack and the incremented rebuys count are both still shown"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "badge_list_reload_roundtrip"
+description = "After earning at least one badge, the badge is listed in the Badges panel with earlier badges still present, and after a full page reload the same badges are still listed in the panel"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "double_deal_starts_one_hand"
+description = "Rapidly double-activating \"Deal next hand\" starts exactly one new hand, and the hands-played count increases by exactly one when that hand completes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in its core poker, stats, persistence, or collaboration features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

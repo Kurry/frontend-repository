@@ -62,147 +62,140 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
-description = "On load, Plan List mode shows multi-day itinerary sections with at least 8 seeded stops and place names visible"
+name = "seeded_multi_day_plan_on_load"
+description = "On load, the planner shows itinerary day sections for Sun 7/5 through Sat 7/11 with at least 8 seeded French Riviera stops (place names visible) distributed across the days, plus at least one unscheduled ideas stop not tied to a day"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
+name = "created_stop_appears_in_list"
 description = "After creating a stop named 'Harbor Lookout' on a day with valid required fields, the text 'Harbor Lookout' is visible in the plan list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
+name = "create_count_delta_exact"
 description = "After adding 3 new stops on top of the seed set, the plan list shows exactly 3 more stops than the initial seeded count"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
-description = "After selecting a stop, the place detail overlay or panel shows that stop's name and tab chrome (About or equivalent)"
+name = "place_detail_card_full_tab_set"
+description = "After selecting a stop, a place-detail card opens over the map showing that stop's name and a tab row with About / Book / Reviews / Photos / Mentions (or equivalent labels for all five)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
+name = "edited_stop_name_replaces_old"
 description = "After editing a stop name to 'Evening Promenade', the text 'Evening Promenade' is visible and the previous name is not"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
+name = "deleted_stop_row_removed"
 description = "After deleting a stop, that stop name is no longer visible in the plan list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
-description = "After deleting all stops, an empty state is visible in the plan list region"
+name = "empty_state_after_last_delete"
+description = "After deleting all stops, an empty state message is visible in the plan list region"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
-description = "After submitting create with an empty required stop name, the stops count does not increase and validation feedback is visible"
+name = "empty_name_submit_rejected"
+description = "After submitting the stop form with an empty required name, the stops count is unchanged and an inline validation message naming the name field is visible"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
+name = "day_filter_recomputes_visible_stops"
 description = "After filtering or focusing a single day (with multi-day stops present), only that day's stops remain emphasized or visible in the filtered list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
+name = "mode_switch_without_navigation"
 description = "After switching emphasis between Plan List and Map modes (or Trip plan / map focus), the workspace shows the other mode without full page navigation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
+name = "detail_tabs_swap_in_place"
 description = "After switching place detail tabs (About / Reviews or equivalent), the panel content swaps without leaving the page"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
+name = "hover_feedback_on_rows_and_chrome"
 description = "When hovering place rows, sidebar items, or map chrome controls, a visible hover lift, wash, or press feedback appears"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "1_13"
-description = "Clicking a map pin selects that stop and scrolls/highlights its row in the plan list, and clicking a plan-list row flies the map to and enlarges that pin"
+name = "row_pin_two_way_sync"
+description = "Starting with the seeded plan visible: click a stop row and confirm the map flies to that stop's pin and the row highlights; then click a different stop's map pin and confirm that stop becomes selected and the plan list scrolls/highlights its row; after each direction the highlighted row and the enlarged pin refer to the same stop"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.14"
-name = "1_14"
-description = "Selecting a day in the sidebar focuses the map on that day and selects the day's first stop"
+name = "day_select_focus_and_restore_flow"
+description = "Selecting a day in the sidebar focuses the map on that day's center/zoom, selects the day's first stop, and shows only that day's stops recomputed from the shared collection; then returning to Overview restores the full multi-day plan without a page reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.15"
-name = "1_15"
+name = "detail_card_dismiss_closes"
 description = "The place-detail card opened over the map can be closed with its dismiss control"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.16"
-name = "1_16"
+name = "console_clean_during_session"
 description = "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.17"
-name = "1_17"
+name = "stops_crud_from_shared_state"
 description = "Itinerary stops collection supports create, edit, and delete with list rows and derived counts updating from shared application state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.18"
-name = "1_18"
+name = "two_modes_available"
 description = "At least two distinct views or interaction modes are switchable without full page navigation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.19"
-name = "1_19"
-description = "Domain state beyond CRUD is implemented (filters, status/priority/mode, or equivalent) and recomputes visible results from the shared collection"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.20"
-name = "1_20"
-description = "Renders visible validation feedback when create is submitted with empty required fields, and the collection count does not increase"
+name = "domain_state_beyond_crud"
+description = "Domain state beyond CRUD is implemented (day filter, mode, selection, or equivalent) and recomputes visible results from the shared collection"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.21"
-name = "1_21"
+name = "static_list_no_working_crud"
 description = "Itinerary stops list is static HTML only with no working create/edit/delete against shared state"
 type = "binary"
 weight = 1.0
@@ -210,45 +203,109 @@ negate = true
 
 [[criterion]]
 id = "1.22"
-name = "1_22"
+name = "outbound_links_instead_of_view_state"
 description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
-id = "1.23"
-name = "1_23"
-description = "Clicking a stop row flies the map to that stop's pin and highlights the row, and clicking a map pin selects that stop and scrolls the plan list to it (two-way sync)"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.24"
-name = "1_24"
-description = "Selecting a day in the sidebar focuses the map on that day and selects that day's first stop"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.25"
-name = "1_25"
-description = "Selecting a stop opens a place-detail card over the map, and its dismiss control closes the card"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.26"
-name = "1_26"
-description = "Clicking a map pin does not select the stop or scroll the plan list to it (pin-to-list sync is missing)"
+name = "pin_click_sync_missing"
+description = "Clicking a map pin leaves the plan list unchanged: the stop is not selected and the list is not scrolled or highlighted to its row (pin-to-list sync is missing)"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "1.27"
-name = "1_27"
-description = "The place-detail card over the map has no working dismiss control, so it cannot be closed once opened"
+name = "detail_card_cannot_be_closed"
+description = "The place-detail card over the map has no working dismiss control, so it remains stuck open once opened"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.28"
+name = "create_flow_multi_surface"
+description = "Full create flow: note a day section's row count and the map's numbered-pin count, create a valid stop assigned to that day, and confirm the day section shows exactly one more stop row and the map shows exactly one more numbered pin in that day's color; then switch between Plan List and Map modes and confirm the same new stop is present in both without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "edit_propagates_list_detail_map"
+description = "With a stop's place-detail card open, edit that stop's name and confirm the new name appears in its day-list row, in the open place-detail card, and in its map pin popup, all without a page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "delete_clears_row_pin_selection"
+description = "After selecting a stop and deleting it, its row disappears from the day section, its pin disappears from the map, and the open selection/detail card is cleared, all in the same interaction"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "reload_restores_seeded_flow"
+description = "Full reset flow: create one stop and delete a different seeded stop, then reload the page; the app returns to its seeded state — the original seeded stops, day colors, and the default Overview view reappear, with the created stop gone and the deleted stop restored"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "double_submit_creates_one_stop"
+description = "Double-activating the stop form submit in quick succession creates exactly one stop: the day section gains exactly one row and the map gains exactly one pin"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "emptied_day_shows_empty_state"
+description = "After deleting every stop belonging to one day, selecting that day shows an empty day state message rather than a blank region"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "map_clears_pins_when_all_deleted"
+description = "After deleting all stops, the map shows no numbered day pins"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "long_name_truncates_with_ellipsis"
+description = "A stop given a name too long for its row truncates with an ellipsis in the list row while the place-detail card shows the full name"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.36"
+name = "live_inline_validation_disables_submit"
+description = "The stop create/edit form validates as the user types: while a required field is invalid it shows an inline error message naming that field, and the submit control stays disabled until all required fields are valid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "inert_chrome_raises_demo_toasts"
+description = "Inert demo affordances (Share, Optimize route, or map layers) give visible simulated feedback such as a toast when activated, rather than doing nothing or navigating away"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.38"
+name = "plan_hero_title_and_dates"
+description = "The plan hero shows a cover image, an editable title reading 'Trip to the French Riviera - Cote d'Azur', and the date range 7/5–7/11"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "A specified core behavior of the itinerary planner is broken or missing in a way that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

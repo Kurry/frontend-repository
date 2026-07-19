@@ -132,3 +132,32 @@ description = "Hovering a use-case tile or a primary button with the real pointe
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "3.11"
+name = "tilt_accents_ease_in_out_alternate"
+description = "The tilt accents animate from a zero transform with ease-in-out alternating direction: the floating hero media card tilts toward -6deg over about 4.5s, the orange/purple \"Ready\" accent toward 6deg over about 3.2s, and the \"?\" mark toward -6deg over about 3.2s (getAnimations reports the alternating infinite animations on each)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.12"
+name = "menu_panels_fade_and_settle"
+description = "Opening the Solutions menu and the mobile menu through their real trigger controls shows each panel entering with a short fade-and-settle transition and leaving cleanly, and opening or closing never snaps other page content elsewhere on the page"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.13"
+name = "hello_accent_reveal_600ms"
+description = "On a fresh load the \"Hello!\" accent reveals with the same rise-and-fade treatment as the hero copy at a measured duration of about 600ms (grade on a fresh load via getAnimations, not a static snapshot)"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

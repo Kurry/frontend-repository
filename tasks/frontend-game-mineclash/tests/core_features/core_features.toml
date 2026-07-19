@@ -62,210 +62,210 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
+name = "setup_screen_direct_entry"
 description = "On load, the setup screen shows the MineClash title, an Easy/Medium/Hard difficulty selector, and a Start match control with no login or routing gate"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
+name = "medium_start_builds_fresh_board"
 description = "After selecting Medium then Start match, the board renders a 10 by 10 grid and both the You and Rival panels read score 0 with 0 filled strikes"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
+name = "safe_reveal_adds_ore_and_adjacency"
 description = "When it is the Player's turn a 'Your turn' indicator is shown, and revealing a safe covered tile adds that tile's ore value (1, 2, or 3) to the You score and shows the tile's adjacent-mine count when greater than 0"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
+name = "rival_turn_thinking_then_returns"
 description = "After the Player reveals a safe tile, the turn passes to the Rival, a 'Rival is thinking' indicator animates for a visible delay, then the Rival reveals one tile and control returns to the Player"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
+name = "mine_hit_penalty_and_persistent_mine"
 description = "When a side reveals a mine, that side's score drops by 5 (never below 0), one Strike icon fills for that side, the mine tile shows a distinct mine icon, and the mine tile stays revealed for the rest of the round"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
+name = "flag_mode_blocks_reveal"
 description = "After activating Flag Mode the mode is visibly active, clicking a covered tile places a flag marker on it, and a normal reveal click on that flagged tile does not reveal it until it is unflagged"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
+name = "hint_costs_and_marks_without_reveal"
 description = "Using Hint costs the You score 3 points and marks one chosen covered tile as safe or mine without revealing it, and the Hint control is disabled after 2 uses in the round"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
+name = "round_result_overlay_on_end"
 description = "When a side reaches 3 Strikes or the Target Score of 50, a Round Result overlay names the winner, the reason, and both final scores"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
+name = "match_complete_best_of_three"
 description = "After one side wins 2 rounds, a Match Complete screen shows the round-by-round scores, the overall winner, and Rematch and New match controls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
+name = "pause_resume_freezes_board"
 description = "Clicking Pause during a round freezes the board and shows a paused indicator so tile clicks are rejected, and Resume unfreezes play"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
+name = "undo_creates_history_branch"
 description = "In the history panel, performing a flag or hint move then Undo restores the exact prior board and scores, and making a different move after undoing creates a new selectable branch shown in the history list rather than replacing the old one"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
+name = "history_state_snapshot_region"
 description = "The region labelled 'History state' shows the selected node's snapshot (both sides' score and strikes and whose turn it is), and Apply Scenario Change is disabled when the selected node is already current"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "1_13"
+name = "stats_view_records_played_match"
 description = "The Stats view shows 'No matches played yet' before any match, and after completing a match it shows the matches played, matches won, total ore mined, and best single-round score under the difficulty that was played"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.14"
-name = "1_14"
+name = "stats_sound_difficulty_survive_refresh"
 description = "After completing a match and refreshing the page, the Stats view still shows the exact previously recorded figures, and the Sound setting and remembered difficulty are restored"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.15"
-name = "1_15"
-description = "On load, the setup screen shows the MineClash title, an Easy/Medium/Hard difficulty selector, and a Start match control with no login or routing gate"
+name = "setup_form_blocks_missing_difficulty"
+description = "On the setup screen with no difficulty selected, Start match is disabled, and attempting to start without a selection shows an inline message that names the difficulty field instead of starting a match"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.16"
-name = "1_16"
-description = "After choosing Medium and starting the match, the board renders a 10 by 10 grid and both the You and Rival score readouts start at 0 with 0 filled strikes"
+name = "right_click_toggles_flag"
+description = "Right-clicking a covered tile places a flag marker on it, and right-clicking the same tile again removes the flag and restores it to a normal covered tile that can be revealed"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.17"
-name = "1_17"
-description = "Revealing a safe covered tile on the Player's turn adds that tile's ore value (1, 2, or 3) to the You score and displays the tile's adjacent-mine count when it is greater than 0"
+name = "rival_picks_covered_unflagged_tiles"
+description = "During its turns the Rival only ever acts on covered, unflagged tiles — it never re-reveals an already-revealed tile and never reveals a tile the Player has flagged"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.18"
-name = "1_18"
-description = "Revealing a mine drops the revealing side's score by 5 without going below 0, fills one Strike icon for that side, and leaves the mine tile revealed with a distinct mine icon for the rest of the round"
+name = "full_board_reveal_draw_on_tie"
+description = "When every non-mine tile has been revealed, the round ends with the higher score named winner in the Round Result overlay, and on an equal score the overlay declares a draw rather than naming a winner"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.19"
-name = "1_19"
-description = "The Player and Rival AI take alternating turns and the current turn is always shown, with a 'Your turn' state for the Player and a 'Rival' state during the Rival's move"
+name = "rematch_restarts_same_difficulty"
+description = "From the Match Complete screen, Rematch restarts the match at the same difficulty with both sides reset to score 0 and 0 strikes for Round 1"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.20"
-name = "1_20"
-description = "After the Player's turn ends, the Rival AI automatically reveals exactly one tile following a visible thinking delay and then returns control to the Player"
+name = "new_match_returns_to_setup"
+description = "From the Match Complete screen, New match returns to the setup screen where a difficulty can be selected for the next match"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.21"
-name = "1_21"
-description = "A round ends the instant a side reaches 3 Strikes or the Target Score of 50, showing a Round Result overlay that names the winner, the reason, and both final scores"
+name = "sound_toggle_defaults_on"
+description = "A Sound on/off control is present, starts in the on state on a first visit, and clicking it visibly switches between the on and off states"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "1.22"
-name = "1_22"
-description = "The match is best-of-3: after a side wins 2 rounds a Match Complete screen shows the round-by-round scores, the overall winner, and Rematch and New match controls"
+name = "safe_reveal_flow_across_surfaces"
+description = "Starting on the Player's turn with the score and history panels visible: revealing a safe tile increases the You score by exactly the ore value shown on the tile, hands the turn banner to the Rival without a reload, and appends a new selectable history state whose 'History state' snapshot shows the updated score with the Rival as the side to move"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.23"
-name = "1_23"
-description = "Activating Flag Mode lets the Player place a flag on a covered tile, and a normal reveal click on a flagged tile does not reveal it until it is unflagged"
+name = "mine_hit_flow_across_surfaces"
+description = "Revealing a mine drops the revealing side's score panel by exactly 5 (never below 0), fills exactly one more Strike icon in that side's strike row, passes the turn banner to the other side, and the newest history snapshot shows the increased strike count — all without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.24"
-name = "1_24"
-description = "Using a Hint costs the You score 3 points and marks one chosen covered tile as safe or mine without revealing it, and the Hint control is disabled after 2 uses in a round"
+name = "match_completion_updates_stats"
+description = "After winning 2 rounds, the Match Complete screen shows the round-by-round scores and overall winner, and opening the Stats view without a reload shows matches played for that difficulty increased by exactly one, total ore mined increased by the ore earned in that match, and best single-round score updated when it was beaten"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.25"
-name = "1_25"
+name = "difficulty_sets_grid_and_mines"
 description = "Difficulty changes the whole match: Easy is an 8 by 8 grid with 10 mines and Hard is a 12 by 12 grid with 24 mines, applied to every round"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.26"
-name = "1_26"
-description = "Pausing during a round freezes the board and shows a paused indicator so tile clicks are rejected, and Resume unfreezes play"
+name = "pause_blocks_all_input_and_rival"
+description = "While paused, the board accepts no reveals, flags, or hints and the Rival does not take its turn; Resume returns play exactly where it left off with the same board, scores, and turn"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.27"
-name = "1_27"
-description = "The Stats view lists matches played, matches won, total ore mined, and best single-round score broken down by each of the three difficulties"
+name = "stats_breakdown_all_difficulties"
+description = "The Stats view lists matches played, matches won (with win rate), total ore mined, and best single-round score broken down by each of the three difficulties"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.28"
-name = "1_28"
-description = "In the history panel, Undo restores the exact prior board and scores, and making a different change after an Undo creates a new selectable branch in the history list rather than replacing the previous move"
+name = "undo_branch_apply_restores_snapshot"
+description = "Revealing a tile, using Undo, then revealing a different tile creates a new branch in the history panel, and selecting the earlier branch node and using Apply Scenario Change restores the exact prior visible board, both scores, both strike rows, and the turn indicator"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.29"
-name = "1_29"
-description = "A region labelled 'History state' shows the selected node's snapshot (both sides' score and strikes and whose turn it is), and the 'Apply Scenario Change' action re-applies the selected node and is disabled when it is already current"
+name = "history_invalid_transitions_disabled"
+description = "Undo is disabled at the history root and Redo is disabled when the selected node has no child, and activating either disabled control leaves the board, scores, and history list unchanged"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.30"
-name = "1_30"
+name = "mine_hit_consequences_missing"
 description = "Revealing a mine fails to end the turn, does not subtract 5 (floored at 0) or does not add a Strike, or the mine tile reverts to covered later in the round"
 type = "binary"
 weight = 1.0
@@ -273,7 +273,7 @@ negate = true
 
 [[criterion]]
 id = "1.31"
-name = "1_31"
+name = "turns_do_not_alternate"
 description = "Turns do not alternate (the Player can take consecutive turns or the Rival never moves) or the current turn is not clearly indicated"
 type = "binary"
 weight = 1.0
@@ -281,7 +281,7 @@ negate = true
 
 [[criterion]]
 id = "1.32"
-name = "1_32"
+name = "score_goes_negative"
 description = "A side's score goes negative after a mine hit or a Hint, showing the floor of 0 is not enforced"
 type = "binary"
 weight = 1.0
@@ -289,7 +289,7 @@ negate = true
 
 [[criterion]]
 id = "1.33"
-name = "1_33"
+name = "undo_flattens_history"
 description = "Undoing and then making a different move silently flattens or corrupts the history instead of creating a selectable branch"
 type = "binary"
 weight = 1.0
@@ -297,9 +297,24 @@ negate = true
 
 [[criterion]]
 id = "1.34"
-name = "1_34"
+name = "stats_blank_before_first_match"
 description = "The Stats view before any match shows blank or zero rows instead of a 'No matches played yet' message"
 type = "binary"
 weight = 0.5
 negate = true
 optional = true
+
+[[criterion]]
+id = "1.35"
+name = "illegal_actions_rejected_with_feedback"
+description = "Acting out of turn, revealing an already-revealed or flagged tile, using a hint past the limit, or revealing while paused is rejected with specific visible feedback naming why, and the board, scores, strikes, and history are left unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in its core game features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

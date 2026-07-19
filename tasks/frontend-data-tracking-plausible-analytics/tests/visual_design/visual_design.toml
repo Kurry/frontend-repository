@@ -62,35 +62,35 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
-description = "At desktop width the layout is a single analytics dashboard with top metric tiles, a dominant trend chart, and sources/pages/countries panels rather than a login-centered or marketing layout"
+name = "dashboard_layout_composition"
+description = "At desktop width the layout is a single analytics dashboard on a light neutral page background — top bar, then a row of four metric tiles, then a dominant trend chart card, then a three-column row of breakdown panels — rather than a login-centered or marketing layout"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
-description = "The summary metrics and the visitors trend are the primary visual focus: large bold numbers over muted labels and a full-width chart card taller than the panels below"
+name = "metrics_and_trend_primary_focus"
+description = "The summary metrics and the visitors trend are the primary visual focus: large bold numbers over small muted labels and a chart card that spans the full content width and stands taller than the panels below"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
+name = "filter_pill_accent_treatment"
 description = "The active filter state is distinguished by a visible pill reading Dimension: value, with the accent hue used for the pill, active row, and focus ring over an otherwise neutral palette"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.4"
-name = "3_4"
+name = "aa_contrast_both_themes"
 description = "Body text meets AA contrast (at least 4.5:1) against its surface in both the light and the dark theme, and every legible pairing stays legible after the theme switch"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "3_5"
+name = "descriptive_title_and_lang"
 description = "The document title is descriptive (names the app and current site) and the root html element carries a valid lang attribute, not a scaffold placeholder"
 type = "binary"
 weight = 0.5
@@ -98,24 +98,23 @@ optional = true
 
 [[criterion]]
 id = "3.6"
-name = "3_6"
-description = "UI labels, headings, buttons, and counts use sentence case and numerals, with short labels carrying no terminal period"
+name = "sentence_case_numeral_labels"
+description = "UI labels, headings, buttons, and counts use sentence case and numerals, action labels are specific (Clear filter, Add site) rather than generic, and short labels carry no terminal period"
 type = "binary"
 weight = 0.5
 optional = true
 
 [[criterion]]
 id = "3.7"
-name = "3_7"
-description = "At mobile width the metric tiles, chart, and panels reflow into a single stacked column that preserves the metrics-then-chart-then-panels hierarchy with no region clipped or horizontally scrolled"
+name = "mobile_single_column_stack"
+description = "At 375px width the metric tiles, chart, and breakdown panels reflow into a single stacked column preserving the metrics-then-chart-then-panels hierarchy, the site, date-range, and clear-filter controls stay reachable, and no content clips, overflows the viewport, or produces a horizontal scrollbar"
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "3.8"
-name = "3_8"
-description = "Prose or paragraph content, if any, does not stretch edge to edge on a wide viewport; content stays within a bounded readable max width"
+name = "content_stretches_edge_to_edge"
+description = "On a wide viewport the dashboard content stretches edge to edge instead of staying within a centered bounded max width near 1120px"
 type = "binary"
 weight = 0.5
 negate = true
@@ -123,8 +122,59 @@ optional = true
 
 [[criterion]]
 id = "3.9"
-name = "3_9"
-description = "The active (filtered) row and the filter state are not conveyed by color alone; a pill text and row emphasis mark the state without relying on hue"
+name = "filter_state_color_only"
+description = "The active (filtered) row or the filter state is conveyed by color alone, with no pill text or non-color row emphasis marking the state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.10"
+name = "card_surface_treatment"
+description = "The metric tiles, chart card, and breakdown panels share one card treatment: white surfaces (dark equivalents in dark theme) with a subtle 1px border, corner radius near 12px, and a soft shadow"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "indigo_gradient_bars_single_accent"
+description = "The visitor bars use an indigo vertical gradient (lighter at the top, deeper indigo at the bottom), and indigo is the single accent hue — used for the logo mark, filter pill, active rows, and focus rings — over an otherwise neutral slate palette"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.12"
+name = "sticky_topbar_brand_cluster"
+description = "The top bar is sticky with a hairline bottom border and shows a brand cluster (gradient logo mark, the title Plausible Analytics, and a subtitle naming the current site) on the left and the site selector, date-range selector, sort selector, and theme toggle on the right"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.13"
+name = "breakdown_rows_two_column_counts"
+description = "Breakdown rows read as a two-column list: a left-aligned name and a right-aligned count in a muted color rendered with tabular figures so digits align vertically across rows"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.14"
+name = "consistent_icon_set"
+description = "Icons in the top bar, selectors, filter pill, and empty states share one consistent visual style with a uniform stroke weight, with no mixed icon styles across the UI"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.15"
+name = "placeholder_copy_shipped"
+description = "Placeholder or lorem text ('Lorem ipsum', 'TODO', unrendered template strings like {{title}}) is visible somewhere in the shipped UI"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

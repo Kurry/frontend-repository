@@ -1,14 +1,14 @@
 <summary>
-Build a PDF form builder and document signing workspace using Vue 3 Composition API, Pinia, and Tailwind CSS v4.
+Build a PDF form builder and document signing workspace using Vue 3 Composition API, Pinia, Tailwind CSS 4.3.2, and Reka UI.
 </summary>
 
 <reference_screenshots>
 Screenshots of the reference application are provided in-container at
-`/reference-screenshots/`: `overview.png` is a full-page desktop-layout
-overview (downscaled); `segment-NN.png` are full-resolution 1440x900 sections
+/reference-screenshots/: overview.png is a full-page desktop-layout
+overview (downscaled); segment-NN.png are full-resolution 1440x900 sections
 in top-to-bottom order with slight overlap. They are part of this instruction:
 recreate what they show. Where a screenshot and the text conflict, the text
-wins. Do not copy the images into `/app` or ship them as app assets.
+wins. Do not copy the images into /app or ship them as app assets.
 </reference_screenshots>
 
 <core_features>
@@ -16,39 +16,78 @@ Core features (each line is an observable behavior the finished app must exhibit
 - The app opens directly into a document template editor with no authentication wall: a top bar (Docuseal wordmark, an editable template-name field, a Build/Preview mode switch, a signing-status pill, and a Send for signing action), a left rail (templates list, submitters list, and a field-type palette), a center document canvas showing the open template as one or more page sheets, and a right properties panel. The initial surface is recognisably PDF form building, submitter assignment and document signing, not a generic dashboard or starter page
 - The left rail lists at least 3 seeded templates, each showing its field count; clicking a template opens it into the canvas, swapping the template name, the document sheets, and the placed fields without a full page reload. One template is open on first load with seeded fields so the workspace is non-empty
 - The field-type palette offers at least the following distinct field types: Text, Signature, Initials, Date, Number, Checkbox, Radio, Select, Image, File, Phone, Cells, Stamp. Clicking a palette type places one field of that type onto the open document, assigned to the currently active submitter
-- Open a template and place one form field: after clicking a palette type, a new field box appears on the document canvas in the active submitter's colour, that field becomes the selected field (the right properties panel switches to a field editor showing its type, name, assigned submitter and required toggle), and the submitter assignment is visible on both the field box and the panel. The action is reflected in the template, the selected field and the submitter assignment together
+- Clicking a palette type makes a new field box appear on the document canvas in the active submitter's colour, that field becomes the selected field (the right properties panel switches to a field editor showing its type, name, assigned submitter and required toggle), and the submitter assignment is visible on both the field box and the panel
 - The submitters list shows at least 2 seeded submitters (First Party, Second Party), each with a distinct colour swatch; an Add submitter control appends another party with its own colour; clicking a submitter row makes it active so subsequently placed fields adopt that submitter's colour
-- Assign a placed field to a submitter: with a field selected, choosing a different submitter in the properties panel reassigns the field. The field box on the canvas recolours to the new submitter's colour and the panel's assigned-submitter control updates in the same step. The change is reflected in the template, the selected field and the submitter assignment together
 - Placing fields for two different submitters keeps each field in its own submitter's colour: a field assigned to First Party and a field assigned to Second Party render in visibly different colours and each retains its assignment
-- Select one placed field and edit its properties: renaming the field in the properties panel updates the field's label on the canvas immediately, and the canvas and the property panel stay synchronized. Clearing the name to empty shows a visible validation message at the field and does not remove the field
-- Delete one selected field: removing the selected field via the panel's Delete field control (or the Delete key while it is selected) removes only that field from the document; the other placed fields remain on the canvas and both submitter definitions remain unchanged
+- Renaming the selected field in the properties panel updates the field's label on the canvas immediately, and the canvas and the property panel stay synchronized as properties change; toggling the required checkbox updates the field's required state in the same step
+- The field editor in the properties panel validates inline per field: clearing the name input to empty shows a validation message that names the name field next to the control, before any submit-style action, and the message clears when a non-empty name is restored
+- Removing the selected field via the panel's Delete field control (or the Delete key while it is selected) removes only that field from the document
 - The properties panel, when no field is selected, summarises the open template (document title, field count, page count, signing status) and a per-submitter field-count breakdown that tracks the placed fields
-- A Send for signing action validates the open template (at least one field, every field assigned to a submitter) and, on success, moves the status pill to an awaiting-first-submitter state and reveals an Advance control that steps the signing status through each submitter to Completed; a failed validation surfaces feedback and does not change the status. A Build/Preview mode switch flips the canvas into a signing preview that shows the placed fields as fillable
+- A Send for signing action validates the open template (at least one field, every field assigned to a submitter) and, on success, moves the status pill to an awaiting-first-submitter state and reveals an Advance control that steps the signing status through each submitter to Completed. A Build/Preview mode switch flips the canvas into a signing preview that shows the placed fields as fillable
 - No outbound navigation exists for app chrome; every control acts on in-app client state
 </core_features>
+
+<user_flows>
+- Place a field end to end: after clicking a palette type, a new field box appears on the canvas in the active submitter's colour, the open template's field count increases by exactly one in the left rail's template row and in the panel summary, the per-submitter field-count breakdown adds one to the active submitter, and after a full page reload the placed field is still on the canvas with the same type, name, and submitter assignment
+- Reassign a field end to end: with a field selected, choosing a different submitter in the properties panel recolours the field box on the canvas to the new submitter's colour in the same step the panel control updates, moves one count between the two parties in the per-submitter breakdown, and after a full page reload the field still renders in the new submitter's colour
+- Delete a field end to end: removing the selected field takes exactly one field box off the canvas, decreases the open template's field count by one in the rail row and the panel summary, updates the per-submitter breakdown, leaves every other placed field and both submitter definitions unchanged, and the removal survives a full page reload
+- Send for signing end to end: on a template that passes validation, activating Send for signing moves the status pill to awaiting the first submitter and reveals an Advance control; stepping Advance once per submitter walks the status through each party and ends at Completed with the pill in its completed treatment, and the current signing status is restored after a full page reload
+- Switch templates end to end: clicking another template in the rail swaps the template name, the document sheets, and the placed fields without a full page reload; returning to the first template shows its fields exactly as they were left
+- After a full page reload the workspace restores the open template, its placed fields and their submitter assignments, the submitters, and the signing status
+</user_flows>
+
+<edge_cases>
+- Clearing a selected field's name to empty shows a visible validation message at the field editor naming the name field and does not remove the field; the field keeps rendering on the canvas while the message is shown
+- Activating Send for signing on a template with no placed fields, or with any field left unassigned to a submitter, surfaces visible feedback describing the problem and leaves the status pill unchanged
+- Deleting the last remaining field leaves the document sheets rendered with the panel summary showing a field count of zero, and the palette still places new fields afterwards
+- Adding several submitters keeps every party's colour swatch visibly distinct from the others already in the list
+</edge_cases>
 
 <visual_design>
 - A three-pane document-editor composition at desktop width: a left tool rail, a center document canvas, and a right properties panel, under a full-width top bar. This is a document canvas with a field palette, submitter colours, property controls and a signing preview, not a grid of equal-weight dashboard cards
 - The document canvas is the primary visual focus: page sheets render as white pages with a faint page label, a faux document body (title, subtitle, and grey text-line placeholders), and colour-tinted field boxes positioned on the page. Secondary metadata (template summary, counts) stays visually subordinate in the side panels
 - Each submitter owns one colour; placed fields are tinted with their submitter's colour (fill, border and label), so a field's owner is readable at a glance. Submitter swatches in the rail use the same colours
 - The selected field is visually distinguished from unselected fields through a stronger outline / selection ring and a resize handle
-- Field-type palette buttons pair a small type glyph with the type label; the properties panel uses labelled inputs, a type badge, a submitter select with a colour dot, a required checkbox, and a destructive Delete field button
+- Field-type palette buttons pair a small type glyph with the type label, drawn from one consistent icon set used across the whole app; the properties panel uses labelled inputs, a type badge, a submitter select with a colour dot, a required checkbox, and a destructive Delete field button
 - Cards and panels use hairline borders and subtle shadows; the status pill changes colour by state (neutral draft, amber awaiting, green completed)
-- Responsive: at desktop the three panes sit side by side; at narrow widths (around 375 pixels wide) the panes stack into a single scrollable column with the palette and the canvas reachable without horizontal scrolling, preserving the primary-before-secondary order
 </visual_design>
 
 <motion>
 - Buttons, template rows, submitter rows and palette buttons take a hover wash (background/border easing) and a slight press-down on click; interactive controls show a visible focus ring on keyboard focus that is distinct from hover
-- Placing a field, selecting a field, reassigning a submitter, and deleting a field update the canvas immediately in place without a full page reload
+- Placing a field animates the new field box into place with a brief entrance (fade/scale) rather than popping in; deleting a field animates it out; the canvas updates in place without a full page reload
+- Adding a submitter animates the new row into the submitters list rather than appearing instantly
 - Selecting a field applies a selection ring and reveals its resize handle; hovering a field box shows a soft colour halo in the field's submitter colour
 - Reassigning a selected field to another submitter recolours the field box on the canvas at the same moment the panel control updates
-- Action feedback appears in a short-lived toast (added, assigned, deleted) that fades in and out; the toast is an aria-live status region
+- Action feedback appears in a short-lived toast (added, assigned, deleted) that fades in and out
 - The mode switch and the status pill update in place; switching to Preview changes the field boxes to a dashed fillable affordance
 - Hover feedback is required on all interactive chrome (top-bar buttons, template rows, submitter rows, palette buttons, field boxes, panel controls); omitting hover feedback is a defect
 </motion>
 
+<responsiveness>
+- At desktop widths the three panes sit side by side under the full-width top bar
+- At narrow widths (around 375 pixels wide) the panes stack into a single scrollable column with the palette and the canvas reachable without horizontal scrolling, preserving the primary-before-secondary order
+- No content clips or overflows the viewport, and no horizontal scrolling appears at 375 pixel width
+</responsiveness>
+
+<accessibility>
+- Every interactive control (top-bar actions, template rows, submitter rows, palette buttons, panel inputs and buttons) is reachable and operable with the keyboard alone, with a visible focus indicator distinct from hover
+- The action-feedback toast is an aria-live status region so placements, reassignments and deletions are announced as well as shown
+- Inline validation messages in the field editor are visible text associated with their input, not colour alone
+- The selected field can be removed with the Delete key while it is selected
+</accessibility>
+
+<performance>
+- The app is interactive within 2 seconds of a local cold load
+- No console errors or warnings appear during a full exercise of the app (placing, editing, reassigning, deleting fields, switching templates, sending for signing, switching modes)
+- Placing, selecting, reassigning and deleting fields update the canvas immediately, and the UI stays responsive under rapid repeated field placement with no hangs or dropped interactions
+</performance>
+
 <requirements>
-- Use Vue 3 Composition API, Pinia, and Tailwind CSS v4.
+- Use Vue 3 Composition API, Pinia, Tailwind CSS 4.3.2 (pinned), and Reka UI.
+- Reka UI provides the interactive component primitives — the submitter select, the required checkbox/toggle, the mode switch, popovers or dialogs, and the toast surface; Tailwind CSS 4.3.2 owns layout, spacing, and all custom surfaces, with design tokens in the theme layer.
+- Motion for Vue is allowed for animation (field entrance/exit, toast motion, panel transitions); no other animation libraries.
+- Phosphor icons via the @phosphor-icons/vue package only — one icon set used consistently for the palette glyphs, panel controls, and chrome; no other icon sets, no raw copy-pasted SVGs.
+- All forms validate through VeeValidate paired with a Zod schema — the field-properties editor (name required and non-empty), the editable template-name field, and any add-submitter input; the schema defines the rules and the form layer surfaces inline per-field errors, naming the field, before submit.
 - Shared application state must live in a Pinia store: the templates and their placed fields, the submitters and the active submitter, the active template, the selected field, the editor mode, and the signing status. UI controls and any programmatic surface must mutate this one shared store, not disconnected local copies.
 - No authentication wall — open directly into the primary workspace.
 - Persist relevant state in localStorage (or equivalent client storage) so a reload restores it: the open template, the placed fields and their submitter assignments, the submitters, and the signing status must survive a full page reload. This persistence is a required part of this task (it overrides the usual in-memory-only rule).
@@ -61,8 +100,8 @@ Core features (each line is an observable behavior the finished app must exhibit
   - Editing a field name to empty shows visible validation at the field and does not delete the field
   - Opening a template swaps the canvas to that template's document and fields without a reload
 - Keep the implementation frontend-only and self-contained; do not depend on a live backend or authentication service. Build tooling: Vite or an equivalent SPA setup. No backend routes.
+- All libraries are installed via npm and bundled locally; no CDN imports of any library, font, or icon set.
 - Zero navigational outbound links for app chrome — in-app controls only.
-- Responsive: three panes side by side on large screens; stacked single column reachable without horizontal scrolling at around 375 pixels wide.
 </requirements>
 
 <integrity>

@@ -1,14 +1,14 @@
 <summary>
-Build a CSS theme builder using Vue 3, Pinia, and Tailwind CSS.
+Build a CSS theme builder using Vue 3, Pinia, Tailwind CSS 4.3.2, and Reka UI.
 </summary>
 
 <reference_screenshots>
 Screenshots of the reference application are provided in-container at
-`/reference-screenshots/`: `overview.png` is a full-page desktop-layout
-overview (downscaled); `segment-NN.png` are full-resolution 1440x900 sections
+/reference-screenshots/: overview.png is a full-page desktop-layout
+overview (downscaled); segment-NN.png are full-resolution 1440x900 sections
 in top-to-bottom order with slight overlap. They are part of this instruction:
 recreate what they show. Where a screenshot and the text conflict, the text
-wins. Do not copy the images into `/app` or ship them as app assets.
+wins. Do not copy the images into /app or ship them as app assets.
 </reference_screenshots>
 
 <core_features>
@@ -20,8 +20,8 @@ Core features (each line is an observable behavior the finished app must exhibit
 - Editing any token — a color swatch, a radius, a size, the border width, a depth/noise toggle, or the dark-color-scheme option — immediately re-themes the live preview with no reload
 - Clicking Random replaces the theme's color tokens with a fresh randomized OKLCH set (and a random light/dark scheme), re-themes the preview, and shows a brief confirmation toast
 - At least two interaction modes: Editor/Generator mode (token controls) and Live Preview mode with three tabs — Components Demo (a dense grid of ~9 component cards: badges/filters, a calendar list, tabs & range, a product card, a registration form, stats + radial progress, an orders table, a chat + code mockup, and pricing), Component Variants (button color variants, form controls, and alert states), and Color Palette (16 token swatches, each showing the token name and its value) — switching tabs swaps the pane in place and re-themes immediately as tokens change
-- The CSS-export control opens a modal previewing the theme as a `[data-theme="name"] { … }` CSS block; a Copy control writes that CSS to the clipboard and shows a brief copied confirmation, and Close, the backdrop, or Escape dismiss the modal
-- Shareable theme payload: the active theme is encoded into a compressed same-document `#theme=` URL hash (JSON → deflate → URL-safe Base64) that updates as the theme changes; loading a URL that carries a `#theme=` payload decodes and applies that theme on first paint
+- The CSS-export control opens a modal previewing the theme as a [data-theme="name"] { … } CSS block; a Copy control writes that CSS to the clipboard and shows a brief copied confirmation, and Close, the backdrop, or Escape dismiss the modal
+- Shareable theme payload: the active theme is encoded into a compressed same-document #theme= URL hash (JSON → deflate → URL-safe Base64) that updates as the theme changes; loading a URL that carries a #theme= payload decodes and applies that theme on first paint
 - Invalid create: an empty or whitespace-only theme name must not add a custom theme; show visible validation feedback
 - Empty My themes state after removing all custom themes while the built-in catalog remains
 - Zero real navigation after settle — same-document hash theme payload allowed; chrome anchors become inert buttons after hydration
@@ -54,7 +54,7 @@ State contracts (behavioral, not storage keys):
 - Deleting/removing a custom theme removes it from My themes and from active selection if it was active
 - Selecting a built-in or custom theme applies tokens to preview without reload; editing a built-in forks a custom copy
 - Preview tab switches and Random mutate shared state; they do not invent a disconnected theme copy
-Stack: Vue 3 + Pinia + Tailwind CSS (Vite or equivalent SPA); frontend-only. DaisyUI theme tokens / component demos are allowed for the live preview. pako (zlib) allowed for hash compression. No unrelated external UI kits.
+Stack: Vue 3 with Pinia, built with Vite or an equivalent SPA setup. Styling is Tailwind CSS 4.3.2 (pinned), with design tokens in @theme. Reka UI components provide dropdowns, the CSS export dialog, selects, toggles, and toasts; no other external component library. Motion for Vue is allowed for animation; no other animation libraries. Remix Icon via unplugin-icons only; no raw pasted SVG icon sets and no icon CDNs. All forms, including theme create, rename, and token editors, validate through a Zod schema driven by VeeValidate and render inline per-field errors before submit. DaisyUI theme tokens and component demos are allowed for the live preview. pako is allowed for hash compression. All libraries are installed via npm and bundled locally; no CDN imports.
 - Exactly 35 built-in presets seeded so first load is non-empty; document title reflects CSS theme builder
 - Empty required theme name on create must not increase custom themes count; show visible validation feedback
 - After removing all custom themes, My themes shows an empty state while built-ins remain

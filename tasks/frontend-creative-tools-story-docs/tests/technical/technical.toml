@@ -61,23 +61,110 @@ allowed_tools = [
 aggregation = "weighted_mean"
 
 [[criterion]]
-id = "2.1"
-name = "2_1"
-description = "Jotai holds scenes, view mode, slide index, and edit focus — shared across components"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "2.2"
-name = "2_2"
-description = "Implemented with React, Jotai, and Tailwind CSS; no browser storage APIs for persistence"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "2.3"
-name = "2_3"
-description = "Uses localStorage or sessionStorage to persist scenes or view mode"
+name = "browser_storage_holds_state"
+description = "localStorage, sessionStorage, or another browser storage API holds app data (scenes, view mode, or other state) after exercising the app"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.4"
+name = "cross_view_state_coherence"
+description = "A scene change made in one view (create, edit, or delete) is immediately reflected in every other view showing that scene without a reload; no view shows stale data another view already updated"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "reload_seeded_baseline"
+description = "After creating a scene, editing another, switching view mode, and advancing the slide index, reloading the page returns every facet coherently to the seeded baseline — the seeded scenes, Tile mode, and the slide index at the first scene — never a partial mix"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "hydration_clean_console"
+description = "No console errors or warnings — including hydration mismatch errors or warnings — appear on first load of the workspace route or during a full exercise of the app"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "hydration_content_flash"
+description = "Statically rendered content visibly flashes and is replaced by different client content after hydration (mismatched text, reflowing layout, or restyled elements between first paint and interactive)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.8"
+name = "deep_link_parity"
+description = "Loading the workspace route URL directly renders the full workspace (header, sidebar, scene grid) with the document title '1. Getting Started — Docs' — no 404 and no half-rendered shell"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "keyboard_operability_focus_ring"
+description = "Every interactive control (header tools, sidebar rows, view-mode toggles, kebab menus, create/edit fields, drawer and slide controls) is reachable and operable with the keyboard alone, with a visible focus indicator"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "kebab_menu_keyboard_operable"
+description = "A scene kebab menu opens as a keyboard-operable menu: arrow keys move between the edit and delete items and Escape closes the menu"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "validation_polite_live_region"
+description = "The create form's inline validation messages are exposed through a polite live region in the accessibility tree as well as shown visually"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.12"
+name = "drawer_escape_focus_return"
+description = "An open notifications or account drawer can be dismissed with Escape, and focus returns to the control that opened it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.13"
+name = "alt_text_and_icon_labels"
+description = "Scene images carry descriptive alt text and icon-only controls carry accessible labels"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.14"
+name = "fast_interactive_stable_load"
+description = "The app is interactive within 2 seconds of a local cold load and renders its content directly with no post-load content flash or visible layout jump as fonts and scene images finish loading; image regions hold their space"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.15"
+name = "rapid_interaction_responsive"
+description = "Rapid view-mode switching and repeated create/delete actions stay responsive with no hangs, dropped interactions, or runtime exceptions in the console"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.16"
+name = "outbound_network_requests"
+description = "Devtools shows network requests to other origins (font, icon, script, or image CDNs) during load or normal use"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect (console, storage, state coherence, accessibility, or load behavior) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, console line, network entry, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

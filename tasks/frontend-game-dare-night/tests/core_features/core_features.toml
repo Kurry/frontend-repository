@@ -182,8 +182,8 @@ optional = true
 
 [[criterion]]
 id = "1.18"
-name = "1_18"
-description = "Toggling category chips filters the deck: starting with only one category selected and drawing several cards yields only cards whose category label matches that category."
+name = "second_category_filter_round_trip"
+description = "After returning to setup from a game played with only Dare selected and starting a new game with only Truth selected, every card drawn in the new game shows the Truth category label, proving the toggles re-filter the deck between games rather than being cosmetic."
 type = "binary"
 weight = 1.0
 
@@ -197,15 +197,15 @@ optional = true
 
 [[criterion]]
 id = "1.20"
-name = "1_20"
-description = "Pressing Draw card reveals a card showing its category label, an intensity badge, and prompt text, with the current player's name displayed above the card."
+name = "done_updates_three_surfaces_without_reload"
+description = "With 3 players set up, pressing Start game, drawing a card, and pressing Done updates three surfaces at once without any page reload: the resolving player's scoreboard points rise by exactly one (count measured immediately around the press), the turn indicator above the card advances to the next player in join order, and the scoreboard ordering re-sorts if the new total changes the standings."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.21"
-name = "1_21"
-description = "Pressing Done awards the current player one point and advances the turn, while pressing Skip logs a forfeit with no point and advances the turn."
+name = "double_activated_done_resolves_one_turn"
+description = "Rapidly double-activating the Done button resolves exactly one turn: measured immediately around the double press, the resolving player's points rise by exactly one and the turn indicator advances exactly one position in join order."
 type = "binary"
 weight = 1.0
 
@@ -225,29 +225,29 @@ weight = 1.0
 
 [[criterion]]
 id = "1.24"
-name = "1_24"
-description = "Deleting a custom card requires a confirmation step, and cancelling the confirmation leaves the card in place while confirming removes it."
+name = "short_custom_prompt_rejected_inline"
+description = "Submitting the custom-card form with a too-short prompt is rejected with a visible message naming the prompt field, and the custom-card list count stays unchanged."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.25"
-name = "1_25"
-description = "The scoreboard lists every player with points and forfeits sorted by points descending and updates immediately after each resolved turn."
+name = "custom_card_lifecycle_round_trip"
+description = "Submitting a valid custom card raises the custom-card list count by exactly one and shows a transient confirmation; after a page refresh the same card is still listed and can still be drawn during play, and after its delete is confirmed and the page is refreshed the card stays gone from the list."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.26"
-name = "1_26"
-description = "With the round timer on, letting the 15-second countdown reach zero logs a forfeit for the current player and advances the turn exactly as a Skip would."
+name = "record_line_names_holder_and_survives_reset"
+description = "After a session where a player exceeds the previous best total, the setup screen's Dare Night record line names that player and their points, and the same record line persists after a page refresh and after a confirmed Start new game reset even though players and scores are cleared."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.27"
-name = "1_27"
-description = "Exhausting the selected-category deck reshuffles it automatically, shows a Deck reshuffled confirmation, and never draws the same card twice in a row across the reshuffle boundary."
+name = "event_log_and_bonus_totals_agree"
+description = "While the live event feed stream is active, delivered values visibly change, and after a delivery sequence the applied-event log entries agree with the per-player live-bonus totals shown in the panel."
 type = "binary"
 weight = 1.0
 
@@ -267,8 +267,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.30"
-name = "1_30"
-description = "The live event feed's Start, Pause, Reconnect, and Deliver out of order controls drive a visible stream status, and out-of-order delivery plus Reconnect resolve to per-player bonus totals matching logical-timestamp order with duplicates ignored and no double-applying."
+name = "reconnect_catches_up_exactly_once"
+description = "After pausing the live event feed and letting events accumulate, pressing Reconnect applies each missed event exactly once: the per-player live-bonus totals agree with the applied-event log with no double-applied entries, and the visible stream status reflects the caught-up state."
 type = "binary"
 weight = 1.0
 
@@ -287,3 +287,11 @@ description = "Rapidly repeating a control such as Done, Draw card, or the live-
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

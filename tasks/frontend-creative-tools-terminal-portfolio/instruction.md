@@ -1,60 +1,111 @@
 <summary>
-Build a CLI terminal product designer portfolio using React, Zustand, and CSS Modules.
+Build a CLI terminal product designer portfolio using Preact, Preact Signals, Tailwind CSS 4.3.2, and DaisyUI.
 </summary>
 
 <reference_screenshots>
 Screenshots of the reference application are provided in-container at
-`/reference-screenshots/`: `overview.png` is a full-page desktop-layout
-overview (downscaled); `segment-NN.png` are full-resolution 1440x900 sections
+/reference-screenshots/: overview.png is a full-page desktop-layout
+overview (downscaled); segment-NN.png are full-resolution 1440x900 sections
 in top-to-bottom order with slight overlap. They are part of this instruction:
 recreate what they show. Where a screenshot and the text conflict, the text
-wins. Do not copy the images into `/app` or ship them as app assets.
+wins. Do not copy the images into /app or ship them as app assets.
 </reference_screenshots>
 
 <core_features>
 Core features (each line is an observable behavior the finished app must exhibit):
+Feature: Boot and shell —
 - A boot sequence prints sequential status lines inside the terminal; pressing Enter (or click/touch) dismisses boot and reveals ASCII name art, a two-column welcome box (capabilities + navigation), and a focused command prompt
 - A slash-command shell resolves section commands — /help, /about, /work, /clients, /skills, /philosophy, /social, /articles, /testimonials, /awards, /contact, /clear — echoing each typed command and printing its formatted output block after a short thinking indicator
 - Quick-info commands (/email, /phone, /linkedin, /facebook, /instagram, /agency, /location, /privacy) and per-project shortcuts (one slug per seeded project) print their own focused cards
 - /help lists commands grouped by section; /skills prints expertise rows whose proficiency bars animate from zero to their target width; /themes lists selectable theme swatches marking the active theme
 - The input supports an autocomplete dropdown that filters as you type (Tab/Enter completes), up/down arrow command history, command aliases, bare-word fuzzy matching, and natural-language intent matching that maps a typed phrase to the closest command
-- An unknown command prints a visible command-not-found line with a hint rather than failing silently
-- Theme switching via /themes, /dark, /light, /retro, /glass swaps session-scoped CSS classes on the document element and recolors the terminal without reloading; running a section command also updates the document title
-- Primary collection — projects (case studies): seed at least 6 projects; each has name, slug/shortcut, blurb, status (shipped | wip | archived), and tags; the collection supports create, edit, and delete via shell commands and/or an in-terminal form
+Feature: Themes and modes —
+- Theme switching via /themes, /dark, /light, /retro, /glass swaps session-scoped theme classes on the document element and recolors the terminal without reloading; running a section command also updates the document title
 - At least two interaction modes: Terminal CLI mode (command prompt + output) and Projects Board mode (list/grid of projects with status/tag filters, reachable via /work board or a mode toggle)
-- Domain behavior beyond CRUD: filter projects by status or tag; /work lists the collection; a project shortcut opens that project's detail in the terminal; deleting all projects shows an empty projects state; a cookie-consent banner appears after boot with Accept/Decline recording the choice in memory
-- Invalid create: an empty project name must not add a project; show visible validation feedback in the terminal output
+Feature: Projects collection —
+- Primary collection — projects (case studies): seed at least 6 projects; each has name, slug/shortcut, blurb, status (shipped | wip | archived), and tags; the collection supports create, edit, and delete via shell commands and/or an in-terminal form
+- The project create and edit form validates per field before submit: an inline message names each invalid field, and the submit control stays disabled or inert until all required fields are valid
+- Domain behavior beyond CRUD: filter projects by status or tag; /work lists the collection; a project shortcut opens that project's detail in the terminal
+Feature: Window chrome and extras —
 - macOS-style window chrome: the red dot closes the terminal to an exit overlay with a Reopen control; yellow minimizes; green maximizes
+- A cookie-consent banner appears after boot with Accept/Decline recording the choice in memory
 - Hidden easter-egg commands are supported (for example a Konami key sequence ↑↑↓↓←→←→BA or /konami that fires a confetti canvas burst, and /matrix green-rain canvas); all link-like controls stay inert with no real navigation
 </core_features>
 
+<user_flows>
+- Create flow: submitting a valid new project through the in-terminal create path adds exactly one project — the /work listing count increases by one, a new card with the correct status badge appears in Projects Board, and a new per-project shortcut command resolves to the new project's detail card, all without a reload; reloading the page returns the app to its seeded projects only
+- Edit flow: renaming a seeded project updates that same record everywhere it appears — the Projects Board card, the /work listing row, the project's detail card, and its autocomplete entry — without a reload
+- Delete flow: deleting a project removes its card from Projects Board, drops the /work listing count by exactly one, and makes its former shortcut print a command-not-found line; deleting every project shows the empty projects state in both Projects Board and /work output
+- Filter flow: applying a status or tag filter in Projects Board narrows the visible cards to matching projects; clearing the filter restores the full collection exactly; a project created while a matching filter is active appears in the filtered view immediately
+- Theme and mode flow: running /retro recolors the terminal, /themes then marks retro as the active swatch, and switching to Projects Board and back keeps the retro theme applied — no step reloads the document
+</user_flows>
+
+<edge_cases>
+- An unknown command prints a visible command-not-found line with a hint rather than failing silently
+- Invalid create: an empty project name must not add a project; show visible validation feedback in the terminal output naming the field
+- Double-activating the create submit adds exactly one project: the collection count increases by one and one new card appears
+- After deleting all projects, Projects Board and /work output show an empty state with a message and a way to create a project
+- Closing the terminal with the red dot and pressing Reopen restores the terminal with its output history and theme intact
+- Pressing the up arrow before any command has been typed leaves the prompt unchanged with no errors
+</edge_cases>
+
 <visual_design>
 - Full-bleed atmospheric wallpaper behind a centered terminal window with macOS traffic-light titlebar
-- JetBrains Mono throughout; CSS variable themes — dark default, light, retro, and glass variants
-- CSS Module + CSS variable themes for dark, light, retro, and glass variants
+- JetBrains Mono throughout, bundled with the app
+- Four visual themes — dark (default), light, retro, and glass — each recolors the terminal background, text, accents, and chrome consistently from shared design tokens
 - Projects Board mode uses dense project cards/rows inside the terminal body with status badges
+- A single consistent icon style across social cards, window controls, and board badges
 - One terminal-over-wallpaper composition — not a marketing multi-section landing
 </visual_design>
 
 <motion>
-- Boot: sequential status lines; Enter/click/touch dismisses boot
+- Boot: sequential status lines print with a typewriter cadence; Enter/click/touch dismisses boot
 - Post-boot enter: ASCII art and welcome box fade/slide in; prompt takes focus
 - CLI thinking + staggered output reveal for command results; skill bars animate to width
+- Creating a project animates its new card into the Projects Board; deleting a project animates its card out
+- Validation and confirmation feedback lines appear with a brief fade rather than popping in
 - Mode switch between Terminal CLI and Projects Board updates without full reload
 - Hover animations (required): titlebar dots ease opacity on hover; project cards/rows ease border-color and background on hover; autocomplete rows highlight on hover/active; social/close buttons ease on hover
 - Easter-egg canvases (confetti burst on the Konami sequence, matrix green-rain on /matrix) animate over the wallpaper for a moment and then clear
 - Respect prefers-reduced-motion by disabling staggered/enter animations where practical
 </motion>
 
+<responsiveness>
+- At widths of 768 pixels and below the terminal window expands to nearly the full viewport width and the two-column welcome box stacks into one column
+- At 375 pixel width no content clips or overflows the viewport, no horizontal scrolling appears, and the command input remains visible and usable
+- Projects Board reduces its card grid to a single column at narrow widths without losing status badges or filters
+</responsiveness>
+
+<accessibility>
+- After boot the command prompt receives focus; every interactive control (traffic lights, mode toggle, filters, board cards, consent buttons) is reachable and operable with the keyboard alone with a visible focus indicator
+- New command output is announced through an aria-live polite region as it is appended
+- The autocomplete dropdown is navigable with up/down arrows, Enter or Tab selects the highlighted entry, and Escape closes it without changing the input
+- The traffic-light window controls carry accessible labels describing close, minimize, and maximize
+- Terminal text keeps readable contrast against the background in all four themes
+</accessibility>
+
+<performance>
+- The app is interactive within 2 seconds of a local cold load
+- No console errors or warnings appear during a full exercise of the app
+- Rapid typing and quickly issued back-to-back commands stay responsive with no dropped characters or hangs
+</performance>
+
+<writing>
+- /help command descriptions are specific to what each command prints, not generic filler
+- Headings, command output labels, and button text use one consistent capitalization convention
+- Error and validation messages name the problem and the fix; empty states explain what belongs there and how to add it; no lorem or placeholder filler text appears anywhere in the shipped UI
+- Portfolio copy (about, philosophy, testimonials, project blurbs) reads as coherent original content for a fictional designer identity
+</writing>
+
 <requirements>
-Shared application state must use the stack state library named in summary (in-memory only): projects collection, command history, theme class, autocomplete, output buffer, active mode, filters, and cookie-consent choice. Do not use localStorage, sessionStorage, or other browser storage APIs.
+Shared application state must use Preact Signals (in-memory only): projects collection, command history, theme, autocomplete state, output buffer, active mode, filters, and cookie-consent choice. Do not use localStorage, sessionStorage, or other browser storage APIs.
 State contracts (behavioral, not storage keys):
 - Creating a valid project increases the collection and shows it in /work and Projects Board
 - Editing a project updates that same record in board, list output, and detail
 - Deleting a project removes it from board, shortcuts, and filters
 - Status/tag filters recompute the visible board from the shared collection
 - Theme and mode are shared client state; toggling them does not reload the document
-Stack: React + Zustand + CSS Modules (Vite or equivalent SPA); frontend-only. Styling must use CSS Modules with JetBrains Mono and CSS variable themes — not Tailwind as the primary system, and no MUI/Chakra/Ant Design.
+Stack: Preact + Preact Signals (Vite or equivalent SPA); frontend-only. Styling: Tailwind CSS 4.3.2 (pinned) with the theme design tokens defined in @theme; the dark, light, retro, and glass themes are token swaps on the document element. DaisyUI is the sole component library, used for the chrome: consent banner, badges, cards, buttons, and menus. GSAP allowed for animation (boot typewriter, staggered output reveal, skill bars); no other animation libraries. Tabler icons via the Iconify Tailwind plugin only; no other icon sets and no raw pasted SVGs. All forms (project create and edit) validate through a schema (Zod or Valibot) rendered by a form library with inline per-field errors before submit. JetBrains Mono is bundled locally via npm. All libraries installed via npm and bundled locally; no CDN imports. No MUI/Chakra/Ant Design.
 - Seed at least 6 projects so /work and Projects Board are non-empty after boot
 - Empty required fields on create must not increase the projects count; show visible validation feedback
 - After deleting all projects, show an empty state in Projects Board / /work output

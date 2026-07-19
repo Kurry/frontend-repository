@@ -62,53 +62,88 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
-description = "After applying a breakdown filter, completion is apparent from the filter pill and the updated metric tiles and chart"
+name = "filter_feedback_pill_and_tiles"
+description = "After applying a breakdown filter through a real row click, completion is apparent from the filter pill and the updated metric tiles and chart"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "4_2"
-description = "Breakdown rows and buttons show distinct hover and focus treatments (a hover wash versus a focus ring), not one shared highlight standing in for both"
+name = "distinct_hover_and_focus_treatments"
+description = "Breakdown rows take an accent hover wash and a distinct, clearly visible focus ring — hover and focus are different visual treatments, not one shared highlight standing in for both"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
-description = "The chart bars animate their height with a short eased transition when the segment, site, or date range changes rather than swapping instantly"
+name = "chart_bars_eased_height_transition"
+description = "The chart bars animate their height with a short eased transition when the segment, site, or date range is changed through the real controls, rather than swapping instantly"
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "4_4"
-description = "Pressed feedback on buttons and the theme toggle appears immediately on pointer-down, before the resulting recompute finishes"
+name = "immediate_press_feedback"
+description = "Buttons and the theme toggle ease their background and border on hover and show slight press feedback immediately on pointer-down, before the resulting recompute finishes"
 type = "binary"
 weight = 0.5
 optional = true
 
 [[criterion]]
 id = "4.5"
-name = "4_5"
+name = "keyboard_and_pointer_flow_parity"
 description = "The core flow (choose site, choose date range, apply a row filter, clear it) is completable with the keyboard alone and, equivalently, with the pointer alone, reaching the same outcome"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "4_6"
-description = "Applying and clearing a filter must go through the real row-button and clear controls, not only through a WebMCP or state shortcut, and the visible pill tracks that interaction"
+name = "real_control_path_bypassed"
+description = "The filter pill, active-row highlight, or recomputed tiles appear only when state is changed through a WebMCP or script shortcut, while clicking the real breakdown row or Clear control produces no visible pill change or animation"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "4.7"
-name = "4_7"
-description = "No interactive control responds to a pointer click but not to Enter or Space while focused (or vice versa), leaving a step reachable by only one input method"
+name = "single_input_method_control"
+description = "At least one interactive control responds to a pointer click but not to Enter or Space while focused (or vice versa), leaving a step reachable by only one input method"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.8"
+name = "sort_reorder_animates"
+description = "Changing the sort through its real selector animates the breakdown rows to their new positions with a visible transition rather than snapping them instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "filter_pill_enter_exit_animation"
+description = "The filter pill animates in when a filter is applied via a real row click and animates out when cleared via the pill or the Clear filter control, rather than appearing and disappearing instantly, and the active row reflects the current filter state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "add_site_dialog_eased_transition"
+description = "The Add site form enters and exits with a short eased transition of roughly 200 to 300 milliseconds when opened and closed through its real controls, rather than appearing instantly"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.11"
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion set on a fresh load, transitions are removed or reduced to fades, and every state change (filter, sort, site, theme, dialog) still applies instantly and completely"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

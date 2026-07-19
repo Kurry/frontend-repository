@@ -62,222 +62,287 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
+name = "empty_first_load_state"
 description = "On load with empty storage, the app opens at the canvas with one board tab named Board 1, a centered 'This board is empty' / 'Add a note, flashcard or shape to get started' hint, and a footer reading '0 objects'."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
-description = "After clicking New Note, a sticky note appears on the canvas; selecting it shows a color picker of 6 swatches, and double-clicking it and typing updates the note body live."
+name = "new_note_swatches_recolor"
+description = "After clicking New Note, a draggable sticky note appears near the canvas center; when it is the sole selection a color picker of exactly 6 swatches appears, clicking a swatch recolors the note immediately with a check mark on the active swatch, and double-clicking the note and typing updates its body live."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
-description = "After clicking New Flashcard, a two-sided card appears showing its Front; using its Flip control hides the Front and shows the Back, and flipping again restores the Front."
+name = "flashcard_flip_two_sides"
+description = "After clicking New Flashcard, a two-sided card appears showing its Front with a flip icon and side label; the Flip control hides the Front and shows the Back, flipping again restores the Front, and each side keeps its own editable text."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
-description = "After adding a Rectangle, a Circle, and an Arrow via New Shape, all three shapes appear, and recoloring a selected shape via its color swatch changes its color immediately."
+name = "shape_menu_place_and_recolor"
+description = "New Shape opens a menu offering Rectangle, Circle, and Arrow; after placing all three, each shape appears, and recoloring a singly selected shape via its 6-swatch shape picker changes its color immediately."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
+name = "footer_count_matches_objects"
 description = "After creating a note, a flashcard, and a shape, the footer object count updates to '3 objects' consistent with the three visible objects."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
+name = "stacking_order_controls"
 description = "When a shape is selected and Send to Back is used it renders behind an overlapping shape, and Bring to Front returns it to the top."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
-description = "After selecting one note then shift-clicking a second, both show the selection outline and a 'N selected' count appears; Delete Selected, confirmed once, removes both notes."
+name = "shift_multi_select_delete"
+description = "After selecting one note then shift-clicking a second, both show the selection outline and a 'N selected' count with Delete Selected and Clear selection controls appears; Delete Selected, confirmed once, removes both notes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
-description = "When the Connect tool is used to click a note then a flashcard, a persistent accent line joins them; its Remove Connector control deletes only the line, leaving both objects."
+name = "connector_create_and_remove"
+description = "When the Connect tool is used to click a note then a flashcard, a persistent accent line joins them; the round Remove Connector control at its midpoint deletes only the line, leaving both objects."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
+name = "reload_restores_object_state"
 description = "After placing at least one object and performing a full page reload, the object reappears with its position, size, text/color, and flashcard flip state preserved exactly."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
-description = "When two notes contain 'lighthouse project' and a third does not, searching 'lighthouse' glows both matching notes (not the third) and pans to a match; searching 'zzzznomatch' shows an explicit no-results message."
+name = "search_glow_count_no_results"
+description = "When two notes contain 'lighthouse project' and a third does not, searching 'lighthouse' glows both matching notes (not the third), shows a match count, and pans the view to the first match; searching 'zzzznomatch' shows an explicit message reading No results for the query."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
+name = "boards_independent_rename"
 description = "After creating a New Board with a distinctive name and adding a note there, the note is absent on the original board and present on the new board; renaming the new board updates its tab label."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
-description = "When Export as Text is opened with a note, a flashcard, and a shape present, the copyable textarea lists all three with type labels and includes the note text and the flashcard front and back."
+name = "export_text_full_listing"
+description = "When Export as Text is opened with a note, a flashcard, and a shape present, a read-only copyable textarea lists the board name, the object count, every object numbered with its type label (Note, Flashcard, or Shape) including the note body and the flashcard front/back with its side shown, plus a connectors listing, and a Copy text control is present."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "1_13"
-description = "When the live-events panel is opened, Start / Pause / Disconnect / Reconnect / Deliver Out of Order controls and a visible status are shown; Deliver Out of Order then Reconnect applies the missing events, and a second Reconnect applies nothing new (no double-apply)."
+name = "live_stream_lifecycle"
+description = "In the live-events panel, Start begins applying the 12 events one note each, Pause halts application, Disconnect stops delivery, and the visible status changes accordingly (Idle, Active, Paused, Disconnected, Replaying, or Caught up)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.14"
-name = "1_14"
+name = "rapid_create_burst_exact"
 description = "After clicking New Note 25 times in rapid succession, exactly 25 new notes exist, the controls stay responsive, and no blank screen or uncaught error occurs."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.15"
-name = "1_15"
-description = "On first load with empty storage the app opens directly at the canvas with one board tab (Board 1), a centered empty-board hint, and a '0 objects' footer."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.16"
-name = "1_16"
-description = "Clicking New Note adds a sticky note; selecting it exposes a 6-color picker and double-clicking to type updates the note body live."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.17"
-name = "1_17"
-description = "Clicking New Flashcard adds a two-sided card whose Flip control hides the Front and reveals the Back, and flipping again restores the Front."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.18"
-name = "1_18"
-description = "New Shape can place a Rectangle, a Circle, and an Arrow, and a selected shape recolors immediately via its color swatch."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.19"
-name = "1_19"
-description = "Send to Back moves a selected shape behind an overlapping shape and Bring to Front returns it to the top."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.20"
-name = "1_20"
-description = "Selecting a note then shift-clicking a second multi-selects both, and Delete Selected removes both after a single confirmation step."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.21"
-name = "1_21"
-description = "The Connect tool clicking one object then another draws a persistent connector, and its Remove Connector control deletes only that line while both objects remain."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.22"
-name = "1_22"
-description = "Searching a shared word glows every matching note/flashcard (not non-matching ones) and pans to a match; a non-matching query shows an explicit no-results message."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.23"
-name = "1_23"
-description = "New Board creates an independent board so a note added there is absent on the original board, and renaming the board updates its tab label."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.24"
-name = "1_24"
-description = "Deleting the active board switches to another existing board (or creates a fresh default) rather than leaving a blank/undefined board."
+name = "board_delete_never_strands"
+description = "Deleting the active board switches to another existing board, and deleting the last remaining board creates a fresh default board rather than leaving a blank/undefined board."
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "1.25"
-name = "1_25"
-description = "Export as Text opens a copyable textarea listing every object with its type label plus the note text and the flashcard front and back."
-type = "binary"
-weight = 0.5
-optional = true
 
 [[criterion]]
 id = "1.26"
-name = "1_26"
-description = "The Zoom In / Zoom Out controls change the displayed zoom percentage and Reset View returns it to 100%."
+name = "zoom_steps_clamped_reset"
+description = "Zoom In / Zoom Out change zoom in 15 percent steps, the readout always shows the current percentage, zoom clamps at 25 percent and 300 percent under repeated presses, and Reset View returns the readout to 100 percent and recenters the view."
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "1.27"
-name = "1_27"
+name = "stream_controls_and_readout"
 description = "The live-events panel exposes Start, Pause, Disconnect, Reconnect, and Deliver Out of Order controls with a visible stream status and an 'N of 12 events applied' readout."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.28"
-name = "1_28"
+name = "reconnect_applies_exactly_once"
 description = "Delivering an event out of order then Reconnecting applies the missing events in logical-timestamp order, and a second Reconnect applies nothing new so no update is double-applied."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.29"
-name = "1_29"
+name = "duplicate_event_ignored"
 description = "Duplicate delivery of the same live event is ignored rather than applying it twice or adding a duplicate note."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.30"
-name = "1_30"
-description = "Selecting an object and using its Delete Selected control without confirming leaves the object in place; the object is removed only after the confirmation is accepted."
+name = "delete_bypasses_confirmation"
+description = "Delete Selected removes objects with no confirmation dialog at all, or objects are removed even after the confirmation dialog is canceled."
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "1.31"
-name = "1_31"
-description = "Requesting a connector between two already-connected objects stacks a duplicate line instead of being a no-op with feedback."
+name = "duplicate_connector_stacked"
+description = "Requesting a connector between two already-connected objects stacks a duplicate line instead of being a no-op with a visible message explaining the duplicate was ignored."
 type = "binary"
 weight = 0.5
 negate = true
 optional = true
+
+[[criterion]]
+id = "1.32"
+name = "canvas_pan_grid_shifts"
+description = "Click-and-dragging empty canvas space pans the view, and the dotted-grid backdrop shifts with the pan so the movement is visible."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "note_edit_open_and_commit"
+description = "A note body editor opens by double-clicking the note or by selecting it and pressing Enter; typing updates the note live, and Escape or clicking outside the editor commits the text."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "bold_formatting_roundtrip"
+description = "While editing a note body or flashcard side, a compact toolbar offers bold, italic, and bullet-list controls; selecting text and activating bold renders it bold immediately, activating bold again removes it, and committed formatting is preserved on the rendered object after the editor closes."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "editor_undo_redo_scoped"
+description = "While a text editor is open, an undo step reverses the most recent typing or formatting change and a redo step reapplies it, without altering any other object on the canvas."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "corner_resize_min_size"
+description = "A singly selected object shows four corner handles; dragging a handle resizes the object, notes and flashcards stop at a minimum size, and the new size persists after deselecting."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "nudge_move_grow_controls"
+description = "A singly selected object exposes on-screen Move (left/up/down/right) and Grow / Shrink controls, and activating them nudges its position by 24px and its size by 24px as a non-drag alternative."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "1.38"
+name = "connector_follows_moved_object"
+description = "After connecting two objects, dragging one of them moves the connector endpoint with it so the line stays attached to both objects."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "connect_mode_helper_banner"
+description = "Activating the Connect tool switches the canvas to a crosshair cursor and shows a helper banner reading 'Click an object to start a connector'."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "1.40"
+name = "board_rename_inline_validation"
+description = "Submitting an empty or over-60-character board name shows an inline error message naming the board-name field with the confirm control disabled, and the previous valid name stays in place until a valid name is submitted."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "board_delete_cancel_keeps"
+description = "The board delete control opens a confirmation dialog; canceling leaves the board and its objects intact, and confirming removes the board."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "minimap_overview_recenters"
+description = "A mini-map panel in the canvas corner shows a scaled overview of the current board's objects plus a rectangle marking the current viewport, and clicking within the mini-map recenters the main view on that point."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "outline_rows_inline_controls"
+description = "The Outline view lists every object on the active board as rows with type label, color name, and flashcard flip state, and each row's inline Edit / Flip / Delete controls work, with the change immediately visible back in the canvas view."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "occupied_position_offset"
+description = "Creating a second object of the same type without moving the first places it offset by about 28px from the occupied default position, so both objects remain individually visible and selectable."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "1.45"
+name = "flow_note_create_multi_surface"
+description = "Starting from an empty board, clicking New Note raises the footer object count by exactly one (measured immediately around the click), removes the empty-canvas hint, and switching to the Outline view shows the same note as a row with its color name without a reload; after a full page reload the note is still present at the same position with the same text and color."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "flow_second_board_rename_reload"
+description = "Creating a second board via New Board switches to an empty canvas showing the empty hint and a '0 objects' count while the first board keeps every object; renaming the new board updates its tab label immediately and the Export as Text modal shows the new name; after a full page reload both boards, their names, and the active board selection are restored."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "flow_delete_cascades_everywhere"
+description = "After connecting two notes, deleting one via Delete Selected (confirmed once) removes that note, every connector touching it, and its Outline row in the same action, and the footer object count decreases by exactly one; after a full page reload neither the deleted note nor its connector reappears."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "flow_stream_counts_in_lockstep"
+description = "Starting the live event stream raises the applied-events readout and the footer object count together, one note per applied event, and each added note also appears as a row in the Outline view; Pause halts both counts at the same value, and after a full page reload every applied note is still present exactly once."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "flow_session_reload_exact"
+description = "After one uninterrupted session of creating, editing, recoloring, reordering, connecting, and deleting objects and switching between the canvas and Outline views, a full page reload restores every committed change exactly, with no deleted object revived."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, resulting state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

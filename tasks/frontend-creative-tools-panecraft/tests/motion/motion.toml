@@ -62,60 +62,80 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
-description = "Hovering the pointer over page tabs, primary buttons, Data Source Library cards, and table rows produces a visible hover response on each"
+name = "workspace_hover_microinteractions"
+description = "Using the real pointer path, buttons, page tabs, table rows, dropdowns, source cards, pane cards, and primary actions each show a visible hover response consistent with their role"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "4_2"
-description = "Pressing Tab through the workspace moves a visible 2px primary-color focus outline across interactive controls, and a pane's Edit/Move/Resize/Delete control row is reachable by keyboard focus even without hovering"
+name = "keyboard_focus_feedback"
+description = "Tabbing through the workspace shows a 2px primary-color focus outline on every interactive control and reveals the pane action row without requiring hover"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
-description = "Hovering a pane card on a wide viewport reveals its Edit/Move/Resize/Delete control row that is hidden at rest"
+name = "pane_control_row_transition"
+description = "On a wide viewport, moving the pointer onto a pane or focusing it fades in the hidden Edit, Move, Resize, and Delete row, and leaving returns it without a layout jump"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "4_4"
-description = "Clicking Copy Link in the Share panel shows a transient Copied! confirmation that appears immediately and clears on its own without trapping the user in the panel"
+name = "copy_feedback_transition"
+description = "Clicking Copy Link immediately turns the control accent green with a Copied confirmation, then clears after about two seconds without closing or trapping the Share panel"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "4_5"
-description = "With a pane's refresh interval set to Every 30s the Last updated Xs ago label advances and the recomputed value updates in place without a layout jump or flicker in the rest of the page"
+name = "refresh_in_place_update"
+description = "With refresh enabled, the elapsed label advances and recomputed value transitions in place without flicker, blank chart, or movement of surrounding panes"
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "4_6"
-description = "The active page tab is distinguished from inactive tabs by a bottom border in the primary color and bold text when it is selected"
+name = "tab_badge_and_toggle_state_feedback"
+description = "Changing active page, support status, pane size, or access toggle gives an immediate visible state transition through the specified tab, pill, and selected-control treatments"
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "pane_and_chart_state_transitions"
+description = "Creating, deleting, moving, or resizing a pane and changing chart source, metric, dimension, or date range produces a perceptible in-place transition; chart marks redraw to the latest data rather than snapping through stale content"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "reduced_motion_behavior"
+description = "With prefers-reduced-motion enabled before a fresh load, pane, control-row, tab, feedback, and chart-state transitions are disabled or substantially reduced while every final state remains clear"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "4_7"
-description = "Interactive chrome and pane cards give no hover feedback and the pane control row never reveals on hover, so the page feels static under the pointer"
+name = "missing_hover_or_state_feedback"
+description = "One or more required interactive controls, pane cards, chart input changes, or selected states remains visually inert or provides no perceptible feedback through the real interaction path"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "4.8"
-name = "4_8"
-description = "Keyboard Tab focus shows no visible focus indicator on interactive controls, or clicking Copy Link gives no visible confirmation"
+name = "missing_focus_or_copy_feedback"
+description = "Keyboard focus is invisible on an interactive control, pane actions remain inaccessible without hover, or Copy Link gives no visible transient confirmation"
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable motion or microinteraction defect that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence that demonstrates it. If the defect is already covered even partially by another criterion, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

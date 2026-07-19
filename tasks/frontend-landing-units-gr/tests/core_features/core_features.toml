@@ -62,133 +62,98 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
+name = "hero_settled_headline_and_cta"
 description = "On load, once the skeleton intro settles the hero shows the display headline \"Home of the uniquely awesome.\" and a \"Book your Unit\" call-to-action button, with no full-viewport loader remaining"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
+name = "root_title_and_canvas_color"
 description = "On load, the document body background color computes to exactly #f4e9e1 (rgb(244, 233, 225)) with black text and the document title is \"Αρχική - Units\""
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
+name = "sidebar_nav_labels_and_chrome"
 description = "On load at desktop width, the sidebar/header shows the numbered nav labels 01 Student Homes, 02 Our way of living, 03 Community, 04 Επικοινωνία plus a \"Book your Unit\" CTA and an inert \"English\" control"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
+name = "red_marquee_phrases_loop"
 description = "After the page settles, the red marquee band (background rgb(234, 55, 55)) is continuously looping horizontally and contains the phrases Social areas, Private kitchen & bathroom, 24/7 Security, Fast and reliable maintenance, and Smart living"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
+name = "blue_marquee_phrases_loop"
 description = "After the page settles, the blue marquee band (background rgb(0, 114, 227)) is continuously looping horizontally and contains the phrases Super-fast WiFi, 24/7 Hot water, Electric bike stations, and Elevator access"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
-description = "When the Swiper living next control is clicked, the amenity carousel advances by one slide across the slides Community living spaces, Ασφάλεια, Υποστήριξη, and Smart Living, and the previous control moves it back"
+name = "carousel_next_prev_step"
+description = "Clicking the living carousel next control advances the amenity carousel by one slide across the slides Community living spaces, Ασφάλεια, Υποστήριξη, and Smart Living, and clicking the previous control moves it back"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
+name = "pricing_tiers_exact"
 description = "On the typical-unit section, the pricing list reads Kick Unit 640€/μήνα, Boost Unit 690€/μήνα, and Flex Unit 740€/μήνα"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
+name = "hamburger_opens_menu_overlay"
 description = "When the hamburger button is clicked at a mobile viewport, a full-screen menu overlay opens listing the nav links, and its close control dismisses it"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
+name = "hover_and_focus_feedback"
 description = "When a nav item or button is hovered, it shows a clear color/fill/underline or wash feedback, and keyboard focus remains visible on interactive controls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
+name = "custom_cursor_desktop_only"
 description = "On load at desktop width (>=1024px) the custom block cursor is present (display block), and at a 390px-wide mobile viewport the custom cursor is hidden (display none)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
-description = "After load, the CookieYes-style consent banner \"Χρησιμοποιούμε cookies\" appears with Αποδοχή and Απόρριψη buttons as page chrome; dismissing it writes nothing to localStorage or sessionStorage"
+name = "consent_banner_appears"
+description = "Shortly after load, the consent banner \"Χρησιμοποιούμε cookies\" appears as page chrome with Αποδοχή and Απόρριψη buttons, and clicking either button removes the banner"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
+name = "book_cta_reachable_no_navigation"
 description = "On load, a \"Book your Unit\" CTA is present in the header/sidebar and reachable within two clicks, and no chrome interaction navigates off the homepage or reaches a 404"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "1_13"
+name = "insta_feed_section_content"
 description = "On the insta-feed section, a black \"Our way of living\" strip bar, an \"Instagram\" / \"Staying connected\" panel, and an #instafeed grid of three colored tiles are present"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.14"
-name = "1_14"
-description = "When window.webmcp_invoke_tool(\"browse_open\", {destination: \"community\"}) is called, the page scrolls to the community section (heading \"Η κοινότητα, όπως τη ζούμε\") using the same lenis scroll path as the UI"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.15"
-name = "1_15"
-description = "After the intro settles, the hero shows the display headline \"Home of the uniquely awesome.\" and a \"Book your Unit\" call-to-action button in their final positions"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.16"
-name = "1_16"
-description = "The sidebar/header renders the numbered nav labels 01 Student Homes, 02 Our way of living, 03 Community, and 04 Επικοινωνία plus a \"Book your Unit\" CTA and an inert \"English\" control"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.17"
-name = "1_17"
-description = "The typical-unit pricing list reads exactly Kick Unit 640€/μήνα, Boost Unit 690€/μήνα, and Flex Unit 740€/μήνα"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.18"
-name = "1_18"
-description = "Clicking the living carousel next control advances the amenity Swiper by one slide across Community living spaces, Ασφάλεια, Υποστήριξη, and Smart Living, and the previous control moves it back"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.19"
-name = "1_19"
+name = "unit_features_eight_icons"
 description = "The typical-unit section lists the eight unit features Πλήρως επιπλωμένα, Γραφείο, Ιδιωτική κουζίνα, Ιδιωτικό μπάνιο, Smart TV, Κλιματισμός, Super-Fast WiFi, and Μπαλκόνι"
 type = "binary"
 weight = 0.5
@@ -196,7 +161,7 @@ optional = true
 
 [[criterion]]
 id = "1.20"
-name = "1_20"
+name = "locations_card_and_map_markers"
 description = "The locations section shows the yellow info card heading \"Σημεία που κάνουν τη ζωή σου εύκολη\" with the chips \"Σύντομα κοντά σου\" and \"Έτοιμα να μπεις!\" beside a map panel carrying the \"Units Parkside\" marker"
 type = "binary"
 weight = 0.5
@@ -204,23 +169,15 @@ optional = true
 
 [[criterion]]
 id = "1.21"
-name = "1_21"
+name = "community_and_stand_for_content"
 description = "The community section shows the heading \"Η κοινότητα, όπως τη ζούμε\" and the what-we-stand-for row shows the three items Οι Άνθρωποι, Το Design, and Η Φροντίδα"
 type = "binary"
 weight = 0.5
 optional = true
 
 [[criterion]]
-id = "1.22"
-name = "1_22"
-description = "Clicking the hamburger button at a mobile viewport opens a full-screen menu overlay listing the nav links, and its close control dismisses the overlay"
-type = "binary"
-weight = 0.5
-optional = true
-
-[[criterion]]
 id = "1.23"
-name = "1_23"
+name = "footer_address_and_policies"
 description = "The footer shows the Units Parkside address block with the email hey@units.gr and phone (+30) 6940006565 plus the policies list Πολιτική Απορρήτου, Πολιτική Cookies, and Όροι Χρήσης"
 type = "binary"
 weight = 0.5
@@ -228,7 +185,7 @@ optional = true
 
 [[criterion]]
 id = "1.24"
-name = "1_24"
+name = "pricing_tiers_wrong_or_missing"
 description = "The pricing tiers are missing or do not read 640€, 690€, and 740€ per month for the Kick, Boost, and Flex units"
 type = "binary"
 weight = 1.0
@@ -236,8 +193,65 @@ negate = true
 
 [[criterion]]
 id = "1.25"
-name = "1_25"
+name = "chrome_link_navigates_away"
 description = "Clicking a homepage chrome link (nav item, the \"English\" control, Book CTA, footer link, or social icon) navigates off the homepage, opens an external origin, or reaches an application-error or Not-found page"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.26"
+name = "menu_flow_scroll_position_round_trip"
+description = "At a 390px-wide viewport, scroll partway down the page, then tap the hamburger: the full-screen menu overlay opens with all four numbered nav links visible, the body carries a menu-open state, and the page behind stops scrolling; activating the close control fades the overlay out, removes the menu-open state, and the underlying scroll position is exactly where it was — all without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "carousel_flow_reload_resets_to_first_slide"
+description = "On the living section, clicking the next control once changes the visible slide title from Community living spaces to Ασφάλεια with its amenity list swapping accordingly; clicking the previous control returns to the first slide with its original amenity list intact; after a full page reload the carousel is back on its first slide"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "consent_flow_seeded_baseline_on_reload"
+description = "On a fresh load the consent banner is visible shortly after load; clicking Αποδοχή removes the banner while the current scroll position and open carousel slide are untouched; reloading the page returns the app to its seeded baseline — the intro plays again, the carousel shows its first slide, and the consent banner reappears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "rapid_carousel_next_stays_in_bounds"
+description = "Rapidly clicking the carousel next control many times never blanks the carousel or skips past its bounds, and at the last slide a further next click leaves a valid slide fully visible (either stopping at the last slide or looping to the first)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "menu_open_resize_leaves_page_usable"
+description = "After opening the menu overlay at a 390px-wide viewport and then resizing the viewport to 1440px, the desktop sidebar is shown and the page is fully usable, with no scroll lock or leftover overlay blocking interaction"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "scroll_revisit_keeps_reveals_settled"
+description = "After scrolling the full page to the footer and back to the top, every previously revealed section remains visible in its settled state — no already-played one-time scroll reveal replays and no section is left stuck invisible"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.32"
+name = "hero_photo_and_supporting_line"
+description = "The hero section shows a full-bleed placeholder lifestyle photograph behind the headline together with the supporting line \"All-inclusive φοιτητική διαμονή με όλα όσα χρειάζεσαι για να ζεις, να σπουδάζεις και να συνδέεσαι.\""
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "core_features.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in its core homepage features or end-to-end flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

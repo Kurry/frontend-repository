@@ -88,3 +88,96 @@ name = "3_4"
 description = "Three circular dial controls (APERTURE / SPEED / ISO) with up/down steppers and a vertical exposure meter captioned UNDER EXPOSED / OVER EXPOSED overlay the full-viewport photo preview"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "condensed_type_dark_chrome_red_accent"
+description = "Dial labels and captions render in a condensed display face (Oswald / Bebas-style), the dial chrome is dark with white values, and a red accent appears on the help trigger and meter emphasis"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "preset_rows_show_name_stops_badges"
+description = "Presets/Compare presents a dense list or strip of looks where each row shows a name, a stop readout, and favorite/tag badges"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "single_icon_set_throughout"
+description = "One icon set is used consistently across the steppers, favorites, filters, and the help trigger — no mixed icon styles"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.8"
+name = "distinct_component_state_treatments"
+description = "Steppers, form fields, and buttons show visually distinct default, hover, focus (visible ring), disabled, and error treatments"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "help_panel_overlays_from_side"
+description = "The help panel overlays the preview from the side without displacing the lab composition, and no marketing sections or competing hero cards appear"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "layered_preview_stack_renders"
+description = "The preview renders as a layered stack — photo, motion frame, depth plate, and tiled noise overlay — with all imagery served from the app's own origin"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "presets_become_drawer_below_768"
+description = "At viewport widths of 768 pixels and below, the presets collection presents as a drawer or sheet over the preview instead of a persistent side panel, and the help toggle works at both desktop and mobile widths"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.12"
+name = "mobile_375_operable_no_clipping"
+description = "At 375 pixel width the three dial steppers, the meter, and the mode switch remain visible and operable with no content clipped and no horizontal scrolling"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.13"
+name = "consistent_label_capitalization"
+description = "Dial labels, meter captions, and mode names keep one consistent capitalization convention throughout the app"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.14"
+name = "help_copy_names_visible_effects"
+description = "The help panel explains aperture, shutter, and ISO in plain sentences that each name the visible effect the control has on the preview"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.15"
+name = "messages_name_problem_and_fix"
+description = "Validation and empty-state messages name the problem and the fix, not just a generic rejection"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.16"
+name = "placeholder_text_visible"
+description = "Lorem ipsum, 'TODO', template-variable, or other placeholder text is visible somewhere in the shipped UI"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

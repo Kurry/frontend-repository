@@ -96,6 +96,62 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "2.11"
+name = "keyboard_operable_controls"
+description = "Every interactive control — the base theme control, icon set control, swatch pickers and hex fields, Back, Continue, Generate, and Download — is reachable and operable with the keyboard alone, with a visible focus indicator"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.12"
+name = "selects_arrow_key_operable"
+description = "The Base theme and Base icon set controls can be operated with arrow keys and Enter or Space, and expose their selected option to assistive technology"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.13"
+name = "swatch_fields_programmatic_labels"
+description = "Each swatch colour picker and hex field is programmatically labelled with its swatch role name (for example Backdrop darkest), so the label is associated with the control in the accessibility tree"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.14"
+name = "aria_live_status_announcements"
+description = "Inline validation messages and the replaced-count status line are exposed through an aria-live polite region in addition to being shown visually"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.15"
+name = "progress_step_exposed_to_at"
+description = "The progress bar conveys the current step to assistive technology through text or ARIA semantics, not only by colour"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.16"
+name = "interactive_within_two_seconds"
+description = "The app is interactive within 2 seconds of a local cold load"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.17"
+name = "console_clean_full_exercise"
+description = "No console errors or warnings appear during a full exercise of the wizard, including generating and downloading the patched result"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.18"
+name = "rapid_input_stays_responsive"
+description = "Rapidly editing swatches or toggling the icon set keeps the Preview and tile grid responsive, with no hangs and no dropped updates"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "2.6"
 name = "2_6"
 description = "An uncaught exception interrupts choosing a colour set or generating the patched result, breaking the flow"
@@ -131,6 +187,22 @@ negate = true
 id = "2.10"
 name = "2_10"
 description = "The app renders or behaves differently depending on whether it is driven by automation (keying behavior on navigator.webdriver or similar signals)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.19"
+name = "reload_loses_persisted_state"
+description = "Reloading the page discards the wizard step or any chosen replacement (base theme, swatch edits, icon set), returning the app to a default state instead of the persisted one"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect (console, network, storage, state coherence, accessibility, or performance) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, console line, network request, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

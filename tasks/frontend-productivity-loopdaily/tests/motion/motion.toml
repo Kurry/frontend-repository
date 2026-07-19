@@ -62,42 +62,35 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
-description = "Hovering a habit row, a category filter chip, and a stepper control produces a clearly visible hover response on each"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "4.2"
-name = "4_2"
-description = "Pressing Tab repeatedly through the main list shows a clearly visible focus indicator on every focused interactive element"
+name = "hover_states_on_interactives"
+description = "Hovering a habit row, a category filter chip, and a stepper control produces a clearly visible hover response on each, verified with computed styles while hovering"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
-description = "Creating a habit, completing a check-in, exporting, and importing each produce a transient visible confirmation (toast or equivalent) immediately after the action"
+name = "toasts_slide_and_autodismiss"
+description = "Creating a habit, completing a check-in, exporting data, and importing data each produce a transient visible confirmation (toast or equivalent) immediately after the action, and the toast slides or fades in and auto-dismisses smoothly rather than snapping"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "4_5"
-description = "The milestone flame's treatment change on crossing 7 or 30 days happens live from the real check-in/stepper action, not a hidden shortcut, and is visible immediately after"
+name = "flame_change_via_real_action"
+description = "The milestone flame's treatment change on crossing 7 or 30 days happens live from the real check-in/stepper action, not a hidden shortcut, and is visible immediately after that action completes"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "4_6"
-description = "The recovery banner and its Retry/Reset controls appear and are announced through the role=alert live region without requiring focus to move to them"
+name = "recovery_banner_appears_unprompted"
+description = "The recovery banner and its Retry/Reset controls appear as soon as a recovery condition is detected and are announced through the role=alert live region without requiring focus to move to them"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "4_7"
+name = "no_hover_feedback_anywhere"
 description = "Buttons, habit rows, and category filter chips show no hover response at all, feeling static under pointer hover"
 type = "binary"
 weight = 1.0
@@ -105,8 +98,65 @@ negate = true
 
 [[criterion]]
 id = "4.8"
-name = "4_8"
+name = "updates_only_after_reload"
 description = "The stepper's +1/-1 taps or the milestone flame's threshold change are only reflected after a full page reload rather than updating live in the running UI"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.9"
+name = "habit_enter_exit_animations"
+description = "A newly created habit animates into the list rather than appearing instantly, a paused habit animates out of the main list, and the remaining rows settle into place with a smooth transition"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "stepper_progress_animates"
+description = "A numeric-target habit's stepper progress bar and fraction animate their update immediately on each real +1/-1 tap rather than jumping with no transition"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "blank_name_shake_cue"
+description = "Submitting the New Habit form with a blank name triggers a visible shake or equivalent motion cue alongside the inline error text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "milestone_confetti_burst"
+description = "Crossing a 7-day or 30-day streak milestone through a real check-in triggers a brief celebratory confetti-style particle burst near the habit card, and the effect fires only on that milestone action — never ambiently or on ordinary non-milestone check-ins"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "drag_lift_and_settle"
+description = "Reordering a habit via its drag handle shows a lift/drag affordance while dragging and the row settles into its new position with a smooth transition on drop, performed through a real pointer drag"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "button_hover_ease_and_press"
+description = "Buttons ease their background and border on hover and show a brief press effect on click rather than switching states instantly"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.15"
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion set, decorative animations and the celebration effect are removed or reduced while state changes (check-ins, creation, pause) still apply instantly and correctly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions (missing, jarring, janky, or usability-harming animation) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

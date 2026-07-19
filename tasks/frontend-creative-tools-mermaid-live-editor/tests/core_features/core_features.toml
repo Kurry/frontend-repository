@@ -62,210 +62,123 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
-description = "On load, the app opens directly into a diagram-editing workspace (no auth wall) with a header reading Mermaid Live Editor, a source editor on the left, and a live diagram preview on the right"
+name = "workspace_opens_without_auth"
+description = "The root opens directly to a Mermaid Live Editor workspace with a source editor on the left and live diagram preview on the right, with no authentication wall or unrelated starter dashboard"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
-description = "On load, the source editor is seeded with a non-empty Mermaid flowchart (default includes an A[Christmas] node) and the preview renders that diagram, so both panes are non-empty before any interaction"
+name = "seeded_source_and_preview"
+description = "On first load the code document contains the non-empty Christmas flowchart and the preview immediately renders its nodes and edges, so both panes are populated before interaction"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
-description = "After typing new Mermaid syntax into the source editor, the editor displays exactly the newly entered syntax"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.4"
-name = "1_4"
-description = "After editing the source, the preview re-renders so the rendered diagram reflects the latest source edit rather than a cached earlier diagram"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.5"
-name = "1_5"
-description = "After making two source edits in sequence, the preview shows only the most recent source, not the intermediate one"
+name = "latest_source_preview_flow"
+description = "Replacing the source with a valid diagram shows exactly the typed text, then re-renders matching marks after a brief settle; making a distinct second edit removes the first edit's marks and leaves only the latest diagram"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
-description = "When invalid Mermaid syntax is entered, an inline error region with a Syntax error heading appears and the preview visibly dims while keeping the last valid render"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.7"
-name = "1_7"
-description = "After correcting invalid syntax back to valid, the error region clears and the corrected diagram renders"
+name = "syntax_error_recovery_flow"
+description = "Starting from a valid render, entering invalid syntax shows a Syntax error region with parser detail, dims but retains the last valid preview, and disables export/copy; correcting the source clears the error, restores full opacity, renders the correction, and re-enables actions"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
-description = "When a Sample diagrams button (Flowchart, Class, Sequence, Entity Relationship, State, Mindmap) is clicked, the source is replaced and the preview re-renders as that diagram type with no residual marks from the prior diagram"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.9"
-name = "1_9"
-description = "After switching diagram types, the header diagram-type badge updates to name the current diagram type"
+name = "sample_diagram_replacement"
+description = "Flowchart, Class, Sequence, Entity Relationship, State, and Mindmap are all offered; choosing two different samples in sequence replaces source and preview each time with the selected type, updates the type badge, and leaves no residual marks"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
-description = "When the SVG action is clicked, a file downloads whose name identifies it as a Mermaid diagram and ends in the .svg extension (pattern mermaid-diagram-YYYY-MM-DD-HHmmss.svg)"
+name = "svg_export_download"
+description = "With valid source, SVG downloads the current rendered diagram in a file named like mermaid-diagram-YYYY-MM-DD-HHmmss.svg, and changing the source before a second export produces content corresponding to the new diagram"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
-description = "When the theme toggle in the header is clicked, the app switches between light and dark and the rendered preview recolors with the theme"
+name = "theme_recolors_app_and_diagram"
+description = "Toggling the header theme changes the header, cards, editor, panels, preview surface, and rendered diagram between coherent light and dark palettes without reloading"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
-description = "When the editor Config tab is selected, the text area swaps to the Mermaid JSON config document without a full page reload, and selecting Code returns to the diagram source"
+name = "code_config_document_roundtrip"
+description = "Editing Code, switching to Config, changing its seeded theme value to another valid JSON value, then switching back preserves the exact Code text; returning to Config preserves its edit and the preview reflects the valid configuration"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "1_13"
-description = "After editing the source and reloading the page, the last-edited source, active tab, and theme are restored"
+name = "multi_facet_reload_roundtrip"
+description = "After editing source and config, selecting Config as the active tab, and choosing dark theme, a full reload restores all four facets together and renders a preview consistent with the restored documents rather than a mixed baseline"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "1.14"
-name = "1_14"
-description = "Throughout editing, sample switching, and export, no control navigates away from the workspace and no console error or unhandled rejection is thrown"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.15"
-name = "1_15"
-description = "The app opens directly into a diagram-editing workspace (no auth wall) with a source editor and a live diagram preview clearly presented as one linked pair"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.16"
-name = "1_16"
-description = "On first load the source editor is seeded with a non-empty Mermaid diagram and the preview renders it, so both panes are non-empty before any interaction"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.17"
-name = "1_17"
-description = "Typing new Mermaid syntax into the source editor makes the editor display exactly the newly entered syntax"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.18"
-name = "1_18"
-description = "After a source edit the preview re-renders so the rendered diagram reflects the latest source rather than a cached earlier diagram"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.19"
-name = "1_19"
-description = "After two source edits in sequence the preview shows only the most recent source, not the intermediate diagram"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.20"
-name = "1_20"
-description = "Entering invalid Mermaid syntax surfaces an inline error region with a Syntax error heading and the parser message"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.21"
-name = "1_21"
-description = "Correcting invalid syntax back to valid clears the error region and renders the corrected diagram"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.22"
-name = "1_22"
-description = "Clicking a Sample diagrams button (Flowchart, Class, Sequence, Entity Relationship, State, Mindmap) replaces the source and re-renders the preview as that diagram type with no residual marks from the prior diagram"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.23"
-name = "1_23"
-description = "A header badge names the current diagram type and updates when the diagram type changes"
-type = "binary"
-weight = 0.5
-optional = true
 
 [[criterion]]
 id = "1.24"
-name = "1_24"
-description = "Clicking SVG downloads a file whose name identifies it as a Mermaid diagram and ends in the .svg extension (pattern mermaid-diagram-YYYY-MM-DD-HHmmss.svg)"
+name = "png_and_clipboard_actions"
+description = "With valid source, PNG downloads an equivalent .png image and Copy image produces visible clipboard success feedback; both actions become unavailable in the syntax-error state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.25"
-name = "1_25"
-description = "The editor offers Code and Config tabs; switching swaps which document the text area edits without a full page reload"
+name = "editor_undo_redo_roundtrip"
+description = "Through the visible code editor, typing two distinct changes, invoking Undo, and then Redo makes the editor and live preview round-trip from latest to prior and back to latest content without losing selection or corrupting syntax"
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "1.26"
-name = "1_26"
-description = "Export and copy controls are unavailable while the source is in a syntax-error state"
+name = "config_inline_validation"
+description = "Entering invalid configuration data shows a specific inline field or document error before apply, preserves the last valid diagram configuration, and correcting the value clears the error"
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "in_app_controls_only"
+description = "Editing, tab switching, sample selection, theme switching, export, and copy remain in the workspace with no outbound navigation or backend-dependent step"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "1.27"
-name = "1_27"
-description = "The primary screen is a static scaffold, starter template, or unrelated dashboard rather than a working diagram source editor with preview"
+name = "non_editor_scaffold"
+description = "The primary screen is a static scaffold, authentication page, unrelated dashboard, or fixed illustration rather than an editable Mermaid source-and-preview workspace"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "1.28"
-name = "1_28"
-description = "Editing the source leaves the preview unchanged, or the preview shows a fixed image regardless of the source text"
+name = "stale_or_static_preview"
+description = "A valid source edit leaves the preview unchanged, two different sources produce the same marks, or marks from an earlier sample remain after replacement"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "1.29"
-name = "1_29"
-description = "The SVG export produces a file with a generic name or a wrong extension that does not end in .svg"
+name = "broken_export_contract"
+description = "An enabled export produces no file, a generic or wrong extension, content unrelated to the current diagram, or remains enabled while syntax is invalid"
 type = "binary"
-weight = 0.5
+weight = 1.0
 negate = true
-optional = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable core-feature defect that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence that demonstrates it. If the defect is already covered even partially by another criterion, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

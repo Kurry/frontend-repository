@@ -62,199 +62,172 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
+name = "dashboard_loads_without_auth_gate"
 description = "On load, the root URL shows the analytics dashboard (metric tiles, a Visitors chart, and Top Sources / Top Pages / Countries panels) with no login, signup, SSO, or invite gate"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
+name = "default_metric_tiles_exact_values"
 description = "On load, the four metric tiles read exactly Unique visitors 16,840, Total pageviews 47,220, Bounce rate 44%, Visit duration 98s"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
-description = "On load, Top Sources shows Google 7,200, Direct 4,800, Twitter 1,600, Newsletter 980; Top Pages shows / 12,800, /pricing 5,600, /blog 3,900, /docs 2,800; Countries shows United States 6,400, United Kingdom 2,400, Germany 1,900, Canada 1,200"
+name = "default_breakdown_rows_exact_values"
+description = "On load, Top Sources shows Google 7,200, Direct 4,800, Twitter 1,600, Newsletter 980; Top Pages shows / 12,800, /pricing 5,600, /blog 3,900, /docs 2,800; Countries shows United States 6,400, United Kingdom 2,400, Germany 1,900, Canada 1,200 — top four rows per panel, name left and count right"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
-description = "On load, the Visitors chart renders one bar per time bucket (ten bars for Last 30 days) rising left to right"
+name = "trend_chart_bar_per_bucket"
+description = "On load, the Visitors chart below the metric tiles renders one bar per time bucket rising left to right, consistent with the same seeded data the metric tiles show"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
+name = "google_filter_pill_and_tiles"
 description = "After clicking the Google row in Top Sources, a filter pill reading Source: Google appears and the metric tiles change from the unfiltered values to the Google segment (Unique visitors 7,200)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
+name = "filtered_panels_recompute"
 description = "After applying the Google source filter, the Top Pages and Countries panels recompute to different row values than the unfiltered view"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
+name = "latest_filter_replaces_previous"
 description = "After clicking a Countries row while a source filter is active, only one filter pill is shown (the latest, Country-dimension) rather than two stacked filters"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
+name = "clear_filter_restores_unfiltered"
 description = "After clicking Clear filter, the metric tiles return to 16,840 / 47,220 / 44% / 98s and no filter pill remains"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
-description = "After changing the date range to Last 7 days, the metric tiles and the trend chart recompute (fewer bars) with no leftover rows from the previous range"
+name = "date_range_change_recomputes_together"
+description = "After changing the date range to Last 7 days, the metric tiles and the trend chart recompute to different values and bars, with no leftover rows from the previous range in any panel"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
+name = "site_switch_recomputes_and_clears_filter"
 description = "After changing the site to shop.example.com, the metric tiles and all three breakdown panels update together and any active filter pill is cleared"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
-description = "After changing the sort to Name A-Z, the rows in the breakdown panels reorder alphabetically"
+name = "sort_name_az_reorders_panels"
+description = "After changing the sort to Name A-Z, the rows in all three breakdown panels reorder alphabetically"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
+name = "breakdown_row_keyboard_filter"
 description = "When a breakdown row is reached by keyboard focus, it shows a visible focus indicator, and pressing Enter or Space applies its filter"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "1_13"
+name = "filter_persists_across_reload"
 description = "After applying a filter and reloading the page, the filter pill and its recomputed metric tiles are restored from client storage"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.14"
-name = "1_14"
+name = "theme_toggle_recolors_everything"
 description = "When the theme toggle is used, every surface, text color, and the chart bars recolor between the light and dark themes and remain legible"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.15"
-name = "1_15"
-description = "On load, the root URL shows the analytics dashboard (metric tiles, Visitors chart, and Top Sources / Top Pages / Countries panels) with no login, signup, SSO, or invite gate"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.16"
-name = "1_16"
-description = "On load, the four metric tiles read exactly Unique visitors 16,840, Total pageviews 47,220, Bounce rate 44%, Visit duration 98s"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.17"
-name = "1_17"
-description = "On load, Top Sources, Top Pages, and Countries show the exact seeded top-four rows (Google 7,200 / Direct 4,800 / Twitter 1,600 / Newsletter 980; / 12,800 / /pricing 5,600 / /blog 3,900 / /docs 2,800; United States 6,400 / United Kingdom 2,400 / Germany 1,900 / Canada 1,200)"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.18"
-name = "1_18"
-description = "On load, the Visitors chart renders one bar per time bucket (ten bars for Last 30 days) rising left to right"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.19"
-name = "1_19"
-description = "After clicking the Google row in Top Sources, a Source: Google filter pill appears and the metric tiles change to the Google segment (Unique visitors 7,200)"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.20"
-name = "1_20"
-description = "After applying the Google source filter, the Top Pages and Countries panels recompute to different row values than the unfiltered view"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.21"
-name = "1_21"
-description = "After clicking a Countries row while a source filter is active, only one (latest) filter pill is shown rather than two stacked filters"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.22"
-name = "1_22"
-description = "After clicking Clear filter, the metric tiles return to 16,840 / 47,220 / 44% / 98s and no filter pill remains"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.23"
-name = "1_23"
-description = "After changing the date range to Last 7 days, the metric tiles and trend chart recompute (fewer bars) with no leftover rows from the previous range"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.24"
-name = "1_24"
-description = "After changing the site to shop.example.com, the metric tiles and all three panels update together and any active filter pill is cleared"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.25"
-name = "1_25"
-description = "After changing the sort to Name A-Z, the breakdown panel rows reorder alphabetically"
-type = "binary"
-weight = 0.5
-optional = true
-
-[[criterion]]
-id = "1.26"
-name = "1_26"
-description = "When a breakdown row is reached by keyboard focus it shows a visible focus indicator, and pressing Enter or Space applies its filter"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.27"
-name = "1_27"
-description = "The metric tiles for a filtered segment are computed from the seed and differ across segments (e.g. Direct differs from Google), not a single hardcoded set of numbers reused for every filter"
+name = "hardcoded_segment_numbers"
+description = "Two different segment filters (e.g. Google and Direct) render identical metric tile numbers, revealing a single hardcoded set of values reused for every filter instead of computation from the seeded data"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "1.28"
-name = "1_28"
-description = "Selecting a breakdown row does not leave the previous segment's numbers or a stale second pill in place after the view recomputes"
+name = "stale_numbers_or_pill_after_refilter"
+description = "After selecting a new breakdown row, the previous segment's numbers or a stale second filter pill remain visible once the view recomputes"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.29"
+name = "add_site_inline_validation_gates_submit"
+description = "In the Add site form, an empty site name or an empty/malformed domain shows an inline validation message naming that specific field before any submit, and the submit control stays disabled until both fields are valid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "add_site_flow_new_site_dashboard"
+description = "Starting from the dashboard: open Add site, fill a valid name and domain, and submit — the form closes, the site selector's entry count increases by exactly one, and selecting the new site immediately shows that site's own dashboard (for an unseeded site: zero-value metric tiles and empty breakdown panels with an explanatory message), not the previously selected site's numbers"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "double_submit_adds_one_site"
+description = "Double-activating the Add site submit control in quick succession adds exactly one new entry to the site selector, measured as a count delta of one immediately around the action"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "malformed_domain_still_adds_site"
+description = "Submitting the Add site form with an empty or malformed domain still adds an entry to the site selector, or leaves the selector count unchanged without any inline message naming the domain field"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.33"
+name = "sort_reversal_round_trip"
+description = "Switching the sort from most visitors to fewest visitors reverses each breakdown panel's row order, and switching back to most visitors restores the original order in all three panels"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "segment_filter_chain_all_surfaces"
+description = "Scripted from the default example.com / Last 30 days view: clicking the Google row in Top Sources shows a Source: Google pill, changes all four metric tiles away from 16,840 / 47,220 / 44% / 98s, visibly redraws the trend chart bars, and recomputes the Top Pages and Countries rows, all without a reload; activating Clear filter then restores every one of those surfaces to the exact unfiltered values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "multi_facet_reload_round_trip"
+description = "After selecting a non-default site, a non-default date range, and a non-default sort, applying a segment filter, and switching the theme, a full page reload restores the same site, range, sort, theme, and filter pill together with the same recomputed numbers on the tiles, chart, and panels — all facets coherently, never a mix of restored and reverted facets"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core dashboard functionality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

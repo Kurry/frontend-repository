@@ -62,208 +62,151 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
-description = "On load after dismissing boot, the terminal shows a live command prompt and welcome/output chrome"
+name = "post_boot_terminal_welcome"
+description = "After dismissing boot, ASCII YOUR NAME art appears above the two-column greeting, rocket, subtitle/email, Capabilities, and Navigation welcome box, followed by a focused command input"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
-description = "After opening Projects Board or running /work, at least 6 seeded projects are visible with names"
+name = "seeded_projects_and_shortcuts"
+description = "Running /work or opening Projects Board shows at least six seeded case studies, and invoking a seeded shortcut such as /signals opens a detail block with type/year, blurb, tags, and stat chips"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
-description = "After creating a project named 'Harbor Atlas' with valid required fields, the text 'Harbor Atlas' is visible in the projects list or board"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.4"
-name = "1_4"
-description = "After adding 3 new projects on top of the seed set, the projects list shows exactly 3 more items than the initial seeded count"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.5"
-name = "1_5"
-description = "After filtering projects by status (e.g. wip) with mixed statuses present, only matching projects remain visible"
+name = "project_create_cross_view_flow"
+description = "Starting from the seeded project count, creating Harbor Atlas with valid name, blurb, status, tags, and stats increases the count by exactly one; it then appears in /work, Projects Board, its detail surface, and matching filters without reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
-description = "After editing a project name to 'Evening Terminal', the text 'Evening Terminal' is visible and the previous name is not"
+name = "project_edit_cross_view_flow"
+description = "Editing one project to Evening Terminal updates that same record in Projects Board, /work output, its shortcut detail, tags/status filters, and derived count without recreating or duplicating it"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
-description = "After deleting a project, that project name is no longer visible in the projects list or board"
+name = "project_delete_cross_view_flow"
+description = "Deleting a selected project decreases the measured count by exactly one and removes it from Projects Board, /work output, shortcut lookup, and every matching filter on the first try"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
-description = "After deleting all projects, an empty state is visible in Projects Board or /work output"
+name = "projects_empty_state"
+description = "After deleting every project through visible controls, Projects Board and /work show a meaningful empty-project state rather than a blank body"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
-description = "After submitting create with an empty required project name, the projects count does not increase and validation feedback is visible"
+name = "project_inline_validation"
+description = "Submitting project create or edit with an empty required name shows an inline field-specific error before submission and leaves the measured project count and last valid record unchanged"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
-description = "After switching between Terminal CLI mode and Projects Board mode, the main canvas shows the other mode without full page navigation"
+name = "terminal_board_mode_switch"
+description = "Switching between Terminal CLI and Projects Board through /work board or the visible mode control replaces the terminal body without a document reload or URL navigation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
-description = "After running a theme command (/dark, /light, /retro, or /glass), documentElement theme classes update without reload"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.12"
-name = "1_12"
-description = "When hovering project rows/cards, autocomplete rows, or titlebar controls, a visible hover wash or highlight appears"
+name = "session_theme_commands"
+description = "Running /dark, /light, /retro, and /glass applies four visibly distinct root-level themes without reload, while /themes lists the choices"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "1_13"
-description = "After load, the terminal plays a boot sequence ending in a ready line; pressing Enter or clicking dismisses boot and reveals the post-boot terminal with a focused command prompt"
+name = "boot_dismissal_paths"
+description = "On a fresh load, sequential boot status lines end in a ready line and Press Enter to continue; Enter, pointer click, and touch-capable activation each dismiss boot into the terminal"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.14"
-name = "1_14"
-description = "After typing /skills, labeled skill bars render and animate from zero toward their target widths, and after /clear prior output is wiped"
+name = "command_catalog_and_clear"
+description = "Slash commands echo their input and produce matching staggered output for /help, /about, /work, /clients, /skills, /philosophy, /social, /articles, /testimonials, /awards, /contact, and /privacy, while /clear wipes prior output"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.15"
-name = "1_15"
-description = "After running an easter-egg command (/matrix or /konami), the corresponding canvas animation (matrix rain or confetti) appears over the page"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.16"
-name = "1_16"
-description = "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.17"
-name = "1_17"
-description = "Projects collection supports create, edit, and delete with list rows and derived counts updating from shared application state"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.18"
-name = "1_18"
-description = "At least two distinct views or interaction modes are switchable without full page navigation"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.19"
-name = "1_19"
-description = "Domain state beyond CRUD is implemented (filters, status/priority/mode, or equivalent) and recomputes visible results from the shared collection"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.20"
-name = "1_20"
-description = "Renders visible validation feedback when create is submitted with empty required fields, and the collection count does not increase"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.21"
-name = "1_21"
-description = "On load the terminal plays a boot sequence ending in a ready line and a Press Enter to continue prompt; pressing Enter, clicking, or touching dismisses boot and reveals the post-boot terminal"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.22"
-name = "1_22"
-description = "Typing slash section commands (/help, /about, /work, /skills, /contact) echoes the input line and appends the matching output, and /clear wipes prior output"
+name = "discoverable_easter_eggs"
+description = "/secrets or /easter-eggs lists working hidden commands; /matrix starts green rain, /konami or the keyboard code triggers confetti, sudo hire designer reaches 100%, and the listed shell-themed extras print themed output"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.23"
-name = "1_23"
-description = "Typing in the command input shows an autocomplete dropdown of matching commands, Tab completes the highlighted one, and the up/down arrows walk command history"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.24"
-name = "1_24"
-description = "Hidden easter-egg commands work and are discoverable via /secrets: /matrix starts a green matrix-rain canvas and /konami fires a confetti burst"
+name = "autocomplete_history_and_aliases"
+description = "Typing a partial command opens matching suggestions, Tab completes the highlighted command, arrow keys traverse history, and an alias, bare-word fuzzy match, and natural-language phrase each resolve to their intended command"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.25"
-name = "1_25"
-description = "The macOS window chrome works: red close opens an exit overlay with a Reopen control that restores the window, yellow minimize swaps the wallpaper blur, and green maximize expands the window"
+name = "window_chrome_controls"
+description = "Red close opens the kill-style exit overlay and Reopen restores the terminal; yellow minimize switches from blurred to sharp wallpaper; green maximize expands the terminal"
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "1.26"
-name = "1_26"
-description = "A cookie-consent banner appears after boot; choosing Accept or Decline dismisses it, updates in-memory consent without throwing, and /privacy reflects the accepted or declined status"
+name = "cookie_consent_privacy_flow"
+description = "After boot, choosing Accept or Decline dismisses the consent banner without an exception and /privacy reports the selected in-memory status; a fresh reload coherently returns consent to not-set"
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "quick_info_inert_controls"
+description = "/linkedin, /facebook, /instagram, /phone, /email, /agency, and /location print placeholder values inline, and all social, contact, award, and exit-overlay controls keep the current URL and tab unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "section_title_without_navigation"
+description = "Running multiple section commands changes the document title to the active section while the URL remains unchanged and the single-page terminal stays mounted"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "1.27"
-name = "1_27"
-description = "Section or easter-egg commands are decorative stubs — /matrix, /konami, or /clear print nothing or do not change the terminal output"
+name = "stubbed_terminal_commands"
+description = "One or more required section, project, clear, or easter-egg commands behaves as a decorative stub, prints unrelated output, or leaves the promised visible state unchanged"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "1.28"
-name = "1_28"
-description = "Projects list is static HTML only with no working create/edit/delete against shared state"
+name = "static_or_desynchronized_projects"
+description = "Project create, edit, delete, shortcut, board, list, or filter surfaces show static or mutually inconsistent records after a visible project mutation"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "1.29"
-name = "1_29"
-description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
+name = "outbound_navigation_present"
+description = "A social, contact, award, close-overlay, or command control navigates to another URL, opens a new tab, or invokes mailto or tel"
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable core-feature defect that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence that demonstrates it. If the defect is already covered even partially by another criterion, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

@@ -62,177 +62,134 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
-description = "On load of /sprint/26 a full-viewport black preloader (#site-loader) with the Razorpay Sprint logo and a #305eff progress bar appears, then exits upward and is removed within about 10 seconds, leaving the page settled with no loader overlay remaining."
+name = "preloader_shows_then_exits"
+description = "On load of /sprint/26 a full-viewport black preloader with the white Novapay Sprint placeholder mark and a thin #305eff progress bar appears, its bar animates toward 100 percent, then the loader exits upward and is removed within about 10 seconds, leaving the page settled with no loader overlay remaining."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
-description = "The fixed segment nav shows all six labels in order: 01.AGENTIC STACK, 02.INTERNATIONAL PAYMENTS, 03.PAYMENT GATEWAY, 04.D2C, 05.MARKETING, 06.BUSINESS BANKING, with hairline dividers between segments."
+name = "segment_nav_six_labels"
+description = "The fixed segment nav shows the white Novapay placeholder wordmark plus all six labels in order: 01.AGENTIC STACK, 02.INTERNATIONAL PAYMENTS, 03.PAYMENT GATEWAY, 04.D2C, 05.MARKETING, 06.BUSINESS BANKING, with hairline dividers between segments."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
-description = "The Three.js hero shows the billboard copy SPRINT 26 / 100+ LAUNCHES & UPDATES, a bottom-center pill reading SCROLL TO SEE 100+ UPDATES, and a top-left white Razorpay / SPRINT '26 brand mark over the WebGL canvas."
+name = "hero_billboard_and_lockup"
+description = "The 3D scroll hero shows the billboard copy SPRINT 26 / 100+ LAUNCHES & UPDATES, a bottom-center pill reading SCROLL TO SEE 100+ UPDATES, and a top-left white brand lockup pairing the Novapay placeholder wordmark with SPRINT '26 over the WebGL canvas."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
-description = "Clicking the 01.AGENTIC STACK segment nav link scrolls #agentic-stack into view; clicking each of the six links (#agentic-stack, #international, #payment-gateway, #D2C, #Marketers, #finance) scrolls that section in and marks its nav cell active."
+name = "nav_links_scroll_sections"
+description = "Clicking the 01.AGENTIC STACK segment nav link scrolls #agentic-stack into view; clicking each of the six links (#agentic-stack, #international, #payment-gateway, #D2C, #Marketers, #finance) scrolls that section in and marks its nav cell active, and clicking the wordmark returns to the hero (#Hero)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
-description = "The clicked/active segment nav cell renders with the electric-blue #0039ff (rgb(0,57,255)) background, and scrolling updates a scroll-spy active indicator using #305eff."
+name = "nav_active_state_colors"
+description = "The clicked/active segment nav cell renders with the electric-blue #0039ff (rgb(0,57,255)) background, and scrolling updates a scroll-spy active indicator using #305eff without any click."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
-description = "Hovering the vertical GET ACCESS rail transitions its background to #305eff; the rail link points at the Typeform signup and opens in a new tab (target _blank)."
+name = "get_access_hover_and_target"
+description = "Hovering the vertical GET ACCESS rail transitions its background to #305eff; the rail link points at an absolute external signup URL and opens in a new tab (target _blank)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
-description = "Clicking an executive play control opens the full-viewport video modal playing a local MP4 and locks body scroll (document.body overflow hidden) while it is open; closing it unlocks scroll."
+name = "video_modal_locks_scroll"
+description = "Clicking an executive play control opens the full-viewport video modal playing a local placeholder MP4 and locks body scroll (document.body overflow hidden) while it is open; closing it stops the video and unlocks scroll."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
-description = "A feature card shows a lazily hydrated Rive canvas visual (for example the Subscription Recovery Agent card) that mounts a canvas as it scrolls into view."
+name = "lazy_card_canvas_hydration"
+description = "A feature card shows a lazily hydrated runtime vector-animation canvas (for example the Subscription Recovery Agent card) that mounts a canvas as it scrolls into view, not eagerly on first paint."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
+name = "word_reveal_heading_splits"
 description = "The word-reveal heading THE AGENTIC ERA is split into the words THE, AGENTIC, and ERA that reveal in sequence as it scrolls into view."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
-description = "Executive quotes render verbatim, including Prabu Ram, SVP, Engineering and the quote 'This shift will redefine commerce as we know it. Not because payments got faster. But because it got intelligent.'"
+name = "executive_quote_verbatim"
+description = "Executive quotes render verbatim with their fictional placeholder attributions, including Arjun Mehta, SVP, Engineering and the quote 'This shift will redefine commerce as we know it. Not because payments got faster. But because it got intelligent.'"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
-description = "Resizing to 390px wide swaps the desktop segment nav for a hamburger menu whose Roman-numeral labels read I.AGENTIC STACK through VI.BUSINESS BANKING, and disables the stacked-section overlap."
+name = "mobile_hamburger_roman_labels"
+description = "Resizing to 390px wide swaps the desktop segment nav for a hamburger menu whose Roman-numeral labels read I.AGENTIC STACK through VI.BUSINESS BANKING, and removes the stacked-section overlap so sections stack edge-to-edge."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
-description = "The footer shows Copyright © Razorpay FTX26, the copy AI-native fintech. / Built from India. For the world., Instagram and LinkedIn links, and a /SPRINT'26 word-mark."
+name = "footer_copy_and_links"
+description = "The footer shows Copyright © Novapay FTX26, the copy AI-native fintech. / Built from India. For the world., a GET ACCESS CTA, Instagram, X, and LinkedIn social links, a www.novapay.example link, and a /SPRINT'26 word-mark."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "1_13"
-description = "Using browser_network_requests, every request the page makes is same-origin with http://127.0.0.1:3000 or a data:/blob: URL: zero external CDN requests for fonts, scripts, images, video, GLB, Draco, or CSS."
+name = "all_requests_same_origin"
+description = "Using browser_network_requests, every request the page makes is same-origin with http://127.0.0.1:3000 or a data:/blob: URL: zero external CDN requests for fonts, scripts, images, video, 3D scene files, Draco decoder, or CSS."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.14"
-name = "1_14"
-description = "The document title is exactly 'Razorpay Sprint 2026: The Age of AI-Native Payments', the page produces no uncaught console errors, and no asset request fails (no 4xx/5xx or net::ERR)."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.15"
-name = "1_15"
-description = "Loading /sprint/26 shows the full-viewport black #site-loader preloader, which then exits and is removed, leaving the header, nav, and hero settled in their final positions with no loader overlay remaining."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.16"
-name = "1_16"
-description = "The fixed segment nav renders all six labels in order: 01.AGENTIC STACK, 02.INTERNATIONAL PAYMENTS, 03.PAYMENT GATEWAY, 04.D2C, 05.MARKETING, 06.BUSINESS BANKING."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.17"
-name = "1_17"
-description = "Clicking each segment nav link with the real nav control (#agentic-stack, #international, #payment-gateway, #D2C, #Marketers, #finance) scrolls that section into view and marks its nav cell active."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.18"
-name = "1_18"
-description = "The Three.js hero shows the billboard SPRINT 26 / 100+ LAUNCHES & UPDATES and a bottom-center pill reading SCROLL TO SEE 100+ UPDATES over the WebGL canvas."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.19"
-name = "1_19"
-description = "Clicking an executive play control with the real UI control opens a full-viewport video modal that plays a local MP4."
+name = "title_and_clean_load"
+description = "The document title is exactly 'Novapay Sprint 2026: The Age of AI-Native Payments', the page produces no uncaught console errors, and no asset request fails (no 4xx/5xx or net::ERR)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.20"
-name = "1_20"
-description = "The six stacked sections each pair an executive portrait, name, role, and pull quote with a feature-card grid; quotes appear verbatim including Prabu Ram, SVP, Engineering 'This shift will redefine commerce as we know it. Not because payments got faster. But because it got intelligent.'"
+name = "sections_pair_exec_and_cards"
+description = "The six stacked sections each pair an original placeholder executive portrait, name, role, play control, and pull quote with a feature-card grid; quotes appear verbatim including Meera Nair, Senior Director, Product 'We aim to deliver the best business banking experience. Today, that translates to 70% of Indian unicorns using NovapayX.'"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.21"
-name = "1_21"
-description = "Feature card names appear verbatim within their sections, for example Payments on In-App Chats, Voice Payments, Localised Checkout, Biometric Card Authentication, Quick Buy 2.0, and AI-powered Multi-Bank Routing."
+name = "feature_card_names_verbatim"
+description = "Feature card names appear verbatim within their sections, for example Payments on In-App Chats, Voice Payments, Novapay for ChatGPT Apps, Localised Checkout, Biometric Card Authentication, Quick Buy 2.0, and AI-powered Multi-Bank Routing."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.22"
-name = "1_22"
-description = "The persistent vertical GET ACCESS rail links to the Typeform signup and opens in a new tab (target _blank, rel noopener noreferrer)."
+name = "rail_new_tab_attributes"
+description = "The persistent vertical GET ACCESS rail links to the external signup form and opens in a new tab (target _blank, rel noopener noreferrer)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.23"
-name = "1_23"
-description = "The Agentic Stack section opens with an Agentic Stack watermark and runs its five sub-bands in order: 01/A Agentic Payments, 01/B Agentic Platform, 01/C Agent Studio, 01/D Payment for Builders, 01/E Agentic Business Banking."
-type = "binary"
-weight = 0.5
-optional = true
-
-[[criterion]]
-id = "1.24"
-name = "1_24"
-description = "Scrolling the page updates a scroll-spy that highlights the nav cell for whichever section is currently in view, without a click."
+name = "agentic_stack_sub_bands"
+description = "The Agentic Stack section opens with an Agentic Stack watermark, tagline, and intro quote, then runs its five sub-bands in order: 01/A Agentic Payments, 01/B Agentic Platform, 01/C Agent Studio, 01/D Payment for Builders, 01/E Agentic Business Banking, each with its own feature cards."
 type = "binary"
 weight = 0.5
 optional = true
 
 [[criterion]]
 id = "1.25"
-name = "1_25"
+name = "nav_or_modal_broken"
 description = "Clicking a segment nav link or play control leads to an application-error or Not found page, or no video modal opens because the play control is missing or inert."
 type = "binary"
 weight = 1.0
@@ -240,8 +197,89 @@ negate = true
 
 [[criterion]]
 id = "1.26"
-name = "1_26"
+name = "fabricated_copy_present"
 description = "The rendered copy invents section, feature, or quote text that does not appear in the PRD (for example a fabricated executive name or feature card not listed in the content requirements)."
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "1.27"
+name = "fresh_load_hero_flow_chain"
+description = "On a fresh load of /sprint/26: the preloader appears with its bar filling toward 100 percent, exits upward, and the 3D hero is revealed pinned at the top; scrolling down scrubs the camera through the scene while the SPRINT 26 billboard and pill stay overlaid; once the scroll-linked sequence completes the hero releases, the first stacked section scrolls into view, and the scroll-spy highlights 01.AGENTIC STACK."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "reload_resets_to_top"
+description = "Reloading the page from a deep scroll position returns to the top of the page and restarts the preloader-then-hero sequence from the beginning, with no scroll position or UI state surviving the reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "section_nav_flow_chain"
+description = "From the hero, clicking 03.PAYMENT GATEWAY scrolls the payment gateway section into view with its nav cell flashing the click-active blue and marked active, and the section's index numeral, executive block, and card grid visible; then manually scrolling into the D2C section moves the scroll-spy highlight from 03.PAYMENT GATEWAY to 04.D2C without any click; clicking the wordmark then returns the page to the hero."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "video_modal_flow_chain"
+description = "Clicking an executive play control in a section opens the full-viewport modal with the placeholder video playing while the page behind cannot be scrolled and the nav state is unchanged; closing it stops playback, unlocks scrolling, and leaves the page at the same section with the scroll-spy highlight unchanged; closing and reopening plays the video from a clean state with body scroll never left locked."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "mobile_menu_flow_chain"
+description = "At a viewport narrower than 768px the desktop segment nav is gone and a hamburger control is present; opening it lists I.AGENTIC STACK through VI.BUSINESS BANKING, and choosing V.MARKETING closes the menu and scrolls the Marketing section into view."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "deep_link_hash_parity"
+description = "Navigating directly to /sprint/26#payment-gateway renders the same view as in-app navigation: the payment gateway section is in view and its nav cell is highlighted."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "rapid_nav_clicks_settle"
+description = "Rapid successive clicks across several segment nav labels settle on the last clicked section with exactly one nav cell marked active."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "1.34"
+name = "preloader_releases_input"
+description = "After the preloader exits, clicking a nav label and using the keyboard both work anywhere on the page — the removed loader intercepts no pointer or keyboard input."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "webgl_unavailable_fallback"
+description = "With WebGL unavailable, the hero region falls back to a static composition with its heading text still present, and every section, nav link, and CTA below remains reachable and usable."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "1.36"
+name = "card_cta_affordance_and_links"
+description = "EXPLORE and READ MORE calls to action on cards use an underline plus chevron affordance and link out to absolute external destination URLs in a new tab."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

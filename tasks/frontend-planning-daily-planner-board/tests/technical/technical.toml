@@ -62,22 +62,102 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "2.1"
-name = "2_1"
+name = "cross_view_state_coherence"
 description = "A task edited, completed, or deleted in one place is reflected consistently in the board card, the calendar panel when scheduled, and the affected column's planned-time total, all without a page reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
-name = "2_2"
+name = "browser_storage_stays_empty"
 description = "localStorage and sessionStorage remain empty after creating, editing, completing, and deleting tasks; app state is held in memory only"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
-name = "2_3"
+name = "state_persisted_to_browser_storage"
 description = "The app writes tasks, filters, or selected day to localStorage or sessionStorage to persist state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.4"
+name = "keyboard_operable_with_visible_focus"
+description = "Every interactive control — nav items, Add task controls, task checkboxes, board header buttons, and right-rail buttons — is reachable and operable with the keyboard alone and shows a visible focus indicator"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "edit_dialog_traps_and_returns_focus"
+description = "The task edit dialog exposes dialog semantics with aria-modal, traps focus while open, and returns focus to the control that opened it on close"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "checkbox_accessible_name_includes_title"
+description = "Each task's completion checkbox exposes an accessible name that includes the task title"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.7"
+name = "toast_announced_via_aria_live"
+description = "The demo toast is announced through an aria-live polite region in addition to being shown visually"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.8"
+name = "interactive_within_two_seconds"
+description = "The app is interactive within 2 seconds of a local cold load"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "console_clean_including_hydration"
+description = "During a full exercise of the app the browser console shows no errors, no warnings, no unhandled promise rejections, and no hydration mismatch messages — on first load and after in-app interaction"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "deep_link_renders_complete_seeded_board"
+description = "Loading the app URL directly renders the complete board with its seeded tasks and full chrome — the same view and state baseline as any in-app path, with no 404, blank shell, or half-rendered page"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "hydration_replaces_prerendered_content"
+description = "Pre-rendered content visibly flashes or is replaced by different content after the page becomes interactive — mismatched text, reflowing layout, or restyled elements between first paint and interactive"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.12"
+name = "rapid_input_stays_responsive"
+description = "Rapidly toggling checkboxes and adding several tasks in quick succession keeps the UI responsive with no hangs, dropped interactions, or views desyncing from each other"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.13"
+name = "external_origin_requests_observed"
+description = "Devtools shows network requests to external origins (CDN scripts, styles, fonts, or icons, or any outbound backend call) while loading or exercising the app"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect (console, storage, network, stability, accessibility, or state coherence) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

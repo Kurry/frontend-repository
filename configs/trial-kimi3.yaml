@@ -1,0 +1,43 @@
+# Modal real-agent trial sweep for all tasks/ using Kimi K3 via the Kimi
+# coding API (kimi-cli), and Codex as the rewardkit judge (OpenAI API key).
+#
+# Setup:
+#   export KIMI_API_KEY=sk-...
+#   export OPENAI_API_KEY=sk-...
+#   unset CODEX_AUTH_JSON CODEX_AUTH_JSON_PATH CODEX_ACCESS_TOKEN
+#
+# Run (sweeps every task dir under tasks/ that has a task.toml):
+#   uv run harbor run -c configs/trial-kimi3.yaml --yes
+#
+# Optional one-task smoke first with -i/--include-task-name, e.g.:
+#   uv run harbor run -c configs/trial-kimi3.yaml \
+#     -i frontend-landing-avax-network \
+#     --job-name smoke-kimi3 --yes
+
+job_name: trial-kimi3-max-50-concurrent
+jobs_dir: jobs
+n_attempts: 1
+n_concurrent_trials: 50
+
+environment:
+  type: modal
+
+retry:
+  max_retries: 2
+
+agents:
+  - name: kimi-cli
+    model_name: kimi/k3
+    env:
+      KIMI_API_KEY: ${KIMI_API_KEY}
+    # Agent-specific runtime host: Kimi coding API (api.kimi.com).
+    extra_allowed_hosts:
+      - api.kimi.com
+
+verifier:
+  env:
+    OPENAI_API_KEY: "${OPENAI_API_KEY}"
+    REWARDKIT_MODEL: "${REWARDKIT_MODEL:-}"
+
+datasets:
+  - path: tasks

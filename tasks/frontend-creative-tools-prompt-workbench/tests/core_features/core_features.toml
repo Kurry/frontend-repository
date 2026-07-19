@@ -1,0 +1,225 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_baseline_present"
+description = "On first load the workbench shows an empty editor with a token count of 0, a model selector listing 6 models grouped under 3 provider groups, a row of at least 4 suggestion chips above the editor, and a Library view reachable without reload containing exactly 4 seeded prompts, at least one of which shows an attachment count of one or more"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "placeholder_detection_and_highlight"
+description = "Typing a prompt containing {{tone}} into the editor renders the placeholder with a highlight treatment visually distinct from plain text and adds a 'tone' entry to the variable binding panel without any manual refresh; deleting the placeholder text removes that entry"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "token_count_tracks_text_and_model"
+description = "The toolbar token count updates continuously while typing (0 when empty, growing with added text), and switching the selected model changes the displayed estimate for the same editor text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "insert_variable_popover_validation"
+description = "Clicking Insert Variable opens a popover whose confirm control stays disabled until the name field contains only letters, digits, and underscores; entering an invalid name (e.g. 'my var!') shows an inline message naming the field and the allowed format, and confirming a valid name inserts the double-brace placeholder at the cursor position and closes the popover"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "binding_updates_preview_unbound_warns"
+description = "With a prompt containing two placeholders, typing a value for one in the binding panel immediately substitutes that value in the live preview, while the still-unbound placeholder renders in the preview with a visible warning highlight instead of a value and shows an Unbound indicator in the panel"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "run_streams_with_status_affordance"
+description = "Clicking Run with a fully bound prompt streams the response progressively (text appears incrementally over time, never in one paint) and a status affordance visibly moves through waiting, streaming, and complete states during the run"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "run_disabled_stop_freezes_output"
+description = "Run is disabled while the editor is empty and while a run is streaming; during streaming the Run control is replaced by a Stop control, and activating Stop freezes the response text (no further characters append), marks the run stopped, and re-enables Run"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "autofollow_and_jump_to_latest"
+description = "While a response streams past the panel's visible height the panel auto-scrolls to follow the newest text; scrolling up during streaming stops the auto-follow and reveals a jump-to-latest control, and activating that control scrolls back to the newest content and resumes following"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "variant_navigation_updates_dependents"
+description = "A completed run exposes 3 response variants with prev/next controls and a position label such as '1 of 3'; prev is disabled on the first variant and next on the last, and flipping variants changes the response text, the reasoning content, and the run metadata row together without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "reasoning_disclosure_lifecycle"
+description = "Each run's reasoning region is collapsed by default and expands/collapses from its header with a rotating chevron; while the run streams the header shows an active indicator, after completion it shows a duration summary line, and the expanded state is remembered per run while the app stays open"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "code_block_copy_confirmation"
+description = "Response content containing code renders in a monospaced block with a language label and a copy control; activating copy places the exact code text on the clipboard and shows a visible confirmation such as an icon swap or a toast"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "suggestion_chip_fills_editor"
+description = "Clicking a suggestion chip replaces the editor content with exactly that chip's prompt text and moves focus to the editor; when the chip row overflows its container it scrolls horizontally without shifting the vertical layout"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "attachments_add_preview_remove"
+description = "The attachment add control opens a picker seeded with at least 5 assets; choosing one appends an inline badge immediately, hovering the badge reveals a preview with the asset name and type plus a remove control, and activating remove deletes exactly that attachment with visible feedback"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "save_modal_validation_and_toast"
+description = "Clicking Save opens a modal whose confirm control stays disabled until the required title and technique tag are valid; submitting an invalid state shows inline messages naming the field and the fix, and confirming a valid save adds the prompt to the library and shows a success toast"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "library_round_trip_restores_prompt"
+description = "Scripted probe: save a prompt containing a bound placeholder and one attachment, switch to the Library view and confirm the count increased by exactly one, open the new entry, and confirm the workbench shows the same prompt text, the same binding value, and the same attachment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "library_delete_and_empty_state"
+description = "Deleting a library entry removes its row and decreases the visible count by exactly one, and deleting every entry shows an empty state message in the library list with a control that returns to the workbench"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "run_history_selectable"
+description = "Each run appends one entry to the run history showing the model that was selected when it started, a timestamp, and its status; selecting an older history entry displays that run's response, reasoning, and variants"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "unbound_run_blocked_with_warning"
+description = "Clicking Run while the prompt contains an unbound variable shows a warning notice naming the unbound variable and no run starts (no streaming begins and no history entry is added)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "double_save_creates_one_entry"
+description = "Rapidly double-activating the Save modal's confirm control creates exactly one library entry: the count increases by one and exactly one new row appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "completed_run_frozen_after_binding_change"
+description = "Scripted probe: after a run completes, changing a variable's bound value updates the live preview but the completed run's response text remains byte-identical to what it showed before the change"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "fabricated_streaming_or_static_output"
+description = "The full response text appears in a single instant rather than progressively, or two runs started from meaningfully different prompt texts produce byte-identical response content"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.22"
+name = "binding_panel_disconnected"
+description = "An entry in the variable binding panel disagrees with the editor: a placeholder present in the editor text has no panel entry, or a removed placeholder's entry lingers, or a typed binding value never reaches the preview"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

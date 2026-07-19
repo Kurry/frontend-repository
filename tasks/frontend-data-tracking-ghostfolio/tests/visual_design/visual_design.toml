@@ -129,17 +129,89 @@ weight = 1.0
 
 [[criterion]]
 id = "3.10"
-name = "3_10"
-description = "The UI does not read as generic starter or placeholder content and does not use a scaffold title such as Vite App or React App."
+name = "generic_scaffold_content_shipped"
+description = "The UI reads as generic starter or placeholder content, or the page uses a scaffold title such as Vite App or React App."
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "3.11"
-name = "3_11"
-description = "The layout uses more than one distinguishable type role and no background/text or accent pairing renders as gray-on-gray or otherwise illegible."
+name = "flat_type_or_illegible_pairing"
+description = "The layout collapses into a single undifferentiated type role, or a background/text or accent pairing renders as gray-on-gray or otherwise illegible."
 type = "binary"
 weight = 0.5
 negate = true
 optional = true
+
+[[criterion]]
+id = "3.12"
+name = "wealth_dashboard_composition"
+description = "The page composes as a calm wealth dashboard on a light, slightly green-tinted background: a top brand bar, a full-width net-worth summary card, then a two-column grid pairing a holdings card with a selected-holding detail card."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.13"
+name = "white_cards_teal_accent"
+description = "Content sits in white cards with generous padding, a large radius, hairline borders, and a soft shadow, and one teal accent hue carries the brand mark, primary buttons, selection highlight, and allocation bars over a neutral base."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.14"
+name = "allocation_row_anatomy"
+description = "Each allocation entry lists the class name, a proportional bar, and a right-aligned percentage, one entry per asset class present in the visible holdings."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.15"
+name = "typography_role_hierarchy"
+description = "Typography shows distinct roles: a large weighted net-worth figure and card titles, regular body text in the table, and small uppercase eyebrow labels on section headers."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.16"
+name = "single_icon_family"
+description = "The brand bar, buttons, empty states, and the sort indicator share one consistent visual icon family at consistent sizes, with no mixed icon styles or ad-hoc mismatched glyphs."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.17"
+name = "desktop_two_column_layout"
+description = "At a 1440-pixel-wide viewport the holdings card and the detail card sit side by side, with the net-worth summary spanning the full width above them."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.18"
+name = "narrow_table_scrolls_in_region"
+description = "At a 375-pixel-wide viewport the page never scrolls horizontally; when the holdings table is wider than the viewport it scrolls within its own region instead of overflowing the page."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.19"
+name = "helpful_error_and_empty_copy"
+description = "Where the app renders validation or error messages they name the field and the fix, and where it renders empty states the copy explains what belongs in the region and how to add it."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.20"
+name = "placeholder_filler_text_visible"
+description = "Placeholder or filler text (lorem ipsum, TODO, asdf, or template variable names such as {{title}}) is visible somewhere in the shipped UI."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

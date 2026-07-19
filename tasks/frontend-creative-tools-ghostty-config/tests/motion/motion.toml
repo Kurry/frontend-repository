@@ -62,28 +62,28 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
+name = "font_family_control_immediate_feedback"
 description = "The font-family control's label or surrounding text predicts its outcome, and operating the visible control gives immediate visual feedback."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "4_2"
+name = "keyboard_focus_visible_while_typing"
 description = "Focusing the font-family input with the keyboard keeps focus visible, and typing (through the real input, not a scripted state injection) updates both the input and the generated font-family line."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
+name = "active_category_identifiable_at_every_step"
 description = "Moving among setting categories and export actions keeps the current location or selection visually identifiable at every step, including the active sidebar item."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "4_4"
+name = "hover_and_focus_distinct_and_consistent"
 description = "Interactive controls render hover and focus as different visual treatments, and controls of the same kind share one consistent state language."
 type = "binary"
 weight = 0.5
@@ -91,7 +91,7 @@ optional = true
 
 [[criterion]]
 id = "4.5"
-name = "4_5"
+name = "pressed_feedback_on_pointer_down"
 description = "Pressing a control shows visible pressed feedback immediately on pointer-down, before the resulting operation finishes."
 type = "binary"
 weight = 0.5
@@ -99,7 +99,7 @@ optional = true
 
 [[criterion]]
 id = "4.6"
-name = "4_6"
+name = "disabled_exports_read_non_interactive"
 description = "When the export actions are disabled (zero overrides) they read as non-interactive while their labels stay legible."
 type = "binary"
 weight = 0.5
@@ -107,8 +107,8 @@ optional = true
 
 [[criterion]]
 id = "4.7"
-name = "4_7"
-description = "Focus and hover are not collapsed into one identical highlight standing in for both states."
+name = "focus_and_hover_share_identical_highlight"
+description = "Focus and hover are collapsed into one identical highlight standing in for both states."
 type = "binary"
 weight = 0.5
 negate = true
@@ -116,8 +116,65 @@ optional = true
 
 [[criterion]]
 id = "4.8"
-name = "4_8"
-description = "The active-category and preview feedback are produced by operating the visible controls, not solely by a scripted state shortcut, and no interactive control is left with no hover, focus, or pressed feedback at all."
+name = "control_lacks_any_state_feedback"
+description = "At least one interactive control gives no hover, focus, or pressed feedback at all when operated through the visible UI."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.9"
+name = "category_switch_animates_body_header_stays"
+description = "Switching categories animates the content in without a full page reload, and the content header stays put while the body transitions."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "override_lines_animate_in_and_out"
+description = "Driven through the visible controls, a new override line entering the generated-config panel animates in and a removed override line animates out, without surrounding lines jumping or overlapping."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "terminal_preview_rethemes_live"
+description = "The interactive terminal preview re-themes live as colors, fonts, cursor, and palette settings are edited through the visible controls."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "toasts_enter_with_motion_and_fade_out"
+description = "Copy, download, and reset produce transient toast feedback that enters with motion, stays readable, and dismisses with a fade."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "cursor_preview_blinks"
+description = "The terminal preview's cursor blinks for emphasis."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.14"
+name = "sliders_track_drag_toggles_animate"
+description = "Sliders visibly track the drag, and switches and pill toggles animate their selected-state change when operated with the pointer rather than snapping."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "reduced_motion_removes_transitions"
+description = "With prefers-reduced-motion set, transitions are removed or minimized and every state change still applies instantly and completely."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion and microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered - even partially - by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

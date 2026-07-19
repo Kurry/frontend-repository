@@ -98,8 +98,8 @@ optional = true
 
 [[criterion]]
 id = "4.6"
-name = "4_6"
-description = "A transient confirmation toast does not persist indefinitely or block further interaction with the board and controls."
+name = "toast_persists_or_blocks_play"
+description = "A transient confirmation toast persists indefinitely or blocks further interaction with the board and controls."
 type = "binary"
 weight = 0.5
 negate = true
@@ -107,8 +107,44 @@ optional = true
 
 [[criterion]]
 id = "4.7"
-name = "4_7"
-description = "Motion is not produced by snapping game state through a shortcut; pausing via the real control observably halts the ongoing fall animation."
+name = "pause_fails_to_halt_motion"
+description = "Pressing the real Pause control leaves the fall animation visibly running, or motion evidence only appears when game state is snapped through a shortcut rather than driven through the real controls."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.8"
+name = "streak_meter_animates"
+description = "Driven through real tile taps and Submit Word, the combo streak meter fills or animates as consecutive valid submissions accrue and resets visibly on an invalid submission."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "celebration_particle_bursts"
+description = "Fully clearing the board and unlocking an achievement each fire a celebratory particle burst tied to that exact moment, triggered only by the real winning action performed through the UI, and the burst never loops ambiently."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "history_entry_animates_in"
+description = "When a run ends, the new Match History entry animates into the top of the list rather than appearing instantly."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.11"
+name = "settings_form_open_close_transition"
+description = "The settings form opens and closes with a short transition, and buttons show hover and focus-visible transitions when hovered and keyboard-focused on the real controls."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

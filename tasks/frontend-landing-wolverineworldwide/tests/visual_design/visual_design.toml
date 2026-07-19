@@ -62,66 +62,119 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "2.1"
-name = "2_1"
-description = "The page presents a coherent monochrome editorial system by computed style: body background rgb(255,255,255) and text rgb(1,1,1), the footer surface rgb(1,1,1) with rgb(255,255,255) text, and white type over the full-bleed hero imagery"
+name = "monochrome_token_system"
+description = "The page presents a coherent monochrome editorial system by computed style: body background rgb(255,255,255) and text rgb(1,1,1), a single neutral gray computing to rgb(204,204,204) where used, the footer surface rgb(1,1,1) with rgb(255,255,255) text, and white type over the full-bleed hero imagery"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
-name = "2_2"
-description = "Headings render in the self-hosted ABC Diatype family (computed font-family ABCDiatype) with a clear display-to-body hierarchy: at 1440px the hero display is about 168px weight 700, the portfolio and careers headings about 128px weight 700, and news card titles about 19px weight 400"
+name = "open_license_grotesque_type_scale"
+description = "Headings render in a self-hosted bundled grotesque family (a non-system font resolving through the page's --font-sans token, not Arial/Helvetica/Times fallback) with the specified fluid scale at 1440px: the hero display Make. Every Day. Better. about 168px / weight 700 / line-height about 132.72px / letter-spacing about -8.4px in rgb(255,255,255); the portfolio and careers headings about 128px / weight 700; section headings Market Snapshot and Many brands, one shared culture, limitless innovation. at about 33px / weight 700; header nav links about 15px; and news card titles about 19px / weight 400"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
-name = "2_3"
-description = "The composition is image-forward and full-bleed: a video hero, a particle/galaxy portfolio field, dense news cards, a market-snapshot stat list, and a dark rounded-top footer slab"
+name = "image_forward_full_bleed_composition"
+description = "The composition is image-forward and full-bleed: a video hero, a particle/galaxy portfolio field, dense news cards, a market-snapshot stat list, a dark careers push panel, and a dark rounded-top footer slab"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.4"
-name = "2_4"
+name = "section_order_top_to_bottom"
 description = "The homepage renders its sections top to bottom in the real order inside main: hero, brand portfolio (A portfolio built for every step.), annual report (2025 Annual Report), culture statement (Many brands, one shared culture, limitless innovation.), Market Snapshot, then the Latest News carousel whose cards carry the employee-culture stats and the Company of the Year award, and the Creating Your Future With Us careers panel, ending in the footer"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.5"
-name = "2_5"
-description = "At the desktop viewport (1440x900) the layout is a coherent 12-column composition (header spans about 1400px within the 1440 viewport, roughly 82px tall) with consistent spacing rhythm and no malformed or overlapping sections; the market-snapshot meta labels render in ABC Diatype Mono uppercase"
+name = "desktop_grid_and_mono_meta_labels"
+description = "At the desktop viewport (1440x900) the layout is a coherent 12-column composition (header spans about 1400px within the 1440 viewport, roughly 82px tall) with consistent spacing rhythm and no malformed or overlapping sections; the market-snapshot meta labels (DAY'S HIGH, DAY'S VOLUME) render in a bundled monospace companion at about 11px uppercase"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.6"
-name = "2_6"
-description = "At the mobile viewport (390px) the sections reflow to a single legible stacked column with the type condensing via clamp() rather than clipping"
+name = "mobile_single_column_reflow"
+description = "At the mobile viewport (390px) the sections reflow to a single legible stacked column with the type condensing via the fluid scale rather than clipping"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.7"
-name = "2_7"
-description = "The cookie-consent banner is a themed, rounded box consistent with the site (not an unstyled default), appearing on load with We use cookies and its actions"
+name = "cookie_banner_themed_with_dark_overlay"
+description = "The cookie-consent banner is a themed, rounded box consistent with the site (not an unstyled default), appearing on load with We use cookies and its actions, rendered over a dark overlay whose background computes to rgba(0,0,0,0.65)"
 type = "binary"
 weight = 0.5
 optional = true
 
 [[criterion]]
 id = "2.8"
-name = "2_8"
-description = "The page uses a generic sans-serif or off-palette colors instead of ABC Diatype and the near-black/white monochrome token system"
+name = "default_font_or_off_palette"
+description = "The page renders in a generic system default font stack (e.g. Times, Arial, unstyled sans-serif) instead of a bundled grotesque, or its surfaces use colors outside the near-black/white monochrome token system"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "2.9"
-name = "2_9"
+name = "horizontal_overflow_or_section_overlap"
 description = "An unintended page-wide horizontal scrollbar appears at 375, 768, or 1440 width (documentElement scrollWidth minus clientWidth exceeds 2px), or sections overlap by more than 8px"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.10"
+name = "nav_swaps_at_1000px_breakpoint"
+description = "At and above 1000px width the header shows the full primary navigation with the Responsibility dropdown; below 1000px it shows the Menu toggle and the desktop nav links are gone"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "fluid_type_and_aspect_ratios_across_widths"
+description = "Resizing the viewport between 375, 768, and 1440 widths scales typography and gaps smoothly and continuously (fluid clamp behavior, no abrupt size jumps between breakpoints), while the hero video, portfolio imagery, and news cards keep their aspect ratios at every width"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.12"
+name = "placeholder_brand_identity_reads_original"
+description = "The header logo mark, the wordmark/logotype, and the eleven brand marks read as an invented placeholder visual identity — each brand tile shows a distinct original mark — while brand names appear as text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.13"
+name = "casing_conventions_and_typo_free_copy"
+description = "Rendered copy keeps the reference's casing conventions consistently (uppercase mono meta labels, sentence-case body copy) and the mandated strings — nav labels, section headings, hero headline, market values, press copy, statistics, awards line, careers copy, legal links, copyright — are free of typos"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "2.14"
+name = "real_brand_assets_shipped"
+description = "The page ships a real third-party brand asset: the actual Wolverine Worldwide logo or wordmark, a real logo of any of the eleven portfolio brands, the reference's licensed typeface, or real brand photography/video, instead of original placeholder stand-ins"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.15"
+name = "crisp_sprite_icons_and_overlay_layering"
+description = "Chrome glyphs (logo, chevron, close, external, social icons) render as crisp consistent inline SVG icons served from the site's own assets, and layering is correct: the sticky header sits above page content, open overlays/modals above the header, and the cookie layer above everything"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "2.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

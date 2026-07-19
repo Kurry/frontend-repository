@@ -1,14 +1,14 @@
 <summary>
-Build a QR color grid paint studio using Svelte, Svelte stores, and Tailwind CSS.
+Build a QR color grid paint studio using Svelte, Svelte stores, Tailwind CSS 4.3.2, and Bits UI.
 </summary>
 
 <reference_screenshots>
 Screenshots of the reference application are provided in-container at
-`/reference-screenshots/`: `overview.png` is a full-page desktop-layout
-overview (downscaled); `segment-NN.png` are full-resolution 1440x900 sections
+/reference-screenshots/: overview.png is a full-page desktop-layout
+overview (downscaled); segment-NN.png are full-resolution 1440x900 sections
 in top-to-bottom order with slight overlap. They are part of this instruction:
 recreate what they show. Where a screenshot and the text conflict, the text
-wins. Do not copy the images into `/app` or ship them as app assets.
+wins. Do not copy the images into /app or ship them as app assets.
 </reference_screenshots>
 
 <core_features>
@@ -56,7 +56,7 @@ State contracts (behavioral, not storage keys):
 - Deleting a board removes it from Gallery and selection
 - Loading a board writes its cells into the shared paint board state
 - Favorites/tag filters recompute the visible gallery from the shared collection
-Stack: Svelte + Svelte stores + Tailwind CSS (Vite or equivalent); frontend-only. Ship QRious locally under assets/ (or equivalent). No MUI/Chakra/Ant Design.
+Stack: Svelte with Svelte stores, built with Vite or an equivalent SPA setup. Styling is Tailwind CSS 4.3.2 (pinned), with design tokens in @theme. Bits UI components provide the toolbar chrome, camera overlay, gallery controls, dialogs, and toasts; no other external component library. svelte-motion is allowed for animation; no other animation libraries. Phosphor icons via phosphor-svelte only; no raw pasted SVG icon sets and no icon CDNs. All forms, including saved-board create and rename, validate through a Zod schema driven by Felte and render inline per-field errors before submit. QRious or an equivalent client-side QR helper is allowed. All libraries are installed via npm and bundled locally; no CDN imports.
 - Seed at least 4 saved boards so Gallery is non-empty on first load
 - Empty required name on save/create must not increase the boards count; show visible validation feedback
 - After deleting all boards, show an empty state in Gallery

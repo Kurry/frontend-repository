@@ -62,21 +62,21 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
-description = "Dark studio shell with Preview/Editor and Saved Themes density remains tool-like"
+name = "dark_studio_shell_lockup"
+description = "Dark studio shell with near-black surfaces, light shell text, an indigo/Material primary accent, Roboto type, and Material iconography; the header brand lockup with a cyan Material logo mark sits above the three-tab bar, and the layout keeps full-viewport tool density rather than a marketing landing"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
+name = "empty_saved_themes_state"
 description = "Empty Saved Themes state is visually present when the collection is empty"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
+name = "static_marketing_page_only"
 description = "Presents only a static marketing page without Monaco or saved themes management"
 type = "binary"
 weight = 1.0
@@ -84,7 +84,58 @@ negate = true
 
 [[criterion]]
 id = "3.4"
-name = "3_4"
-description = "Saved theme cards preview each theme's swatches (e.g. primary / secondary / paper) with load and delete controls and mark the active theme"
+name = "theme_card_swatches_actions"
+description = "Saved theme cards are dense, preview each theme's swatches (e.g. primary / secondary / paper) with a type-and-updated meta line and load/delete controls, and mark the active theme"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "preview_split_regions"
+description = "The Preview tab places the device toggles and framed sample site on one side and the code editor above stacked Palette / Fonts / Typography / Snippets tool panels on the other, with a bottom tool-nav switching panels"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "previews_recolor_from_theme"
+description = "Sample sites and component demos recolor from the live ThemeOptions, so a palette or typography edit is reflected across every preview surface"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "component_state_treatments"
+description = "Buttons, inputs, and accordion controls show distinct default, hover, focus (visible ring), and disabled treatments"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "desktop_side_by_side_layout"
+description = "At desktop widths of 1280 pixels and above, the Preview panel shows the device frame and the editor/tool stack side by side as in the reference layout"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "stacked_layout_below_1024"
+description = "Below roughly 1024 pixels the Preview panel stacks its regions vertically with every tool panel still reachable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "horizontal_overflow_at_768"
+description = "At 768 pixel viewport width, content clips or a horizontal viewport scrollbar appears"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable visual-design defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action, page state, screenshot) that demonstrates it. If the defect is already covered - even partially - by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

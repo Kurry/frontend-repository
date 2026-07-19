@@ -1,21 +1,21 @@
 <summary>
-Build a daisyUI theme generator using Svelte, Svelte stores, and Tailwind CSS.
+Build a daisyUI theme generator using Svelte, Svelte stores, Tailwind CSS 4.3.2, and DaisyUI.
 </summary>
 
 <reference_screenshots>
 Screenshots of the reference application are provided in-container at
-`/reference-screenshots/`: `overview.png` is a full-page desktop-layout
-overview (downscaled); `segment-NN.png` are full-resolution 1440x900 sections
+/reference-screenshots/: overview.png is a full-page desktop-layout
+overview (downscaled); segment-NN.png are full-resolution 1440x900 sections
 in top-to-bottom order with slight overlap. They are part of this instruction:
 recreate what they show. Where a screenshot and the text conflict, the text
-wins. Do not copy the images into `/app` or ship them as app assets.
+wins. Do not copy the images into /app or ship them as app assets.
 </reference_screenshots>
 
 <core_features>
 Core features (each line is an observable behavior the finished app must exhibit):
-- The top site chrome renders a daisyUI brand wordmark, a version control reading 5.6.18, a GitHub-stars control reading ~41k, a theme picker, a language control, and an announcement strip reading "daisyUI v5.6 is now available!"; each looks interactive but clicking it never navigates away from the page
+- The top site chrome renders the product brand wordmark, a version control reading 5.6.18, a GitHub-stars control reading ~41k, a theme picker, a language control, and an announcement strip announcing that version 5.6 is now available; each looks interactive but clicking it never navigates away from the page
 - Clicking the version, theme, or language chrome control opens its dropdown in place without leaving the page; clicking the brand wordmark or stars control performs no navigation
-- The left Themes panel lists exactly 35 built-in daisyUI themes (light, dark, cupcake, bumblebee, emerald, corporate, synthwave, retro, cyberpunk, valentine, halloween, garden, forest, aqua, lofi, pastel, fantasy, wireframe, black, luxury, dracula, cmyk, autumn, business, acid, lemonade, night, coffee, winter, dim, nord, sunset, caramellatte, abyss, silk), each row showing a four-swatch color preview beside its name
+- The left Themes panel lists exactly 35 built-in themes (light, dark, cupcake, bumblebee, emerald, corporate, synthwave, retro, cyberpunk, valentine, halloween, garden, forest, aqua, lofi, pastel, fantasy, wireframe, black, luxury, dracula, cmyk, autumn, business, acid, lemonade, night, coffee, winter, dim, nord, sunset, caramellatte, abyss, silk), each row showing a four-swatch color preview beside its name
 - Selecting any built-in theme row highlights it as the active theme and applies its name plus color / radius / size tokens to the editor and live preview without a page reload
 - A "Hold to add theme" control requires a press-and-hold (~3s) that fills a visible inset progress indicator; completing the hold adds a new theme to My themes and selects it, while releasing early cancels and adds nothing
 - The My themes list holds user-created themes; each can be renamed and token-edited, and removed via a Remove control; built-in themes cannot be removed, and editing a built-in forks an editable custom copy into My themes
@@ -65,7 +65,7 @@ State contracts (behavioral, not storage keys):
 - Editing any color/radius/effect/size control updates the corresponding CSS variable and re-themes the live preview from shared state; the CSS export text reflects the current tokens
 - Loading a page whose URL hash contains theme= decodes the payload and applies that name + tokens to the editor and preview
 - Preview tab switches and Random mutate shared state; they do not invent a disconnected theme copy
-Stack: Svelte + Svelte stores + Tailwind CSS (SvelteKit or Vite). DaisyUI / Tailwind theme tokens are allowed for data-theme and CSS variables. No additional external component libraries beyond DaisyUI (Google Fonts CDN for chrome typefaces is allowed).
+Stack: Svelte with Svelte stores, built with Vite or an equivalent SPA setup. Styling is Tailwind CSS 4.3.2 (pinned), with design tokens in @theme. DaisyUI components provide the theme preview, dropdowns, segmented controls, toggles, modal, and toasts; no other external component library. AutoAnimate and Svelte transitions are allowed for animation; no other animation libraries. Iconify via @iconify/tailwind4 only; no raw pasted SVG icon sets and no icon CDNs. All forms, including theme create, rename, and token editors, validate through a Zod schema driven by Felte and render inline per-field errors before submit. All libraries and fonts are installed via npm or bundled locally; no CDN imports.
 - All 35 built-in themes seeded so the Themes panel is non-empty on first load; document title reflects daisyUI and Tailwind CSS theme generator
 - Empty required theme name on create must not increase custom themes count; show visible validation feedback
 - After removing all custom themes, My themes shows an empty state while built-ins remain

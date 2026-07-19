@@ -62,28 +62,28 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "VD-1"
-name = "VD-1"
+name = "dark_theme_token_palette"
 description = "The workspace uses the dark theme tokens: background near #1F242E, surface panels near #2A303B, borders near #3A414D, with light primary text near #F3F4F6 for readable contrast"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "VD-2"
-name = "VD-2"
+name = "primary_and_accent_button_colors"
 description = "The Export PNG button uses the #0000EE primary background with white text and the active toolbar tool uses the #0079FD accent background with a white icon, distinguishing it from inactive tools"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "VD-3"
-name = "VD-3"
-description = "Toolbar section labels (Shapes, Effects, Style) render small, semi-bold, uppercase, and muted while the Layers heading renders larger and bolder, giving a clear type hierarchy"
+name = "section_label_type_hierarchy"
+description = "Toolbar section labels (Shapes, Effects, Style) render small (~11-13px), semi-bold, uppercase, and muted while the Layers heading renders larger and bolder (~16-18px, weight 700), giving a clear type hierarchy"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "VD-4"
-name = "VD-4"
+name = "radius_and_4px_spacing_scale"
 description = "Toolbar buttons are square with an 8px radius and panels use a 12px radius with a 1px border, and spacing across the rail and panels reads as multiples of a 4px base unit"
 type = "binary"
 weight = 0.5
@@ -91,23 +91,73 @@ optional = true
 
 [[criterion]]
 id = "VD-5"
-name = "VD-5"
-description = "The palette shows at least six preset swatches plus a custom color input and the selected swatch shows a clear selected-state indicator such as a ring or check"
+name = "swatch_palette_with_selected_indicator"
+description = "The palette shows 12 preset swatches plus a custom color input and the selected swatch shows a clear selected-state indicator such as a ring or check"
 type = "binary"
 weight = 0.5
 optional = true
 
 [[criterion]]
 id = "VD-6"
-name = "VD-6"
+name = "light_theme_stays_legible"
 description = "Switching between the dark and light themes keeps every background and text pairing legible in both themes"
 type = "binary"
 weight = 0.5
 optional = true
 
 [[criterion]]
+id = "VD-7"
+name = "mobile_canvas_scales_to_viewport"
+description = "At ~375px viewport width the canvas region scales its content to fit the viewport width so the loaded image and its annotations remain fully visible, and the stacked layout shows no horizontal page scrolling"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "VD-8"
+name = "desktop_three_region_layout"
+description = "At 1280px width and above, the narrow left tool rail (~88px), the flexible central canvas region that centers the image, and the right Layers panel (~256-288px wide, holding the layer list, Saved projects, and Collaboration scenario) are all visible simultaneously without overlap"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "VD-9"
+name = "consistent_icon_set_throughout"
+description = "Every toolbar tool, header action, and Layers row control carries an icon drawn from one consistent icon set at a consistent stroke weight, with no visibly mixed icon styles"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "VD-10"
+name = "system_ui_font_stack"
+description = "Computed styles show UI text rendering from the Segoe UI, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif stack rather than a browser-default serif or an unrelated display face"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "VD-11"
+name = "validation_message_error_color"
+description = "The inline validation message under the project name field renders in a distinct error color clearly separated from the secondary text color"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "VD-12"
+name = "empty_state_copy_explains_next_step"
+description = "The drop-zone empty state names both ways to load an image (choosing a file and dropping one) and the empty Layers panel explains that annotations will appear there, rather than either region rendering blank"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "VD-13"
+name = "specific_verbs_consistent_capitalization"
+description = "Buttons and section labels use one consistent capitalization convention and specific verbs (e.g. Export PNG, Go offline) rather than generic labels like Submit or OK"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "VD-N1"
-name = "VD-N1"
+name = "active_tool_not_distinguished"
 description = "The active tool is not visually distinguished from inactive tools, or the highlight is only a tooltip rather than a background, border, or icon-color change"
 type = "binary"
 weight = 1.0
@@ -115,9 +165,25 @@ negate = true
 
 [[criterion]]
 id = "VD-N2"
-name = "VD-N2"
+name = "regions_lack_hierarchy_or_rhythm"
 description = "The three regions compete for equal visual weight with no dominant canvas, or arbitrary off-scale spacing breaks the visible rhythm"
 type = "binary"
 weight = 0.5
 negate = true
 optional = true
+
+[[criterion]]
+id = "VD-N3"
+name = "placeholder_text_in_shipped_ui"
+description = "Placeholder or scaffold text (Lorem ipsum, TODO, asdf, template variable names like {{title}}) is visible anywhere in the shipped UI"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "VD.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

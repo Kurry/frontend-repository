@@ -62,23 +62,82 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "2.2"
-name = "2_2"
-description = "Implemented with Vue 3, Pinia, and Tailwind CSS; no browser storage APIs for persistence"
+name = "coherent_shared_theme_state"
+description = "A theme change made in one visible surface is reflected immediately and consistently in the theme row, editor controls, every preview tab, and CSS export without reload or stale duplicate values"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
-name = "2_3"
-description = "Uses localStorage or sessionStorage to persist themes or editor state"
+name = "forbidden_browser_storage"
+description = "After exercising create, rename, token editing, tab selection, and chrome-theme controls, localStorage, sessionStorage, IndexedDB, or another browser persistence store contains app theme or editor state"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "2.4"
-name = "2_4"
-description = "Manages the themes collection only in component-local refs rather than Pinia"
+name = "cross_surface_state_desync"
+description = "The same active theme datum shows conflicting values across the theme list, editor, preview, URL hash, or export modal during a normal interaction flow"
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "2.5"
+name = "local_asset_network_hygiene"
+description = "From a fresh load through representative theme editing, dropdown, icon, dialog, and animation interactions, the network log shows only same-origin app assets and the allowed same-document #theme= update, with no CDN-hosted styles, scripts, icons, fonts, or product fetches"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "console_clean_full_flow"
+description = "No console errors or unhandled promise rejections appear from first load through create, rename, token edit, preview-tab switch, Random, export/copy, hash-load, and remove flows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "inline_form_validation_runtime"
+description = "Theme create and rename/token form controls expose visible field-level validation before invalid submission can mutate theme state, and correcting the field clears the error and permits the change"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "accessible_interactive_primitives"
+description = "Chrome menus, selects, toggles, toast feedback, and the CSS export dialog are keyboard-operable through their visible controls; the dialog responds to Escape and focus remains visibly trackable through the interaction"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "hash_round_trip_coherence"
+description = "After changing independent facets—theme name, at least two token types, preview tab, and chrome theme—opening the generated #theme= URL in a fresh page restores the payload-defined theme coherently on first paint while non-payload in-memory facets follow the instruction's baseline rule rather than partially persisting"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "external_runtime_dependency"
+description = "The app requires an outbound CDN or other external origin to obtain styling, icons, fonts, scripts, or product content, causing a missing or degraded interface when that request is blocked"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "runtime_exception_or_broken_load"
+description = "A normal instructed interaction produces a console exception, blank pane, frozen control, or full-page navigation that breaks the single-page editing session"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick or unverifiable implementation preference. If present, name the defect and cite the concrete browser evidence (console entry, network request, storage entry, runtime state, or interaction result) that demonstrates it. If the defect is already covered—even partially—by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

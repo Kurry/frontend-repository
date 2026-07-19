@@ -90,15 +90,15 @@ weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
-description = "After applying a seeded preset, the dial labels update to that preset's aperture/shutter/ISO and the preview meter/brightness respond"
+name = "apply_preset_rerenders_all_surfaces"
+description = "Starting in Presets/Compare with the dials off the preset's values: apply a seeded preset, then confirm the three dial labels change to the preset's aperture, shutter, and ISO, the preview brightness, depth-of-field blur, visible motion frame, and noise overlay all re-render to match, and the meter dot moves to the position those stops imply — all without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
-description = "After editing a preset name to 'Night Street Grain', the text 'Night Street Grain' is visible in the list and the previous name is not"
+name = "edit_preset_propagates_everywhere"
+description = "After editing a preset's name to 'Night Street Grain' and changing its stops, the list row shows the new name and updated stop readout, the previous name is no longer visible, any compare panel showing that preset reflects the edit, and re-applying the preset drives the dials to the new stops — all without a reload"
 type = "binary"
 weight = 1.0
 
@@ -111,8 +111,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
-description = "After deleting all presets, an empty state message is visible and no preset rows remain"
+name = "empty_state_offers_create_control"
+description = "After deleting all presets, the presets list region shows an empty state with a message and a control that opens the create flow, and no preset rows remain"
 type = "binary"
 weight = 1.0
 
@@ -145,13 +145,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.13"
-name = "1_13"
-description = "After pressing the aperture, shutter, or ISO steppers, the preview brightness, depth-of-field blur, or noise and the exposure meter position respond to the new stops"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.14"
 name = "1_14"
 description = "At a stop-list edge, the corresponding up or down stepper is faded and non-interactive and does not change the dial value further"
@@ -162,13 +155,6 @@ weight = 1.0
 id = "1.15"
 name = "1_15"
 description = "After opening the help panel, an aperture / shutter / ISO explainer is visible on-page without leaving the simulator"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.16"
-name = "1_16"
-description = "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session"
 type = "binary"
 weight = 1.0
 
@@ -210,30 +196,87 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.22"
-name = "1_22"
-description = "Applying a preset writes its aperture, shutter, and ISO into the shared dial state so the Meter/Lab dials and preview update to the saved stops"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.23"
-name = "1_23"
-description = "At a stop-list edge, the corresponding up or down stepper fades out and becomes non-interactive"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.24"
-name = "1_24"
-description = "Submitting create with an empty preset name does not add a row and shows visible validation feedback"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.25"
-name = "1_25"
-description = "Pressing the dial steppers does not visibly change the preview brightness, blur, noise, or exposure meter position"
+name = "steppers_leave_preview_static"
+description = "Pressing the dial steppers leaves the preview brightness, blur, noise overlay, and exposure meter position visibly unchanged — the preview behaves as a static image rather than a live simulation"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.26"
+name = "default_stops_match_exact_lists"
+description = "On a fresh load the dials read f/16, 1/60, and ISO 100, and stepping each dial end to end traverses exactly the specified discrete lists: aperture f/22, 16, 11, 8, 5.6, 4, 2.8, 1.8 (8 stops); shutter 1/2, 1/4, 1/8, 1/15, 1/30, 1/60, 1/125, 1/250, 1/500, 1/1000 (10 stops); ISO 50, 100, 200, 400, 800, 1600, 3200 (7 stops) — no values outside these lists ever appear"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "shutter_stop_swaps_motion_frame"
+description = "Stepping the shutter dial swaps the visible motion frame to the one matching the current shutter stop: stepping through several shutter stops shows visibly different local frames rather than one unchanging image"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "inline_per_field_validation_gates_submit"
+description = "In the preset create and edit forms, an invalid or empty required field shows an error message naming that field next to it before submit, and the submit control stays disabled until every required field is valid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "iso_step_updates_three_surfaces"
+description = "Starting from the default stops in Meter/Lab: step ISO up one stop and confirm, without a reload, that all three surfaces change together — the ISO dial label shows the next stop in the list, the tiled noise overlay becomes visibly more opaque than immediately before the press, and the exposure meter dot moves up the vertical track from its prior position"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "create_preset_flow_survives_mode_switch"
+description = "In Presets/Compare: note the visible preset count, create a valid preset with a look tag, and confirm the count increases by exactly one (measured immediately around the submit), the new row shows its name and stop readout, applying its look tag filter still shows the new row, and switching to Meter/Lab and back to Presets/Compare shows the same new preset without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "favorite_then_delete_updates_all_surfaces"
+description = "Mark a preset as favorite and confirm its favorite badge appears immediately and switching the filter to favorites shows it; then delete that preset and confirm it disappears from the list, from any selection or compare slot showing it, and from the favorites filter results, with the visible preset count decreasing by exactly one measured immediately around the delete"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "reload_resets_all_facets_to_seed"
+description = "After stepping the dials off their defaults, creating one preset, and marking one favorite: reload the page and confirm every facet returns to the seeded baseline together — dials back at f/16, 1/60, ISO 100 and only the seeded presets in the collection — never a mix of reset and surviving facets"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "double_submit_creates_exactly_one_preset"
+description = "Double-activating the preset submit control in quick succession creates exactly one preset: the visible count increases by one and exactly one new row appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "long_preset_name_truncates_with_ellipsis"
+description = "A preset whose name is longer than 40 characters shows a truncated name with an ellipsis in its list row, while the edit form shows the full name"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "brand_chip_is_inert"
+description = "A brand chip labeled 'Camera Exposure Simulator' is visible, and activating it neither navigates away nor changes the view — it is an inert label, not a link"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core functionality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

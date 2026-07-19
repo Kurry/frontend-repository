@@ -1,14 +1,14 @@
 <summary>
-Build a live diagram source editor with preview using Svelte 5, Svelte stores/runes, and Tailwind CSS v4.
+Build a live diagram source editor with preview using Svelte 5 with SvelteKit static delivery, Svelte stores/runes, Tailwind CSS 4.3.2, and DaisyUI.
 </summary>
 
 <reference_screenshots>
 Screenshots of the reference application are provided in-container at
-`/reference-screenshots/`: `overview.png` is a full-page desktop-layout
-overview (downscaled); `segment-NN.png` are full-resolution 1440x900 sections
+/reference-screenshots/: overview.png is a full-page desktop-layout
+overview (downscaled); segment-NN.png are full-resolution 1440x900 sections
 in top-to-bottom order with slight overlap. They are part of this instruction:
 recreate what they show. Where a screenshot and the text conflict, the text
-wins. Do not copy the images into `/app` or ship them as app assets.
+wins. Do not copy the images into /app or ship them as app assets.
 </reference_screenshots>
 
 <core_features>
@@ -44,8 +44,9 @@ Core features (each line is an observable behavior the finished app must exhibit
 </motion>
 
 <requirements>
-- Use Svelte 5, Svelte stores/runes, and Tailwind CSS v4. Shared application state (the diagram source, the Mermaid config, the active editor tab, the current diagram type, the parse-error state, and the theme) must live in Svelte runes/stores; UI regions read from that shared state so the editor, preview, header badge, and export all stay consistent
-- Render real Mermaid diagrams from the source text (the mermaid library is allowed); the preview must reflect the actual parsed source, not a static image
+- Use Svelte 5 with SvelteKit static delivery and Svelte stores/runes. Shared application state (the diagram source, the Mermaid config, the active editor tab, the current diagram type, the parse-error state, and the theme) must live in Svelte runes/stores; UI regions read from that shared state so the editor, preview, header badge, and export all stay consistent
+- Styling is Tailwind CSS 4.3.2 (pinned), with design tokens in @theme. Use DaisyUI components for tabs, cards, buttons, alerts, toggles, and action controls; no other external component library. Svelte transitions and AutoAnimate are allowed for preview, error, tab, and control transitions; no other animation libraries. Phosphor icons via phosphor-svelte only; no raw pasted SVG icon sets and no icon CDNs. All forms, including configuration editing, validate through a Zod schema driven by Felte or TanStack Form for Svelte and render inline per-field errors before submit. All libraries are installed via npm and bundled locally; no CDN imports
+- Use CodeMirror 6 for the source and configuration editor panes. Render real Mermaid diagrams from the source text with the mermaid library; the preview must reflect the actual parsed source, not a static image
 - No authentication wall — open directly into the primary workspace
 - Persist relevant state in localStorage (or equivalent client storage) so a reload restores the last-edited source, active tab, config, and theme. This persistence is a required behavior for this task
 - Seed the editor with a non-empty default diagram and provide at least six selectable sample diagrams so the primary workflow is non-empty on first load

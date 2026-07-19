@@ -133,3 +133,68 @@ description = "Any judge-visible surface (rendered text, DOM comment, alt text, 
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "VD-8"
+name = "sticky_shell_centered_column"
+description = "The layout is a single centered column of maximum width around 42rem over the #F5F5F7 canvas, with the top bar and composer sticky so the composer stays reachable at the bottom while the timeline scrolls between them"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "VD-9"
+name = "pinned_note_accent_badge"
+description = "A pinned note carries a small pin indicator badge rendered in the secondary accent color #FFCC00, visible in the Pinned section"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "VD-10"
+name = "bold_italic_span_rendering"
+description = "Bold and italic spans inside note bubbles render visibly heavier or slanted than the surrounding 17px note text while keeping the same font size and color"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "VD-11"
+name = "link_color_distinct_in_bubble"
+description = "URLs inside note bubbles render in the #007AFF link color, visually distinct from the surrounding note text"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "VD-12"
+name = "consistent_icon_set"
+description = "Every control that shows an icon draws it from one consistent icon set at a consistent optical size, with no mismatched icon styles across the top bar, note actions, and composer"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "VD-13"
+name = "desktop_column_and_spacing_scale"
+description = "At desktop width the centered column keeps its maximum width while the canvas background fills the remaining space on both sides, and visible spacing and gaps follow a 4px-multiple scale"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "VD-14"
+name = "capitalization_and_copy_consistency"
+description = "Headings, buttons, chips, and toasts use one consistent capitalization convention throughout, empty states explain what belongs in the region and how to add it, and error messages name the problem and the fix"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "VD-NEG-4"
+name = "placeholder_text_shipped"
+description = "Lorem ipsum, placeholder text (TODO, asdf, template variable names), or other unfinished copy is visible anywhere in the shipped UI"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "VD.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

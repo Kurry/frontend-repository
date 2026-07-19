@@ -127,3 +127,62 @@ type = "binary"
 weight = 0.5
 negate = true
 optional = true
+
+[[criterion]]
+id = "TI-7"
+name = "visible_focus_logical_tab_order"
+description = "Keyboard Tab focus is clearly visible on interactive controls (an accent outline/ring) and moves in a logical reading order from the top bar through the tag rail, timeline, and composer"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "TI-8"
+name = "delete_dialog_focus_trap_escape"
+description = "The delete confirmation dialog traps keyboard focus while open, closes without deleting when Escape is pressed, and returns focus to the control that opened it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "TI-9"
+name = "composer_error_aria_live"
+description = "The composer's inline validation error is exposed through an aria-live polite region in addition to being shown visually"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "TI-10"
+name = "icon_controls_accessible_names"
+description = "Icon-only controls expose accessible names describing their action (visible in the accessibility tree as aria-label or equivalent)"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "TI-11"
+name = "interactive_within_two_seconds"
+description = "The app is interactive within 2 seconds of a local cold load, with no blank screen or blocking spinner past that point"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "TI-NEG-4"
+name = "unescaped_note_html_executes"
+description = "A note whose text contains HTML markup (for example a script or img tag with an event handler) renders or executes it as live markup instead of showing the characters as literal text"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "TI-NEG-5"
+name = "chrome_navigates_off_app"
+description = "App chrome contains an outbound navigational link, or activating any in-app control navigates the browser away from the app's origin"
+type = "binary"
+weight = 0.5
+negate = true
+
+[[criterion]]
+id = "TI.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect (console health, state coherence, persistence, stability) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, storage state, desynced views) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

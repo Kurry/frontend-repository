@@ -1,0 +1,133 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "two_thirds_one_third_layout"
+description = "At 1440px width the editor and response panel stack occupies roughly the left two-thirds of the viewport and the variable binding panel occupies the right one-third, as distinct visual regions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "monospace_editor_placeholder_highlight"
+description = "The editor renders in a monospace typeface, double-brace placeholders carry a blue tag-style background highlight, and unbound placeholders in the preview carry an amber warning highlight clearly distinct from the bound-value rendering"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "toolbar_strip_complete"
+description = "A single toolbar strip across the top of the editor contains the model selector, the token count badge, and the Insert Variable, Run, and Save controls, sharing one consistent visual treatment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "response_panel_code_container"
+description = "The response panel renders as a code-snippet-style container with a visible streaming cursor indicator while a response is in progress"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "status_color_language"
+description = "Run status uses a consistent color language across the status affordance and history rows: neutral for waiting, an active accent while streaming, a success treatment when complete, and a distinct treatment for stopped"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "component_states_and_icons"
+description = "Buttons, inputs, selects, and chips show distinct default, hover, focus (visible ring), and disabled treatments, and one consistent icon set is used across the toolbar, badges, chips, and history rows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "typographic_hierarchy"
+description = "Panel titles are visibly larger than metadata rows and helper text, and the hierarchy is consistent across the workbench and library views with a regular spacing rhythm between panels"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.8"
+name = "responsive_single_column"
+description = "Below 1024px width the variable binding panel moves below the editor stack into a single column with every control still reachable, and at 375px width no content clips, nothing overflows, and no page-level horizontal scrollbar appears while the toolbar wraps its controls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "default_browser_styling_visible"
+description = "Prominent controls (toolbar buttons, selects, modal fields, chips) render with unstyled browser-default appearance, or text and badges overlap or clip their containers at 1440px width"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

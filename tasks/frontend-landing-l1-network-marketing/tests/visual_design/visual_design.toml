@@ -62,21 +62,21 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
-description = "Black-void modular composition with dual corner notches and brand-first hero remains intact"
+name = "void_notch_composition_intact"
+description = "The signature layout system is intact: light content modules float on large black void fields with dual corner language (large radii plus architectural diagonal notches) and the brand-first hero composition remains"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
+name = "empty_manager_state_designed"
 description = "Empty Events Manager state is visually present when no events remain"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
+name = "plain_dashboard_replaces_marketing"
 description = "Replaces the marketing site with a plain dashboard and drops signature void/notch language"
 type = "binary"
 weight = 1.0
@@ -84,7 +84,109 @@ negate = true
 
 [[criterion]]
 id = "3.4"
-name = "3_4"
+name = "four_numbered_pillars"
 description = "The Why Ridge chapter shows exactly four numbered pillars labelled 01, 02, 03, 04"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "ridge_radius_css_tokens"
+description = "Reading computed styles on the document root exposes CSS custom properties named --ridge-radius-module (a large radius) and --ridge-radius-control (a small radius), plus void/ink/accent/surface color variables"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "expressive_display_typeface"
+description = "All-caps chapter titles render in an expressive geometric display face served from the app's own origin — computed font-family is not Inter, Roboto, Arial, or a system-only stack"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "single_consistent_icon_set"
+description = "One consistent icon style appears across the chrome, mega-menu, manager rows, and footer — no visibly mixed icon families"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "ridge_wordmark_and_title"
+description = "The header shows a lowercase 'ridge' wordmark beside a sharp geometric mark in a saturated ember/alpine-red accent (not purple), and the document title names Ridge (e.g. 'Custom Blockchains for Enterprise | Ridge')"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "manager_dense_table_badges"
+description = "Events Manager mode renders as a dense list/table with visible status badges and filter controls styled in the same visual system as the landing chapters"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "real_brand_assets_shipped"
+description = "A real company logo, trademark, licensed brand asset, or real network/company/agency proper noun (e.g. Avalanche, AVAX, avax.network, Snowtrace) appears anywhere in the rendered UI — trust strip, partner marks, media, or copy"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.11"
+name = "placeholder_partner_marks_distinct"
+description = "The trust strip and any client wall show multiple visually distinct, original invented placeholder marks rather than repeated identical placeholders"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.12"
+name = "cliche_atmosphere_present"
+description = "The visual atmosphere leans on purple-indigo gradients, glow spam, or cream-and-terracotta editorial clichés instead of the cool, architectural institutional-tech direction"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.13"
+name = "mobile_375_layout_clean"
+description = "At 375px width, the bento hero cells stack vertically, no content clips or overflows the viewport, no horizontal scrolling appears, and every chapter, form, and the Events Manager remain reachable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.14"
+name = "breakpoint_choreography"
+description = "Breakpoint behavior matches the spec: the mega-menu becomes a full-screen drawer at mobile widths, Get started renders as one column at mobile and three-up from the sm breakpoint, and the hero pull-in composition applies at 1024px and up"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.15"
+name = "consistent_capitalization"
+description = "Headings, nav labels, and CTAs use one consistent capitalization convention throughout the page and the Events Manager"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.16"
+name = "institutional_copy_quality"
+description = "Marketing copy reads as original, coherent institutional-tech voice for an enterprise blockchain product; error messages name the problem field and the fix, and empty states explain what belongs there and how to add it"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.17"
+name = "placeholder_text_visible"
+description = "Lorem ipsum, 'TODO', template variable names, or other filler placeholder text is visible anywhere in the shipped UI"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

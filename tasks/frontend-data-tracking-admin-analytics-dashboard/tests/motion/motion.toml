@@ -62,14 +62,14 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
+name = "hover_theme_popover_animations"
 description = "Required hover animations are present on buttons, table/list rows, and sidebar nav; theme swap and popovers animate as specified"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "4_2"
+name = "view_switch_keeps_hover_feedback"
 description = "View switches update the main canvas without full reload and keep interactive chrome hover feedback"
 type = "binary"
 weight = 0.5
@@ -77,8 +77,65 @@ optional = true
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
+name = "missing_hover_washes"
 description = "Omits hover washes on buttons, rows, or sidebar items so interactive chrome feels static on pointer hover"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.4"
+name = "theme_icon_crossfade_rotate"
+description = "Clicking the theme toggle with the real pointer cross-fades and rotates the sun/moon icons over roughly 0.2s while surfaces recolor, rather than swapping icons instantly with no transition"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "popover_enter_exit_animation"
+description = "The notifications, profile, and sidebar account popovers open anchored to their triggers with a short opacity-plus-scale enter/exit transition, the account menu opens upward from the sticky footer, and menu rows highlight on hover and keyboard focus"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "sidebar_accordion_motion"
+description = "Sidebar nav groups expand/collapse exclusively (opening one closes the previously open group), the group chevron rotates on open and close, and group summaries and items take a hover wash"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "list_row_microinteractions"
+description = "Driven through the real UI controls (never a state-shortcut tool call): a newly created user's row animates into the table, a deleted row animates out, and changing the sort control animates rows to their new positions rather than snapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "toasts_slide_and_autodismiss"
+description = "After create, delete, and bulk actions, a feedback toast slides in, remains readable long enough to scan, and auto-dismisses with a fade"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "drawer_overlay_slide_small_viewport"
+description = "At a small viewport, activating the hamburger control slides the sidebar in with an overlay scrim rather than snapping it open; on a 1440px viewport the sidebar stays open without the overlay"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "status_ping_and_bell_indicator"
+description = "The security-watch status dots show a ping animation and the notification bell keeps a static error indicator that does not animate"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction performed, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

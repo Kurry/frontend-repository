@@ -82,3 +82,53 @@ description = "Omits hover washes on buttons, rows, or tabs so the studio feels 
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "4.4"
+name = "tab_indicator_slides_on_switch"
+description = "Clicking between the Preview / Components / Saved Themes tabs slides a primary-colored indicator to the newly selected tab rather than snapping, and tab labels ease opacity/background on hover and selection"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "palette_accordion_expand_animates"
+description = "Clicking a Palette accordion row expands it with a smooth height transition and an animated chevron rotation, and collapsing reverses the animation, verified via the real click path"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "tutorial_modal_enter_exit_transition"
+description = "Opening the Tutorial control shows the in-page modal with a short enter transition, and closing it plays an exit transition rather than the overlay vanishing instantly"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.7"
+name = "action_toasts_slide_and_autodismiss"
+description = "Action toasts for save/apply slide in when triggered and auto-dismiss with a fade rather than disappearing abruptly or persisting forever"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.8"
+name = "saved_theme_card_add_remove_animates"
+description = "Creating a saved theme animates the new card into the list and deleting a saved theme animates the card out rather than snapping, verified by performing the create and delete through the real UI controls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "reduced_motion_removes_animation"
+description = "On a fresh load with prefers-reduced-motion set, animations are removed and state changes apply instantly while tab switching, palette edits, and saved-theme actions all remain usable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered - even partially - by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

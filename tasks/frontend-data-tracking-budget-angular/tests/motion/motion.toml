@@ -108,9 +108,38 @@ negate = true
 
 [[criterion]]
 id = "4.7"
-name = "4_7"
+name = "animations_absent_via_real_controls"
 description = "Dialog, snackbar, or progress-bar transitions only appear when state is forced through a non-UI shortcut and show no animation when triggered through the real control"
 type = "binary"
 weight = 0.5
 negate = true
 optional = true
+
+[[criterion]]
+id = "4.8"
+name = "table_rows_animate_in_and_out"
+description = "Adding an expense through the dialog animates its new row into the Expenses table, and deleting an expense through its row action animates the row out, rather than the table snapping instantly to the new state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "chart_segments_animate_on_change"
+description = "After adding, editing, or deleting an expense or changing the period through the real UI controls, the spending-breakdown chart animates its segments to their new proportions rather than redrawing abruptly"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.10"
+name = "view_switch_swaps_without_reload"
+description = "Switching between Dashboard, Expenses, and Settings via the bottom navigation swaps the main content without a full page reload, and the active bottom-nav item is visually distinguished from the inactive ones"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions (missing, jarring, janky, or broken animation and feedback, verified through the real UI control path on a fresh load where relevant) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

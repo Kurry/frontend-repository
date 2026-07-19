@@ -62,30 +62,73 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
-description = "Required hover animations are present; boot/CLI reveal and mode switches animate as specified"
+name = "boot_and_post_boot_motion"
+description = "On a fresh load through the real prompt controls, boot lines reveal sequentially and dismissal makes the ASCII art and welcome box fade or slide in before focus settles on the command prompt"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "4_2"
-description = "CLI/Board mode switches update without full reload and keep hover feedback"
+name = "cli_output_and_mode_motion"
+description = "A visible thinking indicator precedes staggered command output, and switching between Terminal CLI and Projects Board updates in place with a perceptible transition rather than a reload"
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "4_4"
-description = "Running /skills renders labeled skill bars that animate from zero to their target percentage width"
+name = "skill_bar_growth"
+description = "Running /skills through the visible command prompt renders at least ten labeled bars whose widths visibly animate from zero to distinct target percentages"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "window_and_theme_feedback"
+description = "Theme changes recolor in place, minimize crossfades blurred and sharp wallpaper, maximize visibly expands the terminal, and reopening the closed terminal restores it with coherent transition feedback"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "easter_egg_canvas_motion"
+description = "Invoking /matrix produces continuous moving green character rain, /konami produces a confetti burst, and sudo hire designer visibly advances a progress bar to 100%"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "required_hover_microinteractions"
+description = "Using the real pointer path, titlebar dots ease opacity, project cards or rows ease border and background, autocomplete rows highlight, and social and close-overlay buttons visibly ease on hover"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "reduced_motion_behavior"
+description = "With prefers-reduced-motion enabled before a fresh load, staggered entry and continuous canvas effects are disabled or substantially reduced while every resulting state remains usable"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
-description = "Omits hover washes on project rows or chrome so the terminal feels static on pointer hover"
+name = "missing_or_snapping_microinteractions"
+description = "Required boot, output, skill-bar, window, canvas, or hover feedback snaps with no perceptible transition, or one of the specified pointer targets remains visually inert"
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "4.9"
+name = "motion_blocks_interaction"
+description = "An animation traps input, obscures terminal controls after completion, causes a major layout jump, or continues intensely under reduced-motion preference"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable motion or microinteraction defect that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence that demonstrates it. If the defect is already covered even partially by another criterion, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

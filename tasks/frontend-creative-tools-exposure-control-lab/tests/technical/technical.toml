@@ -61,13 +61,6 @@ allowed_tools = [
 aggregation = "weighted_mean"
 
 [[criterion]]
-id = "2.2"
-name = "2_2"
-description = "Implemented with Vue 3, Pinia, and Tailwind CSS; no browser storage APIs for persistence"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "2.3"
 name = "2_3"
 description = "Uses localStorage or sessionStorage to persist presets or dial state"
@@ -76,9 +69,80 @@ weight = 1.0
 negate = true
 
 [[criterion]]
-id = "2.4"
-name = "2_4"
-description = "Manages the presets collection only in component-local refs rather than Pinia"
+id = "2.5"
+name = "shared_state_coherence_across_views"
+description = "A change made in one view — creating, editing, favoriting, or applying a preset, or stepping a dial — is immediately reflected in every other surface showing that datum (list, compare panel, dials, meter, preview) without a reload, and no surface shows stale data another surface already updated"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "console_clean_during_full_exercise"
+description = "No console errors or unhandled promise rejections appear during a full exercise of the dials, both modes, preset create/edit/delete/filter, and the help panel"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "interactive_within_two_seconds"
+description = "The app is interactive within 2 seconds of a local cold load"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "rapid_stepper_presses_stay_responsive"
+description = "Under rapid repeated stepper presses, every press lands, dial values never skip outside the specified stop lists, and the preview keeps updating without hangs or freezes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "keyboard_operable_with_focus_ring"
+description = "Every stepper, mode switch, preset control, and form field is reachable and operable with the keyboard alone, with a visible focus ring on the focused control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "edge_steppers_exposed_as_disabled"
+description = "Steppers disabled at a stop-list edge are exposed as disabled to assistive technology (a disabled or aria-disabled attribute in the accessibility tree), not merely dimmed visually"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "help_overlay_dialog_semantics"
+description = "The help overlay behaves as a dialog: it traps keyboard focus while open, closes on Escape, and returns focus to the help trigger on close"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.12"
+name = "validation_announced_aria_live"
+description = "Preset form validation messages are announced through an aria-live region in addition to being shown inline next to the field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.13"
+name = "meter_exposes_text_readout"
+description = "The exposure meter region exposes a text readout of the current exposure state (under, balanced, or over) that updates as the stops change"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.14"
+name = "outbound_requests_for_assets"
+description = "Network requests to other origins occur for fonts, imagery, scripts, or data during load or a full exercise of the app"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

@@ -99,17 +99,46 @@ optional = true
 
 [[criterion]]
 id = "4.6"
-name = "4_6"
-description = "Interactive chrome (top-bar buttons, template rows, submitter rows, palette buttons, field boxes) shows no hover feedback"
+name = "interactive_chrome_missing_hover_feedback"
+description = "Interactive chrome (top-bar buttons, template rows, submitter rows, palette buttons, field boxes, panel controls) shows no hover feedback"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "4.7"
-name = "4_7"
+name = "reassign_recolour_missing_via_real_control"
 description = "Changing a field's submitter through the visible properties control produces no recolour of the field box on the canvas (the recolour happens only via a state shortcut, not the real control path)"
 type = "binary"
 weight = 0.5
 negate = true
 optional = true
+
+[[criterion]]
+id = "4.8"
+name = "field_entrance_and_exit_animate"
+description = "Placing a field by clicking a palette button animates the new field box into place with a brief entrance (fade/scale) rather than popping in, and deleting a field via the panel's Delete field control animates it out — both verified through the real UI controls, not a WebMCP state shortcut"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "submitter_row_animates_into_list"
+description = "Clicking the Add submitter control animates the new row into the submitters list rather than it appearing instantly"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.10"
+name = "mode_switch_and_pill_update_in_place"
+description = "The Build/Preview mode switch and the signing-status pill update in place without a page reload, and switching to Preview changes the field boxes to a dashed fillable affordance"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteraction feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

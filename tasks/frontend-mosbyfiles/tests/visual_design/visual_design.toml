@@ -100,8 +100,8 @@ optional = true
 
 [[criterion]]
 id = "3.6"
-name = "3_6"
-description = "Display titles (hero, case name, about) compute to the Founders Grotesk family at weight 700 uppercase; body and tag text compute to Signifier (hero paragraph and tags around 20px at 1440 width); nav, footer, and captions compute to IBM Plex Mono (nav 16px, footer 12px, captions 14px)"
+name = "three_local_open_license_type_families"
+description = "Display titles (hero, case names, about title) compute to a bundled condensed grotesque display face at weight 700 uppercase; body and tag text compute to a bundled serif text face at weight 400 (hero paragraph and tags around 20px at 1440 width); navigation, footer, captions, and scrapbook labels compute to IBM Plex Mono (nav 16px with a 32px line height, footer 12px uppercase, captions 14px); all three families resolve locally"
 type = "binary"
 weight = 1.0
 
@@ -119,3 +119,84 @@ description = "The root font-size and container offset scale by breakpoint: abou
 type = "binary"
 weight = 0.5
 optional = true
+
+[[criterion]]
+id = "3.9"
+name = "display_type_scale_metrics"
+description = "At a 1440px viewport, the hero title \"American modernism\" renders around 145px, a case architect name renders around 120px, and the about title renders at 52px (3.25rem), each uppercase at weight 700 with a tight line height near 0.8"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "scrapbook_ephemera_styling"
+description = "Scrapbook items read as visually distinct ephemera: cream sticky notes at about ninety-seven percent opacity, white-bordered photographs at slight rotations, a small paperclip graphic, plan/PDF/video previews on white cards, and an audio card, each carrying small monospace type labels"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "about_two_column_desktop_layout"
+description = "At desktop width the about route lays out as two columns, the essay on the left and the photo gallery on the right, with gallery captions in IBM Plex Mono at 14px and sixty percent opacity"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.12"
+name = "footer_monospace_row_with_mask_signature"
+description = "The footer renders in IBM Plex Mono at 0.75rem uppercase with a 3.75rem gap between its two wind roses, architectural scale graphic, signature, and studio credit mark, and the signature is rendered through a CSS mask rather than an image tag"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.13"
+name = "tag_and_stack_responsive_scale"
+description = "Architect tags render at 1.625rem at desktop width, reduce to 1.25rem at or below 1024px, and reduce to 15px at or below 480px, and on tablet and mobile widths the home stack category group heights reduce (to about twenty and fifteen viewport units respectively)"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.14"
+name = "about_single_column_mobile"
+description = "On a narrow viewport (390px) the about route collapses from two columns to a single column with the essay above the gallery and both fully readable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.15"
+name = "viewport_overflow_or_clipping"
+description = "At any of the 320, 390, 768, 1024, 1440, or 1920 pixel widths, some route clips content, overflows the viewport, or shows a horizontal scroll bar"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.16"
+name = "placeholder_filler_text_visible"
+description = "Lorem ipsum, 'TODO', template variable names, or other placeholder filler text is visible anywhere in the shipped UI instead of edited editorial prose"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.17"
+name = "editorial_prose_and_uppercase_convention"
+description = "The hero paragraph, category thesis lines, architect biographies, and about essay read as edited long-form editorial prose, and navigation, footer, and monospace scrapbook labels keep one consistent uppercase convention"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.18"
+name = "real_brand_assets_shipped"
+description = "The shipped app includes real third-party brand assets or credits: the live site's actual wordmark or logo, licensed Founders Grotesk or Signifier font files, photographs, portraits, videos, or signature graphics lifted from the source site, or a credit naming a real person or agency (for example Tubik Studio), instead of original or generated placeholders"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

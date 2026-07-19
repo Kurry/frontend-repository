@@ -62,28 +62,28 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "te-noerror"
-name = "te-noerror"
-description = "The homepage loads and runs (including the carousel, hamburger menu, and scroll interactions) with no uncaught console errors and no failed asset requests"
+name = "console_clean_during_exercise"
+description = "The homepage loads and runs (including the carousel, hamburger menu, consent banner, hover, and full-page scroll) with no uncaught console errors or warnings and no failed asset requests"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "te-sameorigin"
-name = "te-sameorigin"
+name = "all_requests_same_origin"
 description = "Every request the page makes is same-origin or a data:/about: URL, with no external font, image, video, CSS, or JavaScript CDN request"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "te-nostorage"
-name = "te-nostorage"
+name = "browser_storage_stays_empty"
 description = "After exercising the carousel, the hamburger menu, and the cookie banner, localStorage and sessionStorage remain empty"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "te-semantics"
-name = "te-semantics"
+name = "semantic_landmarks_and_names"
 description = "The page uses header, navigation, main, footer, heading, link, and button semantics with useful accessible names on controls that are keyboard reachable"
 type = "binary"
 weight = 0.5
@@ -91,7 +91,7 @@ optional = true
 
 [[criterion]]
 id = "te-nooverflow"
-name = "te-nooverflow"
+name = "no_horizontal_overflow_any_breakpoint"
 description = "At the desktop, tablet (~768px), and mobile (~390px) widths there is no unintended horizontal page overflow (scrollWidth minus clientWidth stays within 2px at scroll origin)"
 type = "binary"
 weight = 0.5
@@ -99,16 +99,66 @@ optional = true
 
 [[criterion]]
 id = "te-neg-storage"
-name = "te-neg-storage"
-description = "localStorage or sessionStorage is populated after interacting with the page (menu or consent state persisted to browser storage)"
+name = "storage_populated_after_interaction"
+description = "localStorage or sessionStorage is populated after interacting with the page (menu, carousel, or consent state persisted to browser storage)"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "te-neg-external"
-name = "te-neg-external"
+name = "external_origin_request_fires"
 description = "The page issues a request to an external origin (a units.gr asset, a font/image/script CDN, or an analytics endpoint)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "te-interactive2s"
+name = "interactive_within_two_seconds"
+description = "The homepage is interactive within 2 seconds of a local cold load, with the documented 0.2s reveal gate and intro timeline the only intentional delays"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "te-keyboard"
+name = "keyboard_operates_all_controls"
+description = "The hamburger, the menu overlay's links and close control, the carousel next/previous controls, the consent banner's Αποδοχή / Απόρριψη buttons, and the footer links are all reachable and operable with the keyboard alone, with a visible focus indicator on each"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "te-langalt"
+name = "lang_el_and_descriptive_alt_text"
+description = "The document declares html lang \"el\", and every placeholder photograph and icon image carries descriptive alt text (or empty alt when purely decorative)"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "te-hydration"
+name = "hydration_clean_console"
+description = "No hydration mismatch errors or warnings appear in the console on first load of the root route or after exercising the page's interactions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "te-deeplink"
+name = "direct_root_load_matches_settled_page"
+description = "Loading the root URL directly renders the same settled page as any in-page interaction path, with no content flash beyond the documented 0.2s opacity gate and no half-rendered shell"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "te-stablescroll"
+name = "no_layout_shift_smooth_animations"
+description = "After the intro settles, scrolling the full page produces no layout shift, and the marquee and cursor animations keep advancing smoothly without visible stutter"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "technical.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect (console, network, storage, load, accessibility, or state coherence) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, request, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

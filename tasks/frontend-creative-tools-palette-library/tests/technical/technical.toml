@@ -62,23 +62,96 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "2.2"
-name = "2_2"
-description = "Implemented with Vue 3, Pinia, and UnoCSS; no browser storage APIs for persistence"
+name = "coherent_palette_state"
+description = "A palette change made in one visible surface is reflected immediately and consistently in the collection count, all three Browse layouts, active period filter, Detail/Editor, selection, and favorite state without reload or stale duplicate values"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
-name = "2_3"
-description = "Uses localStorage or sessionStorage to persist palettes or filters"
+name = "forbidden_browser_storage"
+description = "After exercising palette CRUD, view, period filter, selection, copy feedback, favorite, and popup dismissal, localStorage, sessionStorage, IndexedDB, or another browser persistence store contains app state"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "2.4"
-name = "2_4"
-description = "Manages the palettes collection only in component-local refs rather than Pinia"
+name = "cross_surface_state_desync"
+description = "The same palette datum shows conflicting values between Browse layouts, Detail/Editor, filter results, count, favorite indicator, or active selection during a normal interaction flow"
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "2.5"
+name = "in_memory_reload_round_trip"
+description = "After changing independent facets—collection membership, palette content, active view, period filter, selection, favorite, copy feedback, and popup dismissal—a fresh load resets every facet coherently to the seeded baseline rather than retaining a partial mixture"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "local_asset_network_hygiene"
+description = "From a fresh load through menu, cart, period select, editor, icon, clipboard, animation, and popup interactions, the network log shows only same-origin app assets and no CDN-hosted styles, scripts, icons, fonts, data, checkout, or subscribe request"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "console_clean_full_flow"
+description = "No console errors or unhandled promise rejections appear from first load through view/filter changes, palette create/edit/favorite/delete, copy, Detail round-trip, menu/cart, and subscribe dismiss/submit flows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "inline_form_validation_runtime"
+description = "Palette create/edit and subscribe controls expose visible field-level validation before invalid submission can mutate state, and correcting each field clears its error and permits the in-memory action"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "accessible_overlay_and_select_controls"
+description = "Menu, cart drawer, period select, palette editor, and subscribe dialog are keyboard-operable through visible controls, dismiss predictably, and preserve visibly trackable focus without navigating away"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "derived_view_input_sensitivity"
+description = "Changing the period, editing a palette period or hex, toggling favorite, and switching view each produces the corresponding distinct filtered, hue-sorted/deduped, or selected-state result rather than an identical hardcoded layout"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "historical_collection_responsiveness"
+description = "With the full historical dataset and seeded palettes visible, switching views, filtering periods, opening Detail, and scrolling through swatches remains responsive without a visible freeze, stale result flash, or input lag"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.12"
+name = "external_runtime_dependency"
+description = "The app requires an outbound CDN, backend, or other external origin to obtain styling, icons, fonts, scripts, dataset content, checkout, or subscription behavior, causing a missing or degraded interface when that request is blocked"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.13"
+name = "runtime_exception_or_broken_load"
+description = "A normal instructed interaction produces a console exception, blank library or editor, frozen control, or full-page navigation that breaks the browsing session"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick or unverifiable implementation preference. If present, name the defect and cite the concrete browser evidence (console entry, network request, storage entry, runtime state, performance evidence, or interaction result) that demonstrates it. If the defect is already covered—even partially—by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

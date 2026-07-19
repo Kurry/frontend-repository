@@ -62,147 +62,112 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
-description = "On load, Plan List mode shows multi-day itinerary sections with at least 8 seeded stops and place names visible"
+name = "seeded_multi_day_stops_visible"
+description = "On load, Plan List mode shows multi-day itinerary sections with at least 8 seeded French Riviera stops (e.g. Nice, Monaco, Cannes, Antibes, Eze) and place names visible"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
-description = "After creating a stop named 'Harbor Lookout' on a day with valid required fields, the text 'Harbor Lookout' is visible in the plan list"
+name = "create_stop_appears_in_plan_list"
+description = "After creating a stop named 'Harbor Lookout' on a day with valid required fields, the text 'Harbor Lookout' is visible in the plan list under that day's section"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
-description = "After adding 3 new stops on top of the seed set, the plan list shows exactly 3 more stops than the initial seeded count"
+name = "stop_count_delta_after_three_creates"
+description = "After adding 3 new stops on top of the seed set, the plan list shows exactly 3 more stops than the initial seeded count, measured immediately before and after"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
+name = "detail_panel_shows_selected_stop"
 description = "After selecting a stop, the place detail overlay or panel shows that stop's name and tab chrome (About or equivalent)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
+name = "edit_stop_name_updates_list"
 description = "After editing a stop name to 'Evening Promenade', the text 'Evening Promenade' is visible and the previous name is not"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
+name = "delete_stop_removes_row"
 description = "After deleting a stop, that stop name is no longer visible in the plan list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
-description = "After deleting all stops, an empty state is visible in the plan list region"
+name = "empty_state_after_last_delete"
+description = "After deleting all stops, the plan list region shows an empty state explaining that no stops remain and offering the create flow"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
-description = "After submitting create with an empty required stop name, the stops count does not increase and validation feedback is visible"
+name = "empty_name_submit_blocked"
+description = "After submitting create with an empty required stop name, no stop is added, the visible stops count is unchanged, and validation feedback naming the name field is visible"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
-description = "After filtering or focusing a single day (with multi-day stops present), only that day's stops remain emphasized or visible in the filtered list"
+name = "day_filter_narrows_list"
+description = "After filtering or focusing a single day (with multi-day stops present), only that day's stops remain visible in the plan list, and clearing the filter restores all stops"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
-description = "After switching emphasis between Plan List and Map modes (or Trip plan / map focus), the workspace shows the other mode without full page navigation"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.11"
-name = "1_11"
-description = "After switching place detail tabs (About / Reviews or equivalent), the panel content swaps without leaving the page"
+name = "plan_map_mode_switch_no_reload"
+description = "After switching emphasis between Plan List and Map modes, the workspace swaps the emphasized region without a full page reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
+name = "hover_feedback_on_rows_and_chrome"
 description = "When hovering place rows, sidebar items, or map chrome controls, a visible hover lift, wash, or press feedback appears"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.13"
-name = "1_13"
-description = "On load, the left sidebar shows an AI Assistant control, an Overview group with Explore / Notes / Places, and the itinerary day list Sun 7/5-Sat 7/11 with day-colored dots"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.14"
-name = "1_14"
-description = "The plan hero shows the editable title 'Trip to the French Riviera - Cote d'Azur', the 7/5-7/11 date range, a Browse all control, and guide/hotel suggestion cards"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.15"
-name = "1_15"
-description = "After selecting a stop, switching place detail tabs (About / Book / Reviews / Photos / Mentions) swaps the panel content without leaving the page"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.16"
-name = "1_16"
+name = "console_clean_during_session"
 description = "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.17"
-name = "1_17"
+name = "crud_updates_derived_counts"
 description = "Itinerary stops collection supports create, edit, and delete with list rows and derived counts updating from shared application state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.18"
-name = "1_18"
-description = "At least two distinct views or interaction modes are switchable without full page navigation"
+name = "two_modes_switchable"
+description = "At least two distinct views or interaction modes (Plan List and Map) are switchable without full page navigation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.19"
-name = "1_19"
-description = "Domain state beyond CRUD is implemented (filters, status/priority/mode, or equivalent) and recomputes visible results from the shared collection"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.20"
-name = "1_20"
-description = "Renders visible validation feedback when create is submitted with empty required fields, and the collection count does not increase"
+name = "filters_recompute_from_shared_collection"
+description = "Domain state beyond CRUD is implemented (day filter, mode, detail tab selection) and recomputes visible results from the shared collection"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.21"
-name = "1_21"
+name = "static_list_no_crud"
 description = "Itinerary stops list is static HTML only with no working create/edit/delete against shared state"
 type = "binary"
 weight = 1.0
@@ -210,7 +175,7 @@ negate = true
 
 [[criterion]]
 id = "1.22"
-name = "1_22"
+name = "outbound_links_replace_in_app_state"
 description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
 type = "binary"
 weight = 1.0
@@ -218,29 +183,107 @@ negate = true
 
 [[criterion]]
 id = "1.23"
-name = "1_23"
+name = "sidebar_full_contents"
 description = "The left nav sidebar shows an inert AI Assistant control, an Overview group (Explore / Notes / Places), the itinerary day list for Sun 7/5-Sat 7/11 with day-colored dots, a Budget row, and Support / Hide sidebar controls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.24"
-name = "1_24"
+name = "plan_hero_full_contents"
 description = "The plan hero shows a cover image, the editable title 'Trip to the French Riviera - Cote d'Azur', the 7/5-7/11 date range, a Browse all control, and guide/hotel suggestion cards plus a place-suggestion strip"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.25"
-name = "1_25"
+name = "detail_tab_row_swaps_panels"
 description = "Selecting a stop opens a place detail panel with a tab row (About / Book / Reviews / Photos / Mentions) whose tabs swap panels without page navigation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.26"
-name = "1_26"
+name = "detail_tabs_decorative"
 description = "Place detail tabs are decorative: switching among About / Book / Reviews / Photos / Mentions does not change the panel content"
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "1.27"
+name = "stop_lifecycle_cross_surface_chain"
+description = "Starting from the seeded workspace: create a valid stop through the form and confirm the form closes, exactly one new row appears under its assigned day section, and a matching pin appears on the map when applicable; switch to Map mode and confirm the same new stop is present without a reload; edit that stop's name and confirm the plan list row, the place detail card, and the map selection all show the new name; delete it and confirm it disappears from its day section, from the map pins, and from any active selection, with the visible stop count decreasing by exactly one"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "day_filter_create_clear_chain"
+description = "Choose a day from the sidebar itinerary list and confirm the plan list narrows to exactly that day's stops with the day's color highlight following the selection; while the filter is active, create a stop assigned to that day and confirm it appears in the filtered list; clear the filter and confirm the full multi-day list returns with the new stop still present — all without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "detail_selection_survives_mode_switch"
+description = "Select a stop to open its place detail tabs over the map, switch between at least two tabs and confirm panels swap in place; then switch between Plan List and Map modes and confirm the same stop stays selected; finally deselect or delete the stop and confirm the detail card is dismissed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "reload_restores_seeded_baseline"
+description = "After creating a stop, applying a day filter, and switching to Map mode, a page reload returns the app to its seeded state: the seeded multi-day stops, no day filter, Plan List mode, and the seeded place detail example — all facets reset coherently, never a mix"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "double_submit_creates_single_stop"
+description = "Double-activating the stop submit control in quick succession creates exactly one stop: the visible count increases by one and exactly one new row appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "empty_day_filter_state"
+description = "Filtering to a day with no stops shows an empty day state in the plan list region with a message and an affordance to add a stop or clear the filter"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "inline_validation_disables_submit"
+description = "In the stop create or edit form, an empty required name shows an inline error message naming the name field next to it before submit, and the submit control stays disabled until every required field is valid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "seeded_detail_example_initial"
+description = "A seeded example stop (Musee Picasso or an equivalent seeded stop) opens as the initial place detail card over the map"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "inert_controls_show_demo_toasts"
+description = "Activating inert demo chrome (Share, Optimize route, layers, or equivalent) shows a visible demo toast rather than doing nothing or navigating away"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "planner_direct_entry_no_gate"
+description = "The trip plan workspace (sidebar + plan column + map) renders immediately on load with no marketing landing, login, signup, or booking gate before it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

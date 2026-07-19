@@ -1,55 +1,107 @@
 <summary>
-Build a French Riviera trip itinerary planner using Vue 3, Pinia, and UnoCSS.
+Build a French Riviera trip itinerary planner using Vue 3 with Nuxt static delivery, Pinia, Tailwind CSS 4.3.2, and PrimeVue.
 </summary>
 
 <reference_screenshots>
 Screenshots of the reference application are provided in-container at
-`/reference-screenshots/`: `overview.png` is a full-page desktop-layout
-overview (downscaled); `segment-NN.png` are full-resolution 1440x900 sections
+/reference-screenshots/: overview.png is a full-page desktop-layout
+overview (downscaled); segment-NN.png are full-resolution 1440x900 sections
 in top-to-bottom order with slight overlap. They are part of this instruction:
 recreate what they show. Where a screenshot and the text conflict, the text
-wins. Do not copy the images into `/app` or ship them as app assets.
+wins. Do not copy the images into /app or ship them as app assets.
 </reference_screenshots>
 
 <core_features>
-Core features:
-- Direct planner entry — trip plan workspace (sidebar + plan column + map); no marketing landing, login, signup, or booking gate
-- Top plan chrome — Trip / Travel Planner brand mark, Trip plan / Trip journal mode labels, Share and edit toolbar affordances as in-app chrome
-- Left nav sidebar — inert AI Assistant control, Overview group (Explore / Notes / Places), Itinerary day list for Sun 7/5–Sat 7/11 with day-colored dots, Budget row, and Support / Hide sidebar controls
-- Primary collection — itinerary stops (places): seed at least 8 stops across days; each has name, day assignment, time/note optional, and category; the list supports create, edit, and delete
-- At least two interaction modes: Plan List mode (day sections + stop rows) and Map mode (map pane focus with pin selection / layers)
-- Domain behavior beyond CRUD: day filter; select a stop to open place detail tabs (About / Book / Reviews / Photos / Mentions); Optimize route and layers as demo chrome that may toast; empty day/list state when all stops deleted or filtered to none
-- Plan hero — cover image, editable title Trip to the French Riviera - Cote d'Azur, date range 7/5–7/11, a Browse all control, guide/hotel suggestion cards, and a place-suggestion strip
-- Invalid create: empty stop name must not add a stop; show visible validation feedback
-- Demo toasts for inert actions; zero outbound navigation
-- Map pane is static snapshot chrome with Export / Optimize / layers affordances; place detail seeded open example (Musée Picasso or equivalent)
+Core features (each line is an observable behavior the finished app must exhibit):
+Feature: Planner workspace entry —
+- Direct planner entry: the trip plan workspace (sidebar + plan column + map) renders immediately on load; no marketing landing, login, signup, or booking gate
+- Top plan chrome shows a Trip / Travel Planner brand mark, Trip plan / Trip journal mode labels, and Share and edit toolbar affordances as in-app chrome
+- Left nav sidebar shows an inert AI Assistant control, an Overview group (Explore / Notes / Places), an Itinerary day list for Sun 7/5 through Sat 7/11 with day-colored dots, a Budget row, and Support / Hide sidebar controls
+- Deep-linking the app URL directly renders the same planner workspace as reaching it through in-app navigation, with the same seeded stops visible
+Feature: Itinerary stops collection —
+- Itinerary stops (places) are the primary collection: seed at least 8 stops across days on first load; each stop shows a name, a day assignment, an optional time or note, and a category; the collection supports create, edit, and delete
+- The stop create and edit form validates inline per field before submit: an empty required name shows an error message naming the name field next to it, and the submit control stays disabled until every required field is valid
+- Submitting a valid stop adds exactly one row under its day section in the plan list
+Feature: Modes, filter, and place detail —
+- At least two interaction modes read from the same stops collection: Plan List mode (day sections + stop rows) and Map mode (map pane focus with pin selection and layers); switching modes swaps the emphasized region without a full page reload
+- A day filter recomputes the visible stops from the shared collection; selecting a day narrows the plan list to that day's stops and clearing the filter restores all stops
+- Selecting a stop opens a place detail card over the map with a tab row of About / Book / Reviews / Photos / Mentions; a seeded example (Musee Picasso or an equivalent stop) opens as the initial detail
+- Optimize route and layers controls are demo chrome that may show a toast; the map pane is a static snapshot with Export / Optimize / layers affordances
+Feature: Plan hero and demo chrome —
+- The plan hero shows a cover image, an editable title reading Trip to the French Riviera - Cote d'Azur, the date range 7/5 to 7/11, a Browse all control, guide and hotel suggestion cards, and a place-suggestion strip
+- Inert controls show demo toasts; zero outbound navigation anywhere in the app
 </core_features>
 
+<user_flows>
+End-to-end flows (state must stay coherent across every step without a reload):
+- Stop lifecycle: creating a valid stop closes the form, adds exactly one row under its assigned day section, and shows a matching pin on the map when applicable; switching to Map mode shows the same new stop without a reload; editing that stop's name updates the same record in the plan list row, the place detail card, and the map selection; deleting it removes it from its day section, from the map pins, and from any active selection, and the visible stop count decreases by exactly one
+- Day filter echo: choosing a day from the sidebar itinerary list narrows the plan list to exactly that day's stops and the day's color highlight follows the selection; a stop created while the filter is active appears in the filtered list when it belongs to that day; clearing the filter restores the full multi-day list with the new stop still present
+- Detail round trip: selecting a stop opens its place detail tabs over the map; switching between About / Book / Reviews / Photos / Mentions swaps panels in place without page navigation; switching Plan List and Map modes keeps the same stop selected; deselecting or deleting the stop dismisses the detail card
+- A page reload returns the app to its seeded state: the seeded multi-day stops, no day filter, Plan List mode, and the seeded place detail example
+</user_flows>
+
+<edge_cases>
+- Submitting the stop form with an empty name adds no stop, leaves the visible stop count unchanged, and shows validation feedback naming the name field
+- Double-activating the stop submit control creates exactly one stop: the count increases by one and one new row appears
+- Filtering to a day with no stops shows an empty day state in the plan list region with a message and a way to add a stop or clear the filter
+- After deleting all stops, the plan list region shows an empty state explaining that no stops remain and offering the create flow
+</edge_cases>
+
 <visual_design>
-- Product name Trip / Travel Planner with French Riviera — Côte d'Azur as the trip signal; first viewport is the planner workspace
-- Soft coastal UI: cool blue-gray page wash, Source Sans Pro, navy accent
-- Three-pane desktop composition: left sidebar / center plan column / right map pane — planner density
-- Day colors on sidebar dots and place pins; place detail card over the map with tab row
-- Empty list state is clear when no stops remain
+- Product name Trip / Travel Planner with French Riviera — Cote d'Azur as the trip signal; first viewport is the planner workspace
+- Soft coastal UI: cool blue-gray page wash, Source Sans Pro type, navy accent
+- Three-pane desktop composition: left sidebar / center plan column / right map pane — planner density, not a marketing layout
+- Day colors are consistent between the sidebar day dots and the map place pins; the place detail card floats over the map with its tab row
+- The plan hero stacks the cover image, editable title, date range, and suggestion cards above the day sections in the plan column
+- Empty list and empty day states are visually distinct regions with a message, not blank whitespace
+- Component states: buttons, inputs, and tabs show distinct default, hover, focus (visible ring), disabled, and error treatments
 </visual_design>
 
 <motion>
-- Hover animations (required): sidebar items ease hover opacity and brief press scale; place and carousel cards lift slightly on hover; map chrome buttons use the same hover/press microfeedback
-- Place detail: tab switches swap panels without page navigation; detail overlays the map
-- Mode emphasis between Plan List and Map updates without full reload; day selection may toast or focus the map
-- Demo toasts slide/fade in then auto-dismiss
-- Respect prefers-reduced-motion by disabling toast/control transitions where practical
+- Hover animations (required): sidebar items ease hover opacity and take a brief press scale; place and carousel cards lift slightly on hover; map chrome buttons use the same hover and press microfeedback
+- List microinteractions: a newly created stop row animates into its day section, a deleted row animates out, and reassigning a stop to another day moves it with a transition rather than an instant jump
+- Place detail: tab switches swap panels without page navigation; the detail card overlays the map with a short enter transition
+- Mode emphasis between Plan List and Map updates without a full reload; day selection may toast or focus the map
+- Demo toasts slide or fade in, hold briefly, then auto-dismiss with a fade
+- Validation feedback appears with a short transition rather than popping in
+- With prefers-reduced-motion set, toast, list, and control transitions are removed and state changes apply instantly while every feature stays usable
 </motion>
 
+<responsiveness>
+- At desktop widths (1440 pixels) the layout matches the reference composition: left sidebar, center plan column, right map pane all visible
+- At widths of 768 pixels and below, the sidebar collapses behind a toggle that opens it as an overlay drawer, and the map pane stacks or yields to the active mode instead of sharing the row
+- At 375 pixel width no content clips or overflows the viewport and no horizontal scrolling appears
+</responsiveness>
+
+<accessibility>
+- Every interactive control — sidebar items, mode switches, day filter, stop rows, form fields, detail tabs, and toasts' dismiss affordances — is reachable and operable with the keyboard alone, with a visible focus indicator
+- The place detail tab row is keyboard operable: tabs can be reached and activated from the keyboard and the active tab is programmatically distinguishable
+- Form validation messages are shown visually and associated with their fields so assistive technology announces them
+- Demo toasts are announced through a polite live region as well as shown visually
+</accessibility>
+
+<performance>
+- The app is interactive within 2 seconds of a local cold load
+- No console errors or warnings appear during a full exercise of the app, including no hydration errors or mismatch warnings on any route from a fresh load
+- After first paint there is no visible content flash or layout jump as client hydration completes; the seeded workspace renders once and stays stable
+- The UI stays responsive under rapid repeated input (fast stop creation, filter toggling, tab switching) with no hangs or dropped interactions
+</performance>
+
+<writing>
+- Headings, buttons, and labels keep one consistent capitalization convention across the workspace
+- Action labels are specific verbs such as Add stop and Optimize route rather than generic labels where a specific one is possible
+- Validation and empty-state messages name the problem and the fix; no placeholder or lorem text appears anywhere in the shipped UI
+</writing>
+
 <requirements>
-Shared application state must use the stack state library named in summary (in-memory only): stops collection, day selection, active mode, place detail tabs, map selection, and toasts. Do not use localStorage, sessionStorage, or other browser storage APIs.
+Shared application state must live in Pinia, the state library named in summary (in-memory only): the stops collection, day selection, active mode, place detail tabs, map selection, and toasts. Do not use localStorage, sessionStorage, or other browser storage APIs.
 State contracts (behavioral, not storage keys):
 - Creating a valid stop increases the collection and shows it under its day section and on the map when applicable
 - Editing a stop updates that same record in list, detail, and map selection
 - Deleting a stop removes it from day lists, selection, and map pins
-- Day filter and mode are shared client state; they recompute visible stops from the shared collection
-Stack: Vue 3 + Pinia + UnoCSS (Vite or equivalent SPA); frontend-only. Leaflet/live map tiles are not required for this static-map product.
-- Seed a multi-day French Riviera plan (Nice, Monaco, Cannes, Antibes / Musée Picasso, Èze, Saint-Tropez, Menton) with at least 8 stops
+- Day filter and mode are shared client state; they recompute visible stops from the shared collection — never a second disconnected copy
+Stack: Vue 3 with Nuxt pinned to static generation or SSR with client hydration; all interactivity lives in client state after load — no server API routes, server actions, or loaders. Styling is Tailwind CSS 4.3.2 (pinned) with design tokens in @theme. PrimeVue components for dialogs, selects, tabs, and toasts; PrimeVue keeps its component styles while Tailwind owns layout, spacing, and custom surfaces; no other external component library. Motion for Vue is allowed for animation; no other animation libraries. Tabler icons via @tabler/icons-vue only; no raw pasted SVG icon sets and no icon CDNs. All forms (stop create and edit) validate through a Zod schema driven by VeeValidate rendering inline per-field errors before submit. The Source Sans Pro face ships locally (npm font package or vendored woff2); no font CDNs. The map pane is static snapshot chrome; live map tile engines and external tile servers are not used in this static-map product. All libraries are installed via npm and bundled locally; no CDN imports.
+- Seed a multi-day French Riviera plan (Nice, Monaco, Cannes, Antibes / Musee Picasso, Eze, Saint-Tropez, Menton) with at least 8 stops
 - Empty required fields on create must not increase the stops count; show visible validation feedback
 - After deleting all stops, show an empty state in the plan list region
 - Zero navigational outbound links; no live booking APIs or chat widgets

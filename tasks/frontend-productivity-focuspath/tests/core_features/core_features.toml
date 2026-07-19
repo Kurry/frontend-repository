@@ -159,65 +159,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.15"
-name = "1_15"
-description = "Creating a goal from the + New Goal form (title, target date, one of 8 fixed accent swatches, motivation) adds a card to the overview showing its accent color and a 0% progress bar."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.16"
-name = "1_16"
-description = "The overview lists active goals sorted by nearest target date, with goals that have no target date sorted last."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.17"
-name = "1_17"
-description = "Adding milestones renders them as numbered nodes connected by a line in order, with the first not-yet-complete milestone highlighted as active and later ones outlined/dashed."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.18"
-name = "1_18"
-description = "A milestone auto-completes the instant its last action step is checked, and reverts to incomplete/active when a step is later unchecked."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.19"
-name = "1_19"
-description = "A milestone with zero steps shows \"Add a step to make progress\" and offers no way to be marked complete."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.20"
-name = "1_20"
-description = "Goal completion percentage equals completed steps over total steps aggregated across all milestones, live-updating from 50% (2 of 4) to 75% (3 of 4) as steps toggle."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.21"
-name = "1_21"
-description = "Toggling Focus Today caps Today's Focus at 3 steps and shows an inline message asking to complete or unfocus one on a 4th attempt, keeping exactly the existing 3."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.22"
-name = "1_22"
-description = "A goal with an incomplete milestone whose most recent step-completion or creation date is more than 7 days ago shows a Needs Attention badge on its overview card and detail view."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.23"
-name = "1_23"
-description = "Mark Goal Complete appears only at 100%; confirming it moves the goal into a toggle-visible Completed Goals section with a recorded date and a read-only path."
+name = "milestone_reverts_on_uncheck"
+description = "After a milestone has auto-completed, unchecking one of its steps via its real checkbox reverts the milestone to incomplete: its node loses the solid completed fill, it becomes the highlighted active milestone again, and the goal's percentage drops accordingly."
 type = "binary"
 weight = 1.0
 
@@ -237,23 +181,16 @@ weight = 1.0
 
 [[criterion]]
 id = "1.26"
-name = "1_26"
-description = "With zero goals the overview shows \"Set your first goal to start building a path\" with a + New Goal action, and a goal with zero milestones shows \"Add your first milestone to build this path\"."
+name = "zero_milestone_empty_state"
+description = "Opening a goal that has zero milestones shows \"Add your first milestone to build this path\" in place of the roadmap."
 type = "binary"
 weight = 0.5
 optional = true
 
 [[criterion]]
-id = "1.27"
-name = "1_27"
-description = "The live activity stream's Start, Pause, Reconnect, and Deliver Out of Order controls resolve the applied-event ledger in logical-timestamp order, ignoring duplicates and catching up on reconnect exactly once."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.28"
-name = "1_28"
-description = "Submitting the New Goal form with a blank title shows a visible required-field message and adds no goal card."
+name = "blank_title_accepted"
+description = "Submitting the New Goal form with a blank title adds a goal anyway, or rejects it without an inline \"Goal title is required\" message rendered next to the title field."
 type = "binary"
 weight = 1.0
 negate = true
@@ -270,6 +207,84 @@ negate = true
 id = "1.30"
 name = "1_30"
 description = "A goal's completion percentage reflects only a single milestone's steps rather than aggregating across all its milestones."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.31"
+name = "submit_disabled_until_title_valid"
+description = "The New Goal form's submit control is disabled while the title field is empty and becomes enabled as soon as a non-empty title is typed."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "all_forms_inline_field_errors"
+description = "Each form in the app (goal create and edit, milestone add, step add and edit) validates before submit and shows an inline per-field error message that names the field, rendered next to the offending field rather than as a browser alert."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "flow_create_goal_roundtrip"
+description = "Starting from an overview with at least two dated goals, create a goal whose target date falls between theirs: exactly one new card appears in the correct sort position, opening it shows the same title, target date, motivation note, and accent color, and after a full page refresh the same goal reappears with identical fields."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "flow_steps_progress_cross_view"
+description = "Add a milestone with two steps and check both in the detail view: the milestone's node fills solid and the detail progress bar and percentage rise; returning to the overview shows the same raised percentage and steps-completed count on that goal's card without a reload; reloading the page restores the same checked steps, node fill, and percentages exactly."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "flow_focus_quick_complete_roundtrip"
+description = "Toggle three steps from two different goals into Today's Focus so all three appear in the panel; ticking one focused step's quick-complete checkbox marks the same step complete in its milestone checklist and updates that goal's percentage on both the detail view and its overview card without a reload; after a refresh, the remaining focus selections and the completed step are all restored."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "flow_goal_completion_chain"
+description = "Count the active goal cards, then check the final remaining step of a goal's last incomplete milestone: the milestone auto-completes, the goal reads 100%, and \"Mark Goal Complete\" appears; confirming it decreases the active-goal card count by exactly one (measured immediately around the action), shows the goal inside the toggle-visible Completed Goals section with a recorded completion date and a read-only path, and a refresh keeps the goal in Completed Goals without reviving it in the active list."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "flow_delete_goal_cascades"
+description = "With one of a goal's steps toggled into Today's Focus, delete that goal through its inline confirm step: its card leaves the overview and its step leaves the Today's Focus panel immediately, and a subsequent refresh revives neither the goal nor any of its milestones or steps."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "double_submit_idempotent"
+description = "Rapidly activating a create form's submit control twice in quick succession creates exactly one record: the relevant count increases by one and exactly one new item appears."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "invalid_input_preserves_state"
+description = "Submitting invalid or extreme input (a blank required title, an out-of-range date, or absurdly long text) is rejected with a specific inline message naming the field, and the previously committed data is left untouched."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "stream_duplicate_and_order_convergence"
+description = "On the live activity stream, delivering the same event twice changes the applied-event ledger only once, and delivering a set of events out of order settles the ledger into the same final state as delivering them in order."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

@@ -98,3 +98,54 @@ description = "The help panel slides in from the right edge with opacity and the
 type = "binary"
 weight = 0.5
 optional = true
+
+[[criterion]]
+id = "4.6"
+name = "stepper_edge_opacity_transitions"
+description = "Stepping a dial to (and away from) a stop-list edge fades the affected up/down control's opacity with a short transition as it disables/enables, while pressed steps update the dial value immediately with no page reload — verified by clicking the real stepper controls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "preview_stack_eases_not_snaps"
+description = "Driven through the real stepper controls, a stop change eases the preview stack — brightness filter, depth-of-field blur, shutter motion-frame crossfade (about 0.2s), and noise opacity — rather than snapping instantly between states"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "preset_apply_eases_dials_and_preview"
+description = "Applying a preset through its visible UI control eases the dials and preview toward the saved stops rather than hard-cutting, and the Meter/Lab and Presets/Compare regions swap without a full page reload"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.9"
+name = "preset_list_row_and_validation_transitions"
+description = "A newly created preset row animates into the list, a deleted row animates out, and inline validation feedback appears with a short transition rather than popping in — all driven through the real create/delete/submit controls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "reduced_motion_removes_easing_keeps_function"
+description = "With prefers-reduced-motion set, easing and slide effects are removed and dial, meter, preview, and panel state changes apply instantly while every feature stays usable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "meter_hard_jumps_between_positions"
+description = "Stepping a dial through the real stepper controls makes the exposure meter indicator teleport between positions with no visible travel along the track"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

@@ -62,15 +62,15 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "2.1"
-name = "2_1"
-description = "Solid stores holds board cells, saved boards, mode, and palette — shared across components"
+name = "shared_state_coherence"
+description = "A change made in one surface (renaming a board, toggling a favorite, saving a new board) is immediately reflected in every other surface showing that datum — gallery cards, tag-filtered lists, and the current selection — without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
-name = "2_2"
-description = "Implemented with Solid.js, Solid stores, and Tailwind CSS; no browser storage APIs for persistence"
+name = "reload_returns_seeded_baseline"
+description = "A page reload returns the app to its seeded in-memory baseline — blank canvas, unlocked cell-size slider, exactly the seeded boards — with no facet (favorites, filters, saved boards) surviving the reload"
 type = "binary"
 weight = 1.0
 
@@ -84,8 +84,8 @@ negate = true
 
 [[criterion]]
 id = "2.4"
-name = "2_4"
-description = "Manages the boards collection only in component-local signals only rather than Solid stores"
+name = "views_desync_between_surfaces"
+description = "The same board datum shows different values in two surfaces at once — for example a rename or favorite change visible in one view while another view still shows the stale value until a reload"
 type = "binary"
 weight = 1.0
 negate = true
@@ -104,3 +104,69 @@ description = "The QR mask or image is fetched from an external QR service or ot
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "2.7"
+name = "keyboard_operable_with_focus_ring"
+description = "Every toolbar control, palette swatch, and gallery action is reachable and operable with the keyboard alone, and the focused control shows a visible focus indicator"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "camera_dialog_traps_focus"
+description = "The camera overlay behaves as a modal dialog: focus moves into it when opened, stays trapped inside while open, and returns to the triggering control on close"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "swatches_expose_color_names"
+description = "Each palette swatch exposes an accessible name identifying its color in the accessibility tree, rather than being an unlabeled colored square"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "validation_message_announced"
+description = "The inline save-validation message is exposed to assistive technology (an aria-live region or role='alert') in addition to being shown visually"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.11"
+name = "interactive_within_two_seconds"
+description = "The app is interactive within 2 seconds of a local cold load"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.12"
+name = "console_errors_during_full_exercise"
+description = "Console errors or warnings appear during a full exercise of painting, saving, loading, filtering, and mode switching"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.13"
+name = "drag_painting_stays_smooth"
+description = "Continuous drag-painting across many cells stays smooth, with no visible lag between pointer movement and cells filling"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.14"
+name = "external_asset_requests_made"
+description = "The browser issues network requests to external origins for fonts, icons, libraries, or other assets during load or use"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical, accessibility, or performance defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, console line, network request, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

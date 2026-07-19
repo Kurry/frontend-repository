@@ -62,190 +62,127 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
+name = "tab_title_exact"
 description = "On load the browser tab title reads exactly 2025 McLaren Formula 1 Driver — Lando Norris"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
-description = "On load a full-bleed lime preloader shows the text LOAD NORRIS and then clears within about two seconds to reveal the homepage rather than staying on screen"
+name = "preloader_shows_then_clears"
+description = "On a fresh load a full-bleed lime preloader shows the text LOAD NORRIS and then clears within about one to two seconds to reveal the homepage rather than staying on screen blocking content"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
-description = "On load the fixed nav shows the stacked LANDO NORRIS wordmark, a centered LN4 monogram mark, a lime STORE button, and a hamburger button"
+name = "fixed_nav_contents"
+description = "A fixed nav stays pinned to the top over all sections and shows, left to right, a stacked LANDO NORRIS text wordmark (LANDO above NORRIS), a centered original placeholder monogram mark, a lime STORE button, and a square hamburger button"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
-description = "After clicking the hamburger, a full-screen dark-green menu overlay opens listing HOME, ON TRACK, OFF TRACK, CALENDAR, the socials TikTok, Instagram, YouTube, Twitch, and business@landonorris.com"
+name = "menu_overlay_contents"
+description = "After clicking the hamburger, a full-screen dark-green menu overlay covers the viewport listing HOME, ON TRACK, OFF TRACK, CALENDAR, the socials TikTok, Instagram, YouTube, Twitch, and the business contact business@landonorris.com"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
-description = "When the menu is open, the HOME item is marked as the current item with a lime telemetry stroke while the other menu items are not"
+name = "home_item_current_stroke"
+description = "When the menu is open, the HOME item is marked as the current item with a lime telemetry stroke drawn through its label while ON TRACK, OFF TRACK, and CALENDAR are not"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
-description = "After pressing Escape or clicking the X control, the menu overlay closes and is no longer visible"
+name = "menu_closes_on_x_or_escape"
+description = "After clicking the X control (or pressing Escape) in the open menu, the overlay closes, is no longer visible, and the homepage is interactive again"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
-description = "On load the hero shows a NEXT RACE widget containing NEXT RACE, SPA GP, and MCLAREN F1 SINCE 2019"
+name = "next_race_widget_contents"
+description = "The hero fills at least the first full viewport height and a NEXT RACE widget sits at its lower left showing the eyebrow NEXT RACE, a circuit outline graphic, the label SPA GP, a laurel graphic, and the team line MCLAREN F1 SINCE 2019"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
-description = "After scrolling vertically through the horizontal media section, the media row translates sideways so additional photo cards come into view without the page navigating away"
+name = "horizontal_track_scroll_linked"
+description = "After scrolling vertically through the pinned horizontal media section, the media row translates sideways so later photo cards come into view without the page navigating away"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
-description = "When hovering a helmet grid card, its base image scales up, a masked reveal image wipes in, and the card index label turns lime"
+name = "helmet_card_hover_reveal"
+description = "When hovering a helmet grid card with the real pointer, its base image scales up, a masked reveal image wipes in, and the card index label turns lime"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
+name = "video_hover_play_fade"
 description = "When hovering the social video card, the local video plays and the placeholder image fades from opaque to transparent, and leaving the card pauses the video and restores the placeholder"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
+name = "footer_split_text_and_marquee"
 description = "After scrolling to the footer, a split-text brand statement fills its characters into the lime-off highlight color and a partner logo marquee scrolls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
+name = "hover_feedback_present"
 description = "When hovering the STORE button and nav or footer text links, a visible hover response (split reveal or color shift toward lime) appears"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.13"
-name = "1_13"
-description = "After exercising the homepage, the brand CSS custom property --color--lime computes to #d2ff00 and the body background computes to rgb(40, 44, 32), and no localStorage or sessionStorage entries have been written"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.14"
-name = "1_14"
-description = "After exercising the preloader, menu, hover, scroll, and video workflows, no console errors or unhandled promise rejections have appeared"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.15"
-name = "1_15"
-description = "The browser tab title reads exactly 2025 McLaren Formula 1 Driver — Lando Norris"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.16"
-name = "1_16"
-description = "A full-bleed lime preloader showing LOAD NORRIS appears on load and then clears to reveal the homepage"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.17"
-name = "1_17"
-description = "The fixed nav shows the stacked LANDO NORRIS wordmark, a centered LN4 monogram mark, a lime STORE button, and a hamburger button"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.18"
-name = "1_18"
-description = "Clicking the hamburger opens a full-screen menu overlay listing HOME, ON TRACK, OFF TRACK, CALENDAR, the socials TikTok, Instagram, YouTube, Twitch, and business@landonorris.com"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.19"
-name = "1_19"
-description = "In the open menu the HOME item is the current item marked with a lime telemetry stroke while ON TRACK, OFF TRACK, and CALENDAR are not"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.20"
-name = "1_20"
-description = "The menu overlay closes both when its X control is clicked and when the Escape key is pressed"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.21"
-name = "1_21"
-description = "The hero shows a NEXT RACE widget containing the labels NEXT RACE, SPA GP, and MCLAREN F1 SINCE 2019"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.22"
-name = "1_22"
-description = "A helmet grid shows at least three tall masked helmet cards"
+name = "helmet_grid_three_indexed_cards"
+description = "A helmet grid shows at least three tall portrait cards masked to a helmet silhouette, built from original placeholder imagery, each carrying a visible index label"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.23"
-name = "1_23"
-description = "A collaborators strip shows a marquee of at least five partner logos (Mind, PS4, Quadrant, Tumi, Ralph Lauren)"
+name = "collaborators_marquee_placeholder_logos"
+description = "A collaborators strip shows a horizontal marquee of at least five distinct original placeholder partner logos"
 type = "binary"
 weight = 0.5
 optional = true
 
 [[criterion]]
 id = "1.24"
-name = "1_24"
-description = "A social video card shows a still placeholder image layered over a muted looping local video element"
+name = "video_card_layered_still"
+description = "A social video card shows a still placeholder image layered over a muted looping locally served video element"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.25"
-name = "1_25"
-description = "The footer shows a large brand statement, a partner logo marquee, the LANDO NORRIS wordmark, and legal links Privacy Policy, Terms, and Cookies"
+name = "footer_contents"
+description = "The footer shows a large split-text brand statement, a partner logo marquee, the LANDO NORRIS wordmark, a newsletter signup form, and the legal links Privacy Policy, Terms, and Cookies"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.26"
-name = "1_26"
-description = "Activating any nav or footer chrome scrolls within the homepage or performs a no-op without reloading the document or leaving the origin"
+name = "chrome_stays_on_homepage"
+description = "Activating any navigation chrome (wordmark, monogram, menu items, socials, business contact, legal links, Store button) scrolls within the homepage or performs a no-op without reloading the document or leaving the origin"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.27"
-name = "1_27"
+name = "menu_overlay_missing_or_static"
 description = "The menu overlay never opens or is only a static always-visible list rather than a hamburger-triggered full-screen overlay"
 type = "binary"
 weight = 1.0
@@ -253,7 +190,7 @@ negate = true
 
 [[criterion]]
 id = "1.28"
-name = "1_28"
+name = "outbound_nav_reloads_page"
 description = "Nav or footer chrome uses outbound anchor navigation that reloads the page or leaves the app to another origin"
 type = "binary"
 weight = 1.0
@@ -261,9 +198,118 @@ negate = true
 
 [[criterion]]
 id = "1.29"
-name = "1_29"
+name = "next_race_widget_missing"
 description = "The hero omits the NEXT RACE widget or its SPA GP and MCLAREN F1 SINCE 2019 labels"
 type = "binary"
 weight = 0.5
 negate = true
 optional = true
+
+[[criterion]]
+id = "1.30"
+name = "hero_composition_with_silhouette"
+description = "The hero shows an off-white blob-and-topographic field with an original driver-silhouette placeholder image rendered behind the navigation chrome"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "1.31"
+name = "media_strip_six_cards"
+description = "The horizontal media strip holds a row of at least six landscape placeholder photo cards"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "impact_statement_present"
+description = "An impact statement section between the media strip and the helmet grid renders an oversized display headline in the lime-off color"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "menu_photo_grid_and_texture"
+description = "The open menu overlay shows a faint topographic line pattern and an image grid of original placeholder photos"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "1.34"
+name = "subscribe_disabled_until_valid"
+description = "The newsletter form has one email field and a Subscribe control, and the Subscribe control stays disabled while the field is empty or holds an invalidly formatted email, becoming enabled only once the value is a validly formatted email address"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "menu_flow_probe"
+description = "Scripted menu flow: scroll partway down the page and note the scroll position, click the hamburger, confirm the overlay covers the viewport with the HOME item showing its current-item stroke, then activate a menu item or the X control; confirm the overlay closes, the fixed nav is still pinned, the scroll position and section content are unchanged, and no document reload occurred at any step"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "newsletter_flow_probe"
+description = "Scripted newsletter flow: type an invalid email and confirm Subscribe stays disabled with an inline error naming the email field; correct it to a valid email and confirm the error clears and Subscribe enables; submit and confirm an inline confirmation message appears in the footer and the field empties; confirm no navigation or document reload occurred at any step"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "video_hover_cycle_probe"
+description = "Scripted video flow: hover the social video card, confirm playback starts and the placeholder fades; move the pointer off mid-fade and confirm the placeholder returns to fully opaque and the video pauses; repeat the hover-and-leave cycle at least twice more and confirm it keeps working with no stuck intermediate state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "reload_baseline_probe"
+description = "Scripted reload baseline: open the menu, close it, submit the newsletter with a valid email, then reload the document; confirm the preloader plays again, the menu is closed, the newsletter field is empty with no confirmation shown, and no state from the previous visit persists"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "rapid_menu_toggle_settles"
+description = "Rapidly clicking the hamburger and the X control in succession never leaves the overlay stuck half-open or the page inert; the menu always settles fully open or fully closed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "escape_when_closed_noop"
+description = "Pressing Escape while the menu is closed changes nothing on the page"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "1.41"
+name = "empty_submit_blocked"
+description = "Submitting the newsletter form with an empty field is blocked: an inline message names the email field and no confirmation appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "double_subscribe_single_confirmation"
+description = "Double-activating the Subscribe control on one valid email shows exactly one confirmation message"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "webgl_fallback_hero_static"
+description = "With WebGL rendering unavailable, the hero shows a static composition of the same artwork and every section, control, and flow remains present and usable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core homepage features or flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

@@ -128,3 +128,61 @@ type = "binary"
 weight = 0.5
 negate = true
 optional = true
+
+[[criterion]]
+id = "2.10"
+name = "keyboard_only_operability"
+description = "Every interactive control (inputs, buttons, checkboxes, chevrons, tag chips, breadcrumb segments) is reachable and operable with the keyboard alone, with a visible focus indicator on each"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "move_picker_focus_trap_and_escape"
+description = "The Move To picker traps keyboard focus while open, closes on Escape, and returns focus to the control that opened it; the Tag manager panel is likewise fully keyboard-operable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.12"
+name = "toast_announced_via_aria_live"
+description = "Toast confirmations are exposed through an aria-live polite region in the DOM in addition to being shown visually"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.13"
+name = "readable_contrast_in_all_themes"
+description = "Text and interactive controls keep readable contrast against their background in each of the Light, Dark, and Forest themes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.14"
+name = "cold_load_interactive_within_2s"
+description = "On a local cold load, the app renders and becomes interactive within 2 seconds"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.15"
+name = "rapid_leaf_toggle_stays_consistent"
+description = "Rapidly toggling several leaf checkboxes in succession keeps the UI responsive, and the progress rings and parent completion end consistent with the final toggle state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.16"
+name = "external_network_requests_made"
+description = "The app issues network requests to external origins (CDN scripts, fonts, icons, or APIs) during load or while exercising its features"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect (console health, state coherence, persistence behavior, stability) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, console line, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

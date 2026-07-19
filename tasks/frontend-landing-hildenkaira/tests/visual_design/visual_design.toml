@@ -62,28 +62,28 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "2.1"
-name = "2_1"
-description = "The page uses an off-white default surface with per-section theme swaps (lime #ecfdad, turquoise, chrome-metallic, dark media) rather than one flat background"
+name = "per_section_theme_swaps"
+description = "The page uses an off-white default surface with per-section theme swaps (lime #ecfdad, turquoise, chrome-metallic, dark media, dark-grey) rather than one flat background"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
-name = "2_2"
-description = "Oversized editorial display headings are visually distinct from the medium grotesque used for body and eyebrow text"
+name = "display_vs_grotesque_hierarchy"
+description = "Oversized editorial display headings are visually distinct from the medium-weight grotesque used for body, eyebrow, and nav text"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
-name = "2_3"
-description = "Each client card shows two stat tiles: a lime Organic views tile and a chrome Likes tile with a metallic heart"
+name = "stat_tiles_lime_and_chrome"
+description = "Each client card shows two stat tiles: a lime Organic views tile and a chrome Likes tile with a metallic heart, plus caption chips (age and view count) on the flick cards"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.4"
-name = "2_4"
+name = "popup_and_banner_theming"
 description = "The cookie banner uses a dark theme and the contact popup uses a chrome-metallic panel with floating-label fields"
 type = "binary"
 weight = 0.5
@@ -91,59 +91,120 @@ optional = true
 
 [[criterion]]
 id = "2.5"
-name = "2_5"
-description = "The Finlayson and Autoliitto slots (no dedicated image) and the deck's video slots (only two case videos) use substitutes and reuse, showing real rendered media"
+name = "two_videos_reused_media_renders"
+description = "Exactly two original placeholder case videos are reused across the deck's slots and all five client marks are original placeholders, with every slot showing real rendered media"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.6"
-name = "2_6"
-description = "A generic equal-width stacked layout with a single flat background and no per-section theme swap is a failure of the editorial composition"
+name = "flat_stacked_layout_failure"
+description = "A generic equal-width stacked layout with a single flat background and no per-section theme swap is present instead of the editorial composition"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "2.7"
-name = "2_7"
-description = "Broken image or video references (missing-file placeholders, failed loads) in the client deck slots are a failure"
+name = "broken_media_in_deck_slots"
+description = "Broken image or video references (missing-file placeholders, failed loads, broken-media indicators) appear in the client deck slots or anywhere on the page"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "2.8"
-name = "2_8"
+name = "body_offwhite_nearblack_text"
 description = "The home body default surface renders off-white (computed background near rgb(234, 233, 230) / #eae9e6) with near-black text rgb(24, 24, 24)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.9"
-name = "2_9"
+name = "statement_and_footer_theme_colors"
 description = "The statement band (theme-media) renders background rgb(24, 24, 24) with lime text rgb(236, 253, 173), and the footer (theme-chrome) renders a dark-grey base rgb(43, 43, 43) with white text"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.10"
-name = "2_10"
+name = "accent_colors_exact"
 description = "Accent colors render exactly: the Organic views tile lime rgb(236, 253, 173) (#ecfdad), the Training service card turquoise rgb(63, 174, 134) (#3fae86), and the nav link dot red rgb(255, 69, 69) (#ff4545)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.11"
-name = "2_11"
-description = "The hero H1 renders in PP Editorial New at weight 400 (about 62.8px at 1440 with a tight line-height), and paragraph/nav text renders in PP Neue Montreal at weight 500"
+name = "open_license_faces_and_type_metrics"
+description = "The hero H1 renders in a self-hosted open-license editorial display face at weight 400 (about 62.8px at 1440 width with a tight ~0.9em line-height and negative letter-spacing), body/eyebrow/nav text renders in a self-hosted open-license grotesque at weight 500 (paragraph about 15.7px, nav links about 13.1px at 1440), and Inter appears only for ancillary UI and cookie-consent copy — all faces resolve from local files with no external font requests"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.12"
-name = "2_12"
-description = "A default surface rendered as a flat black/dark background (not the measured off-white ~rgb(234,233,230)) or theme surfaces whose computed colors do not match the measured per-section values are a failure"
+name = "wrong_surface_or_theme_colors"
+description = "The default surface renders as a flat black/dark background (not the measured off-white ~rgb(234,233,230)), or theme surfaces' computed colors contradict the measured per-section values"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.13"
+name = "fluid_type_scale_across_breakpoints"
+description = "The hero H1 measures about 62.8px at 1440 viewport width, about 76px at 991, about 60px at 767, and about 52px at 479, and resizing between these widths scales the type smoothly with no abrupt size jumps at breakpoint boundaries"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.14"
+name = "content_overflow_at_breakpoints"
+description = "At 1440, 768, or 479 viewport widths, content clips or overflows the viewport, or a horizontal scrollbar appears"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.15"
+name = "nav_collapses_to_hamburger_only_narrow"
+description = "On wide and tablet viewports the full centered nav (Our approach, Story, Work, Blog with the locale dropdown and contact CTA) is shown, and on viewports about 479px and below the centered links are replaced by a hamburger button"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.16"
+name = "selection_scrollbar_button_resets"
+description = "Text selection shows a lime-on-black highlight, scrollbars are hidden, and buttons reset their native chrome"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "2.17"
+name = "mandated_copy_exact_with_accent"
+description = "All mandated copy strings render exactly as specified — including the é in Hildén & Kaira wherever the brand name appears — and headings, buttons, and captions keep the reference's casing and terminology consistently across sections"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.18"
+name = "placeholder_or_lorem_text_visible"
+description = "Lorem ipsum, TODO, or template placeholder text (e.g. {{title}}, asdf) is visible anywhere on the shipped page"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.19"
+name = "real_brand_assets_shipped"
+description = "The page ships real brand or third-party assets instead of original stand-ins: the reference site's actual logo, wordmark, or lettermark artwork, real client logos for Finlayson, Kierrätyskeskus, Uusi Juttu, Autoliitto, or Liikku, licensed commercial typefaces, brand photography or case-video footage — or the footer credit names the reference site's real designer or agency instead of an invented generic name"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

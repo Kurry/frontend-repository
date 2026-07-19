@@ -62,21 +62,21 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
+name = "desktop_two_pane_composition"
 description = "At desktop width the composition establishes a two-pane settings-and-preview layout with grouped controls, sliders or inputs, color values, and monospace configuration output."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
+name = "first_viewport_emphasizes_form_and_preview"
 description = "The first viewport gives greater visual emphasis to the categorized settings form and its generated-config preview than to secondary metadata, notes, or badges."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
+name = "monospace_terminal_style_output"
 description = "The generated-config output is monospace and uses a terminal-style color scheme (dark background, light text, colorized keys and values) rather than plain unstyled text."
 type = "binary"
 weight = 0.5
@@ -84,7 +84,7 @@ optional = true
 
 [[criterion]]
 id = "3.4"
-name = "3_4"
+name = "three_distinct_type_roles"
 description = "At least three distinguishable type roles are visible (section title, body text, secondary label) differing in size and/or weight."
 type = "binary"
 weight = 0.5
@@ -92,7 +92,7 @@ optional = true
 
 [[criterion]]
 id = "3.5"
-name = "3_5"
+name = "body_text_contrast_meets_aa"
 description = "Primary body text meets a contrast ratio of at least 4.5 to 1 against its background in the editor."
 type = "binary"
 weight = 0.5
@@ -100,7 +100,7 @@ optional = true
 
 [[criterion]]
 id = "3.6"
-name = "3_6"
+name = "sentence_case_microcopy_with_numerals"
 description = "UI microcopy is concise sentence-case text and uses numerals for counts (for example the override count), rather than Title Case or spelled-out numbers."
 type = "binary"
 weight = 0.5
@@ -108,17 +108,83 @@ optional = true
 
 [[criterion]]
 id = "3.7"
-name = "3_7"
-description = "The editor is not rendered as generic unstyled cards or framework defaults lacking a deliberate settings-and-preview identity."
+name = "generic_unstyled_editor"
+description = "The editor renders as generic unstyled cards or framework-default styling with no deliberate settings-and-preview identity."
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "3.8"
-name = "3_8"
-description = "The visible state change when font-family is edited does not cause overlapping or jumping content in the layout."
+name = "font_family_edit_causes_layout_jump"
+description = "Editing the font-family setting causes overlapping or jumping content in the layout."
 type = "binary"
 weight = 0.5
 negate = true
 optional = true
+
+[[criterion]]
+id = "3.9"
+name = "macos_window_chrome_composition"
+description = "The app presents a desktop macOS-style application window: a translucent left sidebar with window-dot chrome and category icons, a titled content area with a back/forward history control, and a right-hand generated-config panel."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "varied_control_types_in_grouped_sections"
+description = "The settings form uses grouped sections with section titles and notes, labeled rows, and a visible mix of control types including sliders, number steppers with unit toggles, text inputs, dropdowns, pill toggles, switches, color pickers, a palette grid, and a repeatable-value list editor."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "dock_hosts_live_terminal_preview"
+description = "A macOS-style dock hosts a live interactive terminal preview that re-themes as settings change."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.12"
+name = "mixed_icon_styles_present"
+description = "Sidebar categories or control affordances mix icon styles - different icon weights or mismatched glyph sets appear across the UI."
+type = "binary"
+weight = 0.5
+negate = true
+
+[[criterion]]
+id = "3.13"
+name = "consistent_status_colors_and_legibility"
+description = "Light and dark surfaces stay legible, and status colors are consistent across the UI (danger/reset actions in red, success feedback in green)."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.14"
+name = "narrow_width_panes_stack_keeping_identity"
+description = "At a narrow width (about 375 pixels) the sidebar, settings form, and generated-config panel stack while keeping the product identity, with no horizontal page scrolling."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.15"
+name = "validation_copy_names_setting_and_range"
+description = "Where a validation message is rendered, it names the setting and the accepted range or format rather than showing a generic rejection."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.16"
+name = "placeholder_text_visible_in_ui"
+description = "Placeholder or lorem text (for example \"Lorem\", \"TODO\", or template variable names) is visible somewhere in the shipped UI."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered - even partially - by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

@@ -62,8 +62,8 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
-description = "On load, a sticky white header shows Readymag branding plus a Solutions control and Pricing, Examples, Templates, and Learn navigation links, with Log in and Sign up actions on the right"
+name = "header_placeholder_wordmark_and_nav"
+description = "On load, a sticky white header stays fixed to the top of the viewport on scroll and shows an original placeholder wordmark in the logo position (which swaps to a distinct hover mark on hover), a Solutions control plus Pricing, Examples, Templates, and Learn links, and account actions on the right: a \"Log in\" text link and a \"Sign up\" pill button"
 type = "binary"
 weight = 1.0
 
@@ -78,13 +78,6 @@ weight = 1.0
 id = "1.3"
 name = "1_3"
 description = "On load, the oversized accent cluster reads \"Hello!\" in orange followed by \"Ready\" and \"?\" in purple near the hero transition"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.4"
-name = "1_4"
-description = "On load, the workflow section shows four feature cards with the exact titles \"Enjoy easy workflow\", \"Streamline teamwork\", \"Attract with interactivity\", and \"Expand functionality to infinity\""
 type = "binary"
 weight = 1.0
 
@@ -125,15 +118,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
-description = "On load, the footer ends with \"© 2026 Readymag Inc.\" and \"support@readymag.com\" above four link groups (company, product, resources, solutions)"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.11"
-name = "1_11"
-description = "When the Solutions control is clicked or focused and Enter pressed, a menu opens with aria-expanded set to true listing Portfolios, Presentations, Editorials, Companies, Freelancers, Students; pressing Escape closes it and returns focus to the trigger"
+name = "footer_groups_copyright_email"
+description = "The footer is a dark multi-column layout with four link groups carrying the exact labels — company (about, careers, reviews, terms of service, privacy policy, cookie policy), product (pricing, templates, product updates, affiliate program, referral program, npo discount), resources (examples, design almanac, design stories, help, forum, status, blog), solutions (portfolios, presentations, editorials, companies, freelancers, students) — ending with \"© 2026 Readymag Inc.\" and \"support@readymag.com\""
 type = "binary"
 weight = 1.0
 
@@ -152,37 +138,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.14"
-name = "1_14"
-description = "On load, every network request is same-origin with the app and the console reports zero errors and no failed asset requests"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.15"
-name = "1_15"
-description = "A sticky white header renders Readymag branding, a Solutions control, and Pricing, Examples, Templates, and Learn links, with a Log in link and a Sign up pill button"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.16"
-name = "1_16"
-description = "The hero shows the headline \"Design and launch outstanding websites\", the subtitle \"Design, prototype, collaborate, publish.\", and a \"Try Readymag\" button beside \"or choose your subscription plan\""
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.17"
 name = "1_17"
 description = "Four feature cards render with the exact titles \"Enjoy easy workflow\", \"Streamline teamwork\", \"Attract with interactivity\", and \"Expand functionality to infinity\" and their described bodies"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.18"
-name = "1_18"
-description = "Six use-case tiles render with the exact labels Portfolios, Landing pages, Editorials, Company websites, Design studios, and by Readymag team"
 type = "binary"
 weight = 1.0
 
@@ -194,30 +152,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.20"
-name = "1_20"
-description = "The closing call-to-action shows \"Try for free\", a \"Try Readymag\" button, and a \"View pricing\" link"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.21"
-name = "1_21"
-description = "The footer ends with \"© 2026 Readymag Inc.\" and \"support@readymag.com\" above company, product, resources, and solutions link groups"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.22"
 name = "1_22"
 description = "The Solutions control is a button with accessible name \"Solutions menu\", aria-haspopup and aria-controls, and opens a menu (Portfolios, Presentations, Editorials, Companies, Freelancers, Students) on click or Enter with aria-expanded flipping to true; Escape closes it and returns focus to the trigger"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.23"
-name = "1_23"
-description = "At about 390px width the floating hero card and the desktop nav are hidden, the use-case tiles collapse to two columns, and header controls stay usable without horizontal scrolling"
 type = "binary"
 weight = 1.0
 
@@ -240,6 +177,84 @@ negate = true
 id = "1.26"
 name = "1_26"
 description = "A homepage interaction leads to an application-error or \"Not found\" page, or a header/footer chrome link is missing so navigation is not present"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.27"
+name = "solutions_menu_flow_cycles_cleanly"
+description = "Scripted flow: click the Solutions trigger — its panel opens showing all six labels (Portfolios, Presentations, Editorials, Companies, Freelancers, Students) and the trigger reports aria-expanded=true; press Escape — the panel closes, aria-expanded returns to false, and focus is back on the trigger; reopen it and click outside the panel — it closes without activating the element beneath the click; repeat the open/close cycle once more with no leftover or orphaned panel remaining in the DOM"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "mobile_menu_flow_round_trip"
+description = "Scripted flow: at desktop width note the scroll position, resize the viewport to 768px — the desktop navigation and the \"Log in\" link are hidden and a compact \"Menu\" button appears in the header; activate it — a mobile menu panel opens listing the navigation and account links; dismiss the panel and resize back to desktop width — the desktop header layout returns, no mobile panel remains, and the page's scroll position is unchanged throughout"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "slideshow_wraps_seamlessly_unattended"
+description = "Leaving the page idle with no manual control touched, the six-frame slideshow advances on its own timer through all six frames and, after the sixth, wraps back to the first with the same opacity treatment (active 1.0, neighbors 0.35) and no blank frame and no two fully opaque frames at any point across the wrap"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "scroll_reveal_reload_round_trip"
+description = "On a fresh page load (verify on a fresh load — prior scrolling pollutes reveal state) the four workflow feature cards start unrevealed; scrolling the workflow section into view fades and raises them into place with a stagger; they remain in their revealed resting state while scrolling onward; reloading the page restores the unrevealed starting state until the section is scrolled into view again"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "zoom_to_fit_rescale_flow"
+description = "Resizing the viewport from 1440px down to 390px continuously rescales the whole 1024px design artboard to fit the viewport width, the scroll wrapper's height tracks the scaled document height, and at intermediate widths (e.g. 1024px, 768px, 560px, 390px) the full design width stays visible with no horizontal scrollbar and no cropped right edge"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "escape_on_closed_menu_inert"
+description = "With the Solutions menu closed, pressing Escape does nothing: no console error, no visual change, and focus stays where it was"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.33"
+name = "custom_cursor_follows_and_passes_clicks"
+description = "On a fine-pointer desktop viewport, a 43px custom image cursor follows the pointer and swaps to a hover image while over links, buttons, and role=button elements, and clicking a link or button while the cursor image overlaps it activates the element beneath — the cursor layer keeps pointer-events: none and never intercepts the click"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "coarse_pointer_keeps_system_cursor"
+description = "Under coarse-pointer conditions the custom image cursor is absent and the system cursor remains fully visible — the system pointer is never hidden without a visible replacement"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "hero_media_card_plays_local_clip"
+description = "The hero contains a floating media card (rounded, shadowed) on the right that plays an original placeholder clip served from the app's own origin"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "reload_restores_initial_state"
+description = "Scripted flow: open the Solutions menu, let the slideshow advance a few frames, and scroll toward the bottom; reloading the page then returns it to its initial state — menus closed, the slideshow back on its first frame, and the scroll-reveal sections unrevealed until scrolled into view again"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in its core features or end-to-end flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

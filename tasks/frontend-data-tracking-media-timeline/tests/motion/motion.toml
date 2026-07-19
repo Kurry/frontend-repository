@@ -82,3 +82,53 @@ description = "Omits hover feedback on pins or list rows so the stage feels stat
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "4.4"
+name = "detail_open_close_settles"
+description = "Opening an event detail by clicking its pin and closing it with the close control or Escape each show a short opacity/transform settle rather than an instant snap"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "row_create_and_delete_animate"
+description = "Creating an event through the real form animates its list row in, and deleting an event through the real delete control animates its row out rather than snapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "validation_and_empty_state_fade_in"
+description = "Validation errors and the empty state appear with a short fade or slide rather than popping in instantly"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.7"
+name = "stage_pan_updates_pins_live"
+description = "Dragging to pan and wheel-zooming the stage move the year window and pin positions live and continuously, without a page reload or discrete jumps between states"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "reduced_motion_shortens_fades_keeps_function"
+description = "With prefers-reduced-motion enabled, non-essential fades are shortened or removed while pan, scrub, and filtering remain fully functional"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.9"
+name = "scrubber_and_chrome_hover_brighten"
+description = "Scrubber thumbs and chrome buttons visibly brighten or otherwise respond on pointer hover, verified with computed styles while hovering"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

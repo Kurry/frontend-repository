@@ -1,14 +1,14 @@
 <summary>
-Build a falling-tile word game called LetterDrop using React, Zustand, and Tailwind CSS.
+Build a falling-tile word game called LetterDrop using Qwik, Qwik stores, Tailwind CSS 4.3.2, and DaisyUI.
 </summary>
 
 <reference_screenshots>
 Screenshots of the reference application are provided in-container at
-`/reference-screenshots/`: `overview.png` is a full-page desktop-layout
-overview (downscaled); `segment-NN.png` are full-resolution 1440x900 sections
+/reference-screenshots/: overview.png is a full-page desktop-layout
+overview (downscaled); segment-NN.png are full-resolution 1440x900 sections
 in top-to-bottom order with slight overlap. They are part of this instruction:
 recreate what they show. Where a screenshot and the text conflict, the text
-wins. Do not copy the images into `/app` or ship them as app assets.
+wins. Do not copy the images into /app or ship them as app assets.
 </reference_screenshots>
 
 <core_features>
@@ -18,7 +18,6 @@ Core features (each line is an observable behavior the finished app must exhibit
 - Falling accelerates gradually: as the score crosses fixed thresholds the fall speed and spawn rate increase, and a status readout shows the current tier as Tier 1, Tier 2, Tier 3, and so on.
 - Clicking or tapping a falling tile selects it and appends its letter to a current-word tray shown beneath the board; clicking an already selected tile toggles it back off.
 - Pressing Submit Word validates the tray letters against a bundled in-browser dictionary word list (never an external dictionary API); a valid word clears those tiles from the board and awards points scaled by word length, shown as a transient confirmation such as +30 for "CAT"!.
-- Submitting letters that do not form a dictionary word does not silently reject: the word tray shakes and an inline "Not a word" style message appears, and the streak resets.
 - Fully clearing every tile on the board through valid submissions triggers a Board Cleared! confirmation and a bonus multiplier that is applied to the next scored word.
 - A visible horizontal danger line sits across the board; any uncleared tile whose body crosses that line ends the run and shows a Game Over screen with the final score and a Play again control.
 - Consecutive valid submissions without an invalid attempt build a visible streak meter; reaching streak thresholds of 3, 5, and 8 grants a temporary score-multiplier badge shown next to the score, and an invalid submission resets the streak to zero.
@@ -26,10 +25,32 @@ Core features (each line is an observable behavior the finished app must exhibit
 - An Undo Last Tile control removes the most recently tapped tile from the current-word tray without submitting the word.
 - A Pause control freezes tile fall and the run timer and dims the board with a Paused overlay; a Resume control continues from the exact same state.
 - A Best Score is tracked and displayed at all times, updating when a run's final score beats the previous best.
-- A Match History panel lists past runs most recent first, each showing that run's score, tiles-cleared count, and duration; before any run has finished it shows a friendly empty-state message.
-- An Achievements panel shows every named achievement with a locked or unlocked state: Clean Sweep unlocks on clearing the board at least once, Marathon on a run lasting three or more minutes, Combo Master on reaching a streak of eight or more, plus additional milestone badges; locked badges are muted or grayscale and turn to full color when unlocked, and unlocking one shows a transient confirmation.
-- Best score, match history, and unlocked achievements survive a full page refresh via localStorage; deleting or never-creating data is not revived on reload.
+- A Match History panel lists past runs most recent first, each showing that run's score, tiles-cleared count, and duration.
+- An Achievements panel shows every named achievement with a locked or unlocked state: Clean Sweep unlocks on clearing the board at least once, Marathon on a run lasting three or more minutes, Combo Master on reaching a streak of eight or more, plus additional milestone badges; unlocking one shows a transient confirmation.
+Feature: Player settings form —
+- A Settings control opens a settings form with a player name field (required, 2 to 20 characters) and a starting tier select (Tier 1, 2, or 3); the Save control stays disabled until every field is valid.
+- Typing a one-character player name shows an inline validation message directly under the name field that names the field and the length rule, before any submit; correcting the name clears the message and enables Save.
+- Saving valid settings closes the form; each Match History entry recorded afterwards shows the saved player name, and a run started afterwards begins at the chosen starting tier shown in the tier readout.
 </core_features>
+
+<user_flows>
+User flows (each chain must hold without a page reload except where a reload is named):
+- Full run round-trip: pressing Start game begins a run; submitting one valid word raises the score in the HUD and increments the streak meter; letting a tile cross the danger line shows Game Over with that run's final score; switching to the History tab shows exactly one new entry at the top listing the same final score, tiles-cleared count, and duration; if the final score beat the previous best, the Best Score readout shows the new value; after a full page reload the History entry and Best Score are still present.
+- Achievement echo: fully clearing the board during a run shows the Board Cleared! confirmation, switching to the Achievements tab shows Clean Sweep flipped from locked to unlocked in full color without a reload, and the unlock confirmation toast appears at the moment of the clear; after a full page reload Clean Sweep remains unlocked.
+- Streak build and reset: three consecutive valid submissions show the streak meter at 3 and a multiplier badge next to the score; one invalid submission then resets the meter to zero, removes the badge, and the next valid word scores without the streak multiplier.
+- Settings round-trip: saving a new player name in the settings form, finishing a run, and opening the History tab shows the new entry carrying that name; entries recorded before the change keep their original name.
+- Pause integrity: pausing mid-run freezes the timer value and all tile positions; resuming continues the timer from the frozen value and tiles from the frozen positions, and the score is unchanged by the pause itself.
+</user_flows>
+
+<edge_cases>
+- Submitting letters that do not form a dictionary word does not silently reject: the word tray shakes, an inline "Not a word" style message appears, and the streak resets to zero.
+- Pressing Submit Word with an empty tray does not end the run, deduct points, or reset the streak; it shows a visible rejection or the control is disabled.
+- Activating Undo Last Tile when the tray is empty changes nothing and causes no error.
+- Before any run has finished, the Match History panel shows a friendly empty-state message instead of a blank region.
+- Rapidly activating Start game, Pause, Resume, or Submit Word multiple times in quick succession triggers each transition exactly once: no duplicate runs, no duplicate history entries, and no corrupted score.
+- Input from an earlier phase is ignored: clicks on the board after Game Over, or tile taps issued while paused, do not mutate the current run.
+- Deleting or never-creating persisted data is not revived on reload: with no prior runs, a reload still shows the empty history state and a zero Best Score.
+</edge_cases>
 
 <visual_design>
 - Light UI on a #F5F5F7 background with the vivid blue accent #007AFF reserved for the primary call to action (Submit Word), links, and key highlights such as the active streak badge and the current difficulty tier readout.
@@ -41,26 +62,53 @@ Core features (each line is an observable behavior the finished app must exhibit
 - Bomb and Slow power tiles are visually distinct from ordinary letter tiles and from each other in shape and color, and remain readable at normal fall speed.
 - The danger line is always visible and reads as a hazard (a warning-toned line or gradient) distinct from the rest of the board background.
 - The active streak badge and difficulty tier are visually highlighted so the player can read their current state at a glance.
-- Match History shows a friendly empty state before any run completes; locked achievements use a muted or grayscale treatment that turns to full color once unlocked.
-- All buttons (Submit Word, Undo Last Tile, Pause, Resume) show a visible hover state, and keyboard Tab focus is visible on every interactive control.
+- Locked achievements use a muted or grayscale treatment that turns to full color once unlocked.
+- HUD panels, view tabs, dialogs, toasts, and the settings form use one consistent component style throughout the chrome; every icon in the chrome comes from a single icon set applied consistently.
+- All buttons (Submit Word, Undo Last Tile, Pause, Resume, Save) show a visible hover state.
 - Submitting a valid word, triggering a power tile, and unlocking an achievement each show a transient confirmation (toast or equivalent) that does not block further play.
-- At roughly 375px wide the board and HUD scale to fit without horizontal scrolling and tiles stay large enough to tap comfortably.
+- Inline validation messages in the settings form render in a clearly distinct error treatment directly under the field they name.
 </visual_design>
 
 <motion>
-- Tiles animate downward continuously via a hand-rolled requestAnimationFrame fall loop driving the canvas; motion is smooth and the fall rate increases gradually rather than snapping.
+- Tiles animate downward continuously on the canvas board with smooth, eased motion; the fall rate increases gradually as tiers rise rather than snapping between speeds.
 - The combo streak meter fills or animates as consecutive valid submissions accrue and resets visibly on an invalid submission.
 - An invalid submission shakes the word tray as its inline rejection feedback.
 - Power-tile activations (Bomb, Slow), valid-word scoring, Board Cleared, and achievement unlocks each surface a transient on-screen toast that fades on its own without blocking play.
+- Fully clearing the board and unlocking an achievement each fire a celebratory particle burst tied to that exact moment, triggered only by the real winning action and never looping ambiently.
+- A new Match History entry animates into the top of the list when a run ends rather than appearing instantly.
 - Pausing dims the board with a Paused overlay and freezes all tile motion and the timer; resuming restarts motion from the frozen state.
-- Buttons show hover and focus-visible transitions on the real controls.
+- The settings form opens and closes with a short transition, and buttons show hover and focus-visible transitions on the real controls.
 </motion>
 
+<responsiveness>
+- At roughly 375px wide the board and HUD scale to fit without horizontal scrolling and tiles stay large enough to tap comfortably.
+- At desktop widths (1440px) and at 375px, no content clips or overflows the viewport and the view tabs, HUD, and settings form remain fully usable.
+</responsiveness>
+
+<accessibility>
+- Keyboard Tab focus is visible on every interactive control, including the view tabs, game controls, and settings form fields.
+- Start game, Pause, Resume, Submit Word, Undo Last Tile, and the settings form are all operable with the keyboard alone.
+- Transient toasts never steal keyboard focus from the current control.
+- Locked versus unlocked achievement states are distinguishable by a text or shape cue in addition to color.
+</accessibility>
+
+<performance>
+- The app is interactive within 2 seconds of a local cold load.
+- No console errors appear during a full session covering start, play, pause, resume, Game Over, restart, and the History and Achievements tabs.
+- Tile fall motion stays smooth without visible hitching while tiles spawn, fall, and clear at the highest reached tier.
+- The UI stays responsive under rapid repeated input on the run controls with no hangs, blank screens, or dropped interactions.
+</performance>
+
 <requirements>
-- Stack mandate (preserve exactly): React 19 with functional components as a client-rendered Vite single-page app; Zustand for shared app state; Tailwind CSS for styling; HTML5 Canvas 2D for the falling-tile board driven by hand-written TypeScript. Runtime is Node 20. xstate and @xstate/react are available. Do not pull in a game engine or physics library; the fall loop is a hand-rolled requestAnimationFrame update driving canvas rendering.
+- Stack mandate: Qwik with a client-rendered Vite single-page setup; all shared application state lives in Qwik stores (the run state, score, streak, tier, current-word tray, match history, achievements, settings, and active view derive from one shared store — never a second disconnected copy); Tailwind CSS 4.3.2 (pinned) for styling with design tokens defined in the theme; DaisyUI as the sole component library for all chrome (HUD panels, view tabs, dialogs, toasts, buttons, and the settings form); HTML5 Canvas 2D for the falling-tile board. Runtime is Node 20. Do not pull in a game engine or physics library.
+- Animation allowlist: GSAP drives the tile fall, easing, and clearing timelines on the canvas; canvas-confetti provides the celebration bursts for Board Cleared and achievement unlocks; no other animation libraries.
+- Icons: Iconify CSS icons via the @iconify/tailwind4 plugin only; one icon set used consistently; no other icon libraries and no raw pasted SVG icon sets.
+- Forms: every form, including the settings form, is driven by Modular Forms for Qwik paired with a Valibot schema; the schema defines the rules and the form surfaces inline per-field errors before submit, with the submit control disabled until valid.
+- All libraries are installed via npm and bundled locally; no CDN imports of any library, font, or icon set.
 - No backend, no database, no network calls, and no authentication; the app opens directly into the interface at /. Word validity is checked entirely against a bundled in-browser word list, never an external dictionary API. The bundled list must contain enough common short words that an attentive player can regularly clear tiles.
-- Persistence: use localStorage so that Best Score, Match History, and unlocked Achievements survive a full page refresh; guard all storage access so the production build does not crash when storage is unavailable. On reload the exact committed state is restored, and data that was never created is not fabricated.
-- Single player, single board, single route /. In-app panels (Match History, Achievements) are shown and hidden within the single page.
+- Persistence: use localStorage so that Best Score, Match History, unlocked Achievements, and saved settings survive a full page refresh; guard all storage access so the production build does not crash when storage is unavailable. On reload the exact committed state is restored, and data that was never created is not fabricated.
+- Single player, single board, single route /. In-app panels (Match History, Achievements, Settings) are shown and hidden within the single page via shared client state without reloading the document.
+- WebMCP tool handlers invoke the same store commands as the visible controls, so contract-driven changes and UI-driven changes are indistinguishable in the rendered app.
 - Real-time simulation correctness is the core of the task and must be observable: tiles spawn at the top and fall at a steady, gradually accelerating rate; tapping tiles builds the current-word tray; Submit Word validates against the bundled dictionary and, if valid, clears those tiles and awards points scaled by word length; clearing every tile triggers a Board Cleared! bonus multiplier applied to the next scored word; a tile crossing the danger line uncleared ends the run into Game Over with the final score; streak thresholds 3, 5, and 8 grant a temporary multiplier badge next to the score; Bomb tiles clear their whole column when submitted and Slow tiles temporarily reduce fall speed, each with a named toast; fall speed and spawn rate increase as score crosses thresholds with the current tier shown in a status readout; non-dictionary submissions shake the tray and show inline Not a word rather than silently rejecting; Undo Last Tile removes the most recent tapped tile without submitting; Pause freezes fall and timer and dims the board while Resume continues from the same state.
 - Application depth: expose mutable game entities (falling tiles, the current-word tray, run history) and multi-phase state transitions across at least two modes (for example setup/play and play/history). In one uninterrupted session the run crosses at least five legal state transitions including start, an active-state change, a terminal Game Over or checkpoint, restart, and pause/resume. Stale input from an earlier phase must never mutate the current run.
 - Rapid-use robustness: the main run and its controls must withstand at least 25 rapid deterministic repetitions through the normal user controls with the final visible state exact, controls still responsive, and no blank screen, uncaught error, or sustained freeze.

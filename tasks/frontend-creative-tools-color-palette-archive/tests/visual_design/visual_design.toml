@@ -62,21 +62,21 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
-description = "Editorial cream library composition with distinct browse layouts remains non-dashboard"
+name = "editorial_cream_composition"
+description = "The page reads as a cream editorial field with near-black foreground and hairline rules — not a dashboard or promo-card grid — with distinct browse layouts"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
-description = "Empty library state is visually present when the collection or filter result is empty"
+name = "empty_state_visually_clear"
+description = "Empty library state is visually present and clear when the collection or filter result is empty"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
+name = "static_brochure_replaces_library"
 description = "Replaces the library with a static brochure and no interactive palette collection"
 type = "binary"
 weight = 1.0
@@ -84,15 +84,108 @@ negate = true
 
 [[criterion]]
 id = "3.4"
-name = "3_4"
+name = "nomenclature_four_column_index"
 description = "Nomenclature rows read as a four-column index (swatch chip, hex value, historical name with note, and source title and artist) separated by hairline rules"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "3_5"
-description = "Swatch tiles fill edge-to-edge with their color and their hex and name labels auto-contrast (dark ink on light swatches, light ink on dark) so they stay legible"
+name = "swatch_labels_auto_contrast"
+description = "Swatch tiles fill edge-to-edge with their color and their hex and name labels auto-contrast (dark ink on light swatches, light ink on dark) so they stay legible on every swatch, including very light and very dark ones"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "sticky_header_lockup"
+description = "A sticky header shows the script / O&A lockup, a centered MENU, and a CART, and it stays pinned while the page scrolls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "expressive_type_pairing"
+description = "Typography pairs an expressive display face for titles with monospaced hex metadata and italicized historical color names"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "library_controls_row_layout"
+description = "The library controls row shows the view toggles with circular fill indicators and places the period filter on the right"
 type = "binary"
 weight = 0.5
-optional = true
+
+[[criterion]]
+id = "3.9"
+name = "single_consistent_icon_set"
+description = "One icon set is used consistently across chrome and controls, with no mixed icon styles"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.10"
+name = "multi_column_inert_footer"
+description = "A multi-column footer sits behind the main content, styled as inert chrome whose links look interactive but stay on the page"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.11"
+name = "mobile_viewport_overflow"
+description = "At 375 pixel width, content clips, overflows the viewport, or a horizontal scrollbar appears"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.12"
+name = "nomenclature_responsive_reflow"
+description = "Below 768 pixels the nomenclature index reflows so each entry keeps its swatch chip, hex, historical name with note, and source legible without truncating mid-word, while at desktop widths the four-column index layout holds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.13"
+name = "responsive_grids_and_controls"
+description = "Palette cards and swatch tiles reduce their column count at narrower widths so tiles stay legible, and the sticky header and library controls remain usable at every width"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.14"
+name = "editor_panel_fits_mobile"
+description = "The Detail/Editor panel fits within a 375 pixel wide viewport with all fields and controls reachable without horizontal scrolling"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.15"
+name = "editorial_prose_quality"
+description = "The editorial intro (eyebrow, headline, two-column note) reads as finished prose explaining the historical-name pairing, and historical color names with their short notes read as plausible art-historical references, each note a complete phrase"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.16"
+name = "placeholder_text_shipped"
+description = "Placeholder or filler text (lorem ipsum, 'TODO', template variable names, fragment notes) is visible somewhere in the shipped UI"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.17"
+name = "consistent_copy_conventions"
+description = "Headings, buttons, and labels follow one consistent capitalization convention, and validation messages name the field and the fix"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design, layout, responsiveness, or rendered copy that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, viewport, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

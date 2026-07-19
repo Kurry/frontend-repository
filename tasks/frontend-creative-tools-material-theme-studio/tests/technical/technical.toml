@@ -62,15 +62,73 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "2.2"
-name = "2_2"
-description = "Implemented with React, Redux Toolkit, and Tailwind CSS; no browser storage APIs for persistence"
+name = "cold_load_interactive"
+description = "The app is interactive within 2 seconds of a local cold load"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
-name = "2_3"
-description = "Uses localStorage or sessionStorage to persist themes or editor state"
+name = "browser_storage_persists_state"
+description = "Themes or editor state persist in localStorage, sessionStorage, or another browser storage API, surviving a page reload instead of resetting to the seeded state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.4"
+name = "console_clean_full_exercise"
+description = "The browser console stays free of errors and warnings during a full exercise of the app (tab switches, palette edits, source edits, theme create/rename/delete, font add/remove)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "keyboard_operable_focus_visible"
+description = "Every interactive control - tabs, device toggles, accordion rows, tool fields, card actions - is reachable and operable with the keyboard alone, with a visible focus indicator"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "modal_dialog_semantics"
+description = "The Tutorial modal and the theme create/rename forms use role dialog with aria-modal true, trap focus while open, close on Escape, and return focus to the control that opened them"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "accordion_state_exposed"
+description = "Palette accordion rows expose their expanded/collapsed state to assistive technology (e.g. aria-expanded) and toggle with Enter or Space"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "status_messages_aria_live"
+description = "Validation and status messages (invalid name, invalid options, save status) are announced via an aria-live polite region as well as shown visually"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "rapid_input_stays_responsive"
+description = "Palette and typography edits repaint the preview without visible hangs, and the UI stays responsive under rapid repeated input"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "cdn_asset_requests_present"
+description = "After settle, the network log shows the app loading fonts, icons, or script libraries from external CDN origins instead of bundled local assets"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect (console, storage rule, state coherence, load, or accessibility) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action, page state, screenshot) that demonstrates it. If the defect is already covered - even partially - by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

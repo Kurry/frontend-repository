@@ -62,204 +62,127 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
-description = "On load, the Quest tab shows a canvas quest map with numbered waypoint markers, a Log Reps form, the daily-goal progress panel, Current Streak, and the weekly summary chart, and the History tab shows the empty-state placeholder before any set is logged"
+name = "quest_tab_initial_layout"
+description = "On load, the Quest tab shows a canvas quest map with numbered waypoint markers and a character sprite on the path, a Log Reps form (number input plus Log reps button), the daily-goal progress indicator, a Current Streak counter, the History state region, and the weekly summary chart, and the History tab shows the empty-state placeholder before any set is logged"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
-description = "After logging a set with a valid positive whole number of reps, today's total and lifetime reps increase by that amount and the character visibly advances along the quest map canvas"
+name = "log_reps_updates_totals_and_advances"
+description = "After logging a set with a valid positive whole number of reps, today's total and lifetime reps increase by exactly that amount and the character visibly advances along the quest map canvas without a page reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
-description = "When submitting the Log Reps form with an empty field, zero, or a negative number, a visible error appears and lifetime reps, today's total, and the History list stay unchanged"
+name = "log_reps_inline_validation"
+description = "While the Log Reps field holds an invalid value (empty, zero, negative, or non-integer), an inline error message names the reps field and the rule it breaks before submit, the Log reps control is disabled or rejects the submission, and today's total, lifetime reps, and the character position stay unchanged"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
-description = "After logging enough reps to cross a waypoint into a new zone, the quest map canvas background switches to that zone's own distinct palette and a one-time Zone Unlocked notification appears"
+name = "zone_unlock_palette_and_notification"
+description = "After logging enough reps to cross a waypoint into a new zone, the quest map canvas background switches to that zone's own distinct sky/ground palette and a Zone Unlocked notification appears exactly once for that zone, not again on later visits or later sets"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
-description = "After logging a qualifying set on a Boss Challenge waypoint (lifetime reps at or past the waypoint and the set meeting its minimum reps), the boss marker shows a defeated treatment and bonus quest points are awarded"
+name = "boss_defeat_marker_and_bonus"
+description = "After logging a qualifying set on a Boss Challenge waypoint (lifetime reps at or past the waypoint and the single set meeting its stated minimum reps), the boss marker permanently switches to a defeated treatment and bonus Quest Points are awarded"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
-description = "After earning enough quest points and unlocking a Gear Shop outfit, the outfit shows a full-color unlocked treatment instead of its prior muted/grayscale locked treatment, and selecting Equip changes the character's appearance on the quest map"
+name = "gear_unlock_and_equip"
+description = "After earning enough quest points and unlocking a Gear Shop outfit, the outfit shows a full-color unlocked treatment instead of its prior muted/grayscale locked treatment, and selecting Equip immediately changes the character's appearance on the quest map canvas"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
-description = "After deleting a History entry, the entry disappears from the list and today's total, lifetime reps, quest points, and streak are recalculated from the remaining entries"
+name = "delete_entry_recalculates_from_remaining"
+description = "After deleting a History entry, exactly that entry disappears from the list and today's total, lifetime reps, quest points, unlocked zones, defeated bosses, and the streak are recalculated from the remaining entries rather than by adjusting a running total"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
-description = "After logging sets and refreshing the page, the lifetime reps total, current streak, quest points, unlocked zones/gear, and rep history are all restored exactly as they were before the refresh"
+name = "refresh_restores_all_facets_coherently"
+description = "After logging sets, unlocking and equipping gear, and setting a daily goal, a full page refresh restores lifetime reps, the character's waypoint position, current streak, quest points, unlocked zones and gear, equipped gear, and the full rep history exactly as they were — all facets coherently, never a mix of restored and reset values"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
-description = "When switching Game Mode from Quest to Challenge and back, no logged reps, quest points, or history are lost, and only one mode's panel (map/log form or Boss Challenge panel) is visible at a time"
+name = "mode_switch_round_trip_preserves_state"
+description = "Switching Game Mode from Quest to Challenge and back preserves lifetime reps, today's total, quest points, the History list, and any in-progress challenge run state identically before and after the round trip, and only one mode's panel (map/log form or Boss Challenge panel) is visible at a time"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
-description = "After using Undo following an action, the History state region shows the prior snapshot's label and lifetime reps/streak/quest points revert to that snapshot's values; Redo restores the undone action"
+name = "undo_redo_steps_through_snapshots"
+description = "After performing a recorded sequence of state-changing actions (log a set, update the daily goal, buy gear), each Undo updates the History state region's snapshot label and the displayed lifetime reps, streak, and quest points to the prior snapshot's values, and each Redo steps forward through the same sequence"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
-description = "After Undo followed by a different action (not Redo), a new branch appears in the branch list and selecting the earlier branch restores its exact prior visible state"
+name = "undo_branching_preserves_branches"
+description = "After Undo followed by a different action (not Redo), a new selectable branch appears in a branch list rather than the redo-able snapshots being overwritten or silently discarded, and selecting the earlier branch restores its exact prior visible state (lifetime reps, streak, quest points, History list)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
-description = "When toggling the Reset Quest control, a confirmation dialog appears first; confirming wipes lifetime reps, streak, quest points, unlocked zones/gear, and history back to a fresh start, while Cancel leaves everything unchanged"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.13"
-name = "1_13"
-description = "At a 375px-wide viewport, the quest map, forms, and weekly chart resize to fit without introducing horizontal scrolling, and rep totals/streak/history/settings text stays legible"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.14"
-name = "1_14"
-description = "When hovering or keyboard-focusing the Log Reps button, a Gear Shop control, and a History Delete control, each shows a visible hover or focus-ring state"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.15"
-name = "1_15"
-description = "Logging a valid positive whole-number rep set increases lifetime reps and today's total, and the character visibly advances along the canvas quest map"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.16"
-name = "1_16"
-description = "A Boss Challenge waypoint is marked defeated and awards bonus quest points only once lifetime reps have reached it and a qualifying single set (meeting its minimum reps) has been logged"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.17"
-name = "1_17"
-description = "Reaching a new waypoint's zone repaints the quest map canvas with that zone's own background palette and shows a one-time Zone Unlocked notification"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.18"
-name = "1_18"
-description = "Gear Shop outfits unlock by spending quest points, and equipping an unlocked outfit changes the character's appearance on the quest map"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.19"
-name = "1_19"
-description = "Deleting a History entry recalculates lifetime reps, quest points, unlocked zones, defeated bosses, and the streak from the remaining entries rather than adjusting a running total"
+name = "reset_quest_confirmation_flow"
+description = "Activating the Reset Quest control opens a confirmation dialog first; confirming wipes lifetime reps, streak, quest points, unlocked zones/gear, and the full rep history back to a fresh start, while Cancel leaves all state untouched"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.20"
-name = "1_20"
-description = "The daily-goal progress indicator and Current Streak track today's logged reps and consecutive goal-meeting calendar days, resetting the streak the first day the goal is missed"
+name = "goal_progress_and_streak_tracking"
+description = "The daily-goal progress indicator on the Quest tab tracks today's logged reps against the Settings daily-goal target, and the Current Streak counter counts consecutive local-calendar days the goal was met, resetting to zero the first day the goal is missed"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.21"
-name = "1_21"
-description = "The canvas-rendered weekly summary chart shows per-day totals for the last 7 calendar days with a visible daily-goal reference line"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.22"
-name = "1_22"
-description = "Reset Quest is guarded by a confirmation step; only confirming wipes lifetime reps, streak, quest points, unlocked zones/gear, and history, while Cancel leaves everything unchanged"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.23"
-name = "1_23"
-description = "Game Mode exposes two distinct modes (Quest and Challenge); switching between them preserves all logged reps, history, and quest points in both"
+name = "weekly_chart_daily_totals"
+description = "The canvas-rendered weekly summary bar chart shows total reps per day for the last 7 calendar days with a visible daily-goal reference line, and days with zero reps still render a visible zero-height tick rather than a blank area"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.24"
-name = "1_24"
-description = "The Boss Challenge run lifecycle (start, pause, resume, end, restart) only allows transitions from their legal predecessor state; illegal transitions are disabled controls, not silently ignored clicks"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.25"
-name = "1_25"
-description = "Undo restores the immediately prior state snapshot exactly (lifetime reps, streak, quest points, history) and Redo restores the undone snapshot; the History state region reflects the current snapshot's label"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.26"
-name = "1_26"
-description = "Undo followed by a different action (not Redo) creates a new selectable branch in the branch list rather than deleting the abandoned redo-able snapshots; selecting an earlier branch restores its exact prior visible state"
+name = "challenge_run_lifecycle_gating"
+description = "In Challenge mode, the Start run / Pause / Resume / End run lifecycle (idle to active, active to paused, paused to active, active or paused to ended, restart back to idle) only allows transitions from their legal predecessor state; unavailable transitions are disabled controls, not silently ignored clicks"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.27"
-name = "1_27"
-description = "Logging 25 rapid rep sets in immediate succession leaves lifetime reps and the History list exactly matching the sum of what was entered, with no dropped, duplicated, or corrupted entries"
+name = "rapid_logging_integrity"
+description = "Logging 25 rep sets back to back in immediate succession leaves lifetime reps, today's total, and the History list exactly matching the sum of what was entered, with no dropped, duplicated, or corrupted entries and no frozen or blank screen"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.28"
-name = "1_28"
-description = "The Apply Scenario Change control in the History state region visibly mutates quest state and is recorded as its own history snapshot"
+name = "apply_scenario_change_snapshot"
+description = "The Apply scenario change control in the History state region visibly mutates state (rotating through a small set of scenario effects) and is recorded as its own snapshot in the same undo/redo history as other state-changing actions"
 type = "binary"
 weight = 0.5
 optional = true
 
 [[criterion]]
 id = "1.29"
-name = "1_29"
+name = "core_actions_have_no_effect"
 description = "Logging reps, deleting a history entry, buying or equipping gear, or confirming Reset Quest has no visible effect on the quest map, gear shop, or history list (a decorative control that performs no action)"
 type = "binary"
 weight = 1.0
@@ -267,8 +190,79 @@ negate = true
 
 [[criterion]]
 id = "1.30"
-name = "1_30"
+name = "invalid_log_reps_silently_accepted"
 description = "Submitting Log Reps with an empty field, zero, a negative number, or a non-integer value is silently accepted and changes lifetime reps, today's total, or the History list anyway"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.31"
+name = "log_set_flow_cross_surface"
+description = "Starting on the Quest tab with the current today's total and lifetime reps noted, logging a valid set of 12 reps increases both totals by exactly 12 (measured immediately around the action), glides the character forward on the quest map, grows today's bar in the weekly summary chart, and switching to the History tab shows the new entry at the top with its rep count and timestamp, all without a page reload; after a full page refresh, today's total, lifetime reps, the character position, and the History entry all show the same values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "delete_entry_flow_cross_surface"
+description = "Starting with at least two logged sets, deleting one History entry removes exactly that entry from the list; returning to the Quest tab shows the recomputed today's total, lifetime reps, character position, and weekly chart without a reload, and a page refresh preserves the recomputed state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "gear_purchase_flow_with_refresh"
+description = "With the Quest Point balance noted, unlocking a Gear Shop outfit decreases the visible balance by exactly the outfit's cost and flips its card from locked to unlocked; equipping it immediately changes the character's appearance on the quest map, and after a full page refresh the balance, the unlocked state, and the equipped appearance are all preserved"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "daily_goal_save_rescales_surfaces"
+description = "Saving a new Daily Goal value in Settings immediately re-scales the Quest tab progress indicator and moves the goal reference line on the weekly summary chart to the new target, without a page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "daily_goal_invalid_rejected"
+description = "Editing the Daily Goal field with an invalid value (empty, zero, negative, or non-integer) shows an inline error naming the field before submit, and the Save control leaves the previously saved goal in effect"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "daily_reminder_banner_logic"
+description = "Settings offers a Daily Reminder on/off toggle and a reminder-hour selector; when the toggle is on and the configured hour has passed today with the daily goal still unmet, an in-app reminder banner appears, and no banner appears when the toggle is off or once the goal is met"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "history_list_order_and_details"
+description = "The History tab lists every logged set with its rep count and date/time, most recent first, each entry with its own Delete control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "undo_redo_disabled_at_bounds"
+description = "The Undo control is visibly disabled when there is nothing to undo, and the Redo control is visibly disabled when there is nothing to redo, rather than the clicks being silently ignored"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "log_outside_active_run_feedback"
+description = "In Challenge mode, attempting to log reps while a run is not active shows visible feedback and the run state remains unchanged"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "A specified core behavior of RepQuest is broken or missing in a way that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence (element, page state, action sequence) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

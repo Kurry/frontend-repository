@@ -62,126 +62,126 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
-description = "On load, the first viewport shows Ridge brand chrome, mission/clock bento cells, and the hero visual plane (marketing scroll mode)"
+name = "first_viewport_brand_hero"
+description = "On load, the first viewport is a brand-first single composition (not a dashboard): sticky Ridge chrome with a lowercase 'ridge' wordmark and geometric mark, a left bento mission cell, a right bento cell containing a local clock and a SCROLL affordance, and a dominant full-bleed atmospheric hero visual plane below"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
-description = "After opening Events Manager (from View all events or equivalent), at least 6 seeded events are visible with titles"
+name = "seeded_events_visible"
+description = "After opening Events Manager (from Global Events 'View all' or a header control), at least 6 seeded events are visible, each showing a title, date, city, category tag(s), and a status of upcoming, featured, or past"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
+name = "created_event_title_visible"
 description = "After creating an event titled 'Harbor Builder Summit' with a valid date, the text 'Harbor Builder Summit' is visible in the events list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
+name = "triple_create_count_delta"
 description = "After adding 3 new events on top of the seed set, the events list shows exactly 3 more rows than the initial seeded count"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
+name = "status_filter_narrows"
 description = "After filtering events by status (e.g. upcoming) with mixed statuses present, only matching events remain visible"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
+name = "edited_title_replaces_old"
 description = "After editing an event title to 'Evening Validator Meetup', the text 'Evening Validator Meetup' is visible and the previous title is not"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
+name = "deleted_event_removed"
 description = "After deleting an event, that event title is no longer visible in the events list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
-description = "After deleting all events, an empty state is visible in Events Manager"
+name = "empty_state_after_all_deleted"
+description = "After deleting all events, an empty state with an explanatory message is visible in Events Manager"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
-description = "After submitting create with an empty required event title, the events count does not increase and validation feedback is visible"
+name = "empty_title_create_blocked"
+description = "After submitting create with an empty required event title, the events count does not increase and an inline validation message naming the title field is visible"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
+name = "mode_switch_without_reload"
 description = "After switching between Marketing Scroll mode and Events Manager mode, the main canvas shows the other mode without full page navigation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
-description = "After clicking the sun/moon theme toggle, surfaces recolor between light and dark without reload"
+name = "theme_toggle_recolors_all_surfaces"
+description = "After clicking the sun/moon theme toggle pill, the sticky chrome, landing chapters, and Events Manager all recolor between light and dark styling without the document reloading"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
+name = "hover_feedback_present"
 description = "When hovering notched CTAs, event rows, or interactive tiles, a visible hover wash, brightness, or arrow nudge appears"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "1_13"
+name = "why_ridge_sticky_or_fallback"
 description = "On desktop width, scrolling Why Ridge pins pillars into a progressive sticky stack (or reduced-motion/mobile shows the vertical-list fallback)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.14"
-name = "1_14"
-description = "On first load, watch the first viewport: the sticky chrome and bento cells animate into place rather than appearing pre-settled"
+name = "load_entrance_runs"
+description = "On a fresh first load, watch the first viewport: the sticky chrome and bento cells animate into place rather than appearing pre-settled"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.15"
-name = "1_15"
+name = "global_events_headline_decodes"
 description = "Scroll to the Ridge Global Events chapter and confirm the headline resolves from scrambled decoy glyphs to RIDGE GLOBAL EVENTS"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.16"
-name = "1_16"
-description = "Open the header hamburger and confirm a full-screen/drawer mega-menu appears with Build, Solutions, Community, and About panels"
+name = "mega_menu_panels_light_dismiss"
+description = "Opening the header hamburger shows a full-screen/drawer mega-menu with Build, Solutions, Community, and About panels, and clicking outside the open panel (light-dismiss) closes it"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.17"
-name = "1_17"
+name = "console_clean_during_session"
 description = "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.18"
-name = "1_18"
+name = "static_list_without_crud"
 description = "Events list is static HTML only with no working create/edit/delete against shared state"
 type = "binary"
 weight = 1.0
@@ -189,7 +189,7 @@ negate = true
 
 [[criterion]]
 id = "1.19"
-name = "1_19"
+name = "chrome_navigates_offsite"
 description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
 type = "binary"
 weight = 1.0
@@ -197,28 +197,120 @@ negate = true
 
 [[criterion]]
 id = "1.20"
-name = "1_20"
-description = "The header has no horizontal link row; an oversized hamburger opens a full-screen/drawer mega-menu with Build, Solutions, Community, and About panels whose CTAs stay in-page"
+name = "header_hamburger_only_nav"
+description = "The sticky header contains no traditional horizontal navigation link row — navigation lives only in the oversized hamburger mega-menu, and every mega-menu CTA stays in-page"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.21"
-name = "1_21"
-description = "Filtering events by status or category recomputes the visible events list from the shared collection"
+name = "filter_flow_status_category_clear"
+description = "Starting from the full events list with at least one created event added: applying a status filter narrows the rows to matches; switching to a category filter recomputes the rows from the same shared collection; clearing all filters restores the full seeded-plus-created list exactly"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.22"
-name = "1_22"
-description = "Creating an event with an empty title or missing date does not add an event and surfaces visible validation feedback"
+name = "missing_date_create_blocked"
+description = "Submitting the event create form without a date adds no event — the visible event count stays unchanged — and an inline validation message naming the date field appears"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.23"
-name = "1_23"
-description = "A light/dark theme toggle recolors surfaces via theme tokens without reloading the document"
+id = "1.24"
+name = "create_flow_cross_surface"
+description = "Full create flow: note the Events Manager row count, submit a valid new upcoming event, and confirm — without any reload — that the form closes, the manager row count increases by exactly one measured immediately around the submit, and the same event title appears in the Global Events landing listings whose status filter matches"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "edit_flow_cross_surface"
+description = "Full edit flow: change an event's title or status in Events Manager and confirm the same record updates everywhere it appears — the manager row, the Global Events landing listings, and any featured slot showing it — without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "delete_flow_cross_surface"
+description = "Full delete flow: delete an event that is visible on the landing chapters, and confirm its manager row disappears, the visible manager count decreases by exactly one measured immediately around the delete, and the same event vanishes from the landing listings and any featured slot in the same session"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "theme_flow_preserves_state"
+description = "Full theme flow: with an active events filter applied, toggle to dark mode and confirm chrome, hero, chapters, and Events Manager recolor together; toggle back and confirm light styling returns while the events collection contents and the active filter remain exactly as they were"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "reload_restores_seeded_baseline"
+description = "Multi-facet reload probe: create an event, apply a filter, switch the theme, and open the mega-menu, then reload the page — the app returns coherently to its seeded baseline: the original seeded events (at least 6, without the created one), default theme, closed mega-menu, and default filters, never a mix of surviving and reset facets"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "double_submit_adds_one_event"
+description = "Rapidly double-activating the event create submit control adds exactly one event: the visible count increases by one and exactly one new row appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "filter_no_match_empty_state"
+description = "When active filters match no events, the list region shows an empty state with a clear-filters control, and activating that control restores the full list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "empty_state_create_control"
+description = "The Events Manager empty state shown after deleting all events includes a control that opens the create flow"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "contact_form_invalid_blocked"
+description = "Submitting a contact/email form with a malformed email or without privacy consent shows inline errors naming the offending field and the success state does not appear"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "contact_submit_gated_then_succeeds"
+description = "The contact form's submit control stays disabled until every required field (including email format and privacy consent) is valid, and a valid submit then shows an in-page success state with no page navigation and no outbound form POST in the network log"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "featured_flag_surfaces_on_landing"
+description = "Marking an event as featured in Events Manager surfaces that event in the featured slots of the landing chapters, and unmarking (or deleting) it removes it from those slots"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "landing_chapters_present"
+description = "Scrolling the landing page top to bottom passes through the featured initiative strip, Why Ridge chapter, Get started onboarding trio, placeholder-partner trust strip, developer resources, Network in action seeded lists, News & stories carousel, Solutions grid, Community block, and the Ridge Global Events chapter with its featured summit card"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "bento_clock_shows_live_time"
+description = "The hero bento clock shows the current local time and updates while the page is open"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in its core features or end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

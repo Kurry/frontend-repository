@@ -62,62 +62,66 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
-description = "The layout gives primary visual emphasis to the source editor and preview over header chrome and secondary metadata"
+name = "editor_preview_visual_priority"
+description = "A narrower left region stacking editor, samples, and actions pairs with a wider preview region, giving the source and rendered diagram clear priority over header chrome and metadata"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
-description = "The controls that edit the source are visually grouped with the editor they affect, and export controls are grouped in their own Actions panel"
+name = "controls_grouped_by_purpose"
+description = "Code and Config controls are grouped with the monospace editor, sample controls occupy their own panel, and SVG, PNG, and Copy image controls are grouped in a distinct Actions panel"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
-description = "The editor and preview panes read as a coherent pair, with the source, diagram type, rendered marks, and export state presented consistently"
+name = "preview_grid_and_type_badge"
+description = "The preview centers a crisp rendered SVG over a subtle grid backdrop and the header displays a compact, legible badge naming the current diagram type"
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "3.4"
-name = "3_4"
-description = "Light and dark themes both keep the header, editor, panels, preview, and rendered diagram legible with adequate contrast"
+name = "coherent_light_dark_surfaces"
+description = "Light and dark themes keep header, editor, cards, panels, preview, controls, error text, and diagram marks readable with a coherent surface and contrast system"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "3_5"
-description = "The source editor uses a monospace text area with a clearly distinguished active tab between Code and Config"
+name = "tab_card_and_alert_craft"
+description = "The active editor tab is unmistakable, cards use consistent hairline borders and soft shadows, buttons and toggles share one polished component language, and the syntax error is a readable dark destructive banner with icon and monospace detail"
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "3.6"
-name = "3_6"
-description = "At a 375px-wide viewport the editor and preview reflow into a single readable column with no clipped text or overlapping controls and no horizontal page scrolling"
+name = "phone_single_column_layout"
+description = "At roughly 375px wide, editor, samples, actions, and preview reflow to one readable column with reachable exports, no clipped or overlapping controls, and no page-level horizontal scrolling"
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "3.7"
-name = "3_7"
-description = "The editor and preview render at equal visual weight with no clear focal area, or the diagram-editing surface is buried under unrelated chrome"
+name = "buried_or_unbalanced_workspace"
+description = "Unrelated chrome overwhelms the editor-preview pair, the preview is too small to inspect, or source and actions lack clear grouping and hierarchy"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "3.8"
-name = "3_8"
-description = "A single flat text size is used everywhere with no distinguishable type hierarchy between the heading, editor, and panel labels"
+name = "theme_or_responsive_visual_breakage"
+description = "A theme or phone layout produces unreadable contrast, clipped editor text, overlapping controls, horizontal page overflow, or inconsistent browser-default component styling"
 type = "binary"
-weight = 0.5
+weight = 1.0
 negate = true
-optional = true
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable visual-design defect that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence that demonstrates it. If the defect is already covered even partially by another criterion, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

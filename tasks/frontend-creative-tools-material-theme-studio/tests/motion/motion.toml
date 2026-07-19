@@ -62,14 +62,14 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
-description = "Required hover animations are present; tab indicator and preview updates animate as specified"
+name = "hover_animations_present"
+description = "Required hover animations are present: buttons and icon buttons brightness-lift on hover, accordion summaries and saved theme rows take a subtle hover wash, inert link-like controls underline on hover, and tab labels ease opacity/background on hover"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "4_2"
+name = "tab_switch_keeps_hover"
 description = "Tab/mode switches update without full reload and keep hover feedback"
 type = "binary"
 weight = 0.5
@@ -77,7 +77,7 @@ optional = true
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
+name = "hover_washes_missing"
 description = "Omits hover washes on buttons, rows, or tabs so the studio feels static on pointer hover"
 type = "binary"
 weight = 1.0
@@ -85,15 +85,51 @@ negate = true
 
 [[criterion]]
 id = "4.4"
-name = "4_4"
+name = "tab_indicator_slides"
 description = "The primary-colored main tab indicator slides when switching between Preview, Components, and Saved Themes"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "4_5"
-description = "Palette accordion rows expand and collapse with a chevron rotation when clicked"
+name = "accordion_eased_expand"
+description = "Palette accordion rows expand and collapse with a chevron rotation and an eased height transition when clicked via the real accordion control"
 type = "binary"
 weight = 0.5
 optional = true
+
+[[criterion]]
+id = "4.6"
+name = "theme_card_enter_exit"
+description = "Driven through the real UI controls, a newly created saved-theme card eases in and a deleted card animates out rather than vanishing instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "modal_scale_fade_transition"
+description = "The Tutorial and theme-form modals enter with a short opacity and scale transition of roughly 200 to 300 milliseconds and exit the same way"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "toast_slide_and_fade"
+description = "Action toasts (copy, save, snippet applied) slide in, remain readable, and auto-dismiss with a fade"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "reduced_motion_flows_completable"
+description = "With prefers-reduced-motion set, animations are removed and state changes apply instantly while every flow stays completable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable motion or microinteraction defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action, page state, screenshot) that demonstrates it. If the defect is already covered - even partially - by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

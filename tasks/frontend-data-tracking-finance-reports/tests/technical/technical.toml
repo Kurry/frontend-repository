@@ -62,15 +62,15 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "2.1"
-name = "2_1"
-description = "Preact Signals holds transactions, chart tab, filters, and derived totals — shared across components"
+name = "cross_view_state_coherence"
+description = "A transaction change made through one surface is immediately reflected in every other surface showing that data — table rows, the four summary cards, the summary strip, and the chart panels — without a page reload and with no view showing stale data"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
-name = "2_2"
-description = "Implemented with Preact, Signals, and Tailwind CSS; no browser storage APIs for persistence"
+name = "document_title_ledger_reports"
+description = "The browser document title reads exactly 'Ledger | Reports'"
 type = "binary"
 weight = 1.0
 
@@ -81,3 +81,69 @@ description = "Uses localStorage or sessionStorage to persist transactions or fi
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "2.4"
+name = "keyboard_operable_with_visible_focus"
+description = "Every interactive control — nav items, chart pills, filters, row checkboxes, form fields, and bulk actions — is reachable and operable with the keyboard alone, with a visible focus indicator"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "labeled_inputs_aria_live_validation"
+description = "Create and edit form inputs have programmatically associated labels, and inline validation messages are exposed through an aria-live polite region as well as shown visually"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "toast_announced_without_focus_trap"
+description = "Toasts are announced through an aria-live polite region and never trap keyboard focus"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "chart_text_alternative_present"
+description = "Each chart panel exposes a text alternative: node/segment labels and amounts are readable as text in or alongside the chart region"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "interactive_within_two_seconds"
+description = "The app becomes interactive within 2 seconds of a local cold load"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "console_errors_during_full_exercise"
+description = "Console errors or warnings appear during a full exercise of the app (create, edit, delete, filters, bulk actions, chart toggles, toasts)"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "responsive_under_rapid_input"
+description = "Chart tab switches and filter changes apply without visible freezing, and the UI stays responsive under rapid repeated input with no hangs or dropped interactions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "external_origin_requests_or_navigation"
+description = "The running app requests scripts, styles, fonts, or icons from external origins (CDNs) or navigates the top-level page to another origin during use"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network request, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

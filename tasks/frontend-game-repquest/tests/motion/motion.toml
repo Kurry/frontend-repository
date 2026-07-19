@@ -62,36 +62,36 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
-description = "All interactive buttons (Log Reps, Gear Shop Equip/Unlock, Reset Quest, History Delete, Settings Save/toggle, Game Mode, Start/Pause/Resume/End run, Undo/Redo/Apply scenario change) show a visible hover state driven by the real control"
+name = "buttons_hover_state"
+description = "All interactive buttons (Log Reps, Gear Shop Equip/Unlock, Reset Quest, History Delete, Settings Save/toggle, Game Mode, Start/Pause/Resume/End run, Undo/Redo/Apply scenario change) show a visible hover state, verified with a real pointer hover while inspecting computed styles"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "4_2"
-description = "Keyboard Tab focus shows a visible focus ring on every interactive control across all four tabs"
+name = "keyboard_focus_ring_visible"
+description = "Reaching interactive controls with keyboard Tab shows a visible focus ring on every control across all four tabs"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
-description = "The character sprite glides smoothly along the quest map canvas path when a new set is logged, rather than jumping instantly to its new position"
+name = "character_glides_on_log"
+description = "The character sprite advances smoothly (glides, not teleports) along the quest map canvas path when a new set is logged through the real Log Reps form"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "4_4"
-description = "A transient notification visibly enters and then dismisses itself for zone unlocks, boss defeats, gear purchases, undo/redo, and quest reset"
+name = "transient_notification_slide_and_dismiss"
+description = "A transient notification banner slides or fades in when a zone unlocks, a boss is defeated, gear is bought, or the quest is reset, and dismisses itself shortly after without user action"
 type = "binary"
 weight = 0.5
 optional = true
 
 [[criterion]]
 id = "4.5"
-name = "4_5"
+name = "history_delete_reveals_on_hover"
 description = "History Delete controls reveal on row hover or keyboard focus at desktop widths"
 type = "binary"
 weight = 0.5
@@ -99,16 +99,53 @@ optional = true
 
 [[criterion]]
 id = "4.6"
-name = "4_6"
-description = "One or more of the required interactive controls (Log Reps, Gear Shop, Reset Quest, History Delete, Undo/Redo) has no visible hover state and no visible focus-visible ring"
+name = "control_missing_hover_and_focus"
+description = "One or more of the required interactive controls (Log Reps, Gear Shop, Reset Quest, History Delete, Undo/Redo) has no visible hover state and no visible focus ring when reached by keyboard"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "4.7"
-name = "4_7"
-description = "The character position snaps instantly along the quest map with no glide or transition when reps are logged, despite the motion requirement"
+name = "character_snaps_instantly"
+description = "The character position snaps instantly along the quest map with no glide or transition when reps are logged through the real Log Reps form, despite the motion requirement"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.8"
+name = "boss_defeat_confetti_celebration"
+description = "Defeating a boss by submitting the qualifying set through the real Log Reps form triggers a brief one-time confetti-style particle celebration over the quest map"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "history_entries_animate_in_out"
+description = "Adding a set animates the new entry into the top of the History list, and deleting an entry through its real Delete control animates it out rather than snapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "reminder_banner_attention_treatment"
+description = "While visible, the Daily Reminder banner uses a noticeable attention treatment such as a pulse"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.11"
+name = "confetti_loops_or_fires_for_ordinary_sets"
+description = "The boss-defeat particle celebration loops ambiently, replays on later visits without a new boss defeat, or fires for ordinary non-qualifying sets"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable motion or microinteraction defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction, observed frames) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

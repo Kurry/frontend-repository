@@ -1,14 +1,14 @@
 <summary>
-Build a fine-art color palette library using Vue 3, Pinia, and UnoCSS.
+Build a fine-art color palette library using Vue 3, Pinia, Tailwind CSS 4.3.2, and Ark UI.
 </summary>
 
 <reference_screenshots>
 Screenshots of the reference application are provided in-container at
-`/reference-screenshots/`: `overview.png` is a full-page desktop-layout
-overview (downscaled); `segment-NN.png` are full-resolution 1440x900 sections
+/reference-screenshots/: overview.png is a full-page desktop-layout
+overview (downscaled); segment-NN.png are full-resolution 1440x900 sections
 in top-to-bottom order with slight overlap. They are part of this instruction:
 recreate what they show. Where a screenshot and the text conflict, the text
-wins. Do not copy the images into `/app` or ship them as app assets.
+wins. Do not copy the images into /app or ship them as app assets.
 </reference_screenshots>
 
 <core_features>
@@ -54,7 +54,7 @@ State contracts (behavioral, not storage keys):
 - Deleting a palette removes it from lists, selection, and filters
 - Period filter and view mode recompute visible items from the shared collection; nomenclature ordering (hue sort + hex dedupe) derives from the shared collection
 - Copy feedback and subscribe-popup dismissal are ephemeral in-memory state; the popup stays hidden on first paint and appears only after idle (~45s) or deep scroll (~50%)
-Stack: Vue 3 + Pinia + UnoCSS (Vite or equivalent SPA); frontend-only. Lenis + GSAP ScrollTrigger and a nearest-name color helper are allowed. No MUI/Chakra/Ant Design.
+Stack: Vue 3 with Pinia, built with Vite or an equivalent SPA setup. Styling is Tailwind CSS 4.3.2 (pinned), with design tokens in @theme. Ark UI for Vue components provide the menu, cart drawer, period select, palette editor, subscribe dialog, and toasts; no other external component library. @vueuse/motion is allowed for animation; no other animation libraries. Iconify via @iconify/tailwind4 only; no raw pasted SVG icon sets and no icon CDNs. All forms, including palette create and edit and the subscribe form, validate through a Zod schema driven by VeeValidate and render inline per-field errors before submit. A nearest-name color helper is allowed. All libraries are installed via npm and bundled locally; no CDN imports.
 - Seed at least 6 user-manageable palettes plus any historical dataset so first load is non-empty
 - Empty required fields on create must not increase the palettes count; show visible validation feedback
 - After deleting all user palettes (or filtering to zero matches), show an empty state in the library region

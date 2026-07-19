@@ -62,21 +62,21 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "2.1"
-name = "2_1"
-description = "Solid stores holds events, year window, filters, and active mode — shared across components"
+name = "shared_state_coherent_across_views"
+description = "Events, the year window, filters, active mode, and selection behave as one shared client state: a change made in one view (an edit in the library, a filter toggle, a window change) is immediately reflected in every other surface showing that data — pins, counts, era label, open detail — without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
-name = "2_2"
-description = "Implemented with Solid.js, Solid stores, and Tailwind CSS; no browser storage APIs for persistence"
+name = "reload_returns_seeded_in_memory_baseline"
+description = "A page reload returns the app to its seeded in-memory baseline — seeded corpus, default year window, all categories enabled, no user-created events — and browser storage (localStorage, sessionStorage, IndexedDB) stays empty after a full exercise of the app"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
-name = "2_3"
+name = "browser_storage_persists_state"
 description = "Uses localStorage or sessionStorage to persist events or filters"
 type = "binary"
 weight = 1.0
@@ -84,8 +84,73 @@ negate = true
 
 [[criterion]]
 id = "2.4"
-name = "2_4"
-description = "Manages the events collection only in component-local signals only rather than Solid stores"
+name = "views_desync_on_shared_data"
+description = "After an edit, delete, or filter change, the same event or count shows different values in two places (for example the list row disagrees with the stage pin, detail panel, or a readout) until a reload"
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "2.5"
+name = "keyboard_operable_with_visible_focus"
+description = "Every interactive control (mode switch, scrubber thumbs, year inputs, filters, pins or their list equivalents, detail navigation) is reachable and operable with the keyboard alone, with a visible focus ring on the focused control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "dialogs_close_on_escape_and_return_focus"
+description = "The event detail panel/popup and the About overlay behave as dialogs: Escape closes them and keyboard focus returns to the control that opened them"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "arrow_keys_step_detail_through_filtered_events"
+description = "While the detail is open, the left and right arrow keys step Previous/Next through the currently filtered events"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.8"
+name = "interactive_within_two_seconds"
+description = "The app is interactive within 2 seconds of a local cold load"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "console_clean_during_full_exercise"
+description = "No console errors or unhandled promise rejections appear during load or a full exercise of scrubbing, zooming, filtering, creating, editing, and deleting"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "rapid_zoom_and_scrub_stay_responsive"
+description = "Rapid wheel zoom and continuous scrubbing update pins, the era label, and readouts without hangs, visible hitching, or dropped interactions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "outbound_network_requests_present"
+description = "Devtools shows network requests to other origins (CDN scripts, remote fonts, external APIs) during load or use of the app"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.12"
+name = "document_title_reflects_mediatimeline"
+description = "The browser document title reflects MediaTimeline"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect (state, storage, console, network, stability) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, console line, network request, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

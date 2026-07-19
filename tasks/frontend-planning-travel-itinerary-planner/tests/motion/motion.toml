@@ -62,14 +62,14 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
-description = "Required hover animations are present; list/map and detail tab switches behave as specified"
+name = "hover_ease_and_press_scale"
+description = "Hovering sidebar items eases a hover opacity change with a brief press scale on activation, place and carousel cards lift slightly on hover, and map chrome buttons show the same hover/press microfeedback — verified by real pointer hover, not a state shortcut"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "4_2"
+name = "mode_switch_keeps_hover_feedback"
 description = "Plan/Map mode switches update without full reload and keep hover feedback"
 type = "binary"
 weight = 0.5
@@ -77,7 +77,7 @@ optional = true
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
+name = "hover_feedback_missing"
 description = "Omits hover feedback on place rows or chrome so the planner feels static on pointer hover"
 type = "binary"
 weight = 1.0
@@ -85,7 +85,50 @@ negate = true
 
 [[criterion]]
 id = "4.4"
-name = "4_4"
+name = "map_fly_and_pin_enlarge"
 description = "Selecting a stop or a day eases/flies the map to the target and animates the chosen pin into its enlarged active state"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "list_add_remove_animates"
+description = "Creating a stop through the form animates the new row into its day section, and deleting a stop animates its row out, rather than rows appearing or vanishing in a single instant frame — verified through the real UI controls, not a state shortcut"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "day_reassign_reflow_animates"
+description = "Reassigning a stop to another day through the edit form animates the reflow of both affected day sections as the row leaves one and enters the other"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "toast_slide_fade_autodismiss"
+description = "Demo toasts slide or fade in when triggered and auto-dismiss on their own after a short interval"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion enabled, toast and control transitions are disabled or substantially reduced while the app remains fully usable"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.9"
+name = "detail_tabs_swap_without_navigation"
+description = "Place-detail tab switches swap panels in place with the detail card overlaying the map, without any page navigation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

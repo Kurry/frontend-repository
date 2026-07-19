@@ -62,14 +62,14 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
+name = "equity_value_transition"
 description = "Driving the real Deal and betting controls, the hand-equity percentage animates its value change on each new street rather than snapping instantly to the new number"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
+name = "badge_toast_auto_dismisses"
 description = "Earning a badge through real play shows a transient toast at the moment it is earned that clears on its own after a few seconds without blocking the betting controls"
 type = "binary"
 weight = 0.5
@@ -77,21 +77,21 @@ optional = true
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
+name = "hover_states_on_controls"
 description = "Every betting control and panel toggle shows a visible hover state distinct from its resting state when hovered without clicking"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.4"
-name = "3_4"
+name = "focus_visible_on_controls"
 description = "Keyboard Tab focus is clearly visible on every betting control and panel toggle, legible against the dark felt"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "3_5"
+name = "controls_static_on_hover"
 description = "Betting controls and panel toggles show no hover feedback at all, appearing static on pointer hover"
 type = "binary"
 weight = 1.0
@@ -99,9 +99,52 @@ negate = true
 
 [[criterion]]
 id = "3.6"
-name = "3_6"
+name = "equity_snaps_without_transition"
 description = "The hand-equity percentage snaps instantly to its new value on a new street with no visible transition when driven through the real deal flow"
 type = "binary"
 weight = 0.5
 negate = true
 optional = true
+
+[[criterion]]
+id = "3.7"
+name = "human_win_confetti_burst"
+description = "Winning a hand at showdown in the human's favor, reached through real play, fires a brief celebratory confetti burst over the table, and confetti is absent when the hand resolves against the human"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "showdown_reveal_animates"
+description = "At showdown, driven through the real betting flow, the remaining hole cards flip face-up and the winning-hand highlight applies as the hand resolves, rather than the revealed state appearing with no reveal motion"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.9"
+name = "history_entry_animates_in"
+description = "A newly completed hand animates into the top of the Hand history list rather than appearing instantly"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.10"
+name = "mobile_drawer_smooth_transition"
+description = "On a narrow viewport (approximately 375px), the stats/history/badges drawer opens and closes with a smooth transition and never obstructs the table while doing so"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.11"
+name = "reduced_motion_respected"
+description = "On a fresh load with prefers-reduced-motion enabled, decorative animations (equity transition, confetti, history-entry entrance) are removed and state changes apply instantly, while the app remains fully usable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions (jarring, broken, janky, or missing animation feedback) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

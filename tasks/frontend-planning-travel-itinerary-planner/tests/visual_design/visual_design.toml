@@ -62,21 +62,21 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
-description = "Three-pane planner composition (sidebar / plan / map) remains dense and trip-specific"
+name = "three_pane_planner_density"
+description = "Three-pane planner composition (left sidebar / center plan column / right map pane) remains dense and trip-specific, with the planner workspace as the first viewport (no marketing landing)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
-description = "Empty plan list state is visually present when no stops remain"
+name = "empty_list_state_visible"
+description = "Empty plan list state is visually present and clear when no stops remain"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
+name = "static_brochure_collapse"
 description = "Collapses into a static brochure itinerary with no interactive stops collection"
 type = "binary"
 weight = 1.0
@@ -84,15 +84,95 @@ negate = true
 
 [[criterion]]
 id = "3.4"
-name = "3_4"
+name = "day_colored_numbered_pins"
 description = "The map shows one numbered pin per stop colored by its day, the selected pin is enlarged with a popup reading the place name and its Day N label, and unscheduled ideas stops use a neutral non-day marker"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "3_5"
+name = "pins_unnumbered_or_uncolored"
 description = "Map pins are unnumbered or share a single color regardless of day, or the selected pin is not enlarged relative to the others"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.6"
+name = "coastal_palette_and_typeface"
+description = "The page shows a soft coastal look: a cool blue-gray page wash, a humanist sans-serif body typeface, and a navy accent color used consistently across chrome and controls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "sidebar_dot_matches_pin_color"
+description = "Each itinerary day carries its own distinct color, and that color is shared between the day's sidebar dot and its numbered map pins"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "floating_detail_card_anatomy"
+description = "The place-detail card floats over the map pane with a visible tab row (About / Book / Reviews / Photos / Mentions) and a dismiss control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "single_consistent_icon_set"
+description = "Icons across the sidebar, toolbar, and map chrome come from one consistent icon set rendered at consistent sizes, with no mixed styles or pixelated glyphs"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "hero_cover_title_date_range"
+description = "The plan hero presents a cover image, the trip title 'Trip to the French Riviera - Cote d'Azur', and the date range 7/5–7/11 with clear typographic hierarchy over the plan column"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "panes_side_by_side_at_1024"
+description = "At viewport widths of 1024px and above the sidebar, plan column, and map pane render side by side; below 1024px the map pane stacks below the plan column"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.12"
+name = "sidebar_drawer_at_768"
+description = "At viewport widths of 768px and below, the left sidebar collapses behind a toggle control that opens it as an overlay drawer"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.13"
+name = "mobile_horizontal_overflow"
+description = "At 375px viewport width, content clips or overflows the viewport, or a horizontal scrollbar appears"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.14"
+name = "ui_copy_quality"
+description = "Where the app renders headings, labels, empty states, and validation messages, the copy uses one consistent capitalization convention and consistent terminology, and error messages name the problem field rather than a generic rejection"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.15"
+name = "placeholder_text_shipped"
+description = "Lorem ipsum, 'TODO', template variable names, or other placeholder text is visible anywhere in the shipped UI"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

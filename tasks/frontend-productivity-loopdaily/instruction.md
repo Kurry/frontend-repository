@@ -1,35 +1,65 @@
 <summary>
-Build LoopDaily, a frontend-only habit-tracking app using React, Jotai, and Tailwind CSS, with all data persisted to localStorage and recovered gracefully from corrupted persisted data.
+Build LoopDaily, a frontend-only habit-tracking app using React, Jotai, Tailwind CSS 4.3.2, and shadcn/ui, with all data persisted to localStorage and recovered gracefully from corrupted persisted data.
 </summary>
 
 <reference_screenshots>
 Screenshots of the reference application are provided in-container at
-`/reference-screenshots/`: `overview.png` is a full-page desktop-layout
-overview (downscaled); `segment-NN.png` are full-resolution 1440x900 sections
+/reference-screenshots/: overview.png is a full-page desktop-layout
+overview (downscaled); segment-NN.png are full-resolution 1440x900 sections
 in top-to-bottom order with slight overlap. They are part of this instruction:
 recreate what they show. Where a screenshot and the text conflict, the text
-wins. Do not copy the images into `/app` or ship them as app assets.
+wins. Do not copy the images into /app or ship them as app assets.
 </reference_screenshots>
 
 <core_features>
 Core features (each line is an observable behavior the finished app must exhibit):
-- A New Habit form collects a required name, an icon chosen from a fixed emoji palette, and a target of either Once a day or a numeric daily count (e.g. 8); submitting with a blank name is blocked and explained with a visible inline error or shake/hint, not merely a silently disabled button, and no phantom habit is added
+Feature: Create habit —
+- A New Habit form collects a required name, an icon chosen from a fixed emoji palette, and a target of either Once a day or a numeric daily count (e.g. 8); each invalid field shows an inline error message naming that field before submit, and no phantom habit is added on an invalid submit
+- The New Habit form includes a category dropdown so each habit is assigned to one category at creation time
+Feature: Check-ins —
 - A Once a day habit shows a single one-tap complete control: tapping it marks today done with a distinct filled/checked treatment; tapping it again the same day undoes the completion
 - A numeric-target habit shows a plus-one and minus-one stepper plus an n/target fraction (e.g. 3/8) that updates immediately with each tap; the habit reaches a distinct complete treatment only once the day's count reaches the target, and reverts out of that treatment the moment a minus-one tap drops the count below target
 - Each habit shows a flame icon whose treatment changes at three streak milestones: plain below a 7-day streak, bright at 7 to 29 days, and a distinct gold treatment at 30 or more days; the flame updates its treatment the instant a streak crosses 7 or 30 days, without a page refresh
-- The user can create named categories (e.g. Health, Work) and assign each habit to one category via a dropdown on the New Habit form; a category filter bar shows All plus one chip per category, and selecting a chip narrows the visible habit list to that category while the active chip stays visibly highlighted; selecting All restores every habit
+Feature: Categories and filtering —
+- The user can create named categories (e.g. Health, Work); a category filter bar shows All plus one chip per category, and selecting a chip narrows the visible habit list to that category while the active chip stays visibly highlighted; selecting All restores every habit
+Feature: History views —
 - Each habit row shows a compact 7-day grid covering today and the six previous days; each cell visually distinguishes done, missed, and not-yet-elapsed days, and today's cell is visually marked
 - A Heatmap view, opened per habit, renders a full calendar month as a grid of day cells; each cell's shading intensity reflects that day's completion — fully done, partially done for stepper habits, or not done — and future days in the month render as a distinct not-yet-elapsed shade
+- Hovering a day cell in the Heatmap view shows a tooltip naming that date and its completion state
+Feature: Reminders, ordering, pause —
 - Each habit has an optional free-text Remind me at field (e.g. 7:00 AM) shown as a label on its card; it is a static self-reminder note, not a real system notification, and it persists across refresh
 - Habits can be dragged by a handle into a new order; the new order persists across reloads and is not disturbed by completing a check-in
 - A Pause control excludes a habit from streak calculations and from the main habit list while paused, without deleting its history; a Resume control returns it to the main list with its prior streak value intact
-- A Stats view shows, across all habits: the number of active current streaks, the single longest streak ever recorded across any habit, and total completions in the current calendar month; with no habits created yet it shows its own short message instead of blank numbers
+Feature: Stats —
+- A Stats view shows, across all habits: the number of active current streaks, the single longest streak ever recorded across any habit, and total completions in the current calendar month
+- The Stats view renders a completions trend chart covering recent days; recording or undoing a check-in changes the plotted values for today the next time the chart is viewed, without a reload
+Feature: Data import and export —
 - An Export as JSON control downloads all habits, categories, and completion history as a JSON file via a Blob and an anchor download attribute; an Import control reads a previously exported JSON file via FileReader and, after an explicit confirmation step that warns the current data will be replaced, replaces the current data with the imported data
-- All habits, categories, completion history, category assignments, reminder notes, habit order, and the active category filter survive a full page refresh, restored purely from localStorage
-- If the persisted data cannot be parsed or fails validation, the app recovers to the last valid snapshot instead of showing a blank screen, and shows a specific recovery notice in a live region with role alert; Retry re-applies the last valid snapshot and Reset clears to a defined empty state, and both controls produce a visible, deterministic result
-- A visible control literally labeled Load Malformed Sample exercises this same guarded recovery path on demand: it feeds a deliberately malformed data payload through the same import logic used for real files, skips or repairs what it can, and reports the outcome in the same role alert live region
-- All streak, weekly-grid, and heatmap calculations are computed from the real device date; there is no manual advance-day control anywhere in the app
+- A visible control literally labeled Load Malformed Sample exercises the guarded recovery path on demand: it feeds a deliberately malformed data payload through the same import logic used for real files, skips or repairs what it can, and reports the outcome in a live region with role alert
+Feature: Date integrity —
+- All streak, weekly-grid, heatmap, and trend calculations are computed from the real device date; there is no manual advance-day control anywhere in the app
 </core_features>
+
+<user_flows>
+End-to-end flows (each step names its visible state evidence):
+- After submitting a valid New Habit form, the habit list count increases by exactly one, the new habit appears under its assigned category when that category's chip is selected, and after a full page reload the habit is still present with the same name, icon, target, and category
+- Completing a Once a day habit fills today's cell in that habit's 7-day grid, updates its streak and flame treatment, increases the Stats view's total completions for the current month by one, and updates the trend chart's value for today — all without a reload; a full page reload then restores the identical completed state
+- Tapping plus-one on a numeric-target habit until the count reaches the target switches the card to its complete treatment, marks today done in the 7-day grid and the Heatmap view, and increments the Stats monthly completions; a minus-one tap that drops the count below target reverts the card, the grids, and the Stats numbers together
+- Pausing a habit removes it from the main list and from the Stats active-streak count without deleting its history; resuming returns it with its prior streak value intact, and both the paused state and the restored state survive a full page reload
+- Selecting a category chip narrows the habit list to that category, and the active filter itself survives a full page refresh, restored from localStorage along with all habits, categories, completion history, reminder notes, and habit order
+- Dragging a habit to a new position reorders the list, the new order is unchanged after completing a check-in on another habit, and a full page reload shows the same order
+</user_flows>
+
+<edge_cases>
+- Submitting the New Habit form with a blank name is blocked and explained with a visible inline error naming the name field plus a shake or equivalent motion cue, not merely a silently disabled button, and no habit is added
+- Double-activating the New Habit submit control creates exactly one habit: the list count increases by exactly one
+- A minus-one tap when a stepper habit's count for today is already zero leaves the count at zero rather than going negative
+- Before any habit exists, the main list shows a friendly empty-state message inviting the user to create the first habit rather than a blank area
+- The Stats view with no habits created yet shows its own short message instead of blank numbers
+- If the persisted data cannot be parsed or fails validation, the app recovers to the last valid snapshot instead of showing a blank screen, and shows a specific recovery notice in a live region with role alert; Retry re-applies the last valid snapshot and Reset clears to a defined empty state, and both controls produce a visible, deterministic result
+- Importing a file only replaces the current data after an explicit confirmation step that warns the current data will be replaced; cancelling the confirmation leaves the current data untouched
+- Load Malformed Sample runs its deliberately malformed payload through the same validation and recovery logic as a real imported file and reports what was skipped or repaired in the role alert live region, without crashing or blanking the app
+</edge_cases>
 
 <visual_design>
 - Heading font is Manrope with fallback Segoe UI, system-ui, -apple-system, sans-serif, used for habit names and view titles; top-level headings render at roughly 28px-equivalent size and section headings at roughly 20px
@@ -40,34 +70,62 @@ Core features (each line is an observable behavior the finished app must exhibit
 - Cards, inputs, and buttons render with 8px border-radius consistently
 - The primary button has a solid #0F9D74 background, white text, 8px border-radius, and no shadow
 - The secondary button is transparent with a 1px solid #64748B border, #1B2430 text, 8px border-radius, and no shadow
+- Icons across the app chrome come from one consistent icon set used at consistent sizes, alongside the fixed emoji palette used for habit icons
 - The three flame treatments — plain, bright, gold — are visually distinguishable from each other as a distinct graphic element, never a placeholder or absent icon
 - The active category filter chip is visually highlighted distinctly from the inactive chips
 - Heatmap cells visibly differ in shading intensity between fully done, partially done, and not-done days in the same month
 - A paused habit renders with a visibly muted or dimmed treatment (for example reduced opacity or desaturation) distinct from active habits, wherever it appears
-- Buttons, category filter chips, and habit rows show a visible hover state; keyboard Tab focus shows a clearly visible focus indicator on every interactive control
-- Before any habit exists, the main list shows a friendly empty-state message inviting the user to create the first habit rather than a blank area; the Stats view with no habits shows its own short message rather than blank numbers
-- At roughly 375px viewport width the app renders with no horizontal scrolling; habit rows stack in a single column and the New Habit form remains fully usable
-- The recovery notice, when active, is visually distinct from ordinary toasts or banners, remains legible at narrow width, and its Retry and Reset controls are visually distinguishable from ordinary actions
+- Buttons, category filter chips, and habit rows show a visible hover state
+- The recovery notice, when active, is visually distinct from ordinary toasts or banners, and its Retry and Reset controls are visually distinguishable from ordinary actions
 </visual_design>
 
 <motion>
-- Creating a habit, completing a check-in, exporting data, and importing data each produce a transient visible confirmation (a toast or equivalent) immediately after the action
+- Creating a habit, completing a check-in, exporting data, and importing data each produce a transient visible confirmation (a toast or equivalent) immediately after the action; toasts slide or fade in and auto-dismiss smoothly
+- A newly created habit animates into the list rather than appearing instantly, and a paused habit animates out of the main list; remaining rows settle into place with a smooth transition
 - Buttons ease their background and border on hover and show a brief press effect on click; category filter chips and habit rows take a visible hover wash
 - A numeric-target habit's stepper progress bar and fraction animate their update immediately on each tap rather than jumping with no transition
 - Submitting the New Habit form with a blank name triggers a visible shake or equivalent motion cue alongside the inline error text
 - The milestone flame's treatment change on crossing a 7-day or 30-day threshold is driven by the real check-in/stepper action, not a hidden shortcut, and is immediately visible after that action completes
+- Crossing a 7-day or 30-day streak milestone through a real check-in triggers a brief celebratory confetti-style particle burst near the habit card; the effect fires only on that milestone action, never ambiently
 - Habit reorder via the drag handle shows a lift/drag affordance while dragging and settles into its new position with a smooth transition on drop
-- The recovery banner and its Retry/Reset controls appear and are announced through the role alert live region as soon as a recovery condition is detected, without requiring focus to move to them
+- The recovery banner and its Retry/Reset controls appear as soon as a recovery condition is detected, without requiring focus to move to them
+- With prefers-reduced-motion set, decorative animations and the celebration effect are removed or reduced and state changes still apply instantly and correctly
 </motion>
 
+<responsiveness>
+- At roughly 375px viewport width the app renders with no horizontal scrolling; habit rows stack in a single column and the New Habit form remains fully usable
+- At narrow width the Heatmap month grid and the 7-day grid remain fully visible without clipping, and the Stats numbers and trend chart fit the viewport
+- The recovery notice remains legible at narrow width with its Retry and Reset controls reachable
+</responsiveness>
+
+<accessibility>
+- Every interactive control — buttons, chips, steppers, the drag handle, form fields, and the import/export controls — is reachable with keyboard Tab and shows a clearly visible focus indicator
+- Inline form validation errors are rendered adjacent to the field they name and are programmatically associated with that field
+- The recovery notice and the Load Malformed Sample outcome are announced through the role alert live region without requiring focus to move to them
+- Dialogs opened by the app (such as the import confirmation) trap focus while open and return focus to the invoking control on close
+</accessibility>
+
+<performance>
+- The app is interactive within 2 seconds of a local cold load
+- No console errors appear during a full exercise of the app, including the malformed-data recovery path
+- Rapid repeated stepper taps stay responsive with no hangs, and every tap is reflected in the fraction and progress bar
+</performance>
+
+<writing>
+- Headings, buttons, and chips use one consistent capitalization convention throughout the app
+- Action labels are specific verbs or verb phrases such as Add habit, Export as JSON, and Load Malformed Sample rather than generic labels
+- Error messages and the recovery notice name the problem and the fix; empty states explain what belongs there and how to add it; no placeholder text appears anywhere in the shipped UI
+</writing>
+
 <requirements>
-Build with React 19 functional components, Jotai atoms for shared app state, and Tailwind CSS with the pre-installed Vite plugin. Use localStorage for persistence, guarded so that malformed or unreadable stored data never crashes the production build.
+Build with React 19 functional components, Jotai atoms for all shared app state (habits, categories, completion history, habit order, active category filter, and UI chrome — views derive from this one store, never a second disconnected copy), and Tailwind CSS 4.3.2 (pinned) with design tokens in @theme. Use shadcn/ui components for the app's dialogs, dropdowns/selects, tabs, and toasts. Motion for React and AutoAnimate are allowed for animation, and canvas-confetti for the streak-milestone celebration; no other animation libraries. Recharts renders the heatmap and completions trend charts. Phosphor icons (@phosphor-icons/react) only for app chrome icons; the habit icon picker keeps its fixed emoji palette. All forms — the New Habit form, category creation, and the import confirmation — are driven by React Hook Form with a Zod schema defining the validation rules, surfacing inline per-field errors before submit. All libraries are installed via npm and bundled locally; no CDN imports.
+Use localStorage for persistence, guarded so that malformed or unreadable stored data never crashes the production build.
 Persistence and recovery contract (the app's core difficulty — spec exactly):
 - All habits, categories, streak/completion history, habit order, category assignments, reminder notes, and the active category filter survive a full page refresh, restored purely from localStorage.
 - When persisted data cannot be parsed or fails structural validation, the app recovers to the last valid snapshot it has, without ever rendering a blank screen, and shows a specific recovery notice in a live region with role alert; a Retry control and a Reset control are both present with visible, deterministic effects — Retry re-applies the last valid snapshot (or reports none is available), Reset clears to the app's defined empty state.
 - A control literally labeled Load Malformed Sample exercises this same guarded import path on demand from the Data view: it runs a deliberately malformed payload through the same validation and recovery logic used for a real imported file, and reports the outcome in the same role alert live region.
 - Import replaces the current habits and categories only after an explicit confirmation step that warns the user their current data will be replaced; Export downloads the current data as a JSON file via a Blob and an anchor download attribute. Import and Export make no network requests.
-All streak and calendar behavior (weekly grid, heatmap, stats) must be computed from the real device date; never add a manual advance-day control.
+All streak and calendar behavior (weekly grid, heatmap, trend chart, stats) must be computed from the real device date; never add a manual advance-day control.
 No backend, no authentication, and no routes other than the app's single root path are required.
 </requirements>
 

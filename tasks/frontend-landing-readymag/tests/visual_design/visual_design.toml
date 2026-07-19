@@ -76,8 +76,8 @@ weight = 1.0
 
 [[criterion]]
 id = "2.3"
-name = "2_3"
-description = "By computed style, the hero title (h1) is font-size 60px, weight 400, line-height 54px (the 0.9 ratio), letter-spacing -2px, color rgb(0,0,0), in a Graphik display font-family distinct from the Inter UI stack of the nav/buttons"
+name = "hero_title_type_scale_display_face"
+description = "By computed style, the hero title (h1) is font-size 60px, weight 400, line-height 54px (the 0.9 ratio), letter-spacing -2px, color rgb(0,0,0), rendered in a bundled grotesque display face that is visibly distinct from the Inter stack of the nav and buttons"
 type = "binary"
 weight = 1.0
 
@@ -127,9 +127,54 @@ negate = true
 
 [[criterion]]
 id = "2.10"
-name = "2_10"
-description = "Display headings render in a generic default system font with no distinct display/UI type hierarchy, flattening the intended Graphik/Inter contrast"
+name = "display_type_contrast_flattened"
+description = "Display headings render in a generic default system font with no distinct display/UI type hierarchy, flattening the intended display-face versus Inter contrast"
 type = "binary"
 weight = 0.5
 negate = true
 optional = true
+
+[[criterion]]
+id = "2.11"
+name = "secondary_type_scale_measurements"
+description = "By computed style at the 1024px design scale, the section heading measures 40px / line-height 38px / letter-spacing -1.8px, the card headings 28px / 28px / -1px, standard body text 18px / 20px / -0.8px, and header/footer utility text 12px"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.12"
+name = "artboard_scale_transform_measurements"
+description = "The page artboard computes width 1024px with transform-origin 0 0; at a 1440px viewport its computed transform is none (scale 1) and at a 390px viewport its computed transform is matrix(0.380859, 0, 0, 0.380859, 0, 0), with the scaled layers unclipped so the entire design width is visible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.13"
+name = "tablet_768_layout_adaptations"
+description = "At a 768px viewport the floating hero media card is hidden, the feature cards stack in one column, the use-case tiles form two columns, and the footer collapses to two columns, with the header and CTA controls usable and no horizontal scrolling"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.14"
+name = "real_brand_assets_shipped"
+description = "The page ships real third-party brand assets: the reference site's actual logo or wordmark files, its licensed display typeface, real project thumbnails, photography, or video lifted from the reference, or placeholder art/wordmark/cursor imagery that names or depicts real third-party brands, sites, or agencies instead of invented identities"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.15"
+name = "placeholder_or_typo_copy_present"
+description = "Lorem ipsum, TODO, or template placeholder text appears somewhere on the page, or prominent copy (headline, section headings, buttons, footer labels) contains spelling errors or casing inconsistent with the mandated strings"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design, layout, responsiveness, or rendered copy that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

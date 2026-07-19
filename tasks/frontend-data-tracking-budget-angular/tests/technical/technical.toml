@@ -145,8 +145,81 @@ negate = true
 
 [[criterion]]
 id = "2.12"
-name = "2_12"
+name = "webmcp_fabricates_success"
 description = "A WebMCP tool invocation fabricates a success result without dispatching the same store action the visible control uses, or accepts an out-of-catalog free-form patch"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.13"
+name = "keyboard_operable_visible_focus"
+description = "Every interactive control (bottom-nav items, period arrows, category filter, table actions, dialog fields and buttons, settings controls) is reachable and operable with the keyboard alone, showing a visible focus indicator on each focused control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.14"
+name = "dialog_traps_and_returns_focus"
+description = "The add/edit expense dialog behaves as a modal dialog: focus moves into it when it opens, stays trapped inside while it is open, and returns to the triggering control when it closes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.15"
+name = "errors_programmatically_associated"
+description = "Validation errors in the add/edit expense dialog are shown visually and programmatically associated with their fields (observable via the accessibility tree, e.g. the invalid field's accessible description names the error), so assistive technology can announce which field is invalid"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.16"
+name = "progressbar_value_exposed_as_text"
+description = "Each budget progress bar exposes its spent-of-limit value as text (visible or accessible-name/value text), not through fill color alone"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.17"
+name = "active_nav_programmatic_state"
+description = "The active bottom-navigation item is distinguishable programmatically (a state observable in the accessibility tree or element attributes) as well as visually"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.18"
+name = "interactive_within_two_seconds"
+description = "The app is interactive within 2 seconds of a local cold load: the workspace renders and responds to a first click without a prolonged blank or frozen state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.19"
+name = "responsive_under_rapid_input"
+description = "Period switches, view switches, and filter changes update the visible content immediately, and the UI stays responsive under rapid repeated input (e.g. clicking the period arrow several times quickly) with no hangs or dropped interactions"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.20"
+name = "cross_origin_requests_made"
+description = "The network log shows requests to another origin (CDN scripts, fonts, stylesheets, or data) during load or a full exercise of the app, instead of only same-origin resources"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.21"
+name = "partial_persistence_facet_reverts"
+description = "After making several independent changes (add an expense, change the period, rename a category, edit the display name) and reloading, at least one facet silently reverts to its seeded value while others survive — an incoherent partial restore from client storage"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect (console health, state coherence, persistence, accessibility, performance, or serving behavior) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

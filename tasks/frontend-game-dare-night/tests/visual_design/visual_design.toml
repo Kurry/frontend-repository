@@ -134,3 +134,50 @@ type = "binary"
 weight = 0.5
 negate = true
 optional = true
+
+[[criterion]]
+id = "2.11"
+name = "consistent_icon_set"
+description = "The primary play controls, the live-feed status pill, and the custom-card list actions carry crisp inline icons from one consistent visual family, sized to match their labels."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "2.12"
+name = "dialogs_styled_like_app"
+description = "Confirmation dialogs render as centered white panels over a dimmed backdrop, styled with the same pill-shaped buttons and corner radii as the rest of the app."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "2.13"
+name = "no_overlap_across_widths"
+description = "Between 1440px and 375px wide the single-column layout stays centered, buttons remain full pills at a comfortable tap size, and every control renders free of overlap or clipping at intermediate widths."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "2.14"
+name = "writing_conventions_consistent"
+description = "Headings and buttons follow one consistent capitalization convention, action labels are specific verbs such as Draw card, Start game and Undo last turn, error messages name the problem and the fix, and empty states explain what belongs there and how to add it."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.15"
+name = "placeholder_text_shipped"
+description = "Placeholder or template filler text such as lorem ipsum or TODO appears somewhere in the shipped UI."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

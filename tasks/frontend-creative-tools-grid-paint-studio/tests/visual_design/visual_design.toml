@@ -62,22 +62,66 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
-description = "Paint stage + floating toolbar + Gallery density remains a creative tool, not a dashboard"
+name = "creative_tool_stage_composition"
+description = "The page uses a saturated blue field framing a light paint stage with a large centered canvas and floating black toolbar, reading as a desktop-first creative tool rather than a dashboard or card grid"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
-description = "Empty Gallery state is visually present when no boards remain"
+name = "title_and_type_system"
+description = "The high-contrast condensed visual system includes the exact angle-bracket title <GRID PAINT STUDIO> and a clearly legible angle-bracketed typewriter-style intro above the stage"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
+name = "static_poster_instead_of_tool"
 description = "Shows only a static poster with no paintable grid or gallery collection"
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "3.4"
+name = "toolbar_control_order_and_density"
+description = "The floating black toolbar presents, in order, the labelled Cell slider; QR/Color/Eraser and Grid toggle; seven square swatches; and Upload, Camera, Undo, Clear, Download, and Share actions in a compact but readable arrangement"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "exact_palette_visuals"
+description = "The seven square swatches visibly match black #000000, white #ffffff, red #ff0000, yellow #ffff00, green #00ff00, blue #0000ff, and pink #ff0098, with a clear ring around the active swatch"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "gallery_card_density_and_empty_state"
+description = "Gallery uses dense, aligned board cards or rows with readable names, snapshot thumbnails, tags, favorite and delete affordances, and a purposeful empty-state treatment in the same list region after the last deletion"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "responsive_canvas_and_toolbar"
+description = "At desktop and narrow touch widths, the canvas remains centered and usable, toolbar controls remain reachable, the Cell range adapts from roughly 16–64 to the narrower roughly 36–48 band, and the page avoids clipped actions or unintended horizontal overflow"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "toolbar_or_canvas_overlap"
+description = "At a supported viewport, the toolbar or gallery chrome obscures essential canvas content or controls, the draggable panel escapes the stage, or labels and actions overlap or clip"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick or taste disagreement. If present, name the defect and cite the concrete browser evidence (element, page state, viewport, or screenshot) that demonstrates it. If the defect is already covered—even partially—by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

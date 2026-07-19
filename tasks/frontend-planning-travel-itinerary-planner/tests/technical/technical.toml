@@ -62,30 +62,95 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "2.1"
-name = "2_1"
-description = "Qwik stores holds stops, day selection, mode, and place detail — shared across components"
+name = "shared_state_coherence"
+description = "Stops, day selection, active mode, and place-detail selection behave as one coherent shared state: a change made in any one view (list edit, map selection, day filter) is immediately reflected in every other view showing that data, without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
-name = "2_2"
-description = "Implemented with Qwik, Qwik stores, and Tailwind CSS; no browser storage APIs for persistence"
+name = "reload_resets_all_facets_coherently"
+description = "After configuring several independent facets (create a stop, select a day, switch mode, open a detail card), reloading the page returns every facet to the seeded in-memory baseline together — seeded stops, default Overview, no lingering selection — never a mix of surviving and reset facets"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
-name = "2_3"
-description = "Uses localStorage or sessionStorage to persist stops or day selection"
+name = "browser_storage_persistence_used"
+description = "Uses localStorage or sessionStorage to persist stops or day selection, or leaves any browser storage non-empty after exercising the app"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "2.4"
-name = "2_4"
-description = "Manages the stops collection only in component-local signals only rather than Qwik stores"
+name = "views_desync_stale_datum"
+description = "The same datum shows different values in two places at once — for example a stop's day-list row and its open detail card or map popup disagree after an edit until a reload"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.5"
+name = "console_clean_full_exercise"
+description = "No console errors or warnings appear during a full exercise of creating, editing, deleting, mode switching, day selection, and map selection"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "interactive_within_two_seconds"
+description = "The app is interactive within 2 seconds of a local cold load"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "rapid_input_stays_smooth"
+description = "Mode switches, day selection, and map fly animations stay smooth under rapid repeated input, with no hangs, freezes, or dropped interactions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "keyboard_operable_with_focus_ring"
+description = "Every interactive control — sidebar rows, stop rows, form fields, place-detail tabs, and map chrome buttons — is reachable and operable with the keyboard alone, with a visible focus indicator on each"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "detail_tabs_aria_and_focus_return"
+description = "The place-detail tab row is keyboard operable with the active tab marked programmatically (e.g. aria-selected), and activating the dismiss control from the keyboard closes the card and returns focus to the stop that opened it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "validation_announced_aria_live"
+description = "Stop form validation messages are shown inline and announced through an aria-live polite region"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "map_pins_accessible_names"
+description = "Map pins expose accessible names that include the place name and its day assignment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.12"
+name = "outbound_network_requests_made"
+description = "The app issues outbound network requests to other origins — font CDNs, script CDNs, tile servers, booking APIs, or chat widgets — during load or a full exercise of the app"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect (console, storage, network, stability, or accessibility) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network request, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

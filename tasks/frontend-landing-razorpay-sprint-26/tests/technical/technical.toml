@@ -62,45 +62,91 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
+name = "same_origin_requests_only"
 description = "Using browser_network_requests, every request the page makes is same-origin with http://127.0.0.1:3000 or a data:/blob:/about: URL."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "4_2"
-description = "A font, script, stylesheet, image, video, GLB, or Draco asset loads from an external CDN host (for example jsDelivr, unpkg, gstatic, Cloudflare, or an object-storage bucket) instead of same-origin."
+name = "external_cdn_asset_loaded"
+description = "A font, script, stylesheet, image, video, 3D scene, or Draco decoder asset loads from an external CDN host (for example jsDelivr, unpkg, gstatic, Cloudflare, or an object-storage bucket) instead of same-origin."
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
-description = "The settled page produces no uncaught JavaScript console errors and no failed asset request (no 4xx/5xx and no net::ERR for scripts, styles, images, fonts, or media)."
+name = "clean_console_full_scroll"
+description = "On load and during a full top-to-bottom scroll, the page produces no uncaught JavaScript console errors, no hydration errors or hydration warnings, and no failed asset request (no 4xx/5xx and no net::ERR for scripts, styles, images, fonts, or media)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "4_4"
-description = "The /sprint/26 route returns a full document whose title is exactly 'Razorpay Sprint 2026: The Age of AI-Native Payments'."
+name = "route_and_exact_title"
+description = "The /sprint/26 route returns a full document whose title is exactly 'Novapay Sprint 2026: The Age of AI-Native Payments'."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "4_5"
-description = "Resizing to 390px wide reflows the page with no horizontal overflow (documentElement.scrollWidth minus clientWidth at most 2px) and swaps in the hamburger nav with Roman-numeral labels I.AGENTIC STACK through VI.BUSINESS BANKING."
+name = "breakpoint_swap_without_reload"
+description = "Resizing the viewport across the 768px breakpoint swaps between the desktop segment nav and the hamburger treatment (Roman-numeral labels I.AGENTIC STACK through VI.BUSINESS BANKING) without a page reload and without console errors."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "4_6"
-description = "The page uses localStorage or sessionStorage, or a page-chrome control navigates the origin away to a route other than the declared Typeform/Razorpay outbound links."
+name = "storage_or_undeclared_navigation"
+description = "The page uses localStorage or sessionStorage, or a page-chrome control navigates the origin away to a route other than the declared external signup and card CTA outbound links."
 type = "binary"
 weight = 0.5
 negate = true
 optional = true
+
+[[criterion]]
+id = "4.7"
+name = "keyboard_reachable_focus_visible"
+description = "Every interactive control (nav anchors, CTAs, play controls, the modal close control) has an accessible link name, is reachable with the keyboard, and shows a visible focus outline in the #305eff outline color; the video modal's close control is keyboard-focusable and operable."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "seo_meta_and_jsonld"
+description = "The head carries the exact meta description 'Novapay Sprint 2026 Unveils 100+ Launches, From AI-native Payment Upgrades to Agentic Business Banking. The Agentic Era Begins Today.', a canonical link for the /sprint/26 route, and a WebPage JSON-LD block describing the page."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.9"
+name = "hero_and_headings_accessible_text"
+description = "The 3D hero canvas is decorative with the section's real heading text present in the DOM as an accessible equivalent, and word-reveal headings keep the full original phrase exposed to assistive technology on the heading container while the per-word fragments are hidden from the accessibility tree."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.10"
+name = "interactive_before_scene_loads"
+description = "The nav, GET ACCESS rail, and page copy respond to input before the 3D hero scene finishes loading, the scene region holds its space while streaming in, and after first paint no visible layout jumps occur as fonts, images, or the 3D scene finish loading."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "smooth_scroll_lazy_below_fold"
+description = "Continuous scrolling from top to bottom shows no visible hitching or dropped frames through the hero scrub, the pinned sections, and the card grids, and cards far below the fold do not run their canvas animations before they are reached."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect (console health, network hygiene, accessibility, performance, or routing) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, console or network log) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

@@ -62,28 +62,65 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "mo-1"
-name = "mo-1"
-description = "Playing the correct move in Practice through the real board control flashes the board green and shows a Correct! toast; an incorrect legal move flashes red and shows Try again"
+name = "practice_flash_and_toast_feedback"
+description = "Playing the correct move in Practice through the real board control flashes the board green for roughly 0.65s and shows a Correct! toast; an incorrect legal move flashes red and shows Try again before the board reverts"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "mo-2"
-name = "mo-2"
-description = "Hovering (without clicking) a button, an opening list item, a move-tree chip, and a board control each produces a visible hover change distinct from the resting state"
+name = "hover_feedback_on_all_controls"
+description = "Hovering (without clicking) a button, the star toggle, an opening list item, a move-tree chip, and a board control each produces a visible hover change distinct from the resting state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "mo-3"
-name = "mo-3"
+name = "visible_focus_indicator_on_tab"
 description = "Tabbing through interactive controls shows a clearly visible focus indicator on each focused element"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "mo-4"
+name = "toasts_slide_in_and_autodismiss"
+description = "Toasts enter with a short slide-in (about 0.25s) and clear on their own without trapping interaction"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "mo-5"
+name = "saved_list_add_remove_animates"
+description = "Saving a line animates the new entry into the My Saved Lines list and deleting an entry animates it out, with surrounding entries sliding smoothly into place rather than snapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "mo-6"
+name = "library_filter_transitions_animate"
+description = "Narrowing the library by search or by the Favorites Only filter animates list items in and out instead of instantly swapping the list"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "mo-7"
+name = "captured_piece_animates_into_tally"
+description = "A newly captured piece animates into the captured-piece tally rather than appearing abruptly"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "mo-8"
+name = "piece_lift_targets_lastmove_highlight"
+description = "Picking up a board piece lifts it and reveals target markers on its legal destination squares, and the moved piece and last-move squares are highlighted after a move"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "mo-neg-1"
-name = "mo-neg-1"
+name = "hover_feedback_absent_everywhere"
 description = "Interactive controls (buttons, list items, tree chips, board controls) show no hover feedback anywhere"
 type = "binary"
 weight = 1.0
@@ -91,8 +128,16 @@ negate = true
 
 [[criterion]]
 id = "mo-neg-2"
-name = "mo-neg-2"
+name = "focus_never_visibly_indicated"
 description = "Keyboard focus is never visibly indicated as focus moves through interactive controls"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "mo.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or interaction feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

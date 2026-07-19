@@ -62,8 +62,8 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "MO-1"
-name = "MO-1"
-description = "Sending, pinning, archiving, and deleting a note through their visible controls each surface a transient toast confirmation that auto-dismisses after roughly 2.5 seconds"
+name = "toast_confirmations_fade_autodismiss"
+description = "Sending, pinning/unpinning, archiving/unarchiving, attaching a file, and deleting a note through their visible controls each surface a transient toast confirmation that animates in immediately and auto-dismisses with a fade after roughly 2.5 seconds"
 type = "binary"
 weight = 1.0
 
@@ -76,8 +76,8 @@ weight = 1.0
 
 [[criterion]]
 id = "MO-3"
-name = "MO-3"
-description = "Hovering the Send control, a tag chip, and a note action control shows a visible hover state distinct from resting, and Tab focus shows a visible outline/ring on interactive controls"
+name = "hover_and_press_feedback"
+description = "Hovering the Send control, a tag chip, a note action control, and a note bubble each shows a visible hover state distinct from resting (buttons ease their background color, bubbles deepen their shadow), and pressing the Send control or another button depresses it slightly (scales down) while active"
 type = "binary"
 weight = 1.0
 
@@ -105,3 +105,25 @@ type = "binary"
 weight = 0.5
 negate = true
 optional = true
+
+[[criterion]]
+id = "MO-5"
+name = "list_add_remove_move_animates"
+description = "Sending a note animates the new bubble into the timeline rather than snapping in, deleting or archiving a note animates the bubble out, and pinning a note animates it into the Pinned section — each verified by activating the real visible control, not a state shortcut"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "MO-6"
+name = "reduced_motion_disables_animation"
+description = "With prefers-reduced-motion set, the shake, bubble, and toast animations are removed and state changes apply instantly while every feature (send, pin, archive, delete, filter) remains fully usable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "MO.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (control exercised, observed transition or lack of it) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

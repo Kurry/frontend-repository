@@ -194,13 +194,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.20"
-name = "1_20"
-description = "Renders visible validation feedback when create is submitted with empty required fields, and the collection count does not increase"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.21"
 name = "1_21"
 description = "Projects list is static HTML only with no working create/edit/delete against shared state"
@@ -224,20 +217,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.24"
-name = "1_24"
-description = "An unknown slash-command prints a visible command-not-found line with a hint rather than doing nothing"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.25"
-name = "1_25"
-description = "Clicking the macOS titlebar red dot closes the terminal to an exit overlay that offers a Reopen control which restores the terminal"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.26"
 name = "1_26"
 description = "Typing into the prompt shows an autocomplete dropdown that filters as you type, and Tab or Enter completes the highlighted command"
@@ -248,6 +227,126 @@ weight = 1.0
 id = "1.27"
 name = "1_27"
 description = "An unrecognized slash-command produces no visible output or error line (silent failure)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.28"
+name = "boot_dismiss_reveals_shell"
+description = "On a fresh load, a boot sequence prints sequential status lines, and pressing Enter (or click/touch) dismisses boot revealing ASCII name art, a two-column welcome box (capabilities + navigation), and a focused command prompt"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "help_lists_commands_grouped"
+description = "Running /help prints the available commands grouped by section rather than a flat undifferentiated dump"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "arrow_history_recalls_commands"
+description = "After running two different commands, pressing the up arrow at the prompt recalls the most recent command, and pressing up again recalls the earlier one"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "fuzzy_and_intent_matching"
+description = "Typing a bare word (e.g. 'work') or a natural-language phrase (e.g. 'show me your projects') resolves to the closest matching command's output instead of a command-not-found error"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.32"
+name = "clear_command_empties_output"
+description = "Running /clear empties the terminal output buffer, leaving a clean prompt ready for input"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.33"
+name = "project_shortcut_opens_detail"
+description = "Typing a seeded project's per-project shortcut command prints that project's detail card in the terminal"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "cookie_consent_records_choice"
+description = "A cookie-consent banner appears after boot, and clicking Accept or Decline dismisses it and records the choice for the session without any console error"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "create_form_inline_field_validation"
+description = "The project create/edit form validates per field before submit: an inline message names each invalid field, and the submit control stays disabled or inert until all required fields are valid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "create_flow_multi_surface_chain"
+description = "Starting from the seeded state: create a valid new project through the in-terminal create path, then confirm without any reload that the /work listing count increased by exactly one (measured immediately before and after), a new card with the correct status badge appears in Projects Board, and the new per-project shortcut command resolves to the new project's detail card; then reload the page and confirm the app returns to its seeded projects only"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "edit_flow_multi_surface_chain"
+description = "Rename a seeded project via the edit path, then confirm without a reload that the new name appears on its Projects Board card, in the /work listing row, on the project's detail card, and in its autocomplete entry, with the old name gone from all four surfaces"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "delete_flow_multi_surface_chain"
+description = "Delete a seeded project, then confirm without a reload that its card is removed from Projects Board, the /work listing count dropped by exactly one (measured immediately before and after), and typing its former shortcut prints a command-not-found line"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "filter_flow_round_trip_chain"
+description = "In Projects Board with mixed statuses present: apply a status or tag filter and confirm only matching cards remain; create a new project matching the active filter and confirm it appears in the filtered view immediately; then clear the filter and confirm the full collection (including the new project) is restored exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "theme_mode_flow_chain"
+description = "Run /retro and confirm the terminal recolors, run /themes and confirm retro is marked as the active swatch, then switch to Projects Board and back to Terminal CLI and confirm the retro theme is still applied — with no step causing a document reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "double_submit_adds_exactly_one"
+description = "Double-activating the create submit control in quick succession adds exactly one project: the collection count increases by one and exactly one new card appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "history_arrow_on_fresh_prompt_inert"
+description = "On a fresh session before any command has been typed, pressing the up arrow leaves the prompt unchanged with no visible errors and no console errors"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.43"
+name = "reopen_restores_history_and_theme"
+description = "After switching to a non-default theme and running several commands, closing the terminal with the red dot and pressing Reopen restores the terminal with its output history and the chosen theme intact"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "A specified core behavior of the app is broken or missing in a way that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence (element, page state, console output) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

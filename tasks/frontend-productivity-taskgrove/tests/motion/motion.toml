@@ -119,3 +119,53 @@ type = "binary"
 weight = 0.5
 negate = true
 optional = true
+
+[[criterion]]
+id = "4.9"
+name = "row_add_remove_reorder_animates"
+description = "Driven through the real UI controls (not a state shortcut): a newly added task row animates into place rather than appearing instantly, an archived branch's rows animate out of the tree, and a Move Up or Move Down swap slides the affected rows to their new positions instead of snapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "toast_slide_fade_entry"
+description = "A confirmation toast enters with a short slide-and-fade animation rather than popping in instantly, then clears on its own after a few seconds"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.11"
+name = "blank_submit_input_shake"
+description = "Submitting a blank title (root or child) triggers a brief shake animation on the input alongside its inline error text"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.12"
+name = "theme_switch_color_transition"
+description = "Clicking the Theme control recolors every surface, border, and accent with a brief color transition and without a page reload"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.13"
+name = "reduced_motion_disables_animation"
+description = "On a fresh load with prefers-reduced-motion set, animations are removed and state changes (adding rows, toggling the chevron, toasts) apply instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "search_dimming_applies_immediately"
+description = "As a search query is typed, matching-text highlighting and reduced-opacity dimming of non-matching branches apply immediately with each change to the query, and dimmed branches remain on the page rather than disappearing"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteraction behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

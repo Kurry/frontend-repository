@@ -107,17 +107,68 @@ optional = true
 
 [[criterion]]
 id = "4.7"
-name = "4_7"
-description = "Row selection and the detail update occur only through the real UI row control or keyboard, not through a hidden state or WebMCP shortcut lacking a visible control path."
+name = "selection_lacks_real_control_path"
+description = "Row selection or the detail update can only be produced through a hidden state change or WebMCP shortcut: actuating the real visible row control (click or keyboard) fails to select the holding or produces no visible feedback."
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "4.8"
-name = "4_8"
-description = "Focus and hover are not collapsed into one identical highlight, and no interactive control leaves focus invisible."
+name = "focus_hover_collapsed_or_invisible"
+description = "Focus and hover are collapsed into one identical highlight, or some interactive control shows no visible focus indicator when focused from the keyboard."
 type = "binary"
 weight = 0.5
 negate = true
 optional = true
+
+[[criterion]]
+id = "4.9"
+name = "row_add_remove_animates"
+description = "Saving a new holding through the real form animates its row into the table rather than appearing instantly, and deleting a holding through the real delete control animates its row out, with the remaining rows settling into place smoothly."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "net_worth_value_transitions"
+description = "After adding, editing, or deleting a holding through the real controls, the net-worth figure transitions smoothly to its new value rather than snapping, and the summary, allocation, table, and detail panel update in place."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "toast_animates_in_and_fades_out"
+description = "Saving or deleting a holding raises a brief confirmation toast that animates in, remains readable, and dismisses with a fade."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "allocation_bars_animate_on_filter"
+description = "Changing the class filter through its real control updates the visible holdings, totals, and allocation immediately with no reload, and the allocation bars animate to their new proportions rather than redrawing identically or snapping."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "reduced_motion_removes_animation"
+description = "With prefers-reduced-motion enabled on a fresh load, animations are removed and every state change (add, delete, filter, select) applies instantly with no loss of functionality."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "full_page_reload_on_action"
+description = "Selecting, adding, editing, deleting, or filtering holdings triggers a full page reload instead of updating the view in place."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

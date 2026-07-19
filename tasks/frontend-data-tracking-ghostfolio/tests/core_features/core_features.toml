@@ -76,8 +76,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
-description = "On load, the net-worth figure equals the sum of the visible holdings' market values (the seeded portfolio totals $37,769)."
+name = "net_worth_equals_visible_sum"
+description = "On load, the net-worth figure equals the sum of the visible holdings' market values, and the meta line reports how many holdings and how many classes are visible."
 type = "binary"
 weight = 1.0
 
@@ -159,102 +159,102 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.15"
-name = "1_15"
-description = "The root URL shows the portfolio overview (net-worth summary, allocation, holdings table, detail panel) with no login, signup, or onboarding gate."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.16"
-name = "1_16"
-description = "The holdings table lists at least four seeded holdings, each row showing name, symbol, asset class, quantity, and market value."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.17"
-name = "1_17"
-description = "The net-worth figure equals the sum of the visible holdings' market values, and market value equals quantity times unit price."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.18"
-name = "1_18"
-description = "The allocation breakdown shows a percentage per visible asset class and those percentages sum to 100."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.19"
-name = "1_19"
-description = "Filtering to one asset class narrows the table to that class and recomputes the net worth, meta line, and allocation over the visible set."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.20"
-name = "1_20"
-description = "Clearing the filter back to All classes restores the full list of holdings with no duplicated rows."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.21"
-name = "1_21"
-description = "Selecting a holding shows its symbol, class, quantity, unit price, and market value in the detail panel and marks the row as selected."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.22"
-name = "1_22"
-description = "Selecting one holding then another fully switches every detail-panel field to the second holding with no stale values from the first."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.23"
-name = "1_23"
-description = "Saving a valid new holding through Add holding appends its row and updates the net worth and allocation percentages together."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.24"
-name = "1_24"
-description = "Submitting the Add holding form with an empty name or symbol, or a non-positive quantity, shows an inline validation message and adds no row."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.25"
-name = "1_25"
-description = "Adding a holding and reloading restores the same holdings and the updated net-worth total from client storage with no login step."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.26"
-name = "1_26"
-description = "Filtering to one class, adding a holding in a different class, then returning to All classes leaves both the prior and the new holdings identifiable with no duplicates."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.27"
-name = "1_27"
-description = "The net-worth total does not stay frozen when the visible holdings change; adding, editing, or deleting a holding moves the total accordingly."
+name = "net_worth_frozen_after_change"
+description = "The net-worth total stays unchanged after adding, editing, or deleting a holding whose market value should change it."
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
-id = "1.28"
-name = "1_28"
-description = "Switching the selected holding does not leave any stale field from the previously selected holding in the detail panel."
+id = "1.29"
+name = "sort_toggle_with_indicator"
+description = "Activating a sortable column header orders the rows by that column; activating the same header again reverses the order, and a visible indicator on the header shows the active sort column and direction."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "sort_reversal_leaves_totals_unchanged"
+description = "Starting from the full holdings list: sort by market value in one direction and note the exact row order, then sort in the other direction. The row order reverses exactly, and the net-worth total and allocation percentages are byte-identical to their pre-sort values."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "add_flow_updates_all_surfaces"
+description = "Record the row count, net-worth total, and meta line, then save a new valid holding through the form. Immediately after saving: the row count increases by exactly one, the net-worth total increases by exactly the new holding's quantity times unit price, the meta line's holding count increments, and the allocation breakdown recomputes its percentages, all in place with no reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "edit_flow_propagates_everywhere"
+description = "Select a holding, edit its quantity through the form, and save. The table row, the detail panel, the net-worth total, and that class's allocation percentage all update together without a reload, and the changed market value equals the new quantity times the unit price everywhere it appears."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "delete_flow_clears_selection_and_totals"
+description = "Record the row count and net-worth total, select a holding, and activate the delete control. The row count decreases by exactly one, the detail panel and selection no longer show the deleted holding, and the net-worth total and allocation breakdown drop exactly its contribution."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "submit_disabled_until_valid"
+description = "The Add holding form shows a persistent visible label on every field, and the submit control stays disabled until every field holds a valid value."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "inline_error_names_field_and_rule"
+description = "Typing an invalid value (empty symbol or a non-positive quantity) shows an inline validation message directly at that field, naming the field and the rule it breaks, before the form is submitted."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "empty_state_after_last_delete"
+description = "Deleting every holding one by one until none remain shows an empty state in the table region with a message and an Add holding control, the net-worth total reads zero, and the allocation region shows no class entries."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "empty_state_for_unmatched_filter"
+description = "After deleting every holding of one asset class and then filtering to that class, the table region shows an empty-state message, the meta line reports zero visible holdings, and the allocation region shows no entries."
 type = "binary"
 weight = 0.5
+
+[[criterion]]
+id = "1.38"
+name = "double_save_creates_one_holding"
+description = "Rapidly double-activating the save control on a valid Add holding form creates exactly one holding: the row count increases by one and exactly one new row appears."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "long_name_truncated_with_ellipsis"
+description = "A holding whose name is longer than 40 characters is truncated with an ellipsis in its table row and shown in full in the detail panel."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.40"
+name = "duplicate_rows_after_filter_roundtrip"
+description = "After filtering to one class and clearing the filter back to all classes, some holding appears more than once in the table or a previously visible holding is missing."
+type = "binary"
+weight = 1.0
 negate = true
-optional = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in its core features or end-to-end flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

@@ -1,19 +1,19 @@
 <summary>
-Build a CLI terminal product designer portfolio using Angular, NgRx, and Angular Material.
+Build a CLI terminal product designer portfolio using Angular, NgRx, Tailwind CSS 4.3.2, and Angular Material.
 </summary>
 
 <reference_screenshots>
 Screenshots of the reference application are provided in-container at
-`/reference-screenshots/`: `overview.png` is a full-page desktop-layout
-overview (downscaled); `segment-NN.png` are full-resolution 1440x900 sections
+/reference-screenshots/: overview.png is a full-page desktop-layout
+overview (downscaled); segment-NN.png are full-resolution 1440x900 sections
 in top-to-bottom order with slight overlap. They are part of this instruction:
 recreate what they show. Where a screenshot and the text conflict, the text
-wins. Do not copy the images into `/app` or ship them as app assets.
+wins. Do not copy the images into /app or ship them as app assets.
 </reference_screenshots>
 
 <core_features>
 Core features (each line is an observable behavior the finished app must exhibit):
-- On load the terminal plays a boot sequence of sequential status lines ending in a "ready" line (e.g. `designer.portfolio v10.0 — ready.`) and a "Press Enter to continue" prompt; pressing Enter, clicking, or touching dismisses boot and reveals the post-boot terminal
+- On load the terminal plays a boot sequence of sequential status lines ending in a ready line such as "designer.portfolio v10.0 — ready." and a "Press Enter to continue" prompt; pressing Enter, clicking, or touching dismisses boot and reveals the post-boot terminal
 - After boot, ASCII name art ("YOUR NAME") renders above a two-column welcome box: the left column shows a greeting, a pixel/ASCII rocket, and a designer subtitle plus a placeholder email line; the right column shows a Capabilities list and a Navigation list of starter commands; the command input then receives focus
 - A cookie-consent banner appears after boot offering Accept and Decline; choosing either updates in-memory consent, dismisses the banner, and is reflected when /privacy is run (status reads accepted or declined); choosing must not throw when no analytics library is present
 - Typing a slash command echoes the input line and appends staggered output; the shell resolves the section commands /help, /about, /work, /clients, /skills, /philosophy, /social, /articles, /testimonials, /awards, /contact, /privacy, and /clear (which wipes prior output)
@@ -25,7 +25,7 @@ Core features (each line is an observable behavior the finished app must exhibit
 - Each seeded project has a slash shortcut (e.g. /signals, /anylyze, /liveu) that prints a project detail block with its type/year, blurb, tags, and stat chips in the terminal
 - Autocomplete dropdown suggests matching commands as you type and Tab completes the highlighted one; ↑/↓ arrows walk command history; command aliases (e.g. /portfolio, /projects, /me, /hire, /mail), bare-word fuzzy matches, and natural-language phrases all resolve to the correct command
 - Theme switching via /themes (browse list), /dark, /light, /retro, /glass applies a session-scoped theme class on the document root and restyles the terminal without reloading; /retro reads as a CRT look and /glass as translucent glass
-- Hidden easter-egg commands work and are discoverable via /secrets (or /easter-eggs): /matrix starts a green matrix-rain canvas, /konami (and the ↑↑↓↓←→←→BA keyboard code) fires a confetti-canvas party, `sudo hire designer` runs a fake-contract progress bar, and extras (/coffee, /figma, whoami, ls, git log, cat readme.md, ping designer, rm -rf doubts) each print themed output
+- Hidden easter-egg commands work and are discoverable via /secrets (or /easter-eggs): /matrix starts a green matrix-rain canvas, /konami (and the ↑↑↓↓←→←→BA keyboard code) fires a confetti-canvas party, the command "sudo hire designer" runs a fake-contract progress bar, and extras (/coffee, /figma, whoami, ls, git log, cat readme.md, ping designer, rm -rf doubts) each print themed output
 - macOS-style window chrome: red close opens an exit overlay ("kill -9 …" lines, inert LinkedIn/Instagram buttons, and a Reopen terminal control that restores the window); yellow minimize swaps the blurred wallpaper for the sharp one; green maximize expands the terminal window
 - Running a section command updates the document title to reflect the active route without rewriting the URL or navigating
 - At least two interaction modes: Terminal CLI mode (command prompt + output) and Projects Board mode (list/grid of projects with status/tag filters, reachable via /work board or a mode toggle); switching modes updates the terminal body without a full reload
@@ -35,13 +35,13 @@ Core features (each line is an observable behavior the finished app must exhibit
 </core_features>
 
 <visual_design>
-- Full-bleed atmospheric wallpaper behind a centered terminal window with a macOS traffic-light titlebar reading `designer@portfolio ~ /portfolio`
+- Full-bleed atmospheric wallpaper behind a centered terminal window with a macOS traffic-light titlebar reading "designer@portfolio ~ /portfolio"
 - JetBrains Mono monospace throughout; CSS variable themes — dark default, light, retro CRT (scanline/glow feel), and translucent glass variants
 - Post-boot layout: monospace ASCII name art over a two-column welcome box (left: greeting + pixel/ASCII rocket + subtitle/email; right: Capabilities and Navigation lists)
 - Command output area shows echoed prompt lines, headings, skill bars, award/testimonial rows, and project detail blocks with tag and stat chips
 - Angular Material for buttons, overlays, snackbars/tooltips, and dense controls where they fit the terminal chrome
 - Projects Board mode uses dense project cards/rows inside the terminal body with status badges
-- A close overlay reproduces the titlebar (`… ~ /exit`) and shows red exit lines plus inert reconnect CTAs; full-viewport matrix-rain and confetti canvases overlay the page during easter eggs
+- A close overlay reproduces the titlebar text "… ~ /exit" and shows red exit lines plus inert reconnect CTAs; full-viewport matrix-rain and confetti canvases overlay the page during easter eggs
 - One terminal-over-wallpaper composition — not a marketing multi-section landing
 </visual_design>
 
@@ -50,7 +50,7 @@ Core features (each line is an observable behavior the finished app must exhibit
 - Post-boot enter: ASCII art and welcome box fade/slide in; prompt takes focus
 - CLI thinking indicator + staggered output reveal for command results; /skills bars animate from zero to their target width
 - Theme switch recolors the terminal instantly without reloading; minimize crossfades the wallpaper from blurred to sharp; maximize expands the window
-- /matrix animates a continuous green character-rain canvas; /konami (or the keyboard code) bursts a confetti canvas; `sudo hire designer` advances a progress bar to 100%
+- /matrix animates a continuous green character-rain canvas; /konami (or the keyboard code) bursts a confetti canvas; the command "sudo hire designer" advances a progress bar to 100%
 - Mode switch between Terminal CLI and Projects Board updates without full reload
 - Hover animations (required): titlebar dots ease opacity on hover; project cards/rows ease border-color and background on hover; autocomplete rows highlight on hover/active; social/close buttons ease on hover
 - Respect prefers-reduced-motion by disabling staggered/enter and canvas animations where practical
@@ -65,7 +65,7 @@ State contracts (behavioral, not storage keys):
 - Status/tag filters recompute the visible board from the shared collection
 - Theme and mode are shared client state; toggling them does not reload the document
 - Cookie-consent choice is shared state; /privacy reflects the current accepted/declined/not-set status
-Stack: Angular + NgRx + Angular Material (CLI or equivalent SPA); frontend-only. Styling must use Angular Material plus authored theme CSS variables / JetBrains Mono — not Tailwind as the primary system.
+Stack: Angular with NgRx, built with the Angular CLI or an equivalent SPA setup; frontend-only. Styling is Tailwind CSS 4.3.2 (pinned), with design tokens in @theme, JetBrains Mono, and Angular Material components for light terminal chrome such as buttons, overlays, snackbars, tooltips, and dense controls; no other external component library. GSAP is allowed for terminal typing, staggered output, boot and entry motion, skill bars, window transitions, and canvas-effect orchestration; no other animation libraries. Material Symbols icons only; no raw pasted SVG icon sets and no icon CDNs. All forms, including project create and edit, use Angular Reactive Forms with a Zod schema layer and render inline per-field errors before submit. All libraries are installed via npm and bundled locally; no CDN imports.
 - Seed at least 6 projects so /work and Projects Board are non-empty after boot; the reference ships 12 named case studies, each with type, year, blurb, tags, and stat chips
 - Empty required fields on create must not increase the projects count; show visible validation feedback
 - After deleting all projects, show an empty state in Projects Board / /work output

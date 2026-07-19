@@ -62,14 +62,14 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
-description = "Required hover animations are present; load entrance, Why Ridge pile, Get started rise, and Global Events decode contracts remain"
+name = "hover_microinteraction_detail"
+description = "Hovering with the real pointer: notched CTAs brighten and their arrow nudges, tiles ease into a lift/brightness change while keeping their notch silhouette, event rows take a hover wash, and interactive controls show focus-visible rings when focused via keyboard"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "4_2"
+name = "mode_switch_keeps_hover"
 description = "Marketing/Events mode switches update without full reload and keep hover feedback"
 type = "binary"
 weight = 0.5
@@ -77,7 +77,7 @@ optional = true
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
+name = "hover_feedback_missing"
 description = "Omits hover feedback on CTAs or event rows so interactive chrome feels static on pointer hover"
 type = "binary"
 weight = 1.0
@@ -85,37 +85,95 @@ negate = true
 
 [[criterion]]
 id = "4.4"
-name = "4_4"
-description = "On first load, the sticky chrome drops in from off-screen top and the two bento cells and hero plane run a staggered enter sequence that settles over roughly 1.5-2s rather than painting fully settled"
+name = "load_entrance_staggered_sequence"
+description = "On a fresh first load, the sticky chrome drops in from off-screen top, the two bento cells enter via a clip-path-style expansion with a short vertical settle, and the hero plane enters last — a staggered ease-in-out sequence settling over roughly 1.5-2s rather than painting fully settled"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "4_5"
+name = "why_ridge_sticky_pile"
 description = "At desktop width (>=768px), scrolling Why Ridge pins the four pillars into a progressive sticky stack where later cards peek roughly 24-32px below and cover earlier ones"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "4_6"
-description = "On scrolling into the Ridge Global Events chapter, the RIDGE GLOBAL EVENTS headline flashes through decoy glyphs per character before settling and the supporting blurb reveals line-by-line"
+name = "global_events_decode_line_mask"
+description = "On a fresh load, scrolling into the Ridge Global Events chapter makes the RIDGE GLOBAL EVENTS headline flash through decoy glyphs per character before settling, while the supporting blurb reveals line-by-line from behind overflow-hidden masks; the sequence runs once and does not replay on further scrolling"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "4_7"
-description = "Below 1024px width, the Get started trio cards rise from a downward offset into place with a per-card stagger on enter"
+name = "get_started_rise_below_lg"
+description = "Below 1024px width, the three Get started cards rise from a downward offset into place with an ease-out curve and a visible per-card stagger on enter; at 1024px and up the rise translate is suppressed"
 type = "binary"
 weight = 0.5
 optional = true
 
 [[criterion]]
 id = "4.8"
-name = "4_8"
+name = "first_paint_pre_settled"
 description = "The first viewport paints fully settled with no load-entrance sequence for the chrome, bento cells, or hero plane"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.9"
+name = "theme_toggle_icon_animates"
+description = "Clicking the theme pill swaps the sun/moon icon with a short rotate/fade transition and the surfaces recolor smoothly rather than snapping between palettes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "mega_menu_animates_open_close"
+description = "Clicking the hamburger animates the mega-menu drawer/full-screen panel in (slide or fade), and a light-dismiss click outside animates it closed rather than snapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "event_row_add_remove_animates"
+description = "Creating an event through the manager UI animates the new row into the list, deleting an event animates its row out, and the remaining rows ease to their new positions — verified through the real form and delete controls, not an automation state shortcut"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "form_success_transitions_in"
+description = "After a valid contact-form submit, the success state transitions in (fade/slide/scale) rather than appearing instantly with no animation"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.13"
+name = "smooth_inertial_scroll"
+description = "At desktop width, wheel scrolling moves the page with eased, inertial smoothing while position:sticky sections (chrome, Why Ridge pile) continue to pin correctly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion emulated on a fresh load, the page paints settled with no load entrance, the RIDGE GLOBAL EVENTS headline shows its final text immediately, scroll smoothing is disabled, and all content remains complete and reachable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "scroll_hijack_breaks_usability"
+description = "Scroll smoothing traps the user, prevents reaching content, fights the native scroll direction, or breaks position:sticky pinning anywhere on the page"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

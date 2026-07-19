@@ -62,21 +62,21 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "2.1"
-name = "2_1"
+name = "felt_background_and_primary_token"
 description = "The page background renders the near-black felt token --color-background (#02070C) and the human seat highlight or a key call-to-action uses --color-primary (#FFFF7D)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
-name = "2_2"
+name = "poppins_type_scale"
 description = "Headings and body text use the Poppins font stack, with a section heading rendering near 34.56px and body text near 24.84px"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
-name = "2_3"
+name = "tight_spacing_and_5px_radius"
 description = "Cards and panels use an approximately 5px border radius and spacing follows a tight 2px-based scale rather than large default browser spacing"
 type = "binary"
 weight = 0.5
@@ -84,28 +84,28 @@ optional = true
 
 [[criterion]]
 id = "2.4"
-name = "2_4"
+name = "light_on_dark_legibility"
 description = "Card faces, chip-stack amounts, and seat badges use light-on-dark contrast that is clearly legible against the near-black felt"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.5"
-name = "2_5"
+name = "style_badges_visually_distinct"
 description = "The three AI play-style badges are visually distinct from one another by color and/or icon, not distinguishable by text label alone"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.6"
-name = "2_6"
+name = "designed_idle_and_empty_states"
 description = "Before the first hand the table shows a \"Deal first hand\" prompt and the empty Hand history panel shows \"No hands played yet\" rather than blank areas"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.7"
-name = "2_7"
+name = "winning_hand_highlight_distinct"
 description = "At the showdown the winning hand's highlight (border or glow) is clearly distinguishable at a glance from the other revealed hands"
 type = "binary"
 weight = 0.5
@@ -113,14 +113,14 @@ optional = true
 
 [[criterion]]
 id = "2.8"
-name = "2_8"
-description = "At approximately 375px wide the table and betting controls stay usable with no horizontal page scroll and the stats/history panels collapse into a toggleable drawer rather than being clipped"
+name = "mobile_drawer_layout_holds"
+description = "At approximately 375px wide the table and betting controls stay usable with no horizontal page scroll, the stats and history panels collapse into a toggleable drawer rather than being clipped, and data-dense text (chip amounts, equity percentage, stats numbers) stays legible and unclipped"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.9"
-name = "2_9"
+name = "dark_on_dark_text_present"
 description = "Card faces, chip amounts, or seat badges render as dark text on the dark felt, or are otherwise illegibly low-contrast against --color-background"
 type = "binary"
 weight = 1.0
@@ -128,8 +128,52 @@ negate = true
 
 [[criterion]]
 id = "2.10"
-name = "2_10"
+name = "mobile_layout_overflows_or_clips"
 description = "At approximately 375px wide the layout forces horizontal scrolling or clips the table, betting controls, or side panels instead of collapsing them into a drawer"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.11"
+name = "consistent_icon_set"
+description = "Icons across the chrome (panel toggles, badges, controls) come from one consistent icon set with a uniform stroke and sizing, not a visible mix of styles"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.12"
+name = "accent_token_secondary_highlights"
+description = "Links and secondary highlights render the accent token --color-accent (#FFFE68), visually distinct from the primary #FFFF7D reserved for the human seat highlight and key call-to-action buttons"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.13"
+name = "badge_toast_legible_on_felt"
+description = "The badge-unlock toast is clearly legible against the near-black felt background when it appears"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.14"
+name = "ui_copy_consistent_terminology"
+description = "Where the app renders headings, panel titles, and control labels, capitalization follows one consistent convention and the same concept is named consistently across panels (for example the stats, history, and badges panels agree on terminology)"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.15"
+name = "placeholder_copy_shipped"
+description = "Lorem ipsum or placeholder text (\"TODO\", \"asdf\", \"Lorem\", template variable names like {{title}}) is visible somewhere in the shipped UI, or prominent copy contains spelling errors"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

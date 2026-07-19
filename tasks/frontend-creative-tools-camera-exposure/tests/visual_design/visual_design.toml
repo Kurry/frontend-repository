@@ -81,3 +81,82 @@ description = "Replaces the lab with a marketing card grid and no live exposure 
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "3.4"
+name = "condensed_display_type_dark_chrome_red_accent"
+description = "The UI uses a condensed display typeface (Oswald / Bebas-style) for dial titles and readouts, dark chrome dials with white values, and a red accent on the help trigger and meter emphasis"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "dial_and_meter_anatomy_matches_reference"
+description = "Three circular dial controls titled APERTURE / SPEED / ISO each show up/down chevron steppers and a large value readout (f/16, 1/60, 100 at defaults), and a vertical exposure meter sits on the left with UNDER EXPOSED / OVER EXPOSED end captions and a centered rest marker"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "presets_mode_dense_list_with_badges"
+description = "Presets/Compare mode presents the looks as a dense list or strip where each entry shows a name, a stop readout, and favorite/tag badges"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "inert_brand_chip_label"
+description = "A small red-tinted, uppercase, bottom-centered brand chip reads 'Camera Exposure Simulator' as inert styled text (clicking it navigates nowhere), and no marketing sections or competing hero cards appear"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.8"
+name = "component_state_treatments_distinct"
+description = "Steppers, buttons, and form fields show distinct default, hover, focus (visible ring), disabled, and error treatments"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "mobile_375_layout_operable_no_overflow"
+description = "At 375px width the preview stays edge-to-edge, the dials and meter remain visible and operable, no content clips or produces horizontal scrolling, and a separate mobile help trigger opens the same help panel content"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "desktop_1440_matches_reference_composition"
+description = "At 1440px width the layout matches the reference composition: exposure meter on the left, dials overlaid on the photo preview, and the help trigger in its corner position"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "copy_consistent_case_specific_verbs"
+description = "Dial titles, meter captions, and mode labels keep one consistent uppercase convention; buttons use specific verbs such as 'Apply preset' and 'Reset'; and the three help explainer paragraphs are distinct, plain-language explanations of aperture, shutter speed, and ISO"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.12"
+name = "placeholder_or_filler_text_shipped"
+description = "Placeholder or filler text (lorem ipsum, 'TODO', template variable names, or obviously duplicated explainer paragraphs) is visible anywhere in the shipped UI"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.13"
+name = "messages_name_problem_and_fix"
+description = "Validation and empty-state messages name the problem and the fix (e.g. the empty presets state explains that no presets exist and how to create one)"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

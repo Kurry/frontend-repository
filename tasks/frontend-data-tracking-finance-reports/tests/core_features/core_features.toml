@@ -111,8 +111,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
-description = "After submitting create with an empty required payee or amount, the transactions count does not increase and validation feedback is visible"
+name = "invalid_submit_names_field_adds_no_row"
+description = "After submitting create with an empty payee or a missing amount, an inline validation message naming the offending field is visible, no row is added, and the transactions count is unchanged"
 type = "binary"
 weight = 1.0
 
@@ -201,13 +201,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.21"
-name = "1_21"
-description = "Renders visible validation feedback when create is submitted with empty required fields, and the collection count does not increase"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.22"
 name = "1_22"
 description = "Transactions list is static HTML only with no working create/edit/delete against shared state"
@@ -238,14 +231,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.26"
-name = "1_26"
-description = "Clicking a non-active sidebar nav item shows a transient demo toast and keeps the current Reports view without navigating away"
-type = "binary"
-weight = 0.5
-optional = true
-
-[[criterion]]
 id = "1.27"
 name = "1_27"
 description = "Demo chrome controls (Save, Export CSV, Sort, Bulk edit) replace or disable the working create/edit/delete flow instead of showing a transient toast"
@@ -267,4 +252,96 @@ id = "1.29"
 name = "1_29"
 description = "Breakdown renders the sankey flow graph structure: named income-source nodes (Paychecks, Business Income, Interest, Other Income or equivalents) feed a central Income hub that splits into a Net Income node plus one node per expense category, with link thickness proportional to amount and node labels showing name and amount"
 type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "create_flow_updates_all_surfaces"
+description = "Scripted probe: note the table row count, the summary strip count, and the four summary card values; submit a valid new transaction through the create form; without any page reload the table gains exactly one row, all four summary cards recompute to include the new amount, the active chart panel redraws with the changed aggregate, and the summary strip count increases by exactly one"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "edit_flow_moves_cards_charts_strip"
+description = "Scripted probe: change an existing transaction's amount to a distinctly different value; the same row shows the new amount in the table, the affected summary cards move, the corresponding sankey link thickness and doughnut segment differ when each chart panel is next viewed, and the summary strip largest and average figures update — all without a page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "delete_flow_clears_row_selection_aggregates"
+description = "Scripted probe: check a transaction's row checkbox, then delete that transaction; its row leaves the table, it is dropped from the checkbox selection, the summary strip count decreases by exactly one, and the matching chart aggregate shrinks the next time the panel is shown"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "filter_stack_and_clear_round_trip"
+description = "Scripted probe: apply the category filter and confirm only matching rows remain; stack the income-vs-expense filter and confirm the visible rows narrow further; clear both filters and confirm exactly the full current collection returns, with the summary cards unchanged throughout"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "bulk_flow_shifts_table_and_charts"
+description = "Scripted probe: check several rows and apply bulk categorize — each checked row shows the chosen category in the table and the chart aggregates shift accordingly; then check several rows and apply bulk delete — every checked row disappears and the summary strip count drops by exactly that number"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "reload_restores_seeded_baseline"
+description = "Scripted probe: create a transaction, switch the chart tab, and apply a filter, then reload the page; the app returns to its seeded state — the seeded transactions, default filters, and the default chart tab — with every facet reset coherently, never a mix of reset and surviving state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "double_submit_creates_exactly_one_row"
+description = "Scripted probe: fill the create form with valid values and activate submit twice in quick succession; exactly one new transaction appears and the row count increases by exactly one"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "zero_state_after_empty_or_no_matches"
+description = "Filtering to zero matches shows an empty state message in the list region; after deleting all transactions the empty state also shows and the summary cards and summary strip read zero/empty"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "bulk_actions_noop_without_selection"
+description = "With no rows checked, activating bulk categorize or bulk delete performs no destructive change: the row count, chart aggregates, and summary strip stay exactly as they were"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "trends_doughnut_aggregates_live"
+description = "The Trends panel renders a category pie/doughnut with a legend whose segments aggregate from the current transactions collection"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "charts_redraw_on_data_change"
+description = "Scripted probe: note a sankey link width or node amount and a doughnut segment proportion, then create or delete a transaction in the corresponding category; the sankey link widths and node amounts and the doughnut segment proportions visibly differ the next time each panel is shown — the charts are data-driven, not baked images"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "submit_disabled_until_all_fields_valid"
+description = "In the create and edit forms, the submit control stays disabled while any required field is invalid, and each invalid field shows an inline message naming that field (payee required, amount required and numeric)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core functionality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, action sequence) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
 weight = 1.0

@@ -62,31 +62,61 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
-description = "Required hover animations are present on theme rows, chrome, and buttons; hold-to-add and preview re-theme animate as specified"
+name = "hold_to_add_progress_motion"
+description = "Through the real pointer path, holding Hold to add for about three seconds visibly fills its inset progress before success, releasing early visibly cancels/reset the fill, and successful completion gives the new My themes row a brief scale/fade entrance"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "4_2"
-description = "Preview tab and mode switches update without full reload and keep hover feedback"
+name = "preview_retheme_easing"
+description = "Through real token controls and preview tabs, changing a token and then switching tabs causes preview chrome and background colors to ease smoothly between states without a snap, flash, or full reload"
 type = "binary"
 weight = 0.5
 optional = true
 
 [[criterion]]
 id = "4.4"
-name = "4_4"
-description = "Clicking Random mutates the active theme's tokens and eases the live preview to the new colors, while the Random control icon advances with a short rotate"
+name = "random_icon_rotation"
+description = "Clicking Random through its real button changes the active tokens, eases the preview to the new colors, and advances the Random icon with a short rotate on each click"
 type = "binary"
 weight = 0.5
 optional = true
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
-description = "Omits hover washes on theme rows or controls so the studio feels static on pointer hover"
+name = "missing_hover_feedback"
+description = "Theme rows, swatch chips, chrome controls, buttons, or compact selectors remain visually static on real pointer hover and press where the instruction requires a short wash or fill/border transition"
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "4.5"
+name = "editor_control_state_motion"
+description = "Using the real editor controls reveals a color picker, changes radius and size buttons to an active fill/border, and slides Depth and Noise toggles between on and off with visible state feedback"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "hover_focus_dropdown_and_copy_motion"
+description = "Real hover over the announcement, chrome controls, theme rows, chips, buttons, and radius/size selectors produces short 0.15–0.2s-style feedback; dropdowns open with brief opacity/scale, keyboard focus is visible, and Copy shows a short confirmation that resets"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "motion_layout_jank"
+description = "A required hold, row entrance, Random rotate, control-state change, token re-theme, tab change, dropdown, or copy-confirmation animation visibly flickers, shifts unrelated layout, blocks input, or ends in an incorrect visual state"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteraction quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence (real control path, animated element, timing, or resulting state) that demonstrates it. If the defect is already covered—even partially—by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0
