@@ -1,0 +1,19 @@
+{
+  "skill_name": "rubric-align",
+  "evals": [
+    {
+      "id": 0,
+      "eval_name": "align-clockcraft-rubrics",
+      "prompt": "In repo /Users/kurrytran/frontend-repository: copy tasks/frontend-clockcraft into <OUTDIR>/frontend-clockcraft, then update the copy's four dimension rubrics (tests/core_features, tests/visual_design, tests/motion, tests/technical tomls) so they align with the copy's instruction.md in both directions, following docs/rubrics.md. Edit only the copy.",
+      "expected_output": "Each dimension toml still parses; every dimension has >=1 positive and >=1 negative criterion and exactly one open-ended judge catch-all (negate=true, evidence + not-covered + significance clauses); uncovered instruction promises gained criteria in the right dimension; orphaned or internal-implementation criteria rewritten; ids stable; [judge]/[scoring] untouched.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "eval_name": "align-mindthread-rubrics",
+      "prompt": "In repo /Users/kurrytran/frontend-repository: copy tasks/frontend-mindthread into <OUTDIR>/frontend-mindthread, then update the copy's four dimension rubrics (tests/core_features, tests/visual_design, tests/motion, tests/technical tomls) so they align with the copy's instruction.md in both directions, following docs/rubrics.md. Edit only the copy.",
+      "expected_output": "Same alignment contract as eval 0 applied to a Vue/UnoCSS thought-threading app: catch-alls added per dimension, polarity guaranteed, negated criteria phrased as bad-condition-present, animation criteria demand the real UI control path, no internal-implementation claims.",
+      "files": []
+    }
+  ]
+}
