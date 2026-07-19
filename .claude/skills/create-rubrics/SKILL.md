@@ -62,6 +62,60 @@ Apply the 1:1 tag-alignment rule: each gradeable instruction tag verifies agains
 
 7. Keep `writing` self-scoping ("where the app renders …") and nice-to-have. Keep `innovation` self-scoping, optional/bonus, and positive where it rewards work beyond the specification; for fidelity tasks, reward execution quality rather than invention beyond the reference.
 
+## Handling pre-existing criteria vs adding new ones
+
+Every dimension file you open already contains criteria — either the scaffolded
+baselines (the 11 newer dimensions) or hand-authored task criteria (the original
+four). Treat them differently:
+
+- **Scaffolded baselines (generic wording, no task nouns):** specialize in
+  place — keep the id, rewrite the description around the task's actual
+  surfaces and seeded strings, upgrade the name to a descriptive snake_case
+  label. A baseline that genuinely cannot apply to this task (e.g. a drag
+  criterion in an app with no drag) is DELETED, not left as dead generic text —
+  but first check whether the instruction implies a genre-equivalent to
+  specialize toward instead.
+- **Hand-authored existing criteria (task nouns already present):** preserve
+  them. Never delete or renumber; ids are provenance. Reword only to fix a rule
+  violation (stack identity, double-inverted negation, unresolved quantifier),
+  and upgrade numeric names when touching a criterion anyway.
+- **Add** a new criterion only when an instruction promise has no home in any
+  existing criterion — continue the file's id scheme (next free number).
+  Before adding, check the OTHER dimension files: a promise already graded in
+  its tag-aligned home must not be duplicated into a second dimension.
+- Never let specialization shrink coverage: after your pass, every behavioral
+  line under the dimension's tag still maps to at least one criterion.
+
+## Polarity mix — negatives are not optional garnish
+
+The most common authoring failure in this corpus is the all-positive rubric: a
+checklist of good behaviors that a mediocre or gamed build can skate through,
+because nothing in the file can subtract. Positives prove presence; negatives
+catch the silent failures, regressions, and shortcuts that positives cannot see
+(a build can "have hover states" and still clip text at 1440px). Do not aim for
+a prescribed ratio — aim for the mix that a skeptical reviewer of the finished
+product would need, derived per docs/rubrics.md's "How to Identify or Expand
+Criteria":
+
+- For every user-journey step you grade positively, ask what its **silent
+  failure** looks like (no feedback, desync, dead end, clipped layout) — each
+  answer that the instruction implies is a candidate negative, phrased as the
+  bad condition present.
+- Ask the **red-team question** per dimension: "how would a builder make the
+  positive pass without doing the work?" — the answer becomes a negative here
+  or a behavioral probe (different-inputs-different-outputs, reload
+  round-trip), which is what makes hardcoding unprofitable.
+- Every dimension section in docs/rubrics.md ships a Negative HLI list —
+  specialize the ones the task's instruction makes concrete, exactly as you
+  specialize positives. If after honest effort a dimension holds only one
+  token negative plus the catch-all while its positives run deep, that is a
+  smell: revisit the failure modes, don't pad with filler.
+- Negatives must be independently observable failures, not mirror-image
+  restatements of a positive in the same file (a positive "toasts auto-dismiss"
+  plus a negative "toasts never dismiss" grades the same fact twice — pick the
+  polarity that catches more, usually the negative, or make the negative cover
+  a distinct failure like "toast blocks interaction while visible").
+
 ## Criterion and file rules
 
 - Keep at least one positive and one negative criterion in every dimension. `anticheat` is the sole exception: all-negative is correct and `[scoring].aggregation` must be `"all_pass"`.
