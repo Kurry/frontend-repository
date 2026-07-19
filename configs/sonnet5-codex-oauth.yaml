@@ -5,7 +5,7 @@
 #   harbor run -y -c configs/sonnet5-codex-oauth.yaml    # CLAUDE_CODE_OAUTH_TOKEN from host env
 jobs_dir: jobs
 n_attempts: 1
-n_concurrent_trials: 2
+n_concurrent_trials: 4
 
 environment:
   type: docker
