@@ -210,6 +210,28 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "1.22"
+name = "job_config_request_body_field_contract"
+description = "Submit job validates the job-config request-body field contract: jobType one of Data generation|Fine-tune|Evaluate, dataset/model from gated selects, count integer 1–50, cluster one of aurora|basalt|cinder; Evaluate requires benchmark Switchboard|Cartographer|Ledger and repetitions 1–10; Fine-tune-only optional autoEvaluate; violations keep submit disabled with named errors and add no run"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "download_job_config_and_export_runs"
+description = "Copy and Download job-config.json emit the live preview matching the field contract; after a valid submit, Export runs JSON includes schemaVersion 1, a runs entry with that config and runId, and generatedAt ending in Z"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "export_omits_session_run"
+description = "After submitting a job, Export runs or Download job-config omits that session config or runId"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

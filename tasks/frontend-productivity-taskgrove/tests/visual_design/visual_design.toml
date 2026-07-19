@@ -202,7 +202,14 @@ weight = 0.5
 [[criterion]]
 id = "3.21"
 name = "grove_package_panel_monospace_preview"
-description = "The Grove package panel shows a scrollable monospaced JSON preview with Download grove package and Copy grove package controls"
+description = "The Grove package panel shows Grove JSON and Grove CSV tabs with a scrollable monospaced preview and Download grove package and Copy grove package controls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.22"
+name = "status_priority_due_date_visible_on_rows"
+description = "Each task node row shows readable status and priority chips or labels, and a set dueDate renders as YYYY-MM-DD, remaining legible in Light, Dark, and Forest themes"
 type = "binary"
 weight = 1.0
 

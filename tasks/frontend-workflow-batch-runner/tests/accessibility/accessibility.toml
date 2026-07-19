@@ -63,14 +63,14 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "keyboard_reaches_everything"
-description = "Sidebar entries, toolbar and macro controls, grid rows, queue move controls, retry and pause/resume controls, and all form fields are reachable and operable with Tab, Shift+Tab, Enter, and Space"
+description = "Sidebar entries, toolbar and macro controls, grid rows, queue move controls, retry and pause/resume controls, export and import controls, and all form fields are reachable and operable with Tab, Shift+Tab, Enter, and Space"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
 name = "modals_manage_focus"
-description = "The composer, schedule form, and confirmation dialogs trap focus while open, close on Escape, and return focus to the control that opened them"
+description = "The composer, schedule form, export drawer, import surface, and confirmation dialogs trap focus while open, close on Escape, and return focus to the control that opened them"
 type = "binary"
 weight = 1.0
 

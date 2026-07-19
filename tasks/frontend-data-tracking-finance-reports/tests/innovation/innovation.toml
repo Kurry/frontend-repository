@@ -63,157 +63,85 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+name = "polished_ledger_brand_moments"
+description = "Beyond the required soft mint shell, the Ledger brand lockup or sidebar treatment shows an extra polished brand moment that strengthens product identity"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "thresholds_panel_clarity"
+description = "The thresholds panel presents under/near/over status with clarity beyond a bare number, such as progress bars or concise status chips that remain readable"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+name = "export_preview_readability"
+description = "The export drawer preview is especially readable (syntax highlighting, section headers, or sticky Download/Copy chrome) beyond a plain monospace dump"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+name = "undo_redo_affordance_clarity"
+description = "Undo/Redo controls communicate stack availability clearly (disabled styling, tooltips, or last-action labels) beyond bare enabled buttons"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+name = "currency_switch_feedback"
+description = "Switching display currency provides a brief confirmation or rate hint so the conversion is understandable without reading the instruction"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+name = "coachmarks_or_print_stylesheet"
+description = "Optional first-run coachmarks on Export or Thresholds, or a printable stylesheet for the export preview, are present as an enhancement"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+name = "sankey_legend_polish"
+description = "Breakdown sankey labeling or legend polish exceeds minimum readability (stable node layout, clear amount formatting)"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+name = "empty_state_illustration_quality"
+description = "The empty transactions state uses a thoughtful illustration or structured guidance beyond a single terse line"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+name = "keyboard_shortcut_legend"
+description = "A keyboard shortcut legend for Undo/Redo or Export is available as an optional enhancement"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+name = "fx_rate_transparency"
+description = "Mock FX rates used for EUR/GBP conversion are visible somewhere in the UI (tooltip, footer, or currency control) so conversions are inspectable"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+name = "optional_enhancement_breaks_required_export"
+description = "An optional enhancement (coachmark, printable stylesheet, or shortcut legend) blocks or replaces the required Export download/copy path"
 type = "binary"
 negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
-type = "binary"
-negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
-description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant positive innovation or polish beyond the specification that is NOT covered by any other criterion in this file. If present, name the enhancement and cite the concrete evidence. If nothing beyond-spec stands out, answer no."
 type = "binary"
-weight = 1.0
+weight = 0.5

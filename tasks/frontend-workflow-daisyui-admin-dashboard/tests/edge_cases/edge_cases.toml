@@ -132,6 +132,13 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "4.11"
+name = "unknown_permission_id_rejected"
+description = "Attempting to submit Add User with a permission id outside users.read, users.write, billing.view, products.manage, and settings.edit is blocked with a field-named permissions error and adds no row."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "4.n1"
 name = "empty_collection_has_no_feedback"
 description = "An empty active All Users collection shows nothing and provides no empty-state UI feedback."

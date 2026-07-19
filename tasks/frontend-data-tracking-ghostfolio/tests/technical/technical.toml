@@ -219,6 +219,36 @@ weight = 1.0
 
 
 [[criterion]]
+id = "2.13"
+name = "derived_position_math_invariants"
+description = "The shown and exported derived figures satisfy the position-math identities: a symbol's average unit cost equals its total BUY cost divided by its total BUY quantity, cost basis equals average unit cost times quantity, unrealized gain equals market value minus cost basis, and portfolio total return equals unrealized gain plus realized gain plus dividend income minus total fees."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.14"
+name = "import_staging_isolated_from_store"
+description = "The CSV import diagnostics staging state (parsed rows, schema mapping, per-row validity) is held separately and does not mutate the shared holdings/activities collections before Commit; committed rows land in the same one store the table, totals, and exports read from."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n10"
+name = "derived_math_invariant_broken"
+description = "A shown or exported derived figure violates the position-math identities: cost basis, unrealized gain, realized gain, dividend income, total fees, or total return disagrees with the values it should be computed from."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n11"
+name = "batch_or_import_desyncs_store"
+description = "After a bulk action or a committed import, the holdings table, performance summary, or export previews show different values for the same data until a full page reload."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical defect (console, storage, coherence, hydration, or stability) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, or page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

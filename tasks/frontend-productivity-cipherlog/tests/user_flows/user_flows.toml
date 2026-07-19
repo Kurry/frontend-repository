@@ -62,150 +62,150 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "create_transmission_updates_list_and_channel"
+description = "Create flow: activating Create New Transmission, entering a title and body that satisfy the transmission field contract, and saving adds exactly one row to the memo list with a creation toast, and the new memo appears under its assigned channel when that channel is clicked — without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: submitting a blank title or other field-contract violation triggers immediate inline validation naming the offending field and adds no memo."
+name = "invalid_transmission_inline_validation"
+description = "Create flow: submitting a blank title, a title longer than 120 characters, or a priority outside high/standard/low triggers immediate inline validation naming the offending field (with a shake hint) and adds no memo."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "edit_transmission_updates_list_hud_order"
+description = "Edit flow: opening an existing memo, changing its body, and saving updates that memo's list preview, moves it to the top of newest-Last-Modified-first order, updates the HUD word/character counts, and leaves First Transmitted unchanged."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "decommission_and_purge_update_surfaces"
+description = "Decommission flow: Decommission removes the memo from the main list (count decreases by exactly one), shows a toast, and places it in Decommissioned; Restore returns it; Purge after confirmation permanently removes it from Decommissioned."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "channel_and_decommissioned_view_switch"
+description = "View/mode switch: clicking a channel filters the memo list to that channel; Show All Channels clears the filter; opening Decommissioned swaps to that view and returning restores the main list with prior search/filter state while the app stays open."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "empty_channels_memos_decommissioned_states"
+description = "Edge: with nothing created yet (or after purging the last memo), Channels, the memo list, and Decommissioned each show their own distinct friendly empty-state message rather than a blank area or one reused placeholder."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "channel_and_search_filter_coherence"
+description = "Filter/search: selecting a channel then typing search text narrows the memo list to memos matching both; the visible count matches shown rows; Show All Channels widens back to search-only matches without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "session_archive_panel_preserves_workspace"
+description = "Session archive chrome: Export session / Import session panels open and close without losing the Channels sidebar, memo list selection, or Theme Core; reopening Export still reflects the current session."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "lock_and_decommission_overlays"
+description = "Overlays: Lock passcode prompt, Decommission/Purge confirmation, and Session archive panels support their flows and dismiss without trapping the workspace."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "lock_reveal_and_import_recover_without_reload"
+description = "Recovery: an incorrect lock passcode shows a named error and keeps the body redacted; correcting the passcode reveals the body; a rejected Import leaves collections unchanged and the UI operable — no reload required."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "transmission_flows_unavailable"
+description = "Create New Transmission, edit/save, Decommission/Restore/Purge, or channel create cannot be completed from the visible UI."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "new_memo_missing_or_duplicated"
+description = "After a valid transmission save, the new memo fails to appear in the list, appears duplicated, or is missing under its assigned channel."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "edit_or_theme_desyncs_surfaces"
+description = "After editing a memo body or switching Theme Core, list preview, full view, HUD counts, priority badges, and Theme Core accents disagree about the same memo or theme."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "channel_switch_breaks_or_loses_selection"
+description = "Switching channels or opening Decommissioned breaks the layout or loses the open memo selection unexpectedly."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_collections_break_ui"
+description = "Empty Channels, memo list, or Decommissioned regions show a broken/blank UI with no distinct empty-state message."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "channel_and_search_filters_disagree"
+description = "Channel filter and search disagree about which memos are visible, or Show All Channels fails to restore the expected set."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "session_archive_panel_cannot_reopen"
+description = "After closing Export session or Import session, the Session archive controls cannot reopen the panel."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "lock_or_purge_overlay_blocks_exit"
+description = "Lock, Purge confirmation, or Session archive overlays block navigation with no dismiss/cancel path."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "failed_save_lock_or_import_silent"
+description = "A failed transmission save, invalid lock passcode, or contract-invalid Import provides no visible named-field feedback."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "cipherlog_dead_end_requires_reload"
+description = "A CipherLog flow leaves a dead end that requires a full page reload to continue editing, filtering, or exporting."
 type = "binary"
 negate = true
 weight = 1.0

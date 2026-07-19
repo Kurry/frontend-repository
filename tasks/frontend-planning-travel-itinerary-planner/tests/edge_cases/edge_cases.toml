@@ -62,150 +62,150 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_plan_and_day_states"
+description = "After deleting all stops the plan list shows an empty state message, and selecting a day with no stops shows an empty day state rather than a blank region"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "stop_form_inline_validation"
+description = "The stop create/edit form shows inline per-field errors for title, endTime, category, costTier, status, and day before submit under the Stop field contract"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "stop_and_import_errors_actionable"
+description = "Stop validation and trip JSON import errors name the problem field and a fix (for example endTime must be after startTime) rather than only saying Invalid"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "export_copy_and_import_feedback"
+description = "Export Copy and successful Import show a visible confirmation toast or notice, and a failed import shows a visible error"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "vote_and_peer_sim_feedback"
+description = "Simulated peer voting and peer-edit conflict resolution show visible progress or state updates (vote counts changing, conflict modal opening) rather than a silent wait with no UI change"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "delete_supports_undo"
+description = "After deleting a stop, Undo restores it across list, map, and exports; bulk Delete requires an explicit confirm step before removing selected stops"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "coachmarks_guide_workspace"
+description = "The onboarding coachmark sequence and/or tooltips explain the plan column, map pane, and ideas bucket so non-obvious collaboration controls are discoverable"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "planner_controls_semantic"
+description = "Stop form fields, export Download/Copy, Import, role switcher, and sidebar day rows use semantic button/input/label elements rather than clickable bare divs"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "conflict_and_export_dismiss_paths"
+description = "The conflict-resolution modal and export canvas each offer an operable dismiss or choice path that returns to the plan without trapping the user"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "coachmark_and_vote_progress"
+description = "The coachmark sequence shows step progress (Next/Skip), and bucket polls show visible vote-count progress toward the 3-of-4 promotion threshold"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_plan_silent"
+description = "After deleting all stops the plan list region is blank with no empty-state message and no way to add a stop"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "import_or_validation_console_only"
+description = "Stop field-contract failures or trip JSON import failures appear only in the browser console with no inline or toast feedback"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "export_copy_silent"
+description = "Activating Export Copy or Import succeeds or fails with no visible confirmation or error notice"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "bulk_delete_no_confirm"
+description = "Bulk Delete removes selected stops immediately with no confirm step and no Undo path afterward"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "stop_and_export_nonsemantic"
+description = "Primary stop create/submit, Export Download/Copy, or Import controls are non-semantic clickable divs without button semantics"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "conflict_modal_keyboard_trap"
+description = "The conflict-resolution modal or export canvas cannot be dismissed or completed from the keyboard"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "stop_validation_missing"
+description = "Submitting an invalid stop (empty title or endTime before startTime) adds nothing and shows no inline field error"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "export_labels_ambiguous"
+description = "Export or Import controls lack specific labels (for example showing only OK or an unlabeled icon) where Download ICS or Import trip JSON is possible"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "no_coachmarks_or_role_notice"
+description = "There is no coachmark onboarding and Viewer-blocked actions give no read-only notice"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "export_or_bucket_hidden"
+description = "Export canvas, ideas bucket, or Undo controls are visually hidden or unreachable during normal planner use"
 type = "binary"
 negate = true
 weight = 1.0
@@ -298,6 +298,21 @@ description = "After deleting all stops, the ICS preview still contains VEVENT b
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "4.19"
+name = "invalid_stop_import_rejected"
+description = "Importing trip JSON whose stops violate the Stop field contract (missing title, illegal enum, or endTime not after startTime) shows a visible error naming the offending field and leaves the plan unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.20"
+name = "title_or_notes_length_rejected"
+description = "Submitting a title longer than 120 characters or notes longer than 500 characters adds no stop and shows an inline error naming that field"
+type = "binary"
+weight = 1.0
+
 [[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"

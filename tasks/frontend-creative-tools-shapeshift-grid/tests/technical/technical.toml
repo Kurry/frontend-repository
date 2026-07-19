@@ -76,7 +76,7 @@ weight = 1.0
 
 [[criterion]]
 id = "2.3"
-name = "2_3"
+name = "uses_browser_storage_apis"
 description = "Uses localStorage or sessionStorage to persist boards or canvas state"
 type = "binary"
 weight = 1.0
@@ -92,14 +92,14 @@ negate = true
 
 [[criterion]]
 id = "2.5"
-name = "2_5"
+name = "local_qrious_festival_mask"
 description = "The QR mask is generated client-side from a locally shipped QRious (or equivalent) under vendor/, encoding the fixed festival URL with no network calls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.6"
-name = "2_6"
+name = "external_qr_network_fetch"
 description = "The QR mask or image is fetched from an external QR service or other network endpoint instead of generated locally"
 type = "binary"
 weight = 1.0

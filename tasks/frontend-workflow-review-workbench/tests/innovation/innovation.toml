@@ -63,153 +63,81 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+name = "reviewer_keyboard_palette"
+description = "Optional bonus: a reviewer-facing keyboard palette or shortcut layer for moving between gates, trials, and criteria beyond the required breadcrumb and selectors"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "dependency_chain_minimap"
+description = "Optional bonus: a visual mini-map of the gate-to-fix-item-to-recommendation dependency chain that updates live as gates and fix items change"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow, such as a reviewer orientation or a keyboard palette for moving between gates, trials, and criteria."
+name = "dark_mode_toggle"
+description = "Optional bonus: a dark color mode toggle covering portfolio, workspace, inspector, and export/import surfaces consistently"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability, such as a live mini-map of the gate-to-fix-item-to-recommendation dependency chain or a review-duration readout derived from the event timeline."
+name = "review_duration_readout"
+description = "Optional bonus: a per-bundle review-duration readout derived from the event timeline"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+name = "export_diff_or_package_compare"
+description = "Optional bonus: a package compare or diff affordance that highlights what changed between two Review Package JSON snapshots"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+name = "calibration_drilldown"
+description = "Optional bonus: calibration-strip drilldown that opens the matching bundle's trial validity context beyond the required hover figures"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+name = "timeline_scrubber"
+description = "Optional bonus: a timeline scrubber or jump-to-event control that lands the workspace on the related gate, fix item, or verdict state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+name = "print_friendly_summary"
+description = "Optional bonus: a printable review summary layout reachable from the export drawer that restates portfolio and bundle outcomes without changing store state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+name = "coachmarks_for_review_loop"
+description = "Optional bonus: a dismissible coachmarks tour highlighting portfolio, gate re-run, and Export certification package without blocking the primary review loop"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+name = "competition_level_review_polish"
+description = "Optional bonus: competition-level polish visible in the review loop beyond the required surfaces — for example coordinated status storytelling across hero, chips, and export"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+name = "innovation_is_generic_review_shell"
+description = "Beyond the mandated review surfaces, the UI reads as a generic triage shell with no review-operator polish or optional enhancement."
 type = "binary"
+weight = 0.5
 negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
-type = "binary"
-negate = true
-weight = 1.0
 
 [[criterion]]
 id = "innovation.catchall"

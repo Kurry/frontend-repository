@@ -342,36 +342,64 @@ weight = 1.0
 
 [[criterion]]
 id = "1.41"
-name = "export_manifest_mirrors_state"
-description = "Export package on an authored seed shows JSON-shaped manifest text carrying the seed id, repository, pinned 40-character commit, language, kind, title, difficulty, deference profile, failure model, the question text, every positive criterion with id, name, weight, and description, every negative criterion with its class, every foil with failure mode, expects-fail ids, and correctness cap, and the golden answer or justified harvest-pending state"
+name = "export_manifest_field_contract"
+description = "Export center's package-manifest tab shows JSON-shaped text with schemaVersion exactly seed-package-manifest-v1 plus seedId, repository, pinnedCommit (40 lowercase hex), language, kind (issue or pr), title, difficulty (hard or unset), deferenceProfile, failureModel, questionText, positiveCriteria (id/name/weight/description), negativeCriteria (with class), foils (answerText/failureMode/expectsFailIds/correctnessCap), and goldenAnswer (status present or harvest-pending with value)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.42"
 name = "export_reflects_fresh_edits"
-description = "Workbench edits made before exporting appear verbatim in the manifest: renaming a criterion or changing a foil's correctness cap changes the corresponding manifest fields on the next export with no stale values"
+description = "Workbench edits made before exporting appear verbatim in the package-manifest and studio-package previews: renaming a criterion or changing a foil's correctnessCap changes the corresponding fields on the next export with no stale values"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.43"
-name = "copy_manifest_confirmed"
-description = "The Copy manifest control puts the manifest text on the clipboard and shows a visible confirmation"
+name = "copy_and_download_manifest"
+description = "Each Export center format offers Copy (puts the exact preview text on the clipboard with visible confirmation) and Download (triggers a real file download of that format)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.44"
-name = "dataset_snapshot_matches_rollup"
-description = "The Dataset snapshot control produces JSON-shaped summary text with the total seed count, counts by status, by language, and by repository, and the rejected-by-class breakdown, all matching the rollup panel's current figures, with its own copy-with-confirmation control"
+name = "dataset_snapshot_field_contract"
+description = "The dataset-snapshot tab shows JSON with schemaVersion exactly dataset-snapshot-v1, totalSeeds, byStatus, byLanguage, byRepository, rejectedByClass matching the rollup panel figure for figure, and generatedAt as an ISO-8601 datetime ending in Z, with Copy and Download"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.45"
 name = "export_stamps_timeline"
-description = "Completing an export stamps a timestamped export event on that seed's timeline, and the export view names the seed id it was generated from"
+description = "Completing a package-manifest export stamps a timestamped export event on that seed's timeline, and the export view names the seed id it was generated from"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.52"
+name = "studio_package_field_contract"
+description = "The dataset-studio-package tab shows JSON with schemaVersion exactly seed-dataset-studio-v1, studio exactly Seed Dataset Studio, packages as an array of PackageManifest objects for every authored seed, snapshot conforming to DatasetSnapshot, and generatedAt ending in Z"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.53"
+name = "import_round_trip_restores_packages"
+description = "After exporting a DatasetStudioPackage that includes a session-authored seed, diverging that seed's question or foil cap, then Importing the JSON, the workbench fields and a fresh export reconstruct to match the imported package without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.54"
+name = "reject_seed_field_contract"
+description = "Reject submits a RejectSeed payload with rejectClass from the closed five-class enum and justification of at least 20 characters; invalid fields keep submit disabled or show inline errors naming the field and change no seed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.55"
+name = "foil_upsert_field_contract"
+description = "Adding or editing a foil enforces FoilUpsert: answerText non-empty, failureMode from the closed four-value enum, expectsFailIds non-empty and limited to current criterion ids, and correctnessCap between 0 and 40; violations show inline field-named errors and leave the foil list unchanged"
 type = "binary"
 weight = 1.0
 
@@ -428,7 +456,7 @@ negate = true
 [[criterion]]
 id = "1.n2"
 name = "export_text_is_prewritten"
-description = "The export manifest or dataset snapshot is prewritten rather than derived: two different seeds or two different session states yield identical export text, or the snapshot's counts contradict the rollup panel at the moment of export"
+description = "The PackageManifest, DatasetSnapshot, or DatasetStudioPackage is prewritten rather than derived: two different seeds or two different session states yield identical export text, required schemaVersion keys are missing, or the snapshot's counts contradict the rollup panel at the moment of export"
 type = "binary"
 weight = 1.0
 negate = true
@@ -445,6 +473,14 @@ negate = true
 id = "1.n4"
 name = "rollup_disagrees_with_queue"
 description = "After a triage or authoring action, a rollup figure disagrees with the count of queue rows matching that figure's filters until a reload"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n5"
+name = "import_mutates_on_invalid_package"
+description = "Importing malformed JSON or a package that fails the DatasetStudioPackage field contract (wrong schemaVersion, studio not Seed Dataset Studio, or invalid PackageManifest) mutates authored packages or rollups anyway"
 type = "binary"
 weight = 1.0
 negate = true

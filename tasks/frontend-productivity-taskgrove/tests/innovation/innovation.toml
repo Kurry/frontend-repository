@@ -63,153 +63,81 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+name = "command_palette_bonus"
+description = "Optional: a command palette jumps to Export grove, Import grove, Tag manager, or theme beyond the required controls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "richer_grove_diff_preview"
+description = "Optional: Import grove shows a diff preview of incoming tasks before commit"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+name = "first_run_coachmarks"
+description = "Optional: coachmarks guide the first root create or first Grove export while staying on-brand"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+name = "enhanced_progress_visualization"
+description = "Optional: progress visualization beyond the required ring while remaining readable"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+name = "keyboard_chord_hints"
+description = "Optional: keyboard chord hints surface export, import, or theme shortcuts"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+name = "tag_usage_insights"
+description = "Optional: tag usage insights beyond the required filter chips"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+name = "polished_empty_illustration"
+description = "Optional: polished empty-state illustration work that stays on-brand with TaskGrove"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+name = "print_friendly_outline"
+description = "Optional: a print-friendly outline layout beyond Export as Text and Grove CSV"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+name = "bulk_status_macros"
+description = "Optional: bulk status or priority macros beyond single-node Edit task"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+name = "competition_level_polish"
+description = "Optional: competition-level interaction polish visibly beyond the specification"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+name = "demo_blocks_required_flows"
+description = "A bonus enhancement blocks or breaks a required create, Export grove, or Import grove flow"
 type = "binary"
-negate = true
 weight = 1.0
-
-[[criterion]]
-id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
-type = "binary"
 negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
-type = "binary"
-negate = true
-weight = 1.0
 
 [[criterion]]
 id = "innovation.catchall"

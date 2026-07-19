@@ -91,7 +91,14 @@ weight = 1.0
 [[criterion]]
 id = "10.5"
 name = "derived_surfaces_agree"
-description = "The export report, the compare view, the cluster group counts, and the visible result list all agree with each other for the same query state — counts sum and rankings match across surfaces"
+description = "The Search report export, Library package export, the compare view, the cluster group counts, and the visible result list all agree with each other for the same query and corpus state — counts sum, rankings match, and export field contracts use the same ids, types, and scores shown on cards"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.7"
+name = "api_shaped_exports_parse"
+description = "Search report and Library package Download/Copy payloads parse as JSON with schemaVersion exactly 1; Search report includes request and results under the declared keys; Library package includes library exactly Semantic Search Library plus documents and savedSearches arrays whose objects match the DocumentUpsert and SavedSearch field contracts"
 type = "binary"
 weight = 1.0
 

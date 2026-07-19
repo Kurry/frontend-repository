@@ -112,14 +112,14 @@ weight = 1.0
 [[criterion]]
 id = "4.8"
 name = "overlay_transitions_timed"
-description = "The override justification form and the diff-mode picker enter with a short opacity plus scale or slide transition of roughly 200 to 300 milliseconds and exit the same way"
+description = "The override justification form, the diff-mode picker, the export drawer, and the import surface enter with a short opacity plus scale or slide transition of roughly 200 to 300 milliseconds and exit the same way"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
 name = "toasts_slide_autodismiss"
-description = "The Copy summary confirmation and feedback toasts slide in, remain readable long enough to scan, and auto-dismiss with a fade"
+description = "The Copy summary, Copy export, Download, and Import confirmation toasts slide in, remain readable long enough to scan, and auto-dismiss with a fade"
 type = "binary"
 weight = 1.0
 

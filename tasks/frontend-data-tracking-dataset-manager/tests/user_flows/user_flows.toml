@@ -70,14 +70,14 @@ weight = 1.0
 [[criterion]]
 id = "6.2"
 name = "invalid_create_shows_inline_validation"
-description = "Submitting New Dataset with an empty name, or a threshold rule with a missing cap value, triggers immediate inline validation naming the field and nothing is created"
+description = "Submitting New Dataset with an empty name, a schema field name with spaces, a category field with empty allowedValues, or a threshold rule with a missing cap triggers immediate inline validation naming the field and nothing is created"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
 name = "edit_flow_ripples_to_derived"
-description = "Editing a numeric cell through the inline editor updates the formula bar result reading that column, adds or clears a threshold flag when the value crosses a cap, and changes the dataset card stats for that column"
+description = "Editing a numeric cell through the inline editor updates the formula bar result reading that column, adds or clears a threshold flag when the value crosses a cap, and changes the Dataset Package JSON stats for that column"
 type = "binary"
 weight = 1.0
 
@@ -105,7 +105,7 @@ weight = 1.0
 [[criterion]]
 id = "6.7"
 name = "filter_updates_all_surfaces"
-description = "Enabling Show unverified only hides verified rows in the grid AND narrows the export drawer's Rows tab to the same visible set; disabling restores both exactly"
+description = "Enabling Show unverified only hides verified rows in the grid AND narrows the export drawer's Rows CSV tab to the same visible set; disabling restores both exactly"
 type = "binary"
 weight = 1.0
 
@@ -133,7 +133,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n1"
 name = "primary_flows_unavailable_from_ui"
-description = "Creating a dataset, adding or editing or deleting a row, importing, or exporting is not achievable from the visible UI"
+description = "Creating a dataset, adding or editing or deleting a row, importing CSV, exporting Dataset Package JSON, or importing a package is not achievable from the visible UI"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n6"
 name = "filtered_views_disagree"
-description = "The grid, the Verified badge, and the export Rows tab disagree about which rows are currently visible under the active filter"
+description = "The grid, the Verified badge, and the export Rows CSV tab disagree about which rows are currently visible under the active filter"
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +197,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n9"
 name = "failed_flow_lacks_feedback"
-description = "An invalid formula, an unmappable CSV paste, or an invalid split total fails silently with no visible message"
+description = "An invalid formula, an unmappable CSV paste, an invalid split total, or a failed Dataset Package JSON import fails silently with no visible message"
 type = "binary"
 negate = true
 weight = 1.0
@@ -206,6 +206,28 @@ weight = 1.0
 id = "6.n10"
 name = "navigation_dead_end_requires_reload"
 description = "Some flow (wizard, merge, diff, poll of panels) reaches a state that can only be escaped by reloading the page"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "export_after_mutations_includes_session"
+description = "Add a row with a distinctive expectedOutput token, toggle it verified, save a uniquely named snapshot, open Export, and confirm Dataset Package JSON shows schemaVersion exactly dataset-manager.package/v1, contains that expectedOutput under dataset.rows, reflects the verified toggle in stats.verifiedCount, lists the new snapshot name, and keeps every required top-level key; Copy places that JSON on the clipboard"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "import_package_restores_exported_state"
+description = "After exporting a conforming Dataset Package JSON, changing live state, and Importing that package, the grid, verified badge, snapshot list, and a subsequent export return to the imported contents; a package with the wrong schemaVersion is rejected with a named-field error and leaves state unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "export_flow_missing_or_static"
+description = "Export is missing, stuck on seeded text after session mutations, or produces Dataset Package JSON without schemaVersion dataset-manager.package/v1"
 type = "binary"
 negate = true
 weight = 1.0

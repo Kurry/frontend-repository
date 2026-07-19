@@ -210,6 +210,51 @@ type = "binary"
 negate = true
 weight = 1.0
 
+
+[[criterion]]
+id = "1.11"
+name = "undo_redo_export_import_keyboard"
+description = "Undo, Redo, Export, Import, multi-select checkboxes, and bulk Delete selected are reachable and operable with the keyboard alone with a visible focus indicator"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "import_validation_announced_live"
+description = "Import field-contract validation errors are announced via an aria-live polite region as well as shown inline"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n11"
+name = "export_import_unreachable_by_keyboard"
+description = "Export, Import, Undo, or Redo cannot be reached or activated with the keyboard alone"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "search_chips_presenter_keyboard"
+description = "The search field carries a programmatically associated label, each shot-type filter chip exposes its selected state to assistive technology, and the Present control plus all presenter controls (Pause/Resume, previous/next, End presentation) are keyboard reachable and operable with visible focus indicators"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "presenter_escape_and_announcements"
+description = "In the presenter, pressing Escape always exits back to the board, and scene changes (manual or auto-advance) are announced through an aria-live polite region as well as shown visually"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n12"
+name = "presenter_keyboard_trap"
+description = "The presenter traps keyboard users: pressing Escape leaves the presenter open, or the End presentation control is unreachable via keyboard so a keyboard-only user stays stuck in the presenter"
+type = "binary"
+weight = 1.0
+negate = true
+
 [[criterion]]
 id = "accessibility.catchall"
 name = "accessibility_catchall"

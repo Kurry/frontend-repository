@@ -62,152 +62,166 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "generate_and_save_few_shot_end_to_end"
+description = "Generate and save: open Few-Shot, enter a task description and two example rows, attach one reference document, submit, confirm the preview contains the task and both examples, save from the modal with a valid title; library count increases by one and the Few-Shot sidebar chip reads Saved — without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "invalid_technique_submit_inline_validation"
+description = "Validation flow: on Chain-of-Thought, attempt to submit with the goal empty; an inline error names the goal field, no preview is generated, and submit stays disabled until the goal is valid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "draft_retention_across_technique_switch"
+description = "Draft retention: start filling Zero-Shot, switch to Role-Based, fill part of it, switch back; Zero-Shot still holds its entered values and its chip reads In progress."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "delete_library_entry_updates_count"
+description = "Delete flow: deleting a library entry removes its row and decreases the visible library count by exactly one."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "library_to_form_round_trip"
+description = "Round trip: open a seeded library entry; the matching technique form loads with saved values restored and preview populated; change one field, resubmit, and the preview reflects the change without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "empty_library_shows_designed_empty_state"
+description = "Edge: after deleting all library entries (beyond seed if required by the empty-state path), the Library view shows a designed empty state naming what belongs there rather than a blank region."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "technique_sidebar_status_chips_track_lifecycle"
+description = "Technique sidebar: chips track lifecycle (neutral → In progress → Generated → Saved) as the user edits, submits, and saves; the active technique shows selected background and left accent."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "forms_library_switch_preserves_drafts"
+description = "View switch: switching Forms ↔ Library without reload preserves in-progress form drafts and restores the prior technique selection when returning."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "save_export_and_attachment_overlays"
+description = "Overlays: Save to Library confirmation, reference-document picker, and Export library panel support their flows and dismiss without trapping the app."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "export_import_recover_without_reload"
+description = "Recovery: after save then Export library, delete, and Import of the prior JSON, the library reconstructs; a rejected import shows a visible error and changes nothing — no reload required."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "template_forms_flows_unavailable"
+description = "Technique forms, Save to Library, Library delete, or Export/Import cannot be completed from the visible UI."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "saved_prompt_missing_or_duplicated"
+description = "After a valid Save to Library, the new row fails to appear, appears duplicated, or the count does not increase by exactly one."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "preview_library_desync"
+description = "After generate/save, preview promptText, library row technique tag, and Export template-library.json disagree about the same saved entry."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "technique_or_library_switch_breaks"
+description = "Switching techniques or Forms↔Library breaks layout or loses the active technique selection unexpectedly."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_library_breaks_ui"
+description = "An empty Library view is blank/broken with no empty-state message."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "sidebar_chips_disagree_with_form_state"
+description = "Sidebar status chips disagree with the form's actual draft/generated/saved state for the same technique."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "library_view_cannot_reopen"
+description = "After visiting Library, the Forms/Library switch cannot return to Library or Forms."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "save_or_export_modal_blocks_exit"
+description = "Save to Library or Export library overlays block navigation with no cancel/close path."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "failed_submit_or_import_silent"
+description = "An invalid technique submit or contract-invalid Import provides no visible named-field or import error feedback."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "template_forms_dead_end_requires_reload"
+description = "A Template Forms flow leaves a dead end that requires a full page reload to continue."
 type = "binary"
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "export_library_after_save_flow"
+description = "Export library flow: save a valid Few-Shot prompt, open Export library, confirm template-library.json includes that title and technique and promptText matches the preview; Download or Copy succeed; after deleting the entry the next export omits it."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "import_library_round_trip_flow"
+description = "Import round-trip: export JSON after a save, note entries length, delete to diverge, Import that JSON, and confirm the library and a fresh export reconstruct to match."
+type = "binary"
 weight = 1.0
 
 [[criterion]]

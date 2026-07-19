@@ -62,150 +62,150 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "7.1"
-name = "layout_adapts_desktop_to_mobile"
-description = "Layout adapts gracefully from 1440px desktop to 375px mobile."
+name = "layout_adapts_1440_to_375"
+description = "At roughly 1440px and 375px viewport widths the habit shell remains usable: habit rows, category chips, and New Habit remain operable without broken overlap"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
-name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+name = "mobile_checkin_targets_large_enough"
+description = "At roughly 375px, one-tap complete, stepper plus/minus, category chips, and Export as JSON / Import controls present tap targets large enough for touch (approximately 44px or clearly comfortable)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
-name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+name = "type_readable_on_narrow"
+description = "Habit names, fraction labels (n/target), and Stats numbers remain readable at both desktop and roughly 375px widths"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
-name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+name = "heatmap_and_week_grid_unclipped"
+description = "At narrow width the Heatmap month grid and the 7-day weekly grid remain fully visible without clipping cells or labels"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
-name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+name = "view_chrome_adapts_narrow"
+description = "Habits / Stats / Heatmap / Import view chrome adapts at narrow width (stacked or wrapped navigation) so destinations remain reachable"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.6"
-name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+name = "habit_rows_single_column_narrow"
+description = "At roughly 375px habit rows stack in a single column and the New Habit form remains fully usable without overlapping controls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.7"
-name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+name = "narrow_tap_checkin_works"
+description = "At roughly 375px, tapping one-tap complete and stepper controls updates today's completion state without requiring a desktop-only hover path"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.8"
-name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+name = "no_horizontal_scroll_at_375"
+description = "At roughly 375px viewport width the app renders with no horizontal scrolling"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.9"
-name = "media_and_canvases_resize"
-description = "Images, grids, and canvases size responsively to fit the layout."
+name = "stats_chart_fits_viewport"
+description = "At narrow width the Stats numbers and completions trend chart fit the viewport without overflowing horizontally"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.10"
-name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
+name = "recovery_controls_reachable_narrow"
+description = "The recovery notice remains legible at narrow width with its Retry and Reset controls reachable"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.n1"
-name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+name = "layout_breaks_at_375"
+description = "At roughly 375px the habit list, category chips, or New Habit form break with overlapping or unreachable controls"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n2"
-name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+name = "mobile_stepper_targets_too_small"
+description = "At roughly 375px stepper or one-tap complete targets are too small or misaligned for reliable touch"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n3"
-name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+name = "narrow_habit_name_unreadable"
+description = "Habit names or Stats labels shrink to unreadable sizes at narrow width"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n4"
-name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+name = "heatmap_cropped_on_narrow"
+description = "Heatmap month cells or the 7-day grid are cropped or force unnecessary horizontal scrollbars at narrow width"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n5"
-name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
+name = "view_nav_missing_on_narrow"
+description = "Habits / Stats / Heatmap / Import navigation is missing or unusable at some narrow widths"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n6"
-name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
+name = "fixed_toast_obscures_narrow_controls"
+description = "Fixed toasts or banners permanently obscure primary check-in or Export controls at narrow width"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n7"
-name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
+name = "category_chips_overlap_rows"
+description = "Category filter chips overlap habit rows or each other at some viewport size"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n8"
-name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
+name = "narrow_checkin_requires_hover"
+description = "At roughly 375px, completing a habit requires a hover-only control that cannot be activated by tap"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n9"
-name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
+name = "trend_chart_static_overflow"
+description = "The Stats trend chart uses a static width that overflows the viewport at narrow sizes"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n10"
-name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
+name = "export_controls_disappear_narrow"
+description = "Export as JSON, Import, or Load Malformed Sample controls disappear at specific narrow sizes"
 type = "binary"
 negate = true
 weight = 1.0

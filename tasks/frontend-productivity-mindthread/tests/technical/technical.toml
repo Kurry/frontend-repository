@@ -171,7 +171,7 @@ weight = 1.0
 [[criterion]]
 id = "2.18"
 name = "export_import_share_workspace_schema"
-description = "Workspace JSON produced by Export validates against the same mindthread-workspace-v1 field contract that Import accepts; a downloaded then re-imported document restores matching visible state"
+description = "Workspace JSON produced by Export validates against the same mindthread-workspace-v1 field contract that Import accepts (schemaVersion, exportedAt, sparks, threads, reflections, status enums, and cross-field id rules); a downloaded then re-imported document restores matching visible state"
 type = "binary"
 weight = 1.0
 [[criterion]]

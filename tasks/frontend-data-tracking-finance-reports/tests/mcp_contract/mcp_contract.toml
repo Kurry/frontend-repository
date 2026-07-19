@@ -63,77 +63,98 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "12.1"
 name = "mandated_modules_are_bound"
-description = "All contract-mandated modules are initialized and bound."
+description = "Contract modules browse-query-v1, entity-collection-v1, and artifact-transfer-v1 are initialized and bound"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.2"
 name = "handlers_match_visible_ui_logic"
-description = "Exposed tool handlers match visible UI command logic."
+description = "Exposed tool handlers for entity create/update/delete and artifact export/import/copy match the same application logic as the visible UI controls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.3"
 name = "only_documented_operations_exist"
-description = "Only documented operations and routes are available."
+description = "Only documented operations and destinations from the contract bindings are available (no undeclared routes)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.4"
 name = "contract_is_automation_exercisable"
-description = "The contract can be fully exercised via automation."
+description = "The contract can be fully exercised via webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool automation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.5"
 name = "declared_entity_operations_work"
-description = "Entity operations declared in the contract, including create, update, delete, and reorder, all work."
+description = "Declared entity operations create, select, update, and delete work against the expense entity and update the visible table"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.6"
 name = "form_flow_operations_are_bound"
-description = "Form submission validation, error, and cancel operations are clearly bound."
+description = "Entity create/update validation failures surface the same visible field errors as the UI form path"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.7"
 name = "queries_match_allowed_spec"
-description = "Query destinations and filters match the allowed specification."
+description = "Browse destinations include reports-overview, category-breakdown, transaction-list, export-drawer, and thresholds; filters include category, range, and currency"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.8"
 name = "capabilities_stay_declared"
-description = "No extra or undeclared module routes or capabilities are exposed."
+description = "No extra or undeclared module routes or capabilities beyond browse-query-v1, entity-collection-v1, and artifact-transfer-v1 are exposed"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.9"
 name = "session_tool_and_invoke_apis_work"
-description = "Session info, tool list, and invocation are correctly surfaced."
+description = "Session info, tool list, and invocation are correctly surfaced for the bound tools"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.10"
 name = "mcp_initializes_without_harness_edits"
-description = "MCP initialization works without manual editing or test harness changes."
+description = "MCP initialization works without manual editing or test harness changes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.11"
+name = "artifact_export_import_copy_bound"
+description = "Artifact operations export, import, and copy are bound for formats csv and json and import mode ledger-json; invoking export updates the same preview state the Export drawer shows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.12"
+name = "entity_fields_cover_transaction_contract"
+description = "Entity fields exposed for expense include label, amount, category, date, account, and status matching the transaction field contract"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.13"
+name = "workflow_postconditions_export_import"
+description = "Visible postconditions hold: export drawer preview updates after create/edit/delete and matches live totals.count; importing ledger-json replaces table rows, thresholds, and summary cards to match the imported document"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.n1"
 name = "mcp_tools_missing_or_noop"
-description = "MCP tooling is unbound, missing, or a no-op."
+description = "MCP tooling is unbound, missing, or a no-op"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +162,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n2"
 name = "handlers_diverge_from_ui_logic"
-description = "Handlers do not match UI logic because actions mismatch or state does not sync."
+description = "WebMCP invoke and the visible table/export disagree about the same action outcome (handler/UI desync)"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +170,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n3"
 name = "undeclared_capabilities_exposed"
-description = "Undeclared destinations or entity operations are exposed."
+description = "Undeclared destinations or entity operations are exposed beyond the contract bindings"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +178,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n4"
 name = "automation_cannot_exercise_contract"
-description = "The contract cannot be exercised from automation."
+description = "The contract cannot be exercised from automation"
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +186,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n5"
 name = "validation_bypass_desyncs_state"
-description = "Validation bypasses lead to inconsistent MCP and UI state."
+description = "A form submit that bypasses field-contract validation creates an expense in MCP state while the visible UI omits that expense, or shows a UI expense that MCP state omits"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +194,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n6"
 name = "session_or_tool_api_errors"
-description = "The session or tool API returns errors or incomplete data."
+description = "The session or tool API returns errors or incomplete data"
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +202,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n7"
 name = "mcp_relies_on_undocumented_hacks"
-description = "MCP relies on manual or undocumented test hacks."
+description = "MCP relies on manual or undocumented test hacks"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +210,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n8"
 name = "required_contract_module_missing"
-description = "No module contract is implemented where one is declared required."
+description = "A required module among browse-query-v1, entity-collection-v1, or artifact-transfer-v1 is not implemented"
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +218,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n9"
 name = "mcp_is_stubbed_or_commented_out"
-description = "The MCP interface is commented out or only stubbed."
+description = "The MCP interface is commented out or only stubbed"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +226,15 @@ weight = 1.0
 [[criterion]]
 id = "12.n10"
 name = "automated_contract_validation_fails"
-description = "The project fails automated MCP contract validation."
+description = "The project fails automated MCP contract validation"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "12.n11"
+name = "artifact_tools_return_raw_file_bytes"
+description = "Artifact export/import/copy tools return raw file, blob, or base64 contents in WebMCP results instead of status/postconditions"
 type = "binary"
 negate = true
 weight = 1.0

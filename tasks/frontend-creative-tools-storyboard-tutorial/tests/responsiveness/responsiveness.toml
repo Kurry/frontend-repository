@@ -210,6 +210,44 @@ type = "binary"
 negate = true
 weight = 1.0
 
+
+[[criterion]]
+id = "7.11"
+name = "export_import_usable_at_375"
+description = "At 375px width the Export center, Import surface, create form, and bulk action bar remain readable and operable without horizontal page scrolling"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.12"
+name = "header_keeps_export_below_768"
+description = "At widths of 768px and below the header still exposes Export and Import (or an equivalent reachable overflow) without losing the storyboard title"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.n11"
+name = "export_clipped_on_mobile"
+description = "At 375px width Export or Import controls or preview text are clipped or force horizontal scrolling"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.13"
+name = "presenter_and_filters_at_375"
+description = "At 375px width the search field, shot-type chips, and Present control remain reachable and operable, and a running presenter keeps its scene content, countdown, progress readouts, and control strip visible and operable without horizontal page scrolling"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.n12"
+name = "presenter_clipped_at_375"
+description = "At 375px width the presenter's countdown, progress readouts, or controls render clipped or off-screen, or the search field and filter chips force horizontal page scrolling"
+type = "binary"
+weight = 1.0
+negate = true
+
 [[criterion]]
 id = "responsiveness.catchall"
 name = "responsiveness_catchall"

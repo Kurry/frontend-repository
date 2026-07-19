@@ -225,6 +225,57 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "3.22"
+name = "performance_summary_figure_group"
+description = "The performance summary presents net worth, total cost basis, realized gain, unrealized gain, dividend income, total fees, and total return as a labeled figure group in the same white-card language, with gains shown in a positive/negative treatment (teal or red) that reads at a glance."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.23"
+name = "performance_chart_axis_and_legend"
+description = "The performance chart renders a portfolio-value line with axis labels; when Benchmark compare is on, the two series are visually distinguishable and labeled in a legend rather than sharing one indistinct color."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.24"
+name = "batch_tray_visual_language"
+description = "When rows are selected, the batch action tray shows the selected count and the bulk delete and bulk edit controls in the teal accent language above or beside the tables, without obscuring the selected rows."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.25"
+name = "import_diagnostics_screen_visual"
+description = "The CSV import diagnostics screen presents the schema-mapping controls and a row-level diagnostics table where valid and invalid rows are visually distinct (invalid rows flagged in the red family with the failing field named) plus a clearly labeled Commit control."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.26"
+name = "four_labeled_export_tabs"
+description = "The export drawer shows four labeled format tabs (Portfolio JSON, Holdings CSV, Activities CSV, Performance report) sharing the same tab and preview language."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.n6"
+name = "batch_or_diagnostics_unstyled"
+description = "The batch action tray or the CSV import diagnostics screen renders as unstyled browser defaults that clash with the teal/neutral wealth-dashboard visual language."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n7"
+name = "performance_gains_color_only_or_illegible"
+description = "Performance summary gains and losses are indicated by color alone lacking legible value labels, or the gain/loss hues fall outside the teal/red palette, leaving the figures illegible at a glance."
+type = "binary"
+negate = true
+weight = 0.5
+
+[[criterion]]
 id = "3.catchall"
 name = "visual_design_catchall"
 description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

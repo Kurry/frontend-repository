@@ -112,7 +112,7 @@ weight = 1.0
 [[criterion]]
 id = "9.8"
 name = "rapid_input_does_not_freeze"
-description = "Rapid repeated input — quick filter changes, rapid sort clicks, fast view switches — never hangs or drops interactions, including while a run is in progress"
+description = "Rapid repeated input — quick filter changes, rapid sort clicks, fast view switches, and reopening Report after mutations — never hangs or drops interactions, including while a run is in progress; export preview regeneration after a mutation completes without a blank freeze"
 type = "binary"
 weight = 1.0
 
@@ -141,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n2"
 name = "console_errors_during_flows"
-description = "Errors or warnings appear in the console during runs, verdicts, feedback, escalation, or report flows"
+description = "Errors or warnings appear in the console during runs, verdicts, feedback, escalation, export copy/download, or import flows"
 type = "binary"
 negate = true
 weight = 1.0

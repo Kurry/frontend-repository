@@ -63,14 +63,14 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "all_controls_keyboard_operable"
-description = "Every interactive control — portfolio rows and filters, gate cards and evidence links, re-run/retry/pause controls, trial and criterion selectors, diff pickers, fix checkboxes, recommendation controls, the override toggle and form, stepper controls, and the copy and bundling controls — is reachable and operable with Tab, Shift+Tab, Enter, or Space, with a visible focus indicator at each stop"
+description = "Every interactive control — portfolio rows and filters, gate cards and evidence links, re-run/retry/pause controls, trial and criterion selectors, diff pickers, fix checkboxes, recommendation controls, the override toggle and form, stepper controls, export and import controls, and the copy, download, and bundling controls — is reachable and operable with Tab, Shift+Tab, Enter, or Space, with a visible focus indicator at each stop"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
 name = "modals_manage_focus"
-description = "The override justification form and diff picker trap focus while open, close on Escape, and return focus to the control that opened them"
+description = "The override justification form, diff picker, export drawer, and import surface trap focus while open, close on Escape, and return focus to the control that opened them"
 type = "binary"
 weight = 1.0
 
@@ -91,7 +91,7 @@ weight = 1.0
 [[criterion]]
 id = "1.5"
 name = "forms_have_explicit_labels"
-description = "The override justification field, step notes fields, and filter controls have visible labels, and each validation message is associated with its field so it names the field it belongs to"
+description = "The override justification field, step notes fields, import package field, and filter controls have visible labels, and each validation or import error message is associated with its field so it names the field it belongs to"
 type = "binary"
 weight = 1.0
 

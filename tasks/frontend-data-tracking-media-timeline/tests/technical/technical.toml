@@ -161,6 +161,21 @@ description = "Undo and Redo reverse and reapply the same create/edit/delete/bat
 type = "binary"
 weight = 1.0
 
+
+[[criterion]]
+id = "2.15"
+name = "api_shaped_create_matches_export_payload"
+description = "A successful create produces a library row and Timeline JSON event object that share the same API-shaped fields — title, type, timestamp ending with Z, mediaRefs, year, place, categories, summary, and source — so the visible record matches the would-be request body in the export preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.16"
+name = "events_csv_header_matches_field_contract"
+description = "The Events CSV export preview header line is exactly title,type,timestamp,mediaRefs,year,place,categories,summary,source and each data line joins categories with a pipe and mediaRefs with a semicolon"
+type = "binary"
+weight = 1.0
+
 [[criterion]]
 id = "2.catchall"
 name = "technical_catchall"

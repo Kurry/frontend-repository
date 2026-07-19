@@ -156,32 +156,32 @@ weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "view_switch_breaks_weblink"
+description = "Switching primary Weblink views or panels breaks layout or loses the selected link/collection unexpectedly."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_links_break_ui"
+description = "After deleting the last link or clearing a collection, the list region is blank/broken with no designed empty-state message."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "filters_disagree_weblink"
+description = "Search/tag filters disagree about which links are visible, or clearing filters fails to restore the full list."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "collapsed_weblink_chrome_stuck"
+description = "Collapsed Weblink sidebar/panel chrome cannot be reopened from the visible control."
 type = "binary"
 negate = true
 weight = 1.0
@@ -204,11 +204,55 @@ weight = 1.0
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "weblink_dead_end_requires_reload"
+description = "A Weblink flow leaves a dead end that requires a full page reload to continue."
 type = "binary"
 negate = true
 weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "transfer_lifecycle_flow"
+description = "Transfer lifecycle flow: queue one file, Start (status Transferring, readout advancing), Pause (readout frozen), Resume (continues from the frozen value), Cancel (Canceled with partial readout kept), Retry (Not Started at zero); the transfer log shows one entry per action in order and Export Session shows the row's current status and bytesTransferred"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "batch_select_remove_retry_flow"
+description = "Batch flow: queue three files, select two; the bulk bar appears showing the selected count; Remove Selected leaves exactly the unselected row and logs one removed entry per file; after the survivor completes, selecting it and clicking Retry Selected returns it to Not Started at zero"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "drag_reorder_flow"
+description = "Reorder flow: with three queued rows, drag the first row's handle to the last position; the on-screen order updates immediately, survives a reload, and the Session Pack fileQueue array lists rows in that same order"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "transcript_export_flow"
+description = "Transcript flow: send a distinctive chat line, open Export Transcript, and confirm the markdown contains that line with its role label and timestamp; Copy shows confirmation; Download produces a real .md matching the preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "transfer_controls_missing_or_noop"
+description = "Start, Pause, Resume, Cancel, or Retry is missing from queue rows or activating it changes neither the row's status nor its progress readout."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "6.n12"
+name = "bulk_bar_desyncs_from_selection"
+description = "The bulk action bar's count disagrees with the number of checked rows, or Remove Selected deletes rows that were not selected."
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "user_flows.catchall"

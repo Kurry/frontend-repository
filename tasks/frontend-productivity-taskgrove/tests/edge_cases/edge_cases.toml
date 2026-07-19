@@ -77,14 +77,14 @@ weight = 1.0
 [[criterion]]
 id = "4.3"
 name = "field_errors_name_offending_field"
-description = "Task title and tag name/color validation errors name the offending field (title, name, or color) and the fix rather than only saying Invalid."
+description = "Task title, status, priority, dueDate, and tag name/color validation errors name the offending field (title, status, priority, dueDate, name, or color) and the fix rather than only saying Invalid"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
 name = "durable_actions_show_toast"
-description = "Adding a task or child, archiving, restoring, Move To, and importing a grove package each show a transient confirmation toast."
+description = "Adding a task or child, editing a task, archiving, restoring, Move To, and importing a grove package each show a transient confirmation toast"
 type = "binary"
 weight = 1.0
 
@@ -133,14 +133,14 @@ weight = 1.0
 [[criterion]]
 id = "4.11"
 name = "malformed_grove_import_rejected"
-description = "Importing malformed Grove package JSON leaves the tree, tags, archive, and theme unchanged and shows visible validation naming the import problem."
+description = "Importing malformed Grove JSON or Grove CSV leaves the tree, tags, archive, and theme unchanged and shows visible validation naming the import problem"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.12"
 name = "schema_invalid_grove_import_rejected"
-description = "Importing parseable JSON that fails the Grove package field contract — wrong schemaVersion, theme outside light|dark|forest, tag color outside the closed hex enum, blank title, or node tags longer than 5 — leaves the session unchanged and shows validation naming the offending field or rule."
+description = "Importing parseable JSON or CSV that fails the Grove package field contract — wrong schemaVersion, theme outside light|dark|forest, status or priority outside their closed enums, tag color outside the closed hex enum, blank title, node tags longer than 5, or CSV columns that do not match the Grove CSV header — leaves the session unchanged and shows validation naming the offending field or rule"
 type = "binary"
 weight = 1.0
 
@@ -222,6 +222,13 @@ name = "malformed_import_mutates_session"
 description = "Importing malformed Grove package JSON still mutates the tree, tags, archive, or theme."
 type = "binary"
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "invalid_status_priority_due_date_blocked"
+description = "Submitting status outside todo|in_progress|done|blocked, priority outside low|medium|high|urgent, or dueDate that is not empty and not YYYY-MM-DD shows an inline error naming the offending field and adds or saves nothing"
+type = "binary"
 weight = 1.0
 
 [[criterion]]

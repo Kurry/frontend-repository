@@ -231,6 +231,51 @@ negate = true
 weight = 0.5
 
 [[criterion]]
+id = "8.a1"
+name = "kinetic_lettermark_and_line_reveals"
+description = "On a fresh load, kinetic typography runs at character/line level: the brand lettermark rises letter by letter in the intro timeline, and headings/paragraphs reveal with a line-by-line upward mask wipe the first time each scrolls to about 80% of the viewport (verified by real scrolling/fresh load, never a state shortcut)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.a2"
+name = "scroll_storytelling_pinned_services_throw"
+description = "On a fresh load, real scrolling through the pinned services region drives sequential scroll storytelling: the top service card throws away with rotation to reveal the next in the Organic content / Ads for social / Training trio, tied to scroll progress, and scrolling back reverses the sequence"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.a3"
+name = "pointer_reactive_card_inertia"
+description = "On a fine-pointer desktop viewport, eligible cards respond to real pointer enter/leave with continuous momentum/inertia throws (no stepped jumps) while remaining fully clickable and usable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.a5"
+name = "scroll_capture_breaks_usability"
+description = "Smooth scrolling traps the user, prevents reaching content, fights native scroll direction below 768px, or ignores the reduced-motion path that must stop smooth scrolling, drifting thumbnails, decorative video, marquees, and pinned throws while keeping every card, heading, control, and form operable"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "8.a6"
+name = "kinetic_effects_decorative_jank"
+description = "Lettermark letter-assembly or line-by-line mask reveals stutter, reflow mid-animation, or leave characters/lines misaligned after settling"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "8.a7"
+name = "signature_motion_purely_linear_tweens"
+description = "Signature interactive motion (primary-button hover choreography, nav-dot overshoot, flick-deck elastic settle, or CTA-card inertia throws) uses purely linear tweens that start and stop mechanically with no inertial, springy, or overshoot easing"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "3.catchall"
 name = "motion_catchall"
 description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

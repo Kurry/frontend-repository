@@ -210,6 +210,102 @@ type = "binary"
 negate = true
 weight = 1.0
 
+
+[[criterion]]
+id = "6.11"
+name = "create_updates_total_duration"
+description = "Create flow: after a valid Add Scene with a known duration, Total duration increases by exactly that many seconds and the new card shows the matching duration and shot-type badge."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "bulk_delete_flow"
+description = "Bulk delete flow: select at least two scenes, confirm Delete selected — every selected scene is gone, survivors renumber with no gaps, and Slide total plus Total duration update together without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "undo_redo_flow"
+description = "Undo/redo flow: create a scene, Undo removes it and restores Total duration, Redo restores the scene; a new create after Undo leaves Redo disabled."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "mutation_to_export_flow"
+description = "Export flow: after creating a distinctive scene and switching to List, open Export — Storyboard JSON shows schemaVersion storyboard-tutorial-v1, viewMode list, and the session title/duration/shotType under field-contract keys; Markdown names the same; Copy shows Copied! confirmation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "export_import_round_trip_flow"
+description = "Round-trip flow: Download or Copy Storyboard JSON after a mutation, change the board, Import that document — scenes, view mode, and Total duration match the export without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "export_flow_missing_or_static"
+description = "Export is missing, or after a session mutation the Storyboard JSON / Markdown preview stays identical to the pre-mutation seeded export."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n12"
+name = "import_round_trip_fails"
+description = "Importing a previously exported valid Storyboard JSON fails to reconstruct the exported scenes, view mode, or Total duration."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.16"
+name = "search_filter_flow"
+description = "Search and filter flow: create a scene with a distinctive title and the POV shot type; typing a unique part of that title into search shows only that scene in Tile and List with the filtered count reading 1 of M; clearing search and selecting the POV chip shows only POV scenes including the new one; selecting All and clearing search restores the full set exactly — all without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.17"
+name = "presenter_end_to_end_flow"
+description = "Presenter flow: Present shows the first scene with its countdown at that scene's duration; Pause freezes the remaining seconds and Resume continues from them; a short scene's countdown reaching zero auto-advances with Scene N of total incrementing; advancing past the last scene shows the finished state with Restart and Exit; Exit returns to the previous view mode with the board, selection, and undo history intact."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.18"
+name = "bulk_duplicate_flow"
+description = "Duplicate flow: selecting two scenes and activating Duplicate selected appends both copies at the end with (copy) titles, renumbers sequentially, and updates the Slide counter total and Total duration together without a reload; Undo reverses the whole duplication in one step."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.19"
+name = "outline_print_flow"
+description = "Outline flow: after a session mutation, opening Export and selecting Printable outline shows the live outline (board title, Total duration, ordered scene rows), and activating Print opens the browser print preview of that outline layout."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n13"
+name = "presenter_dead_end"
+description = "The presenter cannot be exited (End presentation and Escape both fail), or exiting loses the board state, selection, or undo history that existed before presenting."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "6.n14"
+name = "filter_flow_desync"
+description = "With a search query or shot-type chip active, switching among Tile, List, and Slide shows different subsets or counts for the same filter state."
+type = "binary"
+weight = 1.0
+negate = true
+
 [[criterion]]
 id = "user_flows.catchall"
 name = "user_flows_catchall"

@@ -196,6 +196,73 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "8.a1"
+name = "kinetic_word_reveal_headings"
+description = "On a fresh load, real scrolling reveals word-level kinetic typography: headings such as THE / AGENTIC / ERA split into words and stagger into view with inertial easing as each heading enters the viewport (never a WebMCP state shortcut)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.a2"
+name = "scroll_storytelling_pin_parallax_stack"
+description = "On a fresh load, real scrolling drives sequential scroll storytelling: section pinning, parallax background layers moving at a different rate than foreground content, and stacked-section overlap reveals advance in choreographed order tied to scroll progress and reverse when scrolling back up"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.a3"
+name = "pointer_reactive_hero_parallax"
+description = "On a desktop viewport (≥768px), real mouse movement over the hero adds continuous camera parallax (smoothness about 0.06, no stepping) while the page stays fully usable; below 768px parallax is disabled in favor of a fixed camera offset"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.a4"
+name = "spatial_3d_hero_scroll_scrub"
+description = "The browser-rendered 3D hero scene responds in real time: on a fresh load, real scrolling scrubs the camera along its path through the hero at a stable frame rate rather than a static image or disconnected snap"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.a5"
+name = "scroll_capture_breaks_usability"
+description = "Scroll capture traps the user, prevents reaching later sections, fights native scroll direction or position sticky, or ignores the reduced-motion path that must clear the preloader immediately, disable smooth scrolling/parallax/pinning, settle WebGL to a static composition, and keep every control operable"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "8.a6"
+name = "kinetic_effects_decorative_jank"
+description = "Word-reveal heading splits stutter, reflow mid-animation, or leave words misaligned after settling"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "8.a7"
+name = "signature_motion_purely_linear_tweens"
+description = "Signature motion (preloader exit, word-reveal stagger, card hover scale, or footer gradient fade) uses purely linear tweens that start and stop mechanically with no inertial easing or settle (loader progress-bar width may remain linear)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "8.a8"
+name = "interactive_feature_card_vectors"
+description = "Feature-card canvas/vector animations stay crisp at the desktop viewport and respond to real hover state (pointer-events enabled and card scale to about 1.03 on hover-capable devices) rather than looping identically regardless of interaction"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.a9"
+name = "signature_animation_is_raster_loop"
+description = "The signature 3D hero scrub or interactive feature-card vector animation is faked as a pre-rendered video or raster loop that pixelates when scaled, ignores pointer/scroll state changes, and restarts identically on every encounter"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "3.catchall"
 name = "motion_catchall"
 description = "The app exhibits a significant, browser-observable defect in motion or animation behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "9.2"
 name = "console_clean_during_full_exercise"
-description = "No console errors or warnings appear during a full exercise: opening rubrics, adding/editing/deleting criteria with version bumps, using Tune toggles and thresholds, flipping preview verdicts, exporting, and viewing history diffs."
+description = "No console errors or warnings appear during a full exercise: opening rubrics, adding/editing/deleting criteria with version bumps, using Tune toggles and thresholds, flipping preview verdicts, exporting, importing, undoing/redoing, and viewing history diffs."
 type = "binary"
 weight = 1.0
 
@@ -126,7 +126,7 @@ weight = 1.0
 [[criterion]]
 id = "9.10"
 name = "export_panel_stays_responsive"
-description = "Opening Export and copying the structured text keeps the studio interactive; the monospaced block appears without a multi-second blank hang."
+description = "Opening Export center and switching among structured text, rubric JSON, and package JSON keeps the studio interactive; the monospaced previews appear without a multi-second blank hang, and Copy/Download remain responsive."
 type = "binary"
 weight = 1.0
 

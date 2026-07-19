@@ -97,8 +97,8 @@ weight = 1.0
 
 [[criterion]]
 id = "14.6"
-name = "full_pipeline_probe"
-description = "Full-pipeline probe: design a new experiment whose variants use different prompts or models, run it to completion, and confirm the distributions differ per variant; flag one outlier and confirm the summary statistics change; declare a winner with a rationale; then export the report and confirm it contains the flag-adjusted statistics, the design as entered, and the decision rationale — each stage's output feeding the next."
+name = "full_pipeline_to_export_json"
+description = "Full-pipeline probe: design a new experiment via ExperimentUpsert with differently configured variants, run it to completion, flag one outlier and confirm summary statistics change, declare a winner with DecisionUpsert rationale, then open Export report and confirm schemaVersion ab-experiment-report-v1, post-flag statistics, flaggedResponseIds, and the decision rationale — each stage feeding the next"
 type = "binary"
 weight = 1.0
 
@@ -116,6 +116,14 @@ description = "Edge-state round-trip: flag every response of one variant so the 
 type = "binary"
 weight = 1.0
 
+
+[[criterion]]
+id = "14.9"
+name = "import_export_round_trip_probe"
+description = "Import/export round-trip: on a completed experiment, flag one outlier and declare a winner with a rationale, Download experiment-report.json, reload to seeded state, Import that file onto the matching experiment, and confirm decision header, locked controls, flagged inspector treatment, summary statistics, and a fresh export reconstruct to match; then Import a payload with schemaVersion other than ab-experiment-report-v1 and confirm state is unchanged with a named-field error"
+type = "binary"
+weight = 1.0
+
 [[criterion]]
 id = "14.n1"
 name = "partial_persistence_is_incoherent"
@@ -127,7 +135,7 @@ weight = 1.0
 [[criterion]]
 id = "14.n2"
 name = "derived_surface_ignores_inputs"
-description = "A derived surface renders identically regardless of its inputs — the distribution strip, difference chart, matrix, or radial wheels stay unchanged after outlier flags or additional samples alter the underlying data."
+description = "A derived surface renders identically regardless of its inputs — the distribution strip, difference chart, matrix, radial wheels, or Export report JSON statistics stay unchanged after outlier flags or a decision alter the underlying data"
 type = "binary"
 negate = true
 weight = 1.0

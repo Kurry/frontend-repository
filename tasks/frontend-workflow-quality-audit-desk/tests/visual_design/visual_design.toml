@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.1"
 name = "nav_rail_and_queue_layout"
-description = "The app shows a left navigation rail with entries for Queue, Reviewers, and Report, and the Queue view places the rollup strip and its two charts above the table"
+description = "The app shows a left navigation rail with entries for Queue, Reviewers, and Report; the Queue view places the rollup strip and its two charts above the table; the Report view shows a format switch, monospaced export preview, Copy, Download, Import package, and export history"
 type = "binary"
 weight = 1.0
 
@@ -133,7 +133,7 @@ weight = 1.0
 [[criterion]]
 id = "2.11"
 name = "single_consistent_icon_set"
-description = "One consistent icon set is used throughout the navigation rail, stage badges, check chips, run steps, and row actions, with no mismatched icon styles"
+description = "One consistent icon set is used throughout the navigation rail, stage badges, check chips, run steps, row actions, and export controls, with no mismatched icon styles"
 type = "binary"
 weight = 1.0
 

@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "seeded_corpus_and_index_stats"
-description = "On first load the index panel reports at least 120 seeded documents spanning at least 6 topics and at least 4 document types, its document list shows entries with realistic multi-sentence content, and the index statistics (total indexed, stale count, last build time, distinct term count) render with values consistent with the library"
+description = "On first load the index panel reports at least 120 seeded documents spanning at least 6 topics and using all six closed document types (guide, reference, prompt, checklist, paper, note), its document list shows entries with realistic multi-sentence content, and the index statistics (total indexed, stale count, last build time, distinct term count) render with values consistent with the library"
 type = "binary"
 weight = 1.0
 
@@ -231,7 +231,21 @@ weight = 1.0
 [[criterion]]
 id = "1.25"
 name = "export_report_live_and_copyable"
-description = "The Export report modal shows structured JSON shaped like an API exchange — a request object with query, filters (objects with kind and value per chip), and threshold, plus a results array of hits each with id, title, type, score, snippet, highlights, and feedback — the JSON parses without error, changing the threshold or feedback and reopening the export updates the matching fields, and the Copy control places the exact text on the clipboard with a visible confirmation"
+description = "The Export modal's Search report tab shows JSON under the SearchReport field contract — schemaVersion exactly 1, generatedAt ending in Z, request with query, filters (kind one of tag|type|before and value), and threshold, plus results hits each with id, title, type one of guide|reference|prompt|checklist|paper|note, score to two decimals, snippet, highlights, and feedback one of up|down|none — the JSON parses without error, matches on-screen ranking after threshold and feedback changes, and Download and Copy emit the visible text with Copy showing a confirmation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "document_and_saved_search_field_contracts"
+description = "Add document submits a DocumentUpsert shape — title 1–200 trimmed, body at least 20 characters trimmed, type exactly one of guide|reference|prompt|checklist|paper|note, tags 0–12 unique non-empty strings — keeping Add disabled with named field errors when invalid; Save search submits a SavedSearch shape with unique name 1–80, query, filters, and threshold, rejecting empty or duplicate names with an inline name error and storing nothing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "library_package_export_and_import_round_trip"
+description = "The Export modal's Library package tab shows JSON with schemaVersion exactly 1, library exactly Semantic Search Library, documents as DocumentUpsert objects including id, savedSearches as SavedSearch objects, and generatedAt ending in Z; adding a document or saving a search updates those arrays on reopen; Import of a previously exported package restores the corpus and saved list so a fresh export matches, while malformed packages show a named error and change nothing"
 type = "binary"
 weight = 1.0
 
@@ -246,6 +260,14 @@ weight = 1.0
 id = "1.n1"
 name = "scores_constant_across_queries"
 description = "Two clearly different queries produce identical similarity scores or an identical ranking across the corpus, indicating scores are hardcoded per document rather than computed from the query"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n4"
+name = "export_omits_session_mutations"
+description = "After a search with feedback or threshold change, or after adding a document or saved search, the Search report or Library package export omits those session mutations or uses wrong field names or enum values versus the declared field contracts"
 type = "binary"
 weight = 1.0
 negate = true

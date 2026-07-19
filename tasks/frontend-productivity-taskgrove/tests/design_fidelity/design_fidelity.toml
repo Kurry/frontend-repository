@@ -62,153 +62,153 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "spacing_and_sizing_follow_scale"
-description = "Spacing and sizing follow the design system's scale, with no arbitrary one-off values visible in computed styles."
+name = "spacing_follows_8px_scale"
+description = "Spacing and gaps follow the 8px base unit described in the visual design, with no arbitrary one-off crowding in the shell"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
 name = "typography_matches_spec"
-description = "Typography matches the spec for all headings and body copy."
+description = "Typography matches the spec: app name at 96px in the ui-sans-serif/system-ui stack, secondary headings at 48px, body and task titles at 10px Arial"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "layout_matches_reference"
-description = "Layout matches reference screenshots to within a small tolerance at all specified breakpoints; fidelity tasks achieve near pixel-parity."
+name = "layout_matches_reference_shell"
+description = "Desktop layout matches the reference screenshots shell (header, toolbar, tree beside Archive, footer create form) within a small tolerance; where screenshots and text conflict, text wins"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.4"
 name = "specified_state_changes_animate"
-description = "Transitions or animations are applied to the state changes the spec calls out, such as add, delete, filter, or view switch."
+description = "Row add/remove/reorder, chevron rotate, progress-ring fill, and Grove package panel enter/exit animate as specified rather than hard-cutting"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "responsive_behavior_matches_reference"
-description = "Responsive behavior matches reference patterns."
+name = "narrow_behavior_matches_spec"
+description = "At ~375px the Archive panel stacks below the tree, toolbar wraps, and nested titles wrap or truncate as specified"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.6"
-name = "control_styling_matches_spec"
-description = "Button and form radii, padding, and shadows conform to the spec."
+name = "primary_secondary_buttons_match"
+description = "Primary #00BC7D buttons (16px radius, soft shadow) and secondary bordered buttons match the specified treatments on New Root Task, Add Child, Export as Text, Download grove package, Move, and Archive"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.7"
-name = "typography_has_clear_hierarchy"
-description = "Typography has a clear hierarchy that distinguishes section and body text."
+name = "hierarchy_title_vs_body"
+description = "The TaskGrove title is visually larger than Archive/Tag manager/Grove package headings, which are distinct from 10px task body text"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.8"
-name = "component_states_match_spec"
-description = "Component states (default, hover, active, disabled) match the spec where specified."
+name = "hover_active_states_match"
+description = "Hover and focus states on node rows, chevrons, and primary buttons match the specified treatments"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.9"
-name = "surface_treatments_match_spec"
-description = "Color, depth, and border treatments are precise per the design."
+name = "surfaces_match_palette"
+description = "In Light theme, canvas #FFFFFF, ink #0F172B, and accent #00BC7D match the specified palette; Dark and Forest keep a recognizable green accent"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.10"
-name = "microinteractions_match_spec"
-description = "Microinteraction feedback for hover and press follows the spec in duration and motion."
+name = "grove_panel_chrome_matches"
+description = "Grove package panel tabs, monospaced preview, and Download/Copy controls match the specified chrome language rather than an unstyled default"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.n1"
-name = "sizing_or_spacing_contradicts_scale"
-description = "Visible sizing or spacing values contradict the specified scale."
+name = "spacing_contradicts_scale"
+description = "Visible sizing or spacing values contradict the 8px scale with cramped or uneven shell regions"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "3.n2"
 name = "colors_fall_outside_palette"
-description = "Colors appear outside the specified palette."
+description = "Colors appear outside the specified Light/Dark/Forest palettes on primary surfaces"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "3.n3"
-name = "sizing_mismatches_spec"
-description = "Sizing mismatches the spec."
+name = "typography_mismatches_spec"
+description = "App name, secondary headings, or task titles clearly mismatch the specified sizes or stacks"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "3.n4"
 name = "required_animations_missing_or_wrong"
-description = "Animations are missing or incorrect where the spec requires them."
+description = "Row, chevron, progress-ring, or Grove package animations are missing where the spec requires them"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "3.n5"
 name = "specified_controls_use_browser_defaults"
-description = "Form or button controls use browser default styles when the spec styles them."
+description = "Primary create or Download grove package controls use unstyled browser defaults when the spec styles them"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "3.n6"
 name = "layout_misaligned_at_breakpoints"
-description = "The grid or layout is misaligned at reference breakpoints."
+description = "The tree/Archive layout is misaligned at desktop or ~375px reference breakpoints"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "3.n7"
 name = "elements_are_clipped_or_offscreen"
-description = "Elements render off-screen or clipped."
+description = "Toolbar, tree rows, or Grove package controls render off-screen or clipped"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "3.n8"
 name = "structure_deviates_from_reference"
-description = "Section order, content, or structure deviates from the reference on fidelity tasks."
+description = "Header, toolbar, tree, Archive, and footer appear in an order that contradicts the reference shell and the instruction layout lines"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "3.n9"
 name = "heading_and_body_text_undifferentiated"
-description = "Heading and body text have no distinction."
+description = "App name, secondary headings, and task body text have no visual distinction"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "3.n10"
 name = "microinteractions_deviate_from_reference"
-description = "Microinteractions are missing or deviate from the provided reference."
+description = "Hover or focus microinteractions are missing on node rows and primary buttons"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "design_fidelity.catchall"

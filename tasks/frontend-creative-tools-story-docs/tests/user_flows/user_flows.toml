@@ -210,6 +210,65 @@ type = "binary"
 negate = true
 weight = 1.0
 
+
+[[criterion]]
+id = "6.11"
+name = "filter_search_flow"
+description = "Filter/search flow: set status to review so only review scenes remain, type a unique substring from one remaining title into search, confirm Tile/List/Slide show only that match, then clear search and set All to restore the full set without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "reorder_flow_renumbers"
+description = "Reorder flow: drag a middle scene above the first in Tile or List; numbers renumber contiguously, the moved scene's title is first, and Slide prev/next walks the new order."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "undo_redo_flow"
+description = "Undo/redo flow: create a valid scene (count +1), Undo removes it and restores the count, Redo returns the same title — without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "command_palette_flow"
+description = "Command-palette flow: open with Ctrl/Cmd+K, run Switch to List (List active), run Add Scene (create form opens)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "export_session_then_omit_on_delete"
+description = "Export flow: create a valid scene with a unique title, open Export, confirm markdown/json/outline include that title (json scenes entry matches the field contract), then delete it and confirm the next export omits it."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.16"
+name = "import_round_trip_flow"
+description = "Import flow: export json after a create, delete scenes to diverge, Import the JSON, and confirm collection count, Tile/List/Slide contents, and a fresh export match the imported package."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "export_preview_ignores_create"
+description = "After creating a scene with a unique title, Export markdown/json/outline previews stay identical to the pre-create export."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n12"
+name = "undo_does_not_restore"
+description = "After a create, Undo leaves the new scene on the board (count unchanged)."
+type = "binary"
+negate = true
+weight = 1.0
+
 [[criterion]]
 id = "user_flows.catchall"
 name = "user_flows_catchall"

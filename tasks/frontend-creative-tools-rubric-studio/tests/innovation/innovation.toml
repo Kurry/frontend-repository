@@ -80,7 +80,7 @@ optional = true
 [[criterion]]
 id = "11.3"
 name = "guided_first_run_for_rubric_studio"
-description = "A brief guided first-run or coachmark flow introduces the rail, version gate, Tune view, and Export without blocking the tool (bonus beyond required empty-state copy)."
+description = "A brief guided first-run or coachmark flow introduces the rail, version gate, Tune view, and Export center without blocking the tool (bonus beyond required empty-state copy)."
 type = "binary"
 weight = 0.5
 optional = true
@@ -136,7 +136,7 @@ optional = true
 [[criterion]]
 id = "11.10"
 name = "competition_level_rubric_studio_feel"
-description = "The overall studio feels competition-grade: version-gated editing, Tune sensitivity, weighted-total preview, and export polish read as a professional rubric instrument rather than a wired demo (bonus)."
+description = "The overall studio feels competition-grade: version-gated editing, Tune sensitivity, weighted-total preview, undo/redo, and Export center package polish read as a professional rubric instrument rather than a wired demo (bonus)."
 type = "binary"
 weight = 0.5
 optional = true

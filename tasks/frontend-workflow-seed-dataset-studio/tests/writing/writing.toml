@@ -71,14 +71,14 @@ weight = 0.5
 [[criterion]]
 id = "15.2"
 name = "actions_use_specific_labels"
-description = "Where the app renders action labels, they are specific verbs — Accept for authoring, Reject seed, Run harvest, Mark authored, Export package, Copy manifest — not generic ('Submit', 'OK') when a specific label is possible."
+description = "Where the app renders action labels, they are specific verbs — Accept for authoring, Reject seed, Run harvest, Mark authored, Export package, Copy manifest, Download manifest, Import package — not generic ('Submit', 'OK') when a specific label is possible."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.3"
 name = "errors_name_problem_and_fix"
-description = "Where the app renders validation or gate messages, they name the exact field or condition and what satisfies it (for example the 20-character justification minimum, or each unmet gate condition), not just a rejection ('Invalid')."
+description = "Where the app renders validation, gate, or import messages, they name the exact field or condition and what satisfies it (for example the 20-character justification minimum, correctnessCap bounds, schemaVersion, studio name, or each unmet gate condition), not just a rejection ('Invalid')."
 type = "binary"
 weight = 0.5
 

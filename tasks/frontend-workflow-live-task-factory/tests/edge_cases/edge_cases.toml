@@ -70,7 +70,14 @@ weight = 1.0
 [[criterion]]
 id = "4.2"
 name = "forms_validate_inline_before_submit"
-description = "The Add repository form, the connection panel fields, and the bundle import all surface inline validation before any submission takes effect, each message tied to its field"
+description = "The Add repository form (AddRepository field contract), the reject-reason chooser (RejectAction field contract), the connection panel fields, and the TaskPackageBundle import all surface inline validation before any submission takes effect, each message tied to its field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "invalid_schema_version_rejected"
+description = "Importing a bundle whose schemaVersion is missing or not exactly live-task-package-v1 lists schemaVersion (or an equivalent per-field message naming it) among the errors and adds nothing to the library"
 type = "binary"
 weight = 1.0
 

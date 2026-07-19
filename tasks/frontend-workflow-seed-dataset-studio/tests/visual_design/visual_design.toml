@@ -91,7 +91,7 @@ weight = 1.0
 [[criterion]]
 id = "3.5"
 name = "monospace_for_data_identity"
-description = "Seed ids, commit hashes, and the manifest and snapshot text render in a monospaced face visually distinct from the interface sans-serif, and the sans-serif text shows a clear hierarchy of app title above pane headings above table body and label text"
+description = "Seed ids, commit hashes, and Export center preview text (package manifest, snapshot, and studio package) render in a monospaced face visually distinct from the interface sans-serif, and the sans-serif text shows a clear hierarchy of app title above pane headings above table body and label text; Export center presents format tabs with Copy and Download and Import as a clear companion control"
 type = "binary"
 weight = 1.0
 

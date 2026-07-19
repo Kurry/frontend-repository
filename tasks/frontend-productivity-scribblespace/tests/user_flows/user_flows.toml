@@ -75,6 +75,13 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "6.13"
+name = "create_note_payload_round_trips_export"
+description = "Create flow: New Note, set distinctive text and a closed swatch color, open Export workspace Workspace JSON, and confirm the objects entry shows type note with that text and color hex; Download then Import reconstructs the same note fields on canvas and in the preview."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "6.3"
 name = "edit_note_echoes_outline_export"
 description = "Edit flow: changing a note's body and color updates the Outline row and the Workspace JSON / Plain text export previews to match without reload."

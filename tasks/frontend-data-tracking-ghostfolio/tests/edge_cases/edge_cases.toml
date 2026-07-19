@@ -238,6 +238,57 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "4.16"
+name = "full_sell_moves_gain_to_realized"
+description = "Selling the entire quantity of a holding removes it from the holdings table (or leaves it at zero quantity) and moves its gain from unrealized to realized: the performance summary's unrealized gain drops that holding's contribution and realized gain rises by the sold gain, with no double-counting."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.17"
+name = "zero_valid_import_commit"
+description = "Committing an Activities CSV import in which every row is invalid or excluded imports zero rows: the summary reports zero imported, the ledger and all export previews stay unchanged, and no undo step is recorded as if an import had succeeded."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.18"
+name = "benchmark_toggle_empty_ledger"
+description = "Toggling Benchmark compare while the activities ledger is empty still overlays and removes the seeded benchmark series; the portfolio series reads as empty or flat and toggling does not throw an error."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.19"
+name = "bulk_delete_undo_restores_all"
+description = "Bulk deleting several selected holdings and then pressing Undo once restores every deleted row, the selection state, and the net worth, allocation, and performance summary they contributed, not just the last row."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.20"
+name = "bulk_edit_cross_field_blocked"
+description = "A bulk edit that sets asset class or data source on several selected rows to a value that would break a cross-field rule for one of them is blocked for that row with a visible message, and the batch does not partially apply an invalid change."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.n10"
+name = "full_sell_double_counts_gain"
+description = "After selling an entire position, its gain is counted in both unrealized gain and realized gain, or the removed holding still contributes to net worth or the performance summary."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "zero_import_commit_mutates_or_records_undo"
+description = "Committing an import with zero valid rows still mutates the activities collection or records an undo step as if rows had been imported."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"
 description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

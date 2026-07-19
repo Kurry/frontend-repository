@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -189,14 +189,14 @@ weight = 1.0
 [[criterion]]
 id = "2.18"
 name = "api_shaped_settings_validation"
-description = "Settings, preset save, and session import validation show named-field inline errors before submit: quality outside 1–100, empty preset name, or malformed session JSON never applies invalid values."
+description = "Settings, preset save, and session import validation show named-field inline errors before submit against the SettingsUpdate, ConversionPreset, and ConversionSessionDocument field contracts: quality outside 1–100, empty or over-length preset name, malformed session JSON, or schemaVersion not vert-session-v1 never applies invalid values."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.19"
 name = "export_previews_live_from_store"
-description = "Session JSON and conversion-report previews recompile live from the shared store after a retarget, quality change, preset save, batch action, or conversion — an open export preview reflects the mutation without reload."
+description = "Session JSON and conversion-report previews recompile live from the shared store after a retarget, quality change, preset save, batch action, or conversion — an open export preview reflects the mutation without reload and still shows schemaVersion vert-session-v1 with required ConversionSessionDocument keys."
 type = "binary"
 weight = 1.0
 

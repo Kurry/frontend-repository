@@ -215,7 +215,7 @@ weight = 1.0
 [[criterion]]
 id = "1.41"
 name = "workspace_export_contains_session_work"
-description = "After capturing sparks, creating a thread, assigning, tagging, adding a reflection, and setting status: opening Export shows Workspace JSON containing schemaVersion mindthread-workspace-v1 plus those sparks, threads, and reflections under the required keys, and the Today digest markdown names the same sparks; both texts differ from the pre-mutation export"
+description = "After capturing sparks, creating a thread, assigning, tagging, adding a reflection, and setting status: opening Export shows Workspace JSON containing schemaVersion exactly mindthread-workspace-v1 plus exportedAt, sparks, threads, and reflections under the Workspace JSON field-contract keys (including those session mutations), and the Today digest markdown names the same sparks; both texts differ from the pre-mutation export"
 type = "binary"
 weight = 1.0
 [[criterion]]
@@ -233,19 +233,19 @@ weight = 1.0
 [[criterion]]
 id = "1.44"
 name = "import_rejects_invalid_workspace_contract"
-description = "Importing malformed JSON, or a document missing schemaVersion/sparks/threads/reflections, or with schemaVersion other than mindthread-workspace-v1, or with status outside Active|Dormant|Resolved, leaves the workspace unchanged and shows visible validation naming the offending field"
+description = "Importing malformed JSON, or a document missing schemaVersion/exportedAt/sparks/threads/reflections, or with schemaVersion other than mindthread-workspace-v1, or with status outside Active|Dormant|Resolved, or with unresolved threadId/sparkId, leaves the workspace unchanged and shows visible validation naming the offending field"
 type = "binary"
 weight = 1.0
 [[criterion]]
 id = "1.45"
 name = "spark_and_tag_field_contract_bounds"
-description = "Spark text longer than 2000 characters is rejected naming the text field; a tag with spaces, punctuation, or length over 32 characters is rejected naming the tag field; neither mutation adds a record"
+description = "SparkUpsert/TagAdd bounds: spark text longer than 2000 characters is rejected naming the text field; a tag with spaces, punctuation, or length over 32 characters is rejected naming the tag field; neither mutation adds a record"
 type = "binary"
 weight = 1.0
 [[criterion]]
 id = "1.46"
 name = "thread_title_field_contract_bound"
-description = "A thread title longer than 80 characters is rejected with an inline message naming the title field and creates no thread"
+description = "ThreadUpsert bound: a thread title longer than 80 characters is rejected with an inline message naming the title field and creates no thread"
 type = "binary"
 weight = 1.0
 [[criterion]]

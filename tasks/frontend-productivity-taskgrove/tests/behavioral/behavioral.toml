@@ -84,7 +84,7 @@ weight = 1.0
 [[criterion]]
 id = "14.4"
 name = "tag_echo_across_manager_row_and_export"
-description = "Cross-view echo: create a tag and attach it to a node; confirm the same name and color appear on the node row, in the Tag manager list, on the toolbar filter chip, and in the Export grove JSON tags array without reload."
+description = "Cross-view echo: create a tag and attach it to a node; confirm the same name and color appear on the node row, in the Tag manager list, on the toolbar filter chip, and in the Grove JSON tags array without reload"
 type = "binary"
 weight = 1.0
 
@@ -98,7 +98,7 @@ weight = 1.0
 [[criterion]]
 id = "14.6"
 name = "different_titles_change_export_json"
-description = "Input-dependent output: create two roots with different titles and confirm the Export grove JSON preview contains both distinct titles rather than identical payloads."
+description = "Input-dependent output: create two roots with different titles and distinct status or priority values and confirm both Grove JSON and Grove CSV previews contain both distinct titles and their status/priority values rather than identical payloads"
 type = "binary"
 weight = 1.0
 
@@ -112,21 +112,21 @@ weight = 1.0
 [[criterion]]
 id = "14.8"
 name = "empty_to_repopulated_export_tracks"
-description = "Edge-state round-trip: from a populated tree, archive or remove until the main tree is empty and the empty-state message returns, then create a new root; the empty-state disappears and the Export grove JSON tasks array tracks through both transitions."
+description = "Edge-state round-trip: from a populated tree, archive or remove until the main tree is empty and the empty-state message returns, then create a new root; the empty-state disappears and both Grove JSON tasks array and Grove CSV rows track through both transitions"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.9"
 name = "grove_export_import_preserves_session"
-description = "Mutate → export → import: create a root with one child, create and attach one tag, switch theme away from Light; confirm Export grove JSON shows schemaVersion 1, the theme, tag name/color, and both titles; Download or Copy; mutate away; Import that JSON; confirm tree, tags, theme, and Export grove preview match the pre-export session."
+description = "Mutate → export → import: create a root with one child, set status and priority, create and attach one tag, switch theme away from Light; confirm Grove JSON shows schemaVersion 1, theme, tag name/color, titles, status, and priority, and Grove CSV shows the same title/status/priority; Download or Copy JSON; mutate away; Import that JSON; confirm tree, tags, theme, and both export previews match the pre-export session."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.10"
 name = "schema_invalid_import_leaves_state"
-description = "Starting from a known tree and theme, attempt Import of parseable JSON with theme outside light|dark|forest or a tag color outside the closed hex enum; confirm tree titles, tag chips, archive, and theme stay unchanged and validation names the offending field."
+description = "Starting from a known tree and theme, attempt Import of parseable JSON with theme outside light|dark|forest, status outside its closed enum, or a tag color outside the closed hex enum; confirm tree titles, tag chips, archive, and theme stay unchanged and validation names the offending field."
 type = "binary"
 weight = 1.0
 
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "14.n3"
 name = "different_titles_produce_identical_export"
-description = "Creating roots with different titles yields Export grove JSON that is identical aside from incidental whitespace."
+description = "Creating roots with different titles and status values yields Grove JSON or Grove CSV that is identical aside from incidental whitespace"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +157,7 @@ weight = 1.0
 [[criterion]]
 id = "14.n4"
 name = "tag_or_export_state_is_stale"
-description = "A newly created tag or task title appears on the node row but not in the Tag manager, toolbar filter row, or Export grove JSON until reload."
+description = "A newly created tag or task title appears on the node row but not in the Tag manager, toolbar filter row, or Grove JSON/CSV previews until reload."
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,9 +165,16 @@ weight = 1.0
 [[criterion]]
 id = "14.n5"
 name = "schema_invalid_import_mutates_session"
-description = "Importing Grove package JSON that fails the field contract still mutates the tree, tags, archive, or theme."
+description = "Importing Grove JSON or Grove CSV that fails the field contract still mutates the tree, tags, archive, or theme"
 type = "binary"
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.11"
+name = "grove_csv_round_trip_preserves_fields"
+description = "After creating tasks with status, priority, and dueDate, Download or Copy Grove CSV, diverge the session, Import that CSV, and confirm titles, status, priority, dueDate, and tree parent relationships match the pre-export session"
+type = "binary"
 weight = 1.0
 
 [[criterion]]

@@ -63,21 +63,21 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "6.1"
 name = "create_flow_updates_list_pin_density_export"
-description = "Creating a valid event in Library/Filter mode adds exactly one row, increases Showing N of M by one, shows the pin in Scrub/Explore when in window, increments the matching density count, and includes the new title in Timeline JSON and Events CSV previews without a reload"
+description = "Creating a valid event (title, type, timestamp, mediaRefs, year, place, categories, summary) in Library/Filter mode adds exactly one row showing title and type, increases Showing N of M by one, shows the pin in Scrub/Explore when in window, increments the matching density count, and includes the new title with type/timestamp/mediaRefs in Timeline JSON and Events CSV previews without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
 name = "invalid_create_shows_field_contract_errors"
-description = "Submitting create with an empty title, invalid year, empty place, empty summary, or zero categories shows inline per-field errors naming the failing fields and adds no event"
+description = "Submitting create with an empty title, type outside the closed enum, timestamp that is not ISO-8601 ending with Z or that breaks the year cross-field rule, empty mediaRefs, invalid year, empty place, empty summary, or zero categories shows inline per-field errors naming the failing fields and adds no event"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
 name = "edit_flow_updates_list_pin_detail_export"
-description = "Editing a user-managed event's title or year updates the library row, stage pin and hover label, open detail panel, and Timeline JSON / Events CSV export previews without a reload"
+description = "Editing a user-managed event's title, type, timestamp, mediaRefs, or year updates the library row, stage pin and hover label, open detail panel, and Timeline JSON / Events CSV export previews without a reload"
 type = "binary"
 weight = 1.0
 
@@ -126,7 +126,7 @@ weight = 1.0
 [[criterion]]
 id = "6.10"
 name = "export_import_round_trip_flow"
-description = "After mutating the collection, Copy or Download Timeline JSON then Import that same JSON reconstructs library titles, years, enabled categories, year window, density counts, and export previews to the pre-export mutated state"
+description = "After mutating the collection, Copy or Download Timeline JSON then Import that same JSON reconstructs library titles, types, years, mediaRefs, enabled categories, year window, density counts, and export previews to the pre-export mutated state"
 type = "binary"
 weight = 1.0
 
@@ -148,6 +148,14 @@ weight = 1.0
 id = "6.13"
 name = "reload_clears_session_mutations"
 description = "After create, filter, window, and undoable mutations, a page reload returns seeded corpus, default window, all categories, empty undo/redo, no selection, and no user-created events together"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "6.14"
+name = "export_flow_contains_created_api_fields"
+description = "After creating Signal Tower Demo (type Milestone, timestamp 1920-01-01T00:00:00.000Z, mediaRefs containing signal-tower-demo) and Evening Broadcast (type Broadcast), open Export timeline; Timeline JSON events contain both titles with matching type/timestamp/mediaRefs, Events CSV uses the contract header and both titles, and Copy shows confirmation"
 type = "binary"
 weight = 1.0
 
@@ -202,7 +210,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n7"
 name = "export_import_round_trip_fails"
-description = "Importing a just-exported Timeline JSON leaves titles, window, or export previews different from the pre-export mutated state"
+description = "Importing a just-exported Timeline JSON leaves titles, types, mediaRefs, window, or export previews different from the pre-export mutated state"
 type = "binary"
 negate = true
 weight = 1.0

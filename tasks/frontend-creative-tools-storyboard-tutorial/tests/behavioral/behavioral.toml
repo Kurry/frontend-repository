@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "14.1"
 name = "in_memory_multi_facet_reload_reset"
-description = "Starting on Tile: create a uniquely titled scene, switch to List then Slide and advance one step, edit a seeded scene description, then reload. All facets coherently reset to the seeded baseline together — seeded scenes (including Welcome to Docs! on scene 1), Tile mode active, and first slide position — never a mix of persisted user scenes with reset modes."
+description = "Starting on Tile: create a uniquely titled scene with a distinctive duration, switch to List then Slide and advance one step, edit a seeded scene body, then reload. All facets coherently reset to the seeded baseline together — seeded scenes (including Welcome to Docs! on scene 1), Tile mode active, first slide position, empty undo/redo, and seeded Total duration — never a mix of persisted user scenes with reset modes."
 type = "binary"
 weight = 1.0
 
@@ -147,6 +147,87 @@ description = "After editing a scene description in Tile mode, List or Slide sta
 type = "binary"
 negate = true
 weight = 1.0
+
+
+[[criterion]]
+id = "14.9"
+name = "export_pipeline_contains_session_work"
+description = "Full export pipeline: create a scene with a distinctive title and duration, edit another scene's shotType, switch to List; open Export and confirm Storyboard JSON shows schemaVersion storyboard-tutorial-v1 plus those values under field-contract keys with matching totalDuration, and the Markdown shot list names the same title, shot type, and duration; Copy shows a confirmation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "storyboard_import_round_trip_reconstructs"
+description = "After exporting Storyboard JSON from a mutated session, change the board further, then Import that JSON — scenes, view mode, and Total duration reconstruct to match the export, and both export previews match the restored state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.11"
+name = "total_duration_derived_sensitivity"
+description = "Derived-view sensitivity: note Total duration, create a scene with duration 12, confirm Total duration increases by exactly 12; edit that duration to 20 and confirm Total duration increases by 8 more; delete it and confirm Total duration returns to the prior baseline."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.12"
+name = "undo_round_trip_after_create"
+description = "Undo round-trip: create a uniquely titled scene (count +1), Undo (count back, title gone, Total duration restored), Redo (title and duration return)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "schema_invalid_import_mutates_state"
+description = "Importing parseable JSON that fails the StoryboardDocument field contract (wrong schemaVersion, missing scenes, or enum/bounds violations) still mutates scenes or view mode."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n6"
+name = "export_omits_mutations_behavioral"
+description = "After distinctive create/edit mutations, Export Storyboard JSON and Markdown remain identical to a pre-mutation capture."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.13"
+name = "filter_probe_search_and_chip"
+description = "Create a scene with a unique title and the POV shot type. Type a unique substring of that title into search: only that scene remains visible in Tile and List and the filtered count reads 1 of M. Clear search and select the POV chip: only POV scenes (including the new one) remain. Select All and clear search: the full set returns exactly — proving the filters derive from the live collection."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.14"
+name = "duplicate_count_and_duration_delta"
+description = "Note the scene count and Total duration, select two scenes with known durations, and activate Duplicate selected: immediately the count increases by exactly two, the copies appear at the end with (copy) titles, and Total duration increases by exactly the sum of the two durations. Undo removes both copies and restores the prior count and Total duration together."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.15"
+name = "presenter_timing_input_dependent"
+description = "Arrange two scenes with clearly different durations (for example 3 and 8 seconds, creating or editing as needed). Start Present: the first scene auto-advances after roughly its duration while the second holds visibly longer, and the Scene N of total readout increments on each advance. Edit a scene's duration and re-present: its countdown length changes accordingly — timing derives from live data."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.16"
+name = "outline_full_pipeline_probe"
+description = "Create a scene with a distinctive title and duration, then move another scene earlier. Open Export and select Printable outline: the outline lists the session's scenes in the current board order with the distinctive title and duration present and the moved scene at its new position, and the stated Total duration equals the live sum; Copy on the outline shows a confirmation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n7"
+name = "outline_ignores_session_mutations"
+description = "After a create, reorder, or duration edit, the Printable outline preview remains identical to its pre-mutation content or disagrees with the board order and Total duration."
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "behavioral.catchall"

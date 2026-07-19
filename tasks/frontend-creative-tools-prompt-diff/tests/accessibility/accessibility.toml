@@ -63,77 +63,84 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "controls_are_keyboard_accessible"
-description = "All interactive controls — pickers, tabs, counters, merge choice and bulk controls, graph nodes, thread markers, undo/redo, and export — are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+description = "All interactive controls — pickers, tabs, Ignore whitespace and Ignore case toggles, counters, merge choice and bulk controls, graph nodes, thread markers, undo/redo, Export, Import, Copy, and Download — are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
 name = "modals_manage_focus"
-description = "The restore and merge confirmation dialogs trap focus, close on Escape, and return focus to the originating control on close."
+description = "The restore confirmation, merge confirmation, and Export surface trap focus, close on Escape, and return focus to the originating control on close."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
 name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+description = "Toolbar and gutter icons (plus/minus, thread markers, Export) expose accessible names via aria-label, title, or equivalent — not unlabeled decorative-only controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
 name = "feedback_uses_live_regions"
-description = "Merge completion, restores, posted annotations, and blocking validation are conveyed both visually and via ARIA live regions."
+description = "Merge completion, restores, posted annotations, successful imports, and blocking AnnotationCreate/Import validation are conveyed both visually and via ARIA live regions or associated field errors."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
 name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+description = "AnnotationCreate bodyMarkdown, RestoreCreate changeNote, and Import paste fields use explicit labels or aria-labelledby associations."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
 name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+description = "Headings for the app title, mode panels, Export tabs, and merge flow follow a logical order without skipping levels."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
 name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+description = "The left rail, main diff surface, and header toolbar are exposed with landmark roles or semantic regions (nav/main/aside or equivalent)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
 name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+description = "Diff chrome labels, summary tags, picker text, and form labels have sufficient contrast against their backgrounds."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
 name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+description = "Pickers, tabs, Ignore toggles, Export, and merge choices use button/checkbox/tab semantics rather than unlabeled clickable divs."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
 name = "reduced_motion_is_respected"
-description = "The diff cross-fade, counter pulse, and thread transitions respect the prefers-reduced-motion setting."
+description = "The diff cross-fade, counter pulse, Export enter/exit, and thread transitions respect the prefers-reduced-motion setting by applying instantly."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "diff_not_color_alone"
+description = "Added and removed lines are distinguishable by gutter plus/minus symbols and accessible line annotations, not by color alone."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
 name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+description = "Ignore toggles, Export, Import, merge choices, or graph nodes cannot be activated or reached via keyboard."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +148,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n2"
 name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+description = "Focus indicators are missing or obscured on pickers, Ignore toggles, Export controls, or merge choices."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +156,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n3"
 name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+description = "Custom components for tabs, Ignore toggles, or graph nodes use non-semantic tags and lack ARIA roles or labels."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +164,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n4"
 name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+description = "Added versus removed lines or conflict regions are distinguished by color alone with no gutter symbol or text annotation."
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +172,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n5"
 name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+description = "The restore confirmation, merge confirmation, or Export surface does not trap keyboard focus while open."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +180,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n6"
 name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+description = "Picker labels, summary tags, or validation messages are unreadable due to poor contrast."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +188,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n7"
 name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+description = "AnnotationCreate, RestoreCreate, or Import validation errors are visual only with no association for assistive technology."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +196,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n8"
 name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+description = "Icon-only Export, Import, or gutter controls are missing accessible names."
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +204,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n9"
 name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+description = "Headings skip levels in the main chrome or Export surface (for example H1 to H3)."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +212,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n10"
 name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+description = "With prefers-reduced-motion set, the diff cross-fade, counter pulse, or Export transition still animate over time instead of applying instantly."
 type = "binary"
 negate = true
 weight = 1.0

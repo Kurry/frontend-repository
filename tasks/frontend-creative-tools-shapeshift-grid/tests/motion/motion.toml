@@ -62,31 +62,31 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
-description = "Required hover animations are present; paint/gallery switches and toolbar feedback behave as specified"
+name = "toolbar_gallery_hover_animations"
+description = "Required hover animations are present on the real UI path: primary action buttons fill/ease on hover; mode buttons, mirror control, and swatches show active fill/opacity/border changes; gallery board rows take a hover wash"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "4_2"
-description = "Paint/Gallery mode switches update without full reload and keep hover feedback"
+name = "paint_gallery_switch_keeps_hover"
+description = "Paint/Gallery mode switches update without full reload and keep hover feedback on toolbar and gallery rows"
 type = "binary"
 weight = 0.5
 optional = true
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
-description = "Omits hover feedback on toolbar or gallery rows so the studio feels static on pointer hover"
+name = "hover_feedback_missing_on_tools"
+description = "Omits hover feedback on toolbar buttons, mirror control, swatches, or gallery rows so the studio feels static on pointer hover"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "4.4"
-name = "4_4"
-description = "The cell-size control fades toward a muted disabled look when locked and restores on Clear, and the floating toolbar repositions by dragging its header"
+name = "cell_slider_lock_fade_and_toolbar_drag"
+description = "Through the real UI controls: the cell-size control fades toward a muted disabled look when locked and restores on Clear, and the floating toolbar repositions by dragging its header"
 type = "binary"
 weight = 0.5
 optional = true
@@ -115,9 +115,24 @@ weight = 0.5
 [[criterion]]
 id = "4.8"
 name = "reduced_motion_removes_animation"
-description = "With prefers-reduced-motion set, animations are removed and state changes apply instantly while every feature (painting, saving, loading, filtering, camera overlay) remains usable"
+description = "With prefers-reduced-motion set on a fresh load, animations are removed and state changes apply instantly while every feature (painting, saving, loading, filtering, camera overlay, Export, and Import) remains usable"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "export_surface_enter_and_copy_confirm"
+description = "Opening Export through its real control enters with a brief opacity/scale transition, and clicking Copy on Session JSON shows a short confirmation before resetting — verified on the real UI path, not a WebMCP shortcut"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n1"
+name = "export_or_gallery_snaps_without_motion"
+description = "Export opens by hard-cutting with no enter transition, or gallery save/delete cards only snap with no enter/exit motion when motion is allowed"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.catchall"

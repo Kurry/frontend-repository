@@ -149,6 +149,42 @@ description = "With prefers-reduced-motion set, entrance staggers and layout ani
 type = "binary"
 weight = 1.0
 
+
+[[criterion]]
+id = "4.13"
+name = "export_import_panel_transition"
+description = "Opening and closing the Export center or Import surface shows a brief opacity/scale transition of roughly 200 to 300 milliseconds rather than a hard cut (verified via real Export/Import controls)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "bulk_delete_cards_animate_out"
+description = "Confirming Delete selected animates the removed cards out together and remaining cards settle into renumbered positions rather than vanishing in a single frame"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "copied_toast_fade"
+description = "Copy on an Export format shows a Copied! toast that slides in and auto-dismisses with a fade"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "presenter_transitions_and_progress"
+description = "Entering and exiting the presenter via the real Present and End presentation controls uses a brief transition, scene advances (manual and auto) transition with a short slide or fade rather than an instant swap, and the countdown and overall progress bar deplete or fill smoothly (unless prefers-reduced-motion is set)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.17"
+name = "filter_apply_animates_cards"
+description = "Typing in search or toggling a shot-type chip via the real controls animates the affected scene cards out of and into the grid rather than snapping the layout in a single frame (unless prefers-reduced-motion is set)"
+type = "binary"
+weight = 0.5
+
 [[criterion]]
 id = "4.catchall"
 name = "motion_catchall"

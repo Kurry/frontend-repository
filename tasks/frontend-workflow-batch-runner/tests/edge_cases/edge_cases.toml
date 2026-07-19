@@ -70,21 +70,21 @@ weight = 1.0
 [[criterion]]
 id = "4.2"
 name = "forms_validate_inline"
-description = "The composer and schedule forms validate inline before submit — required fields, end-after-start times, and at least one dataset row"
+description = "The composer and schedule forms validate the create-job field contract inline before submit — name 1 to 80, promptTemplate and model required, concurrency 1 through 5, at least one dataset row with input, and windowEnd after windowStart"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
 name = "errors_are_actionable"
-description = "Parse and validation errors name the problem and the offending field (for example which line of the pasted CSV failed), not just a generic rejection"
+description = "Parse, validation, and import errors name the problem and the offending field or rule (for example which CSV row missing input, schemaVersion batch-run-v1, concurrency 1 to 5), not just a generic rejection"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
 name = "actions_show_confirmation"
-description = "Creating, deleting, exporting, copying the calendar text, and completing a run each give visible success feedback such as a toast"
+description = "Creating, deleting, exporting, importing, copying the calendar or report text, and completing a run each give visible success feedback such as a toast"
 type = "binary"
 weight = 1.0
 
@@ -208,6 +208,20 @@ name = "hidden_affordances"
 description = "Interactive affordances such as row actions or queue move controls are visually hidden with no discoverable path"
 type = "binary"
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "import_invalid_leaves_run_unchanged"
+description = "Importing malformed Run Report JSON or a document that breaks the field contract shows an inline import error, leaves job count and the selected run unchanged, and does not update the Export preview as if a successful import occurred"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "field_contract_rejects_overlong_name"
+description = "A name longer than 80 characters, concurrency outside 1 through 5, or a pasted row missing input shows an inline message naming the field and creates no job"
+type = "binary"
 weight = 1.0
 
 [[criterion]]

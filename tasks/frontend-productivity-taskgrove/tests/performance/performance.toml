@@ -62,153 +62,153 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "9.1"
-name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+name = "interactive_within_two_seconds"
+description = "The app is interactive within 2 seconds of a local cold load"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
-name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+name = "console_clean_on_load"
+description = "No console errors or warnings appear on initial load"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
-name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+name = "console_clean_full_exercise"
+description = "No console errors or warnings appear during create, edit status/priority, nest, toggle, tag, filter, search, zoom, move, archive, restore, Export as Text, Export grove, Import grove, and theme exercise"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.4"
-name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+name = "rapid_leaf_toggle_stays_responsive"
+description = "Rapidly toggling several leaf checkboxes keeps the UI responsive with progress rings consistent with the final state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.5"
-name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+name = "export_import_non_blocking"
+description = "Opening Export grove or Import grove and copying or downloading Grove JSON or Grove CSV does not freeze the tree or drop interactions"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.6"
 name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+description = "The UI remains interactive during create, edit, archive, and import state changes"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
-name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+name = "tree_animations_stay_smooth"
+description = "Row add/remove/reorder and progress-ring animations stay smooth without multi-second stalls during normal tree use"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.8"
 name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+description = "Rapid typing in Smart Search or repeated theme toggles does not hang or freeze the app"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.9"
 name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+description = "An extended session of creating, nesting, and exporting shows no runaway memory growth that freezes the page"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+name = "deep_tree_remains_usable"
+description = "A multi-level nested tree remains scrollable and interactive without multi-second freezes"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.n1"
-name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+name = "long_blank_or_spinner"
+description = "Cold load stays blank or blocked by a spinner past 2 seconds"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n2"
 name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+description = "Errors or warnings are present in the console during create, export, or import flows"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n3"
-name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+name = "export_panel_blocks_or_lags"
+description = "Opening the Grove package panel or switching Grove JSON/CSV tabs blocks or lags the UI for seconds"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n4"
-name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
+name = "import_hangs_ui"
+description = "Import grove causes the UI to hang or freeze"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n5"
-name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+name = "deep_tree_kills_frame_rate"
+description = "A moderately nested tree kills interactivity or frame rate"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n6"
 name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
+description = "Input becomes unresponsive during row or toast animation"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n7"
-name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
+name = "theme_switch_blocks_rendering"
+description = "Theme switching blocks rendering for a prolonged period"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n8"
 name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
+description = "Memory leaks or runaway browser resource usage occur during extended tree editing"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n9"
-name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
+name = "export_preview_blank_while_computing"
+description = "Grove JSON or Grove CSV preview stays blank with no feedback while recomputing after a mutation"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n10"
 name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+description = "The app crashes under rapid toggle, export, or import use"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "performance.catchall"

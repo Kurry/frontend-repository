@@ -166,6 +166,28 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "1.16b"
+name = "create_task_request_body_field_contract"
+description = "Create-task validates the request-body field contract: repository from the seeded select, pullRequestNumber a positive 1–6 digit integer string, minFiles and maxFiles integers 1–500 with minFiles ≤ maxFiles; violations keep submit disabled with named errors and start no run"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16c"
+name = "task_manifest_download_field_contract"
+description = "Download task-manifest.json and Copy for an accepted task emit JSON with required schemaVersion 1, id, repository, pullRequestNumber, minFiles, maxFiles, checks.skeleton and checks.validate true, stages array of five named stages with status and attemptCount, and generatedAt ending in Z — matching the session-created task"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16d"
+name = "manifest_export_omits_session_task"
+description = "After a create-task run reaches accepted, Download task-manifest.json or Copy omits that pullRequestNumber, file bounds, or completed stages"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "1.17"
 name = "double_submit_single_run"
 description = "Rapidly double-activating the create-task form's submit control starts exactly one run: exactly one new row appears in the pipeline view"

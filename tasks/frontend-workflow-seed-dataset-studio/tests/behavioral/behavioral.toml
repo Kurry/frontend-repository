@@ -98,7 +98,14 @@ weight = 1.0
 [[criterion]]
 id = "14.6"
 name = "different_authoring_different_manifests"
-description = "Input-dependent output: author two different seeds with different question texts and foil caps, export each, and confirm the two manifests differ exactly where the authored values differ; running the harvest twice on comparable seeds produces different generated drafts and step timings, not identical output"
+description = "Input-dependent output: author two different seeds with different question texts and foil caps, export each PackageManifest, and confirm the two manifests differ exactly where the authored values differ and both show schemaVersion seed-package-manifest-v1; running the harvest twice on comparable seeds produces different generated drafts and step timings, not identical output"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "export_import_round_trip_probe"
+description = "Export/import round-trip probe: mark a seed authored with a distinctive question text, export DatasetStudioPackage, edit the question to diverge, Import the package, and confirm the distinctive question and foil values return in the workbench and in a fresh package-manifest export"
 type = "binary"
 weight = 1.0
 
@@ -119,7 +126,7 @@ weight = 1.0
 [[criterion]]
 id = "14.9"
 name = "full_pipeline_traceability"
-description = "Full-pipeline probe: take one draft seed through accept, authoring (question, rubric with locked 1.4, 3 resolving foils, golden via harvest or justified pending), gate all-clear, Mark authored, and Export. The same seed id then traces coherently through every surface: the queue badge reads authored, the draft and authored rollups changed by exactly one each, the timeline lists the transition, save, harvest, and export events in order, and the export manifest carries the exact question, criterion, and foil values just authored"
+description = "Full-pipeline probe: take one draft seed through accept, authoring (question, rubric with locked 1.4, 3 resolving foils matching FoilUpsert, golden via harvest or justified pending), gate all-clear, Mark authored, and Export. The same seed id then traces coherently through every surface: the queue badge reads authored, the draft and authored rollups changed by exactly one each, the timeline lists the transition, save, harvest, and export events in order, and the PackageManifest carries schemaVersion seed-package-manifest-v1 with the exact question, criterion, and foil values just authored"
 type = "binary"
 weight = 1.0
 

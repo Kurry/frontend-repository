@@ -62,59 +62,80 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "hover_states_via_real_pointer"
-description = "Verified through real pointer hover: sidebar/nav items and action controls show a pointer cursor and a hover wash, transaction rows take a light mint wash, chart sectors keep a pointer cursor, and interactive controls show focus-visible rings"
+name = "hover_washes_and_pointer_cursors"
+description = "Hovering (with the real pointer) sidebar/nav items and action controls shows a pointer cursor and a hover wash; transaction rows take a light mint wash; chart sectors keep pointer cursor; focus-visible rings appear on interactive controls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "mode_switch_keeps_hover_feedback"
+name = "mode_switch_keeps_page_alive"
 description = "Chart/list mode switches update without full reload and keep hover feedback"
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "hover_washes_missing_on_rows_nav"
+name = "static_chrome_missing_hover_feedback"
 description = "Omits hover washes on rows or nav so the reports chrome feels static on pointer hover"
+negate = true
 type = "binary"
 weight = 1.0
-negate = true
 
 [[criterion]]
 id = "4.4"
-name = "pill_toggle_swaps_panel_in_place"
-description = "Clicking the Breakdown/Trends pill toggle swaps the chart panel in place with no page reload, and the active pill gains visibly stronger weight"
+name = "chart_tab_pill_toggle_swaps_in_place"
+description = "Clicking the Breakdown / Trends pill toggle (via the real UI control) swaps the chart panels in place without a page reload, and the active pill gains stronger weight"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "row_add_remove_animates"
-description = "Driven through the real UI controls (never a state shortcut): a newly created transaction row animates into the table, a deleted row animates out, and bulk delete animates each removed row rather than snapping the list"
+name = "row_create_and_delete_animate"
+description = "When a transaction is created or deleted through the real UI controls (not a state shortcut), the new row animates into the table and the deleted row animates out"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "toast_enters_holds_exits"
-description = "A demo toast (e.g. from clicking Export CSV or a non-active nav item) enters from below with a short ease, holds briefly, then exits and clears"
+name = "bulk_delete_rows_animate_out"
+description = "Bulk deleting several selected rows through the real UI control animates each removed row out rather than snapping the list to its new state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "reduced_motion_instant_and_reachable"
-description = "With prefers-reduced-motion enabled, entry/exit animations are removed and state changes apply instantly, while every feature stays reachable"
+name = "toast_enter_hold_exit_cycle"
+description = "A demo toast enters from below with a short ease, holds briefly, then exits; Copied confirmation follows the same toast language"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "list_changes_snap_without_transition"
+description = "Row insertions, deletions, or bulk removals snap instantly with no transition, or the toast appears and disappears abruptly with no enter/exit motion"
+negate = true
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "export_drawer_animates_in"
+description = "Opening the export drawer through the real UI control uses a short opacity/slide enter transition rather than snapping fully open"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "reduced_motion_disables_entry_exits"
+description = "With prefers-reduced-motion set, entry/exit animations are removed and state changes apply instantly while export, import, undo/redo, and CRUD remain reachable"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.catchall"
 name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

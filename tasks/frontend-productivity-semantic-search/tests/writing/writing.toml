@@ -71,7 +71,7 @@ weight = 0.5
 [[criterion]]
 id = "15.2"
 name = "actions_use_specific_labels"
-description = "Where the app renders action labels, they are specific verbs such as Save search, Index now, and Copy report rather than generic labels like Submit or OK when a specific label is possible"
+description = "Where the app renders action labels, they are specific verbs such as Save search, Index now, Download report, and Copy report rather than generic labels like Submit or OK when a specific label is possible"
 type = "binary"
 weight = 0.5
 

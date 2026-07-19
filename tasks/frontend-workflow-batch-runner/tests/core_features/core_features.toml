@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "1.2"
 name = "composer_fields_complete"
-description = "Clicking New Job opens a modal with a job name field, a prompt template selector offering at least 5 seeded templates, a model selector offering exactly the 4 seeded models (atlas-40b, lyra-8b, quasar-mini, helix-2) each shown with its per-1,000-token rate, and a concurrency limit control accepting 1 through 5 with a default of 3"
+description = "Clicking New Job opens a modal whose create-job fields include name, a promptTemplate selector offering at least 5 seeded templates, a model selector offering exactly the 4 seeded models (atlas-40b, lyra-8b, quasar-mini, helix-2) each shown with its per-1,000-token rate, and a concurrency control accepting 1 through 5 with a default of 3"
 type = "binary"
 weight = 1.0
 
@@ -230,8 +230,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.25"
-name = "export_report_complete"
-description = "Download JSON and Download CSV export the selected run with the job configuration (name, prompt template, model, concurrency), per-item outcomes (status, attempts, latency, cost, output), the rollup values, and the event timeline"
+name = "export_run_report_surface"
+description = "Export run opens a drawer or modal with a live JSON preview of the selected run plus Download JSON, Download CSV, and Copy controls; Download CSV headers include at least index, input, output, status, attempts, latencyMs, and cost"
 type = "binary"
 weight = 1.0
 
@@ -265,15 +265,29 @@ weight = 0.5
 
 [[criterion]]
 id = "1.30"
-name = "api_shaped_field_validation"
-description = "The composer enforces the job payload shape per field: a name longer than 80 characters is rejected with a message naming the 80 character limit, a concurrency value outside 1 through 5 is rejected inline, and a pasted dataset row missing the required input field is listed by row number in the dataset error"
+name = "api_shaped_create_payload_validation"
+description = "The composer enforces the create-job field contract with inline errors naming the field: name 1 to 80 characters (over 80 names the limit), promptTemplate and model from their closed seeded sets, concurrency integer 1 through 5, dataset rows each requiring input with optional expected, and optional schedule whose windowEnd is after windowStart; Submit stays disabled until valid"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.31"
-name = "export_schema_conformance"
-description = "The downloaded JSON report conforms to the job payload shape: its configuration object carries exactly the name, prompt template, model, concurrency, and schedule fields, and every item entry carries index, input, output, status, attempts, latency, and cost with status drawn from the closed set pending, running, complete, failed, retrying, stopped"
+name = "run_report_json_schema_keys"
+description = "The Export run JSON preview shows required keys schemaVersion exactly batch-run-v1, exportedAt, job, and run; job carries name, promptTemplate, model (atlas-40b / lyra-8b / quasar-mini / helix-2), concurrency (1 through 5), and schedule; each run.items entry carries index, input, output, status (pending / running / complete / failed / retrying / stopped), attempts, latencyMs, and cost; run.rollups carries completed, total, failureRate, estimatedRemainingMs, and totalCost"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "import_run_report_round_trip"
+description = "Import run accepts pasted Run Report JSON matching the export field contract and restores the job configuration and run so the sidebar, grid, rollups, timeline, and next Export preview match the imported document"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "import_rejects_invalid_schema"
+description = "Importing malformed JSON or a document that violates the field contract (schemaVersion not batch-run-v1, missing required keys, status or model outside closed sets, concurrency outside 1 through 5, name longer than 80, negative cost or attempts) shows an inline error naming the problem and leaves the current job and run unchanged"
 type = "binary"
 weight = 1.0
 
@@ -296,7 +310,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n3"
 name = "export_omits_session_mutations"
-description = "An exported report reflects stale pre-mutation outcomes — items retried, stopped, paused, or reordered in this session appear in the export with statuses or values different from what the grid and rollups currently show"
+description = "An exported Run Report reflects stale pre-mutation outcomes — items retried, stopped, paused, or reordered in this session appear in the export with statuses or values different from what the grid and rollups currently show, or schemaVersion is missing or not batch-run-v1"
 type = "binary"
 negate = true
 weight = 1.0
@@ -305,6 +319,14 @@ weight = 1.0
 id = "1.n4"
 name = "fabricated_run_completion"
 description = "A launch presents a completed state while the grid statuses, run history, or rollups remain unchanged from before the run"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n5"
+name = "import_accepts_invalid_payload"
+description = "Import treats malformed Run Report JSON or a document that breaks the field contract as a successful mutation that changes the grid or Export preview"
 type = "binary"
 negate = true
 weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -256,21 +256,21 @@ weight = 1.0
 [[criterion]]
 id = "1.39"
 name = "queue_row_field_contract"
-description = "After adding the sample png, the queue row shows non-empty name, from in png|jpg|jpeg|webp|gif|bmp|svg, to in png|jpeg|jpg|webp, status Ready (then Done after Convert), a selection checkbox, and a non-negative input size; when Done, an output size is shown."
+description = "After adding the sample png, the queue row shows QueueFile field-contract fields: non-empty name, from in png|jpg|jpeg|webp|gif|bmp|svg, to in png|jpeg|jpg|webp, status Ready (then Done after Convert), a selection checkbox (selected boolean), and a non-negative inputSize; when Done, a non-negative outputSize is shown."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.40"
 name = "session_json_export_field_contract"
-description = "After converting a sample file with a non-default quality and at least one named preset visible, the session JSON export preview includes current quality, keep-metadata, theme, active catalog category, every conversion preset (name, target, quality), and per-file queue metadata (name, from, to, status, inputSize, outputSize) matching the visible store — with no raw file bytes, blobs, or base64 payloads."
+description = "After converting a sample file with a non-default quality and at least one named preset visible, the session JSON export preview is a ConversionSessionDocument: schemaVersion exactly vert-session-v1, quality, keepMetadata, theme (light|dark), activeCategory (Images|Audio|Documents|Video), defaultTarget (png|jpeg|jpg|webp), presets array of ConversionPreset objects (name, target, quality), files array of QueueFile metadata (name, from, to, status, selected, inputSize, outputSize when Done), and exportedAt ending in Z — matching the visible store, with no raw file bytes, blobs, or base64 payloads."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.41"
 name = "conversion_session_import_round_trip"
-description = "After mutating settings and presets with at least one file still queued, exporting session JSON then Importing that same JSON restores Settings quality/keep-metadata/theme/default target, the presets list, and Convert-to targets on currently queued files that match by filename, and the session JSON export preview matches that imported state."
+description = "After mutating settings and presets with at least one file still queued, exporting session JSON then Importing that same ConversionSessionDocument restores Settings quality/keep-metadata/theme/default target, the presets list, and Convert-to targets on currently queued files that match by filename, and the session JSON export preview matches that imported state including schemaVersion vert-session-v1."
 type = "binary"
 weight = 1.0
 
@@ -320,7 +320,7 @@ weight = 1.0
 [[criterion]]
 id = "1.48"
 name = "save_preset_adds_named_preset"
-description = "Saving a preset named \"Web ready\" with target webp and quality 80 increases the visible preset count by exactly one; empty or whitespace-only names are rejected with an inline message naming the name field and add no preset."
+description = "Saving a ConversionPreset named \"Web ready\" with target webp and quality 80 increases the visible preset count by exactly one and the session JSON presets entry shows those same name/target/quality values; empty, whitespace-only, or over-length (greater than 64) names are rejected with an inline message naming the name field and add no preset."
 type = "binary"
 weight = 1.0
 
@@ -400,6 +400,28 @@ negate = true
 id = "1.n45"
 name = "undo_fails_to_restore_queue_or_presets"
 description = "After removing a queued file or deleting a preset, Undo leaves the queue counts or presets list unrestored."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.57"
+name = "settings_update_field_contract"
+description = "Changing Settings quality within 1–100, keep-metadata, default Convert-to (png|jpeg|jpg|webp), and theme (light|dark) applies a SettingsUpdate payload whose values appear under the matching keys in the live session JSON export preview."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.58"
+name = "schema_invalid_session_import_rejected"
+description = "Importing parseable JSON that fails the ConversionSessionDocument field contract — schemaVersion not exactly vert-session-v1, a missing required key, a preset target outside png|jpeg|jpg|webp, or a file from/to/status outside its closed enum — shows an inline error naming the offending field (or the import field) and leaves quality, presets, and queue targets unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n46"
+name = "session_json_missing_schema_version"
+description = "After a valid conversion and settings mutation, the session JSON export preview omits schemaVersion vert-session-v1 or omits a required ConversionSessionDocument key (quality, keepMetadata, theme, activeCategory, defaultTarget, presets, files, or exportedAt)."
 type = "binary"
 weight = 1.0
 negate = true

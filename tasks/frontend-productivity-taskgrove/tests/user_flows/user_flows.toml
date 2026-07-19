@@ -63,21 +63,21 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "6.1"
 name = "create_root_appears_in_tree_and_export"
-description = "Create flow: submitting a valid New root task title adds exactly one root to the main tree, clears the empty-state message, shows a toast, and includes that title in the Export grove JSON preview."
+description = "Create flow: submitting a valid New root task with title, status, priority, and optional dueDate adds exactly one root to the main tree, clears the empty-state message, shows a toast, and includes that title, status, priority, and dueDate in both Grove JSON and Grove CSV previews"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
 name = "invalid_create_shows_inline_validation"
-description = "Create flow: blank title on New root task or Add Child, or blank/duplicate tag name, triggers immediate inline validation naming the offending field and adds nothing."
+description = "Create flow: blank title on New root task or Add Child, invalid status or priority, or blank/duplicate tag name, triggers immediate inline validation naming the offending field and adds nothing"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
 name = "add_child_updates_ring_and_export"
-description = "Nesting flow: adding two children under a root shows both indented, grows a 0 percent progress ring on the parent, and lists both child titles under that parent in the Export grove JSON."
+description = "Nesting flow: adding two children under a root shows both indented, grows a 0 percent progress ring on the parent, and lists both child titles with their status and priority under that parent in Grove JSON and as CSV rows"
 type = "binary"
 weight = 1.0
 
@@ -112,28 +112,28 @@ weight = 1.0
 [[criterion]]
 id = "6.8"
 name = "tag_manager_panel_preserves_workflow"
-description = "Tag manager panel can be opened and closed while the tree, filters, and Export grove preview remain coherent with the same tag list."
+description = "Tag manager panel can be opened and closed while the tree, filters, and both Export grove previews remain coherent with the same tag list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
 name = "move_to_picker_and_grove_panel_flows"
-description = "Move To picker and Grove package panel open, complete their action (reparent or Download/Copy/Import), and dismiss without trapping the user."
+description = "Move To picker and Grove package panel open, complete their action (reparent or Download/Copy/Import for JSON or CSV), and dismiss without trapping the user"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
 name = "grove_import_recovers_session_without_reload"
-description = "Recovery: after mutating away from an exported grove, Import of that package restores tree, tags, theme, and Export grove preview without requiring a full page reload."
+description = "Recovery: after mutating away from an exported grove, Import of that Grove JSON or Grove CSV restores tree, tags, status/priority labels, theme, and both Export grove previews without requiring a full page reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
 name = "primary_flows_unavailable_from_ui"
-description = "New root task, Add Child, Tag manager create, Export grove, or Import grove are not enabled from the UI."
+description = "New root task, Add Child, Edit task, Tag manager create, Export grove, or Import grove are not enabled from the UI"
 type = "binary"
 negate = true
 weight = 1.0
@@ -208,6 +208,13 @@ name = "navigation_dead_end_requires_reload"
 description = "Zoom, Move To, or Grove package panel leaves a dead end that requires reload for recovery."
 type = "binary"
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "edit_task_updates_row_and_exports"
+description = "Edit flow: changing a task status to blocked, priority to urgent, and dueDate to YYYY-MM-DD updates the node row and both Grove export previews without a reload"
+type = "binary"
 weight = 1.0
 
 [[criterion]]

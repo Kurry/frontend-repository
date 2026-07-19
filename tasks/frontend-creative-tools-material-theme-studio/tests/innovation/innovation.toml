@@ -112,7 +112,7 @@ optional = true
 [[criterion]]
 id = "11.7"
 name = "branded_studio_narrative_polish"
-description = "The Material logo mark, product title Material-UI Theme Creator, version chip, and three-tab studio chrome read as a cohesive branded tool narrative rather than generic unstyled controls (bonus execution quality)."
+description = "The Material logo mark, product title Material-UI Theme Creator, version chip, and four-tab studio chrome (Preview / Components / Saved Themes / Export) read as a cohesive branded tool narrative rather than generic unstyled controls (bonus execution quality)."
 type = "binary"
 weight = 0.5
 optional = true
@@ -160,7 +160,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n2"
 name = "generic_dashboard_template_look"
-description = "The experience is a generic dashboard/card-grid template that ignores the specified dense Material theme-studio composition (header lockup above Preview | Components | Saved Themes)."
+description = "The experience is a generic dashboard/card-grid template that ignores the specified dense Material theme-studio composition (header lockup above Preview | Components | Saved Themes | Export)."
 type = "binary"
 negate = true
 weight = 1.0

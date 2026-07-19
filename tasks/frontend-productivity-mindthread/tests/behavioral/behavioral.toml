@@ -111,7 +111,7 @@ weight = 1.0
 [[criterion]]
 id = "14.9"
 name = "export_import_round_trip_pipeline"
-description = "Mutate → derived → export → import: capture, thread, assign, tag, reflect, set status; confirm Today and Export reflect the work; Download Workspace JSON; mutate away; Import the JSON; confirm Home/Today/Archived/Export match the exported session."
+description = "Mutate → derived → export → import: capture, thread, assign, tag, reflect, set status; confirm Today and Export Workspace JSON (schemaVersion mindthread-workspace-v1 plus sparks/threads/reflections) reflect the work; Download Workspace JSON; mutate away; Import the JSON; confirm Home/Today/Archived/Export match the exported session."
 type = "binary"
 weight = 1.0
 [[criterion]]

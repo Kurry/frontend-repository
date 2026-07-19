@@ -63,14 +63,14 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "controls_are_keyboard_accessible"
-description = "Every interactive control — queue rows, column headers, filter controls, rollup cells, check chips, verdict toggles, disclosures, run controls, form fields, and copy controls — is reachable and operable with Tab, Shift+Tab, Enter, or Space"
+description = "Every interactive control — queue rows, column headers, filter controls, rollup cells, check chips, verdict toggles, disclosures, run controls, form fields, format switch, Copy, Download, and Import package — is reachable and operable with Tab, Shift+Tab, Enter, or Space"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
 name = "modals_manage_focus"
-description = "Modals and overlay forms trap focus while open, close on Escape, and return focus to the control that opened them"
+description = "Modals and overlay forms, including the import surface, trap focus while open, close on Escape, and return focus to the control that opened them"
 type = "binary"
 weight = 1.0
 
@@ -84,7 +84,7 @@ weight = 1.0
 [[criterion]]
 id = "1.4"
 name = "run_and_stage_changes_announced"
-description = "The completion of a run, a step entering the failed state, and a record changing lifecycle stage are announced through an aria-live region as well as shown visually"
+description = "The completion of a run, a step entering the failed state, a record changing lifecycle stage, and copy/download/import confirmations are announced through an aria-live region as well as shown visually"
 type = "binary"
 weight = 1.0
 

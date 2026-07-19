@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "1.26"
 name = "detail_tabs_decorative"
-description = "Place detail tabs are decorative: switching among About / Book / Reviews / Photos / Mentions does not change the panel content"
+description = "Place detail tabs are decorative: switching among About / Book / Reviews / Photos / Mentions leaves the panel content identical"
 type = "binary"
 weight = 1.0
 negate = true

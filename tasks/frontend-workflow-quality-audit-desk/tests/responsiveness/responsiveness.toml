@@ -210,6 +210,14 @@ type = "binary"
 negate = true
 weight = 1.0
 
+
+[[criterion]]
+id = "7.11"
+name = "export_controls_usable_at_375"
+description = "At 375 pixel width, Copy, Download, and Import package remain usable within the viewport without page-level horizontal scrolling"
+type = "binary"
+weight = 1.0
+
 [[criterion]]
 id = "responsiveness.catchall"
 name = "responsiveness_catchall"

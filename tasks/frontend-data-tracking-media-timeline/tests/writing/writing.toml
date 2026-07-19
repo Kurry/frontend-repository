@@ -78,7 +78,7 @@ weight = 0.5
 [[criterion]]
 id = "15.3"
 name = "errors_name_problem_and_fix"
-description = "Where the app renders validation or import errors, they name the failing field and the fix (for example title, year, place, categories, or summary)"
+description = "Where the app renders validation or import errors, they name the failing field and the fix (for example title, type, timestamp, mediaRefs, year, place, categories, or summary)"
 type = "binary"
 weight = 0.5
 

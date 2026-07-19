@@ -105,7 +105,7 @@ weight = 1.0
 [[criterion]]
 id = "6.7"
 name = "export_closes_the_loop"
-description = "Export closes the loop: after annotating at least one step and submitting a valid classification, open the Export panel, confirm the Review JSON carries the exact values just entered, copy it with visible confirmation, then Undo the classification and confirm the preview's failure_report becomes null while annotations remain until undone"
+description = "Export closes the loop: after annotating at least one step and submitting a valid classification, open the Export panel, confirm Review JSON shows schemaVersion exactly trajectory-viewer.review-package.v1 and carries the exact values just entered, copy it with visible confirmation, then Undo the classification and confirm the preview's failure_report becomes null while annotations remain until undone"
 type = "binary"
 weight = 1.0
 

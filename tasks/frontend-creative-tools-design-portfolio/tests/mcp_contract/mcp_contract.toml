@@ -98,8 +98,8 @@ weight = 1.0
 
 [[criterion]]
 id = "12.6"
-name = "entity_fields_title_summary_tags_status"
-description = "Entity create/update accept the declared fields title, summary, tags, and status and surface the same validation failures as the visible create/edit path when required values are missing."
+name = "entity_fields_name_slug_blurb_tags_status_type_year"
+description = "Entity create/update accept the declared fields name, slug, blurb, tags, status, type, and year and surface the same validation failures as the visible create/edit path when required values are missing or violate the project field contract."
 type = "binary"
 weight = 1.0
 

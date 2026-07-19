@@ -204,14 +204,14 @@ weight = 1.0
 [[criterion]]
 id = "1.21"
 name = "trials_list_with_validity"
-description = "Opening a difficulty gate's evidence shows a selectable trial list with at least 4 trials per judge model for the bundle, each labeled with its judge model (Sable-4 or Quartz-Mini), trial number, and a valid or invalid badge"
+description = "Opening a difficulty gate's evidence shows a selectable trial list with at least 4 trials per scoring model for the bundle, each labeled with its scoring model (Sable-4 or Quartz-Mini), trial number, and a valid or invalid badge"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.22"
 name = "three_pane_inspector_content"
-description = "The trial inspector shows three panes for the selected trial: a criterion list of at least 6 rubric criteria each with id, name, weight, and a negated marker where inverted; the judge's per-criterion reasoning with a pass, fail, or not-applicable outcome chip per criterion; and the agent's answer text"
+description = "The trial inspector shows three panes for the selected trial: a criterion list of at least 6 rubric criteria each with id, name, weight, and a negated marker where inverted; the scorer's per-criterion reasoning with a pass, fail, or not-applicable outcome chip per criterion; and the agent's answer text"
 type = "binary"
 weight = 1.0
 
@@ -445,6 +445,50 @@ negate = true
 id = "1.55"
 name = "summary_shows_stale_state"
 description = "The Bundle summary document shows a hero state, recommendation, gate status, fix item, or note that contradicts what the rest of the workspace currently displays"
+type = "binary"
+weight = 1.0
+negate = true
+
+
+[[criterion]]
+id = "1.56"
+name = "recommendation_override_field_contract"
+description = "Saving an out-of-set recommendation requires overrideJustification of 20–2000 trimmed characters under the recommendation/override field contract: shorter, empty, or whitespace-only input shows an inline error naming the justification field and saves nothing; a valid save records the recommendation and justification"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.57"
+name = "export_package_json_field_contract"
+description = "Export certification package shows a live Review Package JSON preview whose visible text includes schemaVersion exactly review-certification/v1, exportedAt ending in Z, portfolioSummary with totalBundles/readyCount/notReadyCount/atRiskCount/stopEarlyCount/sable4ValidityPercent, and a bundles array carrying slug, heroState, recommendation, overrideJustification, bundled, gates, fixItems, reviewerSteps, and timeline keys"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.58"
+name = "export_reflects_session_mutations"
+description = "After recording a recommendation with a distinctive overrideJustification, resolving a fix item, writing a distinctive step note, and completing bundling, reopening Export shows those exact values under the affected bundle in Review Package JSON without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.59"
+name = "export_copy_and_download"
+description = "On the active export format, Copy places the exact visible preview text on the clipboard with a visible confirmation, and Download starts a .json or .md file download whose contents match that preview text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.60"
+name = "import_round_trip_restores_state"
+description = "Importing valid Review Package JSON after a reload restores the mutated recommendation, overrideJustification, resolved fix state, notes, and Bundled badge so portfolio/workspace and the next Export preview match the imported document"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.61"
+name = "export_omits_session_mutations"
+description = "After a recommendation, overrideJustification, fix resolution, step note, bundling, or gate re-run mutation, the Review Package JSON preview still omits that mutation or keeps the pre-mutation values"
 type = "binary"
 weight = 1.0
 negate = true

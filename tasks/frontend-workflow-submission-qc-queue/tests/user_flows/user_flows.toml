@@ -118,8 +118,8 @@ weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Add finding, Request revision, Override, and Approve overlays behave as expected for details, edits, and confirmations, with cancel/close paths that leave the submission unchanged when dismissed without submit"
+name = "finding_revision_override_approve_overlays"
+description = "Overlays: Add finding, Request revision, Override, and Approve dialogs/forms open with their field contracts, accept valid submits or cancel cleanly, and dismiss without trapping the queue/detail workspace."
 type = "binary"
 weight = 1.0
 

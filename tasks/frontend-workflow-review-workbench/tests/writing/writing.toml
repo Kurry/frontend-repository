@@ -71,14 +71,14 @@ weight = 0.5
 [[criterion]]
 id = "15.2"
 name = "actions_use_specific_labels"
-description = "Where the app renders button or action labels, they are specific verbs ('Re-run gate', 'Compare trials', 'Copy summary', 'Complete bundling'), not generic ('Submit', 'OK') when a specific label is possible."
+description = "Where the app renders button or action labels, they are specific verbs ('Re-run gate', 'Compare trials', 'Copy summary', 'Export certification package', 'Import certification package', 'Copy', 'Download', 'Complete bundling'), not generic ('Submit', 'OK') when a specific label is possible."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.3"
 name = "errors_name_problem_and_fix"
-description = "Where the app renders error or blocked-state messages — the override justification validation and locked-step notices — they name the problem and the fix (the minimum length, the prerequisite step), not just a rejection ('Invalid')."
+description = "Where the app renders error or blocked-state messages — the override justification validation, import field-contract errors, and locked-step notices — they name the problem and the fix (the minimum length, the broken schema key, the prerequisite step), not just a rejection ('Invalid')."
 type = "binary"
 weight = 0.5
 
@@ -92,7 +92,7 @@ weight = 0.5
 [[criterion]]
 id = "15.5"
 name = "body_copy_is_well_written"
-description = "Where the app renders review prose — gate summaries, reasons, fix-item details and remediations, judge reasoning, agent answers, and the constraint explanation — rate how well it reads as realistic, bundle-specific prose free of spelling and grammatical errors and of repeated filler shared across bundles."
+description = "Where the app renders review prose — gate summaries, reasons, fix-item details and remediations, scoring reasoning, agent answers, and the constraint explanation — rate how well it reads as realistic, bundle-specific prose free of spelling and grammatical errors and of repeated filler shared across bundles."
 type = "likert"
 points = 5
 weight = 0.5

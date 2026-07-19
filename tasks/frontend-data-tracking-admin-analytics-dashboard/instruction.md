@@ -1,5 +1,5 @@
 <summary>
-Build a commerce operations admin analytics dashboard using React with Next.js static-export delivery, Redux Toolkit, Tailwind CSS 4.3.2, and DaisyUI.
+Build a commerce operations admin analytics dashboard using React with Next.js static-export delivery, Redux Toolkit, Tailwind CSS 4.3.2, and DaisyUI. The app produces the operator's session artifacts: a Session JSON document and a Users CSV compiled live from the active users, KPIs, filters, sort, theme, and active view — downloadable and copyable, reflecting every session mutation.
 </summary>
 
 <reference_screenshots>
@@ -13,34 +13,79 @@ wins. Do not copy the images into /app or ship them as app assets.
 
 <core_features>
 Core features (each line is an observable behavior the finished app must exhibit):
+Feature: Drawer shell and navigation —
 - The app opens into a drawer shell: a branded sidebar (Pineapple Tech) with at least 14 collapsible nav groups — including a Users group containing All Users, Add User, Roles, Permissions, User Logs, User Stats, User Payments, User Products — a top-level Dashboard item, and a sticky account footer (online avatar, name, role) whose click opens a popover upward
 - Clicking sidebar items swaps the main canvas between Operations Overview and the Users module views without a full page reload; no backend routes exist
+Feature: Utility header —
 - The utility header shows: a search field that filters the All Users list, a light/dark theme toggle that recolors the app, a notifications popover seeded with 4 avatar rows plus an error indicator on the bell, and a profile popover listing Profile / Inbox (with badge) / Settings / Logout
+Feature: All Users list —
 - All Users opens non-empty with at least 8 seeded users; every seeded user is reachable in the table (paging through the pagination chrome counts as reachable), and each row shows name, email, role badge, status badge (Active | Invited | Suspended), payments total, products count, and last-active label
 - The All Users view shows a KPI strip (Total / Active / Paying / Suspended) whose numbers track the collection, role and status filters, a sort control (Last active / Newest / Highest spend / Name A-Z), bulk actions (Export / Change status / Change role / Delete) that apply to checkbox-selected rows, a data table (User / Role / Status / Payments / Products / Last active + row actions), and pagination chrome
-- The Add User form presents grouped fields — Profile (first name, last name, email, phone, notes), Access (temporary password, account segment, send invitation), Account settings (status, role, 2FA / product-access toggles), Permissions checkboxes — and validates inline: each invalid field shows a per-field message naming that field before submit, and the submit control stays disabled until required fields are valid
-- Choosing a row's Edit action opens the form prefilled with that user's data; choosing Delete removes the user from the table
-- Changing a user's status or role updates its badge immediately; applying filters or sort recomputes which rows are visible from the shared collection; running a bulk status/role/delete affects every checkbox-selected row
+Feature: Add and edit users (API-shaped create/update payload) —
+- The Add User and Edit User forms present grouped fields — Profile (firstName, lastName, email, phone, notes), Access (temporaryPassword, accountSegment, send invitation), Account settings (status, role, 2FA / product-access toggles), Permissions checkboxes
+- UserCreate field contract (the form submit IS the would-be request body a directory API would accept; Session JSON users entries and Users CSV rows use the same field names and enums; all keys required unless marked optional; example values illustrative only):
+  - firstName: required trimmed non-empty string, length 1 through 40 inclusive
+  - lastName: required trimmed non-empty string, length 1 through 40 inclusive
+  - email: required string containing a domain dot after the at-sign (for example name@example.com)
+  - phone: optional; when present, digits only with length 7 through 15 inclusive
+  - notes: optional; when present, max 280 characters
+  - temporaryPassword: required on create only, min 8 characters; optional on edit
+  - accountSegment: required closed enum exactly one of Internal, Partner, External
+  - role: required closed enum exactly one of Admin, Manager, Member, Viewer
+  - status: required closed enum exactly one of Active, Invited, Suspended
+- Role and status controls on Add/Edit and bulk change only offer those closed enums — no free-text role or status entry
+- Each invalid field shows a per-field message naming that field before submit, and the submit control stays disabled until required fields are valid; correcting an invalid field clears that field's inline error without a reload
+- Submitting Add User with values that satisfy the field contract adds exactly one user: the new row appears on All Users, KPI Total increases by one, and both export previews include the new user
+- Choosing a row's Edit action opens the form prefilled with that user's data; saving updates the row everywhere it appears (list, badges, filtered views, and export previews)
+- Choosing Delete removes the user from the table, selection, KPI counts, and both export previews in the same interaction
+Feature: Status, role, filters, and bulk actions —
+- Changing a user's status or role updates its badge immediately; applying filters or sort recomputes which rows are visible from the shared collection; running a bulk status/role/delete affects every checkbox-selected row (bulk Export with zero selected still opens the export drawer; bulk Change status/role/Delete with zero selected is disabled or a no-op)
+Feature: Additional Users modes —
 - At least two additional Users modes from Roles, Permissions, Logs, Stats, Payments, Products open from the Users sidebar group, each rendering its own filters/table
+Feature: Operations Overview —
 - Operations Overview renders as a distinct view: breadcrumbs and actions, KPI stats, chart cards (revenue/demand column, order-status pie, revenue run-rate primary inverse column, acquisition mix pie, marketing line, fulfillment line), and operational panels (activity table, governance radial + progress, priority queue, promotions, uptime bars, satisfaction, inventory, plugins, automation, security watch, cash movement). Overview metrics may be seeded; Users stays fully interactive
 - Overview chart cards render from their seeded series: hovering a column, slice, or line point shows a tooltip with the underlying value, and toggling the theme redraws every chart in the new theme's accent colors without a reload
+Feature: Session export (useful end state) —
+- Export session (from the header, Operations Overview Export, or bulk Export) opens an export drawer with two format tabs — Session JSON and Users CSV — each regenerated live from the store whenever users, KPIs, filters, sort, theme, or active view change
+- Session JSON is API-shaped like an admin-analytics session snapshot response — a single object whose field names and values are visible in the preview text and must conform to this field contract:
+  - Required schemaVersion: the exact string pineapple-admin-analytics-v1
+  - Required exportedAt: ISO-8601 timestamp string that updates when the preview regenerates
+  - Required users: array of user objects; each entry requires firstName, lastName, email, role (Admin|Manager|Member|Viewer), status (Active|Invited|Suspended), payments (number greater than or equal to 0), products (non-negative integer), and lastActive (non-empty string); phone and notes optional under the same bounds as UserCreate
+  - Required kpis: object requiring total, active, paying, and suspended as non-negative integers matching the All Users KPI strip
+  - Required filters: object requiring role and status (each either null or a closed-enum value from the role/status sets)
+  - Required sort: exactly one of last-active, newest, highest-spend, name-az
+  - Required theme: exactly one of light, dark
+  - Required activeView: non-empty string matching the current main-canvas destination
+- Users CSV preview starts with the exact header firstName,lastName,email,phone,role,status,payments,products,lastActive and includes one data line per user; after creating a user with a distinctive firstName, that firstName appears in a CSV data line before copy or download
+- Export content that omits session work is invalid: after creating a user with a distinctive email and deleting another user, reopening Export must show the new email under users, omit the deleted user, and match the on-screen KPI strip
+- Each format tab offers Copy (writes that format's exact preview text to the clipboard with visible confirmation) and Download (triggers a real file download whose contents match the previewed text for that format)
+Feature: Session import —
+- An Import session control accepts pasted Session JSON text or Users CSV text matching the export field contracts (import modes session-json and users-csv)
+- A valid Session JSON import replaces users, KPIs, filters, sort, theme, and active view so All Users, the KPI strip, and both export previews match the imported document
+- A valid Users CSV import merges or replaces the users collection from CSV rows that satisfy the UserCreate field names and enums so All Users and the next Users CSV preview match
+- Malformed JSON or CSV, or a document that violates the field contract (schemaVersion not exactly pineapple-admin-analytics-v1, missing required keys, role or status outside the closed enums, firstName or lastName outside 1 to 40 characters, email missing a domain dot, temporaryPassword shorter than 8 on a create-shaped row, notes longer than 280, phone outside 7 to 15 digits when present, or negative payments/products/kpi figures), shows an inline error naming the import field (or the payload when unparseable), leaves users count unchanged, and does not treat the attempt as a successful mutation
 </core_features>
 
 <user_flows>
-- Creating a user end to end: submitting Add User with valid fields adds exactly one row to All Users, increases the KPI Total by one and the matching status KPI by one, and typing the new user's name into the header search narrows the table to that row — all without a reload
-- Editing a user: saving the Edit form updates that user's name, badges, and values in the table row, in the KPI strip, and in every filtered view where the user appears, without a reload
-- Deleting a user removes it from the table, from any checkbox selection, and from the KPI counts in the same interaction; the visible row count decreases by exactly one
-- Changing a user's status from Active to Suspended flips its status badge, moves the KPI strip (Active down by one, Suspended up by one), and removes the row from the Active status-filter results without a reload
+- Creating a user end to end: submitting Add User with a valid API-shaped payload adds exactly one row to All Users, increases the KPI Total by one and the matching status KPI by one, typing the new user's name into the header search narrows the table to that row, and both Session JSON and Users CSV previews include the new user — all without a reload
+- Editing a user: saving the Edit form updates that user's name, badges, and values in the table row, in the KPI strip, in every filtered view where the user appears, and in both export previews, without a reload
+- Deleting a user removes it from the table, from any checkbox selection, from the KPI counts, and from both export previews in the same interaction; the visible row count decreases by exactly one
+- Changing a user's status from Active to Suspended flips its status badge, moves the KPI strip (Active down by one, Suspended up by one), removes the row from the Active status-filter results, and updates that user's status in Session JSON without a reload
 - Switching the sort control between two options (for example Newest and Name A-Z) reorders the same rows without changing the visible count; switching back restores the prior order
 - Selecting three rows by checkbox and running a bulk Change status updates all three badges and shifts the KPI counts by three in one action
+- Mutation-to-export: create a user with a distinctive email, delete a different user, open Export session, and confirm Session JSON shows schemaVersion exactly pineapple-admin-analytics-v1, the new email under users, the deleted user absent, and kpis matching the on-screen strip; Users CSV includes the new firstName; Copy and Download are available on the active tab
+- Export then import round-trip: after create/edit plus at least one delete, Copy or Download Session JSON then Import that same text — All Users names/statuses, KPI totals, and both export previews match the pre-export mutated state
 - A page reload returns the app to its seeded state: at least 8 seeded users, the default theme, and the default view
 </user_flows>
 
 <edge_cases>
-- Submitting Add User with empty required fields shows visible per-field validation messages and adds no row; the users count is unchanged
+- Submitting Add User with empty required fields, firstName longer than 40 characters, an email missing a domain dot, a temporaryPassword shorter than 8 characters, notes longer than 280 characters, or phone with fewer than 7 digits shows visible per-field validation messages naming each offending field and adds no row; the users count is unchanged
 - Cancel on Add User or Edit leaves the collection unchanged
 - Double-activating the Add User submit control creates exactly one user: the count increases by one and one new row appears
 - After deleting all users, or when filters and search match nothing, the list region shows an empty state message instead of an empty table
+- Running bulk Change status/role/Delete with no rows checked changes no data (disabled or no-op); bulk Export with zero selected still opens the export drawer
+- Importing malformed Session JSON or Users CSV, or a document that breaks the field contract, shows an inline error naming the import field, leaves users count unchanged, and does not update export previews as if a successful import occurred
+- Create, delete, export copy, and import show visible success or confirmation feedback
 </edge_cases>
 
 <visual_design>
@@ -50,6 +95,7 @@ Core features (each line is an observable behavior the finished app must exhibit
 - Chart accent palette (teal / amber / sky / rose / orange) on overview chart cards
 - Cards with subtle layered shadows and hairline borders; stats, badges, progress, radial-progress, tables, and list rows for density
 - One consistent icon set used throughout the chrome, with local avatar images; search pill and circular ghost icon buttons in the utility header
+- The export drawer shows Session JSON and Users CSV tabs with a monospaced preview and Copy/Download actions
 </visual_design>
 
 <motion>
@@ -62,17 +108,22 @@ Core features (each line is an observable behavior the finished app must exhibit
 - Feedback toasts after create, delete, and bulk actions slide in, remain readable, and auto-dismiss with a fade
 - Hover animations (required): buttons ease background/border/shadow with a slight press; breadcrumbs underline on hover; table rows, list rows, and sidebar items take a full-width hover wash; form controls show focus rings
 - Overview charts support hover/tooltips on seeded series; security-watch status dots ping; notification bell keeps a static error indicator
+- Export drawer slides in from the side rather than snapping open when opened through the real UI controls
 </motion>
 
 <responsiveness>
 - Drawer open by default on large screens; at smaller viewports the sidebar collapses to a hamburger control that opens an overlay drawer
 - At 375 pixel width no content clips or overflows the viewport and no page-level horizontal scrolling appears; dense tables scroll within their own containers
+- At 375 pixel width the export drawer, Add User form, and All Users KPI strip stay fully visible and operable rather than rendering off-screen or overlapping unreadable
 </responsiveness>
 
 <accessibility>
-- Every interactive control — sidebar items, header controls, table row actions, form fields, pagination — is reachable and operable with the keyboard alone, with a visible focus indicator
-- Popovers and menus close on Escape and return focus to the control that opened them
+- Every interactive control — sidebar items, header controls, table row actions, form fields, pagination, and export drawer controls — is reachable and operable with the keyboard alone, with a visible focus indicator
+- Popovers and the export drawer close on Escape and return focus to the control that opened them; while open, the export drawer traps focus within its surface
 - Add/Edit form fields have visible labels, and validation messages are associated with their fields so each message names the field it belongs to
+- Form validation messages and create, delete, export copy, and import completion are announced through an aria-live polite region as well as shown visually
+- Row selection checkboxes and icon-only buttons carry accessible labels
+- Status and role badges convey state with text labels in addition to color
 </accessibility>
 
 <performance>
@@ -80,27 +131,39 @@ Core features (each line is an observable behavior the finished app must exhibit
 - No console errors, warnings, or hydration mismatch messages appear on load or during a full exercise of the app
 - After first paint there is no post-hydration content flash: the rendered shell does not visibly re-render or shift as the app becomes interactive
 - Loading the served URL directly always renders the full dashboard shell; the UI stays responsive under rapid repeated input with no hangs
+- Opening the export drawer and switching between Session JSON and Users CSV regenerates the preview without freezing the UI
 </performance>
 
 <writing>
 - Headings, buttons, and menu items use one consistent capitalization convention throughout the app
-- Action labels are specific verbs (Add user, Change status, Export) rather than generic labels where a specific one is possible
-- Validation messages name the field and the fix; empty states explain what belongs in the region and how to add it; no placeholder text appears anywhere in the shipped UI
+- Action labels are specific verbs (Add user, Change status, Export session, Copy) rather than generic labels where a specific one is possible
+- Validation and import errors name the field and the fix (for example firstName length or email format); empty states explain what belongs in the region and how to add it; no placeholder text appears anywhere in the shipped UI
+- Export drawer tabs read Session JSON and Users CSV
+- Confirmation messages after create, delete, copy, or import state what happened rather than vague affirmations
 </writing>
 
+<innovation>
+- Optional: a structured export summary strip above the preview naming user count and KPI Total
+- Optional: a compact last-mutation chip in the header or toolbar that echoes the newest create, delete, or status change
+- Optional: export Copy feedback that includes an extra polished microinteraction beyond a bare copied state
+- Optional: a live field-contract checklist beside Add User that lights each rule as the payload becomes valid
+</innovation>
+
 <requirements>
-Shared application state must live in Redux Toolkit (in-memory only): the users collection, active view, list filters/sort/selection, theme, and UI chrome. Do not use localStorage, sessionStorage, or other browser storage APIs.
+Shared application state must live in Redux Toolkit (in-memory only): the users collection, active view, list filters/sort/selection, theme, export preview text, import draft, and UI chrome. Do not use localStorage, sessionStorage, or other browser storage APIs. Persistence for this genre is the exportable Session JSON / Users CSV plus the MCP query surface.
 State contracts (behavioral, not storage keys):
-- Creating a valid user increases the collection and shows the new row on All Users; KPIs update
-- Editing a user updates that same record everywhere it appears (list, badges, filtered views)
-- Deleting a user removes it from the list, selection, and derived counts
+- Creating a valid user increases the collection and shows the new row on All Users; KPIs and both export previews update
+- Editing a user updates that same record everywhere it appears (list, badges, filtered views, export)
+- Deleting a user removes it from the list, selection, derived counts, and export previews
 - Status and role changes update visible badges and participate in filters
 - Filters and sort recompute the visible list from the shared collection; they do not invent a second disconnected copy
+- Session JSON and Users CSV compile live from the same store the UI renders; a successful import mutates that same store
 - Theme and active view are shared client state; toggling them does not reload the document
-Build tooling: Next.js with static export (or SSR with client hydration); all interactivity lives in client state after load — no server actions, API routes, or data loaders. Styling is Tailwind CSS 4.3.2 (pinned) with design tokens in the theme layer. DaisyUI is the component library for the drawer, tables, badges, stats, popovers/dropdowns, form controls, pagination, and toasts; no other component library. Motion for React and AutoAnimate allowed for animation; no other animation libraries. Heroicons only, installed via its npm package — no raw copy-pasted SVG icon sets. All forms — Add User, Edit User, and any filter/settings forms — are driven by React Hook Form validating through a Zod schema: the schema defines the rules and inline per-field errors render before submit. @weblogin/trendchart-elements for the overview charts; TanStack Table for the users data table (sorting/filtering/pagination). All libraries installed via npm and bundled locally; no CDN imports. No backend or authentication.
+Build tooling: Next.js with static export (or SSR with client hydration); all interactivity lives in client state after load — no server actions, API routes, or data loaders. Styling is Tailwind CSS 4.3.2 (pinned) with design tokens in the theme layer. DaisyUI is the component library for the drawer, tables, badges, stats, popovers/dropdowns, form controls, pagination, and toasts; no other component library. Motion for React and AutoAnimate allowed for animation; no other animation libraries. Heroicons only, installed via its npm package — no raw copy-pasted SVG icon sets. All forms — Add User, Edit User, bulk change dialogs, Import session, and any filter/settings forms — are driven by React Hook Form validating through a Zod schema: the schema defines the UserCreate and Session JSON / Users CSV field contracts above, inline per-field errors render before submit, a successful create record IS the would-be request body, and export/import validate through the same schemas. End-state contract: Download JSON / Download CSV / Copy MUST emit the session's actual users and KPIs — an export that omits session work is invalid; Import MUST restore the same visible users and KPIs (round-trip). @weblogin/trendchart-elements for the overview charts; TanStack Table for the users data table (sorting/filtering/pagination). All libraries installed via npm and bundled locally; no CDN imports. No backend or authentication.
 - Seed at least 8 users so All Users is non-empty on first load; seed overview analytics so Operations Overview is non-empty
-- Empty required fields on Create user must not increase the users count; show visible validation feedback
+- Empty required fields or field-contract violations on Create user must not increase the users count; show visible validation feedback
 - After deleting all users (or filtering to zero matches), show an empty state in the list region
+- Session JSON and Users CSV export must be compiled live from the current store; after any session mutation that changes users or KPIs, reopening Export session must include that mutation
 - Zero navigational outbound links for app chrome — in-app controls only; view changes via shared client state
 - Icon set and avatar images bundled locally
 - Responsive drawer: open by default on large screens; hamburger + overlay on smaller viewports

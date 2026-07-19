@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "4.2"
 name = "forms_validate_inline"
-description = "The budget cap, range picker, save-view, and schedule forms validate inline before submit"
+description = "The budget-cap, date-range, team-ceiling, save-view, schedule, and recategorize forms validate inline before submit against their request-body field contracts"
 type = "binary"
 weight = 1.0
 
@@ -206,6 +206,28 @@ weight = 1.0
 id = "4.n10"
 name = "hidden_affordances"
 description = "Interactive affordances such as legend toggling, chip removal, or the disclosure are visually hidden with no discoverable path"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "invalid_request_bodies_rejected"
+description = "capUsd of 0 or negative, ceilingUsd of 0 or negative, a ceiling save whose sum would exceed monthly capUsd, a saved-view name shorter than 2 characters, a schedule with empty sections, a recategorize Apply with neither team nor feature, and a date range with to before from each show a named inline error and leave prior state intact"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "zero_match_export_still_valid"
+description = "With a zero-event filter scope, Download JSON still produces schemaVersion 1, totals with eventCount 0 and cost 0, and an empty events array; Download CSV still carries the header row"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "invalid_body_mutates_state"
+description = "An invalid request body (zero cap, over-allocation ceiling, empty schedule sections, or backwards range) mutates the prior cap, ceilings, schedule, or range"
 type = "binary"
 negate = true
 weight = 1.0

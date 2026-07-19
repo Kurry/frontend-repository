@@ -77,7 +77,7 @@ weight = 1.0
 [[criterion]]
 id = "3.3"
 name = "layout_matches_spec"
-description = "The realized layout matches the specified composition: dataset list above the instrumentation panel on the left, toolbar above the grid, and thresholds, splits, and snapshots as side panels"
+description = "The realized layout matches the specified composition: dataset list above the instrumentation panel on the left, toolbar above the grid, thresholds/splits/snapshots as side panels, and an export drawer with Rows CSV and Dataset Package JSON tabs"
 type = "binary"
 weight = 1.0
 

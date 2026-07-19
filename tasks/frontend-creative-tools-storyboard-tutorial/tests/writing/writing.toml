@@ -150,6 +150,44 @@ type = "binary"
 negate = true
 weight = 0.5
 
+
+[[criterion]]
+id = "15.9"
+name = "field_contract_errors_name_fields"
+description = "Where the app renders Scene or StoryboardDocument validation errors, they name the offending field (title, body, duration, shotType, schemaVersion, viewMode, or order) and the fix in plain language."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.10"
+name = "export_import_specific_verbs"
+description = "Where the app renders Export, Import, Copy, and Download controls, labels use those specific verbs rather than generic OK or Go."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.n5"
+name = "validation_errors_generic_only"
+description = "Field-contract validation messages show only generic failure text without naming the offending field."
+type = "binary"
+negate = true
+weight = 0.5
+
+[[criterion]]
+id = "15.11"
+name = "presenter_filter_label_verbs"
+description = "Where the app renders presenter and filter controls, labels use specific verbs (Present, Pause, Resume, End presentation, Clear filters, Print) rather than generic OK or Go, and the filtered-empty state explains that no scenes match and how to clear the search or filter."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.n6"
+name = "filtered_empty_copy_unhelpful"
+description = "The filtered-empty state renders no explanatory copy, or its text fails to say how to clear the active search or filter."
+type = "binary"
+weight = 0.5
+negate = true
+
 [[criterion]]
 id = "writing.catchall"
 name = "writing_catchall"

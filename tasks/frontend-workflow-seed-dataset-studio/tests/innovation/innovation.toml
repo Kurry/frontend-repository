@@ -134,42 +134,42 @@ weight = 1.0
 [[criterion]]
 id = "11.n1"
 name = "demo_is_bare_spec_only"
-description = "The build is purely spec-compliant, barebones, and unenhanced."
+description = "Beyond the required triage-to-export pipeline, the studio shows no optional enhancement such as dataset health charts, keyboard-first triage, or a manifest diff preview."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n2"
 name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
+description = "Interactions and visuals feel generic or templated rather than belonging to a code-question dataset factory studio."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n3"
 name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
+description = "The studio lacks polish, guidance, or a readable product narrative around seed triage and package export."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n4"
 name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
+description = "Queue, rollup, and workbench surfaces feel flat and static with no optional immersion beyond required motion."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n5"
 name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
+description = "The build stops at the minimum triage and export deliverable with no visible effort in optional innovation space."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "innovation.catchall"

@@ -140,7 +140,7 @@ weight = 1.0
 [[criterion]]
 id = "1.12"
 name = "export_workspace_three_formats"
-description = "Opening Export workspace shows Workspace JSON, Markdown outline, and Plain text tabs regenerated live; with a note, flashcard, and shape present, Workspace JSON preview includes schemaVersion scribblespace-workspace-v1 and those objects, Markdown lists them under the board heading, Plain text lists type labels with note body and flashcard front/back plus connectors, and Copy and Download controls are present on each tab."
+description = "Opening Export workspace shows Workspace JSON, Markdown outline, and Plain text tabs regenerated live; with a note, flashcard, and shape present, Workspace JSON preview includes schemaVersion scribblespace-workspace-v1, exportedAt, activeBoardId, and boards with those objects (type/color/geometry fields visible), Markdown lists them under the board heading, Plain text lists type labels with note body and flashcard front/back plus connectors, and Copy and Download controls are present on each tab."
 type = "binary"
 weight = 1.0
 
@@ -241,7 +241,7 @@ weight = 1.0
 [[criterion]]
 id = "1.36"
 name = "corner_resize_min_size"
-description = "A singly selected object shows four corner handles; dragging a handle resizes the object, notes and flashcards stop at a minimum size, and the new size persists after deselecting within the session."
+description = "A singly selected object shows four corner handles; dragging a handle resizes the object, notes and flashcards stop at width 120 and height 96, shapes stop at width and height 48, and the new size persists after deselecting within the session."
 type = "binary"
 weight = 1.0
 
@@ -272,6 +272,34 @@ weight = 0.5
 id = "1.40"
 name = "board_rename_inline_validation"
 description = "Submitting an empty or over-60-character board name shows an inline error message naming the board-name field with the confirm control disabled, and the previous valid name stays in place until a valid name is submitted."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.56"
+name = "note_create_payload_in_export"
+description = "After New Note, recoloring to a closed swatch, and committing distinctive body text, Workspace JSON preview shows an objects entry with type note, that color hex from the closed note enum, text containing the distinctive body, and width/height at or above 120 and 96."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.57"
+name = "flashcard_create_payload_in_export"
+description = "After New Flashcard, editing Front and Back with distinctive strings, and flipping once, Workspace JSON preview shows an objects entry with type flashcard, front and back strings, flipped true, and a color from the closed note/flashcard hex enum."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.58"
+name = "shape_create_payload_in_export"
+description = "After placing a Rectangle via New Shape and recoloring with a shape swatch, Workspace JSON preview shows an objects entry with type rectangle, that shape hex from the closed shape enum, and width/height at or above 48."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.59"
+name = "overlength_text_rejected"
+description = "Committing a note body longer than 8000 characters shows a visible message naming the text field, keeps the prior valid text, and leaves Workspace JSON without the over-length string."
 type = "binary"
 weight = 1.0
 
@@ -370,7 +398,7 @@ weight = 1.0
 [[criterion]]
 id = "1.54"
 name = "import_rejects_bad_schema"
-description = "Importing Workspace JSON with wrong schemaVersion or missing boards/activeBoardId shows an inline error naming the problem and leaves the current boards and objects unchanged."
+description = "Importing Workspace JSON with wrong schemaVersion, missing boards/activeBoardId, type or color outside the closed enums, text/front/back over 8000 characters, width/height below create-contract minima, or connector endpoints that do not resolve on the same board shows an inline error naming the offending field and leaves the current boards and objects unchanged."
 type = "binary"
 weight = 1.0
 

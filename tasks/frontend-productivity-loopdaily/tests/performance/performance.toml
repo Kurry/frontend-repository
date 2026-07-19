@@ -62,150 +62,150 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "9.1"
-name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+name = "cold_start_under_two_seconds"
+description = "The app is interactive within 2 seconds of a local cold load (habit list or empty-state create affordance usable)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
-name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+name = "console_clean_through_malformed_path"
+description = "No console errors appear during a full exercise including create, check-in, Stats, Heatmap, Export as JSON, Import cancel, and Load Malformed Sample"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
-name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+name = "checkin_and_filter_transitions_snappy"
+description = "Category chip filter changes and check-in/stepper updates begin reflecting in the UI in under about 100ms of perceived lag"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.4"
-name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+name = "export_import_stay_responsive"
+description = "Export as JSON download and Import FileReader confirmation remain responsive with visible confirmation feedback rather than a multi-second frozen shell"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.5"
-name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+name = "many_habits_list_stays_usable"
+description = "With a moderately large habit list (dozens of habits via create or field-contract-valid import), scrolling the list and tapping steppers remains usable without multi-second freezes"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.6"
-name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+name = "stats_update_keeps_ui_interactive"
+description = "Recording a check-in that updates Stats monthly completions and the trend chart leaves the habit list and navigation interactive without a blocking wait"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
-name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+name = "habit_enter_and_confetti_smooth"
+description = "Habit enter/exit list animations and the milestone confetti burst (when not reduced-motion) maintain a smooth perceived frame rate without long jank spikes"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.8"
-name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+name = "rapid_stepper_taps_stay_responsive"
+description = "Rapid repeated stepper taps stay responsive with no hangs, and every tap is reflected in the n/target fraction and progress bar"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+name = "extended_checkin_session_stable"
+description = "An extended session of creates, check-ins, filter toggles, and Export as JSON shows no runaway memory growth that makes the tab unusable"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+name = "malformed_recovery_without_hang"
+description = "Load Malformed Sample and corrupted-localStorage recovery complete with a role=alert outcome without hanging the UI in a blank loading state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.n1"
-name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+name = "cold_load_over_two_seconds"
+description = "More than 2 seconds pass before the habit shell is interactive on a local cold load"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n2"
-name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+name = "console_errors_on_export_or_recovery"
+description = "Console errors appear during Export as JSON, Import, Load Malformed Sample, or recovery Retry/Reset"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n3"
-name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+name = "filter_or_checkin_transition_blocks"
+description = "Category filter or check-in transitions block the UI for a noticeable multi-hundred-millisecond hang"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n4"
-name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
+name = "import_reader_freezes_shell"
+description = "Import FileReader or confirmation processing freezes the habit shell with no feedback"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n5"
-name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+name = "large_habit_list_kills_framerate"
+description = "A moderately large habit list makes scrolling or stepper interaction drop to a stuttering unusable frame rate"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n6"
-name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
+name = "confetti_or_enter_blocks_input"
+description = "Habit enter animation or milestone confetti blocks further check-in taps until the effect finishes"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n7"
-name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
+name = "heatmap_render_blocks_shell"
+description = "Opening Heatmap blocks the entire app shell while the month grid paints"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n8"
-name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
+name = "session_memory_runaway"
+description = "Repeated check-ins and exports cause clearly runaway memory or tab slowdown within a short session"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n9"
-name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
+name = "recovery_shows_blank_loading"
+description = "Recovery or Load Malformed Sample leaves a blank loading screen with no role=alert outcome"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n10"
-name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+name = "rapid_stepper_crashes_app"
+description = "Rapid stepper taps or double New Habit submit crash the app or leave it stuck"
 type = "binary"
 negate = true
 weight = 1.0

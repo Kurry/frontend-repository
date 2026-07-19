@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -133,7 +133,7 @@ weight = 1.0
 [[criterion]]
 id = "12.11"
 name = "visible_postconditions_session_export"
-description = "After WebMCP artifact export of session-json or conversion-report (or equivalent store mutation), the visible Session export previews reflect queue, settings, and preset mutations — matching the workflow-completion binding."
+description = "After WebMCP artifact export of session-json or conversion-report (or equivalent store mutation), the visible Session export previews reflect queue, settings, and preset mutations — matching the workflow-completion binding — and the session-json preview still shows ConversionSessionDocument keys including schemaVersion vert-session-v1."
 type = "binary"
 weight = 1.0
 

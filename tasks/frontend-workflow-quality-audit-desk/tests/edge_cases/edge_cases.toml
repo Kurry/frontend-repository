@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "4.1"
 name = "empty_states_present"
-description = "Empty state UI renders where specified: the queue shows an empty state with Clear filters when filters match nothing, and the report appendix explains that audited records will appear there before any record is touched"
+description = "Empty state UI renders where specified: the queue shows an empty state with Clear filters when filters match nothing, and the Markdown appendix explains that audited records will appear there before any record is touched while Audit Package JSON still shows a complete seeded package"
 type = "binary"
 weight = 1.0
 
@@ -84,7 +84,7 @@ weight = 1.0
 [[criterion]]
 id = "4.4"
 name = "actions_show_confirmation"
-description = "Visible confirmation follows actions: toasts after adding an entry, completing a run, escalating, resolving, and copying the report"
+description = "Visible confirmation follows actions: toasts after adding an entry, completing a run, escalating, resolving, copying or downloading an export, and importing a package"
 type = "binary"
 weight = 1.0
 
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n3"
 name = "actions_lack_visible_feedback"
-description = "Submitting an entry, escalating, resolving, or copying the report silently succeeds or fails with no visible feedback"
+description = "Submitting an entry, escalating, resolving, copying or downloading an export, or importing a package silently succeeds or fails with no visible feedback"
 type = "binary"
 negate = true
 weight = 1.0
@@ -206,6 +206,22 @@ weight = 1.0
 id = "4.n10"
 name = "double_activation_duplicates_work"
 description = "Double-activating Run checks starts two runs, or double-activating a form submit appends two entries"
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "4.11"
+name = "invalid_import_rejected"
+description = "Importing malformed Audit Package JSON or a document that breaks the field contract (schemaVersion not quality-audit-package-v1, missing required keys, or feedback findings under 20 characters) shows a visible error naming the offending field and leaves record counts and stages unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "download_mismatches_preview"
+description = "Download emits a file whose contents differ from the visible preview text for the active format"
 type = "binary"
 negate = true
 weight = 1.0

@@ -210,6 +210,87 @@ type = "binary"
 negate = true
 weight = 1.0
 
+
+[[criterion]]
+id = "4.11"
+name = "out_of_contract_duration_rejected"
+description = "Entering a duration outside 1–300 on Add Scene adds no scene, leaves the count unchanged, and shows an inline validation message naming duration."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "empty_undo_redo_disabled"
+description = "On a fresh load with no mutations, Undo and Redo stay disabled and Ctrl+Z / Ctrl+Y change nothing on the board."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "bulk_delete_requires_two_selected"
+description = "With fewer than two scenes selected, Delete selected is absent or disabled and activating it does not remove scenes."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "schema_invalid_import_rejected"
+description = "Importing malformed Storyboard JSON or JSON failing the StoryboardDocument field contract (wrong schemaVersion, bad enums, duration bounds, missing keys) leaves scenes and view mode unchanged and shows a visible error naming the offending field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "empty_board_total_duration_zero"
+description = "After deleting every scene, Total duration shows 0 and the empty-board state still offers a way to add a scene."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "invalid_import_partially_applies"
+description = "A schema-invalid Storyboard JSON import applies a partial subset of scenes or changes view mode despite the error."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n12"
+name = "out_of_bounds_duration_accepted"
+description = "Add Scene accepts a duration below 1 or above 300 and still creates a scene."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "filtered_empty_state_with_clear"
+description = "When search and shot-type filter together match no scene, the board shows a filtered-empty state naming that no scenes match with a Clear filters control that restores the full set, while the Total duration readout keeps the full-collection sum."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.17"
+name = "presenter_bounds_and_empty_board"
+description = "With an empty board or an empty filtered subset the Present control is disabled; in a running presentation, manual advance at the last scene and the final countdown reaching zero both land on the finished state — the presentation never wraps back to the first scene."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.18"
+name = "bulk_bar_two_selection_threshold"
+description = "The bulk action bar exposes Delete selected and Duplicate selected only when two or more scenes are selected; with fewer selected the actions are absent or disabled and activating them changes nothing."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n13"
+name = "empty_presenter_opens_blank"
+description = "Starting Present with no scenes (or an empty filtered subset) opens a blank or broken presenter instead of the control being disabled."
+type = "binary"
+weight = 1.0
+negate = true
+
 [[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"

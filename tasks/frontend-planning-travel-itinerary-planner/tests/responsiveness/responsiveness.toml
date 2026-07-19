@@ -62,78 +62,78 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "7.1"
-name = "layout_adapts_desktop_to_mobile"
-description = "Layout adapts gracefully from 1440px desktop to 375px mobile."
+name = "three_pane_to_stacked"
+description = "At 1440px the sidebar, plan column, and map pane sit side by side; below 1024px the map stacks under the plan; at 375px the workspace remains usable without horizontal page scroll"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
-name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+name = "mobile_tap_targets"
+description = "At 375px width, sidebar toggle, stop rows, and primary Export/Add controls present tap targets at least 44px in at least one dimension"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
-name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+name = "planner_type_scales"
+description = "Trip title and day headings remain readable at 1440px and at 375px without overflowing their containers"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
-name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+name = "no_viewport_clip"
+description = "At 1440px and 375px, plan list rows, map pane, and export canvas controls stay within the viewport without clipping primary content"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
-name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+name = "sidebar_drawer_below_768"
+description = "At widths of 768px and below the left sidebar collapses behind a toggle that opens it as an overlay drawer"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.6"
-name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+name = "map_stacks_below_plan"
+description = "Below 1024px the map pane stacks below the plan column rather than overlapping or sitting beside a crushed sidebar"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.7"
-name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+name = "mobile_tap_operates_stops"
+description = "At 375px width, tapping a stop row selects it and tapping the sidebar toggle opens the drawer"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.8"
-name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+name = "no_page_horizontal_scroll_375"
+description = "At 375px width the page body has no horizontal scrolling; kanban may scroll inside its own container only"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.9"
-name = "media_and_canvases_resize"
-description = "Images, grids, and canvases size responsively to fit the layout."
+name = "map_and_hero_responsive"
+description = "Plan hero cover image and the map pane resize with the layout at 1440px and 375px without overflowing"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.10"
-name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
+name = "toggle_and_export_reachable"
+description = "Sidebar toggle, Export control, and undo/redo remain reachable at 375px without being covered by fixed chrome"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.n1"
 name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+description = "At 1024px or 375px the three-pane planner breaks: panes overlap, primary stop rows clip, or the map covers the plan column"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n2"
 name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+description = "At 375px, sidebar toggle, Add stop, or Export controls are too small to tap or misaligned off their hit targets"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n3"
 name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+description = "At 375px the trip title or day headings are too small to read"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +157,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n4"
 name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+description = "At 375px plan content is cropped or unnecessary page-level horizontal scrollbars appear"
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +165,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n5"
 name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
+description = "At 768px or below the sidebar toggle is missing, or activating it leaves the drawer closed"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n6"
 name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
+description = "Fixed toolbars or drawers obscure stop rows or export controls at 375px"
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +181,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n7"
 name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
+description = "At narrow widths the map pane overlaps the plan column or export canvas"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n8"
 name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
+description = "At 375px stop rows or the sidebar toggle cannot be activated by tap"
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +197,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n9"
 name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
+description = "The map pane or plan hero image uses a static width that overflows the viewport at 375px"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n10"
 name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
+description = "Export, Undo, or Add stop controls disappear at 768px or 375px"
 type = "binary"
 negate = true
 weight = 1.0

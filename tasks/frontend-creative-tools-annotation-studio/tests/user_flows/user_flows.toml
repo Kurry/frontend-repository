@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "6.1"
 name = "annotate_end_to_end_flow"
-description = "Selecting a suite, choosing thumbs-up, moving all three sliders, typing a comment, and pressing Submit & Next decrements that suite queue badge by exactly one, adds the item to the History tab, advances the card to the next item, and increases the Labels JSON preview annotation count by exactly one, all without a reload"
+description = "Selecting a suite, choosing thumbs-up, moving all three sliders, typing a comment, and pressing Submit & Next decrements that suite queue badge by exactly one, adds the item to the History tab, advances the card to the next item, and increases the Labels JSON preview annotation count by exactly one, all without a reload, with the new entry showing rating up, integer scores under Accuracy/Clarity/Relevance, and package schemaVersion annotation-studio-labels-v1"
 type = "binary"
 weight = 1.0
 
@@ -131,9 +131,23 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "6.11"
+name = "export_import_artifact_flow"
+description = "After submitting an annotation with a distinctive comment and a region, open Export and confirm Labels JSON shows schemaVersion annotation-studio-labels-v1 plus taxonomy, metadataFields, and items reflecting those values; Download or Copy the Labels JSON, then Import that document and confirm History, Taxonomy, region lists, and review-state chips reconstruct to match"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "schema_validation_flow"
+description = "Attempting TaxonomyClassCreate with a duplicate shortcut saves nothing and names shortcut; DisputeCreate with an empty reason leaves state unchanged and names reason; Import missing schemaVersion or with schemaVersion not annotation-studio-labels-v1 leaves state unchanged and names the field; then a valid class save and a valid LabelsPackage import succeed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "6.n1"
 name = "primary_flows_unreachable"
-description = "Annotating, taxonomy editing, disputing, or exporting cannot be completed from the UI alone"
+description = "Annotating, taxonomy editing, disputing, exporting, or importing cannot be completed from the UI alone"
 type = "binary"
 negate = true
 weight = 1.0
@@ -206,6 +220,14 @@ weight = 1.0
 id = "6.n10"
 name = "dead_end_requires_reload"
 description = "Some navigation state can only be corrected by reloading the page"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "import_round_trip_loses_fields"
+description = "After Export then Import of a conforming LabelsPackage, taxonomy names, annotation ratings/scores, region geometry, metadata values, or review-state chips disagree with the exported document"
 type = "binary"
 negate = true
 weight = 1.0

@@ -63,70 +63,70 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "4.1"
 name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+description = "After deleting all stops, or filtering to a day with no stops, the plan list region shows a distinct empty-state message and an affordance to add a stop or clear the filter rather than blank whitespace."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
 name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+description = "Stop and expense create/edit forms show inline per-field validation against their field contracts before submit, naming the invalid field (title, amount, category, endTime, weights, and so on)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
 name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+description = "Stop, expense, CSV diagnostic, formula, and trip JSON import errors name the field or rule and the fix rather than only saying Invalid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
 name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+description = "Export Copy, settlement Mark as settled, template injector confirm, and import success or failure each show visible confirmation or error feedback in the UI."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
 name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+description = "CSV import commit, template injector, and receipt-scanner extract each show a brief progress or busy indicator while work runs, then resolve to a completed or failed state."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
 name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+description = "Bulk delete and factory reset require a confirmation step with a cancel path, and Undo restores a bulk delete after it commits."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
 name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+description = "Non-obvious controls such as the formula bar, display-currency toggle, weighted split weights, and CSV schema-mapping dropdowns expose visible help text or tooltips naming their purpose."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
 name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+description = "Stop and expense form fields, day filter controls, detail tabs, export format tabs, and ledger action buttons use semantic interactive elements rather than clickable bare divs."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
 name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+description = "Place detail, stop/expense forms, CSV wizard, and factory-reset confirm overlays each close via an explicit dismiss control and via Escape or an equivalent cancel path without trapping the session."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
 name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+description = "The CSV import wizard shows distinct mapping then diagnostics then commit steps so the user can tell which stage is active during the multi-step ingestion flow."
 type = "binary"
 weight = 1.0
 

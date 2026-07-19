@@ -131,6 +131,20 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "14.11"
+name = "export_schema_and_session_round_trip"
+description = "Export schema probe: after two distinct bulk recategorizations, Download JSON has schemaVersion 1, generatedAt ending in Z, required filters/totals/byModel/byTeam/byFeature/anomalies/events/budget/teamCeilings keys, events rows with promptTokens and completionTokens, and byTeam costs that differ from the pre-mutation export in the direction of the recategorizations; CSV header is timestamp,model,feature,team,promptTokens,completionTokens,cost,tag"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.12"
+name = "invalid_payload_leaves_state"
+description = "Invalid-payload probe: attempt a zero capUsd, an over-allocation ceiling, a one-character saved-view name, and an empty schedule sections save in sequence; each shows a named error, and the prior cap, ceilings, view list, and schedule summary remain unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "14.n1"
 name = "partial_revert_incoherent"
 description = "After Revert or Undo, one derived surface keeps mutated values while others return to their originals"
@@ -158,6 +172,14 @@ weight = 1.0
 id = "14.n4"
 name = "stale_cross_view_state"
 description = "A recategorization, ceiling edit, or filter change appears in one surface but not another until a reload"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "export_schema_incomplete"
+description = "Download JSON lacks schemaVersion 1, omits a required top-level key from the cost-report field contract, or CSV lacks the mandated header columns"
 type = "binary"
 negate = true
 weight = 1.0

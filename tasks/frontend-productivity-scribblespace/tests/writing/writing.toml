@@ -78,7 +78,7 @@ weight = 0.5
 [[criterion]]
 id = "15.3"
 name = "errors_name_problem_and_fix"
-description = "Where the app renders board-rename or Import errors, they name the field and the fix rather than only saying Invalid."
+description = "Where the app renders board-rename, over-length note/flashcard text, or Import errors, they name the field (board-name, text, front, back, schemaVersion, or similar) and the fix rather than only saying Invalid."
 type = "binary"
 weight = 0.5
 

@@ -90,8 +90,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "designer_full_field_set"
-description = "New Experiment opens a modal with experiment name, hypothesis, success metric select listing the judge criteria, minimum sample size (integer 1 to 500), and a variants section starting with variants A and B, each variant having a title, prompt selector, model select, and temperature value"
+name = "designer_experiment_upsert_modal"
+description = "Clicking New Experiment opens a modal that collects an ExperimentUpsert payload: name, hypothesis, successMetric, minimumSampleSize 1 to 500, and 2 to 4 variants each with title, promptId, model in {Larkspur-2, Cobalt-Mini, Meridian-XL, Fernwave-1}, temperature 0 to 2, and trafficAllocation"
 type = "binary"
 weight = 1.0
 
@@ -272,8 +272,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.31"
-name = "export_report_live_derived"
-description = "Export report assembles a preview and download containing the experiment design, per-variant sample counts, current statistics excluding flagged outliers, and any decision with rationale, and the report values match the values currently visible in the results panel — flagging an outlier or deciding before exporting changes the report content"
+name = "export_report_api_shaped_live"
+description = "Export report opens a preview of Experiment Report JSON with schemaVersion exactly ab-experiment-report-v1 and required keys experimentId, design, status, sampleCounts, statistics, decision, flaggedResponseIds, and generatedAt; design matches ExperimentUpsert; statistics exclude flagged outliers and match the results panel; after flagging or deciding the preview updates; Download offers experiment-report.json and Copy places the same JSON on the clipboard with visible confirmation"
 type = "binary"
 weight = 1.0
 
@@ -326,6 +326,36 @@ negate = true
 id = "1.n4"
 name = "flag_leaves_stats_stale"
 description = "Flagging or unflagging an outlier leaves the p-value, means, matrix cells, radial percentages, or export content unchanged from their pre-flag values"
+type = "binary"
+weight = 1.0
+negate = true
+
+
+[[criterion]]
+id = "1.35"
+name = "experiment_upsert_field_contract"
+description = "The designer create and edit forms enforce the ExperimentUpsert field contract: name 1 to 120 characters, hypothesis 1 to 2000 characters, successMetric naming an existing criterion, minimumSampleSize 1 to 500, 2 to 4 variants each with title, promptId, model in {Larkspur-2, Cobalt-Mini, Meridian-XL, Fernwave-1}, temperature 0 to 2, and trafficAllocation values summing to exactly 100; invalid submits add no experiment and name the offending field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "criterion_and_decision_field_contracts"
+description = "The New Criterion form enforces CriterionUpsert (unique name 1 to 60 characters, description 1 to 400 characters, passThreshold 0 to 100) and the decision dialog enforces DecisionUpsert (choice in declare-winner|inconclusive|stop-early, winnerVariant required only for declare-winner, rationale 1 to 1000 characters); invalid submits mutate nothing and name the offending field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "import_report_round_trip"
+description = "Import of a contract-valid Experiment Report JSON restores decision and flaggedResponseIds on the matching experiment so the results header, summary strip, inspector flags, and a fresh export match the imported document; a payload with schemaVersion other than ab-experiment-report-v1 or allocations not summing to 100 leaves the experiment unchanged and shows an inline error naming the offending field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n5"
+name = "export_omits_session_or_schema"
+description = "The Export report JSON preview omits a session flag or decision mutation, drops required field-contract key schemaVersion ab-experiment-report-v1, or shows statistics that disagree with the results panel summary strip"
 type = "binary"
 weight = 1.0
 negate = true

@@ -133,14 +133,28 @@ weight = 1.0
 [[criterion]]
 id = "6.11"
 name = "durability_pipeline_end_to_end"
-description = "The full durable pipeline works in one session: launch, deterministic failures retry with countdowns, one item exhausts into failed, Retry failed items resolves it, a pause and resume continues from the checkpoint, and the finished run's export matches the grid's statuses, attempts, and costs exactly"
+description = "The full durable pipeline works in one session: compose with create-payload fields, launch, deterministic failures retry with countdowns, one item exhausts into failed, Retry failed items resolves it, a pause and resume continues from the checkpoint, and Export run JSON shows schemaVersion batch-run-v1 with job/model/concurrency and per-item statuses, attempts, and costs matching the grid exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "mutation_to_export_flow"
+description = "After Stop All or a retry, reopening Export run shows the JSON items array and rollups reflecting those mutations, with Copy and Download JSON available"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "export_import_round_trip_flow"
+description = "After a run mutation, Copy or Download the Run Report JSON, Import that same text, and confirm the visible grid, rollups, and timeline match the pre-export mutated state and the next Export preview matches again"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
 name = "primary_flows_unavailable"
-description = "Composing, launching, retrying, pausing, or deleting a job is not achievable from the UI"
+description = "Composing, launching, retrying, pausing, exporting, importing, or deleting a job is not achievable from the UI"
 type = "binary"
 negate = true
 weight = 1.0

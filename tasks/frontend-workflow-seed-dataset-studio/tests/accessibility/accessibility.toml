@@ -63,14 +63,14 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "full_keyboard_operability"
-description = "Every interactive control — queue rows and their checkboxes, column headers, filter and chip controls, triage and batch actions, workbench fields, harvest controls, copy controls, and timeline filters — is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter, Space)"
+description = "Every interactive control — queue rows and their checkboxes, column headers, filter and chip controls, triage and batch actions, workbench fields, harvest controls, copy and download controls, Import, and timeline filters — is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter, Space)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
 name = "dialogs_manage_focus"
-description = "The reject form and confirmation dialogs trap focus while open, close on Escape, and return focus to the control that opened them"
+description = "The reject form, Import surface, and confirmation dialogs trap focus while open, close on Escape, and return focus to the control that opened them"
 type = "binary"
 weight = 1.0
 
@@ -91,7 +91,7 @@ weight = 1.0
 [[criterion]]
 id = "1.5"
 name = "forms_have_explicit_labels"
-description = "Fields in the reject form, workbench editors, and harvest-pending justification have visible explicit labels, and validation messages are programmatically associated with their fields"
+description = "Fields in the RejectSeed form, FoilUpsert and criterion editors, harvest-pending justification, and Import paste when presented as a form have visible explicit labels, and validation messages are programmatically associated with their fields"
 type = "binary"
 weight = 1.0
 

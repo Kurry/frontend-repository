@@ -135,14 +135,28 @@ negate = true
 [[criterion]]
 id = "2.11"
 name = "export_compiled_from_live_store"
-description = "Export JSON and CSV previews are compiled from the live session store: after a create or edit, reopening or refreshing the export drawer shows the mutated fields without reload"
+description = "Export JSON and CSV previews are compiled from the live session store under the HistoryEvent contract: after a create or edit, reopening or refreshing the export drawer shows the mutated title/type/timestamp/mediaRefs/detail without reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.12"
 name = "import_replaces_shared_store"
-description = "A successful Timeline JSON import replaces the shared events collection and filter/window fields so Library, stage, scrubber, tally, and a subsequent export all agree"
+description = "A successful Timeline JSON import with document media-history-timeline replaces the shared events collection and filter/window fields so Library, stage, scrubber, tally, and a subsequent export all agree including type, timestamp, and mediaRefs"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.13"
+name = "create_record_is_request_body_shape"
+description = "After a valid create, the Library row and detail panel show the submitted HistoryEvent request-body fields (title, type, timestamp, mediaRefs, year, place, categories, summary, detail) and a subsequent Timeline JSON events entry matches that same shape"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.14"
+name = "in_memory_only_no_storage"
+description = "Throughout create, filter, export, and import exercises, localStorage and sessionStorage remain empty (good-app in-memory genre)"
 type = "binary"
 weight = 1.0
 

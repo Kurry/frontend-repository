@@ -63,157 +63,85 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+name = "export_summary_strip_beyond_spec"
+description = "Optional: a structured export summary strip naming expense count and Total expenses above the preview helps operators trust the artifact beyond the required tabs"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "last_mutation_chip"
+description = "Optional: a compact last-mutation chip names the most recent add, edit, delete, or import beyond the required snackbars"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+name = "over_budget_forecast_hint"
+description = "Optional: an over-budget forecast or remaining-days hint on category rows exceeds the required distinct over-budget treatment"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+name = "period_compare_sparkline"
+description = "Optional: a tiny period-compare sparkline or delta vs prior period on the summary card exceeds the required totals"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+name = "delightful_export_microinteractions"
+description = "Optional: export Download or Copy offers a delightful microinteraction beyond the required Copied confirmation"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+name = "bulk_tray_progress_feedback"
+description = "Optional: bulk categorize/delete shows richer progress or undo toast detail beyond the required tray actions"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+name = "polished_budget_brand_moments"
+description = "Optional: polished brand moments on the pink/magenta chrome (mark animation or period transition) exceed the required accent usage"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+name = "import_diff_preview"
+description = "Optional: Import JSON offers a before/after diff preview of expense counts beyond the required accept/reject path"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+name = "keyboard_shortcut_cheat_sheet"
+description = "Optional: a keyboard shortcut cheat sheet for Export, Undo, and Add expense exceeds the required keyboard operability"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+name = "competition_level_budget_polish"
+description = "Optional: overall personal-finance polish visibly exceeds the specification in ways a real operator would notice"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+name = "optional_enhancement_breaks_required_export"
+description = "An optional enhancement blocks or replaces the required Export CSV/JSON download, Copy, or Import JSON path"
 type = "binary"
 negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
-type = "binary"
-negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
-description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user. If present, name the enhancement and cite the concrete evidence. If nothing beyond the covered optional items stands out, answer no."
 type = "binary"
-weight = 1.0
+weight = 0.5

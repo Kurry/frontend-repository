@@ -19,60 +19,71 @@ Feature: Timeline stage —
 - Panning the stage by drag shifts the pins, wheel-zoom widens or narrows the visible year window about its midpoint, and shift-scroll (or horizontal scroll) slides the window earlier or later in time — all live, without reload
 - A dual-handle footer scrubber sets the visible from/to years (the handles cannot cross and keep a minimum gap) and a Full span control fits the entire corpus; a readout shows the current year range in BCE/CE form
 - The canvas axis draws era bands (about seven labelled eras across the span) and adaptive year ticks; pins carry their category color and are culled when scrolled off-screen
-Feature: Timeline events collection (API-shaped records) —
-- Primary collection — timeline events: seed a substantial corpus (on the order of dozens; target roughly 60), each event carrying the fields of a timeline-event API record: title (required non-empty string), year (required integer; negative for BCE; must be between -3200 and 2024 inclusive), place (required non-empty string), categories (required array of one or more tags drawn from the seeded category set of about a dozen), summary (required non-empty string), and detail (required non-empty string)
-- The collection supports create, edit, and delete of at least a user-managed set (the seeded corpus may stay read-only beside user events, or all events may be editable)
-- The create and edit forms validate per field against that contract: an inline error message naming the field appears next to an empty title, an empty place, an empty summary, an empty detail, a missing categories selection, or an out-of-bounds/non-integer year before submit, and the submit control stays disabled until every required field is valid
-- A valid create produces a record whose visible fields match the submitted payload shape (title, year, place, categories, summary, detail) in the Library row and detail panel
+Feature: HistoryEvent request-body field contract —
+- Primary collection is timeline events: seed a substantial corpus (on the order of dozens; target roughly 60) spanning roughly 3200 BCE to 2024 CE across the closed category set and about seven labelled eras; create, edit, and delete are supported for at least a user-managed set (the seeded corpus may stay read-only beside user events, or all events may be editable)
+- HistoryEvent field contract (API-shaped history-event / timeline-entry payload; the record a successful create/edit produces IS the would-be request body; Timeline JSON export and import share this event object shape; all keys required unless marked optional; example values illustrative only):
+  - title: trimmed non-empty string of 1 to 120 characters
+  - type: exactly one of First Appearance, Mass Adoption, Standardization, Obsoletion, Commemoration
+  - timestamp: ISO-8601 datetime string ending with Z (example shape 1455-01-01T00:00:00.000Z)
+  - mediaRefs: non-empty array of 1 to 6 strings; each entry is a trimmed non-empty media reference label of 1 to 64 characters (catalog keys or asset ids the operator would send to a media API)
+  - year: integer from -3200 through 2024 inclusive (negative for BCE); this is the timeline-axis year used by the scrubber and pins
+  - place: trimmed non-empty string of 1 to 80 characters
+  - categories: non-empty array of one or more labels drawn only from the closed set Oral Culture, Manuscript, Print Press, Telegraph, Telephone, Radio, Television, Recording, Computing, Networks, Mobile, Social Media
+  - summary: trimmed non-empty string of 1 to 2000 characters
+  - detail: trimmed non-empty string of 1 to 4000 characters
+- Cross-field rules: categories must contain only closed-enum labels and at least one entry; mediaRefs must contain at least one entry and at most six; type must be exactly one closed-enum value; when year is greater than or equal to 1, the UTC calendar year of timestamp MUST equal year; when year is less than 1 (BCE), timestamp MUST be exactly 0001-01-01T00:00:00.000Z while year carries the BCE axis value
+- Category filters expose exactly those twelve closed enum labels (all enabled by default) plus a free-text search over title/place/summary/detail; Reset filters restores every category, clears the search, and returns to the default year window
+- The create and edit forms validate every HistoryEvent field before submit: an empty title, a type outside the closed enum, a timestamp that is not an ISO-8601 string ending with Z or that breaks the year cross-field rule, empty or over-limit mediaRefs, year outside -3200..2024 or non-integer, empty place, empty summary, empty detail, or zero categories shows an inline error message naming that field next to it, and the submit control stays disabled or rejects submission until the contract is satisfied; create/edit forms collect title, type, timestamp, mediaRefs, year, place, categories, summary, and detail
+- A valid create produces a record whose visible fields match the submitted payload shape (title, type, timestamp, mediaRefs, year, place, categories, summary, detail) in the Library row and detail panel
 Feature: Modes, library, and filters —
 - At least two interaction modes: Scrub/Explore mode (pan, year window, pins on the stage) and Library/Filter mode (a searchable, filterable event list with create/edit forms)
 - The Library list scrolls smoothly through the full seeded corpus with no blank gaps or hitching, and rows appear as they enter the viewport while scrolling fast through the list
-- Filtering combines a category/band filter (toggling roughly a dozen categories, where an event shows when any of its categories is active), a live text search across title/place/summary/detail, and the year window — all recomputing the visible pins and list from the shared collection, sorted chronologically
+- Filtering combines a category/band filter (toggling the twelve closed categories, where an event shows when any of its categories is active), a live text search across title/place/summary/detail, and the year window — all recomputing the visible pins and list from the shared collection, sorted chronologically
 - A live category tally strip (or equivalent readout) shows counts per active category for the currently visible filtered set and recomputes when filters, search, year window, create, edit, delete, bulk actions, undo, or redo change the set
 - Chrome controls: Filters opens a drawer, About opens an in-page modal, and Reset filters restores the default categories, clears the search, and returns to the default year window
 Feature: Detail panel —
-- Selecting a pin opens an in-page detail panel with a kicker (year · place), title, category pills, summary, and detail, plus Previous/Next controls that step through the sorted, filtered events with wraparound; closing returns to the stage without leaving the page
+- Selecting a pin opens an in-page detail panel with a kicker (year · place), title, type, mediaRefs list, category pills, summary, and detail, plus Previous/Next controls that step through the sorted, filtered events with wraparound; closing returns to the stage without leaving the page
 Feature: Bulk library actions —
-- In Library/Filter mode, each row has a checkbox; a select-all control targets the currently filtered rows; bulk Set category applies one chosen category to every checked row (merging into each event's categories array without removing unrelated tags); bulk Delete removes every checked row after an explicit confirm step
+- In Library/Filter mode, each row has a checkbox; a select-all control targets the currently filtered rows; bulk Set category applies one chosen closed-enum category to every checked row (merging into each event's categories array without removing unrelated tags); bulk Delete removes every checked row after an explicit confirm step
 - Bulk actions update the Library list, stage pins, category tally, and any open selection or detail in the same session without a reload
 Feature: Undo and redo —
 - Toolbar Undo and Redo controls step through create, edit, delete, bulk Set category, and bulk Delete mutations; each control is disabled when there is nothing to undo or redo
 - Undoing a create removes that event and restores Library rows, stage pins, and the category tally to the prior values; redoing reapplies the mutation
 Feature: Timeline pack export and import (useful end state) —
 - The app produces the operator's timeline pack: an Export timeline control opens a drawer with Timeline JSON and Events CSV tabs compiled LIVE from the current store
-- Normative Timeline JSON shape (all keys and nesting required; example values illustrative only): {"version":1,"yearWindow":{"from":1450,"to":1920},"activeCategories":[""],"search":"","events":[{"title":"","year":0,"place":"","categories":[""],"summary":"","detail":""}],"totals":{"eventCount":0,"byCategory":[{"category":"","count":0}]}}. yearWindow matches the live scrubber bounds; activeCategories and search match the live filters; events lists every event in the current collection with the API field contract above; totals.eventCount equals the collection length; totals.byCategory lists every seeded category with its live count across the full collection (not only the filtered view)
-- The Events CSV tab shows CSV-shaped text with header line title,year,place,categories,summary,detail and one data line per current event; categories on a line are joined with a pipe character
-- Both tabs MUST reflect every create, edit, delete, bulk Set category, bulk Delete, undo, and redo made in the session — an export that omits session work is a failure. After two creates with distinct titles, a fresh export must contain both titles
+- Normative Timeline JSON shape (all keys and nesting REQUIRED; example values illustrative only): {"version":1,"document":"media-history-timeline","yearWindow":{"from":1450,"to":1920},"activeCategories":[""],"search":"","events":[{"title":"","type":"First Appearance","timestamp":"1455-01-01T00:00:00.000Z","mediaRefs":[""],"year":1455,"place":"","categories":[""],"summary":"","detail":""}],"totals":{"eventCount":0,"byCategory":[{"category":"","count":0}]}}. document is exactly media-history-timeline; yearWindow matches the live scrubber bounds; activeCategories and search match the live filters; events lists every event in the current collection conforming to the HistoryEvent field contract including type, timestamp, mediaRefs, and detail; totals.eventCount equals the collection length; totals.byCategory lists every closed category with its live count across the full collection (not only the filtered view)
+- The Events CSV tab shows CSV-shaped text with header line title,type,timestamp,mediaRefs,year,place,categories,summary,detail and one data line per current event; categories on a line are joined with a pipe character; mediaRefs on a line are joined with a semicolon
+- Both tabs MUST reflect every create, edit, delete, bulk Set category, bulk Delete, undo, and redo made in the session — an export that omits session work is a failure. After two creates with distinct titles, a fresh export must contain both titles, and each events entry must carry type, timestamp ending with Z, and mediaRefs
 - Download JSON offers a real file download named timeline-pack.json whose body matches the JSON tab. Download CSV offers timeline-events.csv whose body matches the CSV tab. Copy on the active tab puts that tab's text on the clipboard and shows a visible Copied confirmation that clears within 3 seconds
-- An Import timeline control accepts a previously exported Timeline JSON (file picker or paste). A successful import replaces the events collection and restores yearWindow, activeCategories, and search from the document; the Library list, stage pins, scrubber readout, filters, category tally, and a subsequent export all match the imported pack. Malformed JSON or a document missing required keys/fields shows a visible inline error naming the import field and changes nothing
+- An Import timeline control accepts a previously exported Timeline JSON (file picker or paste). A successful import replaces the events collection and restores yearWindow, activeCategories, and search from the document; the Library list, stage pins, scrubber readout, filters, category tally, and a subsequent export all match the imported pack. Malformed JSON, document not exactly media-history-timeline, missing required keys, or any events entry that breaks the HistoryEvent field contract (including type enum, timestamp ISO/Z, mediaRefs bounds, year/timestamp cross-field, or empty detail) shows a visible inline error naming the import field and changes nothing
 - Zero outbound navigation — exploration stays on the local app
 </core_features>
 
 <user_flows>
 End-to-end flows (state stays coherent across the stage, the Library list, derived readouts, and export previews, without any reload):
-- Create flow: submitting a valid new event from Library/Filter mode adds exactly one row to the Library list, increases any visible event count by exactly one, updates the category tally for that event's categories, and — when the event's year lies inside the current year window and its category is active — a new pin for it appears on the stage after switching back to Scrub/Explore mode, all without a reload
-- Edit flow: editing an event's title or year updates the same record everywhere it appears — the Library row text, the pin position on the stage when the year changed, the open detail panel when that event is selected, and a subsequent export's matching event object — without a reload
+- Create flow: submitting a valid new event from Library/Filter mode (title, type, timestamp, mediaRefs, year, place, categories, summary, detail satisfying the HistoryEvent contract) adds exactly one row to the Library list showing title and type, increases any visible event count by exactly one, updates the category tally for that event's categories, and — when the event's year lies inside the current year window and its category is active — a new pin for it appears on the stage after switching back to Scrub/Explore mode, all without a reload
+- Edit flow: editing an event's title, type, timestamp, mediaRefs, or year updates the same record everywhere it appears — the Library row text, the pin position on the stage when the year changed, the open detail panel when that event is selected (including type and mediaRefs), and a subsequent export's matching event object — without a reload
 - Delete flow: deleting an event removes its Library row, removes its pin from the stage, clears it from any open selection or detail panel, decreases the visible count by exactly one, and drops it from the next export
 - Filter flow: toggling a category off removes that category's pins from the stage and its rows from the Library list at the same time; toggling it back on restores both; narrowing the year window with the scrubber drops out-of-range events from both surfaces simultaneously; the category tally recomputes with each change
 - Detail stepping flow: with a search or category filter active, opening a detail and pressing Next steps only through the currently filtered, chronologically sorted events and wraps from the last back to the first; the stage highlight follows the stepped selection
-- Bulk flow: checking at least 2 Library rows and applying bulk Set category adds the chosen category to each checked event's categories in the list and on the stage; bulk Delete with confirm removes every checked row and the visible count drops by exactly that number
+- Bulk flow: checking at least 2 Library rows and applying bulk Set category adds the chosen category to each checked event's categories in the list and on the stage without removing unrelated tags; bulk Delete with confirm removes every checked row and the visible count drops by exactly that number
 - Undo flow: after creating an event, Undo removes that row, decrements the visible count by exactly one, and restores the category tally; Redo restores the created event and prior derived numbers
-- Export flow: after creating an event titled Signal Tower Demo and a second titled Evening Broadcast, open Export timeline; the JSON tab's events array contains both titles, totals.eventCount equals the live collection length, and yearWindow matches the scrubber readout; the CSV tab contains both title strings; Download JSON and Download CSV offer timeline-pack.json and timeline-events.csv; Copy shows Copied
-- Import round-trip flow: export JSON after mutations, delete all user-managed events (or clear to empty where allowed) so the empty state shows, then Import that JSON — the Library list, stage pins, year window, filters, and category tally reconstruct to match the export, and a fresh export's events array matches
+- Export flow: after creating an event titled Signal Tower Demo with type First Appearance, timestamp 1920-01-01T00:00:00.000Z, mediaRefs containing signal-tower-demo, and a second titled Evening Broadcast with type Mass Adoption, open Export timeline; the JSON tab's events array contains both titles with matching type/timestamp/mediaRefs, document is media-history-timeline, totals.eventCount equals the live collection length, and yearWindow matches the scrubber readout; the CSV tab contains both title strings under the contract header; Download JSON and Download CSV offer timeline-pack.json and timeline-events.csv; Copy shows Copied
+- Import round-trip flow: export JSON after mutations, delete all user-managed events (or clear to empty where allowed) so the empty state shows, then Import that JSON — the Library list, stage pins, year window, filters, category tally, types, mediaRefs, and a fresh export's events array reconstruct to match the export
 - A page reload returns the app to its seeded state: the seeded corpus, the default categories, an empty search, the default year window, and empty undo/redo stacks
 </user_flows>
 
 <edge_cases>
 - Empty state: when the filters, search, and year window match nothing — or when all user-managed events are deleted — the list/stage region shows a visible empty state with a message and a control to reset filters or create an event
-- Invalid create: an empty title, empty place, empty summary, empty detail, missing categories, or invalid year must not add an event — the visible count is unchanged — and visible validation feedback names the offending field
+- Invalid create: an empty title, a type outside the closed enum, a timestamp that is not ISO-8601 ending with Z or that breaks the year cross-field rule, empty mediaRefs, year outside -3200..2024, empty place, empty summary, empty detail, or missing categories must not add an event — the visible count is unchanged — and visible validation feedback names the offending field
 - Year bounds: a year below -3200 or above 2024, or a non-integer year, is rejected with an inline error naming year and does not change the collection
 - Double-activating the create form's submit control adds exactly one event: the count increases by one and one new row appears
 - The scrubber handles cannot cross: dragging one handle into the other stops at the minimum gap, and the range readout never shows an inverted range
 - The Full span control always fits the entire corpus, even after the window was zoomed to a narrow slice
 - A very long event title is truncated with an ellipsis in the Library row and shown in full in the detail panel
 - Bulk Set category and bulk Delete with no rows checked perform no destructive change: the collection and pins stay as they were
-- With an empty user-managed set (or empty collection where allowed), Export timeline still produces JSON with version 1, the live yearWindow/filters, an events array covering remaining seeded rows (or empty if none remain), and totals that match; Copy still shows Copied
-- Importing malformed JSON or a pack missing required event fields shows an inline error naming the import field and leaves the collection, filters, and stage unchanged
+- With an empty user-managed set (or empty collection where allowed), Export timeline still produces JSON with version 1, document media-history-timeline, the live yearWindow/filters, an events array covering remaining seeded rows (or empty if none remain) each carrying type, timestamp, and mediaRefs, and totals that match; Copy still shows Copied
+- Importing malformed JSON, document not media-history-timeline, or a pack missing required event fields (bad type, non-Z timestamp, empty mediaRefs, year/timestamp mismatch, or empty detail) shows an inline error naming the import field and leaves the collection, filters, and stage unchanged
 - Undo with nothing to undo leaves the collection unchanged; Redo with nothing to redo leaves the collection unchanged
 </edge_cases>
 
@@ -80,7 +91,7 @@ End-to-end flows (state stays coherent across the stage, the Library list, deriv
 - Product name MediaHistoryTimeline with History of Media and Communication as the brand signal; first viewport is the timeline tool itself
 - Expressive typography (not Inter/Roboto/system defaults); warm or cool paper stage atmosphere with CSS variables
 - Primary composition: full-bleed or primary stage viewport plus scrubber/footer; Library/Filter is a distinct panel or mode, not a competing marketing hero
-- Event pins or list rows show category color; detail uses clear hierarchy (kicker, title, body)
+- Event pins or list rows show category color; detail uses clear hierarchy (kicker, title, type, mediaRefs, category pills, summary, detail)
 - Icons across the chrome (mode switch, filters, about, undo/redo, export/import, form controls) come from one consistent icon set with a uniform stroke style
 - Component states: buttons, inputs, and scrubber thumbs show distinct default, hover, focus, and disabled treatments; form fields show a distinct error treatment; Undo and Redo show a disabled treatment when their stacks are empty
 - The export drawer shows Timeline JSON and Events CSV tabs with a scrollable preview, Download, and Copy affordances
@@ -124,7 +135,8 @@ End-to-end flows (state stays coherent across the stage, the Library list, deriv
 <writing>
 - Headings, buttons, and category labels use one consistent capitalization convention throughout the app
 - Action labels are specific verbs such as Add event, Reset filters, Export timeline, Import timeline, Undo, and Redo rather than generic labels where a specific one is possible
-- Validation messages name the field and the fix; import errors name the import field; the empty state explains what matched nothing and how to recover; no placeholder or lorem-ipsum text appears anywhere in the shipped UI
+- Validation messages name the field and the fix (title, type, timestamp, mediaRefs, year, place, categories, summary, or detail); import errors name the import field; the empty state explains what matched nothing and how to recover; no placeholder or lorem-ipsum text appears anywhere in the shipped UI
+- Export drawer tab labels read exactly Timeline JSON and Events CSV
 </writing>
 
 <innovation>
@@ -134,20 +146,20 @@ End-to-end flows (state stays coherent across the stage, the Library list, deriv
 <requirements>
 Shared application state must use Jotai, the state library named in summary (in-memory only): events collection, visible year window, filters/selection, active mode, detail open state, undo/redo history, export drawer state, and import diagnostic state. Do not use localStorage, sessionStorage, or other browser storage APIs.
 State contracts (behavioral, not storage keys):
-- Creating a valid event increases the collection and shows it in Library/Filter and on the stage when in range; the record matches the timeline-event API field contract
+- Creating a valid event increases the collection and shows it in Library/Filter and on the stage when in range; the record matches the HistoryEvent field contract including type, timestamp, mediaRefs, and detail
 - Editing an event updates that same record in list, pins, detail, and exports
 - Deleting an event removes it from list, stage, selection, counts, and exports
 - Filters and year window recompute visible events from the shared collection; they never create a second disconnected copy
 - Active mode and selection are shared client state; switching modes does not reload the document
 - Export JSON and CSV are compiled live from the shared store; Import replaces that same store and filter window fields
-- The timeline pack export is the session's useful end state: Download and Copy must emit live-compiled JSON or CSV that reflects every mutation; Import round-trips a valid Timeline JSON back into the visible surfaces
+- The timeline pack export is the session's useful end state: Download and Copy must emit live-compiled JSON or CSV that reflects every mutation under the field contracts above — an export that omits session work or drops type/timestamp/mediaRefs/detail is invalid; Import of a previously exported conforming Timeline JSON with document media-history-timeline MUST restore the same visible surfaces (round-trip)
 Stack: React + Jotai + Tailwind CSS 4.3.2 (pinned; Vite or equivalent SPA). Mantine is the component library for the chrome — the Filters drawer, About modal, Export drawer, form inputs and selects, category pills, and feedback toasts; Mantine keeps its component styles while Tailwind owns layout, spacing, and the custom stage surfaces.
 - Motion for React and AutoAnimate are allowed for animation; no other animation libraries
 - Tabler icons via @tabler/icons-react only; no other icon sets, no raw copy-pasted SVG icons
-- All forms (event create and edit, import paste) are driven by React Hook Form with a Zod schema: the schema defines the validation rules mirroring the timeline-event API payload and the form surfaces inline per-field errors before submit
+- All forms (event create and edit, import paste) are driven by React Hook Form with a Zod schema: the schema defines the validation rules mirroring the HistoryEvent and Timeline JSON field contracts above (including type enum, ISO-8601 timestamp ending with Z, mediaRefs bounds, year/timestamp cross-field, and detail); the form surfaces inline per-field errors before submit; a successful create/edit record IS the would-be request body; export and import validate through the same schemas
 - The Library event list is virtualized with TanStack Virtual so scrolling the full corpus stays smooth
 - All libraries installed via npm and bundled locally; no CDN imports of any library, font, or icon set
-- Seed a substantial corpus (on the order of dozens, target roughly 60 events) spanning roughly 3200 BCE to 2024 CE, categorized under about a dozen color-coded categories and grouped by about seven labelled eras; seed enough user-editable events or allow create from an empty user set with a clear empty state
+- Seed a substantial corpus (on the order of dozens, target roughly 60 events) spanning roughly 3200 BCE to 2024 CE across the twelve closed categories and about seven labelled eras; every seeded event conforms to the HistoryEvent field contract including type, timestamp, mediaRefs, and detail; seed enough user-editable events or allow create from an empty user set with a clear empty state
 - Empty required fields on create must not increase the events count; show visible validation feedback
 - After deleting all user-managed events (or filtering to zero matches), show an empty state in the list region
 - Zero outbound navigational links; document title reflects MediaHistoryTimeline
@@ -239,11 +251,11 @@ Bindings:
 - Filters: category; search
 - Entity: event
 - Entity operations: create; select; update; delete
-- Entity fields: title; year; place; categories; summary; detail
+- Entity fields: title; type; timestamp; media-refs; year; place; categories; summary; detail
 - Artifact operations: export; import; copy
 - Export formats: json; csv
 - Import modes: timeline-json
-- Workflow completion: export drawer preview updates after create/edit/delete and includes the mutated event title
+- Workflow completion: export drawer preview updates after create/edit/delete and includes the mutated event title with type timestamp and mediaRefs
 - Workflow completion: importing timeline-json replaces the events collection so Library list and stage pins match the imported document
 
 Mechanics exclusions:

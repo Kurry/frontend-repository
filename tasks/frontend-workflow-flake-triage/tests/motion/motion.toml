@@ -84,14 +84,14 @@ weight = 1.0
 [[criterion]]
 id = "4.4"
 name = "panel_and_form_transitions"
-description = "The detail panel and the re-run form open through their real controls with a short opacity-plus-scale transition of roughly 200 to 300 milliseconds and exit the same way, and new audit timeline entries animate into the list"
+description = "The detail panel, the re-run form, and the export and import surfaces open through their real controls with a short opacity-plus-scale transition of roughly 200 to 300 milliseconds and exit the same way, and new audit timeline entries animate into the list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
 name = "toasts_slide_and_autodismiss"
-description = "Feedback toasts (copy confirmation, re-run completed, re-run stopped) slide in, remain readable long enough to scan, and auto-dismiss with a fade"
+description = "Feedback toasts (copy confirmation, re-run completed, re-run stopped, import success or failure) slide in, remain readable long enough to scan, and auto-dismiss with a fade"
 type = "binary"
 weight = 1.0
 

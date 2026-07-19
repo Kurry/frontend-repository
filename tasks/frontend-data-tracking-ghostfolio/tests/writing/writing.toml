@@ -169,6 +169,28 @@ weight = 0.5
 
 
 [[criterion]]
+id = "15.10"
+name = "performance_labels_consistent"
+description = "Where the app renders the performance figures, they are labeled with their real names (cost basis, realized gain, unrealized gain, dividend income, total fees, total return) consistently across the performance summary, the detail panel, and the Performance report export."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.11"
+name = "import_summary_and_batch_labels_specific"
+description = "Where the app renders the import diagnostics summary it states how many rows were imported and how many skipped rather than a bare number, and the batch action tray labels the selected count and its bulk actions (Delete selected, Edit selected) specifically."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.n6"
+name = "performance_or_import_copy_generic"
+description = "Performance figures use vague labels (a bare Gain or Value with no distinction), or the import diagnostics summary and batch tray report only a bare number with no words for imported versus skipped or the selected count."
+type = "binary"
+negate = true
+weight = 0.5
+
+[[criterion]]
 id = "writing.catchall"
 name = "writing_catchall"
 description = "The app exhibits a significant, browser-observable defect in rendered copy quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

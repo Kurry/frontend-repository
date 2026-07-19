@@ -70,7 +70,14 @@ weight = 1.0
 [[criterion]]
 id = "6.2"
 name = "export_closes_the_loop"
-description = "Export flow: after marking a seed authored, exporting shows a manifest carrying the exact question, criterion, foil, and golden values just authored, Copy manifest confirms visibly, the dataset snapshot's status counts match the rollup panel figure for figure, and the seed's timeline gains an export entry"
+description = "Export flow: after marking a seed authored, Export center shows package-manifest with schemaVersion seed-package-manifest-v1 carrying the exact authored values, snapshot with schemaVersion dataset-snapshot-v1 matching rollup byStatus, and studio-package with schemaVersion seed-dataset-studio-v1 and studio Seed Dataset Studio; Download or Copy confirms visibly and the timeline gains an export entry"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "import_round_trip_flow"
+description = "Import round-trip flow: export a DatasetStudioPackage after authoring, diverge the seed's question or foil cap, Import the JSON, and confirm workbench fields and a fresh export reconstruct to match the imported package without a reload"
 type = "binary"
 weight = 1.0
 
@@ -133,7 +140,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n1"
 name = "primary_flows_unavailable_from_ui"
-description = "Accepting, rejecting, authoring, marking authored, or exporting a seed is not reachable from the visible UI"
+description = "Accepting, rejecting, authoring, marking authored, exporting, or importing a seed package is not reachable from the visible UI"
 type = "binary"
 negate = true
 weight = 1.0

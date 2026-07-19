@@ -129,6 +129,28 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "2.10"
+name = "request_body_schemas_enforced"
+description = "Budget-cap, date-range, team-ceiling, save-view, report-schedule, and recategorize forms reject invalid values with named inline errors and disabled submit until valid, matching the request-body field contracts (capUsd > 0, from ≤ to, ceiling sum ≤ capUsd, name 2–60, frequency/sections enums, at least one of team or feature on recategorize)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "export_conforms_to_same_schemas"
+description = "Cost-report JSON and CSV use the same field names and enums as the usage-event and form contracts — promptTokens/completionTokens camelCase in JSON and CSV header, model in the five seeded names, dimension in model|team|feature — so table, forms, and export agree"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n5"
+name = "form_export_schema_drift"
+description = "Exported event keys or form enums disagree with the usage-event field contract (for example snake_case prompt_tokens in JSON while the table contract requires promptTokens, or a dimension value outside model|team|feature)"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
 id = "technical.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable defect in technical quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

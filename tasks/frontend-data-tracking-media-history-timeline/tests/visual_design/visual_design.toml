@@ -106,7 +106,7 @@ weight = 1.0
 [[criterion]]
 id = "3.7"
 name = "category_color_and_detail_hierarchy"
-description = "Event pins or list rows show their category color, and the detail panel presents a clear hierarchy: a kicker (year and place), a prominent title, category pills, and body text visually distinct from the title"
+description = "Event pins or list rows show their category color, and the detail panel presents a clear hierarchy: a kicker (year and place), a prominent title, type, mediaRefs list, category pills, summary, and detail visually distinct from the title"
 type = "binary"
 weight = 1.0
 

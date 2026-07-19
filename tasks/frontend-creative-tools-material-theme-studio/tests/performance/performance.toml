@@ -84,7 +84,7 @@ weight = 1.0
 [[criterion]]
 id = "9.4"
 name = "shell_visible_while_settling"
-description = "While the app settles after first paint, the header lockup and three-tab bar remain visible rather than a blank white screen with no controls."
+description = "While the app settles after first paint, the header lockup and four-tab bar (Preview / Components / Saved Themes / Export) remain visible rather than a blank white screen with no controls."
 type = "binary"
 weight = 1.0
 

@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "14.1"
 name = "multi_facet_reload_resets_coherently"
-description = "Multi-facet round-trip: apply a stage filter and a column sort, run checks on a pending record, fail one criterion with a typed rationale, and add a feedback entry; then reload. All facets coherently reset to the seeded baseline — the seeded stages and check results return, the rationale, feedback entry, filters, and sort are gone, and the export history is empty — never a mix of kept and reset state"
+description = "Multi-facet round-trip: apply a stage filter and a column sort, run checks on a pending record, fail one criterion with a typed rationale, and add a feedback entry; then reload. All facets coherently reset to the seeded baseline — the seeded stages and check results return, the rationale, feedback entry, filters, and sort are gone, the export history is empty, and the import surface is closed — never a mix of kept and reset state"
 type = "binary"
 weight = 1.0
 
@@ -98,7 +98,7 @@ weight = 1.0
 [[criterion]]
 id = "14.6"
 name = "different_inputs_change_report"
-description = "Input-dependent output: escalate one held record with category Spec conflict and a distinctive summary, and fail a criterion on another record with a distinctive rationale; the report appendix shows each record with its own category, summary, and rationale text — the two outcomes differ as their inputs dictate"
+description = "Input-dependent output: escalate one held record with category Spec conflict and a distinctive summary, and fail a criterion on another record with a distinctive rationale; the Audit Package JSON tasks entries and the Markdown appendix show each record with its own category, summary, and rationale text — the two outcomes differ as their inputs dictate"
 type = "binary"
 weight = 1.0
 
@@ -118,8 +118,8 @@ weight = 1.0
 
 [[criterion]]
 id = "14.9"
-name = "full_pipeline_reflected_in_report"
-description = "Full-pipeline probe: filter the queue and batch-run checks over the filtered set, fail a criterion with a typed rationale on one record, escalate a held record with a category and summary, apply fixes and re-run checks on another held record, then open the Report view and copy the report. The report must reflect every step — the batch's new check outcomes in the pass-rate table, the failed criterion and its exact rationale text in the appendix, the escalation with its category, the re-audited record's flipped outcomes, and a new timestamped entry in the export history"
+name = "full_pipeline_reflected_in_export"
+description = "Full-pipeline probe: filter the queue and batch-run checks over the filtered set, fail a criterion with a typed rationale on one record, escalate a held record with a category and summary, apply fixes and re-run checks on another held record, then open Report and copy Audit Package JSON. The export must show schemaVersion quality-audit-package-v1, the batch's new check outcomes in checkPassRates, the failed criterion and its exact rationale under tasks, the escalation fields, the re-audited record's flipped outcomes, and a new timestamped exportHistory entry"
 type = "binary"
 weight = 1.0
 
@@ -134,7 +134,7 @@ weight = 1.0
 [[criterion]]
 id = "14.n2"
 name = "derived_surface_ignores_inputs"
-description = "A derived surface — rollup cell, chart, admission banner, or report table — renders identically regardless of its inputs"
+description = "A derived surface — rollup cell, chart, admission banner, or export preview — renders identically regardless of its inputs"
 type = "binary"
 negate = true
 weight = 1.0
@@ -151,6 +151,22 @@ weight = 1.0
 id = "14.n4"
 name = "cross_view_state_is_stale"
 description = "A run outcome, verdict, or feedback entry appears in one view but not another until a reload"
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "14.10"
+name = "export_import_reconstructs_desk"
+description = "Export/import pipeline: mutate the desk (run, fail a criterion, or add feedback), export Audit Package JSON, import that JSON, and confirm visible queue stages, rollups, and the next export preview match the exported document"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "export_omits_mutations_in_json"
+description = "Audit Package JSON preview text is identical before and after a run, fail verdict, or feedback entry that should alter tasks, datasetSummary, or checkPassRates"
 type = "binary"
 negate = true
 weight = 1.0

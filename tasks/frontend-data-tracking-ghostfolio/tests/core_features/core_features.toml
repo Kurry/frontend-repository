@@ -338,6 +338,129 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "1.53"
+name = "detail_panel_shows_position_math"
+description = "The selected-holding detail panel shows that holding's cost basis, average unit cost, unrealized gain, and realized gain in addition to its other fields, and these figures change when the underlying activities change."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.54"
+name = "performance_summary_surface"
+description = "A performance summary surface shows the portfolio-wide figures net worth, total cost basis, realized gain, unrealized gain, dividend income, total fees, and total return."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.55"
+name = "average_unit_cost_and_basis_math"
+description = "For a symbol with two BUY activities of 10 units at 100 and 10 units at 120, the derived average unit cost reads 110; with the holding at 20 units and a current unit price of 130, cost basis reads 2200, market value 2600, and unrealized gain 400 (average unit cost = total BUY cost / total BUY quantity; cost basis = average unit cost x quantity; unrealized gain = market value - cost basis)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.56"
+name = "sell_updates_realized_and_unrealized"
+description = "Saving a valid SELL of quantity q at unit price p for a symbol increases realized gain by (p minus the symbol's average unit cost) times q and reduces that holding's unrealized gain accordingly, recomputed without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.57"
+name = "dividend_feeds_total_return"
+description = "Saving a DIVIDEND activity increases the dividend-income figure by quantity times unit price and increases total return, where total return equals unrealized gain plus realized gain plus dividend income minus total fees."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.58"
+name = "performance_chart_from_ledger"
+description = "A portfolio-value-over-time chart is derived from the activities ledger, plotting the portfolio value across the ledger's date buckets (cumulative positions times unit prices at each bucket)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.59"
+name = "benchmark_toggle_two_series"
+description = "Toggling Benchmark compare on the performance chart overlays a second visibly labeled benchmark series alongside the portfolio series; toggling it off removes the benchmark series and leaves only the portfolio series."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.60"
+name = "batch_select_tray_shows_count"
+description = "Holdings rows and activities rows each show a selection checkbox with a select-all control; selecting at least one row shows a bulk action tray reporting the exact count of selected rows with bulk delete and bulk edit controls."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.61"
+name = "bulk_delete_and_edit_apply_to_all"
+description = "Bulk delete removes every selected row in one action, and bulk edit (set data source, or set asset class on holdings) applies its one change to every selected row in one action, with the table, totals, allocation, and performance summary recomputing together."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.62"
+name = "import_diagnostics_precommit_screen"
+description = "Importing an Activities CSV first opens a pre-commit diagnostics screen with a schema-mapping step and a row-level diagnostics table listing each row as valid or invalid and naming the failing field per invalid row; a Commit control applies only the valid rows and a summary states how many rows were imported versus skipped."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.63"
+name = "import_no_mutation_before_commit"
+description = "Nothing in the store changes while the CSV import diagnostics screen is open: holdings and activities are unchanged until Commit, and cancelling the diagnostics screen leaves them unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.64"
+name = "performance_report_tab_keys"
+description = "The export drawer shows a fourth Performance report tab whose JSON preview has exactly the keys meta (with exportedAt, holdingCount, activityCount), performance (with netWorth, totalCostBasis, realizedGain, unrealizedGain, dividendIncome, totalFees, totalReturn), holdings (array of objects with symbol, quantity, averageUnitCost, costBasis, marketValue, unrealizedGain), and series (array of buckets with date and value)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.65"
+name = "performance_report_reflects_mutations"
+description = "After a create, edit, delete, activity save, bulk action, or committed import, the Performance report preview's performance figures and per-holding rows track the derived position math before Copy or Download."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n4"
+name = "realized_gain_unchanged_after_sell"
+description = "After saving a valid SELL that should realize a gain or loss, the realized gain figure and total return stay unchanged, or the sold quantity's unrealized gain remains counted."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n5"
+name = "import_mutates_store_before_commit"
+description = "Opening or interacting with the CSV import diagnostics screen changes the activities collection, ledger, or derived totals before the user presses Commit."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n6"
+name = "batch_tray_count_or_scope_wrong"
+description = "The bulk action tray reports a selected count different from the number of checked rows, or a bulk delete/edit affects only one row instead of every selected row."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n7"
+name = "benchmark_series_tracks_activities"
+description = "The seeded benchmark series on the performance chart changes shape when activities are added, edited, or deleted, instead of staying fixed."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in its core features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

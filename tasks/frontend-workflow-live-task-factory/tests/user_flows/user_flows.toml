@@ -131,6 +131,13 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "6.11"
+name = "export_import_round_trip_flow"
+description = "After a completed demo pipeline run, Download bundle the TaskPackageBundle JSON, delete that library entry, Import the downloaded JSON, and confirm the library entry returns with the same instruction text, repo, pr_number, difficulty, and patch_note"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "6.n1"
 name = "primary_flows_unavailable_from_ui"
 description = "A primary flow — triaging a PR, running the pipeline, downloading a package, or importing a bundle — is not reachable through the visible UI"

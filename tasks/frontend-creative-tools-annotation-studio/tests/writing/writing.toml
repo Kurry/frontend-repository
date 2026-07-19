@@ -71,14 +71,14 @@ weight = 0.5
 [[criterion]]
 id = "15.2"
 name = "actions_use_specific_labels"
-description = "Where the app renders button or action labels, they are specific verbs (Submit & Next, Run Assist, Copy export), not generic (Submit, OK) when a specific label is possible."
+description = "Where the app renders button or action labels, they are specific verbs (Submit & Next, Run Assist, Copy export, Import), not generic (Submit, OK) when a specific label is possible."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.3"
 name = "errors_name_problem_and_fix"
-description = "Where the app renders error messages, they name the problem and the fix (Shortcut 7 is already used by Factual Error), not just a rejection (Invalid)."
+description = "Where the app renders error messages, they name the problem and the fix (Shortcut 7 is already used by Factual Error; schemaVersion must be annotation-studio-labels-v1), not just a rejection (Invalid)."
 type = "binary"
 weight = 0.5
 

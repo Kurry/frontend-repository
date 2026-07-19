@@ -100,7 +100,7 @@ weight = 1.0
 [[criterion]]
 id = "4.6"
 name = "list_add_remove_reorder_animation"
-description = "Driven through the real UI controls (never a state shortcut): a newly created user's row animates into the All Users table, a deleted row animates out, and rows animate to their new positions when a sort or filter change reorders the visible list, rather than snapping"
+description = "Driven through the real UI controls (never a state shortcut): a newly created or restored user's row animates into the All Users table, an archived row animates out, and rows animate to their new positions when a sort or filter change reorders the visible list, rather than snapping"
 type = "binary"
 weight = 1.0
 

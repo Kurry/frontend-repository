@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.1"
 name = "layout_sidebar_and_view_switcher"
-description = "The layout shows a left sidebar with the queue, History tab, and suite entries, and a main area that swaps between the annotation card, Taxonomy, Review queue, Agreement, and Export views via a toolbar view switcher; the assist step list and timeline render alongside the queue while a run is active"
+description = "The layout shows a left sidebar with the queue, History tab, and suite entries, and a main area that swaps between the annotation card, Taxonomy, Review queue, Agreement, and Export views via a toolbar view switcher; the Export view shows Labels JSON / Stats summary tabs with Copy, Download, and Import affordances; the assist step list and timeline render alongside the queue while a run is active"
 type = "binary"
 weight = 1.0
 

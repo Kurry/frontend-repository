@@ -178,6 +178,20 @@ weight = 1.0
 
 
 [[criterion]]
+id = "4.11"
+name = "bulk_switches_animate_together"
+description = "Activating Grant all or Revoke all animates every affected matrix switch handle in the same moment rather than leaving some cells snapping later or not moving"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.12"
+name = "rotation_crossfades_key_surfaces"
+description = "After confirming a rotation via the real dialog, the dashboard's npub and nsec surfaces transition to the new values with a brief crossfade rather than snapping"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "4.catchall"
 name = "motion_catchall"
 description = """The app exhibits a significant, browser-observable motion defect that is NOT covered by any other criterion in this file. If present, name the defect and cite concrete evidence. If already covered, answer no here."""

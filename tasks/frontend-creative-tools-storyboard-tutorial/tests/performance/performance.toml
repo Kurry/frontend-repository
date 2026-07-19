@@ -210,6 +210,44 @@ type = "binary"
 negate = true
 weight = 1.0
 
+
+[[criterion]]
+id = "9.11"
+name = "export_import_exercise_console_clean"
+description = "Opening Export, switching JSON/Markdown previews, and attempting Import produces no console errors or warnings"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.12"
+name = "total_duration_recomputes_without_jank"
+description = "Creating, editing duration, or deleting scenes updates Total duration in place without layout jumps or hangs"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.n11"
+name = "export_hangs_or_errors"
+description = "Opening Export or compiling the Storyboard JSON preview hangs the UI or throws console errors"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.13"
+name = "presenter_run_and_search_responsive"
+description = "A full presenter run across several scenes ticks its countdown and auto-advances with no console errors, UI hangs, or layout jumps, and rapid typing in the search field re-filters the board without dropped keystrokes or lag"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.n12"
+name = "presenter_timer_hangs_or_errors"
+description = "During a presenter run the countdown stalls, the UI freezes, or console errors appear while ticking, auto-advancing, pausing, or exiting"
+type = "binary"
+weight = 1.0
+negate = true
+
 [[criterion]]
 id = "performance.catchall"
 name = "performance_catchall"

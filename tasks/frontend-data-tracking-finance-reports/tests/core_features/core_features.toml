@@ -70,28 +70,28 @@ weight = 1.0
 [[criterion]]
 id = "1.2"
 name = "created_transaction_appears_in_list"
-description = "After creating a transaction with payee 'Ada Books' and a valid amount, the text 'Ada Books' is visible in the transactions list"
+description = "After creating a transaction with payee Ada Books and a valid amount matching the field contract, the text Ada Books is visible in the transactions list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
 name = "three_creates_add_three_rows"
-description = "After adding 3 new transactions on top of the seed set, the list shows exactly 3 more rows than the initial seeded count"
+description = "After adding 3 new valid transactions on top of the seed set, the list shows exactly 3 more rows than the initial seeded count"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
 name = "expense_create_updates_kpi"
-description = "After creating an expense transaction, Total Expenses (or Net) KPI updates to reflect the new amount"
+description = "After creating an expense transaction, Total Expenses (or Net) KPI updates to reflect the new amount in the active display currency"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
 name = "edited_payee_replaces_old_value"
-description = "After editing a payee from the seeded value to 'Evening Market', the text 'Evening Market' is visible and the previous payee is not"
+description = "After editing a payee from the seeded value to Evening Market, the text Evening Market is visible and the previous payee is not"
 type = "binary"
 weight = 1.0
 
@@ -112,7 +112,7 @@ weight = 1.0
 [[criterion]]
 id = "1.8"
 name = "invalid_submit_names_field_adds_no_row"
-description = "After submitting create with an empty payee or a missing amount, an inline validation message naming the offending field is visible, no row is added, and the transactions count is unchanged"
+description = "After submitting create with an empty payee/label or a missing amount, an inline validation message naming the offending field is visible, no row is added, and the transactions count is unchanged"
 type = "binary"
 weight = 1.0
 
@@ -140,7 +140,7 @@ weight = 1.0
 [[criterion]]
 id = "1.13"
 name = "bulk_actions_apply_to_selection"
-description = "After selecting multiple transaction rows and running bulk categorize or bulk delete, the selected rows update category together or disappear from the list and KPIs/charts reflect the change"
+description = "After selecting multiple transaction rows and running bulk categorize or bulk delete, the selected rows update category together or disappear from the list and KPIs/charts/thresholds reflect the change"
 type = "binary"
 weight = 1.0
 
@@ -154,7 +154,7 @@ weight = 1.0
 [[criterion]]
 id = "1.15"
 name = "savings_rate_equals_net_over_income"
-description = "The Savings Rate card equals net income divided by total income for the current transactions"
+description = "The Savings Rate card equals net income divided by total income for the current filtered transactions"
 type = "binary"
 weight = 1.0
 
@@ -175,14 +175,14 @@ weight = 1.0
 [[criterion]]
 id = "1.19"
 name = "two_views_switchable_in_app"
-description = "At least two distinct views or interaction modes are switchable without full page navigation"
+description = "At least two distinct views or interaction modes (Breakdown/Trends chart mode and transactions-list mode) are switchable without full page navigation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.20"
 name = "domain_state_beyond_crud_recomputes"
-description = "Domain state beyond CRUD is implemented (filters, bulk categorize or bulk delete on selected rows, or equivalent) and recomputes visible results from the shared collection"
+description = "Domain state beyond CRUD is implemented (filters, bulk categorize or bulk delete, thresholds, display currency, or undo/redo) and recomputes visible results from the shared collection"
 type = "binary"
 weight = 1.0
 
@@ -212,14 +212,14 @@ weight = 1.0
 [[criterion]]
 id = "1.25"
 name = "summary_strip_derived_from_collection"
-description = "A summary strip below the table reports transaction count, largest transaction, average amount, and covered date range, each recomputed from the current transactions"
+description = "A summary strip below the table reports transaction count, largest transaction, average amount, and covered date range, each recomputed from the current filtered transactions"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.27"
 name = "demo_chrome_replaces_real_crud"
-description = "Demo chrome controls (Save, Export CSV, Sort, Bulk edit) replace or disable the working create/edit/delete flow instead of showing a transient toast"
+description = "Demo chrome controls (Save, Sort, Columns, Bulk edit) replace or disable the working create/edit/delete/export/import flow instead of showing a transient toast"
 type = "binary"
 weight = 1.0
 negate = true
@@ -227,7 +227,7 @@ negate = true
 [[criterion]]
 id = "1.28"
 name = "summary_strip_caption_hardcoded"
-description = "The summary strip shows a hardcoded caption that does not change when transactions are added or deleted"
+description = "The summary strip caption stays identical after adding and deleting transactions, proving it is a hardcoded non-derived caption"
 type = "binary"
 weight = 0.5
 negate = true
@@ -236,49 +236,49 @@ optional = true
 [[criterion]]
 id = "1.29"
 name = "breakdown_sankey_structure_rendered"
-description = "Breakdown renders the sankey flow graph structure: named income-source nodes (Paychecks, Business Income, Interest, Other Income or equivalents) feed a central Income hub that splits into a Net Income node plus one node per expense category, with link thickness proportional to amount and node labels showing name and amount"
+description = "Breakdown renders the sankey flow graph structure: named income-source nodes feed a central Income hub that splits into a Net Income node plus one node per expense category, with link thickness proportional to amount and node labels showing name and amount"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.30"
 name = "create_flow_updates_all_surfaces"
-description = "Scripted probe: note the table row count, the summary strip count, and the four summary card values; submit a valid new transaction through the create form; without any page reload the table gains exactly one row, all four summary cards recompute to include the new amount, the active chart panel redraws with the changed aggregate, and the summary strip count increases by exactly one"
+description = "Scripted probe: note the table row count, the summary strip count, and the four summary card values; submit a valid new transaction through the create form; without any page reload the table gains exactly one row, all four summary cards recompute, the active chart panel redraws, and the summary strip count increases by exactly one"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.31"
 name = "edit_flow_moves_cards_charts_strip"
-description = "Scripted probe: change an existing transaction's amount to a distinctly different value; the same row shows the new amount in the table, the affected summary cards move, the corresponding sankey link thickness and doughnut segment differ when each chart panel is next viewed, and the summary strip largest and average figures update — all without a page reload"
+description = "Scripted probe: change an existing transaction's amount to a distinctly different value; the same row shows the new amount, the affected summary cards move, sankey/doughnut aggregates differ when each panel is next viewed, and the summary strip largest and average figures update — all without a page reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.32"
 name = "delete_flow_clears_row_selection_aggregates"
-description = "Scripted probe: check a transaction's row checkbox, then delete that transaction; its row leaves the table, it is dropped from the checkbox selection, the summary strip count decreases by exactly one, and the matching chart aggregate shrinks the next time the panel is shown"
+description = "Scripted probe: check a transaction's row checkbox, then delete that transaction; its row leaves the table, it is dropped from selection, the summary strip count decreases by exactly one, and the matching chart aggregate shrinks the next time the panel is shown"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.33"
 name = "filter_stack_and_clear_round_trip"
-description = "Scripted probe: apply the category filter and confirm only matching rows remain; stack the income-vs-expense filter and confirm the visible rows narrow further; clear both filters and confirm exactly the full current collection returns, with the summary cards unchanged throughout"
+description = "Scripted probe: apply the category filter and confirm only matching rows remain; stack the income-vs-expense filter and a date range and confirm further narrowing; clear all filters and confirm exactly the full current collection returns"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.34"
 name = "bulk_flow_shifts_table_and_charts"
-description = "Scripted probe: check several rows and apply bulk categorize — each checked row shows the chosen category in the table and the chart aggregates shift accordingly; then check several rows and apply bulk delete — every checked row disappears and the summary strip count drops by exactly that number"
+description = "Scripted probe: check 3 rows and apply bulk categorize — each checked row shows the chosen category and chart aggregates and thresholds shift; then bulk delete those checked rows — every checked row disappears and the summary strip count drops by exactly 3"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.35"
 name = "reload_restores_seeded_baseline"
-description = "Scripted probe: create a transaction, switch the chart tab, and apply a filter, then reload the page; the app returns to its seeded state — the seeded transactions, default filters, and the default chart tab — with every facet reset coherently, never a mix of reset and surviving state"
+description = "Scripted probe: create a transaction, switch the chart tab, apply a filter, change display currency, then reload; the app returns to seeded transactions, default filters, default chart tab, seeded thresholds, and USD display currency"
 type = "binary"
 weight = 1.0
 
@@ -313,21 +313,21 @@ weight = 1.0
 [[criterion]]
 id = "1.40"
 name = "charts_redraw_on_data_change"
-description = "Scripted probe: note a sankey link width or node amount and a doughnut segment proportion, then create or delete a transaction in the corresponding category; the sankey link widths and node amounts and the doughnut segment proportions visibly differ the next time each panel is shown — the charts are data-driven, not baked images"
+description = "Scripted probe: note a sankey link width or node amount and a doughnut segment proportion, then create or delete a transaction in the corresponding category; the sankey and doughnut visibly differ the next time each panel is shown"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.41"
 name = "submit_disabled_until_all_fields_valid"
-description = "In the create and edit forms, the submit control stays disabled while any required field is invalid, and each invalid field shows an inline message naming that field (payee required, amount required and numeric)"
+description = "In the create and edit forms, the submit control stays disabled while any required field is invalid against the field contract, and each invalid field shows an inline message naming that field"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.42"
 name = "opens_directly_without_auth_gate"
-description = "The app opens straight onto the Ledger reports workspace — sidebar, four summary cards, chart card, and transactions table all visible — with no login, signup, or bank-linking gate before the workspace"
+description = "The app opens straight onto the Ledger reports workspace — sidebar, four summary cards, chart card, thresholds panel, and transactions table all visible — with no login, signup, or bank-linking gate"
 type = "binary"
 weight = 1.0
 
@@ -341,23 +341,73 @@ weight = 1.0
 [[criterion]]
 id = "1.44"
 name = "chart_card_subtitle_and_pill_toggle"
-description = "The chart card carries a 'By category & group' subtitle and a Breakdown / Trends pill toggle control"
+description = "The chart card carries a By category & group subtitle and a Breakdown / Trends pill toggle control"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "1.45"
 name = "transaction_rows_carry_all_fields"
-description = "Each transaction row in the table shows a date, payee, category, account, and a signed amount (optional status may also appear)"
+description = "Each transaction row in the table shows a date, payee/label, category, account, and a signed amount (optional status may also appear)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.46"
 name = "demo_chrome_controls_show_toast"
-description = "Activating the demo chrome controls (Filters, Save, Sort, Columns, Export CSV, Bulk edit) shows a brief toast that enters and clears, and never navigates away from or replaces the current view"
+description = "Activating the demo chrome controls (Filters, Save, Sort, Columns, Bulk edit) shows a brief toast that enters and clears, and never navigates away from or replaces the current view"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "field_contract_rejects_invalid_payloads"
+description = "Create rejects zero amount, non-ISO date, category outside the closed set, or Salary with a negative amount with inline field errors and does not add a row"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "thresholds_panel_status_rules"
+description = "The Thresholds panel lists at least four expense-category ceilings with month-to-date spend and under/near/over status; lowering a ceiling below month-to-date spend shows over and names the overage"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "display_currency_fx_converts_surfaces"
+description = "Switching display currency from USD to EUR or GBP recomputes money figures on cards, table amounts, legends, and thresholds using the mock FX rates while the transaction row count stays the same"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "undo_redo_restores_mutations"
+description = "After creating a transaction, Undo removes it and reverts cards/charts/thresholds; Redo restores the row and derived surfaces; Undo/Redo stay disabled when their stacks are empty"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "export_drawer_live_json_and_csv"
+description = "Export opens a drawer with JSON and CSV tabs compiled live from the store; after creates with payees Ada Books and Evening Market, JSON transactions contain both labels, totals.count matches the live strip, CSV includes both labels, and Download/Copy affordances are present with Copied confirmation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.52"
+name = "import_ledger_json_replace_round_trip"
+description = "Importing a valid ledger-json document with Replace replaces transactions and thresholds so the table, cards, strip, charts, and thresholds match the imported document"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.53"
+name = "export_omits_session_mutations"
+description = "After creating transactions with distinct payees, the Export JSON transactions array omits one or more of those session payees/labels"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.catchall"

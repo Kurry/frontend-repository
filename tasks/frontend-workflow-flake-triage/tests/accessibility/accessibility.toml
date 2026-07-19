@@ -60,80 +60,81 @@ allowed_tools = [
 [scoring]
 aggregation = "weighted_mean"
 
+
 [[criterion]]
 id = "1.1"
 name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+description = "Suite switcher, test rows, reason selects, filters, sort, re-run and stop controls, Export triage report, Import triage report, and copy controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space and show a visible focus indicator."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
 name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+description = "The re-run form, Export triage report drawer, and Import triage report surface trap focus while open, close on Escape, and return focus to the control that opened them."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
 name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+description = "Icons in the triage chrome (theme toggle, copy, export, import, stop) expose accessible names or descriptive text alternatives."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
 name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+description = "Re-run completion, stop, copy confirmation, and import success or failure are announced through an aria-live region as well as shown visually."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
 name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+description = "The re-run runCount select, reason select, import paste field, and filter controls use visible labels associated with their inputs."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
 name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+description = "Suite and panel headings in the triage queue, detail panel, quarantine map, and audit timeline follow a logical heading order without skipping levels."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
 name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+description = "The triage shell exposes landmark regions (main and complementary or navigation) so the queue, detail, and quarantine panels are discoverable without pointer use."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
 name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+description = "Queue text, verdict chips, matrix cells, and form controls keep readable contrast in both light and dark themes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
 name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+description = "Suite switcher, reason selects, re-run and stop controls, and export/import controls use semantic button, select, or input elements (or equivalent ARIA roles)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
 name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+description = "With prefers-reduced-motion set, re-run tick-in, panel open/close, quarantine list enter/leave, and toast motion are removed while every state change still applies completely."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
 name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+description = "Reason select, re-run, Export triage report, or Import triage report cannot be activated or reached via keyboard."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +142,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n2"
 name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+description = "Focused triage controls show no visible focus ring or the ring is clipped by the panel."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +150,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n3"
 name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+description = "Primary interactive controls are non-semantic div or span tags without button or select roles."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,15 +158,15 @@ weight = 1.0
 [[criterion]]
 id = "1.n4"
 name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+description = "Pass/fail matrix cells or verdict chips convey state by color alone with no readable label or accessible name."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "modals_leak_focus_to_background"
+description = "While the re-run form, export drawer, or import surface is open, Tab moves focus into background page content behind the overlay."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +174,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n6"
 name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+description = "Queue identifiers, chip labels, or export preview text are unreadable due to poor contrast in the active theme."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +182,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n7"
 name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+description = "runCount validation or import field-contract errors appear only visually with no live-region announcement."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +190,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n8"
 name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+description = "Icon-only chrome controls lack accessible names."
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +198,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n9"
 name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+description = "Panel headings jump levels (for example from H1 directly to H3) in the triage shell."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +206,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n10"
 name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+description = "With prefers-reduced-motion set, re-run tick-in or panel transitions continue animating."
 type = "binary"
 negate = true
 weight = 1.0

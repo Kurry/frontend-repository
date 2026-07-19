@@ -95,8 +95,8 @@ optional = true
 
 [[criterion]]
 id = "11.5"
-name = "keyboard_power_path_beyond_basics"
-description = "Beyond basic Tab/Enter operability, the board supports a power-user keyboard path such as arrowing through Slide scenes or Esc-to-close create without leaving the workspace (bonus)."
+name = "command_palette_power_path"
+description = "Beyond basic Tab/Enter operability, the command palette offers a polished power-user path (fuzzy match, recent commands, or keyboard hints) that remains browser-observable (bonus)."
 type = "binary"
 weight = 0.5
 optional = true
@@ -136,7 +136,7 @@ optional = true
 [[criterion]]
 id = "11.10"
 name = "competition_level_storyboard_feel"
-description = "The overall workspace feels competition-grade: scene grid density, Tile/List/Slide craft, and tutorial-copy polish read as a professional storyboard docs instrument rather than a wired demo (bonus)."
+description = "The overall workspace feels competition-grade: scene grid density, Tile/List/Slide craft, live export artifacts, and tutorial-copy polish read as a professional storyboard docs instrument rather than a wired demo (bonus)."
 type = "binary"
 weight = 0.5
 optional = true

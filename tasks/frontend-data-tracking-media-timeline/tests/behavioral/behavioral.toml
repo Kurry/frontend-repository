@@ -98,7 +98,7 @@ weight = 1.0
 [[criterion]]
 id = "14.6"
 name = "different_inputs_change_outcomes"
-description = "Create two events with different titles and years; the library shows both distinct titles, pins sit at different year positions when both are in window, and Timeline JSON contains both titles"
+description = "Create two events with different titles, types, timestamps, mediaRefs, and years; the library shows both distinct titles and types, pins sit at different year positions when both are in window, and Timeline JSON contains both titles with their matching type/timestamp/mediaRefs"
 type = "binary"
 weight = 1.0
 
@@ -119,7 +119,7 @@ weight = 1.0
 [[criterion]]
 id = "14.9"
 name = "mutate_density_export_pipeline"
-description = "Create a user-managed event in an enabled category inside the current window: density for that category increments by one, N events in view increments when applicable, and Timeline JSON / Events CSV previews include the new title — all in one pipeline without reload"
+description = "Create a user-managed event in an enabled category inside the current window: density for that category increments by one, N events in view increments when applicable, and Timeline JSON / Events CSV previews include the new title with type, timestamp ending with Z, and mediaRefs — all in one pipeline without reload"
 type = "binary"
 weight = 1.0
 
@@ -133,7 +133,7 @@ weight = 1.0
 [[criterion]]
 id = "14.11"
 name = "export_import_round_trip_probe"
-description = "After a create or edit, export Timeline JSON, clear user-managed events or otherwise diverge, then import that JSON; visible titles, years, window, enabled categories, and a fresh export match the exported package"
+description = "After a create or edit, export Timeline JSON, clear user-managed events or otherwise diverge, then import that JSON; visible titles, types, years, mediaRefs, window, enabled categories, and a fresh export match the exported package"
 type = "binary"
 weight = 1.0
 

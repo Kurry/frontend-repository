@@ -62,78 +62,92 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "create_flow_updates_list_kpi_export"
+description = "Create flow: submitting Add User with a valid UserCreate payload adds exactly one All Users row, increases KPI Total by one, and both Session JSON and Users CSV previews include the new user without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "invalid_create_shows_field_contract_errors"
+description = "Create flow: invalid submission (empty required fields, firstName over 40, email missing domain dot, temporaryPassword under 8) shows immediate inline validation naming the field and adds no row"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
 name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+description = "Edit flow: saving Edit updates the table row, KPI strip, filtered views, and both export previews in the same session"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
 name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+description = "Delete flow: the user is removed from All Users, selection, KPI counts, and both export previews after deletion"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "view_switch_retains_filters_theme"
+description = "View/mode switch: switching Operations Overview ↔ All Users keeps theme and previously set filters/sort until reload, with no full page navigation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "last_user_delete_or_zero_filter_empty_state"
+description = "Edge: after deleting all users, or when filters and search match nothing, the list region shows an empty-state message explaining what belongs there instead of an empty/broken table."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "filters_update_list_and_export"
+description = "Edge: filtering by role or status reveals/hides items in All Users and Session JSON filters object reflects the active filter"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "drawer_chrome_preserves_workflow"
+description = "Collapsible chrome: on a small viewport the sidebar hamburger can be hidden and reopened with workflow continuity"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "overlays_support_export_and_popovers"
+description = "Overlays: notifications, profile, account, and export drawer open from their triggers, support expected close paths, and do not trap the user"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "import_recovers_exported_session"
+description = "Recovery: after mutating then exporting Session JSON, a further local change can be corrected by Import of that JSON without requiring a full page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "mutation_to_export_pipeline"
+description = "Mutation-to-export: create a distinctive-email user, delete another, open Export, and confirm schemaVersion pineapple-admin-analytics-v1, the new email present, deleted user absent, and KPI match"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "export_import_round_trip_flow"
+description = "Export then import round-trip: after create/edit plus delete, Import the exported Session JSON and confirm All Users, KPIs, and both export previews match the pre-export mutated state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
 name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+description = "Create/edit/delete/export/import (or genre-equivalent primary flows) are not enabled from the UI"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +155,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n2"
 name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+description = "New users fail to show up in All Users or export previews, or duplicate on create"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +163,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n3"
 name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+description = "State changes are not synced across All Users, KPIs, and export previews"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +171,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n4"
 name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+description = "View/mode switching breaks layout or loses selection unexpectedly"
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,15 +179,15 @@ weight = 1.0
 [[criterion]]
 id = "6.n5"
 name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+description = "Emptying the collection produces broken or missing UI instead of the empty state"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "user_filters_disagree"
+description = "User search and status/role filters disagree about which rows are visible, or clearing filters fails to restore the full user list."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +195,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n7"
 name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+description = "Collapsed sidebar chrome cannot be re-opened on small viewports"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +203,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n8"
 name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+description = "Export drawer or popovers block navigation with no exit option"
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +211,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n9"
 name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+description = "A failed create or import provides no user feedback"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +219,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n10"
 name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+description = "Navigation dead ends or requires reload for recovery after export/import"
 type = "binary"
 negate = true
 weight = 1.0

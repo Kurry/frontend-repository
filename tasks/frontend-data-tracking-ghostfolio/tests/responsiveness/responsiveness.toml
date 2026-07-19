@@ -183,6 +183,21 @@ weight = 1.0
 
 
 [[criterion]]
+id = "7.10"
+name = "new_surfaces_reflow_at_375"
+description = "At about 375 pixel width the performance summary figure group, the performance chart, the batch action tray, and the CSV import diagnostics screen reflow to fit without horizontal page scrolling: the chart sizes down responsively, the diagnostics table scrolls within its own region, and the batch tray stays reachable."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.n8"
+name = "new_surfaces_overflow_at_375"
+description = "At about 375 pixel width the performance chart or the diagnostics table uses a fixed width that overflows the viewport forcing horizontal page scrolling, or the batch action tray renders off-screen or unreachable."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
 id = "responsiveness.catchall"
 name = "responsiveness_catchall"
 description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

@@ -189,7 +189,14 @@ weight = 1.0
 [[criterion]]
 id = "2.19"
 name = "field_contract_validation_runtime"
-description = "Board rename and Import enforce the field contract in the UI: empty or over-60-character board names are rejected naming the board-name field; Import of JSON that fails schemaVersion, boards, activeBoardId, enums, geometry, or connector endpoint rules is rejected naming the offending field and does not mutate the workspace."
+description = "Board rename, note/flashcard text commits, and Import enforce the API-shaped field contracts in the UI: empty or over-60-character board names are rejected naming the board-name field; over-8000-character note text is rejected naming the text field; Import of JSON that fails schemaVersion scribblespace-workspace-v1, boards, activeBoardId, type/color enums, text length bounds, width/height minima, or connector endpoint rules is rejected naming the offending field and does not mutate the workspace."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.20"
+name = "created_records_match_export_schema"
+description = "A note or flashcard created and edited through the visible controls appears in Workspace JSON with the same type, color enum, text/front/back, and geometry field names required by the create/update field contracts."
 type = "binary"
 weight = 1.0
 

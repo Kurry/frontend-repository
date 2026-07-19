@@ -63,77 +63,77 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "controls_are_keyboard_accessible"
-description = "All interactive controls — table rows and headers, filters, designer fields and sliders, tabs, flag and pause/resume controls, undo/redo, and export — are keyboard accessible with Tab, Shift+Tab, Enter/Space, and arrow keys on sliders."
+description = "All interactive controls — library table rows and headers, status filters, bulk actions, designer fields and allocation sliders, results tabs, Flag outlier, pause/resume, undo/redo, Export report, Copy, Download, and Import — are keyboard accessible with Tab, Shift+Tab, Enter/Space, and arrow keys on sliders."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
 name = "modals_manage_focus"
-description = "The designer, decision, and confirmation modals trap focus, close on Escape, and return focus to the originating control on close."
+description = "The designer, decision, Export report, and confirmation modals trap focus, close on Escape, and return focus to the originating control on close."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "icons_have_accessible_names"
+description = "Toolbar, row-action, tab, and flag icons from the Carbon icon set expose accessible names or aria-labels rather than unlabeled decorative glyphs."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
 name = "feedback_uses_live_regions"
-description = "Run completion, decisions, significance verdicts, and validation errors are conveyed both visually and via ARIA live regions."
+description = "Run completion, decisions, significance verdicts, Export/Import feedback, and validation errors are conveyed both visually and via ARIA live regions."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
 name = "forms_have_explicit_labels"
-description = "All designer, criterion, and decision form fields use explicit label elements, and the allocation sliders expose their current value to assistive technology."
+description = "All ExperimentUpsert, CriterionUpsert, DecisionUpsert, and Import fields use explicit label elements, and the allocation sliders expose their current value to assistive technology."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
 name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+description = "Headings follow a logical order across the library, results panel tabs, and Export panel with no skips, such as H1 to H2 to H3."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
 name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+description = "Landmark regions such as main for the library canvas and complementary or dialog roles for the results and Export panels support skip-style navigation."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
 name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+description = "Library rows, status badges, summary tiles, chart labels, and form controls have sufficient color contrast."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
 name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+description = "Semantic HTML roles such as main, table, tablist, dialog, and button are used for the library, results tabs, designer, and Export panel."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
 name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+description = "With prefers-reduced-motion set, progress jumps to current values, the results panel appears instantly, and modal, row, chart, and toast transitions apply instantly."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
 name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+description = "Library filters, designer sliders, Flag outlier, pause/resume, Export, Copy, or Import cannot be activated or reached via keyboard."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n2"
 name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+description = "Focus indicators are missing or obscured on table rows, tabs, sliders, or Export panel controls."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n3"
 name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+description = "Custom table rows, tabs, or flag controls use non-semantic tags and lack ARIA roles or labels."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +157,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n4"
 name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+description = "Significance (green versus yellow winner badge) or allocation error state is conveyed by color alone with no text or accessible name."
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +165,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n5"
 name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+description = "While the designer, decision, or Export modal is open, Tab moves focus to controls outside the modal."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n6"
 name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+description = "Status badge, summary tile, or chart label text is unreadable due to poor contrast."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +181,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n7"
 name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+description = "Allocation, Import, or decision validation feedback is visual only and not screen-reader accessible."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n8"
 name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+description = "Icon-only row actions or flag controls are missing accessible names."
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +197,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n9"
 name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+description = "Headings jump from the app title to a results tab without an intervening level, or skip levels inside the Export panel."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n10"
 name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+description = "Progress bars, panel slide, chart growth, or toast motion ignore prefers-reduced-motion."
 type = "binary"
 negate = true
 weight = 1.0

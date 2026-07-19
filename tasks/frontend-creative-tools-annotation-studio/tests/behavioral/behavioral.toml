@@ -119,7 +119,21 @@ weight = 1.0
 [[criterion]]
 id = "14.9"
 name = "full_pipeline_probe_to_export_text"
-description = "Chain the full pipeline: create a class, draw a region with it on an image item, set a metadata value, submit, run Assist to completion on the suite, accept one suggestion and submit it, flag and resolve one dispute, then open Export: the Labels JSON text contains the new class, the region entry, and the metadata value, and the Stats summary reflects the two new submissions and the resolved dispute; copy the export and confirm the clipboard text equals the visible preview"
+description = "Chain the full pipeline: create a class, draw a region with it on an image item, set a metadata value, submit, run Assist to completion on the suite, accept one suggestion and submit it, flag and resolve one dispute, then open Export: the Labels JSON text shows schemaVersion annotation-studio-labels-v1 and contains the new class, the region entry with classId and x/y/w/h, and the metadata value under field-contract keys, and the Stats summary reflects the two new submissions and the resolved dispute; copy the export and confirm the clipboard text equals the visible preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "export_import_round_trip_probe"
+description = "After a distinctive annotation submit (unique comment and a region), Copy or Download Labels JSON, mutate the board further if desired, then Import that same LabelsPackage: History ratings/comments, Taxonomy names/shortcuts, region geometry, metadata values, and review-state chips reconstruct to match the export, and reopening Export shows the same schemaVersion annotation-studio-labels-v1 package"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.11"
+name = "field_contract_rejects_before_mutate"
+description = "Attempt TaxonomyClassCreate with a duplicate shortcut, DisputeCreate with an empty reason, and Import with schemaVersion not annotation-studio-labels-v1: each shows a named field error and leaves collections unchanged; then a valid class create and a conforming LabelsPackage import succeed against the same contracts"
 type = "binary"
 weight = 1.0
 
@@ -151,6 +165,22 @@ weight = 1.0
 id = "14.n4"
 name = "stale_cross_view_state"
 description = "A state change appears in one view but not another until reload"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "export_omits_pipeline_mutations"
+description = "After the full pipeline probe mutations, Labels JSON lacks schemaVersion annotation-studio-labels-v1 or omits the new class, region, or metadata value that the session produced"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n6"
+name = "import_round_trip_desync"
+description = "After Export then Import of a conforming LabelsPackage, at least one surface (History, Taxonomy, region list, review chip, or Export preview) disagrees with the exported document"
 type = "binary"
 negate = true
 weight = 1.0

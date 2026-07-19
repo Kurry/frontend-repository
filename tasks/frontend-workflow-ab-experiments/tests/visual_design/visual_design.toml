@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "3.1"
 name = "library_and_slide_panel_layout"
-description = "The experiment library table fills the main area and opening an experiment slides a results panel in from the right containing the Results, Monitoring, Matrix, Analytics, and Inspector tabs, while the designer and decision dialogs render as modal dialogs"
+description = "The experiment library table fills the main area and opening an experiment slides a results panel in from the right containing the Results, Monitoring, Matrix, Analytics, and Inspector tabs, while the designer, decision, and Export report dialogs render as modal or panel overlays"
 type = "binary"
 weight = 1.0
 

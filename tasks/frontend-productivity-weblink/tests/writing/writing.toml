@@ -151,6 +151,13 @@ negate = true
 weight = 0.5
 
 [[criterion]]
+id = "15.9"
+name = "status_labels_use_closed_enum"
+description = "Where the app renders queue statuses, the five labels (Not Started, Transferring, Paused, Completed, Canceled) are worded identically everywhere they appear (row pills, transfer log, export preview), and no transfer copy claims a remote peer received or downloaded a file."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "writing.catchall"
 name = "writing_catchall"
 description = "The app exhibits a significant, browser-observable defect in rendered copy quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

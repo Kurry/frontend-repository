@@ -210,6 +210,35 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "1.22"
+name = "save_to_library_request_body_field_contract"
+description = "Save to Library validates the save-to-library request-body field contract: title trimmed 2–80, technique one of the seven ids, fields object, promptText matching the visible preview, optional attachments; empty title keeps confirm disabled with a named title error and adds no row"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "export_library_json_field_contract"
+description = "Export library compiles template-library.json with schemaVersion 1, product exactly Template Forms, entries array of save-to-library bodies, and generatedAt ending in Z; after a save, Download JSON / Copy include that title, technique, and promptText"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "import_library_round_trip"
+description = "After exporting JSON following a save, deleting to diverge, then Import library of that JSON, the library list and a fresh export reconstruct to match; malformed payloads show a visible error and change nothing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "export_omits_session_save"
+description = "After saving a library entry, Export library JSON omits that title or technique"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

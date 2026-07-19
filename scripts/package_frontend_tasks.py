@@ -170,11 +170,30 @@ TASK_SPECS: dict[str, dict] = {
             "Artifact operations": "export; import; copy",
             "Export formats": "ics; json; markdown",
             "Import modes": "trip-json",
+            "Value bounds": {
+                "day": [
+                    "2025-07-05",
+                    "2025-07-06",
+                    "2025-07-07",
+                    "2025-07-08",
+                    "2025-07-09",
+                    "2025-07-10",
+                    "2025-07-11",
+                ],
+                "category": [
+                    "sightseeing",
+                    "dining",
+                    "lodging",
+                    "transport",
+                    "other",
+                ],
+            },
         },
         "mechanics_exclusions": [
             "Map pan/zoom / marker drag stays Playwright",
             "Raw file paths/blobs forbidden in WebMCP args",
             "Chart hover tooling stays Playwright-observed",
+            "Ledger grid inline FX edits, CSV wizard cell fixes, and spreadsheet keyboard navigation stay Playwright-observed; WebMCP entity and artifact tools prove state parity only",
         ],
     },
     "frontend-data-tracking-admin-analytics-dashboard": {

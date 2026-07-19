@@ -62,15 +62,15 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "2.1"
-name = "2_1"
-description = "After building a tree, tagging a node, collapsing a node, archiving a fully-complete branch, and switching theme, a full page refresh restores the tree, tags, collapsed state, archived branch, and theme exactly"
+name = "persistence_round_trip_full_state"
+description = "After building a tree with status and priority, tagging a node, collapsing a node, archiving a fully-complete branch, and switching theme, a full page refresh restores the tree, tags, status and priority, collapsed state, archived branch, and theme exactly"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
 name = "console_clean_during_full_exercise"
-description = "No console errors, warnings, or unhandled promise rejections appear during initial load or a full exercise of the app: creating, nesting, toggling, tagging, filtering, searching, zooming, moving, archiving, restoring, exporting as text, exporting or importing a grove package, and theme switching"
+description = "No console errors, warnings, or unhandled promise rejections appear during initial load or a full exercise of the app: creating, nesting, editing status or priority, toggling, tagging, filtering, searching, zooming, moving, archiving, restoring, exporting as text, exporting or importing Grove JSON or CSV, and theme switching"
 type = "binary"
 weight = 1.0
 
@@ -182,14 +182,14 @@ negate = true
 [[criterion]]
 id = "2.17"
 name = "forms_enforce_task_and_tag_field_contracts"
-description = "New root task, Add Child, and Tag manager forms enforce the declared field contracts in the UI: blank or over-120-character titles are rejected naming title; blank, over-40-character, or duplicate tag names are rejected naming name; a color outside the closed hex enum is rejected naming color; submit stays inactive until valid"
+description = "New root task, Add Child, Edit task, and Tag manager forms enforce the declared field contracts in the UI: blank or over-120-character titles are rejected naming title; status outside todo|in_progress|done|blocked or priority outside low|medium|high|urgent is rejected naming that field; dueDate not empty and not YYYY-MM-DD is rejected naming dueDate; blank, over-40-character, or duplicate tag names are rejected naming name; a color outside the closed hex enum is rejected naming color; submit stays inactive until valid"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.18"
 name = "import_accepts_schema_invalid_grove_package"
-description = "Import grove accepts a parseable JSON document that violates the Grove package field contract (wrong schemaVersion, theme outside light|dark|forest, tag color outside the closed hex enum, or a node tags array longer than 5) and still mutates the tree, tags, archive, or theme"
+description = "Import grove accepts a parseable JSON or CSV document that violates the Grove package field contract (wrong schemaVersion, theme outside light|dark|forest, status or priority outside closed enums, tag color outside the closed hex enum, or a node tags array longer than 5) and still mutates the tree, tags, archive, or theme"
 type = "binary"
 weight = 1.0
 negate = true

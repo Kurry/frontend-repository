@@ -70,14 +70,14 @@ weight = 1.0
 [[criterion]]
 id = "4.2"
 name = "inline_validation_before_submit"
-description = "The reject form, the harvest-pending justification, and the foil cap field validate inline before submit — the 20-character justification minimum, the required reject class, and the 0 to 40 percent cap bounds each surface a message at the field"
+description = "RejectSeed, FoilUpsert, HarvestPendingJustification, and Import validate inline before submit — the 20-character justification minimum, required rejectClass, correctnessCap 0 to 40, empty expectsFailIds, and DatasetStudioPackage schemaVersion/studio rules each surface a message naming the field"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
 name = "errors_are_actionable"
-description = "Validation and gate messages name the exact field or condition and what satisfies it — for example that the justification needs at least 20 characters, or which gate condition is still unmet — not just a bare 'Invalid'"
+description = "Validation, gate, and import messages name the exact field or condition and what satisfies it — for example that the justification needs at least 20 characters, schemaVersion or studio is wrong, or which gate condition is still unmet — not just a bare 'Invalid'"
 type = "binary"
 weight = 1.0
 
@@ -205,9 +205,23 @@ weight = 1.0
 [[criterion]]
 id = "4.n10"
 name = "affordances_hidden_or_inaccessible"
-description = "A required affordance — Undo, the selection toolbar, a copy control, or a chip's remove control — is visually hidden or practically unreachable"
+description = "A required affordance — Undo, the selection toolbar, a copy or download control, Import, or a chip's remove control — is visually hidden or practically unreachable"
 type = "binary"
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "invalid_import_leaves_studio_unchanged"
+description = "Importing malformed JSON or a DatasetStudioPackage that fails its field contract (wrong schemaVersion, studio not Seed Dataset Studio, or invalid PackageManifest) shows validation naming the offending field and leaves authored packages and rollups unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "empty_authored_export_still_valid"
+description = "With zero authored seeds, Export center still opens and the studio-package preview includes schemaVersion seed-dataset-studio-v1, studio exactly Seed Dataset Studio, an empty packages array, and a valid snapshot; Download and Copy remain available"
+type = "binary"
 weight = 1.0
 
 [[criterion]]

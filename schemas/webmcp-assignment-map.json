@@ -667,7 +667,8 @@
       ],
       "editor_modes": [
         "edit",
-        "diff"
+        "diff",
+        "compare"
       ],
       "value_bounds": [
         "font-size 4-60",
@@ -726,7 +727,8 @@
       "Dock open/close stays Playwright-observed",
       "Color-picker/slider drag stays Playwright-driven",
       "Command-palette open gesture and fuzzy highlight stay Playwright-observed",
-      "Undo/redo stack scrubbing stays Playwright-observed"
+      "Undo/redo stack scrubbing stays Playwright-observed",
+      "Theme A/B side-by-side preview rendering stays Playwright-observed"
     ]
   },
   {

@@ -71,14 +71,14 @@ weight = 0.5
 [[criterion]]
 id = "15.2"
 name = "actions_use_specific_labels"
-description = "Where the app renders action labels, they are specific verbs — such as Recategorize, Save view, Run schedule now, Download CSV — not generic Submit or OK when a specific label is possible"
+description = "Where the app renders action labels, they are specific verbs — such as Recategorize, Save view, Run schedule now, Download JSON, Download CSV, Copy — not generic Submit or OK when a specific label is possible"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.3"
 name = "errors_name_problem_and_fix"
-description = "Where the app renders errors — invalid range, unrecognized formula, zero sections — the message names the problem and the fix, not just a rejection"
+description = "Where the app renders errors — invalid capUsd, backwards range, unrecognized formula, empty schedule sections, short saved-view name — the message names the offending field and the fix, not just a rejection"
 type = "binary"
 weight = 0.5
 

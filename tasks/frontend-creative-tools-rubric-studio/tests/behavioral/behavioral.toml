@@ -84,7 +84,7 @@ weight = 1.0
 [[criterion]]
 id = "14.4"
 name = "criterion_edit_echoes_across_surfaces"
-description = "Cross-view echo: after a version-gated save that changes a criterion name or weight, without reload confirm the accordion row, header rollup (criteria count / load-bearing count / weight sum), Tune bars for that criterion, preview panel row, and export text all reflect the same updated values."
+description = "Cross-view echo: after a version-gated save that changes a criterion name or weight, without reload confirm the accordion row, header rollup (criteria count / load-bearing count / weight sum), Tune bars for that criterion, preview panel row, and Export center structured-text / rubric-json / package-json previews all reflect the same updated values."
 type = "binary"
 weight = 1.0
 
@@ -117,6 +117,27 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "14.9"
+name = "export_pipeline_contains_session_work"
+description = "Full-pipeline end state: add a valid CriterionUpsert, open Export center, confirm structured text plus rubric JSON (schemaVersion rubric-document-v1) and package JSON (schemaVersion rubric-package-v1, library Rubric Studio) include the new criterion id/name; delete that criterion with a major bump and confirm the next export omits it — proving artifacts compile live from the store."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "import_export_round_trip_reconstructs"
+description = "Export a RubricPackage after a create, note rubrics length and a criterion id, diverge the studio, Import the package, and confirm rail counts, opened criteria, and a fresh export reconstruct to match the imported document without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.11"
+name = "undo_round_trip_restores_prior_state"
+description = "Undo round-trip: add a valid criterion (or flip a preview verdict), Undo once and confirm the prior criteria count or aggregate returns on every surface that showed the mutation, then Redo and confirm the mutation returns identically."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "14.n1"
 name = "partial_persistence_after_reload"
 description = "After configuring a new criterion, Tune includes, preview verdicts, and aggregation mode then reloading, some user-configured facets survive while others reset — incoherent partial persistence instead of a full return to the seeded baseline."
@@ -144,6 +165,14 @@ negate = true
 id = "14.n4"
 name = "cross_surface_state_stale_until_reload"
 description = "After a version-gated save or Add criterion, the accordion, header rollup, Tune, preview, or export still shows stale values until a full page reload."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "14.n5"
+name = "export_ignores_session_then_import_noop"
+description = "Export center previews omit a just-added criterion, or Import of a previously exported valid RubricPackage leaves the rail and criteria unchanged — breaking the useful end-state contract."
 type = "binary"
 weight = 1.0
 negate = true

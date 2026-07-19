@@ -69,15 +69,15 @@ weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "all_forms_validate_inline"
-description = "The designer, criterion form, and decision dialog all validate inline before submit, including the allocations-sum-to-100 rule shown live as sliders move."
+name = "field_contracts_validate_inline"
+description = "The designer (ExperimentUpsert including allocations-sum-to-100), criterion form (CriterionUpsert), decision dialog (DecisionUpsert), and Experiment Report Import all validate inline before apply, naming the offending field."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
 name = "errors_name_field_and_fix"
-description = "Validation messages name the offending field or rule and the fix — for example that allocations must sum to 100 or that a rationale is required — rather than only saying 'Invalid'."
+description = "Validation messages name the offending field or rule and the fix — for example that allocations must sum to 100, that schemaVersion must be ab-experiment-report-v1, or that a rationale is required — rather than only saying Invalid."
 type = "binary"
 weight = 1.0
 
@@ -127,6 +127,21 @@ weight = 1.0
 id = "4.10"
 name = "long_run_shows_progress"
 description = "A full run to the sample target continuously shows progress — fractions, bars, and timeline entries — never a frozen or blank interval."
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "4.11"
+name = "export_always_schema_valid"
+description = "Opening Export report on a completed seeded experiment before any in-session flag or decision still produces valid JSON with schemaVersion ab-experiment-report-v1 and every required top-level key; the panel never shows an empty or broken region."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "import_rejects_invalid_contract"
+description = "Importing malformed JSON or parseable JSON that fails the Experiment Report field contract (wrong schemaVersion, status outside completed|decided, variants length outside 2 to 4, allocations not summing to 100, or decision non-null while status is completed) leaves the experiment unchanged and shows validation naming the offending field."
 type = "binary"
 weight = 1.0
 
@@ -181,7 +196,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n7"
 name = "validation_feedback_missing_or_delayed"
-description = "Allocation-sum or required-field validation is missing or appears only after the form is submitted with no live indication."
+description = "Allocation-sum, ExperimentUpsert, CriterionUpsert, DecisionUpsert, or Experiment Report Import validation is missing or appears only after apply with no named-field indication."
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +212,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n9"
 name = "non_obvious_flows_lack_guidance"
-description = "The decision or merge-consequence of an action (locked editing after deciding) is never explained anywhere in the UI."
+description = "After a decision is confirmed, Edit and Flag controls become disabled with no visible locked indicator explaining why."
 type = "binary"
 negate = true
 weight = 1.0

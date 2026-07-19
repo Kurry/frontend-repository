@@ -64,64 +64,63 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "15.1"
 name = "headings_use_consistent_capitalization"
-description = "Where the app renders headings and section titles, they use consistent capitalization (one convention — title case or sentence case — throughout)."
+description = "Where the app renders headings, tabs, and section titles (Diff, Compare Branches, Blame, Graph, Export tabs), they use consistent capitalization throughout."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.2"
 name = "actions_use_specific_labels"
-description = "Where the app renders button or action labels, they are specific verbs such as 'Compare branches', 'Complete merge', and 'Restore version', not generic ('Submit', 'OK') when a specific label is possible."
+description = "Where the app renders button or action labels, they are specific verbs such as Compare branches, Complete merge, Restore version, Ignore whitespace, Export, Import, Copy, and Download — not generic Submit or OK when a specific label is possible."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.3"
 name = "errors_name_problem_and_fix"
-description = "Where the app renders blocking or error messages, they name the problem and the fix — for example how many conflict regions remain unresolved — not just a rejection ('Invalid')."
+description = "Where the app renders blocking or error messages, they name the field or problem and the fix — unresolved conflict count, bodyMarkdown length, changeNote required, schemaVersion prompt-diff-package-v1 — not just Invalid."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.4"
 name = "empty_states_explain_next_step"
-description = "Where the app renders empty states, the copy explains what belongs there and how to add it."
+description = "Where the app renders empty states (no search matches, no-differences self-compare), the copy explains what belongs there or that the versions are identical."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.5"
 name = "body_copy_is_well_written"
-description = "Where the app renders seeded prompt content, change notes, and author names, rate how plausible and free of spelling and grammatical errors they read."
+description = "Where the app renders seeded prompt content, change notes, and author names, they read as plausible product data free of spelling and grammatical errors."
 type = "likert"
-points = 5
 weight = 0.5
 
 [[criterion]]
 id = "15.6"
 name = "terminology_is_consistent"
-description = "Where the app renders labels for the same concept in multiple places, terminology is consistent (not 'task' here and 'todo' there)."
+description = "Where the app renders labels for version, merge, annotation, export, and package, terminology stays consistent across the rail, header, Export surface, and toasts."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.7"
 name = "numbers_dates_and_units_are_consistent"
-description = "Where the app renders numbers, dates, and units, formatting is consistent (same date format, same decimal precision, units labeled)."
+description = "Where the app renders version numbers, relative timestamps, and counter integers, formatting is consistent across pickers, history rows, and Export previews."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.8"
 name = "success_messages_are_specific"
-description = "Where the app renders confirmation and success messages, they state what happened ('Entry saved'), not vague affirmations."
+description = "Where the app renders confirmation and success messages for merge, restore, export, and import, they state what happened rather than vague affirmations."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.n1"
 name = "placeholder_copy_is_visible"
-description = "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI."
+description = "Lorem ipsum or placeholder text (TODO, Lorem, asdf, or template variable names such as {{title}}) is visible anywhere in the shipped UI."
 type = "binary"
 negate = true
 weight = 0.5
@@ -129,7 +128,7 @@ weight = 0.5
 [[criterion]]
 id = "15.n2"
 name = "prominent_copy_has_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as headings, hero text, or primary buttons."
+description = "Spelling or grammatical errors appear in prominent copy such as headings, mode tabs, or primary buttons."
 type = "binary"
 negate = true
 weight = 0.5
@@ -137,7 +136,7 @@ weight = 0.5
 [[criterion]]
 id = "15.n3"
 name = "concept_names_are_inconsistent"
-description = "The same concept is named inconsistently across surfaces."
+description = "The same concept is named inconsistently across surfaces (for example Version package in one place and Prompt dump in another)."
 type = "binary"
 negate = true
 weight = 0.5
@@ -145,7 +144,7 @@ weight = 0.5
 [[criterion]]
 id = "15.n4"
 name = "copy_is_truncated_or_overflowing"
-description = "Truncated or overflowing text renders copy unreadable."
+description = "Truncated or overflowing text renders change notes, validation messages, or Export preview labels unreadable."
 type = "binary"
 negate = true
 weight = 0.5
@@ -156,4 +155,4 @@ name = "writing_catchall"
 description = "The app exhibits a significant, browser-observable defect in rendered copy quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5

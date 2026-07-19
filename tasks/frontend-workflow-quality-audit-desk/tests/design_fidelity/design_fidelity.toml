@@ -77,7 +77,7 @@ weight = 1.0
 [[criterion]]
 id = "3.3"
 name = "layout_matches_spec"
-description = "The layout matches the spec: left navigation rail with Queue, Reviewers, and Report; rollup strip and charts above the queue table; the detail view's distinct panels in their specified arrangement"
+description = "The layout matches the spec: left navigation rail with Queue, Reviewers, and Report; rollup strip and charts above the queue table; detail panels in their specified arrangement; Report format switch, monospaced export preview, Copy, Download, Import package, and export history"
 type = "binary"
 weight = 1.0
 

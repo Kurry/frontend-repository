@@ -84,21 +84,28 @@ weight = 1.0
 [[criterion]]
 id = "2.5"
 name = "typography_hierarchy_clear"
-description = "The rubric name is visibly larger than section headings, which are larger than criterion names, which are larger than body and metadata text, consistently across views; the export block renders in a monospaced face distinct from the UI face"
+description = "The rubric name is visibly larger than section headings, which are larger than criterion names, which are larger than body and metadata text, consistently across views; Export center previews render in a monospaced face distinct from the UI face"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.6"
 name = "component_state_treatments"
-description = "Buttons, selects, toggles, and form fields show distinct default, hover, focus (visible ring), disabled, and error treatments; the gated save control in its disabled state is visibly muted and sits adjacent to its inline explanation"
+description = "Buttons, selects, toggles, and form fields show distinct default, hover, focus (visible ring), disabled, and error treatments; the gated save control in its disabled state is visibly muted and sits adjacent to its inline explanation; Undo and Redo appear visibly disabled when their stacks are empty"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "export_center_format_tabs_visible"
+description = "Export center presents format tabs for structured text, rubric JSON, and package JSON with a monospace code preview plus Copy and Download; Import sits as a clear companion control"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.8"
 name = "responsive_reflow_clean"
-description = "At 1024px the left rail collapses behind a toggle that opens it as an overlay, and at 375px width no content clips or overflows the viewport, no page-level horizontal scrolling appears, the Tune bars and diff view reflow to stacked layouts, and the code block scrolls within its own container"
+description = "At 1024px the left rail collapses behind a toggle that opens it as an overlay, and at 375px width no content clips or overflows the viewport, no page-level horizontal scrolling appears, the Tune bars and diff view reflow to stacked layouts, and Export center code blocks scroll within their own containers"
 type = "binary"
 weight = 1.0
 

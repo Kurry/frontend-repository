@@ -70,28 +70,28 @@ weight = 1.0
 [[criterion]]
 id = "4.2"
 name = "forms_validate_inline"
-description = "The annotation composer and any restore or merge confirmation inputs validate inline before submit with per-field messages."
+description = "AnnotationCreate, AnnotationReply, RestoreCreate, and Import validate inline before submit with per-field messages naming bodyMarkdown, changeNote, schemaVersion, or the offending VersionPackage field."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
 name = "errors_name_problem_and_fix"
-description = "Blocking messages name the problem and the fix — for example how many conflict regions remain unresolved before Complete merge enables — rather than only saying 'Invalid'."
+description = "Blocking messages name the problem and the fix — unresolved conflict count before Complete merge, bodyMarkdown length, schemaVersion must be prompt-diff-package-v1 — rather than only saying Invalid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
 name = "actions_show_confirmation"
-description = "Merges, restores, exports, and posted annotations each produce visible success feedback such as a toast naming what happened."
+description = "Merges, restores, exports, successful imports, and posted annotations each produce visible success feedback such as a toast naming what happened."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
 name = "long_operations_show_progress"
-description = "The merge flow shows resolved-out-of-total progress, and export preparation shows its preview before download."
+description = "The merge flow shows resolved-out-of-total progress, and Export shows its live preview before Copy or Download."
 type = "binary"
 weight = 1.0
 
@@ -105,28 +105,56 @@ weight = 1.0
 [[criterion]]
 id = "4.7"
 name = "nonobvious_controls_have_help"
-description = "Non-obvious controls — the net token delta counter, blame attributions, and conflict markers — carry a tooltip or inline explanation."
+description = "Non-obvious controls — the net token delta counter, blame attributions, conflict markers, and Ignore whitespace / Ignore case toggles — carry a tooltip or inline explanation."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
 name = "controls_use_semantic_tags"
-description = "Buttons, inputs, selects, and labels use semantic elements rather than bare divs or spans."
+description = "Buttons, inputs, selects, and labels for pickers, Ignore toggles, Export, Import, and merge choices use semantic elements rather than bare divs or spans."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
 name = "modal_close_paths"
-description = "The restore and merge confirmation dialogs close from their close control, Escape, and a background click where offered."
+description = "The restore confirmation, merge confirmation, and Export surface close from their close control, Escape, and a background click where offered."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
 name = "merge_flow_stepwise_feedback"
-description = "The region-by-region merge flow gives stepwise feedback: each choice updates its chip and the progress indicator immediately."
+description = "The region-by-region merge flow gives stepwise feedback: each MergeRegionResolution choice updates its chip and the progress indicator immediately."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "import_rejects_malformed_json"
+description = "Importing malformed JSON shows an inline parse error naming the import problem and leaves the prompt chain unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "import_rejects_field_contract_failures"
+description = "Importing parseable JSON that fails the VersionPackage field contract — missing required keys, schemaVersion not prompt-diff-package-v1, kind outside main|branch|merge|restore, parentIds length outside 0-2, baseVersionId absent from versions, or resolution outside choose-left|choose-right|edit-manually — leaves the chain unchanged and names the offending field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "annotation_range_and_length_guards"
+description = "AnnotationCreate with bodyMarkdown longer than 4000 characters or with lineEnd less than lineStart posts nothing and names the offending field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "seeded_export_still_opens"
+description = "Export with only the seeded chain and no session merge still opens and shows a Version package including schemaVersion prompt-diff-package-v1 and every required VersionPackage key; Download and Copy remain available."
 type = "binary"
 weight = 1.0
 
@@ -141,7 +169,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n2"
 name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+description = "AnnotationCreate, RestoreCreate, or Import validation failures surface only in the browser console with no visible inline field feedback."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +177,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n3"
 name = "actions_lack_visible_feedback"
-description = "Merging, restoring, annotating, or exporting silently succeeds or fails with no visible feedback."
+description = "Merging, restoring, annotating, exporting, or importing silently succeeds or fails with no visible feedback."
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +193,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n5"
 name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap the pickers, tabs, merge choices, or thread controls."
+description = "Non-semantic div or span tags wrap the pickers, tabs, Ignore toggles, merge choices, Export, or thread controls."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +201,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n6"
 name = "modal_not_keyboard_dismissible"
-description = "A dialog or thread cannot be dismissed via the keyboard."
+description = "A dialog, Export surface, or thread cannot be dismissed via the keyboard."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,15 +217,15 @@ weight = 1.0
 [[criterion]]
 id = "4.n8"
 name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing — for example unlabeled icon-only actions with no accessible name or tooltip."
+description = "Button text is ambiguous or missing — for example unlabeled icon-only Export or Import actions with no accessible name or tooltip."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "The consequence of restoring (a new head version, history preserved) is never explained anywhere in the UI."
+name = "import_mutates_on_invalid_payload"
+description = "Import mutates the prompt chain when given malformed JSON or a VersionPackage that fails the field contract."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +233,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n10"
 name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances such as the annotate control or blame attributions are visually hidden with no way to discover them."
+description = "Interactive affordances such as the annotate control, Ignore toggles, Import, or blame attributions are visually hidden with no way to discover them."
 type = "binary"
 negate = true
 weight = 1.0

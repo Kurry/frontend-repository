@@ -63,14 +63,14 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.1"
 name = "shared_state_coherence"
-description = "All surfaces derive from one shared state: advancing samples updates the progress bars, event timeline, and monitoring chart together; flagging an outlier updates the summary strip, charts, matrix, radial wheels, and export content together; and an experiment edit, archive, or decision is reflected in every view where it appears, all without a reload"
+description = "All surfaces derive from one shared state: advancing samples updates the progress bars, event timeline, and monitoring chart together; flagging an outlier updates the summary strip, charts, matrix, radial wheels, and Export report JSON together; and an experiment edit, archive, decision, or Import is reflected in every view where it appears, all without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
 name = "no_storage_reload_seeded"
-description = "No browser storage is used: localStorage and sessionStorage remain empty after creating, editing, running, pausing, flagging, deciding, archiving, and exporting, and a page reload returns the app to its seeded state (seeded experiments and criteria, default view, no unseeded decisions or flags)"
+description = "No browser storage is used: localStorage and sessionStorage remain empty after creating, editing, running, pausing, flagging, deciding, archiving, exporting, and importing, and a page reload returns the app to its seeded state (seeded experiments and criteria, default view, no unseeded decisions or flags)"
 type = "binary"
 weight = 1.0
 
@@ -93,7 +93,7 @@ negate = true
 [[criterion]]
 id = "2.5"
 name = "console_clean"
-description = "The console is free of errors and warnings on first load and stays clean while designing, previewing, running, pausing, flagging, deciding, undoing, archiving, and exporting experiments and switching tabs"
+description = "The console is free of errors and warnings on first load and stays clean while designing, previewing, running, pausing, flagging, deciding, undoing, archiving, exporting, importing, and switching tabs"
 type = "binary"
 weight = 1.0
 
@@ -114,14 +114,14 @@ weight = 1.0
 [[criterion]]
 id = "2.8"
 name = "statistics_react_to_data"
-description = "The p-value, confidence interval, win rate, and matrix values are computed from the current sample data: flagging outliers or completing additional samples changes them, and the same quantities agree wherever they are shown"
+description = "The p-value, confidence interval, win rate, matrix values, and Export report statistics object are computed from the current sample data excluding flagged outliers: flagging outliers or completing additional samples changes them, and the same quantities agree wherever they are shown"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.9"
 name = "keyboard_operability_focus"
-description = "Every interactive control — table rows and headers, filters, bulk actions, designer fields and allocation sliders, tabs, flag controls, pause/resume, undo/redo, and export — is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space, arrow keys on sliders), with a visible focus indicator at each stop"
+description = "Every interactive control — table rows and headers, filters, bulk actions, designer fields and allocation sliders, tabs, flag controls, pause/resume, undo/redo, export, copy, and import — is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space, arrow keys on sliders), with a visible focus indicator at each stop"
 type = "binary"
 weight = 1.0
 
@@ -150,6 +150,14 @@ weight = 1.0
 id = "2.13"
 name = "fictional_model_names_only"
 description = "Every model name rendered anywhere in the UI is fictional; no real AI provider or model brand names appear"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "2.14"
+name = "export_import_end_state_contract"
+description = "Export produces schema-valid Experiment Report JSON with schemaVersion ab-experiment-report-v1 reflecting session flags and decisions, and Import of a contract-valid report restores decision and flags while contract-invalid import refuses partial mutation — the good-app end state without browser storage"
 type = "binary"
 weight = 1.0
 

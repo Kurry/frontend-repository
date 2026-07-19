@@ -196,6 +196,35 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "4.21"
+name = "performance_values_transition"
+description = "After adding, editing, deleting, or trading through the real controls, the net-worth figure and the performance summary figures (realized, unrealized, dividend income, total return) transition smoothly to their new values rather than snapping."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.22"
+name = "batch_tray_animates_in_out"
+description = "The batch action tray animates in when the first row is selected through the real checkbox control and animates out when the selection is cleared or the batch completes, rather than popping instantly."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.23"
+name = "benchmark_series_animates"
+description = "Toggling Benchmark compare through its real control animates the benchmark series in and out rather than making it appear or vanish abruptly, and the portfolio line eases to its new shape when activities change."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.n11"
+name = "new_surface_motion_snaps"
+description = "With prefers-reduced-motion off, the batch action tray pops in with no transition, the benchmark series appears or vanishes abruptly, or the performance summary figures snap to new values instead of transitioning."
+type = "binary"
+negate = true
+weight = 0.5
+
+[[criterion]]
 id = "4.catchall"
 name = "motion_catchall"
 description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

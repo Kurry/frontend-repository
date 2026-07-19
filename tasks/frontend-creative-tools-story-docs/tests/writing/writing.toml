@@ -118,6 +118,21 @@ description = "Where the app renders demo-only toasts for inert controls, wordin
 type = "binary"
 weight = 0.5
 
+
+[[criterion]]
+id = "15.9"
+name = "filtered_empty_explains_clear"
+description = "Where the app renders a filtered-empty board state, the copy explains that no scenes match and how to clear the filter or search."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.10"
+name = "import_errors_name_field"
+description = "Where the app renders import validation errors, they name the offending field or that the package is invalid, not only a bare rejection."
+type = "binary"
+weight = 0.5
+
 [[criterion]]
 id = "15.n1"
 name = "placeholder_copy_visible"

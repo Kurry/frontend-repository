@@ -85,7 +85,7 @@ negate = true
 [[criterion]]
 id = "2.4"
 name = "keyboard_operable_with_visible_focus"
-description = "Every interactive control — header tools, view toggles, scene actions, the create form, and slide navigation — is reachable and operable with the keyboard alone (Tab/Shift+Tab plus Enter/Space or arrows), and the focused control shows a visible focus indicator"
+description = "Every interactive control — header tools, Undo/Redo, Export/Import, view toggles, scene actions, multi-select, bulk delete, the create form, and slide navigation — is reachable and operable with the keyboard alone (Tab/Shift+Tab plus Enter/Space or arrows), and the focused control shows a visible focus indicator"
 type = "binary"
 weight = 1.0
 
@@ -99,7 +99,7 @@ weight = 1.0
 [[criterion]]
 id = "2.6"
 name = "validation_announced_via_aria_live"
-description = "Create-form validation messages are announced through an aria-live polite region (present in the DOM and populated when validation fires) in addition to being shown inline"
+description = "Create-form and Import validation messages are announced through an aria-live polite region (present in the DOM and populated when validation fires) in addition to being shown inline"
 type = "binary"
 weight = 1.0
 
@@ -120,7 +120,7 @@ weight = 1.0
 [[criterion]]
 id = "2.9"
 name = "console_errors_during_full_exercise"
-description = "Console errors or warnings appear during a full exercise of the app (view switching, create, edit, delete, slide navigation)"
+description = "Console errors or warnings appear during a full exercise of the app (view switching, create, edit, delete, bulk delete, undo/redo, slide navigation, Export, Import)"
 type = "binary"
 weight = 1.0
 negate = true
@@ -136,6 +136,44 @@ weight = 1.0
 id = "2.11"
 name = "outbound_cdn_requests_present"
 description = "Devtools network activity shows outbound cross-origin requests for fonts, icons, scripts, or styles (CDN imports) instead of all assets being served from the app's own origin"
+type = "binary"
+weight = 1.0
+negate = true
+
+
+[[criterion]]
+id = "2.12"
+name = "export_import_use_shared_store"
+description = "Storyboard JSON Export previews and a successful Import reconstruct from the same shared in-memory scenes/viewMode store as the visible board — after Import, Tile/List/Slide and Total duration match the imported document without a second disconnected copy"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.13"
+name = "field_contract_validation_before_submit"
+description = "Scene create/edit and Storyboard JSON import reject out-of-contract payloads with visible per-field errors before mutating the board (empty title/body, duration outside 1–300, invalid shotType, wrong schemaVersion)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n12"
+name = "export_preview_disconnected_from_store"
+description = "Export Storyboard JSON preview stays static while the board scenes, view mode, or Total duration change through the UI"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.14"
+name = "filters_presenter_derive_from_store"
+description = "Search results, shot-type filtered subsets, presenter playback, and the Printable outline all derive from the same shared scenes collection: after an edit or reorder, the filtered views, the next presenter run, and the outline preview reflect it immediately without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n13"
+name = "filter_or_presenter_second_copy"
+description = "A filtered view, the presenter, or the outline preview shows stale scene text, order, or durations that the board already updated — evidence of a second disconnected state copy"
 type = "binary"
 weight = 1.0
 negate = true

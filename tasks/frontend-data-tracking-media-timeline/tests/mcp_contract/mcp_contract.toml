@@ -133,7 +133,7 @@ weight = 1.0
 [[criterion]]
 id = "12.11"
 name = "entity_fields_match_timeline_event"
-description = "Entity fields exposed for create/update are title, year, place, categories, and summary — matching the TimelineEvent payload contract"
+description = "Entity fields exposed for create/update are title, type, timestamp, media-refs, year, place, categories, summary, and source — matching the TimelineEvent payload contract"
 type = "binary"
 weight = 1.0
 
@@ -172,7 +172,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n5"
 name = "validation_bypass_desyncs_state"
-description = "WebMCP create/update bypasses TimelineEvent validation and desyncs MCP state from the visible form rules"
+description = "WebMCP create/update bypasses TimelineEvent validation (type enum, ISO timestamp ending with Z, mediaRefs bounds, or year/timestamp cross-field) and desyncs MCP state from the visible form rules"
 type = "binary"
 negate = true
 weight = 1.0

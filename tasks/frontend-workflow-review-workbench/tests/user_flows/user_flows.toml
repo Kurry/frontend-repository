@@ -77,7 +77,7 @@ weight = 1.0
 [[criterion]]
 id = "6.3"
 name = "trial_audit_flow"
-description = "Auditing a suspect trial: a difficulty gate's evidence link opens the trial inspector on that gate's trials; selecting an invalid trial shows which of its eight checks failed; selecting a negated criterion highlights the judge's reasoning for it and the cited answer passages; entering diff mode against a valid trial flags the flipped checks with a flip count"
+description = "Auditing a suspect trial: a difficulty gate's evidence link opens the trial inspector on that gate's trials; selecting an invalid trial shows which of its eight checks failed; selecting a negated criterion highlights the scorer's reasoning for it and the cited answer passages; entering diff mode against a valid trial flags the flipped checks with a flip count"
 type = "binary"
 weight = 1.0
 
@@ -206,6 +206,29 @@ weight = 1.0
 id = "6.n10"
 name = "navigation_dead_end_requires_reload"
 description = "Some navigation state (deep in the inspector, diff mode, or a locked step) dead-ends and requires a page reload to recover"
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "6.11"
+name = "mutation_to_export_flow"
+description = "Mutation-to-export: after recording a recommendation with a distinctive overrideJustification, resolving a fix item, writing a distinctive step note, and completing bundling, Export certification package Review Package JSON shows schemaVersion review-certification/v1 and those session values under the bundle, with Copy and Download available"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "export_import_round_trip_flow"
+description = "Export then import round-trip: after session mutations, Copy or Download Review Package JSON, reload to seeds, Import that JSON, and confirm portfolio/workspace restore the mutated recommendation, overrideJustification, resolved fix state, notes, and Bundled badge with the next Export matching"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "export_import_flow_dead_end"
+description = "Export or Import certification package cannot be completed from the UI, or a successful-looking import leaves portfolio and workspace disagreeing with the imported document"
 type = "binary"
 negate = true
 weight = 1.0

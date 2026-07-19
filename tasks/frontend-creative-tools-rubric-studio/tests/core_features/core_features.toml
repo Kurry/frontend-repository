@@ -91,14 +91,14 @@ weight = 1.0
 [[criterion]]
 id = "1.5"
 name = "add_criterion_count_delta"
-description = "Submitting the Add criterion form with valid values (unique id, name, description, type, weight, importance) appends exactly one new accordion row showing those values and increases the header criteria count by exactly one, measured immediately before and after the submit"
+description = "Submitting the Add criterion form with a valid CriterionUpsert payload (unique id matching lowercase letters/digits/hyphens, name 1-80, description 1-2000, type binary or likert with likertMin/likertMax when likert, weight 0.5-5 in 0.5 steps, importance must-have or nice-to-have) appends exactly one new accordion row showing those values and increases the header criteria count by exactly one, measured immediately before and after the submit"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
 name = "criterion_form_inline_validation"
-description = "Submitting the criterion form with an empty name or description, a duplicate id, or a likert range where min is not less than max shows inline per-field messages naming the offending fields, keeps the submit control disabled until all required fields are valid, and adds no criterion (the criteria count is unchanged)"
+description = "Submitting the criterion form with an empty name or description, a duplicate id, an id that violates the allowed pattern, a weight outside 0.5-5, an importance outside must-have|nice-to-have, or a likert range where min is not less than max shows inline per-field messages naming the offending fields, keeps the submit control disabled until all required fields are valid, and adds no criterion (the criteria count is unchanged)"
 type = "binary"
 weight = 1.0
 
@@ -153,8 +153,36 @@ weight = 1.0
 
 [[criterion]]
 id = "1.15"
-name = "export_reflects_live_rubric"
-description = "The Export control reveals the opened rubric as structured text in a monospaced code block with a copy control that gives visible confirmation and places exactly the displayed text on the clipboard; after adding a new criterion, re-opening the export includes that criterion's id and name"
+name = "export_center_reflects_live_rubric"
+description = "Export center opens with three live-derived format tabs (structured text, rubric JSON, package JSON); after adding a new criterion, re-opening export includes that criterion's id and name in all three previews; Copy places exactly the displayed text on the clipboard with visible confirmation, and Download triggers a real file download"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "rubric_document_json_field_contract"
+description = "The rubric JSON preview visibly includes schemaVersion exactly rubric-document-v1 plus name, version, arbiterModel (one of quartz-arbiter-2, sable-jury-9, cinder-panel-1), aggregationMode (one of weighted-mean, required-pass, all-pass), and a criteria array whose objects carry CriterionUpsert fields (id, name, description, type, weight, importance, and likertMin/likertMax when type is likert)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "rubric_package_json_field_contract"
+description = "The package JSON preview visibly includes schemaVersion exactly rubric-package-v1, library exactly Rubric Studio, rubrics as an array of RubricDocument objects in rail order, and generatedAt as an ISO-8601 datetime ending in Z"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "import_package_round_trip"
+description = "After exporting a package that includes a session-added criterion, diverging the studio, then Importing that package JSON, the rail membership, versions, and criteria reconstruct to match the imported document without a reload, and a fresh export reflects the restored collection"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "undo_redo_restores_mutations"
+description = "After adding a valid criterion or flipping a preview verdict, Undo restores the prior criteria count or aggregate everywhere it appears (accordion/header/Tune/preview), Redo reapplies the mutation, and both controls are disabled when their stacks are empty"
 type = "binary"
 weight = 1.0
 
@@ -170,6 +198,22 @@ negate = true
 id = "1.n2"
 name = "derived_surfaces_static"
 description = "The Tune bars, the summary strip, or the preview aggregate renders identical values regardless of case toggles, threshold edits, verdict flips, or aggregation-mode changes, indicating hardcoded rather than derived output"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n3"
+name = "export_omits_session_mutations"
+description = "After adding or version-gated-saving a criterion, Export center structured text, rubric JSON, or package JSON omits that criterion's id/name or fails to show the required schemaVersion keys for the active format"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n4"
+name = "import_accepts_invalid_package"
+description = "Importing malformed JSON or a package that fails the RubricPackage field contract (wrong schemaVersion, library not Rubric Studio, or invalid CriterionUpsert) mutates the rubric collection anyway"
 type = "binary"
 weight = 1.0
 negate = true

@@ -62,150 +62,150 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "habit_controls_keyboard_reachable"
+description = "Every interactive control — New Habit fields, category chips, steppers, one-tap complete, drag handle, Pause/Resume, Export as JSON, Import, and Load Malformed Sample — is reachable with keyboard Tab and activatable with Enter or Space, and shows a clearly visible focus indicator"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "import_dialog_traps_and_restores_focus"
+description = "The Import confirmation dialog traps focus while open and returns focus to the invoking Import control on Cancel or Confirm close"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "chrome_icons_have_accessible_names"
+description = "App chrome icons (Phosphor set) used as controls expose accessible names via aria-label or equivalent text, and decorative icons are hidden from assistive tech"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "recovery_and_malformed_use_alert_live_region"
+description = "The recovery notice and Load Malformed Sample outcome are announced through a role=alert live region without requiring focus to move to them"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+name = "new_habit_fields_explicitly_labeled"
+description = "New Habit form fields (name, icon, targetType, targetCount, category, reminder) and category-create name use explicit labels programmatically associated with their inputs; inline field-contract errors are adjacent to and associated with the named field"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+name = "view_headings_logical_order"
+description = "View titles for habits, Stats, Heatmap, and Import/Data use a logical heading order without skipping levels (for example H1 then H2)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "main_landmark_for_habit_shell"
+description = "The habit list / Stats / Heatmap shell exposes a main landmark (or equivalent) so keyboard and assistive-tech users can jump past chrome"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+name = "habit_text_and_controls_contrast"
+description = "Primary text (#1B2430 on #F4F7F6/#FFFFFF), muted secondary text, primary buttons (#0F9D74 with white text), and category chips maintain sufficient contrast for readable labels and active states"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "semantic_buttons_for_checkin_and_filters"
+description = "Check-in, stepper, category filter chips, Pause/Resume, Export as JSON, and Import use semantic button (or equivalent role=button) controls rather than bare non-interactive divs"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "reduced_motion_drops_celebration"
+description = "With prefers-reduced-motion set, decorative animations and the streak-milestone confetti celebration are removed or reduced while check-in state, flame treatment, and list membership still update instantly and correctly"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
-name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+name = "stepper_or_export_unreachable_by_keyboard"
+description = "The stepper plus/minus controls, one-tap complete, or Export as JSON / Import controls cannot be reached or activated via keyboard"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n2"
-name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+name = "focus_indicator_missing_on_chips"
+description = "Focused category filter chips, New Habit inputs, or primary buttons show no visible focus indicator or an obscured one"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n3"
-name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+name = "custom_stepper_lacks_semantics"
+description = "Stepper or one-tap complete controls are non-semantic elements without button roles or accessible names"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+name = "completion_state_color_only"
+description = "Done versus missed weekly-grid or Heatmap cells rely on color alone with no additional text, icon, or pattern cue"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "import_dialog_loses_focus_trap"
+description = "While the Import confirmation dialog is open, Tab escapes to the page behind it or focus is not restored to Import on close"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+name = "muted_text_unreadable_contrast"
+description = "Muted secondary labels (#64748B) or paused-habit text fall below readable contrast against the canvas or card surface"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+name = "field_contract_errors_visual_only"
+description = "HabitUpsert or Workspace JSON field-contract errors are shown only visually with no programmatic association to the field and no live-region announcement for recovery/malformed outcomes"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+name = "chrome_icons_missing_names"
+description = "Interactive chrome icons lack accessible names so screen readers announce them only as unlabeled buttons or images"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+name = "heading_order_skipped_in_views"
+description = "Habits / Stats / Heatmap headings skip levels (for example H1 jumping to H3) or are unordered relative to section structure"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n10"
-name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+name = "confetti_ignores_reduced_motion"
+description = "With prefers-reduced-motion enabled, the streak-milestone confetti burst or other decorative motion still plays at full intensity"
 type = "binary"
 negate = true
 weight = 1.0

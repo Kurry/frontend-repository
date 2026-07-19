@@ -195,6 +195,73 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "14.13"
+name = "sell_moves_gain_probe"
+description = "Save a BUY activity for a symbol, note the holding's unrealized gain and the realized gain figure, then save a SELL of part of that position. Confirm realized gain increases by exactly (sell unit price minus average unit cost) times sell quantity, the holding's unrealized gain recomputes over the remaining quantity, and the Performance report preview's realizedGain and per-holding unrealizedGain both change to match — proving the figures are derived, not hardcoded."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.14"
+name = "import_commit_probe"
+description = "Import an Activities CSV that includes at least one invalid row. In the diagnostics screen, confirm the store is unchanged, exclude or fix the invalid row, and Commit. Confirm the ledger row count increases by exactly the number of valid committed rows, the summary states imported versus skipped, and the Activities CSV and Performance report previews include only the committed rows; then repeat and Cancel instead and confirm nothing changed."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.15"
+name = "batch_delete_undo_probe"
+description = "Select several holdings with the row checkboxes, record the row count and net worth, and bulk delete them. Confirm exactly those rows are removed and net worth, allocation, and the performance summary drop their contribution, then press Undo once and confirm every deleted row, the selection state, and every derived figure and export preview return to their pre-batch values."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.16"
+name = "benchmark_independence_probe"
+description = "Toggle Benchmark compare on and record the benchmark series shape, then add a BUY activity. Confirm the portfolio series visibly changes while the benchmark series stays identical, proving the portfolio series is derived from the live ledger and the benchmark is a fixed seeded series."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.17"
+name = "different_activities_different_total_return"
+description = "Starting from the seeded state, apply one set of activities (for example a BUY then a DIVIDEND) and record total return, then Undo back and apply a different set (for example a BUY then a partial SELL). Confirm the two total-return values differ in the ways the inputs dictate, not a constant figure."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n7"
+name = "realized_gain_unchanged_after_sell"
+description = "After saving a SELL that should realize a gain or loss, the realized gain figure and total return remain identical to their pre-SELL values in the summary, detail panel, and Performance report."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n8"
+name = "import_mutates_before_commit"
+description = "The CSV import diagnostics screen changes the activities collection, ledger, or export previews before Commit is pressed, or Cancel still leaves the store mutated."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n9"
+name = "benchmark_series_tracks_activities"
+description = "The seeded benchmark series changes shape when activities are added, edited, or deleted, instead of staying fixed while the portfolio series moves."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n10"
+name = "batch_undo_incomplete"
+description = "A single Undo after a bulk delete or bulk edit restores only part of the batch or leaves derived totals, allocation, or export previews inconsistent with the fully restored collection."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
 id = "behavioral.catchall"
 name = "behavioral_catchall"
 description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling in the portfolio dashboard that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot). If already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

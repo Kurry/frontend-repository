@@ -142,6 +142,44 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "4.13"
+name = "scene_selection_eases_preview_and_histogram"
+description = "Selecting a scene chip through the real control eases the preview brightness and histogram to the new offset rather than hard-cutting, and the active scene chip's selected treatment transitions smoothly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "zebra_stripes_fade_on_toggle_or_clipping"
+description = "Toggling Highlight or Shadow zebras, or driving exposure until clipping appears/disappears through the real controls, fades the striped hatching in and out over a short transition rather than popping instantly"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.15"
+name = "wipe_handle_tracks_pointer_no_lag"
+description = "In Compare, dragging the wipe handle with the real pointer moves the split continuously and tracks the pointer with no visible lag or stepped jumps"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "bracket_rows_animate_into_strip"
+description = "When Generate bracket runs, the bracket rows and thumbnails animate into their strip rather than appearing instantly"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.13n"
+name = "wipe_handle_lags_or_steps"
+description = "Dragging the wipe handle through the real pointer makes the split lag behind the pointer, jump in discrete steps, or fail to follow the drag continuously"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
 id = "4.12"
 name = "meter_hard_jumps_between_positions"
 description = "Stepping a dial through the real stepper controls makes the exposure meter indicator teleport between positions with no visible travel along the track"

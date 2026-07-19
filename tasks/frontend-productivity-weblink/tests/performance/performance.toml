@@ -90,8 +90,8 @@ weight = 1.0
 
 [[criterion]]
 id = "9.5"
-name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+name = "concurrent_transfers_stay_smooth"
+description = "Ten queued files transferring at the same time keep every progress bar and readout advancing without frozen readouts or dropped frames, and a transfer log holding 50 or more entries scrolls without lag."
 type = "binary"
 weight = 1.0
 

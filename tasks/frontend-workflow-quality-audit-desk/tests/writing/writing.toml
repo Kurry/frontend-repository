@@ -71,7 +71,7 @@ weight = 0.5
 [[criterion]]
 id = "15.2"
 name = "actions_use_specific_labels"
-description = "Where the app renders action labels, they are specific verbs such as Run checks, Add entry, Escalate task, and Copy report, not generic labels like Submit or OK when a specific label is possible"
+description = "Where the app renders action labels, they are specific verbs such as Run checks, Add entry, Escalate task, and Copy, Download, and Import package, not generic labels like Submit or OK when a specific label is possible"
 type = "binary"
 weight = 0.5
 
@@ -145,9 +145,17 @@ weight = 0.5
 [[criterion]]
 id = "15.n4"
 name = "copy_is_truncated_or_overflowing"
-description = "Truncated or overflowing text renders guidance, violation details, or report copy unreadable"
+description = "Truncated or overflowing text renders guidance, violation details, or export preview copy unreadable"
 type = "binary"
 negate = true
+weight = 0.5
+
+
+[[criterion]]
+id = "15.9"
+name = "import_and_form_errors_name_fields"
+description = "Where the app renders validation or import errors, messages name the offending field and the rule broken (rationale 15-character minimum, findings 20-character minimum, or the Audit Package JSON field that failed the contract)"
+type = "binary"
 weight = 0.5
 
 [[criterion]]

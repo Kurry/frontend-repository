@@ -64,21 +64,21 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "11.1"
 name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+description = "Beyond required hover and list transitions, the planner adds a delightful microinteraction such as a day-dot pulse on filter, a pin bounce on selection, or a satisfying settlement check animation that is not required by the spec."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.2"
 name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+description = "Beyond the required list and toast motion, the app adds an advanced transition such as coordinated plan-to-map emphasis, chart morphing between expense edits, or a multi-step export canvas reveal."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.3"
 name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+description = "A first-run coachmark or guided tour highlights the plan list, Budget ledger, and export canvas so a new traveler can find the portable trip files without reading the PRD."
 type = "binary"
 weight = 1.0
 
@@ -92,42 +92,42 @@ weight = 1.0
 [[criterion]]
 id = "11.5"
 name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+description = "Beyond standard pointer and keyboard, the app supports an alternative input such as paste-from-confirmation as a primary create path with visible token highlighting, or a keyboard command palette for day jump and export."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.6"
 name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+description = "Beyond the required light/dark toggle, the app exposes a traveler preference such as preferred display currency default, denser ledger row height, or remembered export format tab that observably changes the UI."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.7"
 name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+description = "The French Riviera / Cote d'Azur trip signal is carried through more than the hero title — for example day-colored storytelling chips, coastal empty-state copy, or export filenames that feel trip-branded."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.8"
 name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+description = "Beyond the required light/dark structural toggle, the app offers an extra theme accent or coastal palette variant that restyles chrome without breaking ledger readability."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.9"
 name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+description = "The app uses a helpful web platform capability for this genre such as print stylesheet for the markdown itinerary, share-target style copy packaging, or offline-ready static asset caching indicators — without claiming a fake backend."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.10"
 name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+description = "A competition-level enhancement is visible — for example conflict-aware day collision hints, smarter minimum-debt explanations, or an export diff preview comparing current session to the last import — beyond the mandated ledger and ICS/JSON contracts."
 type = "binary"
 weight = 1.0
 

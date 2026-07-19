@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "4.2"
 name = "forms_validate_inline_before_submit"
-description = "The Save search and Add document forms validate inline before submit — required-field errors name the field, and the submit controls stay disabled until the form is valid"
+description = "The Save search and Add document forms validate inline before submit under their field contracts — empty or duplicate saved-search name, empty title, body shorter than 20 characters, or type outside guide|reference|prompt|checklist|paper|note name the field, and the submit controls stay disabled until the form is valid"
 type = "binary"
 weight = 1.0
 
@@ -209,6 +209,13 @@ description = "A specified affordance (Reset Feedback, bulk action bar, breadcru
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "4.11"
+name = "invalid_library_package_import_rejected"
+description = "Importing malformed Library package JSON, schemaVersion other than 1, library other than Semantic Search Library, or a document or saved search that fails its field contract leaves the corpus and saved list unchanged and shows a visible error naming the problem"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "edge_cases.catchall"

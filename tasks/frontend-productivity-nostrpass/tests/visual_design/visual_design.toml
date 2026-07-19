@@ -192,6 +192,34 @@ weight = 1.0
 
 
 [[criterion]]
+id = "3.17"
+name = "permissions_matrix_table_anatomy"
+description = "The All identities matrix renders as a table with one nickname-labelled row per identity, one column per application, switch cells at every intersection, and Grant all and Revoke all controls in the column headers; when wider than its panel it scrolls inside the panel"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.18"
+name = "rotate_control_on_cards_and_dashboard"
+description = "Each identity card and the dashboard carry a Rotate keys control alongside Select, Rename, and Delete, opening a confirmation dialog that names the identity"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.19"
+name = "backup_surface_with_qr_placeholder"
+description = "The Export backup surface pairs a monospaced single-identity JSON preview with Copy and Download and a square QR-style tile visibly labelled as a placeholder"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.20"
+name = "audit_filter_control_in_toolbar"
+description = "The Audit log toolbar carries an action-type filter control offering All plus one choice per recorded action type"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "3.catchall"
 name = "visual_design_catchall"
 description = """The app exhibits a significant, browser-observable visual design defect that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence. If already covered by another criterion in this file, answer no here."""

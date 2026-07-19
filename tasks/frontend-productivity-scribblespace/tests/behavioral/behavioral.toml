@@ -119,7 +119,14 @@ weight = 1.0
 [[criterion]]
 id = "14.9"
 name = "export_import_round_trip_preserves_boards"
-description = "Mutate → derived → export → import: create notes on two named boards and a connector; confirm Export Workspace JSON contains schemaVersion scribblespace-workspace-v1 and those objects; Download; mutate away; Import the file; confirm boards, objects, and connector return."
+description = "Mutate → derived → export → import: create notes on two named boards and a connector; confirm Export Workspace JSON contains schemaVersion scribblespace-workspace-v1 plus objects/connectors entries matching the note and connector create field contracts; Download; mutate away; Import the file; confirm boards, objects, and connector return while post-download additions are gone."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.11"
+name = "create_payload_fields_echo_in_export"
+description = "After creating a note with distinctive text and a closed color, and a flashcard with distinctive front/back, Workspace JSON objects entries show type, color, text/front/back, and geometry keys from the create contracts rather than omitting those fields."
 type = "binary"
 weight = 1.0
 

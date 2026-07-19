@@ -112,14 +112,14 @@ weight = 1.0
 [[criterion]]
 id = "10.8"
 name = "import_enforces_bundle_schema"
-description = "Importing a bundle whose fields violate the package schema — a base_sha that is not 40-character lowercase hex, a difficulty outside easy, medium, and hard, or a non-positive pr_number — is rejected with errors naming each offending field, and importing a conforming bundle succeeds"
+description = "Importing a bundle that violates the TaskPackageBundle field contract — schemaVersion other than live-task-package-v1, a base_sha that is not 40-character lowercase hex, a difficulty outside easy, medium, and hard, a non-positive pr_number, source_file_count outside 3–10, or empty instruction — is rejected with errors naming each offending field, and importing a conforming bundle succeeds"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "10.9"
 name = "fixture_data_is_api_shaped"
-description = "Rendered PR data is consistent with the modeled API shape: merged dates render as real dates, the base commit SHA renders as 40-character lowercase hex, additions and deletions are non-negative integers, and PR numbers are positive integers, across the seeded repositories"
+description = "Rendered PR data is consistent with the PullRequest field contract: merged dates render as real dates, the base commit SHA renders as 40-character lowercase hex, additions and deletions are non-negative integers, and PR numbers are positive integers, across the seeded repositories; downloaded TaskPackageBundle JSON shows schemaVersion live-task-package-v1 and the required keys"
 type = "binary"
 weight = 1.0
 

@@ -77,7 +77,7 @@ weight = 1.0
 [[criterion]]
 id = "3.3"
 name = "layout_matches_described_composition"
-description = "The rendered layout matches the described composition — sidebar, rollup strip with progress bar, central grid, queue and timeline alongside, inspector as a side panel"
+description = "The rendered layout matches the described composition — sidebar, rollup strip with progress bar, central grid, queue and timeline alongside, inspector as a side panel, and Export run / Import run reachable from the toolbar"
 type = "binary"
 weight = 1.0
 

@@ -78,7 +78,7 @@ weight = 1.0
 [[criterion]]
 id = "12.3"
 name = "only_documented_operations_exist"
-description = "Only documented bindings are available: destinations including archive-vault and export-drawer; filters role/status; sorts last-active/newest/highest-spend/name-az; themes light/dark; entity user fields name/email/role/status/payments/products/last-active; form fields including temporary-password/account-segment/notes; artifact export/import/copy with formats json/csv and import modes directory-json/users-csv — no invented destinations."
+description = "Only documented bindings are available: destinations including archive-vault and export-drawer; filters role/status; sorts last-active/newest/highest-spend/name-az; themes light/dark; entity user fields name/email/role/status/payments/products/last-active; form fields including temporary-password/account-segment/notes/send-invitation/two-factor-enabled/product-access; artifact export/import/copy with formats json/csv and import modes directory-json/users-csv — no invented destinations."
 type = "binary"
 weight = 1.0
 

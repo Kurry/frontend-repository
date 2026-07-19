@@ -62,119 +62,119 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
+name = "scrub_explore_stage_with_pins"
 description = "On load, Scrub/Explore mode shows a timeline stage with seeded event pins or markers for MediaTimeline"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
+name = "library_shows_seeded_events"
 description = "On load (or after opening Library/Filter), the events list shows multiple seeded events with title and year visible"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
-description = "After creating an event titled 'Signal Tower Demo' with a valid year, the text 'Signal Tower Demo' is visible in the events list"
+name = "create_signal_tower_demo_visible"
+description = "After creating an event titled Signal Tower Demo with type Milestone, timestamp 1920-01-01T00:00:00.000Z, mediaRefs containing signal-tower-demo, and a valid year, the text Signal Tower Demo is visible in the events list and the Timeline JSON preview includes that title with matching type, timestamp, and mediaRefs"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
+name = "three_creates_add_three_rows"
 description = "After adding 3 new events on top of the initial user-managed count, the list shows exactly 3 more rows than before those creates"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
+name = "category_filter_narrows_visible_set"
 description = "After filtering by a category/band (with mixed categories present), only matching events remain visible in the filtered list or stage"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
+name = "edit_title_to_evening_broadcast"
 description = "After editing an event title to 'Evening Broadcast', the text 'Evening Broadcast' is visible and the previous title is not"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
+name = "delete_removes_title_from_list"
 description = "After deleting an event, that event's title is no longer visible in the events list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
+name = "empty_state_after_clearing_user_events"
 description = "After deleting all user-managed events (or clearing the editable set), an empty state is visible in the list region"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
+name = "empty_title_blocks_create"
 description = "After submitting create with an empty required title, the events count does not increase and validation feedback is visible"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
+name = "scrubber_updates_visible_pins"
 description = "After adjusting the year scrubber/window, the set of visible pins or in-view count updates without full page navigation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
+name = "mode_switch_without_reload"
 description = "After switching between Scrub/Explore and Library/Filter modes, the main canvas shows the other mode without full page navigation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
+name = "hover_wash_on_pins_and_controls"
 description = "When hovering pins, list rows, or scrubber controls, a visible hover wash, scale, or glow appears"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.15"
-name = "1_15"
+name = "zoom_pan_updates_in_view_count"
 description = "After zooming or panning the stage, the 'N events in view' count updates without full page navigation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.17"
-name = "1_17"
+name = "crud_updates_shared_collection"
 description = "Timeline events collection supports create, edit, and delete with list rows and derived counts updating from shared application state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.18"
-name = "1_18"
+name = "two_interaction_modes_switchable"
 description = "At least two distinct views or interaction modes are switchable without full page navigation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.19"
-name = "1_19"
+name = "filters_recompute_from_shared_collection"
 description = "Domain state beyond CRUD is implemented (filters, status/priority/mode, or equivalent) and recomputes visible results from the shared collection"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.21"
-name = "1_21"
+name = "static_html_only_no_crud"
 description = "Timeline events list is static HTML only with no working create/edit/delete against shared state"
 type = "binary"
 weight = 1.0
@@ -182,7 +182,7 @@ negate = true
 
 [[criterion]]
 id = "1.22"
-name = "1_22"
+name = "outbound_links_instead_of_in_app"
 description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
 type = "binary"
 weight = 1.0
@@ -190,28 +190,28 @@ negate = true
 
 [[criterion]]
 id = "1.23"
-name = "1_23"
+name = "pin_opens_detail_with_stepping"
 description = "Clicking an event pin opens an in-page detail with kicker (year and place), title, category, and body, and Previous/Next controls or the arrow keys step through the currently filtered events while a close control or Escape returns to the stage"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.24"
-name = "1_24"
+name = "five_era_bands_and_current_era_label"
 description = "At least five named era bands wash the stage and a current-era label updates to the era at the window midpoint as the year window moves"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.25"
-name = "1_25"
+name = "dual_handle_scrubber_and_fit_all"
 description = "The dual-handle year scrubber and numeric year from/to inputs set the visible window with a BCE/CE readout, and a fit-all/reset control returns to the full span"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.26"
-name = "1_26"
+name = "pin_hover_label_and_offset"
 description = "Hovering an unclustered event pin reveals a label with title, place, and BCE/CE year, and overlapping same-year pins offset so each stays individually clickable"
 type = "binary"
 weight = 0.5
@@ -219,7 +219,7 @@ optional = true
 
 [[criterion]]
 id = "1.27"
-name = "1_27"
+name = "in_view_and_catalogued_count_readouts"
 description = "An event-count readout ('N events in view') and a result note ('Showing N of M catalogued events') update as filters and the year window change"
 type = "binary"
 weight = 0.5
@@ -227,7 +227,7 @@ optional = true
 
 [[criterion]]
 id = "1.28"
-name = "1_28"
+name = "pins_ignore_year_window"
 description = "Event pins render at fixed positions that ignore the year window, so scrubbing or zooming does not reposition or re-filter them"
 type = "binary"
 weight = 0.5
@@ -327,8 +327,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.42"
-name = "inline_errors_name_field_and_block_submit"
-description = "On the create and edit forms, an empty title, invalid year outside -4000..2100, empty place, empty summary, or zero categories shows an inline error naming that field next to it, and the submit control stays disabled or rejects submission until the TimelineEvent payload contract is satisfied"
+name = "timeline_event_request_body_field_contract"
+description = "Create and edit forms enforce the TimelineEvent request-body field contract: title trimmed 1–120; type exactly one of Milestone/Invention/Release/Publication/Broadcast; timestamp an ISO-8601 datetime ending with Z whose UTC year equals year when year >= 1 (or timestamp exactly 0001-01-01T00:00:00.000Z when year < 1); mediaRefs a non-empty array of 1–8 trimmed 1–64 character labels; year integer -4000..2100; place trimmed 1–80; summary trimmed 1–2000; categories a non-empty closed-enum subset of Print/Broadcast/Photography/Cinema/Computing/Networks/Audio/Typography/Publishing/Telecom; empty title, invalid type, bad timestamp, empty mediaRefs, invalid year, empty place, empty summary, or zero categories shows an inline error naming that field, and submit stays disabled or rejects until valid"
 type = "binary"
 weight = 1.0
 
@@ -398,29 +398,29 @@ weight = 1.0
 
 [[criterion]]
 id = "1.52"
-name = "timeline_json_package_shape"
-description = "The Timeline JSON preview includes version, document media-timeline, window with fromYear and toYear, enabledCategories, eras with name/fromYear/toYear, and an events array whose entries carry title, year, place, categories, summary, and source"
+name = "timeline_json_package_field_contract"
+description = "The Timeline JSON preview conforms to the package field contract: required keys version, document exactly media-timeline, window.fromYear, window.toYear, enabledCategories, eras (name/fromYear/toYear), and events entries each carrying title, type, timestamp ending with Z, mediaRefs, year, place, categories, summary, and source matching the TimelineEvent contract"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.53"
 name = "export_reflects_session_mutations"
-description = "After creating an event with a distinctive title, both the Timeline JSON and Events CSV export previews contain that title before copy or download; after deleting it, the title is absent from both previews"
+description = "After creating an event with a distinctive title, type, timestamp ending with Z, and mediaRefs, both the Timeline JSON and Events CSV export previews contain that title plus matching type/timestamp/mediaRefs before copy or download; after deleting it, the title is absent from both previews"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.54"
 name = "import_timeline_json_round_trip"
-description = "After mutating the collection, importing a previously exported Timeline JSON restores library titles, years, enabled categories, year window, density counts, and export previews to match the pre-export mutated state"
+description = "After mutating the collection, importing a previously exported Timeline JSON restores library titles, types, years, mediaRefs, enabled categories, year window, density counts, and export previews to match the pre-export mutated state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.55"
 name = "export_omits_session_mutations"
-description = "After a visible create, edit, delete, or batch mutation, the Timeline JSON or Events CSV export preview still omits that session change (title missing after create, or still present after delete)"
+description = "After a visible create, edit, delete, or batch mutation, the Timeline JSON or Events CSV export preview still omits that session change (title, type, timestamp, or mediaRefs missing after create, or still present after delete)"
 type = "binary"
 weight = 1.0
 negate = true
@@ -432,6 +432,14 @@ description = "After deleting a user-managed event, activating Undo leaves the e
 type = "binary"
 weight = 1.0
 negate = true
+
+
+[[criterion]]
+id = "1.57"
+name = "events_csv_header_and_media_refs_join"
+description = "Events CSV preview shows header line title,type,timestamp,mediaRefs,year,place,categories,summary,source with categories pipe-joined and mediaRefs semicolon-joined on each data line"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "1.catchall"

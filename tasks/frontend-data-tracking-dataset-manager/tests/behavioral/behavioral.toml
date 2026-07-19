@@ -70,14 +70,14 @@ weight = 1.0
 [[criterion]]
 id = "14.2"
 name = "import_pipeline_full_track"
-description = "Full import pipeline probe: note the sidebar row count, capacity figures, a pivot summary value, and the export Rows tab line count; run the wizard from a seeded sample CSV through mapping, fix at least one flagged diagnostic cell, exclude one row, and commit. The sidebar count rises by exactly the included row count, the imported rows are findable in the grid, the capacity gauge grows, the pivot summaries change, the dataset card stats change, and the export Rows tab includes the new rows"
+description = "Full import pipeline probe: note the sidebar row count, capacity figures, a pivot summary value, and the export Rows CSV line count; run the wizard from a seeded sample CSV through mapping, fix at least one flagged diagnostic cell, exclude one row, and commit. The sidebar count rises by exactly the included row count, the imported rows are findable in the grid, the capacity gauge grows, the pivot summaries change, and both export tabs (Rows CSV and Dataset Package JSON) change"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.3"
 name = "edit_ripple_track"
-description = "Edit ripple probe: display a formula result over a numeric column, snapshot the dataset, then edit one cell in that column across a threshold cap. The formula result changes to the correct new value, the row's flag state updates, the dataset card mean for that column changes, and a diff of a new snapshot against the earlier one shows exactly that cell changed"
+description = "Edit ripple probe: display a formula result over a numeric column, snapshot the dataset, then edit one cell in that column across a threshold cap. The formula result changes to the correct new value, the row's flag state updates, Dataset Package JSON stats for that column change, and a diff of a new snapshot against the earlier one shows exactly that cell changed"
 type = "binary"
 weight = 1.0
 
@@ -127,9 +127,16 @@ weight = 1.0
 [[criterion]]
 id = "14.n2"
 name = "export_missing_session_edits"
-description = "The export Rows tab or dataset card omits rows or edits made during the session — the exported text reflects the seeded data rather than the live state"
+description = "The export Rows CSV tab or Dataset Package JSON omits rows or edits made during the session — the exported text reflects the seeded data rather than the live state, or required keys schemaVersion/dataset/stats are missing"
 type = "binary"
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "package_export_import_round_trip"
+description = "Package round-trip probe: add a row with a distinctive expectedOutput token, toggle it verified, save a uniquely named snapshot, export Dataset Package JSON showing schemaVersion dataset-manager.package/v1 with that token and snapshot name, edit another cell so live state differs, Import the earlier package, and confirm the grid, verified badge, snapshot list, and a fresh export match the imported package"
+type = "binary"
 weight = 1.0
 
 [[criterion]]

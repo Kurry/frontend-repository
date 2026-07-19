@@ -63,77 +63,91 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "6.1"
 name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+description = "After submitting a valid new transaction, the table gains exactly one row, the four summary cards recompute, the summary strip count increases by one, the active chart panel reflects the new aggregate, and thresholds recompute when the category is an expense — without a page reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
 name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+description = "Submitting create with an empty payee/label, missing amount, zero amount, or Salary with negative amount shows inline validation naming the offending field and adds no row"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
 name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+description = "Editing a transaction amount updates that same table row, moves the affected summary cards, updates matching sankey/doughnut aggregates, and updates matching threshold month-to-date without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
 name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+description = "Deleting a transaction removes its row, drops it from selection, decreases the summary strip count by exactly one, and drops its amount from KPIs, chart aggregates, and thresholds"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
 name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+description = "Switching Breakdown/Trends and focusing list versus chart keeps the transactions collection and filters intact without a page reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
 name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+description = "After deleting all transactions, the list region shows an empty state and summary cards and strip read zero/empty"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
 name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+description = "Category, income-vs-expense, and date-range filters narrow the table and recompute chart aggregates and summary strip; clearing them restores the full list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
 name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+description = "Below 1024px, the collapsed sidebar can be reopened via its toggle and the reports workflow continues without losing the transactions collection"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
 name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+description = "Create/edit forms, the export drawer, and the import panel open, complete their actions, and dismiss without trapping the user"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
 name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+description = "After dismissing an invalid create or closing the export drawer, the user can continue create/edit/filter/undo flows without a page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "export_flow_terminates_at_artifact"
+description = "Export flow: after two creates with payees Ada Books and Evening Market, Export JSON contains both labels, CSV includes both labels, Download offers finance-reports-ledger.json and finance-reports-ledger.csv, and Copy shows Copied"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "currency_thresholds_undo_import_flows"
+description = "Currency flow converts money surfaces when switching USD to EUR/GBP; thresholds flow shows over when a ceiling is lowered below month-to-date spend; undo/redo restores a create; import Replace of ledger-json reconstructs table and thresholds after an empty state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
 name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+description = "Create, edit, delete, Export, Import, Undo, or Redo primary flows are not enabled from the UI"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +155,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n2"
 name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+description = "Newly created transactions fail to show up in the table or appear duplicated"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +163,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n3"
 name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+description = "After create/edit/delete, table, KPI cards, chart aggregates, thresholds, and export preview disagree about the same totals"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +171,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n4"
 name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+description = "Switching Breakdown/Trends breaks the chart layout or clears an unrelated row selection incorrectly"
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +179,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n5"
 name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+description = "Emptying the collection produces broken layout, missing empty state, or crashed chart panels"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +187,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n6"
 name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+description = "Filtered table rows disagree with chart aggregates computed from the same filter scope"
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +195,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n7"
 name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+description = "Collapsed sidebar cannot be re-opened at narrow widths"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +203,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n8"
 name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+description = "Export drawer or import panel blocks navigation with no Escape or close control"
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +211,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n9"
 name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+description = "An invalid create, bad date range, invalid threshold ceiling, or failed import provides no visible user feedback"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +219,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n10"
 name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+description = "A flow dead-ends so the user must reload the page to continue using reports"
 type = "binary"
 negate = true
 weight = 1.0

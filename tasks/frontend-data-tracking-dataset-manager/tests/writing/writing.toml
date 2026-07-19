@@ -64,21 +64,21 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "15.1"
 name = "headings_use_consistent_capitalization"
-description = "Where the app renders headings and panel titles (datasets, thresholds, splits, snapshots, export), they use one consistent capitalization convention throughout"
+description = "Where the app renders headings and panel titles (datasets, thresholds, splits, snapshots, export, Rows CSV, Dataset Package JSON), they use one consistent capitalization convention throughout"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.2"
 name = "actions_use_specific_labels"
-description = "Where the app renders action labels, they are specific verbs (Import CSV, Save Snapshot, Scan for duplicates, Mark verified), not generic ('Submit', 'OK') when a specific label is possible"
+description = "Where the app renders action labels, they are specific verbs (Import CSV, Import package, Save Snapshot, Scan for duplicates, Mark verified), not generic (Submit, OK) when a specific label is possible"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.3"
 name = "errors_name_problem_and_fix"
-description = "Where the app renders error messages (formula errors, split totals, wizard problems), they name the problem and the fix, not just a rejection"
+description = "Where the app renders error messages (formula errors, split totals, wizard problems, Dataset Package JSON import failures), they name the problem and the fix, not just a rejection"
 type = "binary"
 weight = 0.5
 
@@ -92,7 +92,7 @@ weight = 0.5
 [[criterion]]
 id = "15.5"
 name = "body_copy_is_well_written"
-description = "Where the app renders body copy (dataset card text, diagnostics, hints), rate how free it is of spelling and grammatical errors."
+description = "Where the app renders body copy (Dataset Package JSON field labels in UI chrome, diagnostics, hints), rate how free it is of spelling and grammatical errors."
 type = "likert"
 points = 5
 weight = 0.5
@@ -100,7 +100,7 @@ weight = 0.5
 [[criterion]]
 id = "15.6"
 name = "terminology_is_consistent"
-description = "Where the app names the same concept in multiple places (dataset, row, snapshot, split, verified), terminology is consistent across grid, panels, toasts, and exports"
+description = "Where the app names the same concept in multiple places (dataset, row, snapshot, split, verified, Dataset Package JSON), terminology is consistent across grid, panels, toasts, and exports"
 type = "binary"
 weight = 0.5
 

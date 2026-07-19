@@ -201,6 +201,44 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "8.a1"
+name = "kinetic_global_events_character_decode"
+description = "On a fresh load, real scrolling into Ridge Global Events drives kinetic typography: each character of RIDGE GLOBAL EVENTS flashes through decoy glyphs before settling to its final letter (per-character stagger), while the supporting blurb reveals line-by-line from translateY(-100%) inside overflow-hidden wrappers (never a state shortcut; reduced-motion shows final text immediately)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.a2"
+name = "scroll_storytelling_sticky_card_pile"
+description = "On a fresh load at ≥768px, real scrolling through Why Ridge drives sequential scroll storytelling: the four sticky pillars pin with progressively larger top offsets so later cards cover earlier ones while the chapter title pins above them, advancing in choreographed scroll order rather than a static equal stack"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.a5"
+name = "scroll_capture_breaks_usability"
+description = "Scroll smoothing traps the user, prevents reaching content, fights native scroll direction, breaks position:sticky pinning (chrome or Why Ridge pile), or ignores the reduced-motion path that must disable smoothing and load entrance while keeping the page complete and reachable"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "8.a6"
+name = "kinetic_effects_decorative_jank"
+description = "RIDGE GLOBAL EVENTS character-decode or line-mask reveals stutter, reflow mid-animation, or leave characters/lines misaligned after settling"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "8.a7"
+name = "signature_motion_purely_linear_tweens"
+description = "Signature motion (page-load entrance, Get started rise, or Global Events decode/line reveal) uses purely linear tweens that start and stop mechanically with no ease-in-out, ease-out-soft, or other inertial settling"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "4.catchall"
 name = "motion_catchall"
 description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

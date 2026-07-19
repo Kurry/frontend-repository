@@ -70,14 +70,14 @@ weight = 1.0
 [[criterion]]
 id = "10.2"
 name = "shared_state_coherence"
-description = "A change made in one surface is immediately reflected in every other surface showing or deriving from that data without a reload: a cell edit updates the formula result, threshold flags, pivot summaries, dataset card stats, and capacity figures wherever they are visible"
+description = "A change made in one surface is immediately reflected in every other surface showing or deriving from that data without a reload: a cell edit updates the formula result, threshold flags, pivot summaries, Dataset Package JSON stats, and capacity figures wherever they are visible"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "10.3"
 name = "storage_stays_empty"
-description = "After a full exercise of the app (create, import, edit, merge, split, export), localStorage and sessionStorage are both empty and no other browser storage API holds app data"
+description = "After a full exercise of the app (create, CSV import, package export/import, edit, merge, split), localStorage and sessionStorage are both empty and no other browser storage API holds app data"
 type = "binary"
 weight = 1.0
 
@@ -91,7 +91,7 @@ weight = 1.0
 [[criterion]]
 id = "10.5"
 name = "console_clean_during_flows"
-description = "No console errors or unhandled rejections appear while exercising the import wizard, inline editing, dedup scan and merge, pivot, snapshots and diff, splits, bulk tray, undo/redo, and export"
+description = "No console errors or unhandled rejections appear while exercising the import wizard, inline editing, dedup scan and merge, pivot, snapshots and diff, splits, bulk tray, undo/redo, Dataset Package JSON export, and Import package"
 type = "binary"
 weight = 1.0
 
@@ -112,7 +112,7 @@ weight = 1.0
 [[criterion]]
 id = "10.8"
 name = "forms_validate_before_mutation"
-description = "Every form (New Dataset, Add Row, threshold rule, splits, snapshot name, attach) shows inline per-field validation before submit and an invalid submit never mutates the collection"
+description = "Every form (New Dataset, Add Row, threshold rule, splits, snapshot name, attach, Import package) shows inline per-field validation before submit and an invalid submit never mutates the collection"
 type = "binary"
 weight = 1.0
 
@@ -151,6 +151,21 @@ weight = 1.0
 id = "10.n4"
 name = "chrome_navigates_away"
 description = "An app-chrome link or control navigates the browser away from the app's origin"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "10.10"
+name = "package_export_matches_live_store"
+description = "After a cell edit, verified toggle, and snapshot save, reopening Export shows Dataset Package JSON whose dataset.rows, stats.verifiedCount, and dataset.snapshots match the live UI under schemaVersion dataset-manager.package/v1"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.n5"
+name = "package_import_partially_applies"
+description = "Importing a non-conforming Dataset Package JSON partially applies some fields while leaving others, or applies state without a named-field validation error"
 type = "binary"
 negate = true
 weight = 1.0

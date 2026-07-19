@@ -69,15 +69,15 @@ weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "create_dataset_flow"
-description = "New Dataset opens a modal with a required name, optional description, and a repeating schema-field editor (field name, a type select offering text, number, and category, and a required allowed-values list when category is chosen); Submit stays disabled until the name and at least one complete schema field are present, and a valid submit adds exactly one sidebar entry with row count 0 and selects it"
+name = "create_dataset_field_contract"
+description = "New Dataset opens a modal whose submit produces a dataset-create payload: name 1-80 chars, optional description at most 500 chars, and a non-empty schema of field records (name 1-40 letters/digits/underscores, type text|number|category, allowedValues required non-empty for category and empty otherwise, unique names case-insensitively); Submit stays disabled until the contracts pass, and a valid submit adds exactly one sidebar entry with row count 0 whose name, description, and schema match the submitted payload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "invalid_create_validation"
-description = "Submitting New Dataset with an empty name shows an inline validation message naming the name field and adds no sidebar entry"
+name = "invalid_create_field_contract"
+description = "Submitting New Dataset with an empty name, a schema field name outside the allowed pattern, a category field with an empty allowedValues list, duplicate schema field names, or a description longer than 500 characters shows an inline validation message naming the offending field and adds no sidebar entry"
 type = "binary"
 weight = 1.0
 
@@ -97,15 +97,15 @@ weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "inline_cell_edit_commit_cancel"
-description = "Double-clicking a cell opens an in-place editor; Enter commits the value and the change propagates to dependent surfaces, while Escape cancels and restores the prior value; committing a value that violates the record contract (non-numeric text in a number field, a value outside a category field's allowed list) is rejected with an inline error naming the field and the violated rule and the prior value stays in place"
+name = "inline_cell_edit_contract"
+description = "Double-clicking a cell opens an in-place editor; Enter commits only when the value satisfies the row record field contract and the change propagates to dependent surfaces, while Escape cancels and restores the prior value; committing a value that violates the contract (non-numeric text in a number field, a value outside a category field's allowed list, or text longer than the bound) is rejected with an inline error naming the field and the violated rule and the prior value stays in place"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "add_edit_delete_row_flows"
-description = "Add Row opens a modal with one input per schema field plus an expected output textarea and appends exactly one row incrementing the sidebar count; Edit opens the same modal pre-filled and saves in place; Delete asks for confirmation, removes the row, and decrements the sidebar count, while cancel leaves it intact"
+name = "add_edit_delete_row_contract"
+description = "Add Row opens a modal with one input per schema field plus an expected output textarea; a valid submit appends a row matching the row record field contract (values keys equal schema field names; text at most 2000 chars; number finite; category in allowedValues; expectedOutput at most 4000 chars; verified boolean; optional split train|validation|test) and increments the sidebar count; Edit saves in place under the same contract; Delete asks for confirmation, removes the row, and decrements the sidebar count, while cancel leaves it intact"
 type = "binary"
 weight = 1.0
 
@@ -175,7 +175,7 @@ weight = 1.0
 [[criterion]]
 id = "1.17"
 name = "threshold_rules_flag_rows"
-description = "A threshold rule (numeric column, above/below comparator, cap value — all required with inline validation) flags breaching rows with a treatment on the offending cell and a row flag icon, and a Flagged count badge shows how many rows breach any rule"
+description = "A threshold rule matching the field contract (column naming an existing numeric schema field, comparator exactly above or below, finite numeric cap — all required with inline validation naming the field) flags breaching rows with a treatment on the offending cell and a row flag icon, and a Flagged count badge shows how many rows breach any rule"
 type = "binary"
 weight = 1.0
 
@@ -217,14 +217,14 @@ weight = 1.0
 [[criterion]]
 id = "1.23"
 name = "snapshots_and_row_diff"
-description = "Save Snapshot captures the rows under a required name with a timestamp, the snapshot list shows saved snapshots, and diffing two snapshots marks added rows, removed rows, and changed cells with old and new values; a snapshot-edit-snapshot sequence diffs to exactly the one changed cell"
+description = "Save Snapshot captures the rows under a required unique name of 1–80 characters with a timestamp (empty or duplicate names are rejected inline); the snapshot list shows saved snapshots, and diffing two snapshots marks added rows, removed rows, and changed cells with old and new values; a snapshot-edit-snapshot sequence diffs to exactly the one changed cell"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.24"
 name = "split_apply_and_stratification"
-description = "Split percentages that sum to 100 enable Apply, which labels every row in the grid's split column; the segmented proportion bar shows the assigned distribution, and the stratification readout shows per-split verified and unverified counts that update when rows change"
+description = "Split percentages that are integers from 0 to 100 summing to exactly 100 enable Apply, which labels every row in the grid's split column; the segmented proportion bar shows the assigned distribution, and the stratification readout shows per-split verified and unverified counts that update when rows change"
 type = "binary"
 weight = 1.0
 
@@ -238,14 +238,14 @@ weight = 1.0
 [[criterion]]
 id = "1.26"
 name = "undo_redo_coverage"
-description = "Undo and Redo toolbar controls plus Ctrl+Z and Ctrl+Shift+Z step through cell edits, row additions and deletions, merges, bulk actions, and committed imports; undo restores exact prior values including derived counts, and both controls disable when their stack is empty"
+description = "Undo and Redo toolbar controls plus Ctrl+Z and Ctrl+Shift+Z step through cell edits, row additions and deletions, merges, bulk actions, committed CSV imports, and successful Import package operations; undo restores exact prior values including derived counts and export previews, and both controls disable when their stack is empty"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.27"
-name = "export_tabs_live_derived"
-description = "The export drawer's Rows tab shows CSV-shaped text of the currently visible rows honoring the active filter, and the Dataset card tab summarizes name, description, the record contract (each field with type and category allowed values), total/verified/flagged counts, per-numeric-column min, max, and mean, split distribution, and snapshot count; editing a cell or toggling a filter and reopening changes the exported text, and Copy places the text on the clipboard with visible confirmation"
+name = "export_package_live_derived"
+description = "The export drawer offers Rows CSV and Dataset Package JSON tabs compiled live from the store with Copy, Download, and Import package controls; Rows CSV shows visible rows (schema fields plus expectedOutput, verified, split) honoring the unverified-only filter; Dataset Package JSON shows a single object with required keys schemaVersion exactly dataset-manager.package/v1, generatedAt, dataset (id, name, description, createdAt, schema, rows, thresholdRules, snapshots, splitPercentages, attachedSuiteId), and stats (totalRows equal to rows.length, verifiedCount, flaggedCount, numericSummaries, splitDistribution, snapshotCount); editing a cell, toggling verified, applying a split, or saving a snapshot and reopening changes the exported text; Copy confirms and Download offers rows.csv or dataset-package.json"
 type = "binary"
 weight = 1.0
 
@@ -295,7 +295,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n2"
 name = "static_derived_surfaces"
-description = "The formula result, pivot summaries, threshold flags, or export text remain identical after an edit to the data they claim to derive from"
+description = "The formula result, pivot summaries, threshold flags, or Dataset Package JSON / Rows CSV export text remain identical after an edit to the data they claim to derive from"
 type = "binary"
 negate = true
 weight = 1.0
@@ -311,7 +311,29 @@ weight = 1.0
 [[criterion]]
 id = "1.n4"
 name = "contract_violations_accepted"
-description = "Some row entry path (Add Row, Edit Row, inline cell editing, or the import diagnostics) accepts a value that violates the dataset's record contract — wrong type or outside a category field's allowed list — without an error naming the field and rule"
+description = "Some row entry path (Add Row, Edit Row, inline cell editing, or the import diagnostics) accepts a value that violates the row record field contract — wrong type, outside a category field's allowed list, or over length — without an error naming the field and rule"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "import_package_round_trip"
+description = "After exporting Dataset Package JSON that includes a session-added row and snapshot, making a further cell edit, then Importing that package, the grid, verified badge, snapshot list, and a fresh export return to the imported package's contents under schemaVersion dataset-manager.package/v1"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "invalid_package_import_rejected"
+description = "Importing Dataset Package JSON with schemaVersion other than dataset-manager.package/v1, missing dataset or stats, or stats.totalRows disagreeing with dataset.rows.length shows validation naming the offending field and leaves the selected dataset's row count and snapshot list unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n5"
+name = "export_omits_required_package_keys"
+description = "The Dataset Package JSON preview is missing schemaVersion dataset-manager.package/v1, dataset, or stats, or omits a session mutation (new row, verified toggle, or snapshot) that is visible in the UI"
 type = "binary"
 negate = true
 weight = 1.0

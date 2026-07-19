@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -133,7 +133,7 @@ weight = 1.0
 [[criterion]]
 id = "6.11"
 name = "session_export_import_chain"
-description = "Artifact end state: after converting at least one file and changing quality, open Session export — the session JSON preview's quality and per-file status/to/outputSize match the visible store; Copy shows a brief copied confirmation; Download starts a file of that same text; change settings away; Import the same JSON and confirm Settings, presets, and matching queue Convert-to targets restore without reload."
+description = "Artifact end state: after converting at least one file and changing quality, open Session export — the session JSON preview shows schemaVersion vert-session-v1 and quality/per-file status/to/outputSize matching the visible store; Copy shows a brief copied confirmation; Download starts a file of that same text; change settings away; Import the same JSON and confirm Settings, presets, matching queue Convert-to targets, and schemaVersion restore without reload."
 type = "binary"
 weight = 1.0
 
@@ -147,7 +147,7 @@ weight = 1.0
 [[criterion]]
 id = "6.13"
 name = "save_and_apply_preset_flow"
-description = "Preset flow: saving a preset named Web ready with target webp and quality 80 increases the visible preset count by exactly one; applying it writes quality 80 into Settings and webp into the selected (or all Ready) rows; the session JSON export preview includes that preset."
+description = "Preset flow: saving a ConversionPreset named Web ready with target webp and quality 80 increases the visible preset count by exactly one and the session JSON presets entry shows those name/target/quality values; applying it writes quality 80 into Settings and webp into the selected (or all Ready) rows."
 type = "binary"
 weight = 1.0
 
@@ -258,6 +258,28 @@ weight = 1.0
 id = "6.n13"
 name = "undo_redo_broken_after_remove"
 description = "After removing a queued file, Undo fails to restore the row/counts, or after Undo then a new add, Redo remains enabled and resurrects the cleared redo stack."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "create_record_matches_session_json_body"
+description = "Create record is request body: save a valid ConversionPreset and change Settings quality and defaultTarget, then open session JSON — the preview carries schemaVersion vert-session-v1, those SettingsUpdate fields, the saved preset under ConversionPreset keys, and files entries under QueueFile keys matching the visible store."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.16"
+name = "schema_validation_reject_then_valid_export"
+description = "Schema validation flow: Save preset with an empty name leaves preset count unchanged with name field named; Settings quality outside 1–100 is not applied with quality field named; Import JSON with schemaVersion not vert-session-v1 leaves store unchanged with offending field named; then a valid save and export yields session JSON whose payload shape matches the form-produced request bodies."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n14"
+name = "schema_invalid_import_still_applies"
+description = "Importing session JSON with schemaVersion not vert-session-v1, or with a preset/file enum outside its closed set, still mutates Settings, presets, or queue targets."
 type = "binary"
 negate = true
 weight = 1.0

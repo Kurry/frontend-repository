@@ -243,7 +243,7 @@ Module specs:
 
 Bindings:
 - Browsable entity: palettes
-- Destinations: library-grid; palette-detail; export-drawer; layout-simulator; contrast-matrix; color-wheel
+- Destinations: library-grid; palette-detail; export-drawer; layout-simulator
 - Filters: period
 - Entity: palette
 - Entity operations: create; select; update; delete; toggle
@@ -255,7 +255,6 @@ Bindings:
 Mechanics exclusions:
 - Raw file paths/blobs forbidden in WebMCP args
 - Color-wheel drag and layout-simulator hover stay Playwright-observed
-- Batch H/S/L slider gestures, undo/redo history stepping, and vision-simulation appearance stay Playwright-observed
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

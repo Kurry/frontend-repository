@@ -117,7 +117,7 @@ optional = true
 [[criterion]]
 id = "2.8"
 name = "queue_table_name_size_status_columns"
-description = "The file queue renders as a compact table with Name, Size, and Status columns"
+description = "The file queue renders as a compact table with a selection checkbox, drag handle, Name, Size, Status, and Progress per row"
 type = "binary"
 weight = 1.0
 
@@ -169,6 +169,34 @@ negate = true
 id = "2.15"
 name = "export_import_controls_in_chrome"
 description = "Export Session and Import Session controls are visible in the communication workspace chrome alongside the session, chat, and file-transfer panels rather than buried behind an unrelated route"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.16"
+name = "queue_status_pills_distinct_colors"
+description = "Each of the five queue statuses (Not Started, Transferring, Paused, Completed, Canceled) renders as a small pill with a visually distinct background/text color, legible at a glance rather than only from its label"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.17"
+name = "progress_bar_with_numeric_readout"
+description = "Each queue row's progress renders as a horizontal bar paired with a numeric readout showing percent plus bytes transferred of total"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.18"
+name = "bulk_bar_only_with_selection"
+description = "The bulk action bar is hidden with nothing selected and appears with the selected count beside Remove Selected and Retry Selected once at least one row is checked"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.19"
+name = "transfer_log_timestamped_list"
+description = "The transfer log renders as a timestamped list, newest entry first, each entry pairing the event name with its file name"
 type = "binary"
 weight = 0.5
 

@@ -241,11 +241,55 @@ weight = 1.0
 [[criterion]]
 id = "6.n10"
 name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+description = "A NostrPass flow leaves a dead end that requires a full page reload to continue."
 type = "binary"
 negate = true
 weight = 1.0
 
+
+[[criterion]]
+id = "6.13"
+name = "rotation_flow_chain"
+description = "Rotation flow: note the active npub, Rotate keys, confirm; dashboard npub and nsec change, the vault export shows the new npub, and the top audit entry names the rotation with shortened old and new npubs; Undo restores the noted npub everywhere; Redo reapplies the rotation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "bulk_grant_flow_chain"
+description = "Bulk grant flow: with at least three identities, Grant all in one application's column flips that application to granted for every identity, updates the active identity's dashboard pill and connected-app tile, and records one audit entry naming the application and count; one Undo restores every prior grant"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "backup_round_trip_flow"
+description = "Backup flow: Export backup for a non-active identity, Copy or Download the JSON, delete that identity, then Import backup with the same JSON; the identity card returns with identical label, npub, nsec, and grants and the identity count is restored"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.16"
+name = "audit_filter_flow"
+description = "Audit filter flow: after at least one permission toggle and one rotation, filtering the Audit log to the rotation type shows only rotation entries, and returning to All restores the full list in the same order"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "rotation_or_bulk_controls_noop"
+description = "Rotate keys, a matrix cell switch, or Grant all/Revoke all is missing or activating it changes no visible grant or key state."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "6.n12"
+name = "backup_import_applies_partially"
+description = "A rejected or conflicting backup import still mutates the collection, or a valid backup import adds an identity missing its label, keys, or grants."
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "user_flows.catchall"

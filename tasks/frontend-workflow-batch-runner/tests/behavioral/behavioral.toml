@@ -119,21 +119,28 @@ weight = 1.0
 [[criterion]]
 id = "14.9"
 name = "durability_export_pipeline"
-description = "Full pipeline probe: launch the large job, let failures retry, retry the exhausted item, pause and resume, then export; the report's per-item statuses, attempt counts, costs, and rollups match the on-screen grid and rollup strip exactly, including every session mutation"
+description = "Full pipeline probe: launch the large job, let failures retry, retry the exhausted item, pause and resume, then open Export run; the JSON shows schemaVersion batch-run-v1 and its job fields, per-item statuses, attempts, costs, and rollups match the on-screen grid and rollup strip exactly, including every session mutation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.10"
 name = "stop_all_export_truthful"
-description = "Macro truthfulness: after Stop All, the grid marks pending and running items stopped, completed outputs are retained, and an export taken then records stopped items as stopped — not complete"
+description = "Macro truthfulness: after Stop All, the grid marks pending and running items stopped, completed outputs are retained, and Export run then records those items with status stopped — not complete"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.11"
+name = "export_import_reconstructs_run"
+description = "Export/import pipeline: mutate a run (retry or Stop All), Copy or Download the Run Report JSON, Import that same text, and confirm the visible grid, rollups, and timeline match the exported document and the next Export preview matches again"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.n1"
 name = "partial_reset_incoherent"
-description = "After a reload, one facet of state (a schedule, a queue order, a filter) survives while others reset, producing incoherent partial persistence"
+description = "After a reload, one facet of state (a schedule, a queue order, a filter, or an open export/import surface) survives while others reset, producing incoherent partial persistence"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +164,15 @@ weight = 1.0
 [[criterion]]
 id = "14.n4"
 name = "stale_cross_view_state"
-description = "A retry, pause, or reorder appears in one surface but not another until a reload"
+description = "A retry, pause, reorder, or import appears in one surface but not another until a reload"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "export_ignores_session_mutations"
+description = "Export run JSON is identical before and after a retry, Stop All, or pause/resume that should alter items or rollups, or lacks schemaVersion batch-run-v1"
 type = "binary"
 negate = true
 weight = 1.0

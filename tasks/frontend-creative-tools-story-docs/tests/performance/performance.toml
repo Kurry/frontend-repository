@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "9.2"
 name = "console_clean_including_hydration"
-description = "No console errors or warnings appear on load or during a full exercise of the app (create, edit, delete, Tile/List/Slide switches, drawers), including no hydration errors or warnings on the workspace route."
+description = "No console errors or warnings appear on load or during a full exercise of the app (create, edit, delete, Tile/List/Slide switches, drawers), including export, import, undo, filter/search, and no hydration errors or warnings on the workspace route."
 type = "binary"
 weight = 1.0
 
@@ -112,7 +112,7 @@ weight = 1.0
 [[criterion]]
 id = "9.8"
 name = "rapid_mode_and_crud_no_hang"
-description = "Rapid view-mode switching and repeated create/delete actions stay responsive with no hangs or dropped interactions."
+description = "Rapid view-mode switching, filter/search changes, and repeated create/delete/undo/export actions stay responsive with no hangs or dropped interactions."
 type = "binary"
 weight = 1.0
 

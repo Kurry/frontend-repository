@@ -112,7 +112,7 @@ weight = 1.0
 [[criterion]]
 id = "8.8"
 name = "toasts_slide_and_autodismiss"
-description = "Feedback toasts after adding an entry, completing a run, escalating, resolving, and copying the report slide in, remain readable, and auto-dismiss with a fade"
+description = "Feedback toasts after adding an entry, completing a run, escalating, resolving, copying or downloading an export, and importing a package slide in, remain readable, and auto-dismiss with a fade"
 type = "binary"
 weight = 1.0
 

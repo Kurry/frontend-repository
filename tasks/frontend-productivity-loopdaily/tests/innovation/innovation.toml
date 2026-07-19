@@ -63,150 +63,96 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+name = "milestone_confetti_craft_beyond_minimum"
+description = "Beyond the required streak-milestone confetti burst, celebration craft includes an extra delightful beat (for example a richer particle pattern or brief card pulse) that remains browser-observable (bonus)"
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "heatmap_tooltip_polish_beyond_baseline"
+description = "Heatmap day-cell tooltips offer advanced polish beyond naming date and completion — for example streak context or partial-count detail — verified via real hover (bonus)"
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+name = "guided_first_run_for_habits"
+description = "A brief guided first-run or coachmark introduces New Habit, category chips, and Export as JSON without blocking the empty-state create path (bonus beyond required empty-state copy)"
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+name = "trend_chart_interaction_aid"
+description = "An interactive graphic beyond the required trend chart — for example hover readouts on day points or a longest-streak callout graphic — adds usability while staying local (bonus)"
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+name = "keyboard_habit_shortcuts_beyond_tab"
+description = "Beyond basic Tab/Enter operability, habit check-in or category filtering supports an alternate shortcut such as a key to complete the focused habit (bonus)"
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+name = "session_personalization_beyond_requirements"
+description = "Within the persisted session, the app offers a small personalization beyond requirements (for example remembering last opened view: habits vs Stats) that survives reload with the rest of localStorage state (bonus)"
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+name = "branded_habit_tracker_narrative"
+description = "The LoopDaily shell, Manrope titles, mint accent, and flame milestone treatments read as a cohesive habit-tracker product narrative rather than generic unstyled controls (bonus execution quality)"
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+name = "flame_tier_craft_beyond_swap"
+description = "Flame tier treatments (plain / bright / gold) show crafted differentiation beyond a bare icon swap — cohesive glow or color staging that feels designed (bonus)"
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+name = "local_platform_enhancement"
+description = "A genre-appropriate local enhancement (for example high-quality local Manrope rendering or offline-capable app shell assets) is visible without CDN dependence (bonus)"
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+name = "competition_level_loopdaily_feel"
+description = "The overall experience feels competition-grade: habit create with field contracts, check-ins, Heatmap, Stats, and Workspace JSON export/import read as a professional habit instrument rather than a wired demo (bonus)"
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+name = "barebones_unstyled_habit_list"
+description = "The shipped UI is a bare unstyled list or plain text controls with no habit cards, category chips, or mint accent shell"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
+name = "generic_dashboard_template_look"
+description = "The experience is a generic dashboard/card-grid template that ignores the specified LoopDaily mint habit-tracker composition (Manrope titles, #0F9D74 accent, flame milestones)"
 type = "binary"
 negate = true
 weight = 1.0

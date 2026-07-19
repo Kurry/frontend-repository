@@ -84,7 +84,7 @@ weight = 1.0
 [[criterion]]
 id = "4.4"
 name = "sliver_box_discarded"
-description = "Drawing a box smaller than a few pixels in either dimension is discarded rather than creating an unusable sliver region"
+description = "Drawing a box with width or height below 8 image pixels is discarded rather than creating an unusable sliver region"
 type = "binary"
 weight = 1.0
 
@@ -127,6 +127,27 @@ weight = 1.0
 id = "4.10"
 name = "copy_matches_visible_preview"
 description = "Copying the export mid-update copies exactly the text currently visible in the preview block"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "dispute_reason_boundary_rejected"
+description = "Submitting DisputeCreate with an empty reason or a reason longer than 200 characters changes no review state and names the reason field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "import_rejects_bad_labels_package"
+description = "Importing malformed Labels JSON or JSON that fails the LabelsPackage field contract (missing schemaVersion/taxonomy/metadataFields/items, schemaVersion not annotation-studio-labels-v1, review_state or rating outside closed sets, score outside 1–5, or region classId absent from taxonomy) leaves taxonomy, annotations, and review states unchanged and shows a visible error naming the offending field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "seeded_export_opens_valid_package"
+description = "Export with only the seeded history and no new session submit still opens and shows a LabelsPackage that includes schemaVersion annotation-studio-labels-v1 and every required LabelsPackage key; Download, Copy, and Import remain available"
 type = "binary"
 weight = 1.0
 
@@ -197,7 +218,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n9"
 name = "boundary_input_corrupts_state"
-description = "A boundary input (501st comment character, shortcut digit 0, empty dispute reason) corrupts state or throws instead of being rejected with feedback"
+description = "A boundary input (501st comment character, shortcut digit 0, empty dispute reason, Import with schemaVersion not annotation-studio-labels-v1) corrupts state or throws instead of being rejected with feedback naming the field"
 type = "binary"
 negate = true
 weight = 1.0

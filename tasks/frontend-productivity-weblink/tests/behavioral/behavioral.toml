@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "14.1"
 name = "multi_facet_reload_round_trip"
-description = "Multi-facet reload round-trip: edit displayName, enter a valid roomId, send one chat line while connecting/waiting, queue one file, and toggle theme, then reload. Every facet (name, client ID, roomId, seeded plus sent transcript, file queue, theme) is restored from local storage — never a mix of restored and reset facets — and the connection badge resumes at idle or disconnected."
+description = "Multi-facet reload round-trip: edit displayName, enter a valid roomId, send one chat line while connecting/waiting, queue one file and start then pause its transfer, and toggle theme, then reload. Every facet (name, client ID, roomId, seeded plus sent transcript, file queue with the row Paused at its saved progress, transfer log, theme) is restored from local storage — never a mix of restored and reset facets — and the connection badge resumes at idle or disconnected."
 type = "binary"
 weight = 1.0
 
@@ -147,6 +147,50 @@ description = "Session mutations appear in the panels but not in Export Session 
 type = "binary"
 negate = true
 weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "transfer_pause_resume_checkpoint_probe"
+description = "Checkpoint probe: Start a transfer, Pause it, and record the exact bytes readout; Resume and let it finish; at no point after Resume is the readout lower than the recorded value, the row completes at exactly 100 percent, and Export Session shows that row Completed with bytesTransferred equal to sizeBytes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "batch_remove_count_delta"
+description = "Batch count delta: queue three files, select exactly two via checkboxes, and click Remove Selected; the queue row count drops by exactly two, the unselected row survives with its name intact, the transfer log gains one removed entry per deleted file, and the Session Pack fileQueue length matches the visible count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.11"
+name = "reorder_echoes_to_export"
+description = "Order echo: drag a queue row to a new position, then open Export Session without reload; the fileQueue array serializes rows in the new on-screen order, and reloading preserves the same order"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.12"
+name = "transcript_export_input_dependent"
+description = "Input-dependent transcript: send distinctive text A and open Export Transcript (contains A); send distinctive text B and reopen; the regenerated markdown contains both A and B in transcript order — never a stale document missing B"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "progress_ignores_pause_or_rewinds"
+description = "A paused row's readout keeps advancing while Paused, or Resume restarts the readout from zero instead of the frozen value."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "14.n6"
+name = "transfer_log_static_or_rewritten"
+description = "Queue lifecycle actions add no transfer-log entries, or later actions rewrite or delete earlier log entries instead of appending."
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "behavioral.catchall"

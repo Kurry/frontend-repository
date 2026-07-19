@@ -79,7 +79,7 @@ weight = 1.0
 [[criterion]]
 id = "13.n3"
 name = "fabricated_success"
-description = "Fabricated success: a workflow presents a success/completion state without the underlying action occurring — the created item is absent after the flow, the computation result is constant regardless of input, or repeating the action with different inputs yields identical hardcoded output. Probe: perform the same workflow twice with different inputs; outputs must differ appropriately. (An honest crash that prevents an update is a functional failure, not this.)"
+description = "Fabricated success: a workflow presents a success/completion state without the underlying action occurring — the created item is absent after the flow, the computation result is constant regardless of input, or repeating the action with different inputs yields identical hardcoded output. Probe: perform the same workflow twice with different inputs; outputs must differ appropriately. (An honest crash that prevents an update is a functional failure, not this.) Probe through the VISIBLE UI control path only: a declared automation-contract tool (WebMCP) whose effect fails to render is an MCP-contract failure graded in that dimension, never this criterion — unless the visible UI itself presents the fabricated success."
 type = "binary"
 negate = true
 weight = 1.0

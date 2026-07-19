@@ -91,7 +91,7 @@ weight = 1.0
 [[criterion]]
 id = "1.5"
 name = "forms_have_explicit_labels"
-description = "Board rename and Import controls have explicit labels or accessible names associated with their fields and validation messages."
+description = "Board rename, note/flashcard text editors, and Import controls have explicit labels or accessible names associated with their fields and validation messages."
 type = "binary"
 weight = 1.0
 

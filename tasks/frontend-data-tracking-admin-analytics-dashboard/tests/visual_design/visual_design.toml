@@ -79,8 +79,8 @@ id = "3.3"
 name = "equal_width_stack_layout"
 description = "Lays out Operations Overview as a uniform equal-width single-column card stack with no mixed mosaic spans"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "3.4"
@@ -122,49 +122,56 @@ id = "3.9"
 name = "mobile_375_overflow"
 description = "At 375px viewport width, content clips, overflows the viewport, or page-level horizontal scrolling appears"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "3.10"
 name = "tables_scroll_in_containers"
 description = "At 375px viewport width, dense data tables scroll horizontally within their own containers rather than stretching the page"
 type = "binary"
-weight = 0.5
+weight = 1.0
 
 [[criterion]]
 id = "3.11"
-name = "consistent_capitalization"
-description = "Headings, buttons, and menu items follow one consistent capitalization convention (title case or sentence case) throughout the app"
+name = "export_drawer_visual_chrome"
+description = "The export drawer shows Session JSON and Users CSV tabs with a monospaced preview and Copy/Download actions"
 type = "binary"
-weight = 0.5
+weight = 1.0
 
 [[criterion]]
 id = "3.12"
-name = "specific_action_labels"
-description = "Action labels are specific verbs (Add user, Change status, Export) rather than generic labels (Submit, OK) where a specific label is possible"
+name = "consistent_capitalization"
+description = "Headings, buttons, and menu items follow one consistent capitalization convention (title case or sentence case) throughout the app"
 type = "binary"
-weight = 0.5
+weight = 1.0
 
 [[criterion]]
 id = "3.13"
-name = "validation_and_empty_state_copy"
-description = "Validation messages name the offending field and the fix, and empty state copy explains what belongs in the region and how to add it"
+name = "specific_action_labels"
+description = "Action labels are specific verbs (Add user, Change status, Export session) rather than generic labels (Submit, OK) where a specific label is possible"
 type = "binary"
-weight = 0.5
+weight = 1.0
 
 [[criterion]]
 id = "3.14"
-name = "placeholder_text_visible"
-description = "Lorem ipsum, 'TODO', template variable names, or other placeholder text is visible somewhere in the shipped UI"
+name = "validation_and_empty_state_copy"
+description = "Validation messages name the offending field and the fix, and empty state copy explains what belongs in the region and how to add it"
 type = "binary"
 weight = 1.0
-negate = true
 
 [[criterion]]
-id = "3.catchall"
+id = "3.15"
+name = "placeholder_text_visible"
+description = "Lorem ipsum, TODO, template variable names, or other placeholder text is visible somewhere in the shipped UI"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "visual_design.catchall"
 name = "visual_design_catchall"
 description = "The app exhibits a significant, browser-observable defect in visual design, responsiveness, or UI copy that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, viewport, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0

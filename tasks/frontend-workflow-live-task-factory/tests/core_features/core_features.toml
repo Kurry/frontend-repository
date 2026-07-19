@@ -175,35 +175,42 @@ weight = 1.0
 [[criterion]]
 id = "5.17"
 name = "package_four_parts_and_difficulty"
-description = "A completed run's package viewer shows four parts — the instruction document, a TOML-shaped task config, a metadata summary with repository, PR number, base commit SHA, language, and difficulty, and a bug-patch placeholder note naming the PR's non-test source files — and the difficulty matches the source-file count mapping (3 to 4 easy, 5 to 7 medium, 8 to 10 hard) with the count shown"
+description = "A completed run's package viewer shows four parts — the instruction document, a TOML-shaped task config, a metadata summary with repository, PR number, base commit SHA, language, difficulty, and source-file count, and a bug-patch placeholder note naming the PR's non-test source files — and the difficulty matches the source-file count mapping (3 to 4 easy, 5 to 7 medium, 8 to 10 hard) with the count shown"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "5.18"
 name = "package_copy_and_downloads_work"
-description = "The package viewer offers per-part copy controls that give a visible copied confirmation, individual file downloads for the instruction document and the task config, and a Download bundle control that downloads one JSON file containing all parts and the metadata"
+description = "The package viewer offers per-part copy controls that give a visible copied confirmation, individual file downloads for the instruction document and the task config, and a Download bundle control that downloads one TaskPackageBundle JSON file whose visible keys include schemaVersion exactly live-task-package-v1, repo, pr_number, base_sha, language, difficulty, source_file_count, created_at, instruction, task_config, and patch_note"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "5.19"
 name = "batch_run_and_bucketed_report"
-description = "The batch composer queues 2 or more accepted PRs and runs them sequentially with per-item stage progression under an n-of-m progress indicator; the finished batch shows a run report placing every queued PR in exactly one bucket among packaged, trivial, failed, and skipped, with per-bucket counts summing to the batch total, and the report downloads as a JSON file"
+description = "The batch composer queues 2 or more accepted PRs and runs them sequentially with per-item stage progression under an n-of-m progress indicator; the finished batch shows a run report placing every queued PR in exactly one bucket among packaged, trivial, failed, and skipped, with per-bucket counts summing to the batch total, and the report downloads as BatchRunReport JSON with total, packaged, trivial, failed, skipped, and items"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "5.20"
 name = "library_listing_filters_and_reexport"
-description = "The Library lists every produced package plus at least 2 seeded example packages showing repository, PR number, difficulty, language, and created date; filters by repository, difficulty, and language combine as removable chips; opening an entry reopens the full package viewer with working copy and download controls; deleting asks for confirmation and removes exactly that entry; re-export downloads the stored bundle content"
+description = "The Library lists every produced package plus at least 2 seeded example packages showing repository, PR number, difficulty, language, and created date; filters by repository, difficulty, and language combine as removable chips; opening an entry reopens the full package viewer with working copy and download controls; deleting asks for confirmation and removes exactly that entry; re-export downloads the stored TaskPackageBundle content"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "5.21"
 name = "import_bundle_validated_per_field"
-description = "The Import bundle control adds a valid package bundle JSON to the library, while an invalid bundle (missing required fields or violating field formats) is rejected with per-field errors naming each offending field and adds nothing"
+description = "The Import bundle control adds a valid TaskPackageBundle JSON (schemaVersion live-task-package-v1 and all required fields) to the library, while an invalid bundle — missing required fields, schemaVersion other than live-task-package-v1, or violating field formats — is rejected with per-field errors naming each offending field and adds nothing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.23"
+name = "export_import_round_trip"
+description = "After a completed demo pipeline run, downloading the TaskPackageBundle and importing that same JSON reconstructs a library entry whose viewer shows the same instruction text, repo, pr_number, difficulty, and patch_note as the pre-import package"
 type = "binary"
 weight = 1.0
 

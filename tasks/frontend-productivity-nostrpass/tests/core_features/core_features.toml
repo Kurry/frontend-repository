@@ -386,6 +386,92 @@ weight = 1.0
 
 
 [[criterion]]
+id = "1.41"
+name = "rotate_keys_generates_fresh_pair"
+description = "Activating Rotate keys on an identity and confirming the dialog replaces exactly that identity's npub and nsec with fresh, well-formed bech32 values distinct from its prior pair and from every other identity's, while its label and all four grants are unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "rotation_audit_entry_shows_old_and_new_npub"
+description = "A confirmed rotation adds an entry at the top of the Audit log naming the identity and showing shortened forms of both the old and the new npub"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "rotation_undo_restores_prior_keys"
+description = "After a confirmed rotation, Undo restores exactly the prior npub and nsec on the dashboard, the identity card, and the Export vault preview, and Redo reapplies the rotated pair"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "permissions_matrix_renders_all_identities"
+description = "The Permissions view renders an All identities matrix with one row per identity, one switch cell per application (damus, snort, coracle, iris), and each cell matching that identity's actual grant; toggling a cell updates the same grant the per-identity toggle would"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "grant_all_applies_across_identities"
+description = "Activating Grant all in an application's matrix column sets that application's grant for every identity in one action, updates every affected cell and pill together, and records one audit entry naming the application and the number of identities changed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "bulk_action_is_single_undo_step"
+description = "A single Undo after Grant all or Revoke all restores every identity's prior grant for that application, and Redo reapplies the bulk change"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "backup_export_single_identity_json"
+description = "Export backup opens a surface with a monospaced Key Backup JSON preview containing version exactly nostrpass-backup-v1, exportedAt, and that identity's actual label, npub, nsec, and four grant booleans, with Copy (confirmation) and Download controls and a QR-style tile labelled as a placeholder"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "backup_import_adds_identity"
+description = "Importing a valid Key Backup JSON whose npub matches no existing identity adds it as a new card, increases the identity count by exactly one, records an audit entry, and is reversible with Undo"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "backup_conflict_or_bad_schema_rejected"
+description = "Importing a Key Backup whose npub matches an existing identity, or one failing the field contract (wrong version, bad npub1/nsec1 prefix, label bounds, missing grants keys), shows an inline error naming the conflict or offending field and changes nothing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "audit_filter_narrows_by_type"
+description = "Choosing an action type in the Audit log filter narrows the list to entries of that type without mutating the log, and returning to All restores every entry in the same order"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "rotation_leaks_or_fakes"
+description = "After a confirmed rotation, another identity's keys changed, the rotated identity's label or grants changed, or its npub remained identical to the pre-rotation value"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.52"
+name = "bulk_grant_partially_applies"
+description = "After Grant all for one application, at least one identity still shows that application Revoked, or a different application's grants changed"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

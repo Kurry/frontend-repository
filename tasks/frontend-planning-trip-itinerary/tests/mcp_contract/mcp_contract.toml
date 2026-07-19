@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "12.1"
 name = "mandated_modules_are_bound"
-description = "All four contract-mandated modules — browse-query-v1, entity-collection-v1, form-workflow-v1, and artifact-transfer-v1 — are initialized and bound to the product's activities, destinations (overview, day-detail, activity-form, budget-ledger, export-canvas), form fields (title, day, location, notes, startTime, endTime, category), and artifact operations (export, import, copy) with export formats ics, json, and markdown."
+description = "All four contract-mandated modules — browse-query-v1, entity-collection-v1, form-workflow-v1, and artifact-transfer-v1 — are initialized and bound to the product's activities, destinations (overview, day-detail, activity-form, budget-ledger, export-canvas), entity/form fields (title, day, location, notes, startTime, endTime, category) with day value bounds 2025-07-05 through 2025-07-11 and category value bounds sightseeing, dining, lodging, transport, other, and artifact operations (export, import, copy) with export formats ics, json, and markdown plus import mode trip-json."
 type = "binary"
 weight = 1.0
 
@@ -91,7 +91,7 @@ weight = 1.0
 [[criterion]]
 id = "12.5"
 name = "declared_entity_operations_work"
-description = "Entity operations declared for the activity entity — create, select, update, delete (with confirm=true), and reorder — all work against the same shared state as the visible UI, including entity fields title, day, location, notes, startTime, endTime, and category."
+description = "Entity operations declared for the activity entity — create, select, update, delete (with confirm=true), and reorder — all work against the same shared state as the visible UI, including entity fields title, day, location, notes, startTime, endTime, and category, with day and category values constrained to the declared value bounds."
 type = "binary"
 weight = 1.0
 
@@ -141,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n2"
 name = "handlers_diverge_from_ui_logic"
-description = "Handlers do not match UI logic because actions mismatch or state does not sync."
+description = "WebMCP handlers for entity create/update/delete or artifact export/import diverge from the visible UI handlers so the same action leaves MCP-driven state and on-screen plan/ledger/export surfaces out of sync."
 type = "binary"
 negate = true
 weight = 1.0
@@ -213,7 +213,7 @@ weight = 1.0
 [[criterion]]
 id = "12.11"
 name = "artifact_export_import_tools_bound"
-description = "Artifact-transfer tools for export, import, and copy are bound for formats ics, json, and markdown and import mode trip-json, and invoking export/import uses the same handlers as the visible export canvas controls so MCP-driven export state matches the on-screen previews."
+description = "Artifact-transfer tools for export, import, and copy are bound for formats ics, json, and markdown and import mode trip-json, and invoking export/import uses the same handlers as the visible export canvas controls so MCP-driven export state matches the on-screen previews; after a create/edit/delete or successful trip-json import, the ics/json/markdown surfaces reflect the session mutations per the declared workflow-completion bindings."
 type = "binary"
 weight = 1.0
 

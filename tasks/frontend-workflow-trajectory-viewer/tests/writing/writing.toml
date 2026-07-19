@@ -78,7 +78,7 @@ weight = 0.5
 [[criterion]]
 id = "15.3"
 name = "errors_name_problem_and_fix"
-description = "Where the app renders validation or import errors, they name the field or problem (note_text, evidence, trial_id) and the fix, not just Invalid"
+description = "Where the app renders validation or import errors, they name the field or problem (note_text, evidence, schemaVersion, trial_id) and the fix, not just Invalid"
 type = "binary"
 weight = 0.5
 

@@ -64,7 +64,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "11.1"
 name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions beyond the required set — for example distinctive check-chip or rollup treatments that make the audit state legible at a glance"
+description = "The app has unique, delightful microinteractions beyond the required set — for example a celebratory flourish when a record reaches admitted or resolved, or distinctive check-chip treatments that make audit state legible at a glance"
 type = "binary"
 weight = 1.0
 
@@ -92,7 +92,7 @@ weight = 1.0
 [[criterion]]
 id = "11.5"
 name = "alternative_input_support"
-description = "The app supports an alternative input surface such as a keyboard command palette for jumping to records or views"
+description = "The app supports an alternative input surface such as a keyboard command palette for jumping to records, views, or export/import"
 type = "binary"
 weight = 1.0
 
@@ -120,14 +120,14 @@ weight = 1.0
 [[criterion]]
 id = "11.9"
 name = "genre_appropriate_platform_features"
-description = "The app uses web platform features that clearly help this genre, such as a what-if admission preview or printable report styling"
+description = "The app uses web platform features that clearly help this genre, such as a what-if admission preview or a printable audit summary layout reachable from Report"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.10"
 name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users, such as a celebratory flourish when a record reaches admitted or resolved, executed without interfering with required behaviors"
+description = "Competition-level innovation is visible to users, such as per-repository mini-summaries in the queue or a polished export-center narrative, executed without interfering with required behaviors"
 type = "binary"
 weight = 1.0
 

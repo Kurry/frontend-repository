@@ -62,153 +62,153 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "controls_keyboard_accessible"
+description = "Tree controls, chevrons, tag chips, breadcrumbs, Tag manager, Move To, Export grove, Import grove, Download grove package, Copy grove package, Grove JSON/CSV tabs, and footer create/edit forms are keyboard accessible with Tab, Shift+Tab, Enter, or Space"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "dialogs_manage_focus"
+description = "Tag manager panel, Move To picker, and Grove package panel trap focus while open, close on Escape, and return focus to the control that opened them"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "icons_have_accessible_names"
+description = "Icon-only chevron, zoom, move, archive, export, and theme controls expose accessible names describing their action"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "validation_and_toasts_use_live_regions"
+description = "TaskUpsert and TagUpsert inline validation, Import grove validation, and toast confirmations are announced through an aria-live polite region as well as shown visually"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
 name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+description = "New root task, Add Child, Edit task, Tag manager, and Import grove fields use visible labels or accessible names associated with the controls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
 name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+description = "TaskGrove app name and secondary headings (Archive, Tag manager, Grove package, Move dialog) follow a logical order without skips"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "landmark_regions_present"
+description = "The shell exposes landmark regions so the toolbar, main tree, and Archive panel are distinguishable"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
 name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+description = "Primary ink on the page canvas and #00BC7D primary controls keep readable contrast in Light, Dark, and Forest themes"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "semantic_html_roles_used"
+description = "Interactive controls use button/input semantics rather than clickable bare divs for Add Child, Export grove, Import grove, and Archive"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion set, row, chevron, toast, shake, theme, and Grove package panel animations are removed while features remain usable"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
 name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+description = "Grove JSON/CSV tabs, Export grove, or tree chevrons cannot be reached via keyboard"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.n2"
 name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+description = "Focus indicators are missing or obscured on toolbar or tree controls"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.n3"
 name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+description = "Custom tree or Grove package controls use non-semantic tags and lack ARIA roles or labels"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.n4"
 name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+description = "Completion, status, or validation state is conveyed by color alone with no text or icon cue"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.n5"
 name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+description = "While the Move To picker or Grove package panel is open, keyboard focus escapes to background controls behind the dialog"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.n6"
 name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+description = "Task titles or status chips are unreadable due to poor contrast in any theme"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.n7"
 name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+description = "Title, status, priority, or Import field-contract failures are visual only and not screen-reader accessible"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.n8"
 name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+description = "Icon-only controls lack accessible names"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.n9"
 name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+description = "Headings jump from the app name to a much deeper level with no logical intermediate heading"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.n10"
 name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+description = "Row, toast, or Grove package animations ignore prefers-reduced-motion"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "accessibility.catchall"

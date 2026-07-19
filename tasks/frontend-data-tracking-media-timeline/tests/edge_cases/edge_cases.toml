@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "4.2"
 name = "forms_validate_timeline_event_contract"
-description = "Create and edit forms show inline validation for empty title, year outside -4000..2100, empty place, empty summary, and zero categories before submit"
+description = "Create and edit forms show inline validation for empty title, type outside Milestone/Invention/Release/Publication/Broadcast, timestamp not ISO-8601 ending with Z or breaking the year cross-field rule, empty mediaRefs, year outside -4000..2100, empty place, empty summary, and zero categories before submit"
 type = "binary"
 weight = 1.0
 
@@ -126,7 +126,7 @@ weight = 1.0
 [[criterion]]
 id = "4.10"
 name = "malformed_import_leaves_collection_unchanged"
-description = "Importing malformed Timeline JSON or an events entry that breaks the TimelineEvent contract shows an inline error naming the failing field and leaves events count and titles unchanged"
+description = "Importing malformed Timeline JSON or an events entry that breaks the TimelineEvent contract (bad type, non-Z timestamp, empty mediaRefs, or year/timestamp mismatch) shows an inline error naming the failing field and leaves events count and titles unchanged"
 type = "binary"
 weight = 1.0
 

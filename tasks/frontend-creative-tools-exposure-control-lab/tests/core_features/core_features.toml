@@ -248,7 +248,7 @@ weight = 1.0
 [[criterion]]
 id = "1.32"
 name = "reload_resets_all_facets_to_seed"
-description = "After stepping the dials off their defaults, creating one preset, and marking one favorite: reload the page and confirm every facet returns to the seeded baseline together — dials back at f/16, 1/60, ISO 100, only the seeded presets and seeded snapshots, and empty undo/redo stacks — never a mix of reset and surviving facets"
+description = "After stepping the dials off their defaults, moving develop sliders, applying a look, creating one preset, and marking one favorite: reload the page and confirm every facet returns to the seeded baseline together — dials back at f/16, 1/60, ISO 100, every develop slider back at its default, no active look, only the seeded presets and seeded snapshots, and empty undo/redo stacks — never a mix of reset and surviving facets"
 type = "binary"
 weight = 1.0
 
@@ -291,21 +291,21 @@ weight = 1.0
 [[criterion]]
 id = "1.38"
 name = "before_hold_shows_defaults_then_restores"
-description = "With dials off defaults: holding the Before control shows the default exposure (f/16, 1/60, ISO 100) on the preview, meter, EV readout, and histogram without discarding the current stops; releasing Before restores the off-default dials and all derived surfaces immediately"
+description = "With dials and develop sliders off defaults: holding the Before control shows the original unedited photo — default exposure (f/16, 1/60, ISO 100) and every develop slider at its default — on the preview, meter, EV readout, and histogram without discarding the current stops or slider values; releasing Before restores the off-default dials, develop sliders, and all derived surfaces immediately"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.39"
 name = "seeded_snapshots_restore_dials"
-description = "On load the Snapshots strip shows at least 2 named snapshots with stop readouts; restoring a snapshot whose stops differ from the current dials writes those stops into the shared dials so preview, meter, EV, and histogram all match"
+description = "On load the Snapshots strip shows at least 2 named snapshots with stop readouts; restoring a snapshot whose state differs from the current edit writes its stops into the shared dials and its develop values into the sliders so preview, meter, EV, histogram, and slider readouts all match the saved version"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.40"
 name = "snapshot_create_increases_count_by_one"
-description = "Saving a valid named snapshot of the current stops increases the visible snapshot count by exactly one and shows the new row with its name and stop readout"
+description = "Saving a valid named snapshot captures the current stops and the current develop-slider values, increases the visible snapshot count by exactly one, and shows the new row with its name and stop readout"
 type = "binary"
 weight = 1.0
 

@@ -63,70 +63,70 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "9.1"
 name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+description = "Cold start to an interactive planner workspace (sidebar, plan column, map) is under 2 seconds on local render."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
 name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+description = "Browser console shows no errors or warnings — including no hydration mismatch warnings — during stop CRUD, ledger edits, CSV import, and export canvas use."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
 name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+description = "Plan/Map mode switches, day filter changes, and place-detail tab switches begin visible response in under 100ms from the triggering click."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.4"
 name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+description = "CSV import commit, template injector, and receipt-scanner extract show a brief busy or progress indicator while work runs."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.5"
 name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+description = "After a template injector or CSV commit that adds many expense rows, the ledger grid, spreadsheet, and charts render the new rows without multi-second blank stalls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.6"
 name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+description = "During FX currency changes, formula recalculation, and undo/redo, sidebar day chips and export tabs remain clickable without a frozen UI."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
 name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+description = "Stop row enter/exit, bulk tray slide, pie/burn-rate updates, and toast enter/exit run without visible stutter during normal use."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.8"
 name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+description = "Rapid repeated stop creation, day filter toggling, tab switching, and FX dropdown changes leave the UI responsive with no hang or dropped clicks."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.9"
 name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+description = "After an extended exercise of create/edit/delete, import, export regeneration, and chart redraws, the tab stays responsive without progressive slowdown suggesting runaway growth."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.10"
 name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+description = "When a CSV parse or trip JSON import fails, the UI shows a visible error state and keeps the prior session usable rather than blanking the planner."
 type = "binary"
 weight = 1.0
 

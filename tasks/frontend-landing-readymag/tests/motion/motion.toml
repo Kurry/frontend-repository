@@ -199,6 +199,36 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "8.a2"
+name = "scroll_storytelling_feature_card_reveal"
+description = "On a fresh load, real scrolling the workflow section into view is the narrative beat that reveals the four feature cards (fade and rise, staggered by about 80ms); cards stay settled while scrolling onward, and a fresh load restores the unrevealed start until that scroll beat fires again (never a state shortcut)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.a3"
+name = "pointer_reactive_cursor_and_tilts"
+description = "On a fine-pointer desktop viewport, elements respond continuously to the pointer: the 43px custom cursor follows the pointer and swaps on interactive targets, while remaining fully usable; grade via real pointer movement, not a state shortcut"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.a5"
+name = "scroll_capture_breaks_usability"
+description = "Scrolling hijacks or traps the scrollbar, prevents reaching later sections, fights native document scroll or sticky-header behavior, or ignores the reduced-motion path that must stop offset-path travel, tilt, and reveal animation while every section stays fully visible, correctly placed, and operable"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "8.a7"
+name = "signature_motion_purely_linear_tweens"
+description = "Hero intro rise/fade or feature-card scroll reveal uses purely linear tweens that start and stop mechanically with no inertial cubic-bezier(.56,.86,.59,1) easing (marquees and path travels may remain linear)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "3.catchall"
 name = "motion_catchall"
 description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

@@ -77,7 +77,7 @@ weight = 1.0
 [[criterion]]
 id = "12.3"
 name = "only_declared_ops_and_bindings"
-description = "Only documented operations from the bindings are available: editor select/add/delete/update_property/switch_mode/preview on criterion, labelled-case, and sample-verdict; browse destinations among response-quality, code-review-depth, safety-screening, summarization-fidelity, version-history, diff-view, tune-view, preview-panel, and export; artifact export/copy with format structured-text — no invented destinations."
+description = "Only documented operations from the bindings are available: editor select/add/delete/update_property/switch_mode/preview on criterion, labelled-case, and sample-verdict; browse destinations among response-quality, code-review-depth, safety-screening, summarization-fidelity, version-history, diff-view, tune-view, preview-panel, export, and export-center; artifact export/import/copy with formats structured-text, rubric-json, and package-json and import mode package-json — no invented destinations."
 type = "binary"
 weight = 1.0
 
@@ -104,8 +104,8 @@ weight = 1.0
 
 [[criterion]]
 id = "12.7"
-name = "browse_destinations_and_artifact_export_copy"
-description = "Browse destinations open the declared rubric and panel surfaces, and artifact operations export and copy with export format structured-text are bound and invoke without throwing when called through WebMCP (clipboard contents remain Playwright responsibilities)."
+name = "browse_destinations_and_artifact_export_import_copy"
+description = "Browse destinations open the declared rubric and panel surfaces including export-center, and artifact operations export, import, and copy with export formats structured-text, rubric-json, and package-json (import mode package-json) are bound and invoke without throwing when called through WebMCP (clipboard contents and native file pickers remain Playwright responsibilities)."
 type = "binary"
 weight = 1.0
 
@@ -149,7 +149,7 @@ negate = true
 [[criterion]]
 id = "12.n3"
 name = "undeclared_capabilities_exposed"
-description = "Undeclared modules, destinations, or operations beyond the Bindings (editor select/add/delete/update_property/switch_mode/preview; browse destinations listed in the contract; artifact export/copy) are exposed."
+description = "Undeclared modules, destinations, or operations beyond the Bindings (editor select/add/delete/update_property/switch_mode/preview; browse destinations listed in the contract including export-center; artifact export/import/copy with structured-text/rubric-json/package-json) are exposed."
 type = "binary"
 weight = 1.0
 negate = true

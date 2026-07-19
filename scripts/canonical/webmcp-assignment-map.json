@@ -1175,5 +1175,102 @@
       "Chart hover/tooltip mechanics stay Playwright-only",
       "Drawer overlay slide on small viewports stays Playwright-observed"
     ]
+  },
+  {
+    "task": "frontend-workflow-live-task-factory",
+    "modules": [
+      "entity-collection-v1",
+      "form-workflow-v1",
+      "command-session-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "entity": "library-package",
+      "entity_operations": [
+        "select",
+        "delete"
+      ],
+      "entity_fields": [
+        "repository",
+        "pr-number",
+        "difficulty",
+        "language",
+        "created-date"
+      ],
+      "form_fields": [
+        "repository",
+        "github-token",
+        "ai-base-url",
+        "ai-api-key",
+        "reject-reason"
+      ],
+      "form_operations": [
+        "validate",
+        "submit",
+        "cancel",
+        "reset"
+      ],
+      "workflow_steps": [
+        "accept-pr",
+        "reject-pr",
+        "undo-triage",
+        "queue-batch",
+        "disconnect-credential",
+        "reset-coachmarks"
+      ],
+      "value_bounds": [
+        "reject-reason in {too-few-files, too-many-files, docs-only, no-linked-issue}",
+        "repository field must match the owner/name shape with exactly one slash",
+        "seeded repositories limited to nimbusworks/driftline (TypeScript), cobalt-labs/loomdb (Rust), fernfield/petrel (Python)",
+        "difficulty derives from non-test source-file count: 3-4 easy, 5-7 medium, 8-10 hard; runs blocked when the count exceeds 10 (loomdb seeds one such PR)",
+        "TaskPackageBundle field contract: schemaVersion exactly live-task-package-v1, repo owner/name, pr_number positive integer, base_sha 40-character lowercase hex, language non-empty, difficulty in {easy, medium, hard}, source_file_count integer 3-10, created_at ISO 8601, non-empty instruction, task_config, and patch_note",
+        "BatchRunReport field contract: total, packaged, trivial, failed, skipped non-negative integers with packaged+trivial+failed+skipped equal total; items each with repo, pr_number, and outcome in {packaged, trivial, failed, skipped}",
+        "delete requires explicit confirm=true",
+        "credential submit validates field shape only; without a real credential the check fails visibly, the status stays Disconnected, and the app remains in Demo data mode on fixtures"
+      ],
+      "session_operations": [
+        "start",
+        "pause",
+        "resume"
+      ],
+      "demos": [
+        "demo-pipeline-run",
+        "rate-limit-retry-driftline-pr-58",
+        "generate-failure-retry-petrel-pr-31",
+        "trivial-verdict-run",
+        "batch-run"
+      ],
+      "artifact_operations": [
+        "export",
+        "copy",
+        "import"
+      ],
+      "export_formats": [
+        "instruction-document-text",
+        "task-config-toml",
+        "package-bundle-json",
+        "batch-run-report-json"
+      ],
+      "import_modes": [
+        "package-bundle-json"
+      ],
+      "visible_postconditions": [
+        "with no credentials the top-bar mode indicator reads Demo data and every screen is fully populated and exercisable from the seeded fixtures",
+        "triage actions immediately update the board header stats and per-reason rejected breakdown; undo restores the card's previous column and reverts the stats exactly; placements survive a reload",
+        "a completed demo pipeline run produces a TaskPackageBundle whose viewer text, copied text, and downloaded JSON all carry schemaVersion live-task-package-v1, the Generate stage's actual streamed instruction text, and metadata matching the source PR; demo runs of the same fixture PR are deterministic",
+        "a finished batch places every queued PR in exactly one of packaged, trivial, failed, or skipped with bucket counts summing to the batch total, and packaged entries appear in the library as TaskPackageBundle records",
+        "importing a valid TaskPackageBundle adds its package to the library; an invalid bundle lists every offending field by name and adds nothing; export-then-import reconstructs the same visible package content",
+        "disconnecting a credential returns its status to Disconnected and the mode indicator to Demo data; after a reload both credentials show Disconnected while packages, triage placements, and coachmark dismissals persist"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Live GitHub and AI-endpoint calls (account checks, live PR fetching and paging, live chat-completions streaming) are network behaviors the judge grades by observation only \u2014 the judge has no credentials and no tool may simulate a successful connection or Live mode",
+      "Candidates/Triage/Runs/Library navigation, PR source-file bound filters, require-linked-issue toggle, and library filter chips are simple visible controls the judge drives directly via Playwright",
+      "Credential masked-field show/hide toggles and the Connections slide-over transition stay Playwright-driven",
+      "Evaluate/Generate streaming cadence, the pulsing streaming affordance, and the rate-limit reset countdown ticking stay Playwright-observed",
+      "Triage card column-move and undo-return animations stay Playwright-observed",
+      "Command palette Cmd+K/Ctrl+K gesture and keyboard navigation stay Playwright-driven",
+      "File downloads, file-picker import interaction, and clipboard contents remain Playwright responsibilities"
+    ]
   }
 ]

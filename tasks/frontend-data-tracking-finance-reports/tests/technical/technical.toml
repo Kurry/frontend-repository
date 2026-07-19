@@ -61,89 +61,116 @@ allowed_tools = [
 aggregation = "weighted_mean"
 
 [[criterion]]
-id = "2.1"
-name = "cross_view_state_coherence"
-description = "A transaction change made through one surface is immediately reflected in every other surface showing that data — table rows, the four summary cards, the summary strip, and the chart panels — without a page reload and with no view showing stale data"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "2.2"
-name = "document_title_ledger_reports"
-description = "The browser document title reads exactly 'Ledger | Reports'"
+name = "no_browser_storage_seeded_reload"
+description = "No browser storage is used for persistence: localStorage and sessionStorage remain empty after a full exercise of the app including export and import, and a reload returns the seeded state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
-name = "browser_storage_persists_state"
-description = "Uses localStorage or sessionStorage to persist transactions or filters"
+name = "storage_apis_persist_state"
+description = "Uses localStorage or sessionStorage to persist transactions, filters, thresholds, display currency, or export drafts"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "2.4"
-name = "keyboard_operable_with_visible_focus"
-description = "Every interactive control — nav items, chart pills, filters, row checkboxes, form fields, and bulk actions — is reachable and operable with the keyboard alone, with a visible focus indicator"
+name = "console_clean_during_full_exercise"
+description = "No console errors or unhandled promise rejections appear during a full exercise of the app (create, edit, delete, filters, chart tab switches, bulk actions, thresholds, currency switch, undo/redo, export, import)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.5"
-name = "labeled_inputs_aria_live_validation"
-description = "Create and edit form inputs have programmatically associated labels, and inline validation messages are exposed through an aria-live polite region as well as shown visually"
+name = "keyboard_operable_with_visible_focus"
+description = "Every interactive control (sidebar items, chrome actions, chart tabs, table controls, form fields, Export, Import, Undo, Redo, display currency, threshold ceilings) is reachable and operable with the keyboard alone, and the focused control shows a visible focus indicator"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.6"
-name = "toast_announced_without_focus_trap"
-description = "Toasts are announced through an aria-live polite region and never trap keyboard focus"
+name = "modal_form_focus_trap_and_return"
+description = "When the transaction create/edit form is presented as a modal it uses dialog semantics: focus moves into it on open, stays trapped inside while open, and returns to the invoking control on close"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.7"
-name = "chart_text_alternative_present"
-description = "Each chart panel exposes a text alternative: node/segment labels and amounts are readable as text in or alongside the chart region"
+name = "validation_announced_via_live_region"
+description = "Form validation messages are exposed through a polite live region in addition to being shown visually"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.8"
-name = "interactive_within_two_seconds"
-description = "The app becomes interactive within 2 seconds of a local cold load"
+name = "legends_convey_data_without_hover"
+description = "Chart content is readable without hover: node/segment labels and amounts are readable as text in or alongside the chart region"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "2.9"
-name = "console_errors_during_full_exercise"
-description = "Console errors or warnings appear during a full exercise of the app (create, edit, delete, filters, bulk actions, chart toggles, toasts)"
+name = "interactive_within_two_seconds"
+description = "The app is interactive within 2 seconds of a local cold load"
 type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
 id = "2.10"
-name = "responsive_under_rapid_input"
-description = "Chart tab switches and filter changes apply without visible freezing, and the UI stays responsive under rapid repeated input with no hangs or dropped interactions"
+name = "in_place_redraws_without_jank"
+description = "Chart redraws, tab switches, currency switches, undo/redo, and export drawer opens apply in place without a full page reload and without visible jank"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.11"
-name = "external_origin_requests_or_navigation"
-description = "The running app requests scripts, styles, fonts, or icons from external origins (CDNs) or navigates the top-level page to another origin during use"
+name = "document_title_ledger_reports"
+description = "The document title is exactly Ledger | Reports"
 type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.12"
+name = "no_outbound_requests_or_navigation"
+description = "During a full exercise of the app, only same-origin network requests appear in devtools and no control navigates the browser to another origin"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.13"
+name = "multi_facet_reload_resets_coherently"
+description = "Configure several independent facets — create a transaction, switch the chart tab to Trends, apply a category filter, and change display currency — then reload. All facets coherently reset to the seeded baseline, never a mix of reverted and surviving facets"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.14"
+name = "views_desync_on_shared_datum"
+description = "The same datum shows different values in two places at once (table vs KPI vs chart aggregate vs export totals) until a reload"
+type = "binary"
+weight = 1.0
 negate = true
+
+[[criterion]]
+id = "2.15"
+name = "export_drawer_traps_focus"
+description = "The export drawer traps focus while open, closes on Escape, and returns focus to the invoking control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.16"
+name = "field_contract_enforced_on_create"
+description = "A create that violates the transaction field contract (zero amount, non-ISO date, or Salary with negative amount) is rejected with visible field errors and does not increase the collection count"
+type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network request, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true

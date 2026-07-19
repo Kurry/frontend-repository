@@ -187,6 +187,35 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "1.12"
+name = "batch_controls_keyboard_and_count_exposed"
+description = "The row selection checkboxes, select-all control, and bulk action tray controls are reachable and operable by keyboard, and the tray's selected count is exposed to assistive technology rather than conveyed by position alone."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "import_diagnostics_keyboard_and_announced"
+description = "The CSV import diagnostics screen is keyboard-operable (schema mapping, inline row fixes, row exclusion, and Commit reachable by Tab), and each invalid row's failing-field message is programmatically associated with its row or cell and announced."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "benchmark_state_and_labeled_figures"
+description = "The Benchmark compare toggle exposes its on/off state to assistive technology, and the performance summary figures are labeled text rather than color-only indicators of gain or loss."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.n7"
+name = "new_surfaces_inaccessible"
+description = "The batch selection controls or the CSV import diagnostics screen cannot be reached or operated by keyboard, or performance-summary gain and loss are conveyed by color alone with no text label or programmatic state."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
 id = "accessibility.catchall"
 name = "accessibility_catchall"
 description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

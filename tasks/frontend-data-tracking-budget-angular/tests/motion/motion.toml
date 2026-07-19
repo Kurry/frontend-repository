@@ -77,7 +77,7 @@ weight = 1.0
 [[criterion]]
 id = "4.3"
 name = "snackbar_slides_in_and_autodismisses"
-description = "Add, update, and delete actions show a snackbar that slides in from the bottom edge and auto-dismisses after a short delay"
+description = "Add, update, delete, bulk actions, export copy, and import show a snackbar that slides in from the bottom edge and auto-dismisses after a short delay"
 type = "binary"
 weight = 0.5
 optional = true
@@ -133,6 +133,13 @@ weight = 0.5
 id = "4.10"
 name = "view_switch_swaps_without_reload"
 description = "Switching between Dashboard, Expenses, and Settings via the bottom navigation swaps the main content without a full page reload, and the active bottom-nav item is visually distinguished from the inactive ones"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "export_drawer_animates_in_out"
+description = "Opening and closing the Export drawer through the real Export control animates the drawer with a short opacity and slide transition rather than snapping open or closed"
 type = "binary"
 weight = 1.0
 

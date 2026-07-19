@@ -104,7 +104,7 @@ weight = 1.0
 [[criterion]]
 id = "12.6"
 name = "artifact_export_import_copy_bound"
-description = "Artifact operations export, import, and copy are bound for the vault JSON format without putting raw file contents in WebMCP args or results"
+description = "Artifact operations export, import, and copy are bound for the declared json and backup-json export formats and vault-json and backup-json import modes, driving the same vault and backup surfaces as the UI, without putting raw file contents in WebMCP args or results"
 type = "binary"
 weight = 1.0
 
@@ -112,7 +112,7 @@ weight = 1.0
 [[criterion]]
 id = "12.7"
 name = "queries_match_allowed_spec"
-description = "Browse destinations, search filter, label-asc/label-desc sorts, and light/dark themes match the allowed specification"
+description = "Browse destinations, the search and audit-action filters, label-asc/label-desc sorts, and light/dark themes match the allowed specification"
 type = "binary"
 weight = 1.0
 

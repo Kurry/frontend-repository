@@ -62,21 +62,21 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
+name = "exploration_first_composition"
 description = "Timeline stage plus scrubber/library composition stays exploration-first, not a marketing card stack"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
+name = "empty_state_visually_present"
 description = "Empty list/filter state is visually present when no events match"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
+name = "static_brochure_replaces_timeline"
 description = "Replaces the timeline with a static brochure layout and no scrub/explore stage"
 type = "binary"
 weight = 1.0
@@ -92,7 +92,7 @@ weight = 1.0
 [[criterion]]
 id = "3.5"
 name = "category_color_and_detail_hierarchy"
-description = "Event pins or list rows show their category color, and the detail surface presents a clear hierarchy of kicker (year · place), title, and body"
+description = "Event pins or list rows show their category color, and the detail surface presents a clear hierarchy of kicker (year · place), title, type, mediaRefs, category, and body"
 type = "binary"
 weight = 1.0
 

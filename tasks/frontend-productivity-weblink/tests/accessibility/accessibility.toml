@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "controls_are_keyboard_accessible"
-description = "All interactive controls (name, roomId, Join Room, Leave Room, theme toggle, composer, choose-file, Export Session, Import Session, Copy, Download) are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+description = "All interactive controls (name, roomId, Join Room, Leave Room, theme toggle, composer, choose-file, per-row Start/Pause/Resume/Cancel/Retry, row checkboxes, select-all, Remove Selected, Retry Selected, Export Session, Import Session, Export Transcript, Copy, Download) are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
 type = "binary"
 weight = 1.0
 
@@ -208,6 +208,20 @@ name = "animations_ignore_reduced_motion"
 description = "Animations ignore reduced-motion settings."
 type = "binary"
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "progress_and_checkboxes_have_semantics"
+description = "Each row's transfer progress is exposed with progress semantics (a progressbar role carrying the current value, or equivalent visible text tied to the row), and each row checkbox is labeled with its file's name"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "reorder_has_keyboard_alternative"
+description = "Queue drag reorder has a keyboard-operable alternative (move-up/move-down controls or a keyboard-activated handle) that achieves the same reordering"
+type = "binary"
 weight = 1.0
 
 [[criterion]]

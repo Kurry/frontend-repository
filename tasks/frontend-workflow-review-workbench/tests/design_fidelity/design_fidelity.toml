@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "3.2"
 name = "specified_layout_implemented"
-description = "The specified compositions are implemented as written: rollup strip and calibration strip above the portfolio table; workspace header with slug, hero banner, recommendation, and breadcrumb; left-rail stepper; six gate cards in the fixed order; three-pane inspector"
+description = "The specified compositions are implemented as written: rollup strip and calibration strip above the portfolio table with Export/Import certification package controls; workspace header with slug, hero banner, recommendation, and breadcrumb; left-rail stepper; six gate cards in the fixed order; three-pane inspector; export drawer with monospaced preview"
 type = "binary"
 weight = 1.0
 

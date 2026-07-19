@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "2.2"
 name = "no_storage_reload_seeded"
-description = "No browser storage is used: localStorage and sessionStorage remain empty after re-running gates, resolving fix items, saving overrides, writing notes, and bundling, and a page reload returns the app to its seeded state — the 12 seeded bundles with seeded gate results, unset recommendations, empty notes, and no Bundled badges"
+description = "No browser storage is used: localStorage and sessionStorage remain empty after re-running gates, resolving fix items, saving overrides, writing notes, bundling, exporting, and importing, and a page reload returns the app to its seeded state — the 12 seeded bundles with seeded gate results, unset recommendations, empty notes, and no Bundled badges; persistence is the exportable Review Package JSON plus MCP"
 type = "binary"
 weight = 1.0
 
@@ -152,6 +152,22 @@ weight = 1.0
 id = "2.13"
 name = "outbound_chrome_links_present"
 description = "App chrome contains outbound navigational links that leave the app's origin"
+type = "binary"
+weight = 1.0
+negate = true
+
+
+[[criterion]]
+id = "2.14"
+name = "export_import_share_field_contract"
+description = "A successful recommendation/override save creates the same request-body shape that appears under that bundle in Review Package JSON, and a successful import accepts only documents that satisfy the review-certification/v1 field contract"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.15"
+name = "export_preview_diverges_from_store"
+description = "The Export Review Package JSON preview disagrees with the live portfolio/workspace about a bundle's recommendation, overrideJustification, resolved fix items, step notes, or Bundled state"
 type = "binary"
 weight = 1.0
 negate = true

@@ -70,28 +70,28 @@ weight = 1.0
 [[criterion]]
 id = "9.2"
 name = "shared_state_coherence"
-description = "Shared-state coherence: a change made in one surface (a completed run, a verdict, a feedback entry) is immediately reflected in every other surface showing that data — queue row, detail panels, rollup strip, charts, and report — without a reload"
+description = "Shared-state coherence: a change made in one surface (a completed run, a verdict, a feedback entry) is immediately reflected in every other surface showing that data — queue row, detail panels, rollup strip, charts, and both Report export previews — without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
 name = "storage_stays_empty"
-description = "After a full exercise of the app (runs, verdicts, feedback, escalation, fixes, report copy), localStorage, sessionStorage, and other browser storage remain empty"
+description = "After a full exercise of the app (runs, verdicts, feedback, escalation, fixes, export copy/download, import), localStorage, sessionStorage, and other browser storage remain empty"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.4"
 name = "reload_returns_seeded_baseline"
-description = "A page reload returns the app to its seeded state: the seeded records with their original stages, check results, and feedback, the default Queue view, and an empty export history"
+description = "A page reload returns the app to its seeded state: the seeded records with their original stages, check results, and feedback, the default Queue view, an empty export history, and a closed import surface"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.5"
 name = "console_clean_through_flows"
-description = "No console errors or unhandled promise rejections appear on load or while exercising runs, batch runs, pause/resume, verdicts, feedback, escalation, re-audit, and report copy"
+description = "No console errors or unhandled promise rejections appear on load or while exercising runs, batch runs, pause/resume, verdicts, feedback, escalation, re-audit, export copy/download, and import"
 type = "binary"
 weight = 1.0
 
@@ -105,7 +105,7 @@ weight = 1.0
 [[criterion]]
 id = "9.7"
 name = "views_reachable_via_client_state"
-description = "The Queue, Reviewers, Report, and task detail views are all reachable from the in-app navigation, and switching between them never triggers a full page reload"
+description = "The Queue, Reviewers, Report (including format switch and import surface), and task detail views are all reachable from the in-app navigation, and switching between them never triggers a full page reload"
 type = "binary"
 weight = 1.0
 
@@ -150,7 +150,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n4"
 name = "views_desync_same_datum"
-description = "The same datum shows different values in two places at once — for example the rollup strip and the report disagree on a check's pass count, or a queue row lags its detail view"
+description = "The same datum shows different values in two places at once — for example the rollup strip and the Audit Package JSON checkPassRates disagree on a check's pass count, or a queue row lags its detail view"
 type = "binary"
 negate = true
 weight = 1.0
@@ -167,6 +167,22 @@ weight = 1.0
 id = "9.n6"
 name = "external_link_navigates_away"
 description = "An app-chrome link or control navigates away from the app's origin"
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "9.10"
+name = "export_import_share_field_contract"
+description = "Audit Package JSON export and a successful import conform to the same visible field-contract keys (schemaVersion quality-audit-package-v1, datasetSummary, tasks, and related arrays); after a valid import the next export preview matches the imported document"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.n7"
+name = "export_preview_is_static_snapshot"
+description = "The Report export preview ignores live store mutations and remains a static snapshot after runs, verdicts, or feedback entries"
 type = "binary"
 negate = true
 weight = 1.0

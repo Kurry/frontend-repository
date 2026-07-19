@@ -63,77 +63,77 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "9.1"
 name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+description = "Cold start to interactive is under 2 seconds on local render: the workspace with top bar and bottom nav responds to a first click without a prolonged blank state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
 name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+description = "Browser devtools show no errors or warnings during add, edit, delete, bulk actions, period switch, Export, Import, and Settings edits"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
 name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+description = "Period switches, view switches, and filter changes update visible content immediately without a multi-second stall"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.4"
 name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+description = "When Import JSON validation takes a noticeable moment, the UI shows progress or stays responsive rather than freezing the chrome"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "9.5"
 name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+description = "With the seeded multi-period expense set plus several session adds, the Expenses table and Dashboard chart remain responsive"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.6"
 name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+description = "While Dashboard totals, progress bars, and export previews recompute after an expense mutation, the UI remains interactive"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
 name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+description = "Dialog open, row enter/exit, and progress-bar fill animations remain smooth without visible stutter during normal use"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "9.8"
 name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+description = "Clicking the period arrow five times quickly or switching Dashboard/Expenses/Settings rapidly does not hang or freeze the app"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.9"
 name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+description = "An extended session of adds, deletes, exports, and period switches shows no runaway memory growth that freezes the tab"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "9.10"
 name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+description = "Opening Export with an empty period still compiles CSV/JSON previews without hanging"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "9.n1"
 name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+description = "More than 2 seconds pass before the budget workspace is interactive on local render"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n2"
 name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+description = "Errors or warnings appear in the console during expense CRUD, Export, or Import flows"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n3"
 name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+description = "Period or view transitions block interaction for a prolonged period"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +157,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n4"
 name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
+description = "Import JSON validation or export preview regeneration freezes the UI"
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +165,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n5"
 name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+description = "The seeded expense set plus session adds makes the Expenses table or chart unusable due to lag"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n6"
 name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
+description = "Dialog, drawer, or progress-bar animation makes input unresponsive until it finishes"
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +181,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n7"
 name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
+description = "The UI blocks rendering while loading scripts or chart assets with a prolonged blank page"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n8"
 name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
+description = "Memory leaks or runaway browser resource usage occur during repeated expense mutations and exports"
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +197,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n9"
 name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
+description = "Nothing is displayed while the initial workspace or Export drawer is loading"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n10"
 name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+description = "The app crashes under rapid period switching or repeated add/delete"
 type = "binary"
 negate = true
 weight = 1.0

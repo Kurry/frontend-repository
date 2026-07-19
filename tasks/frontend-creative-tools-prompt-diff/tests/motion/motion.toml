@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "4.1"
 name = "diff_crossfade_150ms"
-description = "Changing a version picker through the real control cross-fades the diff panel contents over roughly 150 milliseconds rather than snapping"
+description = "Changing a version picker or an Ignore whitespace/Ignore case toggle through the real control cross-fades the diff panel contents over roughly 150 milliseconds rather than snapping"
 type = "binary"
 weight = 1.0
 
@@ -112,7 +112,7 @@ weight = 1.0
 [[criterion]]
 id = "4.8"
 name = "toasts_slide_autodismiss"
-description = "Toasts after merges, restores, and exports slide in, remain readable long enough to scan, and auto-dismiss with a fade"
+description = "Toasts after merges, restores, exports, and successful imports slide in, remain readable long enough to scan, and auto-dismiss with a fade"
 type = "binary"
 weight = 1.0
 
@@ -122,6 +122,13 @@ name = "reduced_motion_respected"
 description = "With prefers-reduced-motion set, the diff cross-fade, counter pulse, mode-toggle transition, and thread animations apply instantly"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "export_surface_transition"
+description = "Opening and closing the Export surface through the real control uses a brief opacity and scale transition rather than appearing or disappearing instantly"
+type = "binary"
+weight = 0.5
 
 [[criterion]]
 id = "4.n1"

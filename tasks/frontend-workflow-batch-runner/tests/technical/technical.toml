@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "2.2"
 name = "no_storage_seeded_reload"
-description = "localStorage and sessionStorage remain empty after composing, launching, retrying, pausing, reordering, scheduling, exporting, and undoing, and a page reload returns the app to its seeded state (seeded jobs and history, default view, no schedules)"
+description = "localStorage and sessionStorage remain empty after composing, launching, retrying, pausing, reordering, scheduling, exporting, importing, and undoing, and a page reload returns the app to its seeded state (seeded jobs and history, default view, no schedules, closed export/import)"
 type = "binary"
 weight = 1.0
 
@@ -85,7 +85,7 @@ weight = 1.0
 [[criterion]]
 id = "2.4"
 name = "console_errors_during_flows"
-description = "Console errors or unhandled promise rejections appear on load or during composing, launching, retrying, pausing, reordering, comparing, scheduling, exporting, or undoing"
+description = "Console errors or unhandled promise rejections appear on load or during composing, launching, retrying, pausing, reordering, comparing, scheduling, exporting, importing, or undoing"
 type = "binary"
 negate = true
 weight = 1.0
@@ -108,7 +108,7 @@ weight = 1.0
 [[criterion]]
 id = "2.7"
 name = "same_datum_diverges"
-description = "The same datum shows different values in two places — for example an item's cost or status differs between the grid, the inspector, the comparison view, or the export"
+description = "The same datum shows different values in two places — for example an item's cost or status differs between the grid, the inspector, the comparison view, or the Export run JSON"
 type = "binary"
 negate = true
 weight = 1.0
@@ -116,7 +116,7 @@ weight = 1.0
 [[criterion]]
 id = "2.8"
 name = "all_views_reachable"
-description = "Every documented surface — composer, grid, queue, inspector, timeline, comparison, schedule form, exports — is reachable through in-app controls and renders without errors"
+description = "Every documented surface — composer, grid, queue, inspector, timeline, comparison, schedule form, Export run, Import run — is reachable through in-app controls and renders without errors"
 type = "binary"
 weight = 1.0
 

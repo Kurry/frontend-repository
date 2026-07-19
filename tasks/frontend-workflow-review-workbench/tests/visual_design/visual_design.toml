@@ -154,6 +154,14 @@ type = "binary"
 weight = 0.5
 negate = true
 
+
+[[criterion]]
+id = "3.15"
+name = "export_drawer_monospace_preview"
+description = "The export drawer and import surface render a scrollable monospaced preview with format tabs or equivalent chrome, visually distinct from body UI, and Copy/Download controls sit with that preview"
+type = "binary"
+weight = 1.0
+
 [[criterion]]
 id = "3.catchall"
 name = "visual_design_catchall"

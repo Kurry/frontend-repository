@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "14.2"
 name = "search_to_export_pipeline_tracks"
-description = "Full pipeline probe: run a query, note the top three results and their scores, thumbs-up the third result, and raise the threshold; then open the export report. The report's ranked list shows the boosted result's new position, the raised threshold value, the feedback marker on that result, and only results at or above the threshold — every stage tracked the same live state"
+description = "Full pipeline probe: run a query, note the top three results and their scores, thumbs-up the third result, and raise the threshold; then open the Search report export. The JSON has schemaVersion 1, request.threshold matches the slider, results order and feedback match the cards after the boost, and only hits at or above the threshold appear — every stage tracked the same live state under the SearchReport field contract"
 type = "binary"
 weight = 1.0
 
@@ -117,6 +117,13 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "14.9"
+name = "library_package_import_export_round_trip"
+description = "Add a document with a distinctive title and save a uniquely named search, open Library package export and note documents length and that saved search name, delete documents until the count diverges, Import the earlier package JSON, then confirm the index list count, the saved search name, and a fresh Library package export reconstruct to match the imported document — including schemaVersion 1 and library exactly Semantic Search Library"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "14.n1"
 name = "derived_surface_ignores_inputs"
 description = "A derived surface — the result count, cluster counts, index statistics, compare summary, or export report — renders identically after its inputs change (threshold, feedback, document changes, or a different query)"
@@ -127,7 +134,15 @@ negate = true
 [[criterion]]
 id = "14.n2"
 name = "identical_scores_for_different_queries"
-description = "Two different queries yield identical similarity scores for the same documents, or the export report shows scores that do not match the on-screen badges for the same query"
+description = "Two different queries yield identical similarity scores for the same documents, or the Search report export shows scores that do not match the on-screen badges for the same query"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "14.n5"
+name = "import_accepts_invalid_package"
+description = "Importing malformed Library package JSON, schemaVersion other than 1, library other than Semantic Search Library, or a document or saved search that fails its field contract still mutates the corpus or saved list"
 type = "binary"
 weight = 1.0
 negate = true

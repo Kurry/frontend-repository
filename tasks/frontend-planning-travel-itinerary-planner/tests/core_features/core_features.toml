@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "seeded_multi_day_plan_on_load"
-description = "On load, the planner shows itinerary day sections for Sun 7/5 through Sat 7/11 with at least 8 seeded French Riviera stops (place names visible) distributed across the days, plus at least one unscheduled ideas stop not tied to a day"
+description = "On load, the planner shows itinerary day sections for Sun 7/5 through Sat 7/11 with at least 8 seeded French Riviera stops (place names visible) distributed across the days, plus at least 3 unscheduled ideas stops not tied to a day"
 type = "binary"
 weight = 1.0
 
@@ -111,8 +111,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "empty_name_submit_rejected"
-description = "After submitting the stop form with an empty required name, the stops count is unchanged and an inline validation message naming the name field is visible"
+name = "empty_title_submit_rejected"
+description = "After submitting the stop form with an empty required title, the stops count is unchanged and an inline validation message naming the title field is visible"
 type = "binary"
 weight = 1.0
 

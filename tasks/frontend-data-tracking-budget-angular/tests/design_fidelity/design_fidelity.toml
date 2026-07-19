@@ -63,77 +63,77 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "3.1"
 name = "spacing_and_sizing_follow_scale"
-description = "Spacing and sizing follow the design system's scale, with no arbitrary one-off values visible in computed styles."
+description = "Top bar, cards, bottom nav, and table spacing follow a consistent scale with no arbitrary one-off gaps visible against the reference screenshots"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
 name = "typography_matches_spec"
-description = "Typography matches the spec for all headings and body copy."
+description = "Account name, period label, summary labels, and section titles match the mobile-budget typography hierarchy shown in the reference screenshots"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
 name = "layout_matches_reference"
-description = "Layout matches reference screenshots to within a small tolerance at all specified breakpoints; fidelity tasks achieve near pixel-parity."
+description = "At desktop width the top bar, summary card, Budgets by category, chart card, Expenses table, and bottom nav match the reference layout within a small tolerance; text wins on conflicts"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.4"
 name = "specified_state_changes_animate"
-description = "Transitions or animations are applied to the state changes the spec calls out, such as add, delete, filter, or view switch."
+description = "Add, delete, dialog open/close, and progress-bar fill show the motion the instruction requires when driven through real UI controls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
 name = "responsive_behavior_matches_reference"
-description = "Responsive behavior matches reference patterns."
+description = "Narrow-viewport single-column stacking with fixed bottom nav matches the reference mobile-app pattern"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.6"
 name = "control_styling_matches_spec"
-description = "Button and form radii, padding, and shadows conform to the spec."
+description = "Pink/magenta primary buttons, floating action button, and dialog actions use the brand accent radii and elevation from the visual design rather than unstyled browser defaults"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.7"
 name = "typography_has_clear_hierarchy"
-description = "Typography has a clear hierarchy that distinguishes section and body text."
+description = "Summary values, category names, and table body text are visually distinct in hierarchy"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.8"
 name = "component_states_match_spec"
-description = "Component states (default, hover, active, disabled) match the spec where specified."
+description = "Active bottom-nav item, over-budget category row, and disabled dialog submit states are visually distinct from defaults"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.9"
 name = "surface_treatments_match_spec"
-description = "Color, depth, and border treatments are precise per the design."
+description = "Light neutral card surfaces with subtle elevation and rounded corners match the reference card treatment"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.10"
 name = "microinteractions_match_spec"
-description = "Microinteraction feedback for hover and press follows the spec in duration and motion."
+description = "Hover wash and ripple/press feedback on nav items and dialog actions follow the required motion timing character"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.n1"
 name = "sizing_or_spacing_contradicts_scale"
-description = "Visible sizing or spacing values contradict the specified scale."
+description = "Visible card or nav spacing contradicts the consistent mobile-budget scale in the references"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "3.n2"
 name = "colors_fall_outside_palette"
-description = "Colors appear outside the specified palette."
+description = "Primary chrome uses colors outside the pink/magenta accent plus light neutral surfaces described in the instruction"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "3.n3"
 name = "sizing_mismatches_spec"
-description = "Sizing mismatches the spec."
+description = "Top bar, floating action button, or bottom-nav sizing grossly mismatches the reference proportions"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +157,7 @@ weight = 1.0
 [[criterion]]
 id = "3.n4"
 name = "required_animations_missing_or_wrong"
-description = "Animations are missing or incorrect where the spec requires them."
+description = "Required dialog, snackbar, or progress-bar animations are missing when triggered through real UI controls"
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +165,7 @@ weight = 1.0
 [[criterion]]
 id = "3.n5"
 name = "specified_controls_use_browser_defaults"
-description = "Form or button controls use browser default styles when the spec styles them."
+description = "Primary buttons or dialog controls use unstyled browser defaults when the instruction styles them with the brand accent"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "3.n6"
 name = "layout_misaligned_at_breakpoints"
-description = "The grid or layout is misaligned at reference breakpoints."
+description = "Summary, category list, and chart cards are misaligned relative to the reference at desktop width"
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +181,7 @@ weight = 1.0
 [[criterion]]
 id = "3.n7"
 name = "elements_are_clipped_or_offscreen"
-description = "Elements render off-screen or clipped."
+description = "Bottom nav, floating action button, or Export controls render off-screen or clipped at the reference viewport"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "3.n8"
 name = "structure_deviates_from_reference"
-description = "Section order, content, or structure deviates from the reference on fidelity tasks."
+description = "Section order of summary, Budgets by category, and chart on Dashboard grossly deviates from the reference without instruction justification"
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +197,7 @@ weight = 1.0
 [[criterion]]
 id = "3.n9"
 name = "heading_and_body_text_undifferentiated"
-description = "Heading and body text have no distinction."
+description = "Summary labels and values or table headers and cells have no typographic distinction"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "3.n10"
 name = "microinteractions_deviate_from_reference"
-description = "Microinteractions are missing or deviate from the provided reference."
+description = "Hover and press feedback on primary chrome are missing entirely relative to the instructed motion"
 type = "binary"
 negate = true
 weight = 1.0

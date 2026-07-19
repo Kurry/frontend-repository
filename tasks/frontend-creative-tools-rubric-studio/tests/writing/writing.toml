@@ -64,21 +64,21 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "15.1"
 name = "consistent_capitalization_studio_labels"
-description = "Where the app renders headings and section titles (rubric name, Tune, Export, Rationale notes, history summaries), they use one consistent capitalization convention throughout."
+description = "Where the app renders headings and section titles (rubric name, Tune, Export, Import, Rationale notes, history summaries), they use one consistent capitalization convention throughout."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.2"
 name = "specific_verbs_on_actions"
-description = "Where the app renders button or action labels, they use specific labels such as Add criterion, Export, and Copy rather than generic Submit/OK when a specific label is possible."
+description = "Where the app renders button or action labels, they use specific labels such as Add criterion, Export, Import, Undo, Redo, and Copy rather than generic Submit/OK when a specific label is possible."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.3"
 name = "validation_names_problem_and_fix"
-description = "Where the app renders criterion-form or version-bump validation messages, they name the field or violation kind (name, description, id, minor bump required, major bump required) and the fix, not only a bare rejection like Invalid."
+description = "Where the app renders criterion-form, version-bump, or import validation messages, they name the field or violation kind (name, description, id, schemaVersion, library, minor bump required, major bump required) and the fix, not only a bare rejection like Invalid."
 type = "binary"
 weight = 0.5
 
@@ -129,7 +129,7 @@ negate = true
 [[criterion]]
 id = "15.n2"
 name = "prominent_copy_has_spelling_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as seeded rubric names (Response Quality, Code Review Depth, Safety Screening, Summarization Fidelity), Add criterion, Export, or Rationale notes."
+description = "Spelling or grammatical errors appear in prominent copy such as seeded rubric names (Response Quality, Code Review Depth, Safety Screening, Summarization Fidelity), Add criterion, Export, Import, or Rationale notes."
 type = "binary"
 weight = 0.5
 negate = true

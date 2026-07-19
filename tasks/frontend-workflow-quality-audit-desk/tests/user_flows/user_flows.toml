@@ -84,7 +84,7 @@ weight = 1.0
 [[criterion]]
 id = "6.4"
 name = "escalation_flow_updates_all_surfaces"
-description = "Escalating a held record with a category and summary moves its stage to escalated in the detail view, the queue row badge, the state machine strip, and the Report view's escalated count"
+description = "Escalating a held record with a category and summary moves its stage to escalated in the detail view, the queue row badge, the state machine strip, the Report view's escalated count, and the Audit Package JSON tasks/escalation fields"
 type = "binary"
 weight = 1.0
 
@@ -206,6 +206,29 @@ weight = 1.0
 id = "6.n10"
 name = "navigation_dead_end_requires_reload"
 description = "Some navigation state (an open detail view, a paused run, an applied filter combination) can only be escaped by reloading the page"
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "6.11"
+name = "mutation_to_export_flow"
+description = "Fail a criterion with a distinctive rationale and add a feedback entry with distinctive findings, then open Report: Audit Package JSON shows schemaVersion quality-audit-package-v1 and those exact strings under the field-contract keys for that task; Copy and Download are available"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "export_import_round_trip_flow"
+description = "After a session mutation, export Audit Package JSON, import that same text, and confirm the visible queue stages, rollups, and the next export preview match the pre-export mutated state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "export_flow_unavailable"
+description = "Copy, Download, format switch, or Import package is unavailable from the Report view after the desk has session state to export"
 type = "binary"
 negate = true
 weight = 1.0

@@ -77,7 +77,7 @@ weight = 1.0
 [[criterion]]
 id = "1.3"
 name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+description = "Icons used in the navigation rail, credential rows, stage statuses, triage actions, and package controls have descriptive accessible names or alt text."
 type = "binary"
 weight = 1.0
 
@@ -98,42 +98,42 @@ weight = 1.0
 [[criterion]]
 id = "1.6"
 name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+description = "Headings across Candidates, Triage, Runs, and Library follow a logical order with no skips, such as H1 to H2 to H3."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
 name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+description = "Skip-to-content or landmark navigation is present around the top bar, navigation rail, and main console area."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
 name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+description = "Mode indicator chips, stage status labels, reject-reason badges, and body text have sufficient color contrast against their backgrounds."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
 name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+description = "Semantic HTML roles such as nav, main, and button are used for the rail, main view, and interactive controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
 name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+description = "With prefers-reduced-motion set, streaming text still appears but transitions apply instantly and nothing pulses or slides, matching the motion specification."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
 name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+description = "A required interactive control — navigation entry, triage action, stage retry/pause/resume, or package copy/download — cannot be activated or reached via keyboard."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n2"
 name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+description = "Focus indicators are missing or obscured on form fields, triage actions, filter chips, or package controls."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n3"
 name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+description = "Custom components such as filter chips, stage controls, or triage actions use non-semantic tags and lack ARIA roles or labels."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +157,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n4"
 name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+description = "Stage status, connection status, or substantial/trivial verdict is conveyed by color alone with no text or icon label."
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +165,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n5"
 name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+description = "The Connections slide-over, reject-reason chooser, delete confirmation, or command palette does not trap keyboard focus while open."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n6"
 name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+description = "Mode indicator, badge, or stage-status text is unreadable due to poor contrast."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +181,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n7"
 name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+description = "A stage failure, credential error, or import rejection is visual only and is not announced to assistive technology."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n8"
 name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+description = "Icon content in the rail, stage list, or package controls is missing accessible names or alt text."
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +197,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n9"
 name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+description = "Headings across console views are skipped or unordered, such as jumping from H1 to H3."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n10"
 name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+description = "With prefers-reduced-motion set, pulsing streaming affordances or sliding overlays continue to animate."
 type = "binary"
 negate = true
 weight = 1.0

@@ -62,108 +62,128 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "reports_workspace_density_not_landing"
-description = "Ledger sidebar + metrics + chart + transactions density remains a reports workspace, not a marketing landing"
+name = "reports_workspace_density"
+description = "The reports workspace reads as a dense finance tool surface (sidebar, metric cards, chart card, thresholds panel, table, summary strip) rather than a marketing landing"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
 name = "empty_state_visually_present"
-description = "Empty transactions state is visually present when the collection or filter result is empty"
+description = "When the transactions list is empty, a visible empty-state treatment occupies the list region"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "static_chart_mockups_only"
-description = "Shows only static chart mockups with a non-interactive transactions table"
+name = "static_mockups_instead_of_live_ui"
+description = "Primary surfaces are static mockups or images that stay unchanged after create, edit, or delete actions"
+negate = true
 type = "binary"
 weight = 1.0
-negate = true
 
 [[criterion]]
 id = "3.4"
-name = "multi_hue_category_chart_fills"
-description = "Breakdown renders a category sankey/flow and Trends renders a category pie, both using multi-hue category fills aggregated from the transactions"
+name = "multi_hue_charts_signed_amounts"
+description = "Breakdown and Trends charts use multi-hue category fills, and transaction amounts read as signed values in the table"
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "soft_mint_palette_with_ledger_mark"
-description = "The UI reads as a soft mint finance workspace: light page and sidebar washes, a brand teal, mint accents, and a branded Ledger lockup in the sidebar"
+name = "soft_mint_palette_and_ledger_mark"
+description = "The UI uses a soft mint finance palette with brand teal and accent mint, and a Ledger mark appears in the sidebar"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.6"
-name = "sidebar_main_column_layout_order"
-description = "A persistent left sidebar sits beside a main column ordered as page chrome actions, a row of four statistic cards, the chart card, the transactions table, and a summary strip beneath the table"
+name = "sidebar_plus_main_column_structure"
+description = "Layout is a persistent left sidebar plus a main column containing chrome actions (Export, Import, Undo, Redo, currency), four statistic cards, chart card, thresholds panel, transactions table, and summary strip"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.7"
-name = "single_icon_set_inline_sizes"
-description = "Sidebar, chrome actions, and table controls share one consistent icon set rendered inline at text-compatible sizes"
+name = "sankey_bars_curved_links_doughnut_legend"
+description = "Breakdown sankey renders colored bars with curved proportional links and node amount labels; Trends renders a doughnut with a category legend"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.8"
-name = "component_states_visibly_distinct"
-description = "Buttons and inputs show visibly distinct default, hover, focus (visible ring), disabled, and error treatments"
+name = "single_consistent_icon_set"
+description = "One icon set is used consistently across the sidebar, chrome actions, and table controls with no mixed icon styles"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.9"
 name = "sidebar_persistent_at_desktop_widths"
-description = "At 1024px viewport width and above, the left sidebar stays persistently visible beside the main reports column"
+description = "At widths of 1024 pixels and above, the left sidebar stays persistently visible beside the main reports column"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.10"
-name = "sidebar_collapses_to_drawer_below_1024"
-description = "Below 1024px viewport width, the sidebar collapses behind a visible toggle control that opens it as an overlay drawer, with all nav items still reachable"
+name = "narrow_width_stacking_without_overflow"
+description = "At narrower widths the main column stacks vertically with no horizontal scrolling and no clipped content"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.11"
-name = "mobile_375_content_clips_or_scrolls"
-description = "At 375px viewport width, content clips or overflows the viewport, or a page-level horizontal scrollbar appears (the transactions table scrolling inside its own container is allowed)"
-type = "binary"
+name = "narrow_width_layout_breaks"
+description = "At narrow widths content clips, overlaps, or forces page-level horizontal scrolling"
 negate = true
+type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.12"
 name = "consistent_capitalization_convention"
-description = "Headings, nav items, and buttons use one consistent capitalization convention throughout the app"
+description = "Headings, buttons, and nav labels use one consistent capitalization convention throughout the app"
 type = "binary"
-weight = 0.5
-
-[[criterion]]
-id = "3.13"
-name = "actionable_validation_and_empty_state_copy"
-description = "Validation messages name the field and the fix, and empty states explain what belongs in the region and how to add it"
-type = "binary"
-weight = 0.5
-
-[[criterion]]
-id = "3.14"
-name = "placeholder_or_filler_text_shipped"
-description = "Placeholder or filler text (lorem ipsum, 'TODO', template variables, keyboard-mash strings) is visible somewhere in the shipped UI, or seeded payees, categories, or amounts read as implausible junk rather than plausible synthetic finance data"
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
-id = "3.catchall"
+id = "3.13"
+name = "consistent_currency_formatting"
+description = "Currency values use the same symbol and decimal treatment across metric cards, table, legends, summary strip, thresholds panel, and export preview for the active display currency"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.14"
+name = "toast_and_empty_state_copy_quality"
+description = "Toasts name the action they confirm and empty states explain what belongs in the region and how to add it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.15"
+name = "placeholder_text_in_shipped_ui"
+description = "Placeholder or lorem text appears in the shipped UI"
+negate = true
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.16"
+name = "export_drawer_and_over_threshold_treatments"
+description = "The export drawer shows JSON/CSV tabs with a scrollable preview plus Download and Copy affordances; over-threshold treatment uses an error color family distinct from ordinary row hover"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.17"
+name = "component_states_visibly_distinct"
+description = "Buttons and inputs show visually distinct default, hover, focus (visible ring), disabled, and error treatments"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "visual_design.catchall"
 name = "visual_design_catchall"
 description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"

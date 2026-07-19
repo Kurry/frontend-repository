@@ -677,7 +677,8 @@
         ],
         "editor_modes": [
           "edit",
-          "diff"
+          "diff",
+          "compare"
         ],
         "value_bounds": [
           "font-size 4-60",
@@ -736,7 +737,8 @@
         "Dock open/close stays Playwright-observed",
         "Color-picker/slider drag stays Playwright-driven",
         "Command-palette open gesture and fuzzy highlight stay Playwright-observed",
-        "Undo/redo stack scrubbing stays Playwright-observed"
+        "Undo/redo stack scrubbing stays Playwright-observed",
+        "Theme A/B side-by-side preview rendering stays Playwright-observed"
       ]
     },
     {
@@ -2103,7 +2105,10 @@
         "form_fields": [
           "amount",
           "date",
-          "category"
+          "category",
+          "counterparty",
+          "recurrence-day",
+          "threshold-percent"
         ],
         "form_operations": [
           "validate",
@@ -2115,7 +2120,9 @@
           "dashboard",
           "expenses",
           "settings",
-          "export"
+          "export",
+          "recurring",
+          "import"
         ],
         "filters": [
           "reporting-period",
@@ -2131,7 +2138,18 @@
           "json"
         ],
         "import_modes": [
-          "budget-json"
+          "budget-json",
+          "transactions-csv"
+        ],
+        "value_bounds": {
+          "threshold-percent": "integer 0 to 100",
+          "recurrence-day": "integer 1 to 28",
+          "value": "number greater than 0, at most 1000000, at most 2 decimals"
+        },
+        "visible_postconditions": [
+          "export-preview-reflects-every-session-mutation",
+          "import-json-replaces-visible-state",
+          "csv-import-commits-only-valid-rows-after-commit"
         ]
       },
       "mechanics_exclusions": [

@@ -294,6 +294,79 @@ description = "First load opens the storyboard workspace directly (header, left 
 type = "binary"
 weight = 1.0
 
+
+[[criterion]]
+id = "1.38"
+name = "scene_field_contract_enforced"
+description = "Scene create/edit enforces the request-body field contract: title length 2–80, body length 8–2000, status one of draft/review/ready, optional cameraNote at most 200 characters; out-of-contract input shows inline errors naming the field and does not change the scene count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "status_filter_and_search"
+description = "A status filter (All plus draft/review/ready) and a search control filter the board; selecting a status hides non-matching scenes, search matches title/body case-insensitively, and Tile/List/Slide show the same filtered subset and count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "scene_drag_reorder_renumbers"
+description = "After dragging a scene to a new position in Tile or List, visible numbers renumber contiguously from 1 and Slide prev/next follows the new order without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "undo_redo_restore_board"
+description = "After creating a scene, Undo restores the prior scene count and removes that scene; Redo re-applies the create so the same title returns — Tile/List/Slide stay consistent without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "command_palette_runs_handlers"
+description = "Opening the command palette (control or Ctrl/Cmd+K) and activating Switch to List or Add Scene runs the same handler as the visible control: List mode becomes active or the create form opens, and the palette closes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "export_drawer_live_format_previews"
+description = "Export opens a drawer with markdown, json, and outline tabs whose previews regenerate from the live scenes collection; after creating a scene with a unique title, all three previews include that title, and the json preview is a StoryboardPackage with schemaVersion 1, project Demo Projects, storyboard 1. Getting Started, and a scenes array entry matching the field contract"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "import_storyboard_json_round_trip"
+description = "After exporting a StoryboardPackage that includes a session-created scene, deleting scenes to diverge, then Import of that JSON, the collection count, Tile/List/Slide contents, and a fresh export reconstruct to match the imported package without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "status_badge_on_scenes"
+description = "Each scene shows a status badge reading draft, review, or ready (not color-only)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n_export_omits_session"
+name = "export_omits_session_mutations"
+description = "After creating or editing a scene, the Export markdown/json/outline preview omits that scene's title or body — an incomplete session export"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n_import_accepts_invalid"
+name = "import_accepts_invalid_package"
+description = "Importing malformed StoryboardPackage JSON or a scene that fails the field contract still changes the board with no visible error"
+type = "binary"
+weight = 1.0
+negate = true
+
 [[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"

@@ -105,7 +105,7 @@ weight = 1.0
 [[criterion]]
 id = "4.7"
 name = "modal_enter_exit"
-description = "The composer, schedule, and confirmation modals enter with a short opacity and scale transition of roughly 200 to 300 milliseconds and exit the same way"
+description = "The composer, schedule, export, import, and confirmation modals enter with a short opacity and scale transition of roughly 200 to 300 milliseconds and exit the same way"
 type = "binary"
 weight = 1.0
 
@@ -119,7 +119,7 @@ weight = 1.0
 [[criterion]]
 id = "4.9"
 name = "feedback_toasts"
-description = "Toasts after creating, deleting, exporting, copying the calendar text, and completing a run slide in, remain readable, and auto-dismiss with a fade"
+description = "Toasts after creating, deleting, exporting, importing, copying the calendar or report text, and completing a run slide in, remain readable, and auto-dismiss with a fade"
 type = "binary"
 weight = 1.0
 

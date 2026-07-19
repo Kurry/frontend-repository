@@ -196,6 +196,13 @@ weight = 1.0
 
 
 [[criterion]]
+id = "7.11"
+name = "matrix_scrolls_inside_panel_at_375"
+description = "At 375 pixel width the All identities matrix scrolls inside its own panel rather than forcing page-level horizontal overflow"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "responsiveness.catchall"
 name = "responsiveness_catchall"
 description = """The app exhibits a significant, browser-observable responsiveness defect that is NOT covered by any other criterion in this file. If present, name the defect and cite concrete evidence. If already covered, answer no here."""

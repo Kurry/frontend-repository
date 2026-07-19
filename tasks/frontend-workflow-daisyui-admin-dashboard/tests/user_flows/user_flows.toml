@@ -196,9 +196,16 @@ weight = 1.0
 [[criterion]]
 id = "6.n7"
 name = "field_contract_accepted_invalid_payload"
-description = "Add User accepts payloads that violate the field contract (overlong names, email without domain dot, short temporaryPassword) and still creates a row."
+description = "Add User accepts payloads that violate the field contract (overlong names, email without domain dot, short temporaryPassword, or unknown permission ids) and still creates a row."
 type = "binary"
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "create_payload_matches_export_record"
+description = "After Add User with a distinctive email plus sendInvitation true and a closed permission id selected, Directory JSON users entry for that email carries the same firstName/lastName/email/role/status/sendInvitation/permissions field names as the submitted request body."
+type = "binary"
 weight = 1.0
 
 [[criterion]]

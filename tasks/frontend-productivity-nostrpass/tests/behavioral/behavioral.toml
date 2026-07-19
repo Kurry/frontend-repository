@@ -187,6 +187,43 @@ weight = 1.0
 
 
 [[criterion]]
+id = "14.11"
+name = "rotation_undo_exact_value_probe"
+description = "Exact-value rotation probe: note the active identity's full npub text, rotate and confirm; the dashboard and Export vault show a different npub; Undo; the dashboard npub and the export preview match the noted string exactly, character for character"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.12"
+name = "bulk_grant_matrix_probe"
+description = "Bulk matrix probe: with at least three identities, note each identity's grant for one application, activate Grant all in that column; every cell in the column shows granted and the active identity's dashboard pill matches; a single Undo returns every identity to its noted prior state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.13"
+name = "backup_delete_reimport_round_trip"
+description = "Backup round-trip: export a backup of one identity (note its npub), delete that identity, then import the backup JSON; the identity returns with the same label, npub, nsec, and grants, the count returns to its prior value, and the vault export contains it again"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n6"
+name = "bulk_undo_overcorrects"
+description = "Undo after a bulk grant flips identities that already had the grant before the bulk action to revoked, or leaves some affected identities un-restored."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "14.n7"
+name = "audit_filter_mutates_log"
+description = "Applying or clearing the audit action-type filter loses entries, reorders them, or otherwise changes the log content."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "behavioral.catchall"
 name = "behavioral_catchall"
 description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

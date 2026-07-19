@@ -61,80 +61,81 @@ allowed_tools = [
 [scoring]
 aggregation = "weighted_mean"
 
+
 [[criterion]]
 id = "11.1"
 name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+description = "Optional bonus: beyond required toasts and re-run tick-in, the triage console adds unique microinteractions around reason change, export copy, or quarantine membership shifts."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.2"
 name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+description = "Optional bonus: beyond required panel and toast transitions, the app adds coordinated motion such as matrix cell storytelling during re-runs."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.3"
 name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+description = "Optional bonus: a short coachmarks tour highlights the triage queue, Export triage report, and Start re-run on first visit, dismissible and never blocking the primary workflow."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.4"
 name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+description = "Optional bonus: a compact condition-correlation strip shows which varied conditions appear most often on diverging flaky runs in the active suite."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.5"
 name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+description = "Optional bonus: keyboard command shortcuts beyond required focus order accelerate suite switch, export, or filter clear."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.6"
 name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+description = "Optional bonus: beyond the required light/dark toggle, the operator can personalize triage density or default filters within the session."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.7"
 name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+description = "Optional bonus: the shell presents a polished product identity for the flake triage console beyond generic dashboard chrome."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.8"
 name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+description = "Optional bonus: beyond light/dark, the app offers an additional theme accent or density mode that recolors triage surfaces without reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.9"
 name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+description = "Optional bonus: a printable quarantine summary layout reachable from the export drawer restates all-fail and flaky counts without changing store state."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.10"
 name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+description = "Optional bonus: competition-level innovation is visible in the triage workflow beyond the mandatory export and re-run loops."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.n1"
 name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+description = "The demo is purely spec-compliant, barebones, and unenhanced with no optional polish beyond mandatory surfaces."
 type = "binary"
 negate = true
 weight = 1.0
@@ -142,7 +143,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n2"
 name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
+description = "Interactions and visuals are generic templated dashboard chrome with no flake-triage identity."
 type = "binary"
 negate = true
 weight = 1.0
@@ -150,7 +151,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n3"
 name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
+description = "The app has no polish, guidance, or product story beyond raw tables."
 type = "binary"
 negate = true
 weight = 1.0
@@ -158,7 +159,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n4"
 name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
+description = "The app has no extra visual or interactive polish beyond the minimum passing criteria."
 type = "binary"
 negate = true
 weight = 1.0
@@ -166,7 +167,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n5"
 name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
+description = "The UI is flat and static with no immersion around re-run progress or quarantine updates."
 type = "binary"
 negate = true
 weight = 1.0
@@ -174,7 +175,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n6"
 name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
+description = "Clipboard copy confirmation and download affordances for the triage report are omitted where the export surface is present."
 type = "binary"
 negate = true
 weight = 1.0
@@ -182,7 +183,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n7"
 name = "personalization_is_impossible"
-description = "Personalization is impossible."
+description = "Even the required light/dark theme toggle is absent, leaving personalization impossible."
 type = "binary"
 negate = true
 weight = 1.0
@@ -190,7 +191,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n8"
 name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
+description = "The app has no new or delightful user moments around triage completion or export."
 type = "binary"
 negate = true
 weight = 1.0
@@ -198,7 +199,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n9"
 name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
+description = "The design repeats a generic admin table without a flake-triage twist."
 type = "binary"
 negate = true
 weight = 1.0
@@ -206,7 +207,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n10"
 name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
+description = "The app shows minimal effort beyond the MVP deliverable with no optional enhancements."
 type = "binary"
 negate = true
 weight = 1.0

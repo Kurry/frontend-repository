@@ -15,9 +15,14 @@ Feature: Side-by-side diff —
 - Added lines carry a green success-background treatment and removed lines a red error-background treatment; unchanged lines are unstyled; the gutter cell of each changed line shows a plus or minus symbol in the matching color
 - Within changed lines, word-level highlighting marks exactly the words that differ with a stronger shade than the line background — a changed word is never left unhighlighted and an unchanged word inside a changed line is never marked
 
+Feature: Diff options (live-derived) —
+- An Ignore whitespace toggle sits near the unified/split control; when on, lines that differ only by leading, trailing, or repeated whitespace compare as unchanged, and the counters, word-level highlights, and unified blocks recompute immediately from the same pair
+- An Ignore case toggle sits beside it; when on, letter-case-only differences compare as unchanged and the same derived surfaces recompute immediately
+- Turning either toggle off restores the full whitespace-sensitive or case-sensitive diff for the same pair without a reload; both toggles can be on at once and their effects combine
+
 Feature: Unified diff and change summary —
 - A unified-diff toggle collapses the split into a single scrollable column showing only changed blocks with three lines of unchanged context above and below each change; toggling back restores the split view at the same scroll region
-- A strip above the diff shows three counters: lines added, lines removed, and net token delta (positive or negative) between the two versions; the counters recompute whenever either picker changes
+- A strip above the diff shows three counters: lines added, lines removed, and net token delta (positive or negative) between the two versions; the counters recompute whenever either picker changes or either Ignore toggle changes
 - Clicking a counter scrolls the diff panel to the first change of that type and pulses the target block's background before settling
 
 Feature: Three-way compare and merge —
@@ -36,12 +41,13 @@ Feature: Version graph —
 - After completing a merge, the graph gains a new merge node connected to both parent branches without a reload
 
 Feature: Restore and history safety —
-- Restore to Base and Restore to Compare buttons open a confirmation dialog naming the version to restore; confirming creates a new head version whose text equals the restored version, with a change note naming the restore source, and shows a success toast
+- Restore to Base and Restore to Compare buttons open a confirmation dialog that submits a RestoreCreate payload. RestoreCreate field contract (the confirm submit IS the would-be restore request body; all keys required unless marked optional; example values illustrative only): sourceVersionId (required non-empty string — the version id named in the dialog), changeNote (required string, 1 to 200 characters, must name the restore source version number). Confirm stays disabled until changeNote is valid; an empty or over-length changeNote shows an inline message naming the changeNote field; confirming creates a new head version whose text equals the restored version, whose change note equals the submitted changeNote, and shows a success toast
 - Restoring never rewrites or deletes existing versions: the history list and graph keep every prior version and gain exactly one new head entry
 
 Feature: Annotations —
 - Selecting a line range in the diff or blame view offers an Annotate control that opens a thread composer anchored to that range; the composer supports markdown with code highlighting and checklists, previewed live as formatted text
-- Posting an annotation shows a thread marker on the annotated lines; clicking the marker opens the thread showing the formatted note, its author, and timestamp, and allows replies; a resolved toggle collapses the thread with a resolved treatment
+- Posting submits an AnnotationCreate payload. AnnotationCreate field contract (the record the composer creates IS the would-be annotation request body; all keys required unless marked optional): bodyMarkdown (required string, 1 to 4000 characters after trim), lineStart (required integer greater than or equal to 1 — the first selected line), lineEnd (required integer greater than or equal to lineStart — the last selected line), author (required string, 1 to 80 characters). Cross-field rule: lineEnd must be greater than or equal to lineStart. An empty body, over-length body, empty author, or inverted line range shows inline validation naming the offending field and posts nothing; a valid post shows a thread marker on the annotated lines
+- Clicking the marker opens the thread showing the formatted note, its author, and timestamp, and allows replies; a reply submits AnnotationReply field contract: bodyMarkdown (required string, 1 to 4000 characters after trim) with the same empty/over-length rejection; a resolved toggle collapses the thread with a resolved treatment
 - Annotation threads keep their line anchors when switching between split and unified modes
 
 Feature: Search across versions —
@@ -52,18 +58,33 @@ Feature: Undo and redo —
 - Undo and Redo controls in the header revert and reapply the most recent state edits — posted annotations, resolution choices in an open merge, restores, and completed merges; each undo visibly restores the prior state everywhere it appears, and the controls disable when there is nothing to undo or redo
 - Undoing a completed merge or restore removes the created head version from the history list and graph; redo re-adds it identically
 
-Feature: Export —
-- An Export control offers a version history report assembled from the live state: the selected prompt's version chain with numbers, authors, timestamps, and change notes, the current base/compare counters, and any completed merge with its per-region resolutions; the report preview matches the on-screen history and updates when a new version is created before exporting
-- A multi-select in the history list allows choosing two or more versions and exporting them as a single serialized package containing each selected version's full text and metadata; the package contents list exactly the selected versions
-- After a merge, the export offers the merged prompt text itself; the exported text is identical to the merge result shown in the app
+Feature: Merge resolution payloads —
+- Choosing Choose left, Choose right, or Edit manually on a conflict region writes a MergeRegionResolution record into the open merge session. MergeRegionResolution field contract (each region's chip reflects this payload; completing the merge IS posting an array of these as the would-be merge request body): regionId (required non-empty string), resolution (required closed enum exactly one of choose-left, choose-right, edit-manually), manualText (required string when resolution is edit-manually — the inline editor contents, may be empty only when the user explicitly clears it; must be null or omitted when resolution is choose-left or choose-right). Cross-field rule: edit-manually requires manualText to be present as a string; choose-left and choose-right must not carry a non-null manualText. Completing the merge creates a head version whose text is assembled region-by-region from these payloads exactly
+
+Feature: Export and import (API-shaped VersionPackage) —
+- The app produces the user's version-control artifacts: Export opens a surface with three format tabs regenerated live from the store — History report (markdown), Version package (JSON), and Merged prompt text (plain text when a merge head exists for the selected prompt). Each tab shows a scrollable preview; Copy writes that format's text to the clipboard with a brief confirmation; Download triggers a real file download whose contents match the open preview
+- VersionPackage field contract (Copy, Download, and Import all conform to this same shape; field names and enum values are visible in the JSON preview text; all keys and nesting required unless marked optional; example values illustrative only): schemaVersion (required string exactly prompt-diff-package-v1), promptId (required non-empty string), promptTitle (required string, 1 to 120 characters), versions (required array of at least one VersionRecord), baseVersionId (required non-empty string — must equal one versions[].versionId), compareVersionId (required non-empty string — must equal one versions[].versionId), counters (required object with linesAdded integer greater than or equal to 0, linesRemoved integer greater than or equal to 0, and netTokenDelta integer that may be negative), annotations (required array, may be empty), merge (optional null or MergeSummary object)
+- VersionRecord field contract (each element of versions): versionId (required non-empty string), versionNumber (required integer greater than or equal to 1), author (required string, 1 to 80 characters), timestamp (required ISO-8601 datetime string ending with Z or an explicit offset), changeNote (required string, 1 to 500 characters), text (required string — full prompt body for that version), kind (required closed enum exactly one of main, branch, merge, restore), parentIds (required array of zero to two versionId strings; merge kind must list exactly two parents; restore and main may list zero or one)
+- AnnotationRecord field contract (each element of annotations when present from the session): annotationId (required non-empty string), bodyMarkdown (required string, 1 to 4000 characters), lineStart (required integer greater than or equal to 1), lineEnd (required integer greater than or equal to lineStart), author (required string, 1 to 80 characters), resolved (required boolean), replies (required array of objects each with bodyMarkdown string 1 to 4000 characters and author string 1 to 80 characters; may be empty)
+- MergeSummary field contract when merge is non-null: mergeVersionId (required non-empty string), leftBranchVersionId (required non-empty string), rightBranchVersionId (required non-empty string), resolutions (required array of MergeRegionResolution objects matching the field contract above, length at least 1)
+- Cross-field rules for VersionPackage: every parentIds entry must reference a versionId present in versions; baseVersionId and compareVersionId must each match a versions[].versionId; when merge is non-null, mergeVersionId must match a versions[].versionId whose kind is merge; after a merge or restore in the session, the Version package preview includes that new head in versions and, for a merge, a non-null merge object whose resolutions match the choices shown during the flow
+- History report markdown lists the selected prompt title, each version's number, author, timestamp, and change note, the current counters, and when a merge completed in-session its per-region resolutions; the preview matches the on-screen history and updates when a new version is created before exporting
+- A multi-select in the history list allows choosing two or more versions; exporting Version package then includes exactly those selected versions in the versions array (still conforming to VersionPackage, with baseVersionId and compareVersionId pointing at members of that subset when they are among the selection, otherwise the first two selected)
+- After a merge, the Merged prompt text tab shows the merged prompt text itself; the exported text is byte-identical to the merge result shown in the app
+- An Import control accepts a pasted or loaded Version package JSON; a successful import that conforms to the VersionPackage field contract replaces the selected prompt's visible chain with the package versions (history list, pickers, graph, and search index update without a reload) so the package's texts and metadata match what the surfaces show
+- Import rejects non-conforming payloads without mutating prompts: malformed JSON, missing required schemaVersion/promptId/promptTitle/versions/baseVersionId/compareVersionId/counters/annotations keys, schemaVersion not exactly prompt-diff-package-v1, a VersionRecord kind outside main|branch|merge|restore, parentIds length outside 0–2, baseVersionId or compareVersionId not in versions, or a MergeRegionResolution resolution outside choose-left|choose-right|edit-manually shows a visible validation message naming the offending field and leaves the prompt chain unchanged
+- Exporting then re-importing a Version package reconstructs the same visible version texts, authors, change notes, and graph topology for that prompt; an export that omits session mutations (a completed merge or restore head) or fails the field contract is incorrect
 </core_features>
 
 <user_flows>
 - Comparing end to end: picking a prompt, choosing two versions, and reading the diff shows aligned numbered lines, green added and red removed lines with word-level highlights, and counters that match the visible changes; switching either picker re-renders everything without a reload
-- Merge pipeline: editing context — open Compare Branches on the seeded branched prompt, resolve one conflict to the left, one to the right, and one by manual edit, complete the merge, and confirm the new head version's text reflects exactly those three choices, the graph gains a merge node joined to both parents, the history list gains one entry, and the export report lists the merge with its per-region resolutions
-- Restore round trip: restoring an older version creates a new head equal to it while every prior version remains in the history and graph; undo removes the new head and redo restores it
-- Annotate and resolve: annotating a line range, replying, and toggling resolved shows the marker, formatted thread, and collapsed resolved state; the anchor survives switching between split and unified modes
+- Diff options flow: with a pair that differs only by whitespace or letter case, turn Ignore whitespace or Ignore case on and confirm the counters drop those differences and the highlights clear for those lines; turn the toggle off and confirm the differences return
+- Merge pipeline: editing context — open Compare Branches on the seeded branched prompt, resolve one conflict to the left, one to the right, and one by manual edit, complete the merge, and confirm the new head version's text reflects exactly those three choices, the graph gains a merge node joined to both parents, the history list gains one entry, and the Version package JSON shows schemaVersion prompt-diff-package-v1 plus a non-null merge object whose resolutions match those three choices
+- Restore round trip: restoring an older version with a valid RestoreCreate changeNote creates a new head equal to it while every prior version remains in the history and graph; undo removes the new head and redo restores it
+- Annotate and resolve: annotating a line range with a valid AnnotationCreate bodyMarkdown, replying with a valid AnnotationReply, and toggling resolved shows the marker, formatted thread, and collapsed resolved state; the anchor survives switching between split and unified modes
 - Search to diff: searching a phrase that exists only in one version lands on that version in the base picker, and the diff against the compare version shows the phrase inside a highlighted change
+- Artifact end state: complete a merge, open Export, confirm History report and Version package previews include the new head and that Version package shows required schemaVersion, promptId, promptTitle, versions, baseVersionId, compareVersionId, counters, and annotations keys; Download or Copy the JSON, then Import that JSON and confirm the history list and graph reconstruct the same version texts and merge topology
+- Schema validation flow: attempt AnnotationCreate with an empty bodyMarkdown (thread unchanged, bodyMarkdown named); attempt RestoreCreate with an empty changeNote (no new head); Import JSON missing schemaVersion or with schemaVersion not prompt-diff-package-v1 (chain unchanged, field named); then a valid annotation post and a valid package import succeed against the same field contracts
 - A page reload returns the app to its seeded state: the seeded prompts and their version chains, no unseeded annotations, merges, or restores
 </user_flows>
 
@@ -75,41 +96,49 @@ Feature: Export —
 - Annotating a range that already carries a thread adds to the existing thread rather than stacking a second marker on the same lines
 - A change note longer than 80 characters truncates with an ellipsis in the picker option and shows in full in the history list
 - The version search treats the query case-insensitively and an empty query shows no result list rather than matching everything
+- Importing malformed JSON shows an inline parse error naming the import problem and leaves the prompt chain unchanged
+- Importing parseable JSON that fails the VersionPackage field contract — missing required schemaVersion/promptId/promptTitle/versions/baseVersionId/compareVersionId/counters/annotations keys, schemaVersion not exactly prompt-diff-package-v1, a kind outside main|branch|merge|restore, parentIds length outside 0–2, baseVersionId or compareVersionId absent from versions, or a resolution outside choose-left|choose-right|edit-manually — leaves the prompt chain unchanged and shows validation naming the offending field
+- AnnotationCreate with bodyMarkdown longer than 4000 characters or with lineEnd less than lineStart posts nothing and names the offending field
+- Export with only the seeded chain and no session merge still opens and shows a Version package that includes schemaVersion prompt-diff-package-v1 and every required VersionPackage key rather than crashing; Download and Copy remain available
 </edge_cases>
 
 <visual_design>
-- Layout: a left rail with the prompt picker and history list, a header row with the version pickers, mode tabs (Diff, Compare Branches, Blame, Graph), and the change summary strip, with the diff surface filling the remaining area
+- Layout: a left rail with the prompt picker and history list, a header row with the version pickers, mode tabs (Diff, Compare Branches, Blame, Graph), Ignore whitespace and Ignore case toggles, and the change summary strip, with the diff surface filling the remaining area
 - Split panes are equal-width columns separated by a 1 pixel subtle border divider; line numbers sit in a fixed-width muted gutter visually distinct from the text area
 - Added lines use a light green background with its gutter plus symbol in the strong success color; removed lines use a light red background with the minus symbol in the strong error color; word-level highlights use a visibly stronger shade of the same hue than their line background
 - The change summary strip uses three tag treatments: green for added, red for removed, blue for net token delta; conflict regions in three-way mode carry a distinct third treatment (purple or magenta) that is never confused with plain adds or removes
-- Version pickers show version number and relative timestamp in each option label; the history list shows number, author, timestamp, and change note per row with the head version marked
+- Version pickers show version number and relative timestamp in each option label; the history list shows number, author, timestamp, and change note per row with the head version marked, plus multi-select checkboxes for package export
 - Graph nodes are visually distinct by kind: chain nodes, branch nodes, and merge nodes differ in shape or accent, and the selected and compared nodes carry a visible highlight ring
+- Export opens as a centered surface with History report / Version package / Merged prompt text format tabs, a scrollable monospaced preview, and Copy, Download, and Import affordances
 - Monospaced type is used for all prompt text in diff, blame, merge, and export surfaces; UI chrome uses the app's sans-serif hierarchy with the app title larger than panel headings, which are larger than body and label text
 - Buttons, inputs, selects, tabs, and toggles show distinct default, hover, focus (visible ring), disabled, and error treatments; one consistent icon set is used across tabs, gutter symbols, thread markers, and toolbar actions
 </visual_design>
 
 <motion>
-- Re-rendering the diff on a version picker change cross-fades the panel contents over roughly 150 milliseconds
+- Re-rendering the diff on a version picker change or Ignore-toggle change cross-fades the panel contents over roughly 150 milliseconds
 - Clicking a summary counter scrolls the diff to the first change of that type and highlights the target block with a roughly 400 millisecond background pulse before settling
 - The unified/split toggle animates the pane transition rather than snapping between layouts
 - Merge region resolutions animate: choosing a side slides the chosen content into the result preview and the progress indicator fills smoothly
 - The version graph animates a newly added node and its edges into place after a merge or restore
 - Annotation thread markers fade in when posted, and threads expand and collapse with a short height transition and rotating chevron
+- The Export surface enters and exits with a brief opacity and scale transition rather than appearing instantly
 - Hover animations (required): buttons ease background and shadow with a slight press effect; history rows, search results, and graph nodes take a visible hover treatment; form controls show focus rings
-- Toasts after merges, restores, and exports slide in, remain readable, and auto-dismiss with a fade
+- Toasts after merges, restores, exports, and successful imports slide in, remain readable, and auto-dismiss with a fade
 - With prefers-reduced-motion set, all cross-fades, pulses, and transitions apply instantly
 </motion>
 
 <responsiveness>
 - At widths of 768 pixels and below the split view stacks into a single column with a base/compare segment switch, and the left rail collapses behind a toggle; at desktop widths both panes and the rail are visible together
 - At 375 pixel width no content clips or overflows the viewport and no page-level horizontal scrolling appears; long prompt lines wrap or scroll within the diff surface's own container
+- The Export surface, Ignore toggles, and Import control stay fully visible and operable at 375 pixel width rather than rendering off-screen
 </responsiveness>
 
 <accessibility>
-- Every interactive control — pickers, tabs, counters, merge choice controls, graph nodes, thread markers, undo/redo, and export — is reachable and operable with the keyboard alone, with a visible focus indicator
-- The restore and merge confirmation dialogs trap focus while open, close on Escape, and return focus to the control that opened them
+- Every interactive control — pickers, tabs, Ignore whitespace and Ignore case toggles, counters, merge choice controls, graph nodes, thread markers, undo/redo, Export, Import, Copy, and Download — is reachable and operable with the keyboard alone, with a visible focus indicator
+- The restore confirmation, merge confirmation, and Export surface trap focus while open, close on Escape, and return focus to the control that opened them
 - Added and removed lines are distinguishable by the gutter plus and minus symbols and accessible line annotations, not by color alone
-- Completing a merge, a restore, and posting an annotation are announced through an aria-live region as well as shown visually
+- Completing a merge, a restore, posting an annotation, and a successful import are announced through an aria-live region as well as shown visually
+- Validation messages for AnnotationCreate, RestoreCreate, and Import are rendered visually and associated with their fields so assistive technology announces them
 </accessibility>
 
 <performance>
@@ -120,23 +149,26 @@ Feature: Export —
 
 <writing>
 - Headings, tabs, buttons, and labels use one consistent capitalization convention throughout
-- Action labels are specific verbs such as Compare branches, Complete merge, and Restore version rather than generic labels where a specific one is possible
+- Action labels are specific verbs such as Compare branches, Complete merge, Restore version, Ignore whitespace, Export, Import, Copy, and Download rather than generic labels where a specific one is possible
 - Seeded prompt content, change notes, and author names read as plausible product data with no placeholder text, lorem ipsum, or template variables anywhere in the shipped UI
 - Empty states name what belongs in the region and how to get it there; the no-differences state says the versions are identical
+- Validation and import error messages name the field or problem and the fix, including the field contract rule when validation fails (for example bodyMarkdown length, changeNote required, schemaVersion prompt-diff-package-v1, or kind enum); no placeholder text such as TODO or Lorem appears in the shipped UI
 </writing>
 
 <requirements>
-Shared application state must live in Zustand (in-memory only): the prompts collection with full version chains (text, author, timestamp, change note, parent links for branches and merges), the selected prompt, base and compare picker selections, the active mode tab, diff view mode, merge session state with per-region resolutions, annotations with anchors, resolved flags and replies, search query and results, undo/redo history, export selections, and UI chrome. Do not use localStorage, sessionStorage, or other browser storage APIs.
+Shared application state must live in Zustand (in-memory only): the prompts collection with full version chains (text, author, timestamp, change note, parent links for branches and merges), the selected prompt, base and compare picker selections, the active mode tab, diff view mode, Ignore whitespace and Ignore case flags, merge session state with per-region resolutions, annotations with anchors, resolved flags and replies, search query and results, undo/redo history, history multi-selection, export preview derivations, import draft, and UI chrome. Do not use localStorage, sessionStorage, or other browser storage APIs.
 State contracts (behavioral, not storage keys):
-- Switching a picker recomputes the diff, counters, and word-level highlights from the same shared version data
+- Switching a picker or either Ignore toggle recomputes the diff, counters, and word-level highlights from the same shared version data
 - Completing a merge or restore appends exactly one new head version and every surface — history list, pickers, graph, export — reflects it without a reload
 - Merge resolutions feed the created version's text region by region; the result never diverges from the choices shown during the flow
 - Annotations, resolutions, and replies update the markers and threads everywhere they appear
 - Undo and redo operate on the same shared history the visible surfaces render from
 - Search results derive from the live version texts; a version created by merge or restore is immediately searchable
-Build tooling: Vite SPA. Styling is Tailwind CSS 4.3.2 (pinned) with design tokens in the theme layer. IBM Carbon Design System (@carbon/react) is the component library for all UI chrome — modals, dropdowns, tabs, tags, notifications, and form controls; no other component library. diff-match-patch or a comparable diff library for computing line- and word-level diffs. Motion for React and AutoAnimate allowed for animation; no other animation libraries. Icons from @carbon/icons-react only, installed via npm — no raw copy-pasted SVG icon sets. All forms — the annotation composer and any restore or merge confirmation inputs — are driven by React Hook Form validating through a Zod schema with inline per-field errors before submit. All libraries installed via npm and bundled locally; no CDN imports. No backend or authentication. Author names and any model references in seeded data are fictional; do not use real people, providers, or model names.
-- Seed at least 4 prompts, each with 4 to 6 versions carrying distinct texts, fictional authors, timestamps, and change notes; at least one seeded prompt has two branches diverging from a common base with at least 3 conflict regions so Compare Branches and Merge are exercisable on first load
-- Seed at least 2 annotations on one prompt so threads are visible on first load
+- Export History report / Version package / Merged prompt text texts are derived live from the same shared store; Import mutates that same store when the VersionPackage field contract passes
+Build tooling: Vite SPA. Styling is Tailwind CSS 4.3.2 (pinned) with design tokens in the theme layer. IBM Carbon Design System (@carbon/react) is the component library for all UI chrome — modals, dropdowns, tabs, tags, notifications, and form controls; no other component library. diff-match-patch or a comparable diff library for computing line- and word-level diffs. Motion for React and AutoAnimate allowed for animation; no other animation libraries. Icons from @carbon/icons-react only, installed via npm — no raw copy-pasted SVG icon sets. All forms — the annotation composer, AnnotationReply, RestoreCreate confirmation, and Import paste when presented as a form — are driven by React Hook Form validating through a Zod schema with inline per-field errors before submit. Schemas are API-shaped: they model the payloads a real prompt-versioning / merge API would accept — the AnnotationCreate, AnnotationReply, RestoreCreate, MergeRegionResolution, VersionRecord, and VersionPackage field contracts above — the record a form creates IS the would-be request body; Version package export and import conform to the same VersionPackage field contract, including schemaVersion prompt-diff-package-v1, closed kind and resolution enums, ISO-8601 timestamps, and the parentIds / baseVersionId / compareVersionId cross-field rules. All libraries installed via npm and bundled locally; no CDN imports. No backend or authentication. Author names and any model references in seeded data are fictional; do not use real people, providers, or model names.
+- Seed at least 4 prompts, each with 4 to 6 versions carrying distinct texts, fictional authors, timestamps, and change notes; at least one seeded prompt has two branches diverging from a common base with at least 3 conflict regions so Compare Branches and Merge are exercisable on first load; every seeded version conforms to the VersionRecord field contract
+- Seed at least 2 annotations on one prompt so threads are visible on first load; every seeded annotation conforms to the AnnotationRecord field contract
+- Useful end state: the session's work product is the produced version-control artifacts (Export History report / Version package / Merged prompt text with Copy and Download) plus Import round-trip against the VersionPackage field contract; every export must reflect live session mutations and Version package must carry every required key from the field contract above
 - Zero navigational outbound links for app chrome — in-app controls only; view changes via shared client state
 </requirements>
 

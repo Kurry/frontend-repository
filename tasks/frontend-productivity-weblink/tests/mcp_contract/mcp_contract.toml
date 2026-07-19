@@ -70,21 +70,21 @@ weight = 1.0
 [[criterion]]
 id = "12.2"
 name = "session_and_artifact_handlers_match_ui"
-description = "session_connect/disconnect and artifact_import/export/copy handlers drive the same badge, queue, and Session Pack surfaces as Join Room, Leave Room, choose-file, Export Session, and Copy."
+description = "session connect/disconnect/start/pause/resume/stop/restart and artifact import/export/copy handlers drive the same badge, queue rows, progress readouts, and Session Pack/Transcript surfaces as Join Room, Leave Room, choose-file, the per-row transfer controls, Export Session, Export Transcript, and Copy."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.3"
 name = "only_declared_session_and_artifact_ops"
-description = "Only declared operations are available: session connect/disconnect and artifact import/export/copy with export format session-json."
+description = "Only declared operations are available: session connect/disconnect/start/pause/resume/stop/restart and artifact import/export/copy with export formats session-json and transcript-markdown."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.4"
 name = "session_and_artifact_tools_automation_exercisable"
-description = "session_connect, session_disconnect, artifact_import, artifact_export, and artifact_copy can be exercised via webmcp_invoke_tool automation."
+description = "The declared session tools (connect, disconnect, start, pause, resume, stop, restart) and artifact tools (import, export, copy) can be exercised via webmcp_invoke_tool automation."
 type = "binary"
 weight = 1.0
 
@@ -105,14 +105,14 @@ weight = 1.0
 [[criterion]]
 id = "12.7"
 name = "artifact_export_format_is_session_json"
-description = "Artifact export is bound to the declared session-json export format that surfaces Session Pack JSON in the UI."
+description = "Artifact export is bound to the declared session-json and transcript-markdown export formats that surface the Session Pack JSON and markdown transcript in the UI."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.8"
 name = "no_undeclared_modules_or_ops"
-description = "No extra modules beyond command-session-v1 and artifact-transfer-v1, and no undeclared operations beyond connect, disconnect, import, export, and copy, are exposed."
+description = "No extra modules beyond command-session-v1 and artifact-transfer-v1, and no undeclared operations beyond the declared session (connect, disconnect, start, pause, resume, stop, restart) and artifact (import, export, copy) sets, are exposed."
 type = "binary"
 weight = 1.0
 
@@ -209,6 +209,13 @@ description = "The project fails automated MCP contract validation."
 type = "binary"
 negate = true
 weight = 1.0
+
+[[criterion]]
+id = "12.11"
+name = "session_transfer_tools_respect_row_state"
+description = "Declared session start/pause/resume/stop operations respect row state through the same machine as the UI: pause on a Paused row or resume on a row that was never started produces no fabricated progress and no desync between tool result and the visible row"
+type = "binary"
+weight = 0.5
 
 [[criterion]]
 id = "mcp_contract.catchall"

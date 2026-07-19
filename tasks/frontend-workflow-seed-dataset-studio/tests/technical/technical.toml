@@ -63,14 +63,14 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.1"
 name = "shared_state_coherence"
-description = "All surfaces derive from one shared state: a triage action updates the queue row, the rollup figures, and the seed's timeline together; a workbench edit updates the panes, the gate banner, the queue row, and the next export's manifest together; and a harvest step advancing updates the step list, golden pane, and timeline together — all without a reload"
+description = "All surfaces derive from one shared state: a triage action updates the queue row, the rollup figures, and the seed's timeline together; a workbench edit updates the panes, the gate banner, the queue row, and the next PackageManifest/DatasetStudioPackage together; and a harvest step advancing updates the step list, golden pane, and timeline together — all without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
 name = "no_storage_reload_seeded"
-description = "No browser storage is used: localStorage and sessionStorage remain empty after triaging, authoring, harvesting, and exporting, and a page reload returns the app to its seeded state — the seeded manifest with its original statuses and counts, the default queue view, no saved filter chips, and no in-progress harvests"
+description = "No browser storage is used: localStorage and sessionStorage remain empty after triaging, authoring, harvesting, exporting, and importing, and a page reload returns the app to its seeded state — the seeded manifest with its original statuses and counts, the default queue view, no saved filter chips, and no in-progress harvests"
 type = "binary"
 weight = 1.0
 
@@ -93,7 +93,14 @@ negate = true
 [[criterion]]
 id = "2.5"
 name = "console_clean"
-description = "The console is free of errors and warnings on first load and stays clean while filtering, sorting, triaging, batch rejecting, undoing, authoring, harvesting, and exporting"
+description = "The console is free of errors and warnings on first load and stays clean while filtering, sorting, triaging, batch rejecting, undoing, authoring, harvesting, exporting, and importing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.15"
+name = "export_import_field_contracts_end_state"
+description = "PackageManifest, DatasetSnapshot, and DatasetStudioPackage previews visibly include their required schemaVersion keys (seed-package-manifest-v1, dataset-snapshot-v1, seed-dataset-studio-v1) and studio Seed Dataset Studio where applicable; Download and Copy emit live-compiled text; Import of a valid DatasetStudioPackage round-trips authored package field values"
 type = "binary"
 weight = 1.0
 

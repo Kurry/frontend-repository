@@ -156,6 +156,35 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "14.10"
+name = "stacked_filters_goals_export_chain"
+description = "Full pipeline: stack Source: Google and Page: /pricing, confirm Goals and funnel recompute, confirm Stats JSON filters are two dimension/value objects and goals entries include goal_type and match_key, then clear filters — tiles, Goals, funnel, and export filters restore to the unfiltered state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.11"
+name = "add_goal_export_import_round_trip"
+description = "Add a valid goal, confirm it appears in Stats JSON goals with name, goal_type, and match_key, export then import that Stats JSON — the Goals panel and goals array still include that goal object"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.12"
+name = "visitor_floor_export_echo"
+description = "Set unique-visitors floor to 20,000 so Low traffic appears; Stats JSON visitor_floor is 20000 in the export preview without reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "goal_export_omits_field_contract_keys"
+description = "After adding a goal, the Stats JSON goals entry is missing goal_type or match_key, or omits the new goal entirely while the Goals panel shows it"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
 id = "behavioral.catchall"
 name = "behavioral_catchall"
 description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

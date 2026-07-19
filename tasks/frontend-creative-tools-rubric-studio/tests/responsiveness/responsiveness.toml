@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "7.2"
 name = "mobile_tap_targets_adequate"
-description = "At 375px width, rail toggle, accordion headers, Add criterion, verdict toggles, case include toggles, history entries, and Export/copy present tap targets at least 44px in at least one dimension."
+description = "At 375px width, rail toggle, accordion headers, Add criterion, verdict toggles, case include toggles, history entries, Undo, Redo, Export, Import, and copy present tap targets at least 44px in at least one dimension."
 type = "binary"
 weight = 1.0
 
@@ -84,7 +84,7 @@ weight = 1.0
 [[criterion]]
 id = "7.4"
 name = "no_clip_or_overflow_at_375"
-description = "At 375px width, no content clips or overflows the viewport; the Tune bars and diff view reflow to stacked layouts and the export code block scrolls within its own container."
+description = "At 375px width, no content clips or overflows the viewport; the Tune bars and diff view reflow to stacked layouts and Export center code blocks scroll within their own containers; Undo, Redo, Export, and Import remain fully visible and operable."
 type = "binary"
 weight = 1.0
 
@@ -205,7 +205,7 @@ negate = true
 [[criterion]]
 id = "7.n10"
 name = "controls_disappear_at_sizes"
-description = "Add criterion, Export, aggregation selects, or rail toggle disappear at 1024px or 375px widths."
+description = "Add criterion, Export, Import, Undo, Redo, aggregation selects, or rail toggle disappear at 1024px or 375px widths."
 type = "binary"
 weight = 1.0
 negate = true

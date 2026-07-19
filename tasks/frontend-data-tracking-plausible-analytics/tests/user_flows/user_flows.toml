@@ -211,6 +211,49 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "6.11"
+name = "stacked_filter_saved_segment_flow"
+description = "From the default view, click Google then /pricing so two pills stack; save a named segment; clear filters; apply the saved segment — both pills, recomputed numbers, and Stats JSON filters with dimension/value keys return, and saved_segments contains the named segment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "add_goal_field_contract_flow"
+description = "Open Add goal with an empty name or whitespace match_key for event — inline validation names the failing field and submit stays disabled; submit a valid name, goal_type event, and match_key — Goals panel gains exactly one new row and Stats JSON goals includes name, goal_type, and match_key"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "threshold_floor_and_ceiling_flow"
+description = "On example.com Last 30 days, set bounce-rate ceiling to 40 and unique-visitors floor to 20,000 — High bounce and Low traffic labels appear and Stats JSON bounce_rate_ceiling and visitor_floor match; restoring 60 and 0 removes both labels"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "custom_range_flow"
+description = "Choose Custom, enter a valid narrower from/to than Last 30 days, and apply — metric tiles differ from Last 30 days, the top-bar period shows the custom span, and Stats JSON period matches"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "per_panel_csv_after_filter_flow"
+description = "Apply the Google source filter, then export Top Pages per-panel CSV — the CSV starts with dimension,name,visitors and lists the filtered Top Pages rows then visible, not the unfiltered defaults"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "add_goal_flow_dead_end"
+description = "Add goal is missing, or a valid submit fails to append a Goals panel row and Stats JSON goals entry with name, goal_type, and match_key"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
 id = "user_flows.catchall"
 name = "user_flows_catchall"
 description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

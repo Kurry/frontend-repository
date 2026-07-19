@@ -84,7 +84,7 @@ weight = 1.0
 [[criterion]]
 id = "4.4"
 name = "actions_show_confirmation"
-description = "Copying the summary, completing bundling, saving an override, and a re-run finishing each produce a visible confirmation (toast, badge change, or timeline entry)"
+description = "Copying the summary, copying or downloading an export, completing bundling, saving an override, importing a package, and a re-run finishing each produce a visible confirmation (toast, badge change, or timeline entry)"
 type = "binary"
 weight = 1.0
 
@@ -126,7 +126,7 @@ weight = 1.0
 [[criterion]]
 id = "4.10"
 name = "overlays_close_all_paths"
-description = "Overlay surfaces (override form, diff picker, confirmations) close via their close control, the Escape key, and — where a dimmed backdrop exists — a backdrop click, without saving partial state"
+description = "Overlay surfaces (override form, diff picker, export drawer, import surface, confirmations) close via their close control, the Escape key, and — where a dimmed backdrop exists — a backdrop click, without saving partial state"
 type = "binary"
 weight = 1.0
 
@@ -206,6 +206,22 @@ weight = 1.0
 id = "4.n10"
 name = "affordances_hidden_or_inaccessible"
 description = "A required affordance (evidence link, retry control, resolve checkbox, override toggle) is visually hidden or unreachable in some state of the app"
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "4.11"
+name = "import_field_contract_rejects_invalid"
+description = "Importing malformed Review Package JSON or a document that breaks the field contract (wrong schemaVersion, missing required keys, closed-set violations, negative trial counts) shows an inline import error naming the problem, leaves bundle counts and session facets unchanged, and does not refresh the Export preview as a success"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "invalid_import_mutates_portfolio"
+description = "An invalid or malformed Review Package JSON import still changes portfolio rows, recommendations, or the Export preview as if the import succeeded"
 type = "binary"
 negate = true
 weight = 1.0

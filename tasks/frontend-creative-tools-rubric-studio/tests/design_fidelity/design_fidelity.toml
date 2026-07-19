@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "3.2"
 name = "typography_hierarchy_matches_spec"
-description = "Typography matches the spec hierarchy: the rubric name is visibly larger than section headings, which are larger than criterion names, which are larger than body and metadata text; export text uses a monospaced face distinct from the UI face."
+description = "Typography matches the spec hierarchy: the rubric name is visibly larger than section headings, which are larger than criterion names, which are larger than body and metadata text; Export center preview text uses a monospaced face distinct from the UI face."
 type = "binary"
 weight = 1.0
 

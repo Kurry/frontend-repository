@@ -132,7 +132,7 @@ negate = true
 [[criterion]]
 id = "2.10"
 name = "all_controls_keyboard_operable"
-description = "Every interactive control - sidebar categories, sliders, switches, pill toggles, dropdowns, and the export actions - is reachable and operable with the keyboard alone, with a visible focus indicator on each."
+description = "Every interactive control - sidebar categories, sliders, switches, pill toggles, dropdowns, Undo, Redo, Import, Diff, Profiles, the command palette, and the export actions - is reachable and operable with the keyboard alone, with a visible focus indicator on each."
 type = "binary"
 weight = 1.0
 
@@ -146,7 +146,7 @@ weight = 1.0
 [[criterion]]
 id = "2.12"
 name = "action_feedback_announced_via_live_region"
-description = "Copy, download, and reset feedback is announced through a polite live region (aria-live polite or role status) as well as shown visually."
+description = "Copy, download, reset, Import, and profile feedback is announced through a polite live region (aria-live polite or role status) as well as shown visually."
 type = "binary"
 weight = 0.5
 
@@ -160,7 +160,7 @@ weight = 1.0
 [[criterion]]
 id = "2.14"
 name = "console_errors_during_full_exercise"
-description = "Console errors or warnings appear during a full exercise of the editor, the export actions, and category navigation."
+description = "Console errors or warnings appear during a full exercise of the editor, exports, Import, Undo/Redo, profiles, Diff, command palette, and category navigation."
 type = "binary"
 weight = 1.0
 negate = true

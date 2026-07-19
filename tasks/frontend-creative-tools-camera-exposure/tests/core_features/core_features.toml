@@ -221,7 +221,7 @@ weight = 1.0
 [[criterion]]
 id = "1.28"
 name = "reset_restores_defaults"
-description = "Reset returns all three dials to their defaults (f/16, 1/60, ISO 100), zeros Contrast/Highlights/Shadows, restores the default preview, re-centers the exposure meter, and clears the active look pack and snapshot selection"
+description = "Reset returns all three dials to their defaults (f/16, 1/60, ISO 100), zeros Contrast/Highlights/Shadows, restores the default scene Daylight Courtyard, restores the default preview, re-centers the exposure meter, and clears the active look pack and snapshot selection"
 type = "binary"
 weight = 1.0
 
@@ -358,7 +358,7 @@ weight = 1.0
 [[criterion]]
 id = "1.47"
 name = "undo_redo_edit_mutations"
-description = "After a dial step and a light-slider change, Undo reverses each mutation in order and restores the prior preview; Redo reapplies them; a new edit after Undo clears and disables Redo"
+description = "After a dial step, a light-slider change, and a scene selection, Undo reverses each mutation in order (including the scene change) and restores the prior preview; Redo reapplies them; a new edit after Undo clears and disables Redo"
 type = "binary"
 weight = 1.0
 
@@ -393,14 +393,14 @@ weight = 1.0
 [[criterion]]
 id = "1.52"
 name = "edit_stack_import_restores_state"
-description = "After editing dials/sliders and saving a snapshot, exporting the edit stack, Resetting, then importing that JSON restores dials, sliders, look pack, snapshots, preview, histogram, and meter to the exported state"
+description = "After editing dials/sliders, selecting a non-default scene, and saving a snapshot, exporting the edit stack, Resetting, then importing that JSON restores dials, sliders, look pack, scene, snapshots, preview, histogram, and meter to the exported state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.53"
 name = "edit_stack_schema_fields_present"
-description = "A valid Download edit stack document includes required fields schemaVersion (exactly camera-exposure.edit-stack.v1), aperture, shutter, iso, contrast, highlights, shadows, lookPack, and snapshots, with stop and slider values inside the documented bounds"
+description = "A valid Download edit stack document includes required fields schemaVersion (exactly camera-exposure.edit-stack.v1), aperture, shutter, iso, contrast, highlights, shadows, lookPack, scene (exactly one of Daylight Courtyard, Alpine Midday, Stadium Floodlights, Candlelit Study, Neon Alley Night), and snapshots, with stop and slider values inside the documented bounds"
 type = "binary"
 weight = 1.0
 
@@ -414,7 +414,7 @@ weight = 1.0
 [[criterion]]
 id = "1.55"
 name = "export_omits_session_edits"
-description = "A PNG/JPEG or edit-stack export matches the unedited seed while the UI shows dial, slider, look-pack, or snapshot mutations — the artifact ignores the work just performed"
+description = "A PNG/JPEG or edit-stack export matches the unedited seed while the UI shows dial, slider, look-pack, scene, or snapshot mutations — the artifact ignores the work just performed"
 type = "binary"
 negate = true
 weight = 1.0
@@ -425,6 +425,145 @@ name = "css_filter_only_fake_export"
 description = "Download PNG or JPEG produces a file whose pixels match the unedited source image while only the on-screen preview uses CSS filters or overlays — edits are not baked into the downloaded bitmap"
 type = "binary"
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.57"
+name = "preview_effects_are_real_canvas_pixels"
+description = "The preview's capture effects (frame brightness, depth-of-field blur, ISO grain) are real pixel operations on a canvas surface, not CSS-only decoration: the rendered bitmap carries them, which is why a Download PNG/JPEG at a strong edit state reproduces the same brightness, blur, and grain seen on screen"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.58"
+name = "scenes_strip_five_named_scenarios"
+description = "A Scenes strip offers exactly five scenarios with these names and stated light offsets: Daylight Courtyard (0 EV, active by default), Alpine Midday (+2 EV), Stadium Floodlights (+1 EV), Candlelit Study (-2 EV), and Neon Alley Night (-3 EV); the active scene chip shows a selected treatment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.59"
+name = "scene_select_shifts_ev_meter_preview_histogram"
+description = "Selecting a scene applies its light offset on the same press while the three dials keep their current stops: the EV readout shifts by the scene's offset, the meter moves accordingly, the preview brightness changes, and the histogram reshapes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.60"
+name = "identical_dials_different_scenes_differ"
+description = "With identical dial stops, two different scenes (e.g. Neon Alley Night vs Alpine Midday) produce visibly different preview brightness, EV numbers, and histogram shapes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.61"
+name = "two_scenes_render_identical"
+description = "Switching between two scenes with different stated EV offsets leaves the preview brightness, EV readout, and histogram shape visually identical — the scene selection is inert"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.62"
+name = "bracket_panel_controls_and_validated_base_name"
+description = "A Bracket panel offers a frame-count choice of 3 or 5, a step choice of 1 or 2 stops, and a required base-name field validated inline (non-empty, at most 40 characters) before Generate bracket can succeed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.63"
+name = "generate_bracket_creates_preset_series"
+description = "Generate bracket creates the whole series as saved presets in one action: the visible preset count increases by exactly the chosen frame count; each frame keeps the current aperture and ISO and shifts only the shutter along the discrete stop list by the step per frame, centered on the current shutter; frame names are the base name suffixed with the signed EV delta (count 3 step 1 gives -1 EV, 0 EV, +1 EV; count 5 step 2 gives -4 EV, -2 EV, 0 EV, +2 EV, +4 EV)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.64"
+name = "bracket_thumbnail_strip_ordered_darkest_to_brightest"
+description = "A bracket preview strip renders the generated series as thumbnails ordered darkest to brightest; with a mid-list shutter and a nonzero step, adjacent thumbnails differ visibly in brightness"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.65"
+name = "generate_bracket_wrong_count_or_invented_stops"
+description = "Generate bracket changes the preset count by a number other than the chosen frame count, or produces frames whose shutter is not a member of the discrete shutter stop list (invented stops instead of clamping at the list ends)"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.66"
+name = "bracketed_presets_not_first_class"
+description = "Presets produced by Generate bracket cannot be applied, edited, deleted, or filtered like hand-made presets — they behave as a separate inert list rather than real entries in the shared presets collection"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.67"
+name = "clipping_zebras_toggle_over_and_under"
+description = "Independent Highlight zebras and Shadow zebras toggles overlay striped hatching on near-white and near-black preview regions respectively; at default dials in Daylight Courtyard neither overlay covers any meaningful area; pushing exposure far over-exposed makes highlight-zebra coverage appear and grow, and pushing far under-exposed makes shadow-zebra coverage appear and grow"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.68"
+name = "histogram_clipping_indicators_independent_of_toggles"
+description = "The histogram carries a highlight-clipping indicator at its right edge and a shadow-clipping indicator at its left edge that light up whenever clipped regions exist in the current render, whether or not the zebra toggles are on"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.69"
+name = "zebras_at_default_or_absent_when_blown"
+description = "Zebra hatching covers the preview at default dials in Daylight Courtyard where no clipping exists, or never appears even when exposure is pushed strongly over/under so that regions are blown out or crushed"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.70"
+name = "ab_slots_capture_state_compare_gated"
+description = "Set A and Set B capture the complete current exposure state (dials, light sliders, scene, look pack) into slots A and B; a filled slot shows a summary of its stored stops; the Compare control is available only once both slots are filled"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.71"
+name = "compare_wipe_split_draggable"
+description = "Compare view shows one preview split by a draggable vertical wipe handle: left of the handle renders slot A's exposure state and right of it renders slot B's, with A and B labels visible on their sides; dragging the handle moves the split continuously and clamps at the preview edges; leaving Compare returns to the live edit state without altering either slot — probe via the real wipe handle, not a state shortcut"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.72"
+name = "wipe_shows_same_render_both_sides"
+description = "In Compare with two clearly different slots filled, both sides of the wipe handle show the same render (identical brightness/tone) so the split reveals no difference between slot A and slot B"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.73"
+name = "settings_card_png_readable_pixels"
+description = "Download settings card downloads a real PNG file named exposure-settings-card.png rendered client-side whose pixels carry the current aperture (f/N), shutter (1/N), ISO, EV, and active scene name as readable text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.74"
+name = "settings_card_identical_across_states"
+description = "Downloading the settings card, then changing ISO two stops and selecting a different scene, then downloading again produces two card files that are visually identical or whose rendered text does not match the changed readouts"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.75"
+name = "edit_stack_scene_key_and_enum_import"
+description = "The edit-stack JSON carries a required scene key holding exactly one of the five scene names; importing a document whose scene is not one of the five names is rejected as invalid, and a valid export/import round trip restores the scene along with the other fields"
+type = "binary"
 weight = 1.0
 
 [[criterion]]

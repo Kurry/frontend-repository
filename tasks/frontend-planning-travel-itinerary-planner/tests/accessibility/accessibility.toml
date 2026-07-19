@@ -62,150 +62,150 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "planner_controls_keyboard"
+description = "Sidebar day rows, stop rows, stop form fields, place-detail tabs, map chrome, Export Download/Copy, Import, role switcher, and undo/redo are operable with Tab, Shift+Tab, Enter, or Space"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "conflict_export_focus_management"
+description = "Conflict-resolution modal and export canvas trap focus while open and return focus to the originating control on dismiss"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "cover_and_map_chrome_alt"
+description = "Plan hero cover image and icon-only map/toolbar controls expose descriptive alt text or accessible names"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "validation_toast_live_regions"
+description = "Stop validation errors, import errors, demo toasts, and export copy confirmations are shown visually and announced via aria-live regions"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+name = "stop_form_explicit_labels"
+description = "Stop create/edit fields (title, day, location, startTime, endTime, category, costTier, status) use explicit labels associated with their inputs"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+name = "planner_heading_order"
+description = "Planner headings (trip title, day sections, export canvas) follow a logical order with no skips such as H1 to H3"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "planner_landmarks"
+description = "The workspace exposes landmark regions such as nav for the sidebar and main for the plan column, or an equivalent skip-to-content path"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+name = "coastal_theme_contrast"
+description = "Body text, day labels, and primary controls meet readable contrast in both light and dark themes"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "sidebar_main_button_semantics"
+description = "Sidebar navigation, plan main region, and primary actions use semantic nav/main/button roles rather than unlabeled generic containers"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "planner_reduced_motion"
+description = "With prefers-reduced-motion set, toast, list, coachmark, and control transitions are removed or substantially reduced while create, edit, delete, export, and import stay usable"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
-name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+name = "export_or_stop_unreachable"
+description = "Export Download/Copy, Import, stop create submit, or day sidebar rows cannot be reached or activated from the keyboard"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n2"
-name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+name = "planner_focus_ring_missing"
+description = "Focused stop rows, form fields, or export controls show no visible focus indicator or the indicator is obscured"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n3"
-name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+name = "map_pins_or_tabs_lack_semantics"
+description = "Map pins, place-detail tabs, or poll controls lack accessible names or ARIA roles needed to identify them"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+name = "overlap_or_status_color_only"
+description = "Time-overlap warnings or kanban status rely on color alone with no icon, text, or accessible name conveying the state"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Keyboard focus escapes an open modal into the page behind it while the modal is open."
+name = "conflict_focus_escapes"
+description = "While the conflict-resolution modal is open, keyboard focus escapes into the plan behind it"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+name = "dark_theme_unreadable"
+description = "In light or dark theme, day labels or stop titles are unreadable due to poor contrast against the coastal wash"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+name = "stop_errors_visual_only"
+description = "Stop field-contract errors or import failures are visual only with no aria-live or accessible association"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+name = "hero_or_icons_missing_alt"
+description = "Plan hero cover image or icon-only toolbar controls are missing alt text or accessible names"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+name = "day_heading_order_skipped"
+description = "Day section or export canvas headings skip levels (for example H1 to H3) or are unordered"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n10"
-name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+name = "coachmark_ignores_reduced_motion"
+description = "With prefers-reduced-motion set, coachmark, toast, or list transitions still run at full motion"
 type = "binary"
 negate = true
 weight = 1.0

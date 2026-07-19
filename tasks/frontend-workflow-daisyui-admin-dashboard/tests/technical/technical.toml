@@ -86,14 +86,14 @@ weight = 1.0
 [[criterion]]
 id = "2.7"
 name = "keyboard_operability_visible_focus"
-description = "Every interactive control — sidebar items, header controls, table row actions, and form fields — is reachable and operable with the keyboard alone, and the focused control shows a visible focus indicator"
+description = "Every interactive control — sidebar items, header controls, table row actions, form fields, command palette, export drawer controls, and Archive Restore — is reachable and operable with the keyboard alone, and the focused control shows a visible focus indicator"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.8"
 name = "popover_escape_and_focus_return"
-description = "The notifications, profile, and sidebar account popovers close when Escape is pressed and keyboard focus returns to the control that opened them"
+description = "The notifications, profile, and sidebar account popovers, the command palette, and the export drawer close when Escape is pressed and keyboard focus returns to the control that opened them"
 type = "binary"
 weight = 1.0
 
@@ -121,7 +121,7 @@ weight = 1.0
 [[criterion]]
 id = "2.12"
 name = "console_clean_full_exercise"
-description = "No console errors, warnings, or unhandled promise rejections appear during a full exercise of the app (view switches, create/edit/delete, filters, sort, bulk actions, theme toggle, popovers)"
+description = "No console errors, warnings, or unhandled promise rejections appear during a full exercise of the app (view switches, create/edit/archive/restore, filters, sort, bulk actions, command palette, export drawer, theme toggle, popovers)"
 type = "binary"
 weight = 1.0
 
@@ -150,7 +150,14 @@ weight = 1.0
 [[criterion]]
 id = "2.16"
 name = "field_contract_enforced_before_store_write"
-description = "Invalid API-shaped payloads (overlong firstName, email without domain dot, temporaryPassword under 8 on create) never increase the users count; valid submits write the composed display name and enum badges from those fields"
+description = "Invalid API-shaped payloads (overlong firstName, email without domain dot, temporaryPassword under 8 on create, or unknown permission ids) never increase the users count; valid submits write the composed display name and enum badges from those fields"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.17"
+name = "created_record_is_request_body"
+description = "A successful Add User stores a record whose Directory JSON users entry uses the UserCreate request-body field names (firstName, lastName, email, role, status, and when set sendInvitation, twoFactorEnabled, productAccess, permissions) rather than inventing a divergent key set"
 type = "binary"
 weight = 1.0
 

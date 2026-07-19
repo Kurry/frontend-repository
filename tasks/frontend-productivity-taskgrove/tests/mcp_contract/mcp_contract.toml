@@ -62,153 +62,160 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "12.1"
-name = "mandated_modules_are_bound"
-description = "All contract-mandated modules are initialized and bound."
+name = "mandated_modules_bound"
+description = "The three contract-mandated modules — entity-collection-v1, browse-query-v1, and artifact-transfer-v1 — are initialized and bound (webmcp_list_tools shows entity, browse, and artifact prefixes)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.2"
-name = "handlers_match_visible_ui_logic"
-description = "Exposed tool handlers match visible UI command logic."
+name = "handlers_match_visible_ui"
+description = "Exposed entity, browse, and artifact tool handlers drive the same visible UI logic as on-page create/edit/delete/toggle, destination switches, tag filters, theme, and Export grove / Import grove / Copy controls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.3"
-name = "only_documented_operations_exist"
-description = "Only documented operations and routes are available."
+name = "only_documented_operations"
+description = "Only documented entity operations (create, select, update, delete, toggle), browse operations against root/node/grove-panel, and artifact operations (import, export, copy) are available — no undeclared routes"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.4"
-name = "contract_is_automation_exercisable"
-description = "The contract can be fully exercised via automation."
+name = "contract_exercisable_via_automation"
+description = "The contract can be fully exercised via webmcp_invoke_tool for entity create/update/delete/toggle, browse open against root/node/grove-panel, and artifact export/import/copy for grove-json and grove-csv"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.5"
-name = "declared_entity_operations_work"
-description = "Entity operations declared in the contract, including create, update, delete, and reorder, all work."
+name = "entity_task_operations_work"
+description = "Declared task entity operations create, select, update, delete, and toggle work over the contracted fields title, parentId, completed, collapsed, tags, status, priority, and dueDate, with delete requiring explicit confirm=true"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.6"
-name = "form_flow_operations_are_bound"
-description = "Form submission validation, error, and cancel operations are clearly bound."
+name = "artifact_export_import_copy_bound"
+description = "Artifact-transfer export, import, and copy are bound to export formats grove-json and grove-csv and import modes grove-json and grove-csv; invoking them through WebMCP uses the same handlers as the visible Grove package controls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.7"
-name = "queries_match_allowed_spec"
-description = "Query destinations and filters match the allowed specification."
+name = "browse_destinations_filters_themes"
+description = "Browse destinations are limited to root, node, and grove-panel; filters are tag; themes are light, dark, and forest — matching the declared bindings"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.8"
-name = "capabilities_stay_declared"
-description = "No extra or undeclared module routes or capabilities are exposed."
+name = "no_extra_undeclared_modules"
+description = "No extra modules, destinations, or operations beyond entity-collection-v1 / browse-query-v1 / artifact-transfer-v1 and the declared Bindings are exposed"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.9"
-name = "session_tool_and_invoke_apis_work"
-description = "Session info, tool list, and invocation are correctly surfaced."
+name = "session_list_invoke_apis_work"
+description = "window.webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool correctly surface session info, the tool list, and invocation results without errors"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.10"
-name = "mcp_initializes_without_harness_edits"
-description = "MCP initialization works without manual editing or test harness changes."
+name = "mcp_init_without_harness_edits"
+description = "MCP tools register from the app module_spec + Bindings implementation without requiring manual edits to the verifier harness"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.11"
+name = "artifact_export_reflects_entity_create"
+description = "After entity create of a task with a distinctive title via WebMCP, artifact export (grove-json) through WebMCP uses the same store so the visible Grove JSON preview contains that title"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.n1"
 name = "mcp_tools_missing_or_noop"
-description = "MCP tooling is unbound, missing, or a no-op."
+description = "Entity, browse, or artifact MCP tooling is unbound, missing, or a no-op when invoked"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "12.n2"
-name = "handlers_diverge_from_ui_logic"
-description = "Handlers do not match UI logic because actions mismatch or state does not sync."
+name = "handlers_diverge_from_ui"
+description = "An entity or artifact invocation updates MCP-reported state without matching the visible tree or Grove package UI (or the reverse)"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "12.n3"
 name = "undeclared_capabilities_exposed"
-description = "Undeclared destinations or entity operations are exposed."
+description = "Undeclared destinations or operations outside the Bindings/permitted_operations lists are exposed via webmcp_list_tools"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "12.n4"
 name = "automation_cannot_exercise_contract"
-description = "The contract cannot be exercised from automation."
+description = "The contract cannot be exercised from automation via webmcp_invoke_tool"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "12.n5"
 name = "validation_bypass_desyncs_state"
-description = "Validation bypasses lead to inconsistent MCP and UI state."
+description = "An entity create that should fail TaskUpsert field-contract validation still mutates the visible tree while MCP reports success (or the reverse desync)"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "12.n6"
 name = "session_or_tool_api_errors"
-description = "The session or tool API returns errors or incomplete data."
+description = "The session or tool API returns errors or incomplete data for list/invoke"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "12.n7"
 name = "mcp_relies_on_undocumented_hacks"
-description = "MCP relies on manual or undocumented test hacks."
+description = "MCP relies on manual or undocumented test hacks outside the app registration"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "12.n8"
 name = "required_contract_module_missing"
-description = "No module contract is implemented where one is declared required."
+description = "entity-collection-v1, browse-query-v1, or artifact-transfer-v1 is missing where declared required"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "12.n9"
 name = "mcp_is_stubbed_or_commented_out"
-description = "The MCP interface is commented out or only stubbed."
+description = "The MCP interface is commented out or only stubbed"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "12.n10"
 name = "automated_contract_validation_fails"
-description = "The project fails automated MCP contract validation."
+description = "The project fails automated MCP contract validation for the declared modules"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "mcp_contract.catchall"

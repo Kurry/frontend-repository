@@ -62,86 +62,86 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "12.1"
-name = "mandated_modules_are_bound"
-description = "All contract-mandated modules are initialized and bound."
+name = "four_mandated_modules_bound"
+description = "All four contract-mandated modules are initialized and bound: browse-query-v1, entity-collection-v1, form-workflow-v1, and artifact-transfer-v1 (tools discoverable via webmcp_list_tools with browse_*, entity_*, form_*, and artifact_* prefixes)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.2"
-name = "handlers_match_visible_ui_logic"
-description = "Exposed tool handlers match visible UI command logic."
+name = "handlers_match_visible_habit_ui"
+description = "Exposed tool handlers call the same application logic as the visible UI: browse, entity, form, and artifact operations change the same habits collection, category filter, Stats/Heatmap destinations, and Import/Export surfaces the visible controls use"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.3"
-name = "only_documented_operations_exist"
-description = "Only documented operations and routes are available."
+name = "only_declared_ops_and_bindings"
+description = "Only documented operations from the bindings are available: browse destinations habits, stats, import, heatmap; filter category; entity habit with update/delete/toggle/quantity and fields name, reminder, paused; secondary entity category with create/delete; form fields name, icon, target-type, target-count, category, reminder with validate/submit/cancel; artifact import/export with import modes file and malformed-sample and export format json — no invented destinations"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.4"
-name = "contract_is_automation_exercisable"
-description = "The contract can be fully exercised via automation."
+name = "contract_exercisable_via_webmcp"
+description = "The contract can be fully exercised via automation: webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool succeed for the bound browse, entity, form, and artifact tools"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.5"
-name = "declared_entity_operations_work"
-description = "Entity operations declared in the contract, including create, update, delete, and reorder, all work."
+name = "entity_habit_ops_work"
+description = "Entity operations declared for habit work: update, delete (requires confirm=true), toggle, and quantity update the visible habit list, check-in state, and paused membership"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.6"
-name = "form_flow_operations_are_bound"
-description = "Form submission validation, error, and cancel operations are clearly bound."
+name = "form_new_habit_ops_bound"
+description = "Form operations validate, submit, and cancel for New Habit fields (name, icon, target-type, target-count, category, reminder) are bound and surface the same field-contract errors as the visible form"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.7"
-name = "queries_match_allowed_spec"
-description = "Query destinations and filters match the allowed specification."
+name = "browse_destinations_and_category_filter"
+description = "Browse operations for destinations habits, stats, import, and heatmap, plus apply_filter/clear_filter for category, update the visible view and filtered habit list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.8"
-name = "capabilities_stay_declared"
-description = "No extra or undeclared module routes or capabilities are exposed."
+name = "no_undeclared_modules_or_ops"
+description = "No extra modules beyond browse-query-v1, entity-collection-v1, form-workflow-v1, and artifact-transfer-v1, and no undeclared operations beyond the Bindings list (including no habit reorder tool), are exposed on the WebMCP surface"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.9"
-name = "session_tool_and_invoke_apis_work"
-description = "Session info, tool list, and invocation are correctly surfaced."
+name = "session_info_list_tools_invoke_work"
+description = "window.webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool are correctly surfaced and return coherent session/tool data for this app"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.10"
-name = "mcp_initializes_without_harness_edits"
-description = "MCP initialization works without manual editing or test harness changes."
+name = "mcp_init_without_harness_edits"
+description = "MCP initialization works from the app's own registration without requiring manual edits to /tests harness files"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.n1"
 name = "mcp_tools_missing_or_noop"
-description = "MCP tooling is unbound, missing, or a no-op."
+description = "WebMCP tooling for browse-query-v1, entity-collection-v1, form-workflow-v1, or artifact-transfer-v1 is unbound, missing, or a no-op when invoked"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n2"
-name = "handlers_diverge_from_ui_logic"
-description = "Handlers do not match UI logic because actions mismatch or state does not sync."
+name = "handlers_diverge_from_habit_ui"
+description = "Invoking a bound browse, entity, or form tool leaves habits, category filter, or check-in state diverging from what the equivalent visible UI control would produce"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n3"
 name = "undeclared_capabilities_exposed"
-description = "Undeclared destinations or entity operations are exposed."
+description = "Undeclared modules, destinations, or operations beyond the Bindings (browse habits/stats/import/heatmap; filter category; entity habit update/delete/toggle/quantity; secondary category create/delete; form validate/submit/cancel; artifact import/export) are exposed — for example a habit reorder tool"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,15 +157,15 @@ weight = 1.0
 [[criterion]]
 id = "12.n4"
 name = "automation_cannot_exercise_contract"
-description = "The contract cannot be exercised from automation."
+description = "webmcp_list_tools / webmcp_invoke_tool cannot exercise the declared browse, entity, form, or artifact bindings"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n5"
-name = "validation_bypass_desyncs_state"
-description = "Validation bypasses lead to inconsistent MCP and UI state."
+name = "form_submit_bypasses_field_contract"
+description = "A form submit or entity update via WebMCP bypasses HabitUpsert field-contract validation, leaving MCP and UI state inconsistent or accepting illegal targetCount/name values"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n6"
 name = "session_or_tool_api_errors"
-description = "The session or tool API returns errors or incomplete data."
+description = "webmcp_session_info or webmcp_list_tools returns errors or incomplete data for the mandated modules"
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +181,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n7"
 name = "mcp_relies_on_undocumented_hacks"
-description = "MCP relies on manual or undocumented test hacks."
+description = "MCP relies on manual or undocumented test harness hacks rather than app-registered tools"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n8"
 name = "required_contract_module_missing"
-description = "No module contract is implemented where one is declared required."
+description = "One of browse-query-v1, entity-collection-v1, form-workflow-v1, or artifact-transfer-v1 is not implemented where declared required"
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,15 +197,15 @@ weight = 1.0
 [[criterion]]
 id = "12.n9"
 name = "mcp_is_stubbed_or_commented_out"
-description = "The MCP interface is commented out or only stubbed."
+description = "The MCP interface is commented out or only stubbed so tools do not affect habits or export"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n10"
-name = "automated_contract_validation_fails"
-description = "The project fails automated MCP contract validation."
+name = "artifact_export_not_bound"
+description = "artifact export/import tools are missing or fail to drive Export as JSON / Load Malformed Sample confirm paths declared in bindings"
 type = "binary"
 negate = true
 weight = 1.0

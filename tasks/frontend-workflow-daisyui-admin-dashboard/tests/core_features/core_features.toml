@@ -212,7 +212,7 @@ weight = 1.0
 [[criterion]]
 id = "1.28"
 name = "search_field_decorative_only"
-description = "The header search field is decorative and does not change which All Users rows are visible when a query is typed"
+description = "Typing a seeded user's name into the header search field leaves the All Users row set identical to the unfiltered list (search is decorative)"
 type = "binary"
 weight = 1.0
 negate = true
@@ -334,6 +334,20 @@ weight = 1.0
 id = "1.45"
 name = "closed_role_status_enums_only"
 description = "Role and status controls on Add/Edit and bulk change only offer the closed enums Admin/Manager/Member/Viewer and Active/Invited/Suspended — no free-text role/status entry is available"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.57"
+name = "optional_api_toggles_in_create_payload"
+description = "Add User exposes sendInvitation, twoFactorEnabled, and productAccess as boolean toggles and Permissions checkboxes limited to the closed ids users.read, users.write, billing.view, products.manage, and settings.edit; a create with sendInvitation true yields an Invited user (unless status was explicitly set) and Directory JSON for that user reflects the chosen boolean/permission fields under the same names"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.58"
+name = "bulk_update_field_contract"
+description = "Bulk Change status and Change role dialogs require a checkbox selection and only accept the closed status/role enums; submitting a valid bulk change updates every selected row's badge and Directory JSON field for that enum"
 type = "binary"
 weight = 1.0
 

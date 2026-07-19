@@ -84,7 +84,7 @@ weight = 1.0
 [[criterion]]
 id = "3.4"
 name = "specified_state_changes_have_motion"
-description = "State changes the spec calls out — scene enter stagger on first load, newly created card enter, deleted card exit with renumber settle, Tile/List/Slide re-layout, Slide prev/next advance, description edit wash, demo toasts, and right drawers — show the specified transitions rather than hard cuts (verified via real UI controls)."
+description = "State changes the spec calls out — scene enter stagger on first load, newly created card enter, deleted card exit with renumber settle, Tile/List/Slide re-layout, Slide prev/next advance, description edit wash, demo toasts, right drawers, export drawer slide, and command palette fade — show the specified transitions rather than hard cuts (verified via real UI controls)."
 type = "binary"
 weight = 1.0
 

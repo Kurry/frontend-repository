@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "4.2"
 name = "localstorage_persistence_survives_reload"
-description = "Local peer identity, last room identifier, chat transcript, file queue, and theme choice persist in localStorage (or equivalent client storage) and survive a reload"
+description = "Local peer identity, last room identifier, chat transcript, file queue (per-row status, bytesTransferred, and order), transfer log, and theme choice persist in localStorage (or equivalent client storage) and survive a reload"
 type = "binary"
 weight = 1.0
 
@@ -197,6 +197,28 @@ weight = 1.0
 id = "4.19"
 name = "session_pack_never_serializes_connected_peer"
 description = "The app fails this criterion if Session Pack JSON or any WebMCP tool result claims a peer connected/online or serializes connection state as connecting or waiting"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.20"
+name = "transfer_progress_matches_real_file_size"
+description = "A transferring row's readout total equals the chosen file's actual byte size, and after completion the Session Pack shows that row with bytesTransferred equal to sizeBytes and status completed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.21"
+name = "webmcp_transfer_ops_drive_same_rows"
+description = "Invoking the declared session start/pause/resume/stop WebMCP tools drives the same visible queue rows, status pills, and progress readouts as the per-row controls, through the same handlers"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.22"
+name = "session_pack_never_serializes_transferring"
+description = "The app fails this criterion if an exported Session Pack serializes any fileQueue status as transferring instead of pausing the row at its checkpoint"
 type = "binary"
 weight = 1.0
 negate = true

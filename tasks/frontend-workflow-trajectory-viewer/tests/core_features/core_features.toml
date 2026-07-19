@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "1.22"
 name = "review_package_export_reflects_session"
-description = "After annotating at least one step and submitting a valid classification, the Export panel Review JSON preview contains the exact note_text, step_index, stage, root_cause, behavior, impact, evidence, and implicated_steps just entered under the required keys trial_id, task_id, model, reward, outcome, duration, step_count, annotations, and failure_report; Copy export puts that exact preview text on the clipboard with visible confirmation, and Download export yields a file matching the preview"
+description = "After annotating at least one step and submitting a valid classification, the Export panel Review JSON preview shows schemaVersion exactly trajectory-viewer.review-package.v1 and contains the exact note_text, step_index, stage, root_cause, behavior, impact, evidence, and implicated_steps just entered under the required keys schemaVersion, exportedAt, trial_id, task_id, model, reward, outcome, duration, step_count, annotations, and failure_report; Copy export puts that exact preview text on the clipboard with visible confirmation, and Download export yields a file matching the preview"
 type = "binary"
 weight = 1.0
 
@@ -226,7 +226,7 @@ weight = 1.0
 [[criterion]]
 id = "1.25"
 name = "export_omits_session_mutations"
-description = "After adding an annotation or submitting a classification, the Export panel Review JSON still shows empty annotations and a null failure_report, or otherwise omits the session's actual note_text/classification values"
+description = "After adding an annotation or submitting a classification, the Export panel Review JSON still shows empty annotations and a null failure_report, omits schemaVersion trajectory-viewer.review-package.v1, or otherwise omits the session's actual note_text/classification values"
 type = "binary"
 weight = 1.0
 negate = true

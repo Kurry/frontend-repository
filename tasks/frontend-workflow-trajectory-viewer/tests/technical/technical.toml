@@ -121,7 +121,7 @@ weight = 1.0
 [[criterion]]
 id = "2.11"
 name = "api_shaped_form_and_export_contracts"
-description = "The note and classification forms enforce the declared API-shaped bounds and enums (note_text non-empty ≤500 chars; stage/root_cause/behavior/impact restricted to their declared option sets; evidence 20–2000 chars; implicated_steps non-empty), and the Review JSON export uses the same field names and nesting (annotations[].note_text/step_index; failure_report.stage/root_cause/behavior/impact/evidence/implicated_steps)"
+description = "The note and classification forms enforce the declared API-shaped bounds and enums (note_text non-empty ≤500 chars; stage/root_cause/behavior/impact restricted to their declared option sets; evidence 20–2000 chars; implicated_steps non-empty), and the Review JSON export uses the same field names and nesting with schemaVersion exactly trajectory-viewer.review-package.v1 plus exportedAt, trial_id, task_id, model, reward, outcome, duration, step_count, annotations[].note_text/step_index, and failure_report.stage/root_cause/behavior/impact/evidence/implicated_steps (or null)"
 type = "binary"
 weight = 1.0
 

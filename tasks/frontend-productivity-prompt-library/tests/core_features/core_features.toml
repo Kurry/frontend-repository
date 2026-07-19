@@ -245,6 +245,35 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "1.27"
+name = "prompt_request_body_field_contract"
+description = "New Prompt / Edit validate the prompt request-body field contract: title trimmed length 1–60, body non-empty max 8000, technique exactly one closed-list tag, optional description max 280; invalid drafts keep Submit disabled with named field errors and add no row; a valid create record matches that shape"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "export_library_json_and_markdown"
+description = "Export library compiles prompt-library.json with required keys schemaVersion equal to 1, product exactly Prompt Library, prompts array, and generatedAt ending in Z, plus a markdown package; after creating a prompt both artifacts include that title and technique; Download JSON, Download Markdown, and Copy emit the visible text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "import_library_round_trip"
+description = "After exporting JSON following a create, deleting to diverge, then Import library of that JSON, the table count/titles and a fresh export reconstruct to match; malformed JSON shows a visible error and changes nothing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "export_omits_session_prompt"
+description = "After creating a prompt, Export library JSON or markdown omits that prompt's title or technique — an incomplete session export"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

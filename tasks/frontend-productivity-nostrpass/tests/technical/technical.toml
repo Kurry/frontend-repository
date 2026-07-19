@@ -221,6 +221,21 @@ weight = 1.0
 
 
 [[criterion]]
+id = "2.20"
+name = "rotated_keys_are_fresh_bech32"
+description = "After a confirmed rotation, the identity's npub and nsec are well-formed bech32 values (npub1/nsec1 prefixes) distinct from its prior pair and from every other identity's keys"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.21"
+name = "matrix_desyncs_from_pills"
+description = "After any single or bulk grant action, a matrix cell and the same identity-application pill or Permissions toggle disagree about granted versus revoked"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

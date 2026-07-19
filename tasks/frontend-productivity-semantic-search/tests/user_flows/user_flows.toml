@@ -63,14 +63,14 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "6.1"
 name = "search_to_report_flow_complete"
-description = "The full search flow works end to end: entering a query and pressing Enter renders the ranked list with scores descending, moving the threshold slider hides low-scoring cards and updates the count, thumbs-up moves a result up with a feedback marker, and the export report shows the same query, threshold, order, and marker — all without a reload"
+description = "The full search flow works end to end: entering a query and pressing Enter renders the ranked list with scores descending, moving the threshold slider hides low-scoring cards and updates the count, thumbs-up moves a result up with a feedback marker, and the Search report export shows schemaVersion 1 with the same query, threshold, order, and feedback — all without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
 name = "invalid_forms_validate_inline"
-description = "Submitting Save search with an empty name, or Add document with an empty title or body, triggers immediate inline validation naming the field and creates nothing"
+description = "Submitting Save search with an empty or duplicate name, or Add document with an empty title, body shorter than 20 characters, or type outside the closed list, triggers immediate inline validation naming the field and creates nothing"
 type = "binary"
 weight = 1.0
 
@@ -131,9 +131,16 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "6.11"
+name = "library_package_round_trip_flow"
+description = "Exporting a Library package after adding a document and saving a search, diverging the corpus by deletes, then Importing that JSON restores the index list count and saved search so a fresh Library package export matches — Download or Copy emits the visible preview text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "6.n1"
 name = "primary_flows_unavailable_from_ui"
-description = "A primary flow — running a query, adding a document, re-indexing, saving a search, or exporting the report — is not reachable from the visible UI"
+description = "A primary flow — running a query, adding a document, re-indexing, saving a search, exporting a report or library package, or importing a library package — is not reachable from the visible UI"
 type = "binary"
 weight = 1.0
 negate = true

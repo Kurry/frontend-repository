@@ -62,57 +62,57 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "12.1"
-name = "three_mandated_modules_bound"
-description = "All three contract-mandated modules are initialized and bound: browse-query-v1, form-workflow-v1, and entity-collection-v1 (tools discoverable via webmcp_list_tools with browse_*, form_*, and entity_* prefixes)."
+name = "four_mandated_modules_bound"
+description = "All four contract-mandated modules are initialized and bound: browse-query-v1, form-workflow-v1, entity-collection-v1, and artifact-transfer-v1 (tools discoverable via webmcp_list_tools with browse_*, form_*, entity_*, and artifact_* prefixes)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.2"
 name = "handlers_match_visible_board_ui_logic"
-description = "Exposed tool handlers call the same application logic as the visible UI: browse/form/entity operations change the same scene board, view destinations, create form, and scene fields the Tile/List/Slide toggles, Add Scene form, and scene edit/delete controls use."
+description = "Exposed tool handlers call the same application logic as the visible UI: browse/form/entity/artifact operations change the same scene board, create form, view destinations, and export/import surfaces that Tile/List/Slide, Add Scene, scene edit/delete, Export, and Import use."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.3"
 name = "only_declared_ops_and_bindings"
-description = "Only documented operations from the bindings are available: browse destinations scene-list, scene-editor, and tutorial-steps on browsable entity scenes; form fields title and body with operations validate/submit/cancel/advance/return and workflow steps intro/edit/review; entity scene create/select/update/delete with fields title and body — no invented destinations."
+description = "Only documented operations from the bindings are available: browse destinations scene-list, scene-editor, tutorial-steps, export-center, and presenter on browsable entity scenes with filters search and shot-type; form fields title, body, duration, and shot-type with operations validate/submit/cancel/advance/return and workflow steps intro/edit/review; entity scene create/select/update/delete/reorder/toggle with fields title, body, duration, and shot-type; artifact export/import/copy/print_preview with export formats json, markdown, and outline and import mode storyboard-json — no invented destinations."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.4"
 name = "contract_exercisable_via_webmcp"
-description = "The contract can be fully exercised via automation: webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool succeed for the bound browse, form, and entity tools."
+description = "The contract can be fully exercised via automation: webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool succeed for the bound browse, form, entity, and artifact tools."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.5"
-name = "entity_scene_create_select_update_delete"
-description = "Entity operations declared for entity scene work: create, select, update, and delete (delete requires confirm=true) update the visible board scene set and numbering."
+name = "entity_scene_create_select_update_delete_reorder"
+description = "Entity operations declared for entity scene work: create, select, update, delete (delete requires confirm=true), reorder, and toggle update the visible board scene set, numbering, and Total duration."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.6"
-name = "form_title_body_validate_submit_cancel"
-description = "Form operations validate, submit, cancel, advance, and return for fields title and body are bound and match the visible Add Scene create-form validation and submit/cancel behavior."
+name = "form_title_body_duration_shot_type"
+description = "Form operations validate, submit, cancel, advance, and return for fields title, body, duration, and shot-type are bound and match the visible Add Scene create-form validation and submit/cancel behavior under the Scene field contract."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.7"
-name = "browse_destinations_scene_surfaces"
-description = "Browse destinations scene-list, scene-editor, and tutorial-steps are bound for browsable entity scenes and update visible navigation state via the same handlers as UI controls."
+name = "browse_destinations_include_export_center"
+description = "Browse destinations scene-list, scene-editor, tutorial-steps, export-center, and presenter are bound for browsable entity scenes, and apply_filter/clear_filter/search for the search and shot-type filters drive the same handlers as the visible search field and chips, updating the same filtered subset and count the UI shows."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.8"
 name = "no_undeclared_modules_or_ops"
-description = "No extra modules beyond browse-query-v1, form-workflow-v1, and entity-collection-v1, and no undeclared operations beyond the Bindings list, are exposed on the WebMCP surface."
+description = "No extra modules beyond browse-query-v1, form-workflow-v1, entity-collection-v1, and artifact-transfer-v1, and no undeclared operations beyond the Bindings list, are exposed on the WebMCP surface."
 type = "binary"
 weight = 1.0
 
@@ -133,7 +133,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n1"
 name = "mcp_tools_missing_or_noop"
-description = "WebMCP tooling for browse-query-v1, form-workflow-v1, or entity-collection-v1 is unbound, missing, or a no-op when invoked."
+description = "WebMCP tooling for browse-query-v1, form-workflow-v1, entity-collection-v1, or artifact-transfer-v1 is unbound, missing, or a no-op when invoked."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n2"
 name = "handlers_diverge_from_ui_state"
-description = "Invoking a bound browse/form/entity tool leaves the scene board, create form, or view destination diverging from what the equivalent visible UI control would produce."
+description = "Invoking a bound browse/form/entity/artifact tool leaves the scene board, create form, view destination, or export/import surface diverging from what the equivalent visible UI control would produce."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n3"
 name = "undeclared_capabilities_exposed"
-description = "Undeclared modules, destinations, or operations beyond the Bindings (browse scene-list/scene-editor/tutorial-steps; form title/body validate/submit/cancel/advance/return; entity scene create/select/update/delete) are exposed."
+description = "Undeclared modules, destinations, or operations beyond the Bindings (browse scene-list/scene-editor/tutorial-steps/export-center/presenter with filters search/shot-type; form title/body/duration/shot-type; entity scene create/select/update/delete/reorder/toggle; artifact export/import/copy/print_preview json/markdown/outline/storyboard-json) are exposed."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +157,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n4"
 name = "automation_cannot_exercise_contract"
-description = "webmcp_list_tools / webmcp_invoke_tool cannot exercise the declared browse, form, and entity bindings."
+description = "webmcp_list_tools / webmcp_invoke_tool cannot exercise the declared browse, form, entity, and artifact bindings."
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +165,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n5"
 name = "mcp_update_bypasses_shared_state"
-description = "An entity update or form submit invocation updates a parallel copy of state, leaving the visible board showing stale scene title/body that disagrees with the MCP result (MCP/UI desync)."
+description = "An entity update, form submit, or artifact import invocation updates a parallel copy of state, leaving the visible board showing stale scene title/body/duration/shotType that disagrees with the MCP result (MCP/UI desync)."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n8"
 name = "required_modules_not_implemented"
-description = "One or more of browse-query-v1, form-workflow-v1, or entity-collection-v1 is not implemented despite being declared required in the contract."
+description = "One or more of browse-query-v1, form-workflow-v1, entity-collection-v1, or artifact-transfer-v1 is not implemented despite being declared required in the contract."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,23 @@ weight = 1.0
 [[criterion]]
 id = "12.n10"
 name = "form_validation_bypass_via_mcp"
-description = "A form submit or entity create invoked through WebMCP bypasses required title/body validation and creates an invalid scene the visible Add Scene form would reject."
+description = "A form submit or entity create invoked through WebMCP bypasses required Scene field-contract validation and creates an invalid scene the visible Add Scene form would reject."
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "12.11"
+name = "artifact_export_import_copy_bound"
+description = "Artifact operations export, import, copy, and print_preview are bound with export formats json, markdown, and outline and import mode storyboard-json, and invoking them drives the same Export/Import/Print surfaces as the visible UI without returning raw file or blob contents."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.n11"
+name = "artifact_tools_missing_or_noop"
+description = "Artifact-transfer export, import, or copy tools are missing, unbound, or leave the Export/Import UI and board state unchanged when invoked."
 type = "binary"
 negate = true
 weight = 1.0

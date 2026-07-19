@@ -124,6 +124,27 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "3.10"
+name = "scenes_strip_chips_name_and_offset"
+description = "The Scenes strip renders the five scenario chips (Daylight Courtyard, Alpine Midday, Stadium Floodlights, Candlelit Study, Neon Alley Night), each showing its name and EV offset, without breaking the overlaid dial composition."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "bracket_panel_and_histogram_clipping_indicators"
+description = "The Bracket panel shows the frame-count and step choices, the base-name field, and the generated thumbnail strip; the histogram carries small clipping indicators at its left and right edges."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.12"
+name = "compare_wipe_and_ab_slot_summaries"
+description = "Compare view shows the vertical wipe handle with visible A and B side labels; filled A/B slot summaries show their stored stop readouts; the Highlight/Shadow zebra toggles sit in the lab chrome."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "3.n1"
 name = "dashboard_card_grid_layout"
 description = "The lab is presented as a dashboard of equal-weight cards that breaks the full-viewport overlaid composition."
@@ -143,6 +164,14 @@ weight = 1.0
 id = "3.n3"
 name = "marketing_hero_competes"
 description = "Marketing sections or competing hero cards crowd out the edge-to-edge photo preview lab."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n4"
+name = "scene_bracket_zebra_ab_chrome_missing"
+description = "The Scenes strip, Bracket panel, zebra toggles, or A/B compare controls are absent from the lab chrome, or are added in a way that overruns and breaks the full-viewport overlaid dial composition."
 type = "binary"
 negate = true
 weight = 1.0

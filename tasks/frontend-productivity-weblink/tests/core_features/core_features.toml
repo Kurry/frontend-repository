@@ -169,7 +169,7 @@ negate = true
 [[criterion]]
 id = "1.26"
 name = "fabricated_transfer_progress"
-description = "The app fails this criterion if the file-transfer panel displays transfer progress, a completion state, or a recipient name for a file when no peer session exists"
+description = "The app fails this criterion if the file-transfer panel, transfer log, or any export claims a remote peer received, downloaded, or acknowledged a file, or displays a recipient name for a transfer — transfers are local loopback simulations only"
 type = "binary"
 weight = 1.0
 negate = true
@@ -255,7 +255,7 @@ weight = 1.0
 [[criterion]]
 id = "1.38"
 name = "session_pack_export_shows_field_contract_keys"
-description = "After editing displayName to a distinctive valid value, joining a distinctive valid roomId, sending a distinctive chat line, and queueing one file, opening Export Session shows a Session Pack JSON preview with schemaVersion exactly weblink-session-v1 and required keys peer, roomId, theme, messages, and fileQueue, containing those live displayName, roomId, chat text, and file name values"
+description = "After editing displayName to a distinctive valid value, joining a distinctive valid roomId, sending a distinctive chat line, and queueing one file, opening Export Session shows a Session Pack JSON preview with schemaVersion exactly weblink-session-v2 and required keys peer, roomId, theme, messages, fileQueue, and transferLog, containing those live displayName, roomId, chat text, and file name values"
 type = "binary"
 weight = 1.0
 
@@ -269,21 +269,85 @@ weight = 1.0
 [[criterion]]
 id = "1.40"
 name = "session_pack_import_round_trip"
-description = "Download a Session Pack after distinctive displayName, roomId, chat, and file-queue mutations, then Import Session that same JSON: peer displayName, roomId, transcript lines, file queue, and theme reconstruct to match the pack, a fresh Export still shows schemaVersion weblink-session-v1 with those values, and the connection badge is at rest (idle or disconnected)"
+description = "Download a Session Pack after distinctive displayName, roomId, chat, and file-queue mutations (including a started-then-paused transfer), then Import Session that same JSON: peer displayName, roomId, transcript lines, file queue (statuses, bytesTransferred, and order), transfer log, and theme reconstruct to match the pack, a fresh Export still shows schemaVersion weblink-session-v2 with those values, and the connection badge is at rest (idle or disconnected)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.41"
 name = "invalid_session_pack_import_rejected"
-description = "Importing malformed Session Pack JSON, or parseable JSON that fails the field contract (wrong schemaVersion, theme outside light|dark, message role outside local|demo, fileQueue status other than not-started, displayName outside 1–40 characters, illegal roomId characters when non-empty, or missing required keys), shows validation naming the offending field and leaves peer, transcript, queue, and theme unchanged"
+description = "Importing malformed Session Pack JSON, or parseable JSON that fails the field contract (wrong schemaVersion, theme outside light|dark, message role outside local|demo, fileQueue status outside the closed enum or equal to transferring, bytesTransferred outside 0 to sizeBytes, transferLog event outside the closed enum, displayName outside 1–40 characters, illegal roomId characters when non-empty, or missing required keys), shows validation naming the offending field and leaves peer, transcript, queue, transfer log, and theme unchanged"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.42"
 name = "session_pack_omits_session_mutations"
-description = "After editing displayName, joining a distinctive roomId, sending a distinctive chat line, and queueing a file, the Session Pack JSON preview is missing that displayName, roomId, chat text, or file name, or is missing schemaVersion weblink-session-v1"
+description = "After editing displayName, joining a distinctive roomId, sending a distinctive chat line, and queueing a file, the Session Pack JSON preview is missing that displayName, roomId, chat text, or file name, or is missing schemaVersion weblink-session-v2 or the transferLog key"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.43"
+name = "start_transfer_advances_progress"
+description = "After clicking Start on a Not Started queue row, that row's status changes to Transferring and its progress bar plus numeric readout (bytes of the file's real total, and percent) advance in visible increments until the row reads Completed at 100 percent; no visible text claims a remote peer received the file"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "pause_freezes_resume_continues"
+description = "Clicking Pause on a Transferring row freezes the progress bar and numeric readout at their current values with status Paused; clicking Resume continues from exactly that frozen value — the readout is never lower after Resume than it was at Pause"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "cancel_keeps_partial_retry_resets"
+description = "Clicking Cancel on a Transferring or Paused row sets status Canceled while keeping the partial progress readout visible and offering Retry; clicking Retry returns exactly that row to Not Started with a zeroed readout so Start can run again"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "queue_multi_select_bulk_remove"
+description = "Each queue row carries a selection checkbox and the header a select-all checkbox; selecting rows reveals a bulk action bar showing the selected count, and Remove Selected deletes exactly the selected rows while unselected rows are untouched"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "retry_selected_resets_finished_rows"
+description = "With a mix of row states selected, Retry Selected resets every selected Canceled or Completed row to Not Started with zeroed progress and leaves selected Transferring or Paused rows unchanged"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.48"
+name = "drag_reorder_persists_and_exports"
+description = "Dragging a queue row's handle to a new position reorders the queue visibly, the new order survives a page reload, and the Session Pack fileQueue array serializes rows in the on-screen order"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "transfer_log_records_lifecycle_events"
+description = "The transfer log lists one timestamped entry per queue lifecycle event (queued, started, paused, resumed, canceled, completed, retried, removed), newest first, each naming its file, appearing immediately when the action happens"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "transcript_markdown_export"
+description = "Export Transcript opens a markdown transcript compiled live from the store — one line per message with its role label (local or demo) and timestamp in transcript order, including a distinctive line sent this session — with Copy confirmation and a real .md download matching the preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "transfer_progress_fabricated_or_rewound"
+description = "The app fails this criterion if a row's progress total differs from that file's real sizeBytes, Resume restarts a paused transfer from zero, or a Completed row shows a readout other than 100 percent"
 type = "binary"
 weight = 1.0
 negate = true

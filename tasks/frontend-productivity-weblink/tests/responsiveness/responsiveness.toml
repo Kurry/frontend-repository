@@ -104,8 +104,8 @@ weight = 1.0
 
 [[criterion]]
 id = "7.7"
-name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+name = "queue_operable_on_touch_viewports"
+description = "On touch or narrow viewports the queue remains fully operable: row transfer controls, checkboxes, and the reorder alternative (keyboard/button based) work without requiring a desktop drag."
 type = "binary"
 weight = 1.0
 

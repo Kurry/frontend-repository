@@ -63,21 +63,21 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "6.1"
 name = "merge_and_restore_create_versions"
-description = "Create flow: a version created through the merge flow or a restore appears at the head of the history list, in both pickers, on the graph, and in the export preview."
+description = "Create flow: a version created through the merge flow or a restore with a valid RestoreCreate changeNote appears at the head of the history list, in both pickers, on the graph, and in the Export Version package preview."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
 name = "incomplete_merge_blocked_with_feedback"
-description = "Create flow: Complete merge stays disabled with the unresolved count visible until every conflict region is resolved, and the annotation composer validates an empty note inline before posting."
+description = "Create flow: Complete merge stays disabled with the unresolved count visible until every conflict region is resolved, and the annotation composer rejects an empty AnnotationCreate bodyMarkdown inline before posting."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
 name = "resolution_edits_update_preview"
-description = "Edit flow: changing a region's resolution or manual edit updates the region chip and the merge result preview immediately."
+description = "Edit flow: changing a region's MergeRegionResolution (choose-left, choose-right, or edit-manually with manualText) updates the region chip and the merge result preview immediately."
 type = "binary"
 weight = 1.0
 
@@ -91,7 +91,7 @@ weight = 1.0
 [[criterion]]
 id = "6.5"
 name = "mode_tabs_retain_context"
-description = "View switch: switching between Diff, Compare Branches, Blame, and Graph retains the selected prompt, picker selections, and unified/split preference."
+description = "View switch: switching between Diff, Compare Branches, Blame, and Graph retains the selected prompt, picker selections, Ignore toggles, and unified/split preference."
 type = "binary"
 weight = 1.0
 
@@ -119,21 +119,42 @@ weight = 1.0
 [[criterion]]
 id = "6.9"
 name = "dialogs_support_expected_flows"
-description = "Overlays: the restore confirmation, merge flow, and annotation threads open, complete, and cancel as expected without losing surrounding state."
+description = "Overlays: the restore confirmation, merge flow, annotation threads, and Export surface open, complete, and cancel as expected without losing surrounding state."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
 name = "recovery_without_reload"
-description = "Recovery: canceling a merge mid-resolution, dismissing a confirmation, or closing a thread never dead-ends the app; every flow is recoverable without a reload."
+description = "Recovery: canceling a merge mid-resolution, dismissing a confirmation, closing Export, or rejecting an invalid Import never dead-ends the app; every flow is recoverable without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "diff_options_flow"
+description = "Diff options flow: with a pair that differs only by whitespace or letter case, turn Ignore whitespace or Ignore case on and confirm the counters drop those differences; turn the toggle off and confirm the differences return."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "artifact_export_import_end_state"
+description = "Artifact end state: after a merge, Export Version package shows schemaVersion prompt-diff-package-v1 and required keys including the new head; Download or Copy then Import that JSON reconstructs the same version texts and merge topology in history and graph."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "schema_validation_flow"
+description = "Schema validation flow: empty AnnotationCreate bodyMarkdown posts nothing naming bodyMarkdown; empty RestoreCreate changeNote creates no head; Import with schemaVersion not prompt-diff-package-v1 leaves the chain unchanged naming schemaVersion; then a valid annotation and valid import succeed."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
 name = "primary_flows_unavailable_from_ui"
-description = "Comparing, merging, restoring, or annotating (the primary flows) are not enabled from the UI."
+description = "Comparing, merging, restoring, annotating, exporting, or importing (the primary flows) are not enabled from the UI."
 type = "binary"
 negate = true
 weight = 1.0
@@ -180,8 +201,8 @@ weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "The collapsed left rail cannot be reopened."
+name = "export_omits_merge_head"
+description = "After a completed merge, Export Version package or History report omits the new head or the merge resolutions shown in the app."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +210,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n8"
 name = "overlay_blocks_navigation"
-description = "The merge flow or an annotation thread blocks the app with no exit option."
+description = "The merge flow, Export surface, or an annotation thread blocks the app with no exit option."
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +218,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n9"
 name = "failed_flow_lacks_feedback"
-description = "A blocked or invalid action — an unresolved merge, an empty annotation — gives no user feedback."
+description = "A blocked or invalid action — an unresolved merge, an empty annotation, or a non-conforming Import — gives no user feedback naming the field or problem."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +226,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n10"
 name = "navigation_dead_end_requires_reload"
-description = "A navigation dead end requires a reload to recover — for example a merge session that cannot be canceled or completed."
+description = "A navigation dead end requires a reload to recover — for example a merge session that cannot be canceled or completed, or a stuck Export surface."
 type = "binary"
 negate = true
 weight = 1.0

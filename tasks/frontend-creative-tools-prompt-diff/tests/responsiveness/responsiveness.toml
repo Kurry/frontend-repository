@@ -63,28 +63,28 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "7.1"
 name = "layout_adapts_desktop_to_mobile"
-description = "Layout adapts gracefully from 1440px desktop to 375px mobile: the rail, pickers, diff panes, graph, and threads reflow without breakage."
+description = "Layout adapts from 1440px to 375px: the left rail, version pickers, Ignore toggles, diff panes, graph, Export surface, and threads reflow without breakage."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
 name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+description = "At 375px, pickers, tabs, Ignore toggles, merge choices, Export, Import, Undo, and Redo are tap targets at least 44px in at least one dimension."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
 name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+description = "Chrome labels and headings remain readable at both 1440px and 375px without shrinking into illegible sizes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
 name = "content_avoids_clipping_and_overflow"
-description = "No content clips or overflows the viewport at any width; long prompt lines wrap or scroll within the diff surface's own container."
+description = "At 375px no content clips or overflows the viewport and no page-level horizontal scrolling appears; long prompt lines wrap or scroll within the diff surface's own container."
 type = "binary"
 weight = 1.0
 
@@ -98,42 +98,42 @@ weight = 1.0
 [[criterion]]
 id = "7.6"
 name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+description = "At narrow widths the header controls, Ignore toggles, summary strip, and stacked panes reflow in a logical reading order rather than overlapping."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.7"
 name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+description = "At 375px tap activates pickers, tabs, Ignore toggles, merge choices, Export, and Import without requiring hover-only activation."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.8"
 name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+description = "At 375px the page has no page-level horizontal scrolling."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.9"
 name = "graph_and_panes_resize"
-description = "The version graph and diff panes size responsively to fit the layout at every width."
+description = "The version graph and diff panes size responsively to fit the layout at 1440px, 768px, and 375px."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.10"
-name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
+name = "export_import_operable_at_375"
+description = "The Export surface, Ignore toggles, and Import control stay fully visible and operable at 375px rather than rendering off-screen."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.n1"
 name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+description = "At 768px or 375px the rail, split panes, or Export surface break, overlap, or overflow the viewport."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n2"
 name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+description = "At 375px primary controls (tabs, Ignore toggles, Export, merge choices) are smaller than ~44px or misaligned so they are hard to tap."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n3"
 name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+description = "At 375px chrome labels or diff text become too small to read."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +157,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n4"
 name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+description = "At 375px content is cropped by the viewport or page-level horizontal scrollbars appear."
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +165,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n5"
 name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
+description = "Below 768px the left rail cannot be toggled open, or it remains stuck open and covers the diff with no dismiss path."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n6"
 name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
+description = "Fixed header or Export chrome obscures the diff, graph, or merge controls at some width."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +181,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n7"
 name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
+description = "At 768px or 375px pickers, Ignore toggles, summary tags, or graph nodes visibly overlap."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n8"
 name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
+description = "At 375px Ignore toggles, Export, or Import cannot be activated by tap."
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +197,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n9"
 name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
+description = "The version graph or Export preview uses a static width that overflows the viewport at 375px."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n10"
 name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
+description = "Ignore toggles, Export, Import, or mode tabs disappear at 375px or 768px."
 type = "binary"
 negate = true
 weight = 1.0

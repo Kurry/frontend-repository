@@ -117,6 +117,13 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "14.9"
+name = "export_import_round_trip_preserves_package"
+description = "Complete a demo pipeline run, Download bundle the TaskPackageBundle JSON, delete that library entry, Import the downloaded JSON, and confirm the restored entry's viewer shows the same instruction text, repo, pr_number, difficulty, and patch_note as before the delete — proving export and import share one field contract"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "14.n1"
 name = "partial_persistence_is_incoherent"
 description = "After a reload, one persisted facet silently reverts while others survive — for example triage placements are kept but a produced package is gone, or the source-file bounds reset while coachmark dismissals persist"
@@ -136,6 +143,14 @@ weight = 1.0
 id = "14.n3"
 name = "different_inputs_produce_identical_output"
 description = "Running the pipeline on two different PRs yields byte-identical instruction text, or the two packages carry identical metadata (same PR number, base SHA, or file list)"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "export_omits_session_mutations"
+description = "A downloaded TaskPackageBundle omits the session's actual Generate instruction text or carries metadata for a different PR than the run that produced it, or an export-then-import fails to restore the same visible package content"
 type = "binary"
 negate = true
 weight = 1.0

@@ -112,7 +112,7 @@ weight = 1.0
 [[criterion]]
 id = "1.8"
 name = "summary_counters_recompute"
-description = "The change summary strip shows lines added, lines removed, and a positive-or-negative net token delta between the two selected versions, and the counters recompute whenever either picker changes"
+description = "The change summary strip shows lines added, lines removed, and a positive-or-negative net token delta between the two selected versions, and the counters recompute whenever either picker changes or either Ignore whitespace or Ignore case toggle changes"
 type = "binary"
 weight = 1.0
 
@@ -238,7 +238,7 @@ weight = 1.0
 [[criterion]]
 id = "1.26"
 name = "history_report_live_derived"
-description = "Export offers a version history report with the chain's numbers, authors, timestamps, and change notes, the current counters, and any completed merge with its per-region resolutions, and the preview updates when a new version is created before exporting"
+description = "Export offers History report, Version package, and Merged prompt text tabs with Copy and Download; the History report lists numbers, authors, timestamps, change notes, counters, and any completed merge with per-region resolutions, and the preview updates when a new version is created before exporting"
 type = "binary"
 weight = 1.0
 
@@ -305,6 +305,58 @@ negate = true
 id = "1.n4"
 name = "counters_disagree_with_diff"
 description = "The change summary counters disagree with the visible diff — the added or removed counts do not match the highlighted lines, or the counters fail to change when the pickers select a different pair"
+type = "binary"
+weight = 1.0
+negate = true
+
+
+[[criterion]]
+id = "1.32"
+name = "ignore_whitespace_recomputes_diff"
+description = "Turning Ignore whitespace on through the real control makes whitespace-only differences compare as unchanged and immediately recomputes counters, word-level highlights, and unified blocks for the same pair; turning it off restores the whitespace-sensitive diff without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "ignore_case_recomputes_diff"
+description = "Turning Ignore case on through the real control makes letter-case-only differences compare as unchanged and immediately recomputes counters and highlights for the same pair; turning it off restores the case-sensitive diff without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "annotation_create_field_contract"
+description = "Posting an annotation requires a valid AnnotationCreate payload: empty or over-4000-character bodyMarkdown, empty author, or lineEnd less than lineStart shows inline validation naming the offending field and posts nothing; a valid post creates a thread marker on the anchored lines"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "version_package_field_contract_export"
+description = "Export Version package JSON preview shows schemaVersion exactly prompt-diff-package-v1 plus required promptId, promptTitle, versions, baseVersionId, compareVersionId, counters, and annotations keys; after a merge the preview includes the new head in versions and a non-null merge object whose resolutions match the per-region choices"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "version_package_import_round_trip"
+description = "Import of a conforming Version package JSON replaces the selected prompt chain so history, pickers, and graph match the package texts and topology; Import of malformed JSON or a payload failing the VersionPackage field contract (wrong schemaVersion, missing required keys, illegal kind, or baseVersionId not in versions) leaves the chain unchanged and names the offending field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n5"
+name = "export_omits_session_mutations"
+description = "After a completed merge or restore, the Version package or History report export omits the new head version or the merge resolutions that the session produced"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n6"
+name = "import_accepts_invalid_package"
+description = "Import accepts a Version package that fails the field contract — schemaVersion not prompt-diff-package-v1, missing required keys, or illegal kind — and mutates the prompt chain anyway"
 type = "binary"
 weight = 1.0
 negate = true

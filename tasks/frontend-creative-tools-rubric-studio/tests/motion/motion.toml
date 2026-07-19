@@ -91,7 +91,7 @@ weight = 1.0
 [[criterion]]
 id = "3.6"
 name = "dialog_enter_exit_timed"
-description = "The criterion form dialog enters and exits with a short opacity and scale transition of roughly 200 to 300 milliseconds when opened and closed via its real controls, and the diff view transitions in without a full page repaint"
+description = "The criterion form dialog enters and exits with a short opacity and scale transition of roughly 200 to 300 milliseconds when opened and closed via its real controls; Export center and Import surfaces enter and exit with a short opacity transition; the diff view transitions in without a full page repaint"
 type = "binary"
 weight = 1.0
 
@@ -105,7 +105,7 @@ weight = 1.0
 [[criterion]]
 id = "3.8"
 name = "reduced_motion_respected"
-description = "With prefers-reduced-motion enabled, accordion, list, bar, dialog, and toast animations are removed or reduced to instant state changes while every flow (add, edit, delete, tune, preview, export) remains fully available"
+description = "With prefers-reduced-motion enabled, accordion, list, bar, dialog, Export center, and toast animations are removed or reduced to instant state changes while every flow (add, edit, delete, tune, preview, export, import, undo) remains fully available"
 type = "binary"
 weight = 1.0
 

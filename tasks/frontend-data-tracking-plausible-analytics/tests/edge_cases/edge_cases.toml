@@ -90,8 +90,8 @@ weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "single_filter_no_stack"
-description = "Clicking a second breakdown row while a filter is active shows only one filter pill (the latest), never stacked filters"
+name = "same_dimension_replaces_cross_stacks"
+description = "Clicking a second row within the same dimension replaces that dimension's pill in place; clicking a row from a different dimension adds a new pill so up to three pills (source, page, country) can be present at once"
 type = "binary"
 weight = 1.0
 
@@ -119,7 +119,7 @@ weight = 1.0
 [[criterion]]
 id = "4.9"
 name = "dialogs_close_on_escape"
-description = "Add site and the export drawer close on Escape and via an explicit close control"
+description = "Add site, Add goal, and the export drawer close on Escape and via an explicit close control"
 type = "binary"
 weight = 1.0
 
@@ -196,8 +196,8 @@ weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "stacked_filters_allowed"
-description = "Two filter pills remain visible at once after clicking a second breakdown row"
+name = "cross_dimension_stack_fails"
+description = "After a Source filter then a Country filter, the Source pill disappears so only one pill remains instead of two stacked dimension pills"
 type = "binary"
 negate = true
 weight = 1.0
@@ -206,6 +206,35 @@ weight = 1.0
 id = "4.n10"
 name = "ceiling_oob_still_applies"
 description = "A bounce-rate ceiling outside 0 through 100 still applies and toggles High bounce without inline validation"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "empty_segment_save_names_filters_field"
+description = "Saving a segment with no active filters shows an inline message naming the filters field and does not create a saved-segment entry"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "add_goal_invalid_match_key_rejected"
+description = "An event goal whose match_key includes whitespace, or a page goal whose match_key does not start with a slash, shows an inline message naming the match_key field and does not add a Goals panel row"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "zero_intersection_empty_goals_message"
+description = "Stacking filters whose intersection has no visitors shows zero-value metric tiles and empty breakdown, Goals, and funnel panels with a message, not leftover numbers from a broader stack"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "invalid_goal_still_added"
+description = "An invalid Add goal submit (empty name or broken match_key) still adds a Goals panel row with no inline field message"
 type = "binary"
 negate = true
 weight = 1.0

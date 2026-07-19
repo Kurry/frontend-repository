@@ -76,8 +76,8 @@ weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
-description = "Adding a task, archiving a branch, and re-parenting a node via Move To each show a transient toast that clears on its own"
+name = "durable_action_toasts"
+description = "Adding a task, editing a task, archiving a branch, re-parenting via Move To, and importing a grove package each show a transient toast that clears on its own"
 type = "binary"
 weight = 1.0
 
@@ -123,7 +123,7 @@ weight = 1.0
 [[criterion]]
 id = "4.10"
 name = "toast_slide_fade_entry"
-description = "A confirmation toast enters with a short slide-and-fade animation rather than popping in instantly, then clears on its own after a few seconds"
+description = "A confirmation toast enters with a short slide-and-fade animation rather than popping in instantly, then clears on its own within 3 seconds"
 type = "binary"
 weight = 0.5
 
@@ -152,6 +152,13 @@ weight = 1.0
 id = "4.14"
 name = "search_dimming_applies_immediately"
 description = "As a search query is typed, matching-text highlighting and reduced-opacity dimming of non-matching branches apply immediately with each change to the query, and dimmed branches remain on the page rather than disappearing"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.15"
+name = "grove_panel_enter_exit_transition"
+description = "Driven through the real Export grove control (not a state shortcut): the Grove package panel enters and exits with a short opacity-and-scale transition rather than appearing or vanishing instantly"
 type = "binary"
 weight = 0.5
 

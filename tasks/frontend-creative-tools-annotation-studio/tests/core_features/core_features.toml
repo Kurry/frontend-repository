@@ -183,7 +183,7 @@ weight = 1.0
 [[criterion]]
 id = "1.19"
 name = "class_form_fields_and_gating"
-description = "New Class opens a form with class name, color from a fixed palette, badge icon, keyboard shortcut (single digit 1 through 9), and optional attributes each having a name and a kind of select (with options) or text; Save stays disabled until name, color, icon, and a unique shortcut are provided"
+description = "New Class opens a TaxonomyClassCreate form with name (1–60 chars, unique), color as #RRGGBB from a fixed palette, badge icon, keyboard shortcut (exactly one digit 1–9, unique), and optional attributes each with name and kind select (non-empty options) or text; Save stays disabled until name, color, icon, and a unique shortcut are valid"
 type = "binary"
 weight = 1.0
 
@@ -391,11 +391,17 @@ weight = 1.0
 
 [[criterion]]
 id = "1.54"
-name = "export_view_two_tabs"
-description = "The Export view shows a live-compiled monospaced preview with two tabs — Labels JSON and Stats summary — where the Labels JSON is API-shaped like a labeling-dataset payload: a taxonomy array (id, name, color, icon, shortcut, attributes) and an items array whose entries carry id, suite, a review_state of exactly unlabeled, labeled, reviewed, or disputed, and an annotation object with rating (up or down), integer 1-to-5 scores keyed by dimension, a comment capped at 500 characters, metadata keyed by field name, and regions with class id plus numeric x, y, w, h; these field names and enums are visible in the preview text, and submitting an annotation, resolving a dispute, or adding a region changes the corresponding preview values without a reload"
+name = "export_view_labels_package_shape"
+description = "The Export view shows a live-compiled monospaced preview with Labels JSON and Stats summary tabs where Labels JSON is a LabelsPackage: schemaVersion exactly annotation-studio-labels-v1, taxonomy (id, name, color, icon, shortcut, attributes), metadataFields, and items (id, suite, review_state in unlabeled|labeled|reviewed|disputed, annotation null when unlabeled else AnnotationCreate with rating up|down, scores Accuracy/Clarity/Relevance integers 1–5, comment ≤500, metadata keyed by field name, regions with classId and x/y/w/h); these field names and enums are visible in the preview text, and submitting an annotation, resolving a dispute, or adding a region changes the corresponding preview values without a reload"
 type = "binary"
 weight = 1.0
 
+[[criterion]]
+id = "1.55"
+name = "annotation_create_field_contract"
+description = "Submit & Next produces an AnnotationCreate payload with rating exactly up or down, scores.Accuracy/Clarity/Relevance integers 1–5, comment at most 500 characters, metadata keyed by field name, and regions as RegionCreate objects; invalid rating, scores, comment length, or metadata kind blocks submit with an inline message naming the offending field and leaves the queue unchanged"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "1.56"
@@ -408,6 +414,34 @@ weight = 1.0
 id = "1.57"
 name = "stats_match_other_surfaces"
 description = "The Stats summary's numbers match the rest of the app: suite progress equals the sidebar counts, the agreement percentage equals the Agreement view's figure, and the disputed count equals the Review queue's Disputed tier count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.58"
+name = "region_create_geometry_bounds"
+description = "Drawing a region produces a RegionCreate with classId matching a taxonomy class, x/y ≥ 0, w/h ≥ 8, and x+w / y+h within image bounds; boxes with w or h below 8 are discarded; region attributeValues for select attributes use one of that attribute's options"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.59"
+name = "labels_package_import_round_trip"
+description = "Import accepts a conforming LabelsPackage (schemaVersion annotation-studio-labels-v1) and restores taxonomy, metadata fields, annotations, regions, and review-state chips so History, Taxonomy, region lists, and the next Labels JSON preview match the imported document; Export then Import of the same Labels JSON reconstructs the same visible state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.60"
+name = "import_rejects_nonconforming_package"
+description = "Import of malformed JSON or a LabelsPackage failing the field contract (missing schemaVersion/taxonomy/metadataFields/items, schemaVersion not annotation-studio-labels-v1, review_state or rating outside closed enums, score outside 1–5, or region classId absent from taxonomy) shows a visible error naming the offending field and leaves taxonomy, annotations, and review states unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.61"
+name = "dispute_create_reason_contract"
+description = "Dispute submits a DisputeCreate with reason 1–200 characters after trim as a single line; empty, over-length, or multi-line reason shows an inline message naming reason and changes no review state"
 type = "binary"
 weight = 1.0
 
@@ -487,6 +521,30 @@ weight = 1.0
 id = "1.n10"
 name = "copy_confirms_but_clipboard_wrong"
 description = "The Copy export control shows its confirmation, but the clipboard content is empty or differs from the visible preview text"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n11"
+name = "export_omits_session_mutations"
+description = "After submitting an annotation, editing taxonomy, or adding a region, the Labels JSON preview omits those session values under the LabelsPackage field-contract keys (schemaVersion, taxonomy, metadataFields, items) or lacks schemaVersion annotation-studio-labels-v1"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n12"
+name = "import_mutates_on_invalid_payload"
+description = "Import of a non-conforming LabelsPackage still mutates taxonomy, annotations, or review states instead of rejecting the whole document with a named field error"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n13"
+name = "sliver_region_accepted"
+description = "A drawn region with width or height below 8 image pixels is kept as a region entry instead of being discarded"
 type = "binary"
 negate = true
 weight = 1.0

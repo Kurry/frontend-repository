@@ -134,6 +134,13 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
+id = "4.15"
+name = "add_goal_dialog_eased_transition"
+description = "The Add goal form enters and exits with a short eased transition of roughly 200 to 300 milliseconds when opened and closed through its real controls, rather than appearing instantly"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "4.11"
 name = "reduced_motion_respected"
 description = "With prefers-reduced-motion set on a fresh load, transitions are removed or reduced to fades, and every state change (filter, sort, site, theme, dialog, export drawer, compare) still applies instantly and completely"

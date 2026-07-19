@@ -188,14 +188,14 @@ weight = 1.0
 [[criterion]]
 id = "2.18"
 name = "persistence_mandated_fields"
-description = "After configuring site, range, sort, theme, filter, added sites, bounce-rate ceiling, and compare previous, a reload restores those fields from localStorage or equivalent client storage as mandated for this framework-rebuild task"
+description = "After configuring site, range, sort, theme, filter stack, saved segments, added sites, added goals, bounce-rate ceiling, visitor floor, and compare previous, a reload restores those fields from localStorage or equivalent client storage as mandated for this framework-rebuild task"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.19"
 name = "stats_json_schema_keys_present"
-description = "The Stats JSON export preview includes the required keys schema_version, site, period, filters, compare_previous, bounce_rate_ceiling, results, timeseries, breakdowns, and sites with schema_version exactly plausible-stats-v1"
+description = "The Stats JSON export preview includes the required keys schema_version, site, period, filters, saved_segments, compare_previous, bounce_rate_ceiling, visitor_floor, results, timeseries, breakdowns, goals, funnel, and sites with schema_version exactly plausible-stats-v1, and each goals entry includes name, goal_type, and match_key"
 type = "binary"
 weight = 1.0
 
@@ -205,6 +205,13 @@ name = "missing_persistence_after_reload"
 description = "After configuring a non-default site, filter, ceiling, and compare mode, a reload returns all of those facets to the seeded defaults as if nothing was persisted"
 type = "binary"
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.21"
+name = "api_shaped_form_validation_gates"
+description = "Add site, Add goal, and Save segment forms surface inline per-field errors before submit and keep submit disabled until valid against their field contracts (site name/domain/timezone; goal name/goal_type/match_key; segment name plus non-empty filters)"
+type = "binary"
 weight = 1.0
 
 [[criterion]]

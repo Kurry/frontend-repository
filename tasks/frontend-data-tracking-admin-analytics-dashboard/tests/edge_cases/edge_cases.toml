@@ -63,77 +63,77 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "4.1"
 name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+description = "Empty state UI is present and renders when all users are deleted or filters match nothing"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "forms_enforce_usercreate_contract"
+description = "Add User and Edit User show inline per-field validation for the UserCreate field contract before submit, and submit stays blocked while invalid"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
 name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+description = "Validation and import error messages name the offending field and the violated rule rather than only saying Invalid"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
 name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+description = "Create, delete, export Copy, and successful import show visible confirmation or toast feedback"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "export_preview_regenerates_without_blank"
+description = "Opening Export session and switching Session JSON / Users CSV shows a regenerated preview rather than a blank or stuck panel"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "cancel_and_bulk_zero_selection_safe"
+description = "Cancel on Add/Edit leaves the collection unchanged; bulk Change status/role/Delete with zero selected is disabled or a no-op"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "export_import_controls_discoverable"
+description = "Export session and Import session controls are labeled so their purpose is discoverable"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
 name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+description = "Buttons, inputs, labels, checkboxes, and export controls use semantic interactive elements"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
 name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+description = "Export drawer and popovers close via explicit close and Escape"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "bulk_and_create_feedback_steps"
+description = "Bulk actions and create provide visible progress or completion feedback rather than a silent wait"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
 name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+description = "An empty collection or zero-match filter shows nothing and provides no UI feedback"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n2"
 name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+description = "Create or import validation failures appear only in the browser console"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n3"
 name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+description = "Create, delete, export Copy, or import succeed or fail with no visible UI feedback"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,55 +157,55 @@ weight = 1.0
 [[criterion]]
 id = "4.n4"
 name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+description = "Delete or bulk Delete removes users with no confirmation when the UI otherwise supports confirmations"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "double_submit_creates_duplicates"
+description = "Double-activating Add User submit creates more than one user row"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "import_malformed_mutates_session"
+description = "Importing malformed Session JSON or contract-violating users mutates the users collection as if import succeeded"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "bulk_with_zero_selection_fires"
+description = "Bulk Change status/role/Delete with zero checked rows still mutates users"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "long_name_breaks_layout"
+description = "A firstName or lastName of 40 characters overflows or breaks the table row layout instead of truncating readably"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "export_empty_users_errors"
+description = "With zero users, opening Export session errors or fails to show header-only CSV / empty users array JSON"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "validation_feedback_missing_or_delayed"
+description = "Field-contract validation feedback is missing or delayed with no UI indication on invalid Add User"
 type = "binary"
 negate = true
 weight = 1.0

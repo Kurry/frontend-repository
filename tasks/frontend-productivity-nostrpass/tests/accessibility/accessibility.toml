@@ -214,6 +214,20 @@ weight = 1.0
 
 
 [[criterion]]
+id = "1.11"
+name = "matrix_switches_named_identity_and_app"
+description = "Each All-identities matrix cell is a real switch whose accessible name names both its identity and its application, and Grant all/Revoke all controls are keyboard operable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "rotation_dialog_manages_focus"
+description = "The rotate-keys confirmation opens as a dialog: focus moves in while open, Escape closes without rotating, and focus returns to the invoking control"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "accessibility.catchall"
 name = "accessibility_catchall"
 description = """The app exhibits a significant, browser-observable accessibility defect that is NOT covered by any other criterion in this file. If present, name the defect and cite concrete evidence. If already covered, answer no here."""

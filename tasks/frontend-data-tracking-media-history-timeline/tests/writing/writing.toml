@@ -78,7 +78,7 @@ weight = 0.5
 [[criterion]]
 id = "15.3"
 name = "errors_name_problem_and_fix"
-description = "Where the app renders error messages, they name the problem and the fix (Title is required, Year must be between -3200 and 2024), not just a rejection (Invalid)."
+description = "Where the app renders error messages, they name the problem and the fix (Title is required, Year must be between -3200 and 2024, timestamp must end with Z, mediaRefs required), not just a rejection (Invalid)."
 type = "binary"
 weight = 0.5
 
@@ -149,6 +149,13 @@ description = "Truncated or overflowing text renders copy unreadable outside int
 type = "binary"
 weight = 0.5
 negate = true
+
+[[criterion]]
+id = "15.9"
+name = "export_tab_labels_exact"
+description = "Where the app renders export drawer tab labels, they read exactly Timeline JSON and Events CSV."
+type = "binary"
+weight = 0.5
 
 [[criterion]]
 id = "writing.catchall"

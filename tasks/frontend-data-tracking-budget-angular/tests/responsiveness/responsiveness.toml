@@ -63,77 +63,77 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "7.1"
 name = "layout_adapts_desktop_to_mobile"
-description = "Layout adapts gracefully from 1440px desktop to 375px mobile."
+description = "The single-column budget workspace stays centered and capped on a 1440px desktop viewport and remains usable at 375px without edge-to-edge content stretch"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
 name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+description = "Bottom-nav items, period arrows, floating action button, and table actions are tap targets large enough to activate comfortably at 375px"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
 name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+description = "Account name, period label, summary figures, and table text remain readable from desktop down to 375px"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
 name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+description = "At 375px Dashboard cards, Expenses table, and Settings tabs fit without clipped text or horizontal page scrolling"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
 name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+description = "Top bar period control and bottom navigation remain usable on narrow screens without overlapping the scrollable content"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.6"
 name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+description = "Summary, budgets-by-category, and chart cards stack in a readable single column at narrow widths"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.7"
 name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+description = "Tap activation of bottom-nav items, period arrows, and the floating action button works at 375px"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.8"
 name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+description = "At 375px the page has no horizontal scrolling to reach Expenses rows or dialog actions"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.9"
 name = "media_and_canvases_resize"
-description = "Images, grids, and canvases size responsively to fit the layout."
+description = "The spending-breakdown chart resizes to fit the app column rather than overflowing the viewport"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.10"
 name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
+description = "Fixed bottom navigation, floating action button, Undo/Redo, Export, and Import JSON remain fully visible and operable at 375px"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.n1"
 name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+description = "Layout breaks or overflows at 1440px or 375px in the budget workspace"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n2"
 name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+description = "Bottom-nav items, period arrows, or the floating action button are too small or misaligned at 375px"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n3"
 name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+description = "Summary figures or Expenses table text is too small to read at 375px"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +157,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n4"
 name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+description = "Dashboard cards, Expenses table, or Settings content is cropped or forces unnecessary horizontal scrollbars at 375px"
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +165,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n5"
 name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
+description = "Bottom navigation or top-bar period control is unresponsive or missing at some widths"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n6"
 name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
+description = "Fixed bottom navigation or floating action button obscures Expenses rows or dialog actions"
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +181,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n7"
 name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
+description = "Top bar, cards, or table actions overlap at some viewport size"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n8"
 name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
+description = "Required tap targets (bottom nav, period arrows, floating action button) are not activatable at 375px"
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +197,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n9"
 name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
+description = "The spending-breakdown chart uses a static size and overflows the viewport"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n10"
 name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
+description = "Export, Import JSON, Undo/Redo, or bottom-nav controls disappear at 375px"
 type = "binary"
 negate = true
 weight = 1.0

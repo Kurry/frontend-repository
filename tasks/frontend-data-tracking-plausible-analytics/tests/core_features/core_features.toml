@@ -104,8 +104,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "latest_filter_replaces_previous"
-description = "After clicking a Countries row while a source filter is active, only one filter pill is shown (the latest, Country-dimension) rather than two stacked filters"
+name = "cross_dimension_filters_stack"
+description = "After clicking the Google row in Top Sources and then a Countries row, two filter pills remain visible together (Source and Country), and the metric tiles recompute to the intersection of both filters"
 type = "binary"
 weight = 1.0
 
@@ -290,7 +290,7 @@ weight = 1.0
 [[criterion]]
 id = "1.45"
 name = "export_drawer_stats_json_schema"
-description = "Opening Export report shows Stats JSON and Breakdown CSV tabs; the Stats JSON preview includes schema_version exactly plausible-stats-v1 plus site, period, filters, compare_previous, bounce_rate_ceiling, results, timeseries, breakdowns, and sites keys, with results values matching the four metric tiles"
+description = "Opening Export report shows Stats JSON and Breakdown CSV tabs; the Stats JSON preview includes schema_version exactly plausible-stats-v1 plus site, period, filters, saved_segments, compare_previous, bounce_rate_ceiling, visitor_floor, results, timeseries, breakdowns, goals, funnel, and sites keys, with results values matching the four metric tiles and each goals entry including name, goal_type, and match_key"
 type = "binary"
 weight = 1.0
 
@@ -334,6 +334,92 @@ negate = true
 id = "1.51"
 name = "malformed_import_mutates_dashboard"
 description = "Importing malformed Stats JSON or JSON missing schema_version, results, or sites changes the site count or filter state as if the import succeeded, or clears undo history without showing an inline error naming the import field"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.52"
+name = "same_dimension_filter_replaces"
+description = "With Source: Google active, clicking Direct in Top Sources replaces the Google pill with a Source: Direct pill rather than stacking two source pills"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.53"
+name = "visitor_floor_toggles_low_traffic"
+description = "On example.com Last 30 days (16,840 visitors), setting the unique-visitors floor to 20,000 shows a Low traffic text label on the unique-visitors tile; setting the floor back to 0 removes that label; Stats JSON visitor_floor matches the control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.54"
+name = "goals_panel_seeded_three"
+description = "The Goals panel lists at least the three seeded goals Signup, Pricing viewed, and Docs read, each with a completions count and a conversion rate percent"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.55"
+name = "funnel_three_steps_with_conversion"
+description = "The conversion funnel shows at least three ordered steps, each with a count, a proportional bar, and a step-to-step conversion percentage (first step step_conversion 100)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.56"
+name = "add_goal_field_contract_validation"
+description = "In the Add goal form, an empty name, a goal_type outside event or page, or a match_key that breaks the goal_type rule shows an inline validation message naming that field, and submit stays disabled until name, goal_type, and match_key are all valid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.57"
+name = "add_goal_appears_in_panel_and_export"
+description = "Submitting a valid Add goal form (name, goal_type event or page, and a rule-matching match_key) closes the form, adds exactly one new Goals panel row with that name, and includes an object with that name, goal_type, and match_key in the Stats JSON goals array"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.58"
+name = "save_segment_round_trip_filters_contract"
+description = "After stacking Source: Google and Page: /pricing, saving a named segment, clearing filters, then applying the saved segment restores both pills and Stats JSON filters as dimension/value objects; saved_segments contains the named entry with those two filters"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.59"
+name = "custom_range_changes_metrics_and_period"
+description = "Choosing Custom, entering a valid from/to span narrower than Last 30 days, and applying changes metric tiles away from the Last 30 days values and sets the Stats JSON period to that custom span"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.60"
+name = "per_panel_csv_headers"
+description = "Per-panel export from Top Pages starts with dimension,name,visitors; Goals per-panel CSV starts with goal,completions,conversion_rate; funnel per-panel CSV starts with step,count,step_conversion"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.61"
+name = "goals_recompute_with_filter"
+description = "Applying the Google source filter changes at least one goal's completions or conversion rate and at least one funnel step count away from the unfiltered values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.62"
+name = "add_goal_rejects_invalid_match_key"
+description = "An Add goal submit with goal_type event and a whitespace-containing match_key, or goal_type page and a match_key missing a leading slash, adds a new Goals panel row while omitting any inline match_key validation message"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.63"
+name = "cross_dimension_stack_collapsed_to_one"
+description = "After applying a source filter and then a country filter, only one filter pill remains instead of two stacked dimension pills"
 type = "binary"
 weight = 1.0
 negate = true

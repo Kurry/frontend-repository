@@ -91,7 +91,7 @@ weight = 1.0
 [[criterion]]
 id = "7.5"
 name = "toolbar_docks_or_reflows_on_narrow"
-description = "At small widths the floating toolbar may dock, but all brush modes, swatches, and actions stay reachable."
+description = "At small widths the floating toolbar may dock, but all brush modes, swatches, mirror control, fill stats, Export, Import, and actions stay reachable."
 type = "binary"
 weight = 1.0
 
@@ -206,6 +206,21 @@ weight = 1.0
 id = "7.n10"
 name = "tools_disappear_at_narrow_width"
 description = "Brush modes, swatches, or primary actions disappear at 375px width."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.11"
+name = "export_import_usable_at_375"
+description = "At 375px width the Export and Import surfaces remain readable and operable without clipped format tabs, Copy/Download, or paste/file controls."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.n11"
+name = "export_import_clipped_at_375"
+description = "At 375px width Export or Import controls are clipped, off-screen, or otherwise unusable."
 type = "binary"
 negate = true
 weight = 1.0

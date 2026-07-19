@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "14.1"
 name = "multi_facet_reload_resets_seeds"
-description = "Multi-facet round-trip: resolve a fix item on one bundle, record a recommendation on it, write a step note, mark a step done, and apply a portfolio filter, then reload the page. All facets coherently reset to the seeded baseline — 12 seeded bundles with seeded gate results, unset recommendations, empty notes, no done steps, no active filters — never a mix of surviving and reset facets"
+description = "Multi-facet round-trip: resolve a fix item on one bundle, record a recommendation on it, write a step note, mark a step done, and apply a portfolio filter, then reload the page. All facets coherently reset to the seeded baseline — 12 seeded bundles with seeded gate results, unset recommendations, empty notes, no done steps, no active filters, closed export/import surfaces — never a mix of surviving and reset facets"
 type = "binary"
 weight = 1.0
 
@@ -158,6 +158,29 @@ weight = 1.0
 id = "14.n4"
 name = "cross_view_state_is_stale"
 description = "A gate flip, fix resolution, step completion, or bundling shows in one view while another view (portfolio row, workspace header, summary, timeline) keeps the old value until a reload"
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "14.11"
+name = "mutation_to_export_contains_session"
+description = "End-to-end export probe: after flipping ember-relay-router via re-run, recording a recommendation with distinctive overrideJustification, resolving a fix item, writing a distinctive step note, and completing bundling, open Export. The Review Package JSON preview contains schemaVersion review-certification/v1 and that bundle's current heroState, recommendation, overrideJustification, resolved fix item, note text, and bundled true — compiled from actual session state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.12"
+name = "export_import_behavioral_round_trip"
+description = "Export/import behavioral round-trip: after the mutation-to-export session work, Copy the Review Package JSON, reload to seeds, Import that text, and confirm portfolio Bundled badge, workspace recommendation/justification/notes/fix resolution, and the next Export preview all match the pre-export mutated package"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "export_preview_ignores_mutations"
+description = "After a recommendation, overrideJustification, fix resolution, note, bundling, or gate re-run, the Export Review Package JSON preview is identical to the pre-mutation preview or omits the changed fields"
 type = "binary"
 negate = true
 weight = 1.0

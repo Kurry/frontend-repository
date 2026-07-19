@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "3.1"
 name = "rail_header_diff_layout"
-description = "The app composes as a left rail with the prompt picker and history list, a header row with the version pickers, the Diff, Compare Branches, Blame, and Graph mode tabs, and the change summary strip, with the diff surface filling the remaining area"
+description = "The app composes as a left rail with the prompt picker and history list, a header row with the version pickers, the Diff, Compare Branches, Blame, and Graph mode tabs, Ignore whitespace and Ignore case toggles, and the change summary strip, with the diff surface filling the remaining area"
 type = "binary"
 weight = 1.0
 
@@ -91,7 +91,7 @@ weight = 1.0
 [[criterion]]
 id = "3.5"
 name = "picker_and_history_anatomy"
-description = "Version picker options show version number and relative timestamp, and history rows show number, author, timestamp, and change note with the head version visibly marked"
+description = "Version picker options show version number and relative timestamp, and history rows show number, author, timestamp, and change note with the head version visibly marked plus multi-select checkboxes for package export"
 type = "binary"
 weight = 1.0
 
@@ -120,6 +120,13 @@ weight = 1.0
 id = "3.9"
 name = "responsive_stack_and_rail"
 description = "At widths of 768 pixels and below the split view stacks into a single column with a base/compare segment switch and the left rail collapses behind a toggle, while at 375 pixel width no content clips or overflows the viewport, no page-level horizontal scrolling appears, and long lines wrap or scroll within the diff surface's container"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "export_surface_anatomy"
+description = "Export opens as a centered surface with History report / Version package / Merged prompt text format tabs, a scrollable monospaced preview, and Copy, Download, and Import affordances"
 type = "binary"
 weight = 1.0
 

@@ -77,7 +77,7 @@ weight = 1.0
 [[criterion]]
 id = "3.3"
 name = "layout_matches_specified_composition"
-description = "The layout matches the specified composition at desktop width: top bar with view switcher, rollup above or beside the queue, filter and chip row above the table, and the workbench's header strip plus multi-pane body"
+description = "The layout matches the specified composition at desktop width: top bar with view switcher, rollup above or beside the queue, filter and chip row above the table, the workbench's header strip plus multi-pane body, and Export center with format tabs plus monospace preview and Copy/Download"
 type = "binary"
 weight = 1.0
 

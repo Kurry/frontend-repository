@@ -63,14 +63,14 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.1"
 name = "shared_state_coherence"
-description = "All surfaces derive from one shared state: switching a picker recomputes the diff, counters, and highlights together; completing a merge or restore updates the history list, pickers, graph, search index, and export together; and annotations and resolutions appear everywhere they are shown, all without a reload"
+description = "All surfaces derive from one shared state: switching a picker or Ignore toggle recomputes the diff, counters, and highlights together; completing a merge or restore updates the history list, pickers, graph, search index, and Export together; Import mutates that same store; and annotations and resolutions appear everywhere they are shown, all without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
 name = "no_storage_reload_seeded"
-description = "No browser storage is used: localStorage and sessionStorage remain empty after comparing, merging, restoring, annotating, undoing, and exporting, and a page reload returns the app to its seeded state (seeded prompts and version chains, no unseeded annotations, merges, or restores)"
+description = "No browser storage is used: localStorage and sessionStorage remain empty after comparing, merging, restoring, annotating, undoing, exporting, and importing, and a page reload returns the app to its seeded state (seeded prompts and version chains, no unseeded annotations, merges, or restores)"
 type = "binary"
 weight = 1.0
 
@@ -93,7 +93,7 @@ negate = true
 [[criterion]]
 id = "2.5"
 name = "console_clean"
-description = "The console is free of errors and warnings on first load and stays clean while comparing versions, toggling modes, merging, restoring, annotating, searching, undoing, and exporting"
+description = "The console is free of errors and warnings on first load and stays clean while comparing versions, toggling Ignore options, merging, restoring, annotating, searching, undoing, exporting, and importing"
 type = "binary"
 weight = 1.0
 
@@ -107,7 +107,7 @@ weight = 1.0
 [[criterion]]
 id = "2.7"
 name = "rapid_input_no_stale_renders"
-description = "Rapid repeated picker switches, mode toggles, and searches cause no hangs, dropped interactions, or stale renders showing a previous selection's diff or counters"
+description = "Rapid repeated picker switches, Ignore toggles, mode toggles, and searches cause no hangs, dropped interactions, or stale renders showing a previous selection's diff or counters"
 type = "binary"
 weight = 1.0
 
@@ -121,14 +121,14 @@ weight = 1.0
 [[criterion]]
 id = "2.9"
 name = "keyboard_operability_focus"
-description = "Every interactive control — pickers, tabs, counters, merge choices, bulk resolution, graph nodes, thread markers, undo/redo, and export — is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space), with a visible focus indicator at each stop"
+description = "Every interactive control — pickers, tabs, Ignore toggles, counters, merge choices, bulk resolution, graph nodes, thread markers, undo/redo, Export, Import, Copy, and Download — is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space), with a visible focus indicator at each stop"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.10"
 name = "modal_focus_trap_escape"
-description = "The restore and merge confirmation dialogs trap keyboard focus while open, close on the Escape key, and return focus to the control that opened them"
+description = "The restore confirmation, merge confirmation, and Export surface trap keyboard focus while open, close on the Escape key, and return focus to the control that opened them"
 type = "binary"
 weight = 1.0
 
@@ -142,7 +142,7 @@ weight = 1.0
 [[criterion]]
 id = "2.12"
 name = "aria_live_announcements"
-description = "Completing a merge, completing a restore, and posting an annotation are announced through an aria-live region in addition to their visual indication"
+description = "Completing a merge, completing a restore, posting an annotation, and a successful import are announced through an aria-live region in addition to their visual indication"
 type = "binary"
 weight = 1.0
 
@@ -150,6 +150,13 @@ weight = 1.0
 id = "2.13"
 name = "fictional_names_only"
 description = "Every author name and any model reference rendered in the UI is fictional; no real people, AI providers, or model brand names appear"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.14"
+name = "field_contract_validation_visible"
+description = "AnnotationCreate, RestoreCreate, and Import validation failures show inline messages naming the offending field (for example bodyMarkdown, changeNote, or schemaVersion) before any state mutation"
 type = "binary"
 weight = 1.0
 

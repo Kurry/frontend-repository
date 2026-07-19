@@ -125,6 +125,13 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "14.10"
+name = "request_body_fields_survive_export_import"
+description = "Create a user with distinctive firstName/email, sendInvitation true, and a closed permission id; confirm Directory JSON users entry uses those request-body field names; export then import Directory JSON and confirm the restored user still carries sendInvitation and that permission id."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "14.n1"
 name = "partial_persistence_is_incoherent"
 description = "After reload, some facets (theme, created user, Archive) survive while others reset, producing incoherent partial persistence in this in-memory genre."

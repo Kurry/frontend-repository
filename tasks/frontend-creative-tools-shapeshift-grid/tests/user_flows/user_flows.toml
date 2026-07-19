@@ -226,6 +226,13 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "6.12"
+name = "mirror_then_fill_stats_flow"
+description = "Mirror paint flow: set mirrorMode to Horizontal or Vertical, paint one blank cell near an edge — the mirror-partner cell receives the same brush and color; fill stats increase for both cells when both were blank; switching mirrorMode to Off then painting a different cell changes only that cell."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "user_flows.catchall"
 name = "user_flows_catchall"
 description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

@@ -63,22 +63,22 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+name = "linked_chart_highlighting"
+description = "Optional polish: hovering a variant series on the grouped bar, monitoring, or matrix surfaces linked-highlights the same variant across the other results charts."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "timeline_scrub_or_jump"
+description = "Optional polish: the run event timeline offers a jump-to-milestone or filter chip interaction beyond bare chronological listing."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+name = "first_run_coachmarks"
+description = "Optional polish: a short coachmark or empty-library guidance steers a new operator toward New Experiment, Run, and Export report."
 type = "binary"
 weight = 1.0
 
@@ -91,50 +91,50 @@ weight = 1.0
 
 [[criterion]]
 id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+name = "keyboard_power_user_shortcuts"
+description = "Optional polish: keyboard shortcuts beyond basic tab order accelerate common actions such as opening New Experiment or Export report."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+name = "saved_filter_presets"
+description = "Optional polish: operators can save or reapply a library status-filter and search combination as a named preset."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+name = "experiment_narrative_summary"
+description = "Optional polish: the Export panel or results header includes a short plain-language narrative of winner, power, and decision beyond raw statistics."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+name = "theme_density_toggle"
+description = "Optional polish: a density or theme control beyond requirements adjusts table and chart chrome without breaking the Carbon look."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+name = "offline_export_resilience"
+description = "Optional polish: Export report and Copy remain usable if the clipboard API is unavailable, with a visible fallback such as selectable preview text."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+name = "competition_level_studio_polish"
+description = "Competition-level innovation is visible: the studio feels like a real prompt-eval console rather than a thin CRUD demo, especially around run monitoring and the Experiment Report pack."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.n1"
 name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+description = "The demo is purely spec-compliant, barebones, and unenhanced around charts, run monitoring, and Export."
 type = "binary"
 negate = true
 weight = 1.0
@@ -142,7 +142,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n2"
 name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
+description = "Interactions and visuals are generic dashboard chrome with no experimentation-studio identity."
 type = "binary"
 negate = true
 weight = 1.0
@@ -150,7 +150,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n3"
 name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
+description = "The app has no polish, guidance, or narrative around designing, running, and exporting experiments."
 type = "binary"
 negate = true
 weight = 1.0
@@ -158,7 +158,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n4"
 name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
+description = "The app has no extra visual or interactive polish on results charts or the Export panel."
 type = "binary"
 negate = true
 weight = 1.0
@@ -166,7 +166,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n5"
 name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
+description = "The UI is flat and static with no immersion during runs or results exploration."
 type = "binary"
 negate = true
 weight = 1.0
@@ -174,7 +174,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n6"
 name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
+description = "Modern platform capabilities such as clipboard copy confirmation for the Experiment Report are ignored where they would clearly help."
 type = "binary"
 negate = true
 weight = 1.0
@@ -182,7 +182,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n7"
 name = "personalization_is_impossible"
-description = "Personalization is impossible."
+description = "Operators cannot personalize any repeatable workflow convenience beyond the hard requirements."
 type = "binary"
 negate = true
 weight = 1.0
@@ -190,7 +190,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n8"
 name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
+description = "The app has no delightful moments during run completion, decision, or export."
 type = "binary"
 negate = true
 weight = 1.0
@@ -198,7 +198,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n9"
 name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
+description = "The design repeats a generic admin-table pattern without an experimentation twist."
 type = "binary"
 negate = true
 weight = 1.0
@@ -206,7 +206,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n10"
 name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
+description = "The app shows minimal effort beyond an MVP library table with no depth in results or export."
 type = "binary"
 negate = true
 weight = 1.0

@@ -63,153 +63,133 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "9.1"
 name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+description = "The app is interactive within 2 seconds of a local cold load"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "9.2"
 name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+description = "No console errors or warnings appear on load or during a full exercise of connections, candidates, triage, a pipeline run, library, and the palette"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "9.3"
 name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+description = "UI transitions such as view switches, filter chip updates, and overlay open/close respond without perceptible lag under normal use"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "9.4"
 name = "async_work_has_loading_indicators"
-description = "Async or simulated-async work shows visible activity: the credential checking status, the streaming affordance on Evaluate and Generate, the rate-limit countdown, and the batch n-of-m progress indicator."
+description = "Async or simulated-async work shows visible activity: the credential checking status, the streaming affordance on Evaluate and Generate, the rate-limit countdown, and the batch n-of-m progress indicator"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "9.5"
 name = "large_collections_render_without_lag"
-description = "The paginated PR lists, the triage board, and the filtered library render and update without perceived lag as pages load and filters change."
+description = "The paginated PR lists, the triage board, and the filtered library render and update without perceived lag as pages load and filters change"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "9.6"
 name = "state_changes_remain_interactive"
-description = "The UI remains interactive while a run is streaming: switching views, filtering lists, and opening the command palette all work during an active pipeline run."
+description = "The UI remains interactive while a run is streaming: switching views, filtering lists, and opening the command palette all work during an active pipeline run"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "9.7"
 name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+description = "Streaming text, triage card moves, and list enter/exit transitions maintain a smooth frame rate without visible hitching"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "9.8"
 name = "rapid_input_does_not_freeze"
-description = "Rapid repeated input — quick filter toggles, fast triage actions, repeated palette open and close — never hangs or freezes the app, including while a run is streaming."
+description = "Rapid repeated input — quick filter toggles, fast triage actions, repeated palette open and close — never hangs or freezes the app, including while a run is streaming"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "9.9"
 name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+description = "An extended session of repeated runs, triage actions, and library imports shows no progressive slowdown or runaway resource use"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "9.10"
 name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+description = "Simulated failure paths (rate-limit countdown, Generate failure with Retry) keep the UI responsive with visible recovery controls rather than freezing"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "9.n1"
 name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+description = "More than 2 seconds pass before interaction is possible on local render"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "9.n2"
 name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+description = "Errors or warnings are present in the console during load or a full exercise of the app"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "9.n3"
 name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+description = "View switches, filter updates, or overlay transitions block interaction or lag noticeably"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "9.n4"
 name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
+description = "Streaming Evaluate/Generate or a batch run causes the UI to hang or freeze"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "9.n5"
 name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+description = "Paging through PR lists or filtering the library kills the frame rate"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "9.n6"
 name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
+description = "Input becomes unresponsive during card-move, streaming, or overlay animations"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "9.n7"
 name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
+description = "The UI blocks rendering while loading fixture data or starting a run"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "9.n8"
 name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
+description = "Memory leaks or runaway browser resource usage occur across repeated runs"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "9.n9"
 name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
+description = "Nothing is displayed while a stage is running or a credential check is in progress"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "9.n10"
 name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+description = "The app crashes under rapid filter toggles, double Run activations, or edge-case imports"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "performance.catchall"
 name = "performance_catchall"

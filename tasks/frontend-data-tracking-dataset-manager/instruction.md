@@ -1,23 +1,26 @@
 <summary>
-Build a dataset manager for an AI evaluation workspace using React, Zustand, Tailwind CSS 4.3.2, and IBM Carbon Design System.
+Build a dataset manager for an AI evaluation workspace using React, Zustand, Tailwind CSS 4.3.2, and IBM Carbon Design System. The app produces the operator's dataset package files — Rows CSV and Dataset Package JSON compiled live from the selected dataset — so session work leaves with the user.
 </summary>
 
 <core_features>
 Core features (each line is an observable behavior the finished app must exhibit):
 
-Feature: Dataset collection —
+Feature: Dataset collection (API-shaped create payload) —
 - The left sidebar lists the seeded datasets (at least 3 on first load); each entry shows the dataset name, its live row count, and a created date; clicking an entry loads that dataset's rows into the main grid and the entry shows a visibly selected treatment
-- Clicking New Dataset opens a modal dialog with a name field (required), a description field (optional), and a repeating schema-field editor (each schema row has a field name input, a type select offering text, number, and category, and — when category is chosen — a required allowed-values list); the Submit control stays disabled until the name is non-empty and at least one schema field has a name and type; the saved schema is the dataset's record contract, and every later row mutation validates against it
-- Submitting a valid New Dataset form closes the modal, adds exactly one entry to the sidebar with a row count of 0, and selects the new dataset
-- Submitting with an empty name shows an inline validation message naming the name field and adds no entry
+- Clicking New Dataset opens a modal dialog whose submit produces a would-be dataset-create API body and must conform to this field contract (all keys required unless marked optional; example values illustrative only): name is a non-empty string of 1 to 80 characters after trim; description is optional and when present is a string of at most 500 characters; schema is a non-empty array of schema-field objects
+- Schema-field field contract (each schema row IS one would-be schema-field record): name is a non-empty string of 1 to 40 characters matching letters, digits, and underscores only; type is exactly one of text, number, or category; allowedValues is required when type is category and must be a non-empty array of unique non-empty strings each at most 40 characters, and must be an empty array when type is text or number; schema field names must be unique within the dataset case-insensitively
+- The modal presents name, description, and a repeating schema-field editor (field name, type select, and — when category is chosen — the allowed-values list); Submit stays disabled until every required field satisfies the field contracts above; the saved schema is the dataset's record contract, and every later row mutation validates against it
+- Submitting a valid New Dataset form closes the modal, adds exactly one entry to the sidebar with a row count of 0, and selects the new dataset; the created record's name, description, and schema match the submitted payload
+- Submitting with an empty name, a schema field name outside the allowed pattern, a category field with an empty allowedValues list, duplicate schema field names, or a description longer than 500 characters shows an inline validation message naming the offending field and adds no entry
 
-Feature: Virtualized data grid —
+Feature: Virtualized data grid (API-shaped row payload) —
 - The flagship seeded dataset contains at least 500 rows; the grid renders through virtualization so only a window of rows exists in the DOM at once, and scrolling from the first row to the last is smooth with no blank flashes or dropped frames
 - The grid shows one column per schema field, an expected output column, a verified column, and a split column; a header row labels every column
-- Double-clicking a cell opens an inline editor in place; pressing Enter commits the new value and the change is reflected everywhere that value feeds (stats, flags, pivot, export); pressing Escape cancels and restores the prior value
-- Committing a cell value that violates the dataset's record contract — non-numeric text in a number field, or a value outside a category field's allowed list — is rejected with an inline error naming the field and the violated rule, and the prior value stays in place; the same contract validation applies in the Add Row and Edit Row forms
-- Clicking Add Row opens a modal with one input per schema field plus an expected output textarea; submitting appends the row, increments the sidebar row count by one, and the new row is reachable in the grid
-- Clicking a row's Edit action opens the same modal pre-filled; saving updates that row in place without a reload
+- Row record field contract (Add Row, Edit Row, and inline cell commits produce would-be row API bodies; all keys required unless marked optional; example values illustrative only): values is an object whose keys are exactly the dataset's schema field names; each text field value is a string of at most 2000 characters; each number field value is a finite number; each category field value is exactly one string from that field's allowedValues; expectedOutput is a string of at most 4000 characters (empty string allowed); verified is a boolean; split is optional and when present is exactly one of train, validation, or test
+- Double-clicking a cell opens an inline editor in place; pressing Enter commits the new value only when it satisfies the row record field contract and the change is reflected everywhere that value feeds (stats, flags, pivot, export); pressing Escape cancels and restores the prior value
+- Committing a cell value that violates the field contract — non-numeric text in a number field, a value outside a category field's allowed list, or text longer than the bound — is rejected with an inline error naming the field and the violated rule, and the prior value stays in place; the same contract validation applies in the Add Row and Edit Row forms
+- Clicking Add Row opens a modal with one input per schema field plus an expected output textarea; a valid submit appends a row matching the field contract, increments the sidebar row count by one, and the new row is reachable in the grid
+- Clicking a row's Edit action opens the same modal pre-filled; saving updates that row in place without a reload under the same field contract
 - Clicking a row's Delete action opens a confirmation dialog; confirming removes the row and decrements the sidebar row count by one; canceling leaves the row intact
 
 Feature: CSV import with mapping and diagnostics —
@@ -25,12 +28,12 @@ Feature: CSV import with mapping and diagnostics —
 - After a source is provided, the mapping step shows a table with one row per detected CSV column: the column header name, a preview of its first values, and a select assigning it to a schema field, to the expected output, or to Ignore; columns whose header matches a schema field name arrive pre-assigned to that field
 - The mapping step's Continue control stays disabled until at least one CSV column is assigned to a schema field or the expected output; an inline message explains what is missing
 - Confirming the mapping opens the diagnostic step: a row-by-row review where every incoming row appears with its mapped cells, cells that violate the record contract — non-numeric text mapped to a number field, a value outside a category field's allowed list, or an empty cell for a required mapping — are individually highlighted with a message naming the field and the violated rule, exactly as an ingestion API would report them
-- Each flagged cell in the diagnostic step can be edited in place; fixing a cell clears its highlight immediately, and a summary line showing how many rows are ready and how many still have issues updates as fixes are made
+- Each flagged cell in the diagnostic step can be edited in place; fixing a cell clears its highlight immediately, and a summary line showing the ready-row count and the unresolved-issue count updates as fixes are made
 - Each diagnostic row has an Exclude toggle; excluded rows are skipped at commit and the ready count updates; the Commit control stays disabled while any included row still has an unresolved issue
-- Activating Commit imports every included row: the sidebar row count increases by exactly the committed row count, the imported rows appear in the grid immediately, and a success toast states how many rows were imported
+- Activating Commit imports every included row: the sidebar row count increases by exactly the committed row count, the imported rows appear in the grid immediately, and a success toast states the exact committed row count
 
 Feature: Ground truth tagging —
-- Each row has a Verified toggle; toggled-on rows render a checkmark icon in the verified column and toggled-off rows render a dash icon; a Verified count badge in the panel header shows how many of the dataset's rows are verified and updates immediately on every toggle
+- Each row has a Verified toggle; toggled-on rows render a checkmark icon in the verified column and toggled-off rows render a dash icon; a Verified count badge in the panel header shows the exact verified-row count for the dataset and updates immediately on every toggle
 - A Show unverified only filter above the grid hides verified rows; turning it off restores the full set exactly
 
 Feature: Formula bar —
@@ -38,9 +41,9 @@ Feature: Formula bar —
 - The displayed formula result recomputes when the data it reads changes: editing a cell inside the evaluated column changes the shown result without re-entering the formula
 - Submitting an invalid formula (unknown function, unknown column, or a numeric function over a text column) shows an inline error naming the problem and no result value
 
-Feature: Threshold alerts —
-- A threshold rules panel lists the active rules and lets the user add a rule with a numeric column select, a comparator (above or below), and a cap value; all three are required with inline validation
-- Rows breaching any active rule show a flagged treatment on the offending cell and a flag icon on the row; a Flagged count badge shows how many rows currently breach any rule
+Feature: Threshold alerts (API-shaped create payload) —
+- A threshold rules panel lists the active rules and lets the user add a rule whose submit IS the would-be threshold-rule API body and must conform to this field contract: column is a required non-empty string naming an existing numeric schema field; comparator is exactly one of above or below; cap is a required finite number. All three are required with inline validation naming the offending field
+- Rows breaching any active rule show a flagged treatment on the offending cell and a flag icon on the row; a Flagged count badge shows the exact count of rows that currently breach any rule
 - Editing a cell across a rule's cap adds or clears that row's flag immediately, and deleting a rule clears every flag it caused
 
 Feature: Duplicate detection and merge —
@@ -54,13 +57,13 @@ Feature: Pivot builder —
 - Dropping or removing a chip recomputes the pivot table immediately; with two chips in the Rows bucket the table shows nested row summaries grouped by the first field then the second
 - The pivot derives from live data: returning to the grid, editing a cell that feeds the pivot, and reopening the pivot shows changed summary values
 
-Feature: Snapshots and diff —
-- A Save Snapshot control captures the dataset's current rows under a required snapshot name with a timestamp; the dataset's snapshot list shows every saved snapshot
+Feature: Snapshots and diff (API-shaped create payload) —
+- A Save Snapshot control captures the dataset's current rows; the submitted record IS the would-be snapshot-create API body and must conform to this field contract: name is a required non-empty string of 1 to 80 characters after trim, unique among the dataset's snapshots case-insensitively. An empty or duplicate name shows an inline message naming the name field and saves nothing; a valid save stores the rows under that name with a timestamp and the dataset's snapshot list shows every saved snapshot
 - Selecting two snapshots opens a row-level diff: rows present only in the newer snapshot are marked added, rows present only in the older are marked removed, and rows whose cells changed show each changed cell with its old and new value side by side
 - The diff derives from the actual snapshot contents: taking a snapshot, editing one cell, taking a second snapshot, and diffing the two shows exactly that one changed cell
 
-Feature: Split management —
-- A Splits panel provides train, validation, and test percentage inputs; the form shows an inline validation error when the three do not sum to 100 and the Apply control stays disabled
+Feature: Split management (API-shaped apply payload) —
+- A Splits panel provides train, validation, and test percentage inputs; the submitted apply payload must conform to this field contract: train, validation, and test are each integers from 0 to 100 inclusive and the three must sum to exactly 100. The form shows an inline validation error naming the percentages when they do not sum to 100 and the Apply control stays disabled
 - Applying a valid split assigns every row a split label shown in the grid's split column, and a segmented proportion bar shows the actual assigned distribution across the three splits
 - A stratification readout under the bar shows, for each split, its verified and unverified row counts; adding, deleting, or re-splitting rows updates the bar and the readout
 
@@ -70,13 +73,21 @@ Feature: Bulk mutation tray —
 - Changing the selection while the tray is open updates its count immediately
 
 Feature: Undo and redo —
-- Toolbar Undo and Redo controls, plus Ctrl+Z and Ctrl+Shift+Z, step backward and forward through cell edits, row additions and deletions, merges, bulk actions, and committed imports
-- Undo restores the exact prior values including every derived surface (row counts, verified badge, flags, splits); redo reapplies them; both controls are disabled when their stack is empty
+- Toolbar Undo and Redo controls, plus Ctrl+Z and Ctrl+Shift+Z, step backward and forward through cell edits, row additions and deletions, merges, bulk actions, committed CSV imports, and successful Import package operations
+- Undo restores the exact prior values including every derived surface (row counts, verified badge, flags, splits, export previews); redo reapplies them; both controls are disabled when their stack is empty
 
-Feature: Export —
-- An Export control opens a drawer with two tabs; the Rows tab shows CSV-shaped text of the currently visible rows (a header line plus one line per row) honoring the active unverified-only filter; the Dataset card tab shows generated text summarizing the dataset name, description, the record contract (each field with its type and, for category fields, its allowed values), total and verified and flagged row counts, per-numeric-column min, max, and mean, the split distribution, and the snapshot count
-- Both tabs derive from live state: editing a cell or toggling a filter and reopening the drawer changes the exported text accordingly
-- A Copy control in the drawer places the visible export text on the clipboard and shows a visible confirmation
+Feature: Export and import dataset package (useful end state; API-shaped payload) —
+- The app PRODUCES the operator's dataset package: an Export control opens a drawer with two tabs compiled LIVE from the store — Rows CSV and Dataset Package JSON — plus Copy, Download, and Import package controls
+- The Rows tab shows CSV-shaped text of the currently visible rows (a header line plus one line per row covering every schema field plus expectedOutput, verified, and split) honoring the active unverified-only filter
+- Dataset Package JSON is API-shaped like a dataset-service package response — a single object (not an array) whose field names and values are visible in the preview text and must conform to this field contract (all top-level keys REQUIRED unless marked optional; example values illustrative only):
+  - schemaVersion: required string, exactly dataset-manager.package/v1
+  - generatedAt: required ISO-8601 datetime string that updates whenever the package is regenerated
+  - dataset: required object with id (non-empty string), name (1 to 80 characters), description (string at most 500 characters, empty string allowed), createdAt (ISO-8601 datetime), schema (non-empty array of schema-field records matching the schema-field field contract above), rows (array of row records matching the row record field contract above, including verified and split), thresholdRules (array of objects each requiring column, comparator in {above, below}, and numeric cap), snapshots (array of objects each requiring name, createdAt ISO-8601 datetime, and rows array), splitPercentages (object with train, validation, and test integers that sum to 100), and attachedSuiteId (string or null)
+  - stats: required object with totalRows (non-negative integer equal to dataset.rows.length), verifiedCount (non-negative integer), flaggedCount (non-negative integer), numericSummaries (array of objects each requiring field, min, max, and mean for every numeric schema field), splitDistribution (object with train, validation, and test counts), and snapshotCount (non-negative integer equal to dataset.snapshots.length)
+- Cross-field rules: every row.values key set equals the schema field names; every category value is inside its field's allowedValues; every thresholdRules.column names a numeric schema field; stats.totalRows equals dataset.rows.length; stats.verifiedCount equals the count of rows with verified true; stats.snapshotCount equals dataset.snapshots.length; splitPercentages sum to 100
+- Both tabs derive from live state: editing a cell, toggling verified, applying a split, saving a snapshot, or toggling the unverified-only filter and reopening the drawer changes the exported text; an export that omits session mutations or that violates the Dataset Package JSON field contract is incomplete; the open JSON preview must still show every required top-level key
+- A Copy control places the visible export text on the clipboard and shows a visible confirmation; Download offers the visible tab as a file — rows.csv for the Rows tab and dataset-package.json for the Dataset Package JSON tab
+- An Import package control accepts pasted or file-picked Dataset Package JSON matching the export field contract; a valid import replaces the selected dataset's schema, rows, threshold rules, snapshots, split percentages, and attached suite so the sidebar count, grid, badges, panels, and a subsequent export match the imported package; malformed JSON or a document that fails the field contract (schemaVersion not exactly dataset-manager.package/v1, missing dataset or stats, schema field type outside text|number|category, category allowedValues empty, row values breaking the row contract, splitPercentages not summing to 100, or stats.totalRows disagreeing with dataset.rows.length) shows visible validation naming the offending field and changes nothing
 
 Feature: Capacity instrumentation —
 - An instrumentation panel shows a workspace capacity gauge: total rows and an estimated size across all datasets against a displayed mock capacity, plus a per-dataset breakdown of rows and estimated size
@@ -88,10 +99,12 @@ Feature: Attach to eval suite —
 
 <user_flows>
 - Import pipeline end to end: choosing a seeded sample CSV, adjusting one column's mapping, fixing a flagged cell in the diagnostic step, excluding one bad row, and committing raises the sidebar row count by exactly the included row count, shows the new rows in the grid, grows the capacity gauge, changes the pivot's summaries, and changes both export tabs — all without a reload
-- Edit ripple: editing a numeric cell through the inline grid editor updates the formula bar result that reads that column, adds or clears a threshold flag when the value crosses a cap, changes the dataset card's stats for that column, and appears as a changed cell in a diff against a snapshot taken before the edit
+- Edit ripple: editing a numeric cell through the inline grid editor updates the formula bar result that reads that column, adds or clears a threshold flag when the value crosses a cap, changes the Dataset Package JSON stats for that column, and appears as a changed cell in a diff against a snapshot taken before the edit
 - Dedup round trip: running the duplicate scan surfaces the seeded groups; merging one group decreases the row count by the group size minus one and re-running the scan no longer lists that group
 - Bulk then undo: selecting 5 rows and applying Mark verified raises the Verified badge by exactly the number newly verified; a single Undo restores every one of those rows and the badge to their prior values
 - Split coherence: applying an 80/10/10 split labels every row, the proportion bar and stratification readout match the grid's split column, and deleting rows updates both
+- Export after mutations: add a row with a distinctive expectedOutput token, toggle it verified, save a uniquely named snapshot, open Export, and confirm Dataset Package JSON shows schemaVersion exactly dataset-manager.package/v1, contains that expectedOutput under dataset.rows, shows verifiedCount reflecting the toggle, lists the new snapshot name, and keeps every required top-level key; Copy places that JSON on the clipboard; Download offers dataset-package.json
+- Import package round trip: after the export-after-mutations steps, note the package JSON, make a further cell edit so the live state differs, Import the earlier package, and confirm the grid, verified badge, snapshot list, and a fresh export return to the imported package's contents; importing JSON with schemaVersion other than dataset-manager.package/v1 leaves state unchanged and shows a named-field error
 - Sorting or filtering never mutates data: toggling Show unverified only and back restores the identical full row set
 - A page reload returns the app to its seeded state: the seeded datasets and row counts, no snapshots beyond the seeded ones, no threshold rules beyond the seeded ones, and an empty undo history
 </user_flows>
@@ -105,6 +118,11 @@ Feature: Attach to eval suite —
 - Submitting split percentages that do not sum to 100 keeps Apply disabled and shows a message naming the required total
 - Pasting CSV text with no parseable rows shows an inline wizard error and the mapping step is not offered
 - The formula bar given a numeric function over a category column shows an error naming the column's type rather than a result
+- Submitting New Dataset with a schema field name containing spaces or punctuation, a category field with empty allowedValues, or a description longer than 500 characters shows inline validation naming the field and creates no dataset
+- Submitting Add Row with non-numeric text in a number field, a category value outside allowedValues, or expectedOutput longer than 4000 characters shows inline validation naming the field and appends no row
+- Saving a snapshot with an empty name or a duplicate name shows inline validation naming the name field and adds no snapshot
+- Importing malformed Dataset Package JSON, or parseable JSON that fails the field contract (wrong schemaVersion, missing dataset or stats, type outside text|number|category, stats.totalRows disagreeing with rows.length), leaves the selected dataset unchanged and shows validation naming the offending field
+- Opening Export before any in-session edits still produces Dataset Package JSON for the selected seeded dataset with schemaVersion dataset-manager.package/v1 and every required top-level key; the drawer never shows an empty or broken region
 </edge_cases>
 
 <visual_design>
@@ -119,6 +137,7 @@ Feature: Attach to eval suite —
 - Spacing follows a consistent rhythm across the sidebar, toolbar, grid, and panels, with no crowded or orphaned regions
 - Buttons, inputs, selects, and toggles show distinct default, hover, focus (visible ring), disabled, and error treatments
 - One consistent icon set is used throughout the toolbar, sidebar, row actions, and status indicators
+- The export drawer shows tabs labeled Rows CSV and Dataset Package JSON, a monospaced preview block, and Copy, Download, and Import package actions
 </visual_design>
 
 <motion>
@@ -131,7 +150,7 @@ Feature: Attach to eval suite —
 - The duplicate-scan stage indicators animate their status changes, and the running stage shows continuous activity
 - The capacity gauge animates toward its new value when rows change rather than jumping
 - Hover animations (required): buttons ease background and shadow with a slight press effect; sidebar entries, grid rows, and panel list items take a full-width hover wash; form controls show focus rings
-- Feedback toasts after import, merge, bulk apply, attach, and copy slide in, remain readable, and auto-dismiss with a fade
+- Feedback toasts after CSV import, package import, merge, bulk apply, attach, and copy slide in, remain readable, and auto-dismiss with a fade
 - With prefers-reduced-motion set, all rows and batches appear instantly and every transition applies immediately
 </motion>
 
@@ -155,17 +174,19 @@ Feature: Attach to eval suite —
 </performance>
 
 <requirements>
-Shared application state must live in Zustand (in-memory only): the datasets collection with rows and schemas, the selected dataset, grid selection and inline-edit state, the import wizard's source, mapping, and diagnostic state, verified flags, the unverified-only filter, formula input and result, threshold rules and derived flags, duplicate-scan stages and groups, pivot bucket assignments and aggregation, snapshots and diff selection, split percentages and assignments, the undo/redo history, export drawer state, capacity totals, eval-suite attachments, and UI chrome. Do not use localStorage, sessionStorage, or other browser storage APIs.
+Shared application state must live in Zustand (in-memory only): the datasets collection with rows and schemas, the selected dataset, grid selection and inline-edit state, the import wizard's source, mapping, and diagnostic state, verified flags, the unverified-only filter, formula input and result, threshold rules and derived flags, duplicate-scan stages and groups, pivot bucket assignments and aggregation, snapshots and diff selection, split percentages and assignments, the undo/redo history, export drawer state including Dataset Package JSON and Rows CSV previews, capacity totals, eval-suite attachments, and UI chrome. Do not use localStorage, sessionStorage, or other browser storage APIs.
 State contracts (behavioral, not storage keys):
-- Creating a dataset adds it to the sidebar and the capacity breakdown; deleting rows updates the sidebar count, the gauge, and every derived surface
-- Editing a cell updates that value everywhere it appears or feeds: the grid, formula results, threshold flags, pivot summaries, stats, and exports
+- Creating a dataset adds it to the sidebar and the capacity breakdown under the dataset-create field contract; deleting rows updates the sidebar count, the gauge, and every derived surface
+- Editing a cell updates that value everywhere it appears or feeds: the grid, formula results, threshold flags, pivot summaries, Dataset Package JSON stats, and both export tabs
 - The verified filter, pivot, diff, and both export tabs recompute from the shared collection; they never operate on a second disconnected copy
 - Undo and redo operate on the same shared state the visible controls mutate, restoring derived counts exactly
-- The import wizard commits through the same append logic as Add Row, so committed rows behave identically to manually added rows
-Build tooling: Vite SPA. Styling is Tailwind CSS 4.3.2 (pinned) with design tokens in the theme layer. IBM Carbon Design System (@carbon/react) is the component library for all UI chrome — modals, data tables, tags, toolbar controls, notifications, toggles, and form controls; no other component library. Papa Parse for CSV parsing. TanStack Virtual for grid virtualization and TanStack Table allowed for grid structure. Motion for React and AutoAnimate allowed for animation; no other animation libraries. Icons from @carbon/icons-react only, installed via npm — no raw copy-pasted SVG icon sets. All forms — New Dataset, Add Row, Edit Row, threshold rules, splits, snapshot name, and attach — are driven by React Hook Form validating through a Zod schema: the schema defines the rules and inline per-field errors render before submit. Each dataset's record contract is itself schema-shaped: per-field types, required rules, and category allowed-values are enforced identically wherever rows enter the system — the Add Row and Edit Row forms, inline cell editing, and the import diagnostics — and every violation message names the field and the violated rule. All libraries installed via npm and bundled locally; no CDN imports. No backend or authentication; import sources, scan results, and all data are client-side.
-- Seed at least 3 datasets: one flagship with at least 500 rows including at least 2 duplicate groups and a mix of text, number, and category fields, and the others with at least 20 rows each; roughly half of each dataset's rows verified; seed at least 2 sample CSV fixtures selectable in the import wizard, at least 1 snapshot on the flagship dataset, at least 1 threshold rule, and at least 3 eval suites
-- Submitting any form with invalid required fields must not mutate the collection; show visible validation feedback
+- The import wizard commits through the same append logic as Add Row under the row record field contract, so committed rows behave identically to manually added rows
+- Dataset Package JSON export and a successful Import package round-trip through the same field contract; import rejection leaves shared state untouched
+Build tooling: Vite SPA. Styling is Tailwind CSS 4.3.2 (pinned) with design tokens in the theme layer. IBM Carbon Design System (@carbon/react) is the component library for all UI chrome — modals, data tables, tags, toolbar controls, notifications, toggles, and form controls; no other component library. Papa Parse for CSV parsing. TanStack Virtual for grid virtualization and TanStack Table allowed for grid structure. Motion for React and AutoAnimate allowed for animation; no other animation libraries. Icons from @carbon/icons-react only, installed via npm — no raw copy-pasted SVG icon sets. All forms — New Dataset, Add Row, Edit Row, threshold rules, splits, snapshot name, attach, and Import package — are driven by React Hook Form validating through a Zod schema that mirrors the field contracts above: the schema defines the rules and inline per-field errors render before submit. The record a successful create produces IS the would-be request body for that contract; Dataset Package JSON export and a successful import conform to the same field names, enums, bounds, and cross-field rules. Each dataset's record contract is itself schema-shaped: per-field types, required rules, and category allowed-values are enforced identically wherever rows enter the system — the Add Row and Edit Row forms, inline cell editing, and the import diagnostics — and every violation message names the field and the violated rule. All libraries installed via npm and bundled locally; no CDN imports. No backend or authentication; import sources, scan results, and all data are client-side.
+- Seed at least 3 datasets: one flagship with at least 500 rows including at least 2 duplicate groups and a mix of text, number, and category fields conforming to the field contracts, and the others with at least 20 rows each; roughly half of each dataset's rows verified; seed at least 2 sample CSV fixtures selectable in the import wizard, at least 1 snapshot on the flagship dataset, at least 1 threshold rule, and at least 3 eval suites
+- Submitting any form with invalid required fields must not mutate the collection; show visible validation feedback naming the offending field
 - Zero navigational outbound links for app chrome — in-app controls only; view changes via shared client state
+- End-state contract: Export must produce Rows CSV and Dataset Package JSON that contain the session's actual rows, schema, verified flags, threshold rules, snapshots, splits, and stats under schemaVersion dataset-manager.package/v1, with Copy and Download; an export that omits session mutations or fails the field contract is invalid. Importing a previously exported conforming package MUST restore the same visible dataset state (round-trip); Import MUST reject non-conforming JSON without mutating the current session
 </requirements>
 
 <integrity>

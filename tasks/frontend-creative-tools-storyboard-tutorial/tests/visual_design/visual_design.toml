@@ -100,7 +100,7 @@ negate = true
 [[criterion]]
 id = "3.6"
 name = "header_composition_complete"
-description = "The top header shows a logo mark, a Demo Projects project label, the storyboard title 1. Getting Started, a kebab menu, and utility tools (notifications bell, dashboard, account)"
+description = "The top header shows a logo mark, a Demo Projects project label, the storyboard title 1. Getting Started, a kebab menu, utility tools (notifications bell, dashboard, account), and Undo, Redo, Export, and Import controls"
 type = "binary"
 weight = 1.0
 
@@ -172,7 +172,7 @@ weight = 0.5
 [[criterion]]
 id = "3.16"
 name = "messages_name_problem_and_fix"
-description = "The empty-board state and the create-form validation messages name the problem and the fix in plain language"
+description = "The empty-board state and the create-form / Import validation messages name the problem and the fix in plain language"
 type = "binary"
 weight = 0.5
 
@@ -182,6 +182,58 @@ name = "hover_reveals_three_dot_actions"
 description = "Hovering an imaged scene card with the real pointer reveals a three-dot actions button on that card"
 type = "binary"
 weight = 1.0
+
+
+[[criterion]]
+id = "3.18"
+name = "export_center_visual_language"
+description = "The Export center shows monospaced Storyboard JSON and Markdown shot list preview blocks plus a print-styled Printable outline preview, with clear format tabs or section labels and visible Copy and Download controls (and Print on the outline tab) distinct from board chrome"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.19"
+name = "shot_type_badge_and_duration_on_cards"
+description = "Imaged scene cards show a shot-type badge and a duration readout in seconds, and the nav bar shows a live Total duration readout"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.20"
+name = "bulk_select_and_action_bar_visible"
+description = "Scene selection checkboxes and the bulk action bar (when two or more scenes are selected) are visually distinct; selected cards show a clear selected treatment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.n17"
+name = "export_center_unstyled_or_missing"
+description = "Export/Import surfaces are missing or render as unstyled plain text without distinct preview blocks and Copy/Download controls"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.21"
+name = "nav_bar_search_chips_present_control"
+description = "The storyboard nav bar integrates a search field, shot-type filter chips with the active chip visibly selected and a filtered-count readout while filtering, and a Present control, all styled with the same light/yellow workspace language as the view toggles"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.22"
+name = "presenter_view_composition"
+description = "The presenter view is visually distinct from the board: one scene dominates the viewport with its number, title, body, and shot-type badge, a per-scene countdown, a Scene N of total readout, an overall progress bar, and a compact control strip with Pause/Resume, previous/next, and End presentation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.n18"
+name = "presenter_unstyled_or_missing_chrome"
+description = "The presenter renders as a bare unstyled overlay — missing the countdown, progress readouts, or control strip — or its chrome visibly clashes with the light/yellow workspace language"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "3.catchall"

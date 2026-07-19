@@ -161,6 +161,21 @@ type = "binary"
 weight = 1.0
 negate = true
 
+
+[[criterion]]
+id = "2.17"
+name = "export_artifacts_track_store"
+description = "After a create, edit, delete, reorder, or status change, opening Export shows markdown/json/outline previews that reflect the updated scenes collection without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.18"
+name = "in_memory_only_persistence_via_export"
+description = "Across create, filter, export, import, and undo, localStorage and sessionStorage remain unused for app state (good-app in-memory rule); persistence is export/MCP only"
+type = "binary"
+weight = 1.0
+
 [[criterion]]
 id = "2.catchall"
 name = "technical_catchall"

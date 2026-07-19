@@ -155,6 +155,21 @@ description = "Scene tutorial copy reads as clear, grammatical instructional sen
 type = "binary"
 weight = 0.5
 
+
+[[criterion]]
+id = "3.14"
+name = "export_drawer_monospace_preview"
+description = "The export drawer presents format tabs (markdown, json, outline) with a monospace code preview distinct from the light storyboard workspace field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.15"
+name = "status_badges_and_filter_chrome"
+description = "Scene status badges and the status filter/search controls are visually integrated into the board chrome without looking like bolted-on marketing chips"
+type = "binary"
+weight = 0.5
+
 [[criterion]]
 id = "3.catchall"
 name = "visual_design_catchall"

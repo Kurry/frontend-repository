@@ -84,7 +84,7 @@ weight = 1.0
 [[criterion]]
 id = "1.4"
 name = "live_announcements"
-description = "Submitting an annotation, the completion of an assist run, and a step entering the failed state are announced through an aria-live region as well as shown visually"
+description = "Submitting an annotation, the completion of an assist run, a step entering the failed state, and a successful Import are announced through an aria-live region as well as shown visually"
 type = "binary"
 weight = 1.0
 

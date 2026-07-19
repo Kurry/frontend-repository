@@ -75,6 +75,13 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "4.16"
+name = "overlength_note_text_keeps_prior"
+description = "Committing a note body longer than 8000 characters shows a visible message naming the text field and keeps the last valid text rather than storing the over-length value."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "4.3"
 name = "errors_name_field_and_fix"
 description = "Board-rename and Import errors name the offending field and the fix rather than only saying Invalid."
@@ -133,7 +140,7 @@ weight = 1.0
 [[criterion]]
 id = "4.11"
 name = "import_malformed_leaves_workspace"
-description = "Importing malformed JSON or a payload that fails the field contract leaves boards and objects unchanged and shows an inline error."
+description = "Importing malformed JSON or a payload that fails the field contract (wrong schemaVersion, illegal type/color, over-length text, geometry below minima, or unresolved connectors) leaves boards and objects unchanged and shows an inline error naming the offending field."
 type = "binary"
 weight = 1.0
 

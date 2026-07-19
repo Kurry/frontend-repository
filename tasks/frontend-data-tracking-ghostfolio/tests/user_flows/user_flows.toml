@@ -241,6 +241,65 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "6.15"
+name = "buy_then_sell_derived_pipeline"
+description = "Saving a BUY activity for a symbol then a SELL of part of that position updates the derived figures together without a reload: the holding's cost basis and unrealized gain recompute, realized gain increases by (sell unit price minus average unit cost) times sell quantity, and the Performance report preview's realizedGain and per-holding unrealizedGain both change to match."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.16"
+name = "import_diagnostics_commit_pipeline"
+description = "Importing an Activities CSV opens the diagnostics screen; excluding or fixing the invalid rows and pressing Commit adds only the valid rows so the ledger row count increases by exactly the imported-row count, the summary states imported versus skipped, and the Activities CSV and Performance report previews include the committed rows; cancelling instead leaves the ledger and every preview unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.17"
+name = "batch_delete_undo_roundtrip"
+description = "Selecting several holdings with the row checkboxes and bulk deleting them removes exactly those rows and drops their contribution from net worth, allocation, and the performance summary; a single Undo restores every deleted row and every derived figure at once, and the export previews return to their pre-batch content."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.18"
+name = "benchmark_toggle_then_activity_flow"
+description = "Toggling Benchmark compare on shows a second labeled benchmark series and toggling it off removes it; adding a BUY activity afterward visibly changes the portfolio series while the benchmark series stays the same."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.19"
+name = "mutate_then_performance_report_contains_work"
+description = "After adding a holding or saving an activity, the Performance report preview reflects that work (the new symbol appears in its holdings rows and the performance figures move) before Copy or Download, without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "derived_pipeline_desyncs"
+description = "After a SELL or DIVIDEND activity, the detail panel, performance summary, or Performance report preview shows a realized gain, unrealized gain, or total return that stays stale until a full page reload."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n12"
+name = "import_commit_wrong_or_cancel_mutates"
+description = "A committed Activities CSV import adds the wrong number of rows relative to the imported-versus-skipped summary, or cancelling the diagnostics screen still mutates the activities collection."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n13"
+name = "batch_undo_restores_partial"
+description = "A single Undo after a bulk delete or bulk edit restores only one row or leaves derived totals inconsistent instead of reversing the entire batch."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
 id = "user_flows.catchall"
 name = "user_flows_catchall"
 description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

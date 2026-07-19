@@ -77,7 +77,7 @@ weight = 1.0
 [[criterion]]
 id = "12.3"
 name = "only_documented_ops"
-description = "Only documented operations and bindings are available — destinations example.com, blog.example.com, shop.example.com, export-drawer; filters source/page/country/period; sorts most-visitors/fewest-visitors/name-az; themes light/dark; artifact formats stats-json and breakdown-csv"
+description = "Only documented operations and bindings are available — destinations example.com, blog.example.com, shop.example.com, export-drawer, goals-view; filters source/page/country/period/saved-segment/custom-range; sorts most-visitors/fewest-visitors/name-az; themes light/dark; artifact formats stats-json, breakdown-csv, and panel-csv"
 type = "binary"
 weight = 1.0
 
@@ -91,21 +91,21 @@ weight = 1.0
 [[criterion]]
 id = "12.5"
 name = "form_fields_bound"
-description = "Form fields site-name, domain, timezone, bounce-rate-ceiling, and import are bound with validate, submit, and cancel operations"
+description = "Form fields site-name, domain, timezone, bounce-rate-ceiling, visitor-floor, segment-name, custom-from, custom-to, goal-name, goal-type, goal-match-key, and import are bound with validate, submit, and cancel operations"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.6"
 name = "form_validation_stays_active"
-description = "Form validate/submit through WebMCP still surfaces the same inline validation as the visible Add site and ceiling controls; invalid submit adds no site"
+description = "Form validate/submit through WebMCP still surfaces the same inline validation as the visible Add site, Add goal, and ceiling controls; invalid submit adds no site or goal"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.7"
 name = "browse_destinations_and_filters"
-description = "Browse destinations and filters match the allowed specification including export-drawer and period/source/page/country filters"
+description = "Browse destinations and filters match the allowed specification including export-drawer, goals-view, and period/source/page/country/saved-segment/custom-range filters"
 type = "binary"
 weight = 1.0
 

@@ -105,7 +105,7 @@ weight = 1.0
 [[criterion]]
 id = "1.7"
 name = "workspace_landmarks_present"
-description = "The app exposes semantic landmarks (for example nav or tablist for the main tabs and main for the Preview/Components/Saved Themes workspace) so assistive technology can navigate the studio."
+description = "The app exposes semantic landmarks (for example nav or tablist for the main tabs and main for the Preview/Components/Saved Themes/Export workspace) so assistive technology can navigate the studio."
 type = "binary"
 weight = 1.0
 

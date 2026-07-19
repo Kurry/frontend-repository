@@ -117,7 +117,7 @@ weight = 1.0
 [[criterion]]
 id = "4.10"
 name = "import_validation_names_offending_field"
-description = "Import of a document failing the workspace field contract shows visible validation naming the offending field and changes nothing."
+description = "Import of a document failing the Workspace JSON field contract (wrong schemaVersion, missing keys, illegal status/tag/bounds, or unresolved threadId/sparkId) shows visible validation naming the offending field and changes nothing."
 type = "binary"
 weight = 1.0
 [[criterion]]

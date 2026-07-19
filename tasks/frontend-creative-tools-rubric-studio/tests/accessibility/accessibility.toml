@@ -63,14 +63,14 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "keyboard_operable_studio_controls"
-description = "Every interactive control — rail entries, header selects, accordion headers, form fields, verdict toggles, case include toggles, history entries, and the copy control — is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space), each showing a visible focus indicator when focused."
+description = "Every interactive control — rail entries, header selects, accordion headers, form fields, verdict toggles, case include toggles, history entries, Undo, Redo, Export, Import, and copy controls — is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space), each showing a visible focus indicator when focused."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
 name = "criterion_form_focus_trap_and_return"
-description = "The criterion form dialog traps focus while open, closes on Escape, and returns focus to the control that opened it."
+description = "The criterion form dialog, Export center, and Import surface trap focus while open, close on Escape, and return focus to the control that opened them."
 type = "binary"
 weight = 1.0
 
@@ -133,7 +133,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n1"
 name = "controls_unreachable_by_keyboard"
-description = "Rail entries, accordion headers, verdict toggles, case toggles, or Export/copy cannot be activated or reached via keyboard."
+description = "Rail entries, accordion headers, verdict toggles, case toggles, Undo/Redo, or Export/Import/copy cannot be activated or reached via keyboard."
 type = "binary"
 weight = 1.0
 negate = true

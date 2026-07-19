@@ -211,6 +211,42 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "4.11"
+name = "reload_mid_transfer_restores_paused"
+description = "Reloading the page while a row is Transferring restores that row as Paused at its saved progress readout — never as Transferring and never reset to zero"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "remove_all_returns_empty_state"
+description = "Selecting every queue row and clicking Remove Selected returns the queue to its empty-state message, hides the bulk action bar, and clears the select-all checkbox"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "import_rejects_invalid_transfer_fields"
+description = "Importing a Session Pack whose fileQueue contains status transferring, a bytesTransferred outside 0 to sizeBytes, or a transferLog event outside the closed enum shows validation naming the offending field and changes nothing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "zero_byte_file_completes_cleanly"
+description = "Starting a transfer for a zero-byte file completes it immediately at 100 percent with no malformed readout (no NaN, Infinity, or negative values)"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.n11"
+name = "log_rewrites_history"
+description = "Cancel, Retry, or Remove rewrites or deletes earlier transfer-log entries instead of appending new ones."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"
 description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

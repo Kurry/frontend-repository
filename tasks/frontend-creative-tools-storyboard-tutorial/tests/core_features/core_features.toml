@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "1.2"
 name = "created_scene_visible_on_board"
-description = "After creating a scene titled 'Harbor Opening' with valid required fields, the text 'Harbor Opening' is visible on the board"
+description = "After creating a scene titled 'Harbor Opening' with valid Scene field-contract fields (title, body, duration, shotType), the text 'Harbor Opening' is visible on the board with matching duration and shot-type badge"
 type = "binary"
 weight = 1.0
 
@@ -112,7 +112,7 @@ weight = 1.0
 [[criterion]]
 id = "1.8"
 name = "empty_submit_blocked_with_validation"
-description = "After submitting the create form with an empty required title or description, the visible scene count is unchanged and an inline validation message naming the empty field is shown"
+description = "After submitting the create form with an empty required title or body, the visible scene count is unchanged and an inline validation message naming the empty field is shown"
 type = "binary"
 weight = 1.0
 
@@ -248,16 +248,155 @@ weight = 1.0
 [[criterion]]
 id = "1.35"
 name = "inline_validation_before_submit_names_field"
-description = "Typing an invalid or empty value in a create-form field shows an inline validation message directly under that field, naming the field, before any submit occurs"
+description = "Typing an invalid or empty value in a create-form field (title, body, duration, or shotType) shows an inline validation message directly under that field, naming the field, before any submit occurs"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.36"
 name = "create_submit_disabled_until_valid"
-description = "In the Add Scene create form, the submit control is disabled while the required title or description field is empty or invalid, and becomes enabled once both fields hold valid values"
+description = "In the Add Scene create form, the submit control is disabled while any Scene field-contract field is empty or invalid, and becomes enabled once title, body, duration, and shotType are all valid"
 type = "binary"
 weight = 1.0
+
+
+[[criterion]]
+id = "1.37"
+name = "scene_field_contract_on_create"
+description = "Add Scene create form enforces the Scene field contract: title (1–80), body/Description (1–500), duration integer 1–300, and shotType one of wide/medium/close-up/insert/pov; submit stays disabled until valid, and a successful create shows matching title, body, duration, and shot-type badge on the new card"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "invalid_duration_or_shot_type_rejected"
+description = "Entering a duration outside 1–300 or leaving shot type unset/invalid on Add Scene shows an inline validation message naming duration or shotType, adds no scene, and leaves the visible scene count unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "total_duration_live_rollup"
+description = "The nav bar Total duration equals the sum of every scene's duration in seconds and recomputes immediately after create, edit, delete, bulk delete, or reorder"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "multi_select_bulk_delete"
+description = "Selecting at least two scenes reveals a bulk Delete selected control; confirming it removes every selected scene, renumbers survivors with no gaps, and updates Slide total and Total duration in one step"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "undo_redo_scene_mutations"
+description = "After create, edit, or delete, Undo restores the prior scenes collection, numbering, and Total duration and enables Redo; Redo reapplies the mutation; Undo/Redo disable at empty stacks; Ctrl+Z and Ctrl+Shift+Z (or Ctrl+Y) drive the same history"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "export_center_storyboard_json_and_markdown"
+description = "Export opens a center with live Storyboard JSON, Markdown shot list, and Printable outline previews plus Copy and Download on the active format; Storyboard JSON shows schemaVersion storyboard-tutorial-v1, title, viewMode (tile/list/slide), totalDuration, and scenes entries with id, title, body, duration, shotType, and order"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "export_contains_session_mutations"
+description = "After creating a scene with a distinctive title and duration, editing another scene's shot type, and switching to List, reopening Export shows those values under the field-contract keys in Storyboard JSON (viewMode list, new title/duration, updated shotType, matching totalDuration) and the Markdown shot list names the same title, shot type, and duration"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "import_round_trip_reconstructs_board"
+description = "After exporting Storyboard JSON from a mutated board, changing the board further, then Importing that JSON reconstructs scenes, view mode, and Total duration to match the export without a reload, and both Export previews match the restored state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "scene_reorder_updates_order"
+description = "Using Move earlier/later (or drag-reorder) on a scene changes board order, renumbers sequentially with no gaps, keeps Total duration unchanged, and makes Slide mode walk the new sequence"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n37"
+name = "export_omits_session_mutations"
+description = "After creating or editing a scene with distinctive field-contract values, the Storyboard JSON or Markdown export preview omits those session mutations or shows a static seeded-only document"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n38"
+name = "schema_invalid_import_mutates_board"
+description = "Importing malformed JSON or JSON that fails the StoryboardDocument field contract still changes the visible scenes collection or view mode"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n39"
+name = "undo_does_not_restore_board"
+description = "After a create, edit, or delete, activating Undo leaves the board, numbering, or Total duration unchanged from the post-mutation state"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "search_and_shot_type_filter"
+description = "The nav bar exposes a search field and shot-type chips (All plus Wide, Medium, Close-up, Insert, POV): typing a query narrows visible scenes to case-insensitive title/body matches, selecting a chip narrows to that shot type, using both intersects, a filtered-count readout shows N of M scenes, Tile/List/Slide show the same filtered subset (Slide total equals the filtered count), and clearing search plus selecting All restores the full set exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "bulk_duplicate_selected"
+description = "With two or more scenes selected, Duplicate selected appends one copy per selected scene at the end of the board in board order — each copy keeping the source body, duration, and shot type with its title suffixed (copy) — renumbers sequentially, and increases Total duration by exactly the sum of the duplicated durations in one undoable step"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "presenter_mode_playback"
+description = "Activating Present replaces the workspace with a presenter showing one scene (image, number, title, body, shot-type badge) and a countdown starting at that scene's duration in seconds; when the countdown reaches zero the presenter auto-advances and the countdown resets to the new scene's duration; a Scene N of total readout and an overall progress bar track the run; End presentation or Escape exits back to the previous view mode with the board intact"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "presenter_pause_resume_manual_advance"
+description = "In the presenter, Pause freezes the countdown and becomes Resume, resuming continues from the remaining seconds rather than restarting the scene; Right/Left arrow keys and the visible next/previous controls advance manually with the countdown resetting to the shown scene's duration; after the last scene the presenter shows a finished state with Restart and Exit rather than wrapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "printable_outline_export"
+description = "The Export center's Printable outline tab shows a print-optimized outline compiled live from the store — board title, Total duration, and one row per scene in board order with number, title, shotType label, and duration in seconds — Copy and Download work on its text, and a Print control on that tab opens the browser print preview showing the outline layout"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n40"
+name = "filter_desyncs_modes_or_total_duration"
+description = "While a search or shot-type filter is active, Tile, List, and Slide disagree about the visible subset or count, or the Total duration readout changes to a filtered sum instead of keeping the full-collection sum"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n41"
+name = "presenter_countdown_ignores_durations"
+description = "In the presenter, two scenes with clearly different duration values show identical countdown lengths or identical auto-advance timing, or the countdown is a fixed interval that ignores each scene's duration"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.catchall"

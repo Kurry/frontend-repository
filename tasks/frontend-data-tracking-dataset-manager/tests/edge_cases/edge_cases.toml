@@ -70,14 +70,14 @@ weight = 1.0
 [[criterion]]
 id = "4.2"
 name = "forms_validate_inline"
-description = "New Dataset, Add Row, threshold rule, splits, and snapshot name forms all validate inline before submit with messages naming the offending field"
+description = "New Dataset, Add Row, threshold rule, splits, snapshot name, and Import package forms all validate inline before submit with messages naming the offending field"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
 name = "errors_are_actionable"
-description = "The formula bar and import wizard errors name the actual problem (unknown column, non-numeric column, no parseable rows, percentages must sum to 100), not just 'Invalid'"
+description = "The formula bar, import wizard, and Import package errors name the actual problem (unknown column, non-numeric column, no parseable rows, percentages must sum to 100, wrong schemaVersion, missing dataset or stats), not just Invalid"
 type = "binary"
 weight = 1.0
 
@@ -206,6 +206,42 @@ weight = 1.0
 id = "4.n10"
 name = "truncation_loses_data"
 description = "A cell value longer than 80 characters is clipped with no way to see the full value in the inline editor or Edit modal"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "schema_field_contract_rejects_bad_names"
+description = "Submitting New Dataset with a schema field name containing spaces or punctuation, or a category field with empty allowedValues, shows inline validation naming the field and creates no dataset"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "row_contract_rejects_overlong_expected_output"
+description = "Submitting Add Row with expectedOutput longer than 4000 characters, or a category value outside allowedValues, shows inline validation naming the field and appends no row"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "invalid_package_import_leaves_state"
+description = "Importing malformed Dataset Package JSON, or JSON with schemaVersion other than dataset-manager.package/v1 or stats.totalRows disagreeing with rows.length, leaves the selected dataset unchanged and shows validation naming the offending field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "seeded_export_still_schema_valid"
+description = "Opening Export before any in-session edits still produces Dataset Package JSON for the selected seeded dataset with schemaVersion dataset-manager.package/v1 and every required top-level key; the drawer never shows an empty or broken region"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "bad_package_import_mutates_anyway"
+description = "Importing a Dataset Package JSON that fails the field contract still changes the selected dataset's rows, schema, or snapshots"
 type = "binary"
 negate = true
 weight = 1.0

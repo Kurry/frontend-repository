@@ -105,7 +105,7 @@ weight = 1.0
 [[criterion]]
 id = "12.7"
 name = "queries_match_allowed_spec"
-description = "Browse destinations (task-catalog, task-page, trial-viewer, reference-filesystem, trial-filesystem, annotations-list, classification-report, export-panel, command-palette), sorts (reward-asc, reward-desc), and filter step-type match the Bindings block"
+description = "Browse destinations (task-catalog, task-page, trial-viewer, reference-filesystem, trial-filesystem, annotations-list, classification-report, export-panel, command-palette), sorts (reward-asc, reward-desc), filter step-type, and value bounds including schemaVersion trajectory-viewer.review-package.v1 match the Bindings block"
 type = "binary"
 weight = 1.0
 
@@ -140,7 +140,7 @@ weight = 1.0
 [[criterion]]
 id = "12.12"
 name = "artifact_export_reflects_session_review"
-description = "After creating an annotation and submitting a classification via UI or MCP, invoking artifact.export acknowledges the live review package (same store as the visible Export panel preview)"
+description = "After creating an annotation and submitting a classification via UI or MCP, invoking artifact.export acknowledges the live review package under schemaVersion trajectory-viewer.review-package.v1 (same store as the visible Export panel preview)"
 type = "binary"
 weight = 1.0
 

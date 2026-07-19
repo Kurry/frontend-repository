@@ -77,7 +77,7 @@ weight = 1.0
 [[criterion]]
 id = "1.3"
 name = "create_signal_tower_demo_visible"
-description = "After creating an event titled Signal Tower Demo with a valid year, place, categories, summary, and detail, the text Signal Tower Demo is visible in the events list"
+description = "After creating an event titled Signal Tower Demo with valid HistoryEvent fields (type, timestamp ending with Z, mediaRefs, year, place, categories, summary, detail), the text Signal Tower Demo is visible in the events list"
 type = "binary"
 weight = 1.0
 
@@ -212,7 +212,7 @@ negate = true
 [[criterion]]
 id = "1.23"
 name = "detail_panel_fields_and_stepping"
-description = "Selecting a pin opens an in-page detail panel with a year-and-place kicker, title, category pills, summary, and detail, plus Previous/Next controls that step through the sorted filtered events with wraparound"
+description = "Selecting a pin opens an in-page detail panel with a year-and-place kicker, title, type, mediaRefs list, category pills, summary, and detail, plus Previous/Next controls that step through the sorted filtered events with wraparound"
 type = "binary"
 weight = 1.0
 
@@ -249,14 +249,14 @@ negate = true
 [[criterion]]
 id = "1.28"
 name = "create_flow_pin_appears_cross_mode"
-description = "Scripted create flow: in Library/Filter mode, note the visible event count, then submit a valid new event whose year lies inside the current year window and whose category is active. Exactly one new row appears in the Library list and any visible count increases by exactly one (measured immediately around the submit); switching back to Scrub/Explore mode then shows a new pin for that event on the stage — all without a reload"
+description = "Scripted create flow: in Library/Filter mode, note the visible event count, then submit a valid HistoryEvent (including type, Z-timestamp, mediaRefs, and detail) whose year lies inside the current year window and whose category is active. Exactly one new row appears in the Library list showing title and type and any visible count increases by exactly one (measured immediately around the submit); switching back to Scrub/Explore mode then shows a new pin for that event on the stage — all without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.29"
 name = "edit_flow_updates_list_pin_and_detail"
-description = "Scripted edit flow: edit an event's title and year, then confirm the same record updated everywhere it appears — the Library row shows the new title, the pin's position on the stage moved to reflect the new year, and an open detail panel for that event shows the edited values — without a reload"
+description = "Scripted edit flow: edit an event's title, type, mediaRefs, and year, then confirm the same record updated everywhere it appears — the Library row shows the new title and type, the pin's position on the stage moved to reflect the new year, and an open detail panel for that event shows the edited type/mediaRefs/year — without a reload"
 type = "binary"
 weight = 1.0
 
@@ -298,7 +298,7 @@ weight = 1.0
 [[criterion]]
 id = "1.35"
 name = "seed_corpus_scale_and_span"
-description = "The seeded corpus is substantial — on the order of dozens of events (target roughly 60) — spanning roughly 3200 BCE to 2024 CE, categorized under about a dozen categories (verify by fitting the full span and inspecting the Library list)"
+description = "The seeded corpus is substantial — on the order of dozens of events (target roughly 60) — spanning roughly 3200 BCE to 2024 CE across the twelve closed categories, with every seeded event carrying type, timestamp ending with Z, mediaRefs, and detail (verify by fitting the full span and inspecting Library/detail/export)"
 type = "binary"
 weight = 1.0
 
@@ -333,7 +333,7 @@ weight = 1.0
 [[criterion]]
 id = "1.40"
 name = "inline_errors_and_disabled_submit"
-description = "In the create/edit form, an inline error message naming the field appears next to an empty title, empty place, empty summary, empty detail, missing categories, or an invalid year before submit, and the submit control stays disabled until every required field is valid"
+description = "In the create/edit form, an inline error message naming the field appears next to an empty title, a type outside the closed enum, a non-Z or cross-field-invalid timestamp, empty or over-limit mediaRefs, empty place, empty summary, empty detail, missing categories, or an invalid year before submit, and the submit control stays disabled until every required field is valid"
 type = "binary"
 weight = 1.0
 
@@ -354,7 +354,7 @@ weight = 0.5
 [[criterion]]
 id = "1.43"
 name = "api_field_contract_on_create"
-description = "A valid create requires title, year (-3200 to 2024 integer), place, one or more categories from the seeded set, summary, and detail; the Library row and detail panel show those same field values for the new event"
+description = "A valid create requires the HistoryEvent contract: title, type (exactly one of First Appearance, Mass Adoption, Standardization, Obsoletion, Commemoration), ISO-8601 timestamp ending with Z that satisfies the year cross-field rule, mediaRefs (1–6 labels), year (-3200 to 2024 integer), place, one or more closed categories, summary, and detail; the Library row and detail panel show those same field values for the new event"
 type = "binary"
 weight = 1.0
 
@@ -375,7 +375,7 @@ weight = 1.0
 [[criterion]]
 id = "1.46"
 name = "bulk_set_category_and_delete"
-description = "In Library/Filter mode, checking at least 2 rows and applying bulk Set category adds the chosen category to each checked event; bulk Delete with confirm removes every checked row and the visible count drops by exactly that number"
+description = "In Library/Filter mode, checking at least 2 rows and applying bulk Set category merges the chosen closed-enum category into each checked event without removing unrelated tags; bulk Delete with confirm removes every checked row and the visible count drops by exactly that number"
 type = "binary"
 weight = 1.0
 
@@ -389,7 +389,7 @@ weight = 1.0
 [[criterion]]
 id = "1.48"
 name = "export_drawer_json_csv_live"
-description = "Export timeline opens a drawer with Timeline JSON and Events CSV tabs compiled live from the store; after creating Signal Tower Demo and Evening Broadcast, both titles appear in the JSON events array and the CSV text, and totals.eventCount equals the live collection length"
+description = "Export timeline opens a drawer with Timeline JSON and Events CSV tabs compiled live from the store; after creating Signal Tower Demo (type First Appearance, timestamp 1920-01-01T00:00:00.000Z, mediaRefs containing signal-tower-demo) and Evening Broadcast (type Mass Adoption), both titles appear in the JSON events array with matching type/timestamp/mediaRefs, document is media-history-timeline, CSV contains both titles under the contract header, and totals.eventCount equals the live collection length"
 type = "binary"
 weight = 1.0
 
@@ -418,7 +418,43 @@ negate = true
 [[criterion]]
 id = "1.52"
 name = "import_malformed_mutates_state"
-description = "Importing malformed JSON or a pack missing required event fields silently changes the collection or filters without a visible inline error naming the import field"
+description = "Importing malformed JSON, document not media-history-timeline, or a pack missing required HistoryEvent fields silently changes the collection or filters without a visible inline error naming the import field"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.53"
+name = "export_events_carry_api_fields"
+description = "After a valid create, the Timeline JSON events entry for that event includes type from the closed enum, timestamp ending with Z, mediaRefs as a non-empty array, and detail, matching the submitted HistoryEvent payload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.54"
+name = "csv_header_matches_history_event_contract"
+description = "The Events CSV tab header is exactly title,type,timestamp,mediaRefs,year,place,categories,summary,detail with categories pipe-joined and mediaRefs semicolon-joined on data lines"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.55"
+name = "closed_type_and_category_enums"
+description = "Create/edit type choices are limited to First Appearance, Mass Adoption, Standardization, Obsoletion, and Commemoration, and category filters expose exactly the twelve closed labels Oral Culture, Manuscript, Print Press, Telegraph, Telephone, Radio, Television, Recording, Computing, Networks, Mobile, and Social Media"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.56"
+name = "timestamp_year_cross_field_enforced"
+description = "Submitting a CE year with a timestamp whose UTC calendar year does not equal that year, or a BCE year with a timestamp other than 0001-01-01T00:00:00.000Z, shows an inline error naming timestamp or year and does not add an event"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.57"
+name = "export_drops_type_timestamp_or_media_refs"
+description = "After creating an event, the export JSON events entry for it omits type, timestamp ending with Z, or mediaRefs while the Library shows the created event"
 type = "binary"
 weight = 1.0
 negate = true

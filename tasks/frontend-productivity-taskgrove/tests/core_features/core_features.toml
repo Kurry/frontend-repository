@@ -147,7 +147,7 @@ weight = 1.0
 [[criterion]]
 id = "1.13"
 name = "blank_title_rejected_root_and_child"
-description = "Submitting the New Root Task input with a blank or whitespace-only title is rejected with a visible inline error naming the title field and no blank-titled root is added; submitting Add Child with a blank title is rejected the same way and adds nothing"
+description = "Submitting New root task or Add Child with a blank or whitespace-only title is rejected with a visible inline error naming the title field and adds no task"
 type = "binary"
 weight = 1.0
 
@@ -178,7 +178,7 @@ negate = true
 [[criterion]]
 id = "1.28"
 name = "create_children_complete_chain_flow"
-description = "Starting from an empty tree: create a root task via the footer input with a valid title and confirm exactly one new tree appears, the empty-state message disappears, a confirmation toast shows, and the Export grove JSON preview includes that task's title; add two children via Add Child and confirm both render indented beneath the root and the root grows a progress ring at 0 percent; toggle both children complete and confirm the ring rises live through the intermediate percentage to the 100 percent checkmark treatment and the parent is marked complete automatically, all without any page reload"
+description = "Starting from an empty tree: create a root via the footer form with a valid title, status, priority, and optional dueDate; confirm exactly one new tree appears, the empty-state disappears, a toast shows, and both Export grove JSON and CSV previews include that title, status, and priority; add two children via Add Child and confirm both render indented with a 0 percent progress ring on the parent; toggle both children complete and confirm the ring reaches the 100 percent checkmark, the parent completes automatically, each leaf status becomes done, and both export previews update, all without reload"
 type = "binary"
 weight = 1.0
 
@@ -192,7 +192,7 @@ weight = 1.0
 [[criterion]]
 id = "1.30"
 name = "tag_lifecycle_filter_refresh_chain_flow"
-description = "Create a tag in the Tag manager with a valid name and a closed-enum hex color and confirm one chip appears in the manager's list and one matching filter chip appears in the toolbar row; attach it to a node and confirm the node's row shows the chip in the same color; toggle the toolbar filter chip on and confirm the tree narrows to branches containing that node with ancestors auto-expanded, then toggle it off and confirm the full tree returns; after a full page refresh the tag still exists in the manager, on the node's row, and in the filter row with the same color; the Export grove JSON preview includes that tag's name and color"
+description = "Create a tag in the Tag manager with a valid name and a closed-enum hex color and confirm chips appear in the manager and toolbar; attach it to a node; toggle the toolbar filter on then off; after refresh the tag still exists with the same color; both Export grove JSON and CSV previews include that tag name (JSON also shows the closed-enum color)"
 type = "binary"
 weight = 1.0
 
@@ -213,7 +213,7 @@ weight = 1.0
 [[criterion]]
 id = "1.33"
 name = "tag_manager_field_contract_validation"
-description = "In the Tag manager's tag-creation form, a blank tag name shows an inline error naming the name field before submit, the submit control stays inactive until name and color are valid per the Tag create field contract, and no blank-named tag is added"
+description = "In the Tag manager create form, a blank or over-40-character tag name shows an inline error naming name, a duplicate name is rejected naming name, a color outside the closed hex enum is rejected naming color, submit stays inactive until valid per the TagUpsert field contract, and no invalid tag is added"
 type = "binary"
 weight = 1.0
 
@@ -240,15 +240,15 @@ weight = 1.0
 
 [[criterion]]
 id = "1.37"
-name = "grove_package_api_shaped_field_contract"
-description = "After creating at least one task and one tag and switching theme, the Export grove JSON preview is a single object whose visible text includes the required Grove package field contract: schemaVersion 1; theme exactly light, dark, or forest; a tags array entry with name and a closed-enum hex color; and a tasks array entry with title, completed, collapsed, tags, and children keys"
+name = "grove_json_api_shaped_field_contract"
+description = "After creating a task with status, priority, and optional dueDate, creating a tag, and switching theme, the Grove JSON preview is a single object whose visible text includes schemaVersion exactly 1, exportedAt ending in Z, theme exactly light|dark|forest, an archive array key, a tags entry with name and closed-enum hex color, and a tasks entry with title, status, priority, dueDate, completed, collapsed, tags, and children"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.38"
 name = "grove_export_import_round_trip"
-description = "After mutating tasks, a tag, and theme, Download or Copy the Grove package JSON then Import that same document and confirm the main tree titles, Tag manager chip, Archive panel, theme, and Export grove preview match the pre-export session"
+description = "After mutating tasks (including status or priority), a tag, archive, and theme, Download or Copy Grove JSON then Import that document and confirm main tree titles, status/priority, Tag manager chip, Archive panel, theme, and both Grove JSON and CSV previews match the pre-export session"
 type = "binary"
 weight = 1.0
 
@@ -262,10 +262,31 @@ weight = 1.0
 [[criterion]]
 id = "1.40"
 name = "export_omits_session_mutations"
-description = "After creating a task and a tag and changing theme, the Export grove JSON preview omits the new task title, the new tag name or color, or the chosen theme"
+description = "After creating a task with a distinctive title and status, creating a tag, and changing theme, the Grove JSON preview omits the new task title or status, the new tag name or color, or the chosen theme"
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "1.41"
+name = "grove_csv_mirrors_task_upsert_fields"
+description = "After creating a root with title, status, priority, and a YYYY-MM-DD dueDate, the Grove CSV preview shows a header row exactly id,title,status,priority,dueDate,parentId,completed,collapsed,tags,archived and a data row carrying that title, status, priority, and dueDate"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "edit_task_status_priority_due_date"
+description = "Using Edit task to set status to blocked, priority to urgent, and dueDate to a YYYY-MM-DD value updates the node row immediately and appears under the same keys in both Grove JSON and Grove CSV previews without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "invalid_status_priority_due_date_rejected"
+description = "Submitting New root task, Add Child, or Edit task with status outside todo|in_progress|done|blocked, priority outside low|medium|high|urgent, or dueDate not empty and not YYYY-MM-DD shows an inline error naming the offending field and saves nothing"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "1.catchall"

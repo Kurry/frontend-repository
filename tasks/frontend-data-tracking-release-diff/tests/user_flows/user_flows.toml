@@ -97,22 +97,22 @@ weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "diff_or_timeline_empty_state"
+description = "Edge: when a diff pair or filter matches nothing, and in any list region with no entries, a designed empty state explains what belongs there instead of a blank region."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "splits_view_and_diff_summary_coherence"
+description = "Filter/derived views: Splits composition bars and Diff summary strip counts update immediately when the selected version or diff pair changes; they stay consistent with the shared manifests."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "sidebar_and_export_panel_continuity"
+description = "Chrome: the releases sidebar stays usable while Cut release, Export release pack, and Import release pack panels open and close; returning to the sidebar keeps the selected sealed version."
 type = "binary"
 weight = 1.0
 
@@ -132,84 +132,83 @@ weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "cut_diff_rotation_unavailable"
+description = "Cut release, Diff pickers, Advance rotation, or Export/Import release pack cannot be completed from the visible UI."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "sealed_cut_missing_or_duplicated"
+description = "After a successful seal, the new version fails to appear in the sidebar, appears duplicated, or Export omits it."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "diff_rotation_export_desync"
+description = "After a cut or rotation advance, sidebar selection, timeline events, and Export Release pack JSON disagree about versions or rotation.cycle."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "view_switch_loses_diff_or_version"
+description = "Switching Manifest/Diff/Splits/Rotation breaks layout or loses the selected version or diff picker pair while the session is open."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_diff_or_list_breaks_ui"
+description = "A no-match diff/filter or empty list region is blank/broken with no designed empty-state message."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "diff_counts_disagree_across_surfaces"
+description = "Diff summary strip counts disagree with the visible row classifications for the same base/compare pair."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "export_or_cut_panel_cannot_reopen"
+description = "After closing Cut release or Export/Import release pack, those panels cannot be reopened from their controls."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "cut_or_export_overlay_blocks_exit"
+description = "Cut release, Export, or Import panels block navigation with no cancel/close path."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "failed_cut_or_import_silent"
+description = "An invalid cut submit, failed rank-stability step, or contract-invalid Import provides no visible named-field or status feedback."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "release_diff_dead_end_requires_reload"
+description = "A Larkspur Releases flow leaves a dead end that requires a full page reload to continue."
 type = "binary"
 negate = true
 weight = 1.0
-
 
 [[criterion]]
 id = "6.11"

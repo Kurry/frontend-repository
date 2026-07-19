@@ -148,6 +148,51 @@ type = "binary"
 negate = true
 weight = 1.0
 
+
+[[criterion]]
+id = "14.9"
+name = "export_contains_session_create"
+description = "Full-pipeline export probe: measure collection, create a valid scene with a unique title and body meeting the field contract, open Export immediately — markdown/json/outline previews contain that exact title and body text, and the json scenes array includes a matching request-body object (session work product, not a seed-only snapshot)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "import_export_round_trip_probe"
+description = "Round-trip probe: create a scene, Download/copy StoryboardPackage JSON, delete all scenes (empty state), Import the package — collection count, Tile/List/Slide titles, and a fresh json export reconstruct to the imported document without reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.11"
+name = "undo_round_trip_after_create"
+description = "Undo round-trip: create a valid scene (count +1), Undo (count restored, title gone), Redo (same title returns) — proving mutations are reversible from live store state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.12"
+name = "filter_derived_view_sensitivity"
+description = "Derived-view sensitivity: create a scene with status review and a unique title, set status filter to draft — the new scene disappears; set filter to review or All — it reappears; search for its unique title with All selected shows only that match across modes."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "export_identical_after_create"
+description = "Creating a scene with a unique title and body leaves the Export markdown/json/outline visually identical to the pre-create export (derived artifact ignoring session mutations)."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n6"
+name = "import_fails_to_restore"
+description = "After Import of a valid previously exported StoryboardPackage, the board count or titles diverge from the imported document."
+type = "binary"
+negate = true
+weight = 1.0
+
 [[criterion]]
 id = "behavioral.catchall"
 name = "behavioral_catchall"

@@ -210,6 +210,22 @@ type = "binary"
 negate = true
 weight = 1.0
 
+
+[[criterion]]
+id = "7.11"
+name = "export_import_palette_usable_at_375"
+description = "At 375px width Export, Import, Command palette, Undo/Redo, status filter, and search remain reachable and operable without page-level horizontal scrolling or overlay clipping."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.n11"
+name = "export_or_palette_offscreen_at_375"
+description = "At 375px, the export drawer or command palette renders off-screen or is unreachable."
+type = "binary"
+negate = true
+weight = 1.0
+
 [[criterion]]
 id = "responsiveness.catchall"
 name = "responsiveness_catchall"

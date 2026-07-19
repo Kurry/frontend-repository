@@ -91,7 +91,7 @@ weight = 1.0
 [[criterion]]
 id = "9.5"
 name = "derived_recomputes_feel_instant"
-description = "Formula results, threshold flags, pivot summaries, and export text recompute without perceptible lag after an edit"
+description = "Formula results, threshold flags, pivot summaries, and Dataset Package JSON / Rows CSV export text recompute without perceptible lag after an edit"
 type = "binary"
 weight = 1.0
 

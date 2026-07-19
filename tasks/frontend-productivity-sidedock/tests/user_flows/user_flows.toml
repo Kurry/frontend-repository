@@ -76,140 +76,139 @@ weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "inline_rename_updates_tree_and_pins"
+description = "Edit flow: renaming a bookmark or folder inline (Enter to save) updates the tree row immediately; if the bookmark is pinned, the Pinned tile title updates too without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "delete_folder_removes_contained_bookmarks"
+description = "Delete flow: confirming Delete on a folder removes the folder and every bookmark it contained; search for a contained title returns no match; the package preview no longer contains those nodes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "workspace_and_sidebar_view_switch"
+description = "View/mode switch: creating/switching workspace tabs swaps the folder/bookmark tree; toggling Show sidebar view narrows to 375px and back while keeping the active workspace."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "zero_workspaces_and_empty_workspace_states"
+description = "Edge: with zero workspaces the Welcome to SideDock empty state with Create workspace is visible; an empty workspace shows a distinct prompt to add the first bookmark."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "search_scope_current_vs_all_workspaces"
+description = "Search/filter: with two workspaces each holding a bookmark, scoping search to all workspaces while workspace A is active shows workspace B's match; switching scope back to current workspace removes it without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "package_panel_preserves_workspace"
+description = "Package chrome: Export/Import SideDock package panels open and close without losing workspace tabs, tree selection, or Pinned row; reopening Export still reflects the session."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "delete_confirm_and_package_overlays"
+description = "Overlays: Delete confirmation and SideDock package Export/Import panels support their flows and dismiss without trapping the app."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "pin_limit_and_import_recover_without_reload"
+description = "Recovery: attempting a ninth pin is blocked with an eight-item limit message; a rejected package import shows a visible error and leaves the session unchanged — no reload required."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "sidedock_flows_unavailable"
+description = "Create workspace, Add bookmark, inline rename, Delete, pin, or package Export/Import cannot be completed from the visible UI."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "bookmark_or_workspace_missing_or_duplicated"
+description = "After a valid Add bookmark or Create workspace, the new row/tab fails to appear, appears duplicated, or package preview omits it."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "rename_pin_or_package_desync"
+description = "After rename, pin, or accentColor change, tree row, Pinned tile, workspace tab, and package preview disagree about the same values."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "workspace_or_sidebar_switch_breaks"
+description = "Switching workspace tabs or Show sidebar view breaks layout or loses the active workspace unexpectedly."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_sidedock_breaks_ui"
+description = "Zero-workspace or empty-workspace states are blank/broken with no welcoming empty-state copy."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "search_scopes_disagree"
+description = "Current-workspace vs all-workspaces search scopes disagree about matches, or clearing search fails to restore the full tree."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "package_panel_cannot_reopen"
+description = "After closing Export/Import SideDock package, the package controls cannot reopen the panel."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "delete_or_package_overlay_blocks_exit"
+description = "Delete confirmation or package panels block navigation with no cancel/close path."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "failed_bookmark_or_import_silent"
+description = "An invalid Add bookmark/Create workspace submit or contract-invalid package Import provides no visible named-field or import error feedback."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "sidedock_dead_end_requires_reload"
+description = "A SideDock flow leaves a dead end that requires a full page reload to continue."
 type = "binary"
 negate = true
 weight = 1.0
-
 
 [[criterion]]
 id = "6.11"

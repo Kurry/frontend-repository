@@ -226,6 +226,13 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "4.12"
+name = "mirror_center_cell_records_once"
+description = "With mirrorMode Horizontal or Vertical on an odd-width grid, painting the center cell (partner coincides with itself) writes that cell only once and a single Undo reverts it."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"
 description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

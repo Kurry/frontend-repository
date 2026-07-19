@@ -70,14 +70,14 @@ weight = 1.0
 [[criterion]]
 id = "4.2"
 name = "empty_name_description_inline_before_submit"
-description = "Submitting the criterion form with an empty name or description shows inline messages naming those fields before a successful add, and no criterion is added — the criteria count is unchanged."
+description = "Submitting the criterion form with an empty name or description, an id that violates the allowed pattern, a weight outside 0.5-5, or an importance outside must-have|nice-to-have shows inline messages naming those fields before a successful add, and no criterion is added — the criteria count is unchanged."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
 name = "validation_names_field_not_bare_invalid"
-description = "Criterion-form and version-bump validation copy names the offending field or violation kind (for example name, description, id, minor bump required, major bump required) rather than only saying Invalid."
+description = "Criterion-form, version-bump, and import validation copy names the offending field or violation kind (for example name, description, id, schemaVersion, library, minor bump required, major bump required) rather than only saying Invalid."
 type = "binary"
 weight = 1.0
 
@@ -206,6 +206,35 @@ negate = true
 id = "4.n10"
 name = "cancel_still_mutates_rubric"
 description = "Cancel on the criterion form or Cancel on a pending version bump still changes the rubric criteria, version, or history."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.11"
+name = "import_rejects_nonconforming_package"
+description = "Importing malformed JSON or parseable JSON that fails the RubricPackage field contract (schemaVersion not rubric-package-v1, library not Rubric Studio, missing rubrics/generatedAt, or invalid CriterionUpsert) leaves the rubric collection unchanged and shows a visible error naming the offending field or that the package is invalid."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "undo_redo_disabled_when_stacks_empty"
+description = "With an empty undo history, Undo is disabled; with an empty redo stack, Redo is disabled — neither control silently no-ops while appearing enabled."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "export_empty_criteria_still_shows_schema_keys"
+description = "After deleting all criteria (each with major bump), Export center still opens and shows artifacts that include schemaVersion rubric-document-v1 / rubric-package-v1 and the required keys rather than crashing; Download and Copy remain available."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "invalid_import_mutates_collection"
+description = "A non-conforming Import package mutates the rail or criteria collection despite failing the RubricPackage field contract."
 type = "binary"
 weight = 1.0
 negate = true

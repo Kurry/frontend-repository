@@ -119,7 +119,7 @@ weight = 1.0
 [[criterion]]
 id = "10.9"
 name = "all_views_reachable"
-description = "All documented views (annotation card, Taxonomy, Review queue, Agreement, Export, History) are reachable from the UI and render completely"
+description = "All documented views (annotation card, Taxonomy, Review queue, Agreement, Export, History) are reachable from the UI and render completely, including Import on the Labels JSON export surface"
 type = "binary"
 weight = 1.0
 
@@ -131,10 +131,25 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "10.11"
+name = "field_contract_validation_visible"
+description = "AnnotationCreate, TaxonomyClassCreate, MetadataFieldCreate, DisputeCreate, and Import validation failures show inline messages naming the offending field (for example rating, shortcut, reason, or schemaVersion) before any state mutation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.12"
+name = "export_import_end_state_coherent"
+description = "Download Labels JSON / JSONL and Copy export reflect session annotations, taxonomy, regions, metadata, and review states; Import of a conforming LabelsPackage restores the same visible state without leaving localStorage or sessionStorage populated"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "10.n1"
 name = "storage_violation"
 description = "localStorage, sessionStorage, or another browser storage API is non-empty after exercising the app"
 type = "binary"
+negate = true
 weight = 1.0
 
 [[criterion]]
@@ -142,6 +157,7 @@ id = "10.n2"
 name = "views_desync"
 description = "The same datum shows different values in two places — for example the sidebar remaining count disagrees with the export Stats summary for the same suite"
 type = "binary"
+negate = true
 weight = 1.0
 
 [[criterion]]
@@ -149,6 +165,7 @@ id = "10.n3"
 name = "console_errors_during_flows"
 description = "Console errors or unhandled rejections appear during normal flows"
 type = "binary"
+negate = true
 weight = 1.0
 
 [[criterion]]
@@ -156,13 +173,23 @@ id = "10.n4"
 name = "outbound_request_observed"
 description = "An outbound network request to a non-local origin occurs at any point"
 type = "binary"
+negate = true
 weight = 1.0
 
 [[criterion]]
 id = "10.n5"
 name = "interaction_throws_runtime_error"
-description = "A specific interaction (drawing a region, undoing a bulk action, filtering the timeline) throws a runtime exception observable in the console, even if the UI limps on"
+description = "A specific interaction (drawing a region, undoing a bulk action, filtering the timeline, importing Labels JSON) throws a runtime exception observable in the console, even if the UI limps on"
 type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "10.n6"
+name = "field_errors_generic_only"
+description = "Form or Import validation failures show only a generic rejection without naming the offending field required by the field contracts"
+type = "binary"
+negate = true
 weight = 1.0
 
 [[criterion]]

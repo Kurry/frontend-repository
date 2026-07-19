@@ -70,14 +70,14 @@ weight = 1.0
 [[criterion]]
 id = "9.2"
 name = "console_clean_during_studio_flows"
-description = "No console errors or warnings appear during a full exercise of painting, saving, loading, filtering, and mode switching."
+description = "No console errors or warnings appear during a full exercise of painting, saving, loading, filtering, Export, Import, and mode switching."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
 name = "paint_strokes_respond_immediately"
-description = "Continuous drag-painting across many cells stays smooth with no visible lag between pointer movement and cells filling (UI response under ~100ms)."
+description = "Continuous drag-painting across many cells stays smooth with no visible lag between pointer movement and cells filling (UI response under ~100ms), including when mirrorMode is Horizontal or Vertical."
 type = "binary"
 weight = 1.0
 

@@ -63,21 +63,21 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "6.1"
 name = "create_flow_updates_all_surfaces"
-description = "Create flow: submitting a valid new event adds exactly one Library row, increases the visible count by one, updates the category tally, and shows a stage pin when in range — without reload"
+description = "Create flow: submitting a valid HistoryEvent (title, type, timestamp, mediaRefs, year, place, categories, summary, detail) adds exactly one Library row showing title and type, increases the visible count by one, updates the category tally, and shows a stage pin when in range — without reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
 name = "invalid_create_shows_inline_validation"
-description = "Create flow: empty title, empty place, empty summary, empty detail, missing categories, or invalid year triggers immediate inline validation naming the field and adds no event"
+description = "Create flow: empty title, type outside the closed enum, non-Z or cross-field-invalid timestamp, empty mediaRefs, empty place, empty summary, empty detail, missing categories, or invalid year triggers immediate inline validation naming the field and adds no event"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
 name = "edit_flow_updates_related_displays"
-description = "Edit flow: editing title or year updates the Library row, pin position when year changed, open detail, and a subsequent export's matching event object without reload"
+description = "Edit flow: editing title, type, timestamp, mediaRefs, or year updates the Library row, pin position when year changed, open detail (including type and mediaRefs), and a subsequent export's matching event object without reload"
 type = "binary"
 weight = 1.0
 
@@ -133,7 +133,7 @@ weight = 1.0
 [[criterion]]
 id = "6.11"
 name = "bulk_flow_updates_list_and_stage"
-description = "Bulk flow: checking at least 2 rows and applying bulk Set category updates each checked event's categories in the list and on the stage; bulk Delete with confirm removes every checked row and drops the count by exactly that number"
+description = "Bulk flow: checking at least 2 rows and applying bulk Set category merges the chosen closed-enum category into each checked event's categories without removing unrelated tags; bulk Delete with confirm removes every checked row and drops the count by exactly that number"
 type = "binary"
 weight = 1.0
 
@@ -147,14 +147,14 @@ weight = 1.0
 [[criterion]]
 id = "6.13"
 name = "export_flow_contains_session_titles"
-description = "Export flow: after creating Signal Tower Demo and Evening Broadcast, open Export timeline — JSON events contain both titles, totals.eventCount matches the live collection length, yearWindow matches the scrubber, CSV contains both titles, and Copy shows Copied"
+description = "Export flow: after creating Signal Tower Demo with type First Appearance, timestamp 1920-01-01T00:00:00.000Z, mediaRefs containing signal-tower-demo, and Evening Broadcast with type Mass Adoption, open Export timeline — JSON events contain both titles with matching type/timestamp/mediaRefs, document is media-history-timeline, totals.eventCount matches the live collection length, yearWindow matches the scrubber, CSV contains both titles under the contract header, and Copy shows Copied"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.14"
 name = "import_round_trip_flow"
-description = "Import round-trip: export JSON after mutations, clear to empty/user-cleared, Import that JSON — Library, pins, year window, filters, and tally reconstruct, and a fresh export's events array matches"
+description = "Import round-trip: export JSON after mutations, clear to empty/user-cleared, Import that JSON — Library titles/types/mediaRefs, pins, year window, filters, and tally reconstruct, and a fresh export's events array matches"
 type = "binary"
 weight = 1.0
 
@@ -167,59 +167,59 @@ weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "timeline_event_flows_unavailable"
+description = "Create, edit, delete, bulk Set category/Delete, or Export/Import timeline cannot be completed from the visible UI."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "new_event_missing_or_duplicated"
+description = "After a valid HistoryEvent create, the Library list is missing the new title, shows a duplicated row for it, or the stage lacks a pin for an in-window category-active event."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "library_stage_export_desync"
+description = "After create/edit/delete, the Library row, stage pin, detail panel, category tally, and Timeline JSON export disagree about the same event."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "scrub_library_switch_breaks"
+description = "Switching Scrub/Explore and Library/Filter breaks the stage layout or loses the selected pin/detail unexpectedly."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_events_break_ui"
+description = "After deleting all user-managed events (or filtering to zero), the Library/stage region is blank/broken with no designed empty-state message."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "category_year_filters_disagree"
+description = "Category filters, search, and year-window scrubber disagree about which events appear on the stage vs Library, or Reset filters fails to restore defaults."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "filters_or_export_drawer_cannot_reopen"
+description = "After closing Filters, About, or Export/Import timeline drawers, those controls cannot reopen their panels."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "6.n8"
@@ -231,19 +231,19 @@ negate = true
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "failed_create_or_import_silent"
+description = "An invalid HistoryEvent submit or contract-invalid Import provides no visible named-field or import error feedback."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "timeline_dead_end_requires_reload"
+description = "A Media History Timeline flow leaves a dead end that requires a full page reload to continue exploring or exporting."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "6.n11"

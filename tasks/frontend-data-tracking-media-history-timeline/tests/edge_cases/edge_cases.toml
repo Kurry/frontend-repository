@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "4.2"
 name = "forms_validate_inline"
-description = "Inline validation appears on create/edit before submit for empty title, place, summary, detail, missing categories, and invalid year, naming each field"
+description = "Inline validation appears on create/edit before submit for empty title, type outside the closed enum, non-Z or cross-field-invalid timestamp, empty mediaRefs, empty place, summary, detail, missing categories, and invalid year, naming each field"
 type = "binary"
 weight = 1.0
 
@@ -154,7 +154,7 @@ weight = 1.0
 [[criterion]]
 id = "4.14"
 name = "malformed_import_rejected"
-description = "Importing malformed JSON or a pack missing required keys/fields shows an inline error naming the import field and leaves collection, filters, and stage unchanged"
+description = "Importing malformed JSON, document not media-history-timeline, or a pack missing required HistoryEvent fields (bad type, non-Z timestamp, empty mediaRefs, year/timestamp mismatch, or empty detail) shows an inline error naming the import field and leaves collection, filters, and stage unchanged"
 type = "binary"
 weight = 1.0
 
@@ -168,7 +168,7 @@ weight = 1.0
 [[criterion]]
 id = "4.16"
 name = "empty_export_still_valid_shape"
-description = "With an empty user-managed set (or empty collection where allowed), Export still produces JSON with version 1, live yearWindow/filters, events covering remaining rows or empty, and totals that match; Copy still shows Copied"
+description = "With an empty user-managed set (or empty collection where allowed), Export still produces JSON with version 1, document media-history-timeline, live yearWindow/filters, events covering remaining rows (each carrying type, timestamp, and mediaRefs) or empty, and totals that match; Copy still shows Copied"
 type = "binary"
 weight = 1.0
 
@@ -267,6 +267,20 @@ description = "A malformed import partially applies some fields while leaving ot
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "4.17"
+name = "media_refs_bounds_rejected"
+description = "Submitting create with zero mediaRefs or more than six mediaRefs shows an inline error naming mediaRefs and does not increase the events count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.18"
+name = "wrong_document_import_rejected"
+description = "Importing a Timeline JSON whose document field is not exactly media-history-timeline shows an inline error naming document or the import field and leaves the collection unchanged"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "edge_cases.catchall"

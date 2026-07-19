@@ -119,7 +119,7 @@ weight = 1.0
 [[criterion]]
 id = "14.9"
 name = "full_pipeline_to_export_import"
-description = "Full-pipeline probe: open a task, sort by reward descending, open the top trial, annotate a late step, submit a valid classification, open Export and confirm Review JSON carries those values, Copy export with confirmation, then import that JSON after clearing the session edits and confirm the annotations list and report card match the imported package"
+description = "Full-pipeline probe: open a task, sort by reward descending, open the top trial, annotate a late step, submit a valid classification, open Export and confirm Review JSON shows schemaVersion exactly trajectory-viewer.review-package.v1 and carries those values, Copy export with confirmation, then import that JSON after clearing the session edits and confirm the annotations list and report card match the imported package"
 type = "binary"
 weight = 1.0
 

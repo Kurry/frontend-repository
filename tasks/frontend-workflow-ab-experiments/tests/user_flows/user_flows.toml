@@ -62,15 +62,15 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_experiment_appears_everywhere"
-description = "Create flow: an experiment created through the designer appears in the library table with its name, variant titles, sample size, and Pending badge, and its Edit prefill matches what was entered."
+name = "create_experiment_upsert_everywhere"
+description = "Create flow: submitting a valid ExperimentUpsert through the designer adds a Pending library row whose name, variant titles, sample size, and Edit prefill match the submitted payload fields."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_designer_inline_validation"
-description = "Create flow: submitting the designer with an empty name or hypothesis, or allocations not summing to 100, triggers immediate inline validation naming the field or rule, before any experiment is added."
+name = "invalid_upsert_inline_validation"
+description = "Create flow: submitting the designer with an empty name or hypothesis, a model outside the closed enum, a temperature outside 0 to 2, or allocations not summing to 100 triggers immediate inline validation naming the field or rule, before any experiment is added."
 type = "binary"
 weight = 1.0
 
@@ -118,8 +118,8 @@ weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "dialogs_support_expected_flows"
-description = "Overlays: the designer, preview playground, decision dialog, and confirmation dialogs open, complete, and cancel as expected without losing surrounding state."
+name = "dialogs_and_export_import_flows"
+description = "Overlays: the designer, preview playground, decision dialog, Export report panel with Copy/Download/Import, and confirmation dialogs open, complete, and cancel as expected without losing surrounding state."
 type = "binary"
 weight = 1.0
 
@@ -127,6 +127,21 @@ weight = 1.0
 id = "6.10"
 name = "recovery_without_reload"
 description = "Recovery: canceling the designer mid-edit, dismissing a confirmation, or closing the panel never dead-ends the app; every flow is recoverable without a reload."
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "6.11"
+name = "export_after_mutations_flow"
+description = "Export after mutations: flag one outlier on a completed experiment, open Export report, and confirm statistics and flaggedResponseIds reflect the flag; decide with a rationale, reopen Export, and confirm status is decided and decision carries the choice and rationale with schemaVersion ab-experiment-report-v1."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "import_round_trip_flow"
+description = "Import round trip: Download a contract-valid experiment-report.json after a flag and decision, reload to seeded state, Import it, and confirm decision, flags, statistics, and a fresh export reconstruct; Import of schemaVersion other than ab-experiment-report-v1 leaves state unchanged with a named-field error."
 type = "binary"
 weight = 1.0
 
@@ -149,7 +164,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n3"
 name = "state_changes_desync_displays"
-description = "A flag, decision, or edit is not synced across the library, panel, and export surfaces."
+description = "A flag, decision, or edit is not synced across the library, panel, and Export report JSON preview."
 type = "binary"
 negate = true
 weight = 1.0

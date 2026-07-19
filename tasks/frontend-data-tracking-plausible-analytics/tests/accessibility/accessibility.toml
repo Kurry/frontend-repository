@@ -91,21 +91,21 @@ weight = 1.0
 [[criterion]]
 id = "1.5"
 name = "dialogs_trap_focus"
-description = "Add site and the export drawer trap focus while open, close on Escape, and return focus to the opener"
+description = "Add site, Add goal, and the export drawer trap focus while open, close on Escape, and return focus to the opener"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
 name = "validation_assistive"
-description = "Inline validation for Add site, bounce-rate ceiling, and import is exposed to assistive technology as well as shown visually"
+description = "Inline validation for Add site, Add goal, bounce-rate ceiling, and import is exposed to assistive technology as well as shown visually"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
 name = "high_bounce_and_chips_not_color_only"
-description = "High bounce and compare percent-change chips convey state with text in addition to color"
+description = "High bounce, Low traffic, and compare percent-change chips convey state with text in addition to color"
 type = "binary"
 weight = 1.0
 
@@ -119,7 +119,7 @@ weight = 1.0
 [[criterion]]
 id = "1.9"
 name = "form_labels_present"
-description = "Add site fields (site name, domain, timezone) and the bounce-rate ceiling control have visible labels associated with their inputs"
+description = "Add site fields (site name, domain, timezone), Add goal fields (name, goal_type, match_key), and the bounce-rate ceiling control have visible labels associated with their inputs"
 type = "binary"
 weight = 1.0
 

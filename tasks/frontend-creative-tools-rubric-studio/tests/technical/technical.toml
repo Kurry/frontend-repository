@@ -63,14 +63,14 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "4.1"
 name = "shared_state_coherence"
-description = "All surfaces derive from one shared collection: a saved criterion edit, add, or delete is immediately reflected in the accordion list, header rollups, rail badge and counts, Tune bars, preview panel, and export text without a reload, and no surface shows stale data another surface already updated"
+description = "All surfaces derive from one shared collection: a saved criterion edit, add, or delete is immediately reflected in the accordion list, header rollups, rail badge and counts, Tune bars, preview panel, and Export center structured-text / rubric-json / package-json previews without a reload, and no surface shows stale data another surface already updated"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
 name = "no_storage_reload_seeded"
-description = "localStorage and sessionStorage remain empty after adding, editing, and deleting criteria, saving version bumps, toggling cases and verdicts, and exporting, and a page reload returns the app to its seeded baseline"
+description = "localStorage and sessionStorage remain empty after adding, editing, and deleting criteria, saving version bumps, toggling cases and verdicts, exporting, importing, and undoing, and a page reload returns the app to its seeded baseline"
 type = "binary"
 weight = 1.0
 
@@ -93,7 +93,7 @@ negate = true
 [[criterion]]
 id = "4.3"
 name = "console_clean_full_exercise"
-description = "The console is free of errors, warnings, and unhandled promise rejections on load and stays clean through adding, editing, deleting, version-gated saves, diff viewing, tuning, preview toggling, and export"
+description = "The console is free of errors, warnings, and unhandled promise rejections on load and stays clean through adding, editing, deleting, version-gated saves, diff viewing, tuning, preview toggling, export, import, and undo/redo"
 type = "binary"
 weight = 1.0
 
@@ -107,28 +107,42 @@ weight = 1.0
 [[criterion]]
 id = "4.5"
 name = "rapid_input_stability"
-description = "Under rapid repeated input (fast verdict toggling, quick case toggles, rapid rubric switching), the UI stays responsive with no hangs, and derived numbers settle to values consistent with the final input state"
+description = "Under rapid repeated input (fast verdict toggling, quick case toggles, rapid rubric switching), the UI stays responsive with no hangs, and derived numbers and Export center previews settle to values consistent with the final input state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
 name = "keyboard_operability_focus"
-description = "Every interactive control — rail entries, header selects, accordion headers, disclosures, form fields, verdict and case toggles, history entries, copy control — is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space), showing a visible focus indicator at each stop"
+description = "Every interactive control — rail entries, header selects, accordion headers, disclosures, form fields, verdict and case toggles, history entries, Undo, Redo, Export, Import, and copy controls — is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space), showing a visible focus indicator at each stop"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
 name = "dialog_focus_trap_escape"
-description = "The criterion form dialog traps focus while open, closes on the Escape key, and returns keyboard focus to the control that opened it; accordion headers and disclosures expose an expanded or collapsed state attribute to the accessibility tree"
+description = "The criterion form dialog, Export center, and Import surface trap focus while open, close on the Escape key, and return keyboard focus to the control that opened them; accordion headers and disclosures expose an expanded or collapsed state attribute to the accessibility tree"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
 name = "labels_and_error_association"
-description = "Every form field has a visible label, and each validation message names the field it belongs to and is programmatically associated with that field"
+description = "Every form field has a visible label, and each validation message (criterion, version bump, import) names the field it belongs to and is programmatically associated with that field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "api_shaped_validation_rejects_invalid_payloads"
+description = "Invalid CriterionUpsert submissions (empty required fields, duplicate id, likert min not less than max, weight outside 0.5-5, importance outside must-have|nice-to-have) and non-conforming Import packages are rejected with visible per-field or package errors and leave the collection unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "end_state_export_is_portable_persistence"
+description = "After session mutations, Download or Copy of package JSON yields a RubricPackage that includes schemaVersion rubric-package-v1, library Rubric Studio, and the session's criteria; good-app persistence is this portable package plus MCP reads — browser storage stays unused"
 type = "binary"
 weight = 1.0
 

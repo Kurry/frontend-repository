@@ -119,7 +119,7 @@ weight = 1.0
 [[criterion]]
 id = "1.9"
 name = "rollup_strip_cells_complete"
-description = "The rollup strip above the queue shows a pass-rate cell for each of the nine checks (package-shape, task-config, rubric-wiring, file-modes, harvest, container-parity, dependency-pinning, foils, judge-contract), a pass-rate cell for each of the ten admission criteria, and an entry-count cell for each seeded reviewer"
+description = "The rollup strip above the queue shows a pass-rate cell for each of the nine checks (package-shape, task-config, rubric-wiring, file-modes, harvest, container-parity, dependency-pinning, foils, scoring-contract), a pass-rate cell for each of the ten admission criteria, and an entry-count cell for each seeded reviewer"
 type = "binary"
 weight = 1.0
 
@@ -189,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "1.19"
 name = "run_nine_steps_fixed_order"
-description = "Clicking Run checks starts a simulated run decomposed into nine visible steps in the fixed order package-shape, task-config, rubric-wiring, file-modes, harvest, container-parity, dependency-pinning, foils, judge-contract, each showing the check name and a status that advances visibly through pending, running, and complete or failed"
+description = "Clicking Run checks starts a simulated run decomposed into nine visible steps in the fixed order package-shape, task-config, rubric-wiring, file-modes, harvest, container-parity, dependency-pinning, foils, scoring-contract, each showing the check name and a status that advances visibly through pending, running, and complete or failed"
 type = "binary"
 weight = 1.0
 
@@ -329,7 +329,7 @@ weight = 1.0
 [[criterion]]
 id = "1.39"
 name = "escalation_flow"
-description = "A held record's Escalate control opens a form with a category select (Spec conflict, Tooling gap, Dataset defect, Judge disagreement) and a summary field requiring at least 20 characters; submitting a valid escalation moves the stage to escalated, shows the category and summary on the detail view, and stamps the timeline"
+description = "A held record's Escalate control opens a form with a category select (Spec conflict, Tooling gap, Dataset defect, Scoring disagreement) and a summary field requiring at least 20 characters; submitting a valid escalation moves the stage to escalated, shows the category and summary on the detail view, and stamps the timeline"
 type = "binary"
 weight = 1.0
 
@@ -357,35 +357,35 @@ weight = 1.0
 [[criterion]]
 id = "1.43"
 name = "report_summary_sections"
-description = "The Report view shows a dataset summary with counts of admitted, held, escalated, and resolved records plus the total; a check pass-rate table with one row per check showing passes, fails, and pass rate; a criterion failure ranking ordering the ten criteria by failure count; and a reviewer activity section with each reviewer's entry count and verdict mix"
+description = "The Report view's Audit Report Markdown (and matching datasetSummary / checkPassRates / criterionFailureRanking / reviewerActivity in Audit Package JSON) shows admitted, held, escalated, and resolved counts plus the total; a check pass-rate table with one row per check showing passes, fails, and pass rate; a criterion failure ranking ordering the ten criteria by failure count; and reviewer activity with each reviewer's entry count and verdict mix"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.44"
 name = "report_appendix_per_touched_task"
-description = "The report includes a per-task appendix with one entry for every record touched during the session (any run, verdict change, feedback entry, fix, escalation, or resolution) showing its slug, current stage, check outcomes, each failed criterion with its rationale text, and its feedback verdicts"
+description = "The Audit Report Markdown includes a per-task appendix with one entry for every record touched during the session (any run, verdict change, feedback entry, fix, escalation, or resolution) showing its slug, current stage, check outcomes, each failed criterion with its rationale text, and its feedback verdicts, and the matching tasks entries appear in Audit Package JSON"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.45"
 name = "report_tracks_session_state"
-description = "Changing session state and returning to the Report view changes the rendered report — running more checks, failing a criterion, or adding feedback alters the summary numbers and appendix content accordingly"
+description = "Changing session state and returning to the Report view regenerates both export previews — running more checks, failing a criterion, or adding feedback alters the summary numbers, appendix content, and JSON field values accordingly"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.46"
-name = "copy_report_with_confirmation"
-description = "A Copy report control puts the full report text on the clipboard and gives visible confirmation of the copy"
+name = "copy_export_with_confirmation"
+description = "A Copy export control puts the exact visible preview text (Audit Package JSON or Audit Report Markdown for the active format) on the clipboard and gives visible confirmation of the copy"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.47"
 name = "export_stamps_history_and_timelines"
-description = "Copying the report appends a timestamped Report exported entry to the export history in the Report view header and stamps a report-export event on the audit timeline of every record listed in the appendix"
+description = "Copying or downloading an export appends a timestamped export-history entry with the active format in the Report view header and stamps a report-export event on the audit timeline of every session-touched appendix record"
 type = "binary"
 weight = 1.0
 
@@ -480,7 +480,66 @@ weight = 1.0
 [[criterion]]
 id = "1.n12"
 name = "report_is_stale_snapshot"
-description = "The Report view shows numbers or appendix entries that contradict the current session state, such as counts that ignore a completed run or an appendix missing a record the session touched"
+description = "The Report export previews show numbers, appendix entries, or JSON field values that contradict the current session state, such as counts that ignore a completed run or a tasks entry missing a session mutation"
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "1.48"
+name = "feedback_entry_field_contract"
+description = "The add-entry form enforces the FeedbackEntry field contract with inline errors naming each offending field and submit disabled until valid: reviewer from the nine seeded names, verdict exactly one of Approve / Approve with caveats / Needs edit / Reject, and findings at least 20 characters after trim; violations create no entry"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "criterion_fail_verdict_field_contract"
+description = "Saving a fail verdict enforces the CriterionFailVerdict field contract: criterion from the ten admission criteria, verdict exactly fail, and rationale at least 15 characters after trim; a shorter rationale shows an inline message naming the rationale field and is not saved"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "escalation_and_resolution_field_contracts"
+description = "Escalate enforces category from Spec conflict / Tooling gap / Dataset defect / Scoring disagreement and summary at least 20 characters; Resolve enforces note at least 15 characters; violations show named field errors and leave the stage unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "audit_package_json_field_contract"
+description = "The Report view's Audit Package JSON preview shows schemaVersion exactly quality-audit-package-v1, exportedAt as an ISO-8601 string ending in Z, and required keys datasetSummary, checkPassRates, criterionFailureRanking, reviewerActivity, tasks, and exportHistory with field names visible in the preview text; Copy and Download are available"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.52"
+name = "download_export_matches_preview"
+description = "A Download export control offers the visible preview as a downloadable file for the active format (JSON or markdown) whose contents match the preview text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.53"
+name = "audit_package_import_round_trip"
+description = "Import package accepts pasted or file-picked Audit Package JSON matching the export field contract; a valid import reconstructs records, stages, checks, criteria, feedback, and rollups so the next export preview matches, and malformed or contract-breaking JSON shows an inline error naming the offending field and leaves the desk unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n13"
+name = "export_omits_session_mutations"
+description = "After a run, fail verdict, feedback entry, or escalation, the active export preview omits that session mutation under the declared field-contract keys"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n14"
+name = "import_accepts_invalid_package"
+description = "Import accepts malformed JSON or a package that breaks the Audit Package JSON field contract and mutates the desk anyway"
 type = "binary"
 negate = true
 weight = 1.0

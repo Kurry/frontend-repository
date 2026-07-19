@@ -60,80 +60,81 @@ allowed_tools = [
 [scoring]
 aggregation = "weighted_mean"
 
+
 [[criterion]]
 id = "9.1"
 name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+description = "Cold start to interactive is under 2 seconds on local render: the triage queue renders and a test can be selected."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
 name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+description = "No console errors or warnings appear on load or during a full exercise including a complete 10-run re-run, a stop, export copy, and an invalid import attempt."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
 name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+description = "Opening the detail panel, re-run form, or Export triage report begins a visible response in under 100ms from the real control activation."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.4"
 name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+description = "During a re-run, an overall progress indicator advances as each run ticks in rather than leaving a blank progress region."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.5"
 name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+description = "With the seeded suites of at least 10 tests each, switching suites and scrolling the queue stays responsive without perceived lag."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.6"
 name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+description = "While a re-run is in progress, suite switcher, filters, and stop remain operable without freezing the shell."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
 name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+description = "Re-run tick-in and panel open/close transitions stay smooth enough that the queue remains readable without stutter that blocks interaction."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.8"
 name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+description = "Rapidly switching suites, toggling filters, starting re-runs, and reopening Export causes no hangs or dropped interactions."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.9"
 name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+description = "Completing multiple re-runs and opening Export repeatedly leaves the tab responsive without runaway resource use that freezes the UI."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.10"
 name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+description = "While a 10-run re-run is in progress, the progress affordance remains visible rather than a blank region if ticks arrive slowly."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.n1"
 name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+description = "More than 2 seconds pass before the triage queue is interactive on local render."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +142,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n2"
 name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+description = "Console errors or warnings appear during re-run, export, or import flows."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +150,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n3"
 name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+description = "Opening detail, export, or import blocks interaction for a noticeable lag before any UI response."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +158,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n4"
 name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
+description = "A re-run freezes the entire shell so stop and filters cannot be activated."
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +166,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n5"
 name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+description = "Scrolling the seeded queue or switching suites drops interaction to an unusable frame rate."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +174,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n6"
 name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
+description = "Panel or toast animation makes keyboard and pointer input unresponsive until it finishes."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +182,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n7"
 name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
+description = "The triage shell stays blank while fonts or scripts load with no progressive queue content."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +190,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n8"
 name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
+description = "Repeated re-runs and export opens leave the tab unresponsive from runaway browser resource usage."
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +198,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n9"
 name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
+description = "During a re-run the progress region stays blank with no indicator while runs are pending."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +206,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n10"
 name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+description = "Rapid suite switches, stop mid-run, or invalid import crashes the app or blanks the document."
 type = "binary"
 negate = true
 weight = 1.0

@@ -70,63 +70,63 @@ weight = 1.0
 [[criterion]]
 id = "6.2"
 name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+description = "Create flow: submitting stop or expense create with values that violate the Stop or Expense field contract (empty title/description, non-positive amount, illegal enum, endTime not after startTime, invalid weights) shows inline validation naming the field and adds no row."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
 name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+description = "Edit flow: renaming a stop or changing an expense amount/currency updates the plan list or ledger row, the open detail or spreadsheet cell, and the derived money or export surfaces without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
 name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+description = "Delete flow: deleting a stop removes its day-list row and map pin; deleting an expense removes its ledger row and its contribution from balances, pie, and burn-rate in the same interaction."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
 name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+description = "View/mode switch: switching Plan List, Map, Budget/Ledger, spreadsheet, and export canvas keeps the shared selection and collection state so the same stop or expense remains identifiable without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
 name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+description = "Edge: after deleting every stop, the plan list empty state is visible and the ICS preview has zero VEVENT blocks with an empty trip JSON stops array."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
 name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+description = "Edge: choosing a day from the sidebar itinerary list narrows the plan list to that day's stops with the day's color highlight, and clearing the filter restores the full multi-day list."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
 name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+description = "Collapsible chrome: Hide sidebar collapses the left nav and the toggle reopens it as an overlay drawer without losing day filter, mode, or selection state."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
 name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+description = "Overlays: place detail, stop/expense forms, CSV wizard, and factory-reset confirm open over the workspace, complete their flow, and dismiss without stranding the user."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
 name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+description = "Recovery: cancelling factory reset, rejecting a bad trip JSON import, or dismissing the place detail card returns the user to a usable planner workspace without requiring a full page reload."
 type = "binary"
 weight = 1.0
 
@@ -174,56 +174,56 @@ weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "stop_expense_flows_unavailable"
+description = "Stop create/edit/delete, expense create/edit, Budget/Ledger flows, or trip export/import cannot be completed from the visible UI."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "new_stop_or_expense_missing_or_duplicated"
+description = "After a valid stop or expense create, the new row fails to appear where it should, appears duplicated, or derived totals omit it."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "plan_map_ledger_desync"
+description = "After editing a stop or expense, the plan list, map/detail, ledger grid, and derived charts/totals disagree about the same record."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "plan_map_budget_switch_breaks"
+description = "Switching Plan List / Map / Budget-Ledger breaks layout or loses the selected stop or expense unexpectedly."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_stops_or_expenses_break_ui"
+description = "After deleting all stops or expenses, the plan list or ledger region is blank/broken with no designed empty-state message."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "day_filter_and_ledger_disagree"
+description = "Day filters, plan list, map pins, and ledger/chart totals disagree about the visible stop/expense set, or clearing a day filter fails to restore all stops."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "hide_sidebar_cannot_reopen"
+description = "After Hide sidebar, the sidebar cannot be reopened from the visible toggle."
 type = "binary"
 negate = true
 weight = 1.0
@@ -238,16 +238,16 @@ weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "failed_stop_expense_or_import_silent"
+description = "An invalid stop/expense submit or contract-invalid import provides no visible named-field or import error feedback."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "trip_planner_dead_end_requires_reload"
+description = "A trip itinerary flow leaves a dead end that requires a full page reload to continue planning or budgeting."
 type = "binary"
 negate = true
 weight = 1.0

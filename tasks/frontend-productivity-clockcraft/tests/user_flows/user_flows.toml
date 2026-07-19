@@ -164,8 +164,8 @@ weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_clocks_break_ui"
+description = "After removing the last custom clock/timer entry (or emptying a list region), that region is blank/broken with no designed empty-state message."
 type = "binary"
 negate = true
 weight = 1.0

@@ -187,6 +187,13 @@ weight = 1.0
 
 
 [[criterion]]
+id = "9.11"
+name = "bulk_apply_has_no_partial_states"
+description = "A bulk Grant all or Revoke all across every identity applies as one immediate visible update with no per-row lag or partially applied intermediate states left on screen"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "performance.catchall"
 name = "performance_catchall"
 description = """The app exhibits a significant, browser-observable performance defect that is NOT covered by any other criterion in this file. If present, name the defect and cite concrete evidence. If already covered, answer no here."""

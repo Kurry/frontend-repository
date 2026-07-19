@@ -130,6 +130,28 @@ description = "Per-scene kebab menus open as keyboard-operable menus: arrow keys
 type = "binary"
 weight = 1.0
 
+
+[[criterion]]
+id = "1.11"
+name = "export_palette_dialogs_focus"
+description = "The export drawer and command palette behave as dialogs: focus moves into them when opened, stays trapped while open, Escape dismisses them, and focus returns to the invoking control."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "status_badges_not_color_only"
+description = "Status badges include the status word draft, review, or ready — status is not conveyed by color alone."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "import_errors_announced_live"
+description = "Import validation errors are shown visually and announced through a polite ARIA live region."
+type = "binary"
+weight = 1.0
+
 [[criterion]]
 id = "1.n1"
 name = "controls_unreachable_by_keyboard"

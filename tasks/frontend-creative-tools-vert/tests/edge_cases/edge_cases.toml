@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -181,14 +181,14 @@ weight = 1.0
 [[criterion]]
 id = "4.11"
 name = "invalid_session_import_rejected"
-description = "Importing malformed session JSON shows an inline error naming the import field, leaves quality, presets, and queue targets unchanged, and does not clear undo history as if the import succeeded."
+description = "Importing malformed session JSON, or JSON that fails the ConversionSessionDocument field contract (schemaVersion not vert-session-v1, missing required key, invalid ConversionPreset, or invalid QueueFile), shows an inline error naming the offending field (or the import field), leaves quality, presets, and queue targets unchanged, and does not clear undo history as if the import succeeded."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.12"
 name = "empty_preset_name_rejected"
-description = "Saving a preset with an empty name does not increase the preset count and shows an inline message naming the name field."
+description = "Saving a preset with an empty, whitespace-only, or over-length (greater than 64) name does not increase the preset count and shows an inline message naming the name field."
 type = "binary"
 weight = 1.0
 
@@ -227,7 +227,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n11"
 name = "invalid_session_import_mutates_state"
-description = "Importing malformed session JSON still mutates settings, presets, queue targets, or clears undo history as if the import succeeded."
+description = "Importing malformed session JSON, or JSON that fails the ConversionSessionDocument field contract, still mutates settings, presets, queue targets, or clears undo history as if the import succeeded."
 type = "binary"
 negate = true
 weight = 1.0
@@ -249,7 +249,14 @@ weight = 1.0
 [[criterion]]
 id = "4.15"
 name = "empty_queue_session_export_valid"
-description = "Session export with an empty queue still compiles valid session JSON and conversion-report text (settings and presets present, files array empty) without errors."
+description = "Session export with an empty queue still compiles valid ConversionSessionDocument session JSON (schemaVersion vert-session-v1, settings and presets present, files array empty) and conversion-report text without errors."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "schema_version_mismatch_import_rejected"
+description = "Importing parseable JSON whose schemaVersion is not exactly vert-session-v1 shows an inline error naming schemaVersion or the import field and leaves quality, presets, and queue targets unchanged."
 type = "binary"
 weight = 1.0
 
@@ -265,6 +272,14 @@ weight = 1.0
 id = "4.n13"
 name = "empty_queue_export_errors"
 description = "Opening Session export with an empty queue throws an error or fails to compile session JSON / conversion-report text."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n14"
+name = "overlength_preset_name_still_adds"
+description = "Saving a ConversionPreset with a name longer than 64 characters increases the visible preset count or adds the over-length name."
 type = "binary"
 negate = true
 weight = 1.0

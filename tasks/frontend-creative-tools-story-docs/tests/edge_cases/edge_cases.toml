@@ -210,6 +210,51 @@ type = "binary"
 negate = true
 weight = 1.0
 
+
+[[criterion]]
+id = "4.11"
+name = "field_contract_bounds_rejected"
+description = "Submitting create with title shorter than 2 characters, body shorter than 8 characters, or status outside draft/review/ready adds no scene, shows an inline validation message naming the invalid field, and leaves submit disabled until valid."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "filtered_empty_state"
+description = "When the status filter or search matches nothing, the board shows an empty filtered state explaining that no scenes match and how to clear the filter or search."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "import_rejects_invalid_package"
+description = "Importing malformed StoryboardPackage JSON, schemaVersion other than 1, project other than Demo Projects, storyboard other than 1. Getting Started, or a scene that fails the create/edit field contract leaves the collection unchanged and shows a visible error naming the problem."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "undo_redo_noop_when_empty"
+description = "Undo with no prior mutation leaves the board unchanged; Redo with nothing undone is a no-op (controls disabled or inert with no board change)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "import_mutates_on_invalid"
+description = "An invalid StoryboardPackage import changes the scene collection without a visible error naming the problem."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n12"
+name = "out_of_contract_create_succeeds"
+description = "A create with title/body outside the field-contract bounds or an invalid status still increases the scene count."
+type = "binary"
+negate = true
+weight = 1.0
+
 [[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"

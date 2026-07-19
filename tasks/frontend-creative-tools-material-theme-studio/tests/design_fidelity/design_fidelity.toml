@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "3.1"
 name = "spacing_matches_studio_tool_density"
-description = "At 1440px, spacing among the header lockup, three-tab bar, Preview device frame, and editor/tool stack follows a consistent dense-studio scale matching the reference screenshots — no arbitrary one-off gaps that break the composition."
+description = "At 1440px, spacing among the header lockup, four-tab bar, Preview device frame, and editor/tool stack follows a consistent dense-studio scale matching the reference screenshots — no arbitrary one-off gaps that break the composition."
 type = "binary"
 weight = 1.0
 
@@ -105,7 +105,7 @@ weight = 1.0
 [[criterion]]
 id = "3.7"
 name = "clear_hierarchy_header_tabs_tools"
-description = "Typography hierarchy clearly distinguishes the product title Material-UI Theme Creator, the three-tab bar labels, denser tool-panel titles (Palette / Fonts / Typography / Snippets), and preview/sample copy."
+description = "Typography hierarchy clearly distinguishes the product title Material-UI Theme Creator, the four-tab bar labels, denser tool-panel titles (Palette / Fonts / Typography / Snippets), and preview/sample copy."
 type = "binary"
 weight = 1.0
 

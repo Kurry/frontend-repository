@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -151,14 +151,14 @@ weight = 1.0
 [[criterion]]
 id = "14.9"
 name = "mutate_then_session_export_contains_work"
-description = "Full-pipeline probe ending at export text: lower quality, save a preset, add sample png, Batch set format or retarget to webp, Convert to Done, then open session JSON export — the preview text contains the lowered quality, the saved preset, and a per-file entry matching the Done row (name/from/to/status/outputSize), proving the export is compiled live from session mutations."
+description = "Full-pipeline probe ending at export text: lower quality, save a ConversionPreset, add sample png, Batch set format or retarget to webp, Convert to Done, then open session JSON export — the preview text contains schemaVersion vert-session-v1, the lowered quality, the saved preset under ConversionPreset keys, and a QueueFile entry matching the Done row (name/from/to/status/outputSize), proving the export is compiled live from session mutations."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.10"
 name = "session_import_export_round_trip"
-description = "Export→import round-trip: after mutating settings and presets with at least one file still queued, Download or Copy the session JSON, change settings/presets away, then Import that same JSON text — Settings, presets, and matching queued files' Convert-to targets match the pre-export mutated state, and the export preview matches again."
+description = "Export→import round-trip: after mutating settings and presets with at least one file still queued, Download or Copy the session JSON, change settings/presets away, then Import that same ConversionSessionDocument — Settings, presets, and matching queued files' Convert-to targets match the pre-export mutated state, and the export preview matches again including schemaVersion vert-session-v1."
 type = "binary"
 weight = 1.0
 
@@ -180,7 +180,7 @@ weight = 1.0
 [[criterion]]
 id = "14.12"
 name = "malformed_import_leaves_store_and_undo"
-description = "Import of malformed session JSON is rejected with an inline error naming the import field; quality, presets, and queue targets stay unchanged, and undo history is not cleared as if the import succeeded."
+description = "Import of malformed session JSON, or JSON that fails the ConversionSessionDocument field contract (wrong schemaVersion, invalid preset, or invalid QueueFile), is rejected with an inline error naming the offending field (or the import field); quality, presets, and queue targets stay unchanged, and undo history is not cleared as if the import succeeded."
 type = "binary"
 weight = 1.0
 
@@ -188,6 +188,21 @@ weight = 1.0
 id = "14.n6"
 name = "undo_leaves_export_stale"
 description = "After Undo of a remove or retarget, the session JSON export preview still shows the post-mutation queue while the visible queue restored."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.13"
+name = "form_payload_echoes_in_export_contract"
+description = "After a valid SettingsUpdate (quality and defaultTarget) and a valid ConversionPreset save, the session JSON export preview shows those exact field-contract values under quality, defaultTarget, and presets — the created records ARE the would-be request bodies mirrored in the export."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n7"
+name = "export_omits_schema_version_after_mutations"
+description = "After lowering quality, saving a preset, and converting a sample file, the session JSON export preview omits schemaVersion vert-session-v1 or omits the mutated quality/preset/file fields despite visible store changes."
 type = "binary"
 negate = true
 weight = 1.0

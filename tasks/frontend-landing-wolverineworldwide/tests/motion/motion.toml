@@ -219,6 +219,44 @@ negate = true
 weight = 0.5
 
 [[criterion]]
+id = "8.a1"
+name = "kinetic_portfolio_split_heading"
+description = "On a fresh load, real scrolling the brand-portfolio region into view drives kinetic typography: the portfolio heading A portfolio built for every step. splits into three line spans that reveal with staggered offsets tied to scroll entry (never a WebMCP state shortcut)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.a2"
+name = "scroll_storytelling_particle_galaxy"
+description = "On a fresh load, real scrolling the brand-portfolio region drives sequential scroll storytelling: a continuous particle/galaxy parallax field advances with scroll progress while fade/rise/rise-and-scale and split-text reveals choreograph in order, rather than a one-off fade or pre-settled static field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.a5"
+name = "scroll_capture_breaks_usability"
+description = "Scroll capture traps the user, prevents reaching content, fights native document scroll or sticky-header morph behavior, or ignores the reduced-motion path that must collapse tokenized transition durations to 0s and short-circuit scripted timelines (no transform-in, stagger, or particle parallax) while the page stays navigable"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "8.a6"
+name = "kinetic_effects_decorative_jank"
+description = "Split-text portfolio heading or other kinetic line/character reveals stutter, reflow mid-animation, or leave lines/characters misaligned after settling"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "8.a7"
+name = "signature_motion_purely_linear_tweens"
+description = "Signature motion (hero intro timeline, scroll reveals, header morph, or menu staggers) uses purely linear constant-speed tweens that start and stop mechanically with no inertial expo-out / power2-out / sine-out settling"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "3.catchall"
 name = "motion_catchall"
 description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

@@ -117,6 +117,13 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "8.9"
+name = "batch_progress_fills_continuously"
+description = "During a real batch run of 2 or more accepted PRs, the overall batch progress indicator fills continuously as items complete rather than jumping from empty to full"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "8.n1"
 name = "animation_causes_jank_or_flicker"
 description = "Streaming text, card moves, or list transitions visibly shift surrounding layout, flicker, or leave elements misplaced after settling"

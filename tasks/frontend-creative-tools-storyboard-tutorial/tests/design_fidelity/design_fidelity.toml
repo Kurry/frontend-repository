@@ -210,6 +210,29 @@ type = "binary"
 negate = true
 weight = 1.0
 
+
+[[criterion]]
+id = "3.11"
+name = "export_import_fit_storyboard_chrome"
+description = "Export center and Import surfaces use the same light workspace / yellow-accent visual language as the reference storyboard chrome rather than an unrelated modal skin."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.n11"
+name = "export_breaks_reference_composition"
+description = "Export or Import overlays obliterate the docs/storyboard composition with unrelated dense dashboard chrome that contradicts the reference workspace."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.12"
+name = "hardened_surfaces_instruction_wins"
+description = "The search field, shot-type chips, Present control, presenter view, and Printable outline tab follow the same light/yellow workspace language as the rest of the chrome; where the reference screenshots omit these hardened surfaces, the instruction text wins and their presence is not a fidelity deviation."
+type = "binary"
+weight = 1.0
+
 [[criterion]]
 id = "design_fidelity.catchall"
 name = "design_fidelity_catchall"

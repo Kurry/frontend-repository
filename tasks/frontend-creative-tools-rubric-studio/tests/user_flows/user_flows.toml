@@ -131,6 +131,27 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "6.11"
+name = "export_session_flow_to_artifact"
+description = "Export session flow: add a valid criterion, open Export center, confirm structured text, rubric JSON (schemaVersion rubric-document-v1 with name/version/arbiterModel/aggregationMode/criteria), and package JSON (schemaVersion rubric-package-v1, library Rubric Studio, rubrics, generatedAt) include that criterion, then Download or Copy the active format."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "import_round_trip_flow"
+description = "Import round-trip flow: export the package after a create, diverge the studio, Import the JSON, and confirm rail counts, opened criteria, and a fresh export reconstruct to match the imported package without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "undo_round_trip_flow"
+description = "Undo round-trip: add a valid criterion or flip a preview verdict, Undo and confirm the prior criteria count or aggregate returns on accordion/header/Tune/preview, then Redo and confirm the mutation returns."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "6.n1"
 name = "criterion_crud_unavailable_from_ui"
 description = "Add criterion, edit, or delete cannot be completed from the visible UI controls on the opened rubric."
@@ -205,7 +226,15 @@ negate = true
 [[criterion]]
 id = "6.n10"
 name = "export_or_diff_dead_end_requires_reload"
-description = "Recovering from the export panel or the history diff view requires a full page reload — the UI reaches a dead end."
+description = "Recovering from the Export center, Import surface, or the history diff view requires a full page reload — the UI reaches a dead end."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "6.n11"
+name = "export_flow_omits_added_criterion"
+description = "After adding a criterion and opening Export center, structured text, rubric JSON, or package JSON omits that criterion's id and name."
 type = "binary"
 weight = 1.0
 negate = true

@@ -342,20 +342,19 @@ Module specs:
 
 Bindings:
 - Browsable entity: palettes
-- Destinations: archive-grid; palette-detail; filters; export-drawer; comparison
-- Filters: period; tag; archived
+- Destinations: archive-grid; palette-detail; filters; export-drawer
+- Filters: period
 - Sorts: name-asc; name-desc
 - Entity: palette
 - Entity operations: create; select; update; delete; toggle
-- Entity fields: name; artist; swatches; favorite; period; tags; notes; archived
-- Artifact operations: export; import; copy; print_preview
+- Entity fields: name; artist; swatches; favorite; period
+- Artifact operations: export; import; copy
 - Export formats: css; utility-theme; scss; json
 - Import modes: archive-json
 
 Mechanics exclusions:
 - Raw file paths/blobs forbidden in WebMCP args
 - Color-blindness filter visual verification stays Playwright-observed
-- Swatch drag-reorder gesture stays Playwright-observed; reorder is not exposed as an entity operation
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

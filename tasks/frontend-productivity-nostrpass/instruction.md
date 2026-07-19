@@ -33,16 +33,35 @@ Feature: Permissions —
 - From a Permissions view, reviewing or changing one named application's access grant for the active identity (choosing among damus, snort, coracle, or iris) flips only that application's grant for the active identity; the other three applications' grants for that identity, and every application's grants for every other identity, are unchanged
 - Each identity's grants object carries exactly four boolean keys — damus, snort, coracle, iris — visible as Granted or Revoked pills on the dashboard and as switch state in Permissions; a newly created identity starts with all four grants false (Revoked)
 
+Feature: Key rotation (undoable) —
+- Each identity card and the dashboard (for the active identity) expose a Rotate keys control that opens a confirmation naming the identity and warning that its current keypair will be replaced; confirming generates a fresh keypair for exactly that identity: its npub and nsec change to new valid bech32 values distinct from its own prior values and from every other identity's, while its label and grants are unchanged
+- A confirmed rotation records an audit entry at the top of the Audit log naming the identity and showing shortened forms of both the old and the new npub
+- Rotation is undoable: Undo restores exactly the prior npub and nsec (matching a value copied before the rotation), and Redo reapplies the rotated pair; cancelling the rotation confirmation changes nothing and records no audit entry
+- Rotating one identity never changes any other identity's keys, and rotating the same identity twice yields a third distinct npub
+
+Feature: Bulk permissions across identities —
+- The Permissions view, below the active-identity panel, renders an All identities matrix: one row per identity, one column per application (damus, snort, coracle, iris), each cell a switch showing that identity-application grant
+- Toggling a single matrix cell behaves exactly like toggling that grant with that identity active: the identity's dashboard pills, stat tiles, export preview, and audit log stay consistent
+- Each application column offers Grant all and Revoke all controls: activating one sets that application's grant for every identity in a single action, updates every affected cell, pill, and count together, and records one audit entry naming the application and how many identities changed
+- A bulk grant or revoke is a single undo step: Undo after Grant all restores every identity's prior grant for that application (identities that already had the target state stay unchanged), and Redo reapplies the bulk change
+
+Feature: Identity key backup (per-identity export and import) —
+- Each identity card and the dashboard expose an Export backup control that opens a surface with a single-identity Key Backup JSON preview compiled live from the store, plus Copy (with confirmation) and Download controls; a square QR-style placeholder tile, labelled as a placeholder rendering of the backup, accompanies the preview
+- Key Backup JSON field contract: a top-level object with version exactly nostrpass-backup-v1, exportedAt (ISO-8601 date-time), and identity (object carrying label — 1–40 trimmed characters, npub — string starting with npub1, nsec — string starting with nsec1, and grants — object with exactly the four boolean keys damus, snort, coracle, iris); the backup for an identity carries that identity's actual current label, keys, and grants
+- Import backup accepts pasted or file-picked Key Backup JSON validated against that same schema: a valid backup whose npub matches no existing identity adds it as a new identity card (identity count increases by exactly one, an audit entry is recorded, and the import is undoable); a backup whose npub matches an existing identity is rejected with an inline error naming the npub conflict and changes nothing
+- A backup that fails the field contract (wrong version, missing identity keys, bad npub1/nsec1 prefix, label outside 1–40 trimmed characters, grants missing any of the four keys) shows an inline error naming the offending field and changes nothing
+
 Feature: Search and sort —
 - A search field on the Identities view narrows the card grid to identities whose nickname or npub contains the query as the user types; clearing the field restores every identity card exactly
 - A sort control offers Label A–Z and Label Z–A; switching between them reverses the visible card order relative to the other choice, and the order is derived from the live collection rather than two hardcoded lists
 
 Feature: Audit log and theme —
-- An Audit log view lists a running history of identity and permission actions (creation, rename, delete, selection, permission grant/revoke, theme changes, vault export, vault import) with the newest entry first, seeded with at least one entry on first load
+- An Audit log view lists a running history of identity and permission actions (creation, rename, delete, selection, permission grant/revoke, bulk grant/revoke, key rotation, backup export, backup import, theme changes, vault export, vault import) with the newest entry first, seeded with at least one entry on first load
+- The Audit log toolbar offers an action-type filter (All plus one choice per recorded action type); choosing a type narrows the list to entries of that type without mutating the log, an empty filtered result shows an empty state naming the filter, and returning to All restores every entry in the same order
 - A Settings view exposes a single control that switches the app between light and dark theme; the surface recolors immediately without a page reload
 
 Feature: Undo and redo —
-- Undo reverses the most recent mutating action — create, rename, delete, select, permission toggle, or successful vault import — and restores the prior identities, active identity, grants, and derived counts
+- Undo reverses the most recent mutating action — create, rename, delete, select, permission toggle, bulk grant/revoke, key rotation, successful backup import, or successful vault import — and restores the prior identities, active identity, keys, grants, and derived counts
 - Redo reapplies the most recently undone action with the same completeness; performing a new mutating action after an undo clears the redo stack and disables Redo
 - Undo and Redo controls show enabled/disabled states that match whether a step is available
 
@@ -66,6 +85,10 @@ End-to-end flows (state must stay coherent across every surface named in each ch
 - Rename then undo: renaming an identity updates its card label and, when it is active, the dashboard nickname and the export preview's matching label; Undo restores the prior label on every surface and in the export preview
 - Delete then undo: confirming delete on a non-sole identity decreases the identity count by exactly one, removes its card, and drops it from the export preview; Undo restores that identity with the same npub and grants
 - Export then import round-trip: after mutating the vault (create or toggle at least one grant), Copy or Download the vault JSON, then Import that same JSON text — after confirmation the dashboard, Identities grid, Permissions grants, theme, and export preview match the pre-export mutated state including version nostrpass-vault-v1, activeLabel, theme, and each identity's label, npub, nsec, and grants
+- Rotation round-trip: copy or note the active identity's npub, activate Rotate keys, and confirm; the dashboard npub and nsec change to fresh values, the vault export preview shows the new npub, and the Audit log's top entry names the rotation with shortened old and new npubs; Undo restores exactly the noted prior npub on the dashboard and in the export preview; Redo reapplies the rotated pair
+- Bulk grant flow: with at least three identities present, activating Grant all in one application's matrix column flips that application's cell to granted for every identity, updates the active identity's dashboard pill and connected-app stat tile to match, and records one audit entry naming the application and the number of identities changed; a single Undo restores every identity's prior grant for that application
+- Backup round-trip: open Export backup for a non-active identity, Copy or Download its Key Backup JSON, delete that identity (confirming), then Import backup with that same JSON — the identity returns as a card with the same label, npub, nsec, and grants, the identity count returns to its prior value, and the vault export preview contains it again
+- Audit filter flow: after performing at least one permission toggle and one rotation, filtering the Audit log to the rotation type shows only rotation entries, and returning the filter to All restores the full list in the same order
 - Search and sort coherence: typing a search that matches one identity shows only that card; clearing search restores all cards; switching Label A–Z to Label Z–A reverses card order relative to the prior sort
 - A page reload returns the app to its seeded state: the seeded identities with their original labels and keys, the original active identity, the original grants, light or the seeded theme, empty undo/redo stacks, and no search query — session mutations do not survive the reload
 </user_flows>
@@ -81,6 +104,10 @@ End-to-end flows (state must stay coherent across every surface named in each ch
 - A search that matches no identities shows an empty state in the Identities grid with a clear-search control that restores every card
 - Importing malformed vault JSON, or vault JSON that violates the field contract (wrong version, empty identities, invalid label bounds, npub/nsec prefix, grants keys, or theme enum), shows an inline error naming the import field, leaves the identity count and labels unchanged, and does not treat the attempt as a successful import for undo
 - After Undo restores a deleted identity, Redo deletes it again; after a new create following an undo, Redo is disabled and cannot resurrect the cleared redo stack
+- Cancelling the rotate-keys confirmation leaves the identity's npub and nsec unchanged and records no audit entry
+- Importing a Key Backup whose npub matches an existing identity is rejected with an inline error naming the npub conflict; the identity count, cards, and grants are unchanged
+- Activating Grant all when every identity already has that application granted leaves every cell granted and does not flip any grant to revoked; a following Undo restores the state that preceded the bulk action
+- Filtering the Audit log to a type with no recorded entries shows an empty state naming the filter, and clearing the filter restores the full list
 </edge_cases>
 
 <visual_design>
@@ -90,7 +117,10 @@ End-to-end flows (state must stay coherent across every surface named in each ch
 - Below the identity card, three compact stat tiles show identity count, connected-app count, and audit-entry count
 - Identities view renders identity cards in a responsive grid with a search field, sort control, and Undo/Redo and Export vault controls in the toolbar; the active card is visually highlighted (accent border/background) and carries an Active badge; each card exposes Select, Rename, Delete, and Reveal/Hide nsec controls, and an inline create-identity form (label field, submit, cancel) appears above the grid when opened
 - Permissions view renders a single panel naming the active identity, with one row per application: app name, a one-line access description, and a switch-style toggle control reflecting granted/revoked
-- Audit log view renders a reverse-chronological list of short activity lines, each with a timestamp
+- Below the active-identity panel, the All identities matrix renders as a table with one row per identity (labelled with its nickname), one column per application, switch cells at every intersection, and per-column Grant all and Revoke all controls in the column headers; when wider than its panel the matrix scrolls inside the panel rather than overflowing the page
+- Audit log view renders a reverse-chronological list of short activity lines, each with a timestamp, and an action-type filter control in its toolbar
+- Each identity card and the dashboard carry a Rotate keys control alongside Select, Rename, and Delete, with a confirmation dialog naming the identity before any rotation applies
+- The Export backup surface shows a monospaced single-identity JSON preview, Copy, Download, and a square QR-style placeholder tile visibly labelled as a placeholder
 - The Export vault drawer shows a monospaced JSON preview, Copy, Download, and an Import vault control with confirmation
 - Dark and light theme surfaces are both fully styled (backgrounds, text, borders, badges) — the app must not look unstyled or broken in either theme
 - Monospace type is used specifically for npub/nsec key surfaces and the vault JSON preview to signal their cryptographic nature; everything else uses the app's default sans type
@@ -102,7 +132,8 @@ End-to-end flows (state must stay coherent across every surface named in each ch
 - The theme switch recolors backgrounds, text, and borders across the whole shell immediately when the Settings control is clicked; there is no flash of unstyled content
 - The reveal-key control swaps the masked dot string for the real nsec value only when clicked (a real UI click, not a state shortcut) and swaps back on a second click
 - Switching the active identity (via Select) transitions the dashboard's displayed key and permission badges to the new identity's data without a full page reload
-- The permission toggle switch animates its handle between the revoked (left) and granted (right) positions when clicked
+- The permission toggle switch animates its handle between the revoked (left) and granted (right) positions when clicked; matrix cell switches animate the same way, and a bulk Grant all or Revoke all animates every affected switch in the same moment
+- After a confirmed key rotation, the dashboard's npub and nsec surfaces transition to the new values with a brief crossfade rather than snapping
 - A newly created identity's card animates into the Identities grid (a brief entrance ease of roughly 150 to 300 milliseconds) rather than appearing instantly
 - New Audit log entries animate in at the top of the list when an action is recorded while the view is visible
 - Creating an identity, changing a permission grant, copying npub, exporting, or importing surfaces a brief confirmation toast that slides in, remains readable, and auto-dismisses with a fade
@@ -113,32 +144,34 @@ End-to-end flows (state must stay coherent across every surface named in each ch
 <responsiveness>
 - At widths of 768 pixels and below, the persistent sidebar collapses to a compact navigation control that opens the same five destinations; at desktop widths the sidebar is open by default
 - The Identities grid reflows from multiple columns at desktop widths to a single column at 375 pixel width
-- No content clips or overflows the viewport, and no horizontal scrolling appears at 375 pixel width; npub and nsec strings and the vault JSON preview wrap or truncate within their surfaces rather than forcing overflow
+- No content clips or overflows the viewport, and no horizontal scrolling appears at 375 pixel width; npub and nsec strings and the vault and backup JSON previews wrap or truncate within their surfaces rather than forcing overflow, and the permissions matrix scrolls inside its own panel at narrow widths
 </responsiveness>
 
 <accessibility>
-- Every interactive control (nav items, Select, Rename, Delete, reveal/hide, Copy npub, permission toggles, form fields, theme switch, Undo, Redo, Export vault, Import vault) is reachable and operable with the keyboard alone, with a visible focus indicator
-- Permission toggles expose their on/off state to assistive technology as real switch controls, and the reveal/hide control's accessible name reflects its current state
-- Delete and import confirmations open as dialogs: focus moves into the dialog while open, Escape closes without applying the action, and focus returns to the control that opened it
+- Every interactive control (nav items, Select, Rename, Delete, Rotate keys, reveal/hide, Copy npub, permission toggles, matrix cell switches, Grant all/Revoke all, audit filter, form fields, theme switch, Undo, Redo, Export vault, Import vault, Export backup, Import backup) is reachable and operable with the keyboard alone, with a visible focus indicator
+- Permission toggles expose their on/off state to assistive technology as real switch controls, and the reveal/hide control's accessible name reflects its current state; each matrix cell switch has an accessible name that names both its identity and its application
+- Delete, rotation, and import confirmations open as dialogs: focus moves into the dialog while open, Escape closes without applying the action, and focus returns to the control that opened it
 - The create-identity and rename forms' validation messages, and import field errors, are announced via a polite live region as well as shown visually
 - Text keeps readable contrast against its background in both light and dark themes, including badge and pill text
 </accessibility>
 
 <performance>
 - The app is interactive within 2 seconds of a local cold load
-- No console errors or warnings appear during a full exercise of the app (create, rename, delete, select, toggle, reveal, copy, export, import, theme switch, undo, redo, reload)
+- No console errors or warnings appear during a full exercise of the app (create, rename, delete, select, toggle, bulk grant/revoke, rotate, reveal, copy, export, import, backup export/import, audit filter, theme switch, undo, redo, reload)
 - The UI stays responsive under rapid repeated input — quickly toggling permissions, switching identities, or undoing and redoing — produces no hangs, dropped updates, or mixed-identity states
+- A bulk Grant all or Revoke all across every identity applies as one immediate visible update with no per-row lag or partially applied intermediate states left on screen
 </performance>
 
 <writing>
-- Validation and import errors name the offending field and the fix (empty label, label too long, wrong vault version, missing grants key) rather than a generic Invalid message
+- Validation and import errors name the offending field and the fix (empty label, label too long, wrong vault version, wrong backup version, npub conflict, missing grants key) rather than a generic Invalid message
+- Audit entries name the action and the identity; rotation entries include shortened forms of the old and new npub; bulk entries name the application and the number of identities changed
 - Empty search state copy explains that no identities match and how to clear the search
 - Control labels use one consistent capitalization convention and specific verbs (Select, Rename, Delete, Export vault, Import vault, Copy npub) rather than generic OK or Submit where a specific label is possible
 - No placeholder or lorem-ipsum text appears anywhere in the shipped UI
 </writing>
 
 <requirements>
-Use SolidJS with Solid stores, Tailwind CSS 4.3.2 (pinned), and Ark UI for the whole application; state (identities, active identity, per-identity per-app grants, theme, audit log, search query, sort order, undo/redo stacks, export drawer, import errors, and UI chrome) is held in a Solid store as the single live source of truth, and every view derives from that one store. Do not use localStorage, sessionStorage, or other browser storage APIs — persistence for this good-app is the exportable vault JSON plus the MCP export surface.
+Use SolidJS with Solid stores, Tailwind CSS 4.3.2 (pinned), and Ark UI for the whole application; state (identities, active identity, per-identity per-app grants, theme, audit log and its action-type filter, search query, sort order, undo/redo stacks, export and backup drawers, import errors, and UI chrome) is held in a Solid store as the single live source of truth, and every view derives from that one store. Do not use localStorage, sessionStorage, or other browser storage APIs — persistence for this good-app is the exportable vault JSON plus the MCP export surface.
 State contracts (behavioral):
 - Creating a valid identity increases the identity count, generates a distinct keypair, becomes the new active identity, and appears in the vault export preview
 - Renaming updates that identity's label everywhere it appears (card, dashboard when active, activeLabel when active, export preview)
@@ -146,6 +179,9 @@ State contracts (behavioral):
 - Selecting an identity updates the active identity everywhere it is displayed (dashboard key surfaces, permission badges, permissions view, export activeLabel) without mixing in another identity's data
 - Toggling one application's grant for the active identity changes only that application's grant for that identity; every other application/identity combination is unaffected; the export preview's grants object updates to match
 - Reveal/hide of the private key is local UI state that does not affect any other identity's reveal state
+- Rotating an identity replaces only that identity's keypair (label and grants untouched) and every surface showing its keys updates together
+- A bulk grant/revoke mutates every affected identity's grant in one history step; the matrix, per-identity pills, stat tiles, and export preview never disagree
+- Backup export compiles from the live store; backup import adds exactly one identity and is rejected on npub conflict without partial application
 - Undo/redo walk the same shared history the visible controls write
 - Theme and active view are shared state changes that do not reload the document
 - WebMCP tool handlers invoke the same store commands the visible controls use
@@ -154,7 +190,7 @@ Seed at least 2 identities on first load, each with its own generated keypair an
 A page reload returns the app to that seeded baseline; session mutations do not survive the reload.
 No backend, no network calls, and no simulated Nostr relay connection; the app is entirely self-contained and works offline.
 Public keys are rendered as npub1-prefixed strings and private keys as nsec1-prefixed strings; keys must be real bech32-encoded values generated at identity-creation time, not placeholder text.
-Forms and schemas: all forms (create-identity, rename, and vault import) are driven by Felte paired with a Zod schema; schemas are API-shaped — the create/rename schema models the identity-create request body (required label string, trimmed, length 1–40), the vault import schema models the nostrpass-vault-v1 document (version, activeLabel, theme enum light/dark, identities array of label/npub/nsec/grants records with the four grant booleans), the record a form creates is the would-be request body, and vault JSON export and import compile and validate against that same vault schema; inline per-field errors appear before submit, with submit disabled until the schema passes.
+Forms and schemas: all forms (create-identity, rename, vault import, and backup import) are driven by Felte paired with a Zod schema; schemas are API-shaped — the create/rename schema models the identity-create request body (required label string, trimmed, length 1–40), the vault import schema models the nostrpass-vault-v1 document (version, activeLabel, theme enum light/dark, identities array of label/npub/nsec/grants records with the four grant booleans), and the backup schema models the nostrpass-backup-v1 document (version, exportedAt, and one identity record of label/npub/nsec/grants); the record a form creates is the would-be request body, and vault and backup JSON export and import compile and validate against those same schemas; inline per-field errors appear before submit, with submit disabled until the schema passes.
 Component library: Ark UI (Solid) provides the interactive primitives — the permission switch toggles, the theme switch, the toast surface, the export drawer, and dialog/disclosure chrome where used; do not hand-roll these primitives.
 Animation: Motion (the vanilla motion.dev package) and CSS transitions are allowed for animation; no other animation libraries.
 Icons: Tabler icons only, via the @tabler/icons-solidjs package.

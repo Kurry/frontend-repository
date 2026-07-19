@@ -63,77 +63,77 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+description = "Sidebar items, header controls, table row actions, form fields, pagination, and export drawer controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space and show a visible focus indicator"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
 name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+description = "Export drawer traps focus while open and returns it to the originating control on Escape or close; popovers return focus similarly"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
 name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+description = "Avatar images and icon-only buttons have descriptive alt text or accessible names"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
 name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+description = "Validation errors and create/delete/export/import confirmations are conveyed visually and via aria-live polite regions"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
 name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+description = "Add/Edit form fields use visible labels associated with their controls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
 name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+description = "Headings in Operations Overview and Users views follow a logical order without skips that break structure"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
 name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+description = "Sidebar navigation and main canvas use semantic landmarks (nav/main) so regions are discoverable"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
 name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+description = "Text and controls across light and dark themes have sufficient color contrast"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
 name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+description = "Semantic HTML roles such as nav, main, and button are used for chrome and actions"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "status_role_not_color_only"
+description = "Status and role badges convey state with text labels in addition to color"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
 name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+description = "Sidebar, table actions, or export controls cannot be activated or reached via keyboard"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n2"
 name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+description = "Focus indicators are missing or obscured on interactive chrome"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n3"
 name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+description = "Custom components use non-semantic tags and lack ARIA roles or labels for row actions or export controls"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +157,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n4"
 name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+description = "Status or role state is indicated by color only with no text label"
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +165,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n5"
 name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+description = "While the export drawer is open, keyboard focus freely escapes into background chrome"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n6"
 name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+description = "Text is unreadable due to poor contrast in light or dark theme"
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +181,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n7"
 name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+description = "Validation or import error feedback is visual only and is not screen-reader accessible"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n8"
 name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+description = "Avatar or icon content is missing alt text or accessible names"
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,15 +197,15 @@ weight = 1.0
 [[criterion]]
 id = "1.n9"
 name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+description = "Headings are skipped or unordered in a way that breaks document structure"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n10"
-name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+name = "export_escape_fails_focus_return"
+description = "Escape on the export drawer fails to close it or fails to return focus"
 type = "binary"
 negate = true
 weight = 1.0

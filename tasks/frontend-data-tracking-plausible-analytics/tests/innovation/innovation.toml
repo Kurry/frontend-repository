@@ -78,7 +78,7 @@ weight = 0.5
 [[criterion]]
 id = "11.3"
 name = "export_active_filter_chip"
-description = "A compact chip in the export drawer header shows the active filter when one is applied"
+description = "A compact chip in the export drawer header shows the active filter stack when filters are applied"
 type = "binary"
 weight = 0.5
 

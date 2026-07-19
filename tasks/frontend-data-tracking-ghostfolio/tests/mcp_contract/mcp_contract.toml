@@ -218,6 +218,28 @@ weight = 1.0
 
 
 [[criterion]]
+id = "12.14"
+name = "performance_and_diagnostics_destinations_bound"
+description = "Browse destinations include performance-chart and import-diagnostics; opening performance-chart reaches the portfolio-value-over-time chart and opening import-diagnostics reaches the CSV import pre-commit diagnostics screen through the same paths as the visible controls."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.15"
+name = "performance_report_export_format_bound"
+description = "The artifact export format performance-report is bound; invoking it drives the same Performance report tab as the visible UI and its result matches the live performance summary and per-holding rows without returning raw file/blob/base64 contents in WebMCP results."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.n9"
+name = "new_destinations_or_format_missing_or_undeclared"
+description = "The performance-chart or import-diagnostics destination, or the performance-report export format, is missing or no-op when invoked, or destinations, formats, or operations beyond the Bindings block are exposed through the tool list."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
 id = "mcp_contract.catchall"
 name = "mcp_contract_catchall"
 description = "The MCP contract for browse-query-v1 / entity-collection-v1 / artifact-transfer-v1 with holding, asset-class/activity-type, and portfolio export/import bindings deviates from its declaration in a way NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to automation or a real user. If present, name the defect and cite concrete evidence. If already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

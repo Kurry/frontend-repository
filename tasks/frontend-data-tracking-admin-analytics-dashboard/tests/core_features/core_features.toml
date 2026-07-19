@@ -70,14 +70,14 @@ weight = 1.0
 [[criterion]]
 id = "1.2"
 name = "create_user_appears_in_list"
-description = "After creating a user with first name 'Ada', last name 'Lovelace', and a valid email, the text 'Ada Lovelace' (or equivalent full name) is visible in the All Users list"
+description = "After creating a user with first name Ada, last name Lovelace, and a valid email that satisfies the UserCreate field contract, the text Ada Lovelace (or equivalent full name) is visible in the All Users list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
 name = "create_count_delta_matches"
-description = "After adding 3 new users on top of the seed set, the All Users table shows exactly 3 more rows than the initial seeded count"
+description = "After adding 3 new users on top of the seed set with valid UserCreate payloads, the All Users table shows exactly 3 more rows than the initial seeded count"
 type = "binary"
 weight = 1.0
 
@@ -91,7 +91,7 @@ weight = 1.0
 [[criterion]]
 id = "1.5"
 name = "edit_updates_name_in_list"
-description = "After editing a user's name from the seeded value to 'Evening Runner', the text 'Evening Runner' is visible in the list and the previous name is not"
+description = "After editing a user's name from the seeded value to Evening Runner, the text Evening Runner is visible in the list and the previous name is not"
 type = "binary"
 weight = 1.0
 
@@ -112,7 +112,7 @@ weight = 1.0
 [[criterion]]
 id = "1.8"
 name = "invalid_submit_adds_no_row"
-description = "After submitting Create user with an empty required name or email field, the users count in the list does not increase and validation feedback is visible"
+description = "After submitting Create user with an empty required firstName or email field, or with firstName longer than 40 characters, the users count in the list does not increase and validation feedback naming the field is visible"
 type = "binary"
 weight = 1.0
 
@@ -184,16 +184,16 @@ id = "1.20"
 name = "static_list_without_crud"
 description = "Users list is static HTML only with no working create/edit/delete against shared state"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "1.21"
 name = "outbound_links_in_chrome"
 description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "1.22"
@@ -226,7 +226,7 @@ weight = 1.0
 [[criterion]]
 id = "1.26"
 name = "add_user_form_groups_inline_validation"
-description = "The Add User form presents grouped sections — Profile (first name, last name, email, phone, notes), Access (temporary password, account segment, send invitation), Account settings (status, role, 2FA / product-access toggles), and Permissions checkboxes — and validates inline: each invalid field shows a per-field message naming that field before submit, and the submit control stays disabled until required fields are valid"
+description = "The Add User form presents grouped sections — Profile (firstName, lastName, email, phone, notes), Access (temporaryPassword, accountSegment, send invitation), Account settings (status, role, 2FA / product-access toggles), and Permissions checkboxes — and validates the UserCreate field contract inline: each invalid field shows a per-field message naming that field before submit, and the submit control stays disabled until required fields are valid"
 type = "binary"
 weight = 1.0
 
@@ -261,7 +261,7 @@ weight = 1.0
 [[criterion]]
 id = "1.31"
 name = "create_flow_kpi_search_chain"
-description = "Scripted probe: on All Users, record the visible row count and the KPI Total; submit Add User with valid fields for a new Active user named 'Nora Quinn'; confirm All Users gains exactly one row, the KPI Total increases by exactly one, the Active KPI increases by exactly one, and typing 'Nora' into the header search narrows the table to that row — all without a page reload"
+description = "Scripted probe: on All Users, record the visible row count and the KPI Total; submit Add User with a valid UserCreate payload for a new Active user named Nora Quinn; confirm All Users gains exactly one row, the KPI Total increases by exactly one, the Active KPI increases by exactly one, and typing Nora into the header search narrows the table to that row — all without a page reload"
 type = "binary"
 weight = 1.0
 
@@ -329,9 +329,46 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "1.41"
+name = "export_drawer_session_json_contract"
+description = "Opening Export session shows Session JSON and Users CSV tabs; Session JSON preview includes schemaVersion exactly pineapple-admin-analytics-v1, exportedAt, users, kpis, filters, sort, theme, and activeView"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "export_contains_session_mutations"
+description = "After creating a user with a distinctive email and deleting another user, reopening Export shows the new email under users, omits the deleted user, and kpis match the on-screen KPI strip; Users CSV includes the new firstName"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "export_copy_download_and_import_roundtrip"
+description = "Copy writes the visible export preview to the clipboard with confirmation and Download starts a file download of that same text; importing previously exported Session JSON restores users, KPIs, and both export previews to the pre-export mutated state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n3"
+name = "export_omits_session_work"
+description = "Export Session JSON or Users CSV omits a create, edit, delete, status, or role change that is already visible in the UI, or Import of valid Session JSON fails to restore the exported session"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n4"
+name = "field_contract_not_enforced"
+description = "Add User accepts an empty firstName, firstName longer than 40 characters, an email missing a domain dot, temporaryPassword shorter than 8 characters, a role or status outside the closed enums, or notes longer than 280 characters and still adds a row"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0

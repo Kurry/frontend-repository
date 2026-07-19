@@ -84,7 +84,7 @@ weight = 1.0
 [[criterion]]
 id = "14.4"
 name = "cross_view_echo_without_reload"
-description = "Cross-view echo: create or edit an event in Library/Filter mode and confirm the same title/year appears on the stage pin and in an open detail without reload; export preview also reflects the change."
+description = "Cross-view echo: create or edit an event in Library/Filter mode and confirm the same title/year/type/mediaRefs appear on the stage pin and in an open detail without reload; export preview also reflects the change."
 type = "binary"
 weight = 1.0
 
@@ -98,7 +98,7 @@ weight = 1.0
 [[criterion]]
 id = "14.6"
 name = "different_inputs_change_outcomes"
-description = "Input-dependent output: create two events with distinct titles and years; the Library shows both distinct titles and the export JSON events array contains both distinct titles and years."
+description = "Input-dependent output: create two events with distinct titles, types, timestamps, mediaRefs, and years; the Library shows both distinct titles and the export JSON events array contains both distinct titles with matching type/timestamp/mediaRefs and years."
 type = "binary"
 weight = 1.0
 
@@ -126,7 +126,7 @@ weight = 1.0
 [[criterion]]
 id = "14.10"
 name = "import_export_byte_stable_titles"
-description = "Import/export round-trip: after two creates, export JSON, clear user events, import the pack, and confirm a fresh export's events array contains the same two titles."
+description = "Import/export round-trip: after two creates, export JSON, clear user events, import the pack, and confirm a fresh export's events array contains the same two titles with the same type, timestamp, and mediaRefs values."
 type = "binary"
 weight = 1.0
 
@@ -166,6 +166,21 @@ negate = true
 id = "14.n5"
 name = "export_ignores_undo"
 description = "After Undo removes a created event from the UI, the export preview still contains that event's title."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "14.11"
+name = "api_payload_round_trip_in_export"
+description = "Create Signal Tower Demo with type First Appearance, timestamp 1920-01-01T00:00:00.000Z, and mediaRefs containing signal-tower-demo; open Export — the JSON events entry for that title carries those exact type, timestamp, and mediaRefs values and document is media-history-timeline."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n6"
+name = "export_strips_api_shaped_fields"
+description = "After a valid create, the export JSON events entry for that event is missing type, timestamp ending with Z, or mediaRefs."
 type = "binary"
 weight = 1.0
 negate = true

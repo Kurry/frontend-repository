@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.1"
 name = "shared_state_coherence"
-description = "All views derive from one shared collection: a status/role edit, create, or delete made in any view is immediately reflected in every other place it appears (table rows, badges, KPI counts, filtered views) without a reload, and filters/sort/bulk actions recompute the same visible list"
+description = "All views derive from one shared collection: a status/role edit, create, or delete made in any view is immediately reflected in every other place it appears (table rows, badges, KPI counts, filtered views, export previews) without a reload, and filters/sort/bulk actions recompute the same visible list"
 type = "binary"
 weight = 1.0
 
@@ -79,21 +79,21 @@ id = "2.3"
 name = "storage_persistence_used"
 description = "localStorage or sessionStorage holds users, theme, or filter state after exercising the app"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "2.5"
 name = "external_network_requests"
 description = "The devtools network log shows requests to external origins or third-party CDNs (scripts, styles, fonts, icons, or data) during load or a full exercise of the app"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "2.6"
 name = "hydration_clean_console"
-description = "The console is free of errors, warnings, and hydration mismatch messages on first load and stays clean after switching views and exercising create, edit, delete, filter, sort, and theme flows"
+description = "The console is free of errors, warnings, and hydration mismatch messages on first load and stays clean after switching views and exercising create, edit, delete, filter, sort, export, import, and theme flows"
 type = "binary"
 weight = 1.0
 
@@ -109,8 +109,8 @@ id = "2.8"
 name = "post_hydration_content_flash"
 description = "After first paint, the statically rendered content visibly flashes, shifts, or is replaced by different client content (mismatched text, reflowing layout, restyled elements) as the app becomes interactive"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "2.9"
@@ -122,21 +122,21 @@ weight = 1.0
 [[criterion]]
 id = "2.10"
 name = "rapid_input_stability"
-description = "Under rapid repeated input (fast theme toggles, quick view switches, rapid filter changes), the UI stays responsive with no hangs and no view showing stale data another view already updated"
+description = "Under rapid repeated input (fast theme toggles, quick view switches, rapid filter changes, export tab switches), the UI stays responsive with no hangs and no view showing stale data another view already updated"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.11"
 name = "keyboard_operability_focus"
-description = "Every interactive control — sidebar items, header controls, table row actions, form fields, pagination — is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space), showing a visible focus indicator at each stop"
+description = "Every interactive control — sidebar items, header controls, table row actions, form fields, pagination, export drawer — is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space), showing a visible focus indicator at each stop"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.12"
 name = "escape_closes_returns_focus"
-description = "Open popovers and menus (notifications, profile, sidebar account) close on the Escape key and return keyboard focus to the control that opened them"
+description = "Open popovers and the export drawer close on the Escape key and return keyboard focus to the control that opened them"
 type = "binary"
 weight = 1.0
 
@@ -148,9 +148,16 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.catchall"
+id = "2.14"
+name = "export_end_state_live_compile"
+description = "Session JSON and Users CSV compile live from the current store: after a create or delete, reopening Export shows the mutation without requiring a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "technical.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0

@@ -62,153 +62,153 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "7.1"
-name = "layout_adapts_desktop_to_mobile"
-description = "Layout adapts gracefully from 1440px desktop to 375px mobile."
+name = "no_horizontal_scroll_375"
+description = "At approximately 375px wide there is no page-level horizontal scrolling"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
-name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+name = "archive_stacks_below_tree"
+description = "At ~375px the Archive panel stacks below the task tree instead of sitting beside it; at desktop widths they sit side by side"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
-name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+name = "app_name_scales_down"
+description = "At ~375px the app-name heading scales down rather than overflowing the viewport"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
-name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+name = "toolbar_and_grove_usable_narrow"
+description = "At ~375px toolbar controls including Export grove wrap onto additional rows, and Grove package tabs plus Download, Copy, and Import stay fully visible and operable"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
-name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+name = "nested_titles_wrap_or_truncate"
+description = "Deeply nested rows truncate or wrap their title text rather than forcing the page wider at narrow and desktop widths"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.6"
-name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+name = "desktop_side_by_side_layout"
+description = "At desktop widths the task tree and Archive panel sit side by side with both panels usable"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.7"
-name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+name = "mobile_tap_targets_usable"
+description = "Primary tree and toolbar controls remain tappable without overlapping neighbors at ~375px"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.8"
 name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+description = "Small screens have no horizontal scrolling across tree, toolbar, and Grove package panel"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.9"
-name = "media_and_canvases_resize"
-description = "Images, grids, and canvases size responsively to fit the layout."
+name = "grove_preview_scrolls_locally"
+description = "The Grove package monospaced preview scrolls inside its panel rather than expanding the page width"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.10"
-name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
+name = "footer_create_form_remains_accessible"
+description = "The New root task form in the footer remains reachable and usable at ~375px and desktop widths"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.n1"
-name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+name = "page_scrolls_horizontally_375"
+description = "At ~375px the page scrolls horizontally"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n2"
 name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+description = "Export grove, Import grove, or tree action controls are too small or misaligned on mobile"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n3"
-name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+name = "app_name_overflows"
+description = "The app-name heading overflows or clips at ~375px"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n4"
 name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+description = "Tree titles or Grove package controls are cropped or force unnecessary page scrollbars"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n5"
-name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
+name = "archive_layout_breaks_by_width"
+description = "The Archive panel is missing, overlapping, or stuck beside the tree at narrow width"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n6"
 name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
+description = "Fixed toolbar or footer positions obscure task rows or Grove package controls"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n7"
 name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
+description = "Toolbar chips, Export grove, or tree controls overlap at some viewport size"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n8"
-name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
+name = "grove_controls_disappear_narrow"
+description = "Download grove package, Copy grove package, or Import grove disappear at narrow width"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n9"
-name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
+name = "nested_title_forces_page_wider"
+description = "A deeply nested title forces page-level horizontal overflow"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n10"
 name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
+description = "Theme, Tag manager, or Export grove controls disappear at specific sizes"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "responsiveness.catchall"
