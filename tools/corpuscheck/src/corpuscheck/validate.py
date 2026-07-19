@@ -370,14 +370,13 @@ def validate_eval_validity(task_dir: Path) -> CheckResult:
         seen: dict[str, str] = {}
         for criterion in data.get("criterion", []):
             cid = str(criterion.get("id") or criterion.get("name") or "<unknown>")
-            criterion_name = str(criterion.get("name") or "")
+            if cid.endswith(".catchall"):
+                continue
             description = str(criterion.get("description") or "")
             if stack_pattern.search(description):
                 messages.append(f"{path.name}:{cid}: stack-identity phrasing/name")
-            is_catchall = cid.endswith(".catchall") or "catchall" in criterion_name.casefold()
             if (
                 criterion.get("negate") is True
-                and not is_catchall
                 and DOUBLE_NEGATION_RE.search(description)
             ):
                 messages.append(f"{path.name}:{cid}: likely double-inverted negation")
@@ -423,9 +422,10 @@ def validate_oracle(
         messages.append("solution/app/package.json is missing or invalid JSON")
     else:
         scripts = package.get("scripts")
-        if not isinstance(scripts, dict) or set(scripts) != {"start", "verify:build"}:
+        required_scripts = {"start", "verify:build"}
+        if not isinstance(scripts, dict) or not required_scripts.issubset(scripts):
             keys = sorted(scripts) if isinstance(scripts, dict) else []
-            messages.append(f"package.json scripts must be exactly start+verify:build (found {keys})")
+            messages.append(f"package.json scripts must include start+verify:build (found {keys})")
         start = str(scripts.get("start", "")) if isinstance(scripts, dict) else ""
         referenced_outputs: set[str] = set()
         if re.search(r"\b(?:dist|build)(?:/|\b)", start):

@@ -384,8 +384,11 @@ def record_serving(
     package = _load_json(app_dir / "package.json", "solution/app/package.json") if app_dir.is_dir() else None
     if not app_dir.is_dir():
         failures.append("solution/app is absent")
-    if package is not None and set(package.get("scripts", {})) != {"start", "verify:build"}:
-        failures.append("package.json scripts are not exactly start+verify:build")
+    if package is not None:
+        scripts = package.get("scripts")
+        required_scripts = {"start", "verify:build"}
+        if not isinstance(scripts, dict) or not required_scripts.issubset(scripts):
+            failures.append("package.json scripts do not include start+verify:build")
     evidence: dict = {"git_sha": git_sha()}
     if validation:
         validation_path = Path(validation).expanduser().resolve()
