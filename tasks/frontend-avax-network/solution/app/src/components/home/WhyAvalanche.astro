@@ -1,0 +1,191 @@
+---
+const avalancheMark = `<svg viewBox="0 0 722 628" class="w-1/2" aria-hidden="true">
+<path d="M548.831 381.485C560.015 362.435 587.792 362.435 598.853 381.485L717.703 584.525C728.887 603.575 714.876 627.296 692.63 627.296H454.932C432.686 627.296 418.797 603.575 429.859 584.525L548.831 381.485Z" fill="currentcolor" />
+<path d="M477.034 246.295C487.849 227.367 487.849 204.015 477.034 184.965L379.57 14.9872C368.631 -4.06311 341.346 -4.06311 330.408 14.9872L4.21765 584.407C-6.7209 603.457 6.92156 627.301 28.7987 627.301H223.603C245.358 627.301 265.391 615.625 276.207 596.697L476.911 246.295H477.034Z" fill="currentcolor" />
+</svg>`;
+
+const items = [
+  {
+    n: "01",
+    title: "Fast. Powerful. Secure.",
+    body: "The groundbreaking Avalanche consensus powers a network of fast, efficient, highly-optimized chains that finalize transactions almost instantly. Accompanied by a best-in-class developer experience and suite of tools, Avalanche is the platform of choice for builders and users ready for what’s next in Web3.",
+    icon: "/_astro/14_Z2r6dTW.svg",
+    alt: "Fast. Powerful. Secure. symbol",
+    classes:
+      "text-black dark:text-white [--bg-color:var(--color-neutral-50)] dark:[--bg-color:var(--color-slate-500)] dark:group-[.colorful]/section:[--bg-color:var(--color-blue-800)]",
+  },
+  {
+    n: "02",
+    title: "Infinitely Scalable by Design",
+    body: "Avalanche is where Web3's big ideas scale with confidence. Whether it’s a single application, or launching a fully-customizable Layer 1 blockchain, Avalanche makes it easy to scale up — or across — in an interconnected ecosystem.",
+    icon: "/_astro/blokchain_Z2jM1Y7.svg",
+    alt: "Infinitely Scalable by Design symbol",
+    classes:
+      "text-black group-[.colorful]/section:text-white dark:text-white [--bg-color:var(--color-neutral-100)] group-[.colorful]/section:[--bg-color:var(--color-blue)] dark:[--bg-color:var(--color-slate-600)]",
+  },
+  {
+    n: "03",
+    title: "Customizable Layer 1s",
+    body: "Whatever your use-case, Avalanche makes launching your own L1 more economically feasible, simpler to customize, smoother to maintain and quicker to bring to market. The network is anchored by a lightning-fast and efficient primary chain and a universe of sovereign blockchains, all natively connected through Avalanche Interchain Messaging.",
+    icon: "/_astro/product-development_ZHGzN.svg",
+    alt: "Customizable Layer 1s symbol",
+    classes:
+      "text-black group-[.colorful]/section:text-white dark:text-white [--bg-color:var(--color-neutral-300)] group-[.colorful]/section:[--bg-color:var(--color-neutral-500)] dark:[--bg-color:var(--color-slate-800)] dark:group-[.colorful]/section:[--bg-color:var(--color-red-800)]",
+  },
+  {
+    n: "04",
+    title: "Global Community",
+    body: "Avalanche is more than just a blockchain network. It's a global community of builders, creators, and collaborators, all together on a mission to drive the adoption of blockchain technology. There are no gatekeepers, just an open ecosystem where knowledge and resources are shared, creating a global movement ready to turn ideas into real-world impact.",
+    icon: "/_astro/enterprise-software_1q9OVe.svg",
+    alt: "Global Community symbol",
+    classes: "text-black dark:text-white [--bg-color:var(--color-red)]",
+  },
+];
+---
+
+<section id="solutions-insights" class="relative w-full" data-show-number="false">
+  <div
+    id="solutions-insights-inner"
+    class="group/section animate-in-view colorful transition-mode flex w-full flex-col items-stretch justify-start gap-[var(--gap-xl)] rounded-[var(--radius-4xl)] fill-white p-[var(--padding-md)] dark:fill-dark [--insight-card-height:100lvh]"
+  >
+    <div class="absolute inset-0">
+      <div class="corner-background-top sticky top-[var(--navbar-height)] h-[calc(var(--insight-card-height)-var(--navbar-height))] w-full">
+        <wm-shape
+          id="solutions-insights-inner"
+          rounded="clamp(1rem, -0.143rem + 1.786vw, 2rem)"
+          rounded-mobile="clamp(1rem, 0.421rem + 2.469vw, 2rem)"
+          corner-rounded="clamp(0.75rem, -0.107rem + 1.339vw, 1.5rem)"
+          corner-rounded-mobile="clamp(0.75rem, -0.107rem + 1.339vw, 1.5rem)"
+          corner-size="clamp(4.5rem, -0.071rem + 7.143vw, 8.5rem)"
+          corner-size-mobile="clamp(3.5rem, 0.606rem + 12.346vw, 8.5rem)"
+          stroke-width="1"
+          corner="tr"
+        ></wm-shape>
+      </div>
+    </div>
+
+    <div class="relative flex flex-col items-stretch justify-start">
+      <h2
+        class="h1 sticky top-[calc(var(--navbar-height)+var(--padding-md))] mb-[var(--gap-xl)] leading-[80%] uppercase transition-mode"
+        style="line-height: 80%"
+      >
+        <span
+          class="block w-fit translate-x-[50vw] bg-white pl-0.75 pt-0.75 transition-move group-[.visible]/section:translate-x-0 dark:bg-dark"
+          >Why</span
+        >
+        <span class="block bg-white pl-0.75 pt-0.75 transition-mode dark:bg-dark">Avalanche</span>
+      </h2>
+
+      {
+        items.map((item, i) => (
+          <div
+            style={`--index: ${i}; --offset: 0px;`}
+            class:list={[
+              "insight sticky top-[calc(var(--navbar-height)+var(--padding-md)+var(--offset))] grid h-[calc(var(--insight-card-height)-var(--navbar-height)-var(--offset)-var(--padding-md)*2)] grid-cols-1 place-items-stretch will-change-transform transition-mode lg:grid-cols-[2fr_1.2fr]",
+              item.classes,
+            ]}
+          >
+            <div class="relative flex h-full flex-col gap-[var(--gap-base)] fill-(--bg-color) p-[var(--padding-md)] stroke-neutral-200 transition-mode lg:flex-row lg:gap-[var(--gap-xl)] lg:rounded-2xl lg:border lg:border-neutral-200 lg:bg-(--bg-color) lg:pr-[var(--padding-4xl)] dark:stroke-neutral-800 dark:lg:border-neutral-800">
+              <div class="absolute inset-0 -bottom-px lg:hidden">
+                <wm-shape
+                  id="solutions"
+                  rounded="clamp(0.75rem, -0.107rem + 1.339vw, 1.5rem)"
+                  rounded-mobile="1rem"
+                  corner-rounded="clamp(0.625rem, 0.196rem + 0.67vw, 1rem)"
+                  corner-rounded-mobile="1rem"
+                  corner-size="clamp(4.5rem, -0.071rem + 7.143vw, 8.5rem)"
+                  corner-size-mobile="clamp(3.5rem, 0.606rem + 12.346vw, 8.5rem)"
+                  stroke-width="1"
+                  corner="tr"
+                  image-position="tl"
+                ></wm-shape>
+              </div>
+              <p
+                id="insight-number"
+                class="xl font-aeonik text-black transition-mode group-[.secondary]/insight:text-neutral-400 dark:text-white"
+              >
+                {item.n}
+              </p>
+              <div class="flex h-full flex-col items-start justify-between gap-[var(--gap-base)]">
+                <div class="flex flex-col gap-[var(--gap-base)]">
+                  <h2
+                    id="insight-title"
+                    class="pr-[var(--padding-lg)] text-[clamp(1.5rem,calc(1.179rem+1.282vw),2rem)] leading-none uppercase lg:pr-0 lg:text-[clamp(2rem,calc(0.857rem+1.786vw),3rem)]"
+                  >
+                    {` ${item.title} `}
+                  </h2>
+                  <p id="insight-description" class="text-[1rem] leading-[120%] sm:text-lg">
+                    {item.body}
+                  </p>
+                </div>
+                <div
+                  class="flex size-[clamp(2rem,1.711rem+1.235vw,2.5rem)] shrink-0 items-center justify-center rounded-full bg-transparent text-red group-[.secondary]/insight:text-red lg:size-[clamp(1.5rem,0.357rem+1.786vw,2.5rem)]"
+                  set:html={avalancheMark}
+                />
+              </div>
+            </div>
+            <div class="relative flex items-center justify-center rounded-2xl border border-neutral-200 bg-(--bg-color) fill-(--bg-color) stroke-neutral-200 transition-mode lg:rounded-none lg:border-none lg:bg-transparent dark:border-neutral-800 dark:stroke-neutral-800">
+              <img
+                src={item.icon}
+                alt={item.alt}
+                loading="lazy"
+                decoding="async"
+                width="201"
+                height="200"
+                class="h-20 w-auto shrink-0 py-[var(--padding-xs)] lg:h-[clamp(6.625rem,-0.089rem+10.491vw,12.5rem)]"
+              />
+              <div class="absolute inset-0 hidden lg:-left-px lg:block">
+                <wm-shape
+                  id="solutions"
+                  rounded="clamp(0.75rem, -0.107rem + 1.339vw, 1.5rem)"
+                  rounded-mobile="1rem"
+                  corner-rounded="clamp(0.625rem, 0.196rem + 0.67vw, 1rem)"
+                  corner-rounded-mobile="1rem"
+                  corner-size="clamp(4.5rem, -0.071rem + 7.143vw, 8.5rem)"
+                  corner-size-mobile="clamp(3.5rem, 0.606rem + 12.346vw, 8.5rem)"
+                  stroke-width="1"
+                  corner="tr"
+                ></wm-shape>
+              </div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  const root = document.getElementById("solutions-insights");
+  const showNumber = root?.getAttribute("data-show-number") === "true";
+
+  const updateOffsets = () => {
+    const insights = document.querySelectorAll<HTMLElement>(".insight");
+    // Always recompute from a clean slate so resize/re-entry stays idempotent.
+    insights.forEach((card) => card.style.setProperty("--offset", "0px"));
+    insights.forEach((card, i) => {
+      const numberEl = card.querySelector("#insight-number");
+      const titleEl = card.querySelector("#insight-title");
+      const descEl = card.querySelector("#insight-description");
+      const next = insights[i + 1] as HTMLElement | undefined;
+      if (!titleEl || !descEl) return;
+      const currentOffset = card.style.getPropertyValue("--offset") || "0";
+      const top = card.getBoundingClientRect().top;
+      const numberTop = numberEl?.getBoundingClientRect().top ?? top;
+      const titleTop = titleEl.getBoundingClientRect().top;
+      const descTop = descEl.getBoundingClientRect().top;
+      const anchor =
+        window.innerWidth > 1024 ? descTop : showNumber ? titleTop : numberTop;
+      next?.style.setProperty("--offset", `${anchor - top + parseFloat(currentOffset)}px`);
+    });
+  };
+
+  const schedule = () => {
+    updateOffsets();
+    requestAnimationFrame(() => updateOffsets());
+  };
+  schedule();
+  window.addEventListener("resize", schedule);
+  window.addEventListener("load", schedule);
+  document.fonts?.ready?.then(schedule);
+</script>

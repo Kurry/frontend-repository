@@ -1,0 +1,52 @@
+schema_version = "1.3"
+
+[task]
+name = "mercor-intelligence/frontend-loopdaily"
+description = "LoopDaily habit tracker with malformed-data recovery good-app eval."
+
+[agent]
+timeout_sec = 3600.0
+
+[agent.env]
+CLAUDE_FORCE_OAUTH = "1"
+CLAUDE_CODE_OAUTH_TOKEN = "${CLAUDE_CODE_OAUTH_TOKEN}"
+
+[verifier]
+timeout_sec = 14400.0
+
+[verifier.env]
+OPENAI_API_KEY = "${OPENAI_API_KEY:-}"
+CODEX_AUTH_JSON = "${CODEX_AUTH_JSON:-}"
+REWARDKIT_MODEL = "${REWARDKIT_MODEL:-}"
+
+[environment]
+workdir = "/app"
+build_timeout_sec = 1200.0
+memory_mb = 8192
+cpus = 4
+
+[[artifacts]]
+source = "/app"
+destination = "app"
+exclude = [
+    "node_modules",
+    ".git",
+    ".DS_Store",
+    "dist",
+    "build",
+    "out",
+    ".next",
+    ".nuxt",
+    ".svelte-kit",
+    "storybook-static",
+    ".cache",
+    ".vite",
+    ".turbo",
+    ".parcel-cache",
+    ".pnpm-store",
+    ".yarn",
+    ".npm",
+    "coverage",
+    "playwright-report",
+    "test-results",
+]

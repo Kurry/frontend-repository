@@ -1,0 +1,1 @@
+import{v as e}from"./core.min-C6O5v62Y.js";import{s as r}from"./store-CcC-Cn2p.js";import"./preloader-Bns9QiKi.js";import"./types-BMbUCgPc.js";const m=o=>{const[t]=e();t.state.content.profile.bio=o.target.value,r(t.state)};export{m as s_ow0wD4BugzY};

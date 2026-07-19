@@ -1,0 +1,144 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/mcp/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "2_1"
+description = "Loading the root URL renders the converter workspace without a blank page or framework error overlay, and reloading re-renders the drop zone and queue rather than an application error."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "2_2"
+description = "Navigating categories, format selectors, settings, and privacy, and running a conversion, produces no uncaught JavaScript exception or unhandled promise rejection in the console."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "2_3"
+description = "Image conversion is real and local: converting the same file to two different targets, or at two different quality settings, yields genuinely different output bytes and a valid downloadable file of the chosen format, with no network request required."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.4"
+name = "2_4"
+description = "The theme, active conversion category, and conversion settings (quality, keep-metadata) persist in client storage and are restored after a page reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "2_5"
+description = "The queue rows, per-file target selection, per-file status, and counts all derive from one shared client state: adding, converting, removing, or clearing files updates the rows and counts together, not as disconnected copies."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "2_6"
+description = "A WebMCP surface is exposed on window (webmcp_session_info, webmcp_list_tools, webmcp_invoke_tool) whose tools drive the same store actions as the visible UI: entity_create then artifact_convert produces a visible queue row that reaches Done exactly as the Convert control does."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "2.7"
+name = "2_7"
+description = "No fabricated or hardcoded success: the conversion result must not be a constant regardless of input, a success state must not appear without the conversion running, and a converted result must remain valid within the session (anticheat AC-003)."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.8"
+name = "2_8"
+description = "No hidden element, attribute, or window global exposes internal ground-truth state (computed results, statuses, or file data) that a real user could not reach through normal visible interaction (anticheat AC-001)."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.9"
+name = "2_9"
+description = "No judge-visible surface (rendered text, DOM comments, alt text, title, or console output) contains language addressed to an AI judge or grading system (anticheat AC-002)."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.10"
+name = "2_10"
+description = "The app does not render or behave differently under automation: no runtime code path keys behavior on navigator.webdriver or other automation signals (anticheat AC-004)."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.11"
+name = "2_11"
+description = "A reload before any file is added must not restore a phantom file row, a stale converted result, or false progress; the queue returns to a single empty state."
+type = "binary"
+weight = 1.0
+negate = true

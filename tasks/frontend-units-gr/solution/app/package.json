@@ -1,0 +1,13 @@
+{
+  "name": "units-gr-oracle",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "verify:build": "node -e \"require('fs').accessSync('./prebuilt/index.html')\""
+  }
+}

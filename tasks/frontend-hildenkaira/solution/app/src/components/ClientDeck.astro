@@ -1,0 +1,104 @@
+---
+import data from "../data/home.json";
+import Button from "./Button.astro";
+import BunnyPlayer from "./BunnyPlayer.astro";
+const decks = data.decks;
+const arrow = `<svg class="slider-button_arrow" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="square"/></svg>`;
+const arrowPrev = `<svg class="slider-button_arrow is--prev" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="square"/></svg>`;
+const eye = `<svg class="flick-card_data-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.6"/></svg>`;
+---
+<section class="section_client-deck" data-gsap-ignore>
+  <div class="section-padding-128px">
+    <div class="padding-global">
+      <div class="container-col-12">
+        <div class="swiper-group" data-swiper-group>
+          <div class="swiper" data-swiper-wrap>
+            <div class="swiper-wrapper">
+              {decks.map((deck) => (
+                <div class="swiper-slide" role="listitem">
+                  <div class="client-deck_card">
+                    <div class="client-deck_card-title">
+                      <div class="client-deck_card-pf">
+                        <img class="image" src={deck.pf} alt="" loading="lazy" />
+                      </div>
+                      <h2 class="client-deck_title">{deck.title}</h2>
+                      <div class="client-deck_button">
+                        <Button label="Show case" href={deck.caseHref} variant="secondary" />
+                      </div>
+                    </div>
+
+                    <div class="client-deck_card-slider">
+                      <div class="flick-group" data-flick-cards-init>
+                        <div class="flick-group__collection" data-flick-cards-collection>
+                          <div class="flick-group__list" data-flick-cards-list>
+                            {deck.cards.map((card, i) => (
+                              <div class="flick-group__item" data-flick-cards-item data-flick-cards-item-status={i === 0 ? "active" : "hidden"}>
+                                <div class="flick-card">
+                                  <div class="flick-card__media">
+                                    <BunnyPlayer
+                                      src={card.video}
+                                      poster={card.poster}
+                                      caption={card.caption}
+                                      pf={deck.pf}
+                                      likes={card.cardLikes}
+                                    />
+                                  </div>
+                                </div>
+                                <div class="flick-card_data-wrap">
+                                  <div class="flick-card_data-mask">
+                                    <div class="flick-card_data theme-dark">
+                                      <div class="paragraph-s" data-split-visible>{card.age}</div>
+                                    </div>
+                                  </div>
+                                  <div class="flick-card_data-mask">
+                                    <div class="flick-card_data theme-white">
+                                      <div class="flick-card_data-icon" set:html={eye} />
+                                      <div class="paragraph-s" data-split-visible>{card.cardViews}</div>
+                                      <div class="paragraph-s" data-split-visible>views</div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        <div class="flick-group__pagination is-client-deck">
+                          <button class="flick-group__button" data-flick-prev aria-label="Previous video" set:html={arrowPrev} />
+                          <button class="flick-group__button" data-flick-next aria-label="Next video" set:html={arrow} />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="client-deck_card-data">
+                      <div class="client-deck_data-title">
+                        <div class="dot-l"></div>
+                        <div class="paragraph-m">Social reach from past 30 days</div>
+                      </div>
+                      <div class="client-deck_card-data-wrap">
+                        <div class="client-deck_card-views theme-lime">
+                          <div class="paragraph-regular">Organic views</div>
+                          <div class="client-deck_views-title" data-count="organic-views">{deck.views}</div>
+                        </div>
+                        <div class="client-deck_card-likes theme-chrome">
+                          <div class="paragraph-regular">Likes</div>
+                          <div class="client-deck_likes-title" data-count="likes">{deck.likes}</div>
+                          <div class="client-deck_likes-heart">
+                            <img src="/images/emoji/heart.avif" alt="Metallic Heart Emoji" loading="lazy" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div class="swiper-navigation">
+            <button class="slider-button" data-swiper-prev aria-label="Previous client" set:html={arrowPrev} />
+            <button class="slider-button" data-swiper-next aria-label="Next client" set:html={arrow} />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

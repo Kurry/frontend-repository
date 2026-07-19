@@ -1,0 +1,45 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import Navigation from "../../../components/Navigation.astro";
+import Footer from "../../../components/Footer.astro";
+import NewsletterContact from "../../../components/forms/NewsletterContact.astro";
+import blogPosts from "../../../data/blog-posts.json";
+import blogBodies from "../../../data/blog-bodies.json";
+
+export function getStaticPaths() {
+  return blogPosts.map((post) => ({ params: { slug: post.slug } }));
+}
+
+const slug = Astro.params.slug ?? "";
+const post = blogPosts.find((p) => p.slug === slug);
+if (!post) {
+  return Astro.redirect("/about/blog");
+}
+
+const body = (blogBodies as Record<string, { description?: string; paragraphs?: string[]; title?: string }>)[slug];
+const description = body?.description ?? post.title;
+const paragraphs = body?.paragraphs ?? [];
+---
+
+<Layout title={`${post.title} | Avalanche Blog`} description={description}>
+  <Navigation />
+  <main class="pt-[var(--navbar-height)]">
+    <article class="group/section animate-in-view mx-[var(--padding-base)] mt-[var(--padding-base)] rounded-[var(--radius-4xl)] bg-dark p-[var(--padding-xl)] lg:p-[var(--padding-3xl)]">
+      <p class="text-[var(--text-sm)] uppercase tracking-widest text-neutral-500">
+        <a href="/about/blog" class="hover:text-red">Blog</a>
+      </p>
+      <h1 class="font-aeonik split-heading mt-4 max-w-[22ch] text-[var(--text-5xl)] font-black leading-none">{body?.title ?? post.title}</h1>
+      <p class="split-text mt-6 max-w-[65ch] text-[var(--text-base)] text-neutral-300 opacity-0">{description}</p>
+      {paragraphs.length > 0 && (
+        <div class="mt-[var(--gap-xl)] max-w-[65ch] space-y-4 text-[var(--text-sm)] leading-[1.55] text-neutral-400">
+          {paragraphs.map((para) => <p>{para}</p>)}
+        </div>
+      )}
+      <div class="mt-[var(--gap-xl)]">
+        <a href="/about/blog" class="btn btn-primary">Back to blog</a>
+      </div>
+    </article>
+    <NewsletterContact />
+  </main>
+  <Footer />
+</Layout>

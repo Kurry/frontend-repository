@@ -1,0 +1,12 @@
+{
+  "name": "ghostfolio-oracle",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "node -e \"require('fs').accessSync('index.html');console.log('ok')\"",
+    "verify:build": "node -e \"require('fs').accessSync('index.html');require('fs').accessSync('src/app.js');console.log('build ok');process.exit(0)\""
+  }
+}

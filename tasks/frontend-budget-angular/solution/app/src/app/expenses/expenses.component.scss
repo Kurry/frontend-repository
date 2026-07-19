@@ -1,0 +1,43 @@
+.expenses {
+  position: relative;
+  padding-bottom: 72px;
+}
+
+.filter-bar {
+  margin-bottom: 8px;
+}
+
+.filter-field {
+  width: 100%;
+}
+
+.expense-table {
+  width: 100%;
+  background: #fff;
+}
+
+.edit-btn {
+  color: #c2185b;
+  min-width: 32px;
+}
+
+.delete-btn {
+  color: #c2185b;
+  min-width: 32px;
+}
+
+.empty-state {
+  text-align: center;
+  color: #777;
+  padding: 24px 0;
+}
+
+.add-fab {
+  position: fixed;
+  right: 24px;
+  bottom: 88px;
+  background: #c2185b;
+  color: #fff;
+  font-size: 28px;
+  line-height: 1;
+}

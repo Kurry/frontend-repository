@@ -1,0 +1,44 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  color-scheme: light;
+}
+:root.dark {
+  color-scheme: dark;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Grid backdrop behind the rendered diagram (mirrors the reference preview grid) */
+.grid-bg {
+  --preview-bg: #ffffff;
+  background-color: var(--preview-bg);
+  color: #64748b;
+}
+:root.dark .grid-bg {
+  --preview-bg: #0f172a;
+  color: #94a3b8;
+}
+.grid-bg {
+  background-image:
+    linear-gradient(color-mix(in srgb, currentColor 8%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, currentColor 8%, transparent) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.diagram-source {
+  font-family: ui-monospace, 'SF Mono', 'Fira Code', Menlo, Consolas, monospace;
+  tab-size: 2;
+}

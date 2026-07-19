@@ -1,0 +1,44 @@
+---
+import data from "../data/home.json";
+import Button from "./Button.astro";
+import BunnyBg from "./BunnyBg.astro";
+const about = data.about;
+---
+<section class="section_about-us theme-media">
+  <div class="bg-video">
+    <div class="bg-overlay"></div>
+    <div class="bg-blur"></div>
+    <div class="image-parallax">
+      <div class="image-parallax_image" data-parallax-image>
+        <BunnyBg src={about.video} poster={about.poster} />
+      </div>
+      <div class="image-parallax_trigger is-section-100vh" data-parallax-trigger></div>
+    </div>
+  </div>
+  <div class="padding-global">
+    <div class="container-col-08">
+      <div class="about-us_wrapper">
+        <div class="about-us_img-wrapper is-left">
+          <div class="about-us_img" data-scroll data-scroll-speed="0.1">
+            <img class="image" src={about.imgLeft} alt="" loading="lazy" />
+          </div>
+        </div>
+        <div class="about-us_img-wrapper is-right">
+          <div class="about-us_img" data-scroll data-scroll-speed="-0.1">
+            <img class="image" src={about.imgRight} alt="" loading="lazy" />
+          </div>
+        </div>
+        <div class="max-width-880px">
+          <h2 class="heading-xxl" data-animate="heading">{about.h2}</h2>
+        </div>
+        <div class="about-us_body">
+          <p class="paragraph-m">{about.body}</p>
+          <div class="button-group">
+            <Button label={about.buttons[0].label} href={about.buttons[0].href} variant="secondary" themeClass="theme-dark" />
+            <Button label={about.buttons[1].label} href={about.buttons[1].href} variant="primary" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

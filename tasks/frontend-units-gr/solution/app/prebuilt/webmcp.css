@@ -1,0 +1,36 @@
+/* units-gr oracle — styles for the injected menu overlay backing the hamburger.
+   Token-driven; no external requests. */
+
+/* Menu overlay backing the hamburger */
+.nav-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 600;
+  background: #f4e9e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .5s cubic-bezier(.19,1,.22,1);
+}
+.nav-overlay.is-open { opacity: 1; pointer-events: auto; }
+.nav-overlay__inner { position: relative; text-align: center; padding: 30px; }
+.nav-overlay__close {
+  position: absolute;
+  top: -10px;
+  right: -6px;
+  font-size: 34px;
+  line-height: 1;
+  background: none;
+  border: none;
+  color: var(--color-1);
+  cursor: pointer;
+}
+.nav-overlay__list li { margin: 14px 0; }
+.nav-overlay__list a {
+  font: 850 clamp(30px, 5vw, 56px)/1 var(--font-Alfabet, Alfabet, arial);
+  color: var(--color-1);
+  text-decoration: none;
+}
+.nav-overlay__list a:hover { color: #0072e3; }

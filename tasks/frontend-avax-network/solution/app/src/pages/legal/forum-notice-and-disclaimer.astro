@@ -1,0 +1,16 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Navigation from "../../components/Navigation.astro";
+import Footer from "../../components/Footer.astro";
+---
+<Layout title="Forum Notice and Disclaimer | Avalanche">
+  <Navigation />
+  <main class="mx-auto max-w-3xl px-[var(--padding-md)] pb-24 pt-[calc(var(--navbar-height)+2rem)]">
+    <h1 class="font-aeonik text-[var(--text-5xl)] font-bold">Forum Notice and Disclaimer</h1>
+    <div class="prose prose-invert mt-8 space-y-4 text-[var(--text-base)] text-neutral-300">
+      <p>This page mirrors the live Avalanche legal surface. Full normative copy should be sourced from harvest legal HTML when available.</p>
+      <p>Offline legal copy. Source harvested under <code>harvest/curl-mirror/www.avax.network/legal/</code>.</p>
+    </div>
+  </main>
+  <Footer />
+</Layout>

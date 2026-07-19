@@ -1,0 +1,1 @@
+import{v as t}from"./core.min-Dne1Y5Yk.js";import{x as f}from"./core.min-Dne1Y5Yk.js";import{j as p}from"./store-CK9GeNlI.js";import"./preloader-Bns9QiKi.js";import"./utils-ah47JOmW.js";const a=r=>{const[o]=t();o.onHistoryChange(p(o.history,r))};export{f as _hW,a as s_AiViSeOoYmI};

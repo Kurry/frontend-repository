@@ -1,0 +1,269 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/mcp/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "1_1"
+description = "On load, the app opens directly into a document template editor showing a top bar with the Docuseal wordmark, a left rail with a templates list and a field-type palette, a center document canvas with page sheets, and a right properties panel — recognisably PDF form building, not a generic dashboard"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "1_2"
+description = "On load, the left rail lists at least 3 seeded templates (including 'Sales Agreement') and one template is open with at least 3 seeded field boxes visible on the document canvas"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "1_3"
+description = "On load, the field-type palette shows distinct types including Text, Signature, Date and Checkbox, and the submitters list shows at least 'First Party' and 'Second Party' with distinct colour swatches"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "1_4"
+description = "After clicking a different template in the left rail (e.g. 'NDA — Mutual'), the template-name field and the document canvas change to that template and its own fields without a full page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "1_5"
+description = "After clicking the Signature type in the palette, exactly one new field box appears on the open document, it becomes the selected field, and the right panel switches to a field editor showing its type, name, assigned submitter and a required toggle"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "1_6"
+description = "After placing a field while 'First Party' is the active submitter, the new field box renders in First Party's colour and the properties panel shows it assigned to First Party"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "1_7"
+description = "After selecting a placed field and choosing 'Second Party' in the properties panel's assigned-submitter control, the field box on the canvas recolours to Second Party's colour and the panel reflects the new assignment in the same step"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "1_8"
+description = "With fields assigned to two different submitters present, a First Party field and a Second Party field render in visibly different colours and each keeps its own assignment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "1_9"
+description = "After renaming the selected field in the properties panel, the field's label on the canvas updates immediately to the new name"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "1_10"
+description = "After clearing the selected field's name to empty, a visible validation message appears at the field and the field is not removed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "1_11"
+description = "After deleting one selected field via the Delete field control, that field is gone from the canvas while the other placed fields remain visible and both submitter definitions remain in the rail"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "1_12"
+description = "After invoking the WebMCP editor_add tool with a declared field type, the same new field box appears on the document canvas, matching what the palette control produces"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "1_13"
+description = "After clicking Send for signing on a template that has fields assigned, the status pill changes from 'Draft' to an awaiting state (e.g. 'Awaiting First Party') and an Advance control appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "1_14"
+description = "After placing a field and reloading the page, the placed field and the signing status are still present, restored from localStorage"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "1_15"
+description = "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "1_16"
+description = "The app opens into a three-pane document template editor (top bar, a left rail with templates list and field-type palette, a center document canvas of page sheets, a right properties panel) that is recognisably PDF form building, submitter assignment and document signing rather than a generic dashboard or starter page"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "1_17"
+description = "At least 3 templates are listed in the left rail and clicking one opens it into the canvas, swapping the template name, the document sheets and the placed fields without a full page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "1_18"
+description = "The field-type palette offers distinct field types including at least Text, Signature, Date and Checkbox, and clicking a palette type places one field of that type onto the open document"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "1_19"
+description = "Placing one form field adds exactly one field box to the document, makes it the selected field, and opens its editor in the properties panel (type, name, assigned submitter, required) — the action is reflected in the template, the selected field and the submitter assignment together"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "1_20"
+description = "At least 2 submitters with distinct colours exist and a newly placed field adopts the active submitter's colour on the canvas"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "1_21"
+description = "Assigning a selected field to a different submitter via the properties panel recolours the field box on the canvas and updates the panel's assigned-submitter control in the same step"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "1_22"
+description = "Fields placed for two different submitters each render in their own submitter's colour and each retains the correct submitter assignment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "1_23"
+description = "Renaming the selected field in the properties panel updates the field's label on the canvas immediately, keeping the canvas and the property panel synchronized"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "1_24"
+description = "Deleting one selected field removes only that field from the document while the other placed fields remain on the canvas and both submitter definitions remain unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "1_25"
+description = "Clearing the selected field's name to empty shows a visible validation message at the field and does not delete the field"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "1.26"
+name = "1_26"
+description = "A Send for signing action validates the template and advances a signing-status indicator through the submitters toward a completed state, and a Build/Preview switch shows the placed fields as a fillable signing preview"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "1.27"
+name = "1_27"
+description = "The app is a static placeholder or generic starter (for example a marketing hero or a bare counter) with no working field placement, selection, or deletion on a document canvas"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.28"
+name = "1_28"
+description = "Placing or deleting a field leaves the document canvas or the per-submitter field counts unchanged, indicating the fields are not driven by shared application state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.29"
+name = "1_29"
+description = "A core workflow shows a success or completion state (a field appears to be added, a count updates) while the underlying field is absent after a reload, or the same action with different inputs yields identical hardcoded output"
+type = "binary"
+weight = 1.0
+negate = true

@@ -1,0 +1,82 @@
+---
+import "../styles/global.css";
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+import CookieBanner from "../components/CookieBanner.astro";
+
+interface Props {
+  title?: string;
+  bodyClass?: string;
+}
+const { title = "Hildén & Kaira", bodyClass = "" } = Astro.props;
+
+const orgJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Hildén & Kaira",
+  url: "https://www.hildenkaira.fi/",
+  slogan: "We will 10x your organic presence or work for free until it's done.",
+  sameAs: [
+    "https://instagram.com/hildenkaira",
+    "https://tiktok.com/@hildenkaira",
+    "https://youtube.com/@hildenkaira",
+    "https://www.facebook.com/hildenkaira/",
+  ],
+  review: [
+    {
+      "@type": "Review",
+      author: { "@type": "Person", name: "Nea Mertsalmi" },
+      reviewBody:
+        "Results speak for themselves. We've reached a massive audience and broken into traditional media's awareness in just a few months.",
+    },
+    {
+      "@type": "Review",
+      author: { "@type": "Person", name: "Alma Rapakko" },
+      reviewBody:
+        "Hildén & Kaira has succeeded in bringing the expertise and knowledge at the core of our work to a wide audience, and the results have followed.",
+    },
+  ],
+};
+---
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/webclip.png" />
+    <link rel="alternate" hreflang="en-GB" href="/" />
+    <link rel="alternate" hreflang="x-default" href="/" />
+    <link rel="preload" href="/fonts/PPEditorialNew-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/PPNeueMontreal-Medium.woff2" as="font" type="font/woff2" crossorigin />
+    <script type="application/ld+json" set:html={JSON.stringify(orgJsonLd)} />
+    <script is:inline>
+      // Motion gate + Safari class, before first paint.
+      document.documentElement.classList.add("js-motion");
+      if (/^((?!chrome|android).)*safari/i.test(navigator.userAgent)) {
+        document.documentElement.classList.add("is-safari");
+      }
+    </script>
+    <noscript>
+      <style>
+        .js-motion main :is(h1, h2, h3, p), .js-motion footer :is(h1, h2, h3, p) { visibility: visible !important; }
+        .hero-home_pageload-bg { display: none; }
+      </style>
+    </noscript>
+  </head>
+  <body class={bodyClass}>
+    <div class="page-wrapper">
+      <CookieBanner />
+      <Nav />
+      <main class="main-wrapper">
+        <slot />
+      </main>
+      <Footer />
+    </div>
+    <script>
+      import "../scripts/main.js";
+    </script>
+    <script src="../scripts/webmcp.ts"></script>
+  </body>
+</html>

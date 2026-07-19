@@ -1,0 +1,113 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/mcp/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "4_1"
+description = "Hovering a workspace tab, button, folder row, and bookmark row with the pointer shows a clearly visible hover state on each"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "4_2"
+description = "Tabbing through interactive controls with the keyboard shows a clearly visible focus ring on each that is distinct from its hover state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "4_3"
+description = "Pressing an interactive control (pointer-down without releasing) shows immediate pressed feedback before the triggered operation completes"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.4"
+name = "4_4"
+description = "Performing add, import, export, and delete each surfaces a transient toast that shares one consistent position, shape, and color and dismisses on its own"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "4_5"
+description = "Starting a real drag of a bookmark toward a folder and pausing over it shows a visible dragging state on the item and a valid-drop-target highlight on the folder"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "4_6"
+description = "Keyboard focus and pointer hover render as the same identical treatment, or interactive controls show no visible focus ring at all when Tabbed to"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.7"
+name = "4_7"
+description = "During a real drag of a bookmark or folder, neither the dragged item nor the drop target shows any visible highlight beyond a cursor change"
+type = "binary"
+weight = 1.0
+negate = true

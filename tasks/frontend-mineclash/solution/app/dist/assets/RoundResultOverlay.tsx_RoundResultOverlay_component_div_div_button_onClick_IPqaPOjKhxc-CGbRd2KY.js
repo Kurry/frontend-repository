@@ -1,0 +1,1 @@
+import{v as t}from"./core.min-DGtNB905.js";import{s as r}from"./gameLogic-DwwwkqqM.js";import"./preloader-Bns9QiKi.js";const e=()=>{const[o]=t();r(o)};export{e as s_IPqaPOjKhxc};

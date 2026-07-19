@@ -1,0 +1,731 @@
+---
+const posts = [
+  {
+    title: "Avalanche Payments Collective: How a Payments Ecosystem Took Shape on Avalanche",
+    tags: [
+      { label: "Payments", tone: "solid" },
+      { label: "Announcement", tone: "outline" },
+    ],
+    meta: "Jun 18, 2026 / By Avalanche / 7 Minute Read",
+    excerpt: "28 organizations have joined the Avalanche Payments Collective, formalizing one of the industry's broadest payments ecosystems.",
+    href: "/about/blog/avalanche-payments-collective",
+    img: "/_astro/APC_BlogImage_D2Ips.webp",
+    featured: true,
+  },
+  {
+    title: "NEC Signs MOU to Explore Biometric-Verified On-Chain Services on Avalanche",
+    tags: [
+      { label: "Infrastructure and Tooling", tone: "solid" },
+      { label: "Research", tone: "outline" },
+      { label: "Announcement", tone: "outline" },
+    ],
+    meta: "Jul 10, 2026 / By Avalanche / 6 Minute Read",
+    excerpt: "Ava Labs and NEC signs a Memorandum of Understanding(MOU) to jointly publish a whitepaper proposes how biometric verification can unlock trusted on-chain services.",
+    href: "/about/blog",
+    img: "/images/B_8Oqti.webp",
+  },
+  {
+    title: "Progmat is Now on Avalanche",
+    tags: [
+      { label: "Business", tone: "solid" },
+      { label: "Announcement", tone: "outline" },
+    ],
+    meta: "Jul 10, 2026 / By Avalanche / 3 Minute Read",
+    excerpt: "When Progmat announced in February 2026 that it would migrate Japan's largest security token platform onto Avalanche, it marked a milestone for institutional tokenization.",
+    href: "/about/blog",
+    img: "/images/signal-2026-07-10-12-26-59-812_003_Zzl0R6.webp",
+  },
+  {
+    title: "Retro9000 C-Chain Round 4: New Mechanics, Rewards and Opportunities for Builders",
+    tags: [{ label: "Announcement", tone: "solid" }],
+    meta: "May 27, 2026 / By Avalanche Foundation / 5 Minute Read",
+    excerpt: "Round 4 of the Retro9000 C-Chain program is here - introducing verified user tiers, fairer reward distribution, and new opportunities for builders.",
+    href: "/about/blog",
+    img: "/images/signal-2026-05-27-101553_002_Z29s6ci.webp",
+  },
+  {
+    title: "Avalanche Team1 Applications Are Now Open",
+    tags: [{ label: "Ecosystem Coverage", tone: "solid" }],
+    meta: "May 27, 2026 / By Avalanche Foundation / 2 Minute Read",
+    excerpt: "Avalanche Team1 is a global community program dedicated to growing the Avalanche ecosystem through education, events, and collaboration.",
+    href: "/about/blog",
+    img: "/images/logos/FDN-Open-2_2ojU8s.webp",
+  },
+  {
+    title: "The Avalanche Foundation Introduces Call For Research Program Selection Committee",
+    tags: [{ label: "Research", tone: "solid" }],
+    meta: "May 21, 2026 / By Avalanche Foundation / 6 Minute Read",
+    excerpt: "Meet the independent selection committee assembled by the Avalanche Foundation to evaluate research proposals across cryptography, consensus, and applications.",
+    href: "/about/blog",
+    img: "/images/image1_ZEQG3D.webp",
+  },
+  {
+    title: "The Avalanche Foundation Opens Up To $50,000 In Research Grants On Avalanche Network Economics",
+    tags: [{ label: "Research", tone: "solid" }],
+    meta: "Apr 29, 2026 / By Avalanche Foundation / 4 Minute Read",
+    excerpt: "Applications are open for up to $50,000 in research grants from the Avalanche Foundation, funding original research that advances the Avalanche network.",
+    href: "/about/blog",
+    img: "/images/signal-2026-04-28-094333_002_Z29aMDt.webp",
+  },
+];
+
+const solutions = [
+  {
+    letter: "I",
+    title: "Institutions and Capital Markets",
+    body: "Avalanche's customizable, high-performance network helps bring traditional finance onchain.",
+    href: "/institutions",
+    img: "/_astro/8_PTYtc.webp",
+  },
+  {
+    letter: "G",
+    title: "Gaming",
+    body: "High-performance, immersive Web3 gaming powered by Avalanche's speed and scale.",
+    href: "/gaming",
+    img: "/_astro/9_R8Bdu.webp",
+  },
+  {
+    letter: "E",
+    title: "Enterprise and Consumer Apps",
+    body: "Scalable solutions with real-world utility, from logistics to loyalty programs.",
+    href: "/enterprise",
+    img: "/_astro/1_ZGR4fw.webp",
+  },
+  {
+    letter: "D",
+    title: "Decentralized Finance (DeFi)",
+    body: "Fast, low-cost DeFi programs powering the future of financial systems.",
+    href: "/defi",
+    img: "/_astro/2_2oNQIv.webp",
+  },
+  {
+    letter: "N",
+    title: "NFTs, Arts, and Culture",
+    body: "The Avalanche network enables community building and connection for creatives.",
+    href: "/nft",
+    img: "/_astro/10_Z2fuRCR.webp",
+  },
+  {
+    letter: "I",
+    title: "Infrastructure and Tooling",
+    body: "Developers can leverage seamless network infrastructure and powerful tools.",
+    href: "/infrastructure",
+    img: "/_astro/5_Z2skXuv.webp",
+  },
+];
+
+const socials = [
+  { label: "X", href: "https://x.com/avax", icon: "/_astro/twitter_Z26kwQC.svg" },
+  { label: "Arena", href: "https://arena.social/avax", icon: "/images/icons/the-arena-logo_Z1k4eOU.svg" },
+  { label: "Discord", href: "https://discord.gg/avax", icon: "/_astro/discord_Z21UXRB.svg" },
+  { label: "YouTube", href: "https://www.youtube.com/Avalancheavax", icon: "/images/icons/youtube_ZSk6Q3.svg" },
+  { label: "Reddit", href: "https://www.reddit.com/r/Avax/", icon: "/images/icons/reddit_Z29KPHH.svg" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/company/avalancheavax/", icon: "/images/icons/linkedin_2ba9AL.svg" },
+];
+---
+
+<section id="blog" class="relative w-full">
+  <div
+    class="group/section animate-in-view corner-background-top relative flex w-full flex-col items-stretch justify-start gap-[var(--gap-xl)] rounded-[var(--radius-4xl)] fill-white px-[var(--padding-md)] py-[var(--padding-3xl)] transition-mode lg:p-[var(--padding-3xl)] lg:pr-[var(--padding-md)] dark:fill-dark"
+  >
+    <wm-shape
+      rounded="clamp(1rem, -0.143rem + 1.786vw, 2rem)"
+      rounded-mobile="clamp(1rem, 0.421rem + 2.469vw, 2rem)"
+      corner-rounded="clamp(0.75rem, -0.107rem + 1.339vw, 1.5rem)"
+      corner-rounded-mobile="clamp(0.75rem, -0.107rem + 1.339vw, 1.5rem)"
+      corner-size="clamp(4.5rem, -0.071rem + 7.143vw, 8.5rem)"
+      corner-size-mobile="clamp(3.5rem, 0.606rem + 12.346vw, 8.5rem)"
+      stroke-width="1"
+      corner="tl"
+    ></wm-shape>
+
+    <div
+      class="grid grid-cols-1 place-items-start gap-[var(--gap-xl)] overflow-x-clip border-b border-neutral-200 pb-[var(--padding-xl)] transition-mode lg:grid-cols-[2fr_5fr] lg:grid-rows-1 lg:place-items-end dark:border-neutral-800"
+    >
+      <div class="flex flex-col items-end justify-end gap-[var(--gap-xl)] sm:flex-row-reverse sm:items-center lg:col-start-2 lg:row-start-1 lg:items-end">
+        <svg
+          viewBox="0 0 120 120"
+          fill="none"
+          class="w-[clamp(4rem,1.975rem+8.642vw,7.5rem)] shrink-0 translate-x-[calc(100%+1px)] stroke-[1rem] transition-move group-[.visible]/section:translate-x-0 group-[.visible]/section:delay-500 lg:w-[clamp(4rem,0rem+6.25vw,7.5rem)] lg:self-start dark:text-white"
+          aria-hidden="true"
+        >
+          <path d="M6 6L59.6641 60.5L6 114M114 6L75.875 44.125M114 114L75.875 76.875" fill="none" stroke="currentcolor"></path>
+        </svg>
+        <h2 class="h4 max-w-256 split-heading text-balance text-right leading-none uppercase dark:text-white" style="line-height: 1">
+          News & Stories from the Avalanche Network
+        </h2>
+      </div>
+    </div>
+
+    <div class="flex flex-col items-stretch justify-start gap-y-2">
+      <div class="flex flex-row items-center justify-start gap-[var(--gap-xl)]">
+        <div class="flex flex-1 flex-row items-center justify-start gap-[var(--gap-xl)]">
+          <h3 class="h6 hidden w-full max-w-[clamp(20rem,6.979rem+55.556vw,42.5rem)] uppercase lg:block lg:max-w-[clamp(25rem,-0.143rem+39.286vw,47rem)]">
+            Featured
+          </h3>
+          <h3 class="h6 flex-1 uppercase">News</h3>
+        </div>
+        <div id="blog-labels" class="flex flex-row items-center justify-end gap-0.5">
+          <button type="button" class="group/button button arrow empty swiper-blog-button-prev rotate-180" aria-label="Previous articles">
+            <wm-shape
+              id="button"
+              rounded="clamp(0.625rem, 0.196rem + 0.67vw, 1rem)"
+              rounded-mobile="clamp(0.875rem, 0.803rem + 0.309vw, 1rem)"
+              corner-rounded="clamp(0.25rem, 0.107rem + 0.223vw, 0.375rem)"
+              corner-rounded-mobile="clamp(0.313rem, 0.276rem + 0.154vw, 0.375rem)"
+              corner-size="clamp(1.125rem, -0.161rem + 2.009vw, 2.25rem)"
+              corner-size-mobile="clamp(2rem, 1.855rem + 0.617vw, 2.25rem)"
+            ></wm-shape>
+          </button>
+          <button type="button" class="group/button button arrow empty swiper-blog-button-next" aria-label="Next articles">
+            <wm-shape
+              id="button"
+              rounded="clamp(0.625rem, 0.196rem + 0.67vw, 1rem)"
+              rounded-mobile="clamp(0.875rem, 0.803rem + 0.309vw, 1rem)"
+              corner-rounded="clamp(0.25rem, 0.107rem + 0.223vw, 0.375rem)"
+              corner-rounded-mobile="clamp(0.313rem, 0.276rem + 0.154vw, 0.375rem)"
+              corner-size="clamp(1.125rem, -0.161rem + 2.009vw, 2.25rem)"
+              corner-size-mobile="clamp(2rem, 1.855rem + 0.617vw, 2.25rem)"
+            ></wm-shape>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex w-[calc(100%+var(--padding-md))] flex-row items-stretch justify-start">
+        <div
+          id="swiper-blog"
+          class="swiper group/swiper relative w-full translate-x-[100vw] overflow-visible! transition-transform duration-0 delay-0 ease-out-quart group-[.visible]/section:translate-x-0 group-[.visible]/section:duration-2000 !pr-[var(--padding-md)]"
+        >
+          <div class="swiper-wrapper group/swiperWrapper relative">
+            {
+              posts.map((p, i) => (
+                <a
+                  href={p.href}
+                  class:list={[
+                    "group article-card swiper-slide !flex shrink-0 cursor-grab flex-col items-stretch justify-start overflow-hidden rounded-2xl border border-neutral-200 !transition-all duration-300 ease-out-cubic hover:bg-neutral-50 active:cursor-grabbing dark:border-neutral-800 dark:hover:bg-neutral-900",
+                    i === 0
+                      ? "w-full max-w-[clamp(20rem,6.979rem+55.556vw,42.5rem)] lg:max-w-[clamp(25rem,-0.143rem+39.286vw,47rem)]"
+                      : "max-w-[clamp(20rem,17.83rem+9.259vw,23.75rem)] lg:max-w-[clamp(12.875rem,0.446rem+19.42vw,23.75rem)] -ml-px",
+                  ]}
+                >
+                  <div class="relative aspect-video w-full shrink-0 overflow-hidden rounded-b-2xl">
+                    <wm-shape
+                      id="article-card-cover"
+                      rounded="clamp(0.5rem, -0.071rem + 0.893vw, 1rem)"
+                      rounded-mobile="1rem"
+                      corner-rounded="clamp(0.5rem, -0.071rem + 0.893vw, 1rem)"
+                      corner-rounded-mobile="clamp(0.75rem, -0.107rem + 1.339vw, 1.5rem)"
+                      corner-size="clamp(4.5rem, -0.071rem + 7.143vw, 8.5rem)"
+                      corner-size-mobile="clamp(3.5rem, 0.606rem + 12.346vw, 8.5rem)"
+                      image={p.img}
+                    ></wm-shape>
+                  </div>
+                  <div class="!flex flex-1 flex-col items-start justify-between gap-[var(--gap-md)] p-8 pt-4 lg:p-[var(--padding-md)] lg:pt-[var(--padding-base)]">
+                    <div class="flex w-full flex-col items-start justify-start gap-1">
+                      <div class="mb-[var(--gap-xs)] flex flex-row flex-wrap items-center justify-start gap-[var(--gap-xs)]">
+                        {p.tags.map((t) => (
+                          <span
+                            class:list={[
+                              "xs shrink-0 rounded-full px-[var(--padding-base)] py-[var(--padding-xs)] font-aeonik font-bold select-none transition-mode",
+                              t.tone === "solid"
+                                ? "bg-red-700 text-white"
+                                : "border border-neutral-200 text-black dark:border-neutral-800 dark:text-white",
+                            ]}
+                          >
+                            {t.label}
+                          </span>
+                        ))}
+                      </div>
+                      <p class="text-xs text-neutral-500 transition-mode dark:text-neutral-300">{p.meta}</p>
+                      <h4 class="mt-1 line-clamp-4 text-ellipsis text-xl/normal capitalize transition-mode">{p.title}</h4>
+                      <p class="sm mt-[var(--gap-xs)] line-clamp-3 text-ellipsis leading-[150%] text-neutral-500 transition-mode dark:text-neutral-300">
+                        {p.excerpt}
+                      </p>
+                    </div>
+                    <span class="group/button button arrow secondary pointer-events-none inline-flex">
+                      <wm-shape
+                        id="button"
+                        rounded="clamp(0.625rem, 0.196rem + 0.67vw, 1rem)"
+                        rounded-mobile="clamp(0.875rem, 0.803rem + 0.309vw, 1rem)"
+                        corner-rounded="clamp(0.25rem, 0.107rem + 0.223vw, 0.375rem)"
+                        corner-rounded-mobile="clamp(0.313rem, 0.276rem + 0.154vw, 0.375rem)"
+                        corner-size="clamp(1.125rem, -0.161rem + 2.009vw, 2.25rem)"
+                        corner-size-mobile="clamp(2rem, 1.855rem + 0.617vw, 2.25rem)"
+                      ></wm-shape>
+                      Read More
+                    </span>
+                  </div>
+                </a>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+
+      <a href="/about/blog" class="group/button button arrow transparent inline-flex w-auto self-start">
+        <wm-shape
+          id="button"
+          rounded="clamp(0.625rem, 0.196rem + 0.67vw, 1rem)"
+          rounded-mobile="clamp(0.875rem, 0.803rem + 0.309vw, 1rem)"
+          corner-rounded="clamp(0.25rem, 0.107rem + 0.223vw, 0.375rem)"
+          corner-rounded-mobile="clamp(0.313rem, 0.276rem + 0.154vw, 0.375rem)"
+          corner-size="clamp(1.125rem, -0.161rem + 2.009vw, 2.25rem)"
+          corner-size-mobile="clamp(2rem, 1.855rem + 0.617vw, 2.25rem)"
+        ></wm-shape>
+        View More
+      </a>
+    </div>
+  </div>
+</section>
+
+<section id="solutions" class="relative w-full">
+  <div
+    class="group/section animate-in-view corner-background-bottom relative flex w-full flex-col items-stretch justify-start gap-[var(--gap-xl)] rounded-[var(--radius-4xl)] fill-white px-[var(--padding-md)] py-[var(--padding-3xl)] transition-mode lg:p-[var(--padding-3xl)] lg:pr-[var(--padding-md)] dark:fill-dark"
+  >
+    <wm-shape
+      rounded="clamp(1rem, -0.143rem + 1.786vw, 2rem)"
+      rounded-mobile="clamp(1rem, 0.421rem + 2.469vw, 2rem)"
+      corner-rounded="clamp(0.75rem, -0.107rem + 1.339vw, 1.5rem)"
+      corner-rounded-mobile="clamp(0.75rem, -0.107rem + 1.339vw, 1.5rem)"
+      corner-size="clamp(4.5rem, -0.071rem + 7.143vw, 8.5rem)"
+      corner-size-mobile="clamp(3.5rem, 0.606rem + 12.346vw, 8.5rem)"
+      stroke-width="1"
+      corner="bl"
+    ></wm-shape>
+    <div
+      class="grid grid-cols-1 place-items-start gap-[var(--gap-xl)] overflow-x-clip border-b border-neutral-200 pb-[var(--padding-xl)] transition-mode lg:grid-cols-[5fr_2fr] dark:border-neutral-800"
+    >
+      <div class="flex flex-col items-start justify-end gap-[var(--gap-xl)] sm:flex-row sm:items-center lg:items-end">
+        <svg
+          viewBox="0 0 120 120"
+          fill="none"
+          class="w-[clamp(4rem,1.975rem+8.642vw,7.5rem)] shrink-0 -translate-x-[calc(100%+1px)] stroke-[1rem] transition-move group-[.visible]/section:translate-x-0 group-[.visible]/section:delay-500 lg:w-[clamp(4rem,0rem+6.25vw,7.5rem)] lg:self-start dark:text-white"
+          aria-hidden="true"
+        >
+          <path d="M-4 68.3594C27 68.3594 52 93.3594 52 124.359" stroke="currentcolor" fill="none"></path>
+          <path d="M68 124.359C68 93.3594 93 68.3594 124 68.3594" stroke="currentcolor" fill="none"></path>
+          <path d="M124 52.3594C93 52.3594 68 27.3594 68 -3.64063" stroke="currentcolor" fill="none"></path>
+          <path d="M52 -3.64062C52 27.3594 27 52.3594 -4.00001 52.3594" stroke="currentcolor" fill="none"></path>
+        </svg>
+        <h2 class="h4 max-w-256 split-heading text-balance text-left leading-none uppercase dark:text-white">
+          Avalanche Solutions
+        </h2>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 place-items-start gap-[var(--gap-xl)] lg:grid-cols-[2fr_5fr] lg:place-items-stretch">
+      <p class="split-text leading-[135%]">
+        Avalanche empowers founders, businesses and institutions across industries, both Web2 and crypto-native, to build anything they want, any way they want. Take control with the best custom scaling solutions and supportive developer community on Avalanche.
+      </p>
+      <div class="grid grid-cols-1 place-items-stretch md:grid-cols-2 lg:col-start-2">
+        {
+          solutions.map((s, i) => (
+            <a
+              href={s.href}
+              style={`--index: ${i};`}
+              class="group/button group/card relative -mt-px -ml-px flex h-auto min-h-[7.25rem] w-full shrink-0 flex-row items-center justify-start gap-[var(--gap-base)] overflow-clip p-[var(--padding-xs)] font-normal no-underline transition-move translate-y-1/2 before:absolute before:inset-0 before:rounded-2xl before:border before:border-neutral-200 before:bg-transparent before:transition-mode group-[.visible]/section:translate-y-0 group-[.visible]/section:duration-[calc(2000ms+(200ms*var(--index)))] hover:before:bg-neutral-50 dark:before:border-neutral-800 dark:hover:before:bg-neutral-900"
+            >
+              <div class="relative flex aspect-square h-full shrink-0 flex-row items-center justify-center overflow-hidden rounded-2xl bg-neutral-500">
+                <img
+                  src={s.img}
+                  alt={s.title}
+                  loading="lazy"
+                  decoding="async"
+                  width="300"
+                  height="300"
+                  class="absolute inset-0 h-full w-full object-cover"
+                />
+                <h3 class="h5 relative text-white">{s.letter}</h3>
+              </div>
+              <div class="relative flex h-full w-full flex-col items-start justify-center gap-[var(--gap-xs)] lg:flex-row lg:items-center lg:justify-start lg:gap-0">
+                <div class="flex w-full flex-col items-start justify-center gap-[var(--gap-xs)] md:h-1/2 lg:h-auto">
+                  <h4 class="pr-[var(--padding-base)] text-xl/normal uppercase lg:pr-0">{s.title}</h4>
+                  <p class="sm hidden text-ellipsis leading-[135%] text-neutral-500 lg:line-clamp-3">{s.body}</p>
+                </div>
+                <div class="flex w-full shrink-0 items-end justify-between gap-[var(--gap-xs)] md:h-1/2 md:w-auto md:items-start lg:h-full lg:items-end lg:justify-end lg:gap-0 lg:p-[var(--padding-base)] lg:pl-[var(--padding-xs)]">
+                  <p class="sm line-clamp-3 text-ellipsis leading-[135%] text-neutral-500 lg:hidden">{s.body}</p>
+                  <button type="button" class="group/button button arrow empty" tabindex="-1" aria-hidden="true">
+                    <span class="sr-only">View {s.title} details</span>
+                  </button>
+                </div>
+              </div>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="community" class="relative w-full">
+  <div
+    class="group/section animate-in-view corner-background-top relative flex w-full flex-col items-stretch justify-start gap-[var(--gap-xl)] rounded-[var(--radius-4xl)] fill-white py-[var(--padding-3xl)] pr-8 pl-[var(--padding-md)] transition-mode lg:p-[var(--padding-3xl)] lg:pr-8 dark:fill-dark"
+  >
+    <wm-shape
+      rounded="clamp(1rem, -0.143rem + 1.786vw, 2rem)"
+      rounded-mobile="clamp(1rem, 0.421rem + 2.469vw, 2rem)"
+      corner-rounded="clamp(0.75rem, -0.107rem + 1.339vw, 1.5rem)"
+      corner-rounded-mobile="clamp(0.75rem, -0.107rem + 1.339vw, 1.5rem)"
+      corner-size="clamp(4.5rem, -0.071rem + 7.143vw, 8.5rem)"
+      corner-size-mobile="clamp(3.5rem, 0.606rem + 12.346vw, 8.5rem)"
+      stroke-width="1"
+      corner="tr"
+    ></wm-shape>
+    <div
+      class="grid grid-cols-1 place-items-start gap-[var(--gap-xl)] overflow-x-clip border-b border-neutral-200 pb-[var(--padding-xl)] transition-mode lg:grid-cols-[2fr_5fr] lg:grid-rows-1 lg:place-items-end dark:border-neutral-800"
+    >
+      <div class="flex flex-col items-end justify-end gap-[var(--gap-xl)] sm:flex-row-reverse sm:items-center lg:col-start-2 lg:row-start-1 lg:items-end">
+        <svg
+          viewBox="0 0 120 120"
+          fill="none"
+          class="w-[clamp(4rem,1.975rem+8.642vw,7.5rem)] shrink-0 translate-x-[calc(100%+1px)] stroke-[1rem] transition-move group-[.visible]/section:translate-x-0 group-[.visible]/section:delay-500 lg:w-[clamp(4rem,0rem+6.25vw,7.5rem)] lg:self-start dark:text-white"
+          aria-hidden="true"
+        >
+          <path d="M114 6L77.7359 42.5L77.7359 77.5L114 114M6 114L42.2641 77.5L42.2641 42.5L6.00001 6" fill="none" stroke="currentcolor"></path>
+        </svg>
+        <h2 class="h4 max-w-256 split-heading text-balance text-right leading-none uppercase dark:text-white">
+          Join The Best Community in web3
+        </h2>
+      </div>
+      <div class="flex flex-row items-start justify-start justify-self-start self-start lg:col-start-1 lg:row-start-1">
+        <p class="split-text sm:text-balance">
+          The Avalanche culture goes beyond the chain. Get connected with the founders, investors, artists, gamers, and creators who call Avalanche home.
+        </p>
+      </div>
+    </div>
+    <div class="flex flex-col items-stretch justify-start gap-y-2">
+      <div class="flex flex-row items-center justify-start">
+        <div class="flex flex-1 flex-row items-center justify-between gap-2 sm:justify-start">
+          {
+            socials.map((s) => (
+              <a
+                href={s.href}
+                target="_blank"
+                rel="noopener"
+                class="group/social flex flex-row items-center justify-start rounded-lg border border-neutral-200 p-[var(--padding-xs)] no-underline transition-mode hover:bg-black dark:border-neutral-800 dark:hover:bg-white"
+              >
+                <span class="sr-only">Link to {s.label} social</span>
+                <div
+                  class="flex size-[clamp(2rem,1.421rem+2.469vw,3rem)] flex-row items-center justify-center rounded-[0.625rem] border border-neutral-200 bg-black transition-mode group-hover/social:border-neutral-800 lg:size-[clamp(2rem,0.857rem+1.786vw,3rem)] lg:rounded-[clamp(0.375rem,0.089rem+0.446vw,0.625rem)] dark:border-neutral-800 dark:bg-white dark:group-hover/social:border-neutral-200"
+                >
+                  <img
+                    src={s.icon}
+                    alt=""
+                    width="64"
+                    height="64"
+                    class="w-1/2 shrink-0 invert transition-all duration-300 ease-out-cubic group-hover/social:!invert-0 dark:invert-0 dark:group-hover/social:!invert"
+                  />
+                </div>
+                <p class="sm hidden px-[var(--padding-base)] font-aeonik font-bold transition-mode group-hover/social:text-white sm:block lg:px-[var(--padding-md)] dark:group-hover/social:text-black">
+                  {s.label}
+                </p>
+              </a>
+            ))
+          }
+        </div>
+        <div class="hidden flex-row items-center justify-end gap-0.5 lg:flex">
+          <a
+            href="https://x.com/avax"
+            target="_blank"
+            rel="noopener"
+            class="group/social x flex flex-row items-center justify-start rounded-lg border border-neutral-200 p-[var(--padding-xs)] no-underline transition-mode hover:bg-black dark:border-neutral-800 dark:hover:bg-white"
+          >
+            <span class="sr-only">Link to Follow @avax social</span>
+            <div
+              class="flex size-[clamp(2rem,1.421rem+2.469vw,3rem)] flex-row items-center justify-center rounded-[0.625rem] border border-neutral-200 bg-black transition-mode group-hover/social:border-neutral-800 group-[.x]/social:rounded-none group-[.x]/social:border-none group-[.x]/social:bg-transparent lg:size-[clamp(2rem,0.857rem+1.786vw,3rem)] lg:rounded-[clamp(0.375rem,0.089rem+0.446vw,0.625rem)] dark:border-neutral-800 dark:bg-white dark:group-hover/social:border-neutral-200"
+            >
+              <img
+                src="/_astro/twitter_Z26kwQC.svg"
+                alt=""
+                width="64"
+                height="64"
+                class="w-1/2 shrink-0 invert transition-all duration-300 ease-out-cubic group-hover/social:!invert dark:invert-0 dark:group-hover/social:!invert-0 group-[.x]/social:w-1/3 group-[.x]/social:invert-0 dark:group-[.x]/social:invert"
+              />
+            </div>
+            <p class="sm hidden px-[var(--padding-base)] font-aeonik font-bold transition-mode group-hover/social:text-white sm:block lg:px-[var(--padding-md)] group-[.x]/social:block group-[.x]/social:px-0 dark:group-hover/social:text-black">
+              Follow @avax
+            </p>
+          </a>
+          <button type="button" class="group/button button arrow empty swiper-feed-button-prev rotate-180" aria-label="Previous feed items" disabled>
+            <wm-shape
+              id="button"
+              rounded="clamp(0.625rem, 0.196rem + 0.67vw, 1rem)"
+              rounded-mobile="clamp(0.875rem, 0.803rem + 0.309vw, 1rem)"
+              corner-rounded="clamp(0.25rem, 0.107rem + 0.223vw, 0.375rem)"
+              corner-rounded-mobile="clamp(0.313rem, 0.276rem + 0.154vw, 0.375rem)"
+              corner-size="clamp(1.125rem, -0.161rem + 2.009vw, 2.25rem)"
+              corner-size-mobile="clamp(2rem, 1.855rem + 0.617vw, 2.25rem)"
+            ></wm-shape>
+          </button>
+          <button type="button" class="group/button button arrow empty swiper-feed-button-next" aria-label="Next feed items" disabled>
+            <wm-shape
+              id="button"
+              rounded="clamp(0.625rem, 0.196rem + 0.67vw, 1rem)"
+              rounded-mobile="clamp(0.875rem, 0.803rem + 0.309vw, 1rem)"
+              corner-rounded="clamp(0.25rem, 0.107rem + 0.223vw, 0.375rem)"
+              corner-rounded-mobile="clamp(0.313rem, 0.276rem + 0.154vw, 0.375rem)"
+              corner-size="clamp(1.125rem, -0.161rem + 2.009vw, 2.25rem)"
+              corner-size-mobile="clamp(2rem, 1.855rem + 0.617vw, 2.25rem)"
+            ></wm-shape>
+          </button>
+        </div>
+      </div>
+      <div class="flex w-[calc(100%+var(--padding-md))] flex-row items-stretch justify-start">
+        <div
+          id="swiper-feed"
+          class="swiper group/swiper is-beginning relative w-full translate-x-[100vw] overflow-visible! transition-transform duration-0 delay-0 ease-out-quart group-[.visible]/section:translate-x-0 group-[.visible]/section:duration-2000"
+        >
+          <div class="swiper-wrapper group/swiperWrapper relative items-start"></div>
+        </div>
+      </div>
+      <div class="mt-[var(--gap-lg)] flex flex-row items-center justify-between gap-[var(--gap-base)] sm:mt-0 sm:justify-end lg:hidden">
+        <a
+          href="https://x.com/avax"
+          target="_blank"
+          rel="noopener"
+          class="group/social x flex flex-row items-center justify-start rounded-lg border border-neutral-200 py-[var(--padding-xs)] pr-[var(--padding-md)] pl-1 no-underline transition-mode hover:bg-black dark:border-neutral-800 dark:hover:bg-white"
+        >
+          <span class="sr-only">Link to Follow @avax social</span>
+          <div
+            class="flex size-[clamp(2rem,1.421rem+2.469vw,3rem)] flex-row items-center justify-center rounded-[0.625rem] border border-neutral-200 bg-black transition-mode group-hover/social:border-neutral-800 group-[.x]/social:rounded-none group-[.x]/social:border-none group-[.x]/social:bg-transparent dark:border-neutral-800 dark:bg-white"
+          >
+            <img
+              src="/_astro/twitter_Z26kwQC.svg"
+              alt=""
+              width="64"
+              height="64"
+              class="w-1/3 shrink-0 transition-all duration-300 ease-out-cubic dark:invert"
+            />
+          </div>
+          <p class="sm px-0 font-aeonik font-bold transition-mode group-hover/social:text-white dark:group-hover/social:text-black">
+            Follow @avax
+          </p>
+        </a>
+        <div class="flex flex-row items-center justify-end gap-0.5">
+          <button type="button" class="group/button button arrow empty swiper-feed-button-prev rotate-180" aria-label="Previous feed items" disabled>
+            <wm-shape
+              id="button"
+              rounded="clamp(0.625rem, 0.196rem + 0.67vw, 1rem)"
+              rounded-mobile="clamp(0.875rem, 0.803rem + 0.309vw, 1rem)"
+              corner-rounded="clamp(0.25rem, 0.107rem + 0.223vw, 0.375rem)"
+              corner-rounded-mobile="clamp(0.313rem, 0.276rem + 0.154vw, 0.375rem)"
+              corner-size="clamp(1.125rem, -0.161rem + 2.009vw, 2.25rem)"
+              corner-size-mobile="clamp(2rem, 1.855rem + 0.617vw, 2.25rem)"
+            ></wm-shape>
+          </button>
+          <button type="button" class="group/button button arrow empty swiper-feed-button-next" aria-label="Next feed items" disabled>
+            <wm-shape
+              id="button"
+              rounded="clamp(0.625rem, 0.196rem + 0.67vw, 1rem)"
+              rounded-mobile="clamp(0.875rem, 0.803rem + 0.309vw, 1rem)"
+              corner-rounded="clamp(0.25rem, 0.107rem + 0.223vw, 0.375rem)"
+              corner-rounded-mobile="clamp(0.313rem, 0.276rem + 0.154vw, 0.375rem)"
+              corner-size="clamp(1.125rem, -0.161rem + 2.009vw, 2.25rem)"
+              corner-size-mobile="clamp(2rem, 1.855rem + 0.617vw, 2.25rem)"
+            ></wm-shape>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="event" class="relative w-full">
+  <div
+    class="group/section animate-in-view corner-background-bottom relative grid w-full grid-cols-1 place-items-stretch gap-[var(--gap-md)] rounded-[var(--radius-4xl)] fill-white p-[var(--padding-md)] transition-mode lg:grid-cols-[1fr_3fr] lg:gap-[var(--gap-xl)] lg:pl-[var(--padding-3xl)] dark:fill-dark"
+  >
+    <wm-shape
+      rounded="clamp(1rem, -0.143rem + 1.786vw, 2rem)"
+      rounded-mobile="clamp(1rem, 0.421rem + 2.469vw, 2rem)"
+      corner-rounded="clamp(0.75rem, -0.107rem + 1.339vw, 1.5rem)"
+      corner-rounded-mobile="clamp(0.75rem, -0.107rem + 1.339vw, 1.5rem)"
+      corner-size="clamp(4.5rem, -0.071rem + 7.143vw, 8.5rem)"
+      corner-size-mobile="clamp(3.5rem, 0.606rem + 12.346vw, 8.5rem)"
+      stroke-width="1"
+      corner="br"
+    ></wm-shape>
+    <div class="flex flex-col items-start justify-between gap-[var(--gap-xl)] sm:flex-row lg:flex-col lg:pb-[var(--padding-md)]">
+      <div class="flex flex-col items-start justify-start gap-[var(--gap-md)]">
+        <h1 class="h6 split-heading uppercase">Avalanche Global Events</h1>
+        <p class="split-text leading-[135%]">
+          Avalanche events are unmatched in experience and uniqueness, while offering unparalleled access to founders and leaders in the blockchain space.
+        </p>
+      </div>
+      <a class="group/button button arrow transparent inline-flex w-full sm:w-auto lg:self-end" href="/community-hub/events">
+        <wm-shape
+          id="button"
+          rounded="clamp(0.625rem, 0.196rem + 0.67vw, 1rem)"
+          rounded-mobile="clamp(0.875rem, 0.803rem + 0.309vw, 1rem)"
+          corner-rounded="clamp(0.25rem, 0.107rem + 0.223vw, 0.375rem)"
+          corner-rounded-mobile="clamp(0.313rem, 0.276rem + 0.154vw, 0.375rem)"
+          corner-size="clamp(1.125rem, -0.161rem + 2.009vw, 2.25rem)"
+          corner-size-mobile="clamp(2rem, 1.855rem + 0.617vw, 2.25rem)"
+        ></wm-shape>
+        View All Events
+      </a>
+    </div>
+    <div class="group/event relative flex h-auto w-full flex-col items-start justify-between gap-[var(--gap-xl)] rounded-2xl p-[var(--padding-md)] lg:gap-[var(--gap-md)]">
+      <div class="absolute inset-0 overflow-hidden rounded-2xl">
+        <wm-shape
+          id="event-card-cover"
+          rounded="clamp(0.5rem, -0.071rem + 0.893vw, 1rem)"
+          rounded-mobile="1rem"
+          corner-rounded="clamp(0.5rem, -0.071rem + 0.893vw, 1rem)"
+          corner-rounded-mobile="clamp(0.75rem, -0.107rem + 1.339vw, 1.5rem)"
+          corner-size="clamp(4.5rem, -0.071rem + 7.143vw, 8.5rem)"
+          corner-size-mobile="clamp(3.5rem, 0.606rem + 12.346vw, 8.5rem)"
+          image="/_astro/WebsiteBanner_GenericA_1dmYo1.webp"
+          overlay="0.3"
+        ></wm-shape>
+      </div>
+      <div class="relative flex flex-col items-start justify-start gap-[var(--gap-xs)]">
+        <div class="flex flex-row flex-wrap items-start justify-start gap-[var(--gap-xs)]">
+          {["Conference", "Onchain Finance", "Consumer Applications"].map((t) => (
+            <span class="xs shrink-0 rounded-full bg-red-700 px-[var(--padding-base)] py-[var(--padding-xs)] font-aeonik font-bold text-white select-none transition-mode">
+              {t}
+            </span>
+          ))}
+        </div>
+        <div class="flex flex-row items-center justify-start gap-[var(--gap-xs)]">
+          <p class="sm leading-[150%] text-white">Sep 16, 2026</p>
+          <span class="text-white">→</span>
+          <p class="sm leading-[150%] text-white">Sep 17, 2026</p>
+        </div>
+        <p class="sm -mt-[var(--gap-xs)] leading-[150%] text-white">NYC</p>
+        <h2 class="h5 max-w-2/3 text-balance leading-none text-white uppercase">Avalanche Summit New York</h2>
+      </div>
+      <a class="group/button button arrow red-light relative inline-flex" href="https://www.avalanchesummit.com/" target="_blank" rel="noopener">
+        <wm-shape
+          id="button"
+          rounded="clamp(0.625rem, 0.196rem + 0.67vw, 1rem)"
+          rounded-mobile="clamp(0.875rem, 0.803rem + 0.309vw, 1rem)"
+          corner-rounded="clamp(0.25rem, 0.107rem + 0.223vw, 0.375rem)"
+          corner-rounded-mobile="clamp(0.313rem, 0.276rem + 0.154vw, 0.375rem)"
+          corner-size="clamp(1.125rem, -0.161rem + 2.009vw, 2.25rem)"
+          corner-size-mobile="clamp(2rem, 1.855rem + 0.617vw, 2.25rem)"
+        ></wm-shape>
+        Learn More
+        <span class="sr-only">about Avalanche Summit New York</span>
+      </a>
+    </div>
+  </div>
+
+  <div id="questions" class="group/section animate-in-view relative mt-px grid w-full grid-cols-1 place-items-stretch gap-px md:grid-cols-3">
+    {
+      [
+        {
+          title: "Questions  about Avalanche?",
+          body: "Head to the Avalanche Discord for tech support and community connections.",
+          cta: "Get Support",
+          href: "https://discord.com/invite/RwXY7P6",
+          icon: "/_astro/discord_Z21UXRB.svg",
+          external: true,
+        },
+        {
+          title: "Avalanche Team1",
+          body: "Team1 is a global network of builders, developers, creatives, gamers and community members who grow Avalanche.",
+          cta: "Learn More",
+          href: "https://www.team1.network/",
+          icon: "/_astro/enterprise-software_1q9OVe.svg",
+          external: true,
+        },
+        {
+          title: "The Community Hub",
+          body: "The Community Hub is where Avalanche builders, businesses, and users can share resources and connect with each other.",
+          cta: "Explore Now",
+          href: "/community-hub",
+          icon: "/_astro/Small_Icons_Z1Tl05b.svg",
+          external: false,
+        },
+      ].map((q, i) => (
+        <div
+          style={`--index: ${i};`}
+          class="question-card relative flex h-full translate-y-1/2 flex-col items-start justify-between gap-[var(--gap-xl)] rounded-[var(--radius-4xl)] p-[var(--padding-md)] pr-[var(--padding-2xl)] transition-move group-[.visible]/section:translate-y-0 group-[.visible]/section:duration-[calc(2000ms+(400ms*var(--index)))] before:absolute before:inset-0 before:rounded-[var(--radius-4xl)] before:bg-white before:transition-mode lg:translate-y-0 lg:transition-none lg:group-[.visible]/section:duration-0 dark:before:bg-dark"
+        >
+          <div class="relative flex flex-col items-start justify-start gap-[var(--gap-lg)]">
+            <img
+              src={q.icon}
+              alt={`${q.title} icon`}
+              loading="lazy"
+              decoding="async"
+              width="65"
+              height="65"
+              class="h-16 w-auto transition-filter duration-300 ease-out-cubic lg:h-[clamp(2.25rem,0.25rem+3.125vw,4rem)] dark:invert"
+            />
+            <h2 class="h6 text-balance uppercase">{q.title}</h2>
+            <p class="-mt-[var(--padding-md)] leading-[135%]">{q.body}</p>
+          </div>
+          <a
+            class="group/button button arrow transparent relative inline-flex"
+            href={q.href}
+            target={q.external ? "_blank" : undefined}
+            rel={q.external ? "noopener" : undefined}
+          >
+            <wm-shape
+              id="button"
+              rounded="clamp(0.625rem, 0.196rem + 0.67vw, 1rem)"
+              rounded-mobile="clamp(0.875rem, 0.803rem + 0.309vw, 1rem)"
+              corner-rounded="clamp(0.25rem, 0.107rem + 0.223vw, 0.375rem)"
+              corner-rounded-mobile="clamp(0.313rem, 0.276rem + 0.154vw, 0.375rem)"
+              corner-size="clamp(1.125rem, -0.161rem + 2.009vw, 2.25rem)"
+              corner-size-mobile="clamp(2rem, 1.855rem + 0.617vw, 2.25rem)"
+            ></wm-shape>
+            {q.cta}
+            <span class="sr-only"> {q.title}</span>
+          </a>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<script>
+  import Swiper from "swiper";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+  import gsap from "gsap";
+  import "swiper/css";
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.querySelectorAll<HTMLElement>(".swiper").forEach((el) => {
+    const id = el.id?.replace("swiper-", "") || "blog";
+    const next = document.querySelectorAll(`.swiper-${id}-button-next`);
+    const prev = document.querySelectorAll(`.swiper-${id}-button-prev`);
+    const labels = document.getElementById(`${id}-labels`);
+    const swiper = new Swiper(el, {
+      slidesPerView: "auto",
+      initialSlide: 0,
+      spaceBetween: 0,
+      on: {
+        reachBeginning: () => {
+          prev.forEach((b) => ((b as HTMLButtonElement).disabled = true));
+          labels?.classList.add("is-beginning");
+          el.classList.add("is-beginning");
+        },
+        reachEnd: () => {
+          next.forEach((b) => ((b as HTMLButtonElement).disabled = true));
+          el.classList.add("is-end");
+        },
+        activeIndexChange: (s) => {
+          if (!s.isBeginning) {
+            prev.forEach((b) => ((b as HTMLButtonElement).disabled = false));
+            labels?.classList.remove("is-beginning");
+            el.classList.remove("is-beginning");
+          }
+          if (!s.isEnd) {
+            next.forEach((b) => ((b as HTMLButtonElement).disabled = false));
+            el.classList.remove("is-end");
+          }
+        },
+        init: () => {
+          prev.forEach((b) => ((b as HTMLButtonElement).disabled = true));
+        },
+      },
+    });
+    next.forEach((b) => b.addEventListener("click", () => swiper.slideNext()));
+    prev.forEach((b) => b.addEventListener("click", () => swiper.slidePrev()));
+    ScrollTrigger.create({
+      trigger: el,
+      start: "top bottom",
+      onLeaveBack: () => swiper.slideTo(0),
+    });
+  });
+</script>

@@ -1,0 +1,36 @@
+---
+interface Props {
+  label: string;
+  href?: string;
+  variant?: "primary" | "secondary" | "outline";
+  themeClass?: string;
+  class?: string;
+  asDiv?: boolean;
+}
+const { label, href = "#", variant = "primary", themeClass = "theme-default", class: extra = "", asDiv = false } = Astro.props;
+const isPrimary = variant === "primary";
+const contentClass =
+  variant === "secondary" ? "btn-icon-content is-secondary" :
+  variant === "outline" ? "btn-icon-content is-outline" : "btn-icon-content";
+const bgClass = variant === "secondary" ? "btn-icon-content__bg is-secondary" : "btn-icon-content__bg";
+const Tag = asDiv ? "div" : "a";
+---
+<Tag class={`btn-icon-link w-inline-block ${themeClass} ${extra}`} {...(asDiv ? {} : { href })}>
+  <div class={contentClass}>
+    <div class="btn-icon-content__mask">
+      <span class="btn-icon-content__text" data-button-anim-target>{label}</span>
+    </div>
+    {isPrimary && (
+      <div class="btn-icon-icon" data-icon-size>
+        <div class="btn-icon-icon__bg" data-button-anim-target></div>
+        <div class="btn-icon-icon__wrap">
+          <div class="btn-icon-icon__list">
+            <svg class="btn-icon-icon__arrow" data-button-anim-target viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"/></svg>
+            <svg class="btn-icon-icon__arrow" data-button-anim-target viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"/></svg>
+          </div>
+        </div>
+      </div>
+    )}
+    <div class={bgClass} data-button-anim-target></div>
+  </div>
+</Tag>

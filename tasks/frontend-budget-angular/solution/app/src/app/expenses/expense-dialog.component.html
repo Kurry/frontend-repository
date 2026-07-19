@@ -1,0 +1,34 @@
+<h2 mat-dialog-title>{{ data.mode === 'add' ? 'Add expense' : 'Edit expense' }}</h2>
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <div mat-dialog-content class="dialog-content">
+    <mat-form-field class="full-width">
+      <mat-label>Amount</mat-label>
+      <input matInput type="number" step="0.01" formControlName="value" name="amount" required />
+      <mat-error *ngIf="form.controls.value.invalid">Amount must be greater than 0</mat-error>
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+      <mat-label>Date</mat-label>
+      <input matInput type="date" formControlName="datetime" name="date" required />
+      <mat-error *ngIf="form.controls.datetime.invalid">Date is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+      <mat-label>Category</mat-label>
+      <mat-select formControlName="categoryId" name="category" required>
+        <mat-option *ngFor="let c of categories$ | async" [value]="c.id">{{ c.name }}</mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.controls.categoryId.invalid">Category is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+      <mat-label>Counterparty</mat-label>
+      <input matInput type="text" formControlName="counterparty" name="counterparty" />
+    </mat-form-field>
+  </div>
+
+  <div mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="cancel()">Cancel</button>
+    <button mat-button color="primary" type="submit">{{ data.mode === 'add' ? 'Add' : 'Update' }}</button>
+  </div>
+</form>

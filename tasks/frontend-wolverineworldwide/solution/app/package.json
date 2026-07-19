@@ -1,0 +1,14 @@
+{
+  "name": "wolverineworldwide-oracle",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Reference oracle for the wolverineworldwide.com corporate marketing homepage \u2014 air-gapped static Craft/Vite/GSAP/Swup capture served on port 3000.",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "verify:build": "node -e \"const fs=require('fs');if(fs.existsSync('web/index.html')){console.log('build ok');process.exit(0)}else{console.error('missing web/index.html');process.exit(1)}\""
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

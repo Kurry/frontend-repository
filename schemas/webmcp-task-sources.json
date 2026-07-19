@@ -118,5 +118,210 @@
     "source": "DailyPlannerBoard",
     "instruction": "DailyPlannerBoard/instruction.md",
     "description": "Cadence multi-day daily planner board good-app eval."
+  },
+  "frontend-avax-network": {
+    "source": "AvaxNetwork",
+    "instruction": "AvaxNetwork/instruction.md",
+    "description": "Avalanche network marketing homepage fidelity eval."
+  },
+  "frontend-hildenkaira": {
+    "source": "Hildenkaira",
+    "instruction": "Hildenkaira/instruction.md",
+    "description": "Hilden & Kaira social-media agency homepage fidelity eval."
+  },
+  "frontend-landonorris": {
+    "source": "LandoNorris",
+    "instruction": "LandoNorris/instruction.md",
+    "description": "Lando Norris F1 driver homepage fidelity eval."
+  },
+  "frontend-mosbyfiles": {
+    "source": "MosbyFiles",
+    "instruction": "MosbyFiles/instruction.md",
+    "description": "Mosby's Files American Modernist architecture editorial archive fidelity eval."
+  },
+  "frontend-razorpay-sprint-26": {
+    "source": "RazorpaySprint26",
+    "instruction": "RazorpaySprint26/instruction.md",
+    "description": "Razorpay Sprint 2026 marketing microsite fidelity eval."
+  },
+  "frontend-readymag": {
+    "source": "Readymag",
+    "instruction": "Readymag/instruction.md",
+    "description": "Readymag design-tool marketing homepage fidelity eval."
+  },
+  "frontend-units-gr": {
+    "source": "UnitsGr",
+    "instruction": "UnitsGr/instruction.md",
+    "description": "units.gr all-inclusive student-housing marketing homepage fidelity eval."
+  },
+  "frontend-wolverineworldwide": {
+    "source": "WolverineWorldwide",
+    "instruction": "WolverineWorldwide/instruction.md",
+    "description": "Wolverine Worldwide corporate marketing homepage fidelity eval."
+  },
+  "frontend-focuspath": {
+    "source": "Focuspath",
+    "instruction": "Focuspath/instruction.md",
+    "description": "FocusPath goal decomposition and roadmap tool good-app eval."
+  },
+  "frontend-mineclash": {
+    "source": "Mineclash",
+    "instruction": "Mineclash/instruction.md",
+    "description": "Dueling minefield puzzle game good-app eval."
+  },
+  "frontend-letterdrop": {
+    "source": "Letterdrop",
+    "instruction": "Letterdrop/instruction.md",
+    "description": "LetterDrop falling-tile canvas word game good-app eval."
+  },
+  "frontend-frameflick": {
+    "source": "Frameflick",
+    "instruction": "Frameflick/instruction.md",
+    "description": "FrameFlick screenshot-dressing canvas compositor good-app eval."
+  },
+  "frontend-dare-night": {
+    "source": "DareNight",
+    "instruction": "DareNight/instruction.md",
+    "description": "Dare Night pass-the-device party card game good-app eval."
+  },
+  "frontend-lineforge": {
+    "source": "Lineforge",
+    "instruction": "Lineforge/instruction.md",
+    "description": "LineForge chess opening study app good-app eval."
+  },
+  "frontend-notenest": {
+    "source": "Notenest",
+    "instruction": "Notenest/instruction.md",
+    "description": "Nested-folder note-taking app good-app eval."
+  },
+  "frontend-feltrun": {
+    "source": "Feltrun",
+    "instruction": "Feltrun/instruction.md",
+    "description": "Single-player Texas hold'em poker table good-app eval."
+  },
+  "frontend-cipherlog": {
+    "source": "Cipherlog",
+    "instruction": "Cipherlog/instruction.md",
+    "description": "CipherLog covert-transmissions memo log good-app eval."
+  },
+  "frontend-tagnote": {
+    "source": "Tagnote",
+    "instruction": "Tagnote/instruction.md",
+    "description": "TagNote inline-tag note timeline good-app eval."
+  },
+  "frontend-markupflow": {
+    "source": "Markupflow",
+    "instruction": "Markupflow/instruction.md",
+    "description": "Solid.js image annotation and markup studio good-app eval."
+  },
+  "frontend-swiftnote": {
+    "source": "Swiftnote",
+    "instruction": "Swiftnote/instruction.md",
+    "description": "Keyboard-first SwiftNote note app good-app eval."
+  },
+  "frontend-sidedock": {
+    "source": "Sidedock",
+    "instruction": "Sidedock/instruction.md",
+    "description": "SideDock color-coded workspace bookmark manager good-app eval."
+  },
+  "frontend-mindthread": {
+    "source": "Mindthread",
+    "instruction": "Mindthread/instruction.md",
+    "description": "MindThread thought-capture and idea-threading good-app eval."
+  },
+  "frontend-scribblespace": {
+    "source": "Scribblespace",
+    "instruction": "Scribblespace/instruction.md",
+    "description": "ScribbleSpace freeform infinite-canvas notes board good-app eval."
+  },
+  "frontend-panecraft": {
+    "source": "Panecraft",
+    "instruction": "Panecraft/instruction.md",
+    "description": "PaneCraft mock-data dashboard builder good-app eval."
+  },
+  "frontend-repquest": {
+    "source": "Repquest",
+    "instruction": "Repquest/instruction.md",
+    "description": "RepQuest fitness-quest canvas game-sim good-app eval."
+  },
+  "frontend-loopdaily": {
+    "source": "Loopdaily",
+    "instruction": "Loopdaily/instruction.md",
+    "description": "LoopDaily habit tracker with malformed-data recovery good-app eval."
+  },
+  "frontend-taskgrove": {
+    "source": "Taskgrove",
+    "instruction": "Taskgrove/instruction.md",
+    "description": "TaskGrove hierarchical task-tree planner good-app eval."
+  },
+  "frontend-clockcraft": {
+    "source": "Clockcraft",
+    "instruction": "Clockcraft/instruction.md",
+    "description": "Personal time-tracking productivity app with branching edit history good-app eval."
+  },
+  "frontend-fandangofury": {
+    "source": "Fandangofury",
+    "instruction": "Fandangofury/instruction.md",
+    "description": "FandangoFury side-scrolling hack-and-slash festival combat game good-app eval."
+  },
+  "frontend-portfolioframe": {
+    "source": "Portfolioframe",
+    "instruction": "Portfolioframe/instruction.md",
+    "description": "Resume-and-portfolio builder good-app eval."
+  },
+  "frontend-euroscope": {
+    "source": "Euroscope",
+    "instruction": "Euroscope/instruction.md",
+    "description": "Custom EuroScope air-traffic-client theme and icon patcher good-app eval."
+  },
+  "frontend-docuseal": {
+    "source": "Docuseal",
+    "instruction": "Docuseal/instruction.md",
+    "description": "Docuseal PDF form builder and document signing workspace good-app eval."
+  },
+  "frontend-mermaid-live-editor": {
+    "source": "MermaidLiveEditor",
+    "instruction": "MermaidLiveEditor/instruction.md",
+    "description": "Mermaid live diagram source editor with preview good-app eval."
+  },
+  "frontend-md-uy": {
+    "source": "MdUy",
+    "instruction": "MdUy/instruction.md",
+    "description": "md.uy collaborative markdown editor good-app eval."
+  },
+  "frontend-ghostfolio": {
+    "source": "Ghostfolio",
+    "instruction": "Ghostfolio/instruction.md",
+    "description": "Ghostfolio wealth portfolio dashboard good-app eval."
+  },
+  "frontend-plausible-analytics": {
+    "source": "PlausibleAnalytics",
+    "instruction": "PlausibleAnalytics/instruction.md",
+    "description": "Plausible privacy web-analytics dashboard good-app eval."
+  },
+  "frontend-ghostty-config": {
+    "source": "GhosttyConfig",
+    "instruction": "GhosttyConfig/instruction.md",
+    "description": "Ghostty terminal configuration generator with live preview good-app eval."
+  },
+  "frontend-vert": {
+    "source": "Vert",
+    "instruction": "Vert/instruction.md",
+    "description": "VERT private local file converter good-app eval."
+  },
+  "frontend-nostrpass": {
+    "source": "Nostrpass",
+    "instruction": "Nostrpass/instruction.md",
+    "description": "Native local Nostr identity and key manager good-app eval."
+  },
+  "frontend-weblink": {
+    "source": "Weblink",
+    "instruction": "Weblink/instruction.md",
+    "description": "Weblink peer-to-peer WebRTC chat and file-transfer client good-app eval."
+  },
+  "frontend-budget-angular": {
+    "source": "BudgetAngular",
+    "instruction": "BudgetAngular/instruction.md",
+    "description": "Native personal expense and budget tracker good-app eval."
   }
 }

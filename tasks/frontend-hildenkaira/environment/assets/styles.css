@@ -1,0 +1,246 @@
+/*
+ * Hildén & Kaira homepage — exact CSS custom properties and per-selector
+ * rules, relocated verbatim from the PRD's Design Tokens section for
+ * density. Companion to instruction.md > Design Tokens: that section keeps
+ * the compact summary/tables; this file has the full resolved declarations,
+ * one real rule/property-set per line where reasonable. Every value here is
+ * load-bearing for pixel parity — consult directly for exact figures.
+ *
+ * Section order mirrors the PRD's Design Tokens subsections: Colors, Root/
+ * default theme resolution, Theme maps, Text selection, Typography (font
+ * faces, family/weight tokens, size scale, heading/paragraph tokens), Osmo
+ * adaptive scaling, Layout (containers, nav, footer, breakpoints).
+ */
+
+/* Colors — swatch custom properties */
+:root {
+  --_colors---swatch--lime: #ecfdad;
+  --_colors---swatch--turquoise: #3fae86;
+  --_colors---swatch--black: #181818;
+  --_colors---swatch--white: white; /* #ffffff */
+  --_colors---swatch--off-white: #eae9e6;
+  --_colors---swatch--red: #ff4545;
+  --_colors---swatch--dark-grey: #2b2b2b;
+}
+
+/* Form / validation accents (inline CSS) */
+/* Error border: #FF4C24 · select empty option color: rgba(19, 19, 19, 0.3) */
+/* Additional hex seen in shared CSS (Webflow chrome / utilities): #000, #fff, #131313, #324bca, #0082f3, #3898ec */
+
+/* Root/default theme resolution — applies before any .theme-* class overrides it (this is the
+   "Complete custom property reference" default/light-theme block from the PRD; genuinely new vs.
+   the .theme-dark block below, which is what the home body class actually applies) */
+:root {
+  --_theme---background: var(--_colors---swatch--off-white);
+  --_theme---body-text: var(--_colors---swatch--black);
+  --_theme---border: var(--_colors---swatch--black);
+  --_theme---button-bg: var(--_colors---swatch--lime);
+  --_theme---button-hover-bg: var(--_colors---swatch--turquoise);
+  --_theme---button-hover-text: var(--_colors---swatch--black);
+  --_theme---button-icon: var(--_colors---swatch--black);
+  --_theme---button-icon-svg: var(--_colors---swatch--off-white);
+  --_theme---button-secondary-bg: var(--_colors---swatch--black);
+  --_theme---button-secondary-hover-bg: var(--_colors---swatch--turquoise);
+  --_theme---button-secondary-icon: var(--_colors---swatch--lime);
+  --_theme---button-secondary-icon-svg: var(--_colors---swatch--black);
+  --_theme---button-secondary-text: white;
+  --_theme---button-text: var(--_colors---swatch--black);
+  --_theme---cursor-select-bg: var(--_colors---swatch--lime);
+  --_theme---cursor-select-text: var(--_colors---swatch--black);
+  --_theme---heading: var(--_colors---swatch--black);
+  --_theme---locale-bg: white;
+  --_theme---locale-item-hover: var(--_colors---swatch--lime);
+  --_theme---locale-text: var(--_colors---swatch--black);
+  --_theme---video-border: white;
+  --blueprint--gap: 1em;
+  --blueprint--label-height: 3em;
+  --blueprint--label-text-size: .875em;
+}
+
+/* Theme maps — apply by adding one class to body or section; nav theme follows
+   the intersecting section via Slater script (prefix "theme-", probe at 3em from top) */
+body.theme-dark, .theme-dark {
+  --_theme---background: var(--_colors---swatch--black); /* #181818 */
+  --_theme---body-text: var(--_colors---swatch--off-white); /* #eae9e6 */
+  --_theme---border: var(--_colors---swatch--black);
+  --_theme---button-icon: var(--_colors---swatch--black);
+  --_theme---button-secondary-icon: var(--_colors---swatch--lime);
+  --_theme---button-icon-svg: var(--_colors---swatch--off-white);
+  --_theme---button-secondary-icon-svg: var(--_colors---swatch--black);
+  --_theme---button-hover-bg: var(--_colors---swatch--turquoise);
+  --_theme---button-secondary-hover-bg: var(--_colors---swatch--turquoise);
+  --_theme---button-bg: var(--_colors---swatch--lime);
+  --_theme---button-text: var(--_colors---swatch--black);
+  --_theme---button-secondary-bg: var(--_colors---swatch--white);
+  --_theme---button-secondary-text: var(--_colors---swatch--black);
+  --_theme---video-border: white;
+  --_theme---locale-item-hover: var(--_colors---swatch--turquoise);
+  --_theme---locale-bg: var(--_colors---swatch--dark-grey);
+  --_theme---locale-text: var(--_colors---swatch--off-white);
+  --_theme---heading: var(--_colors---swatch--off-white);
+  --_theme---cursor-select-bg: var(--_colors---swatch--lime);
+  --_theme---cursor-select-text: var(--_colors---swatch--black);
+  --_theme---button-hover-text: var(--_colors---swatch--black);
+} /* body default on home */
+body.theme-white, .theme-white {
+  --_theme---background: white;
+  --_theme---body-text: var(--_colors---swatch--black);
+  --_theme---heading: var(--_colors---swatch--black);
+  --_theme---button-secondary-bg: var(--_colors---swatch--black);
+  --_theme---button-secondary-text: white;
+  --_theme---locale-bg: var(--_colors---swatch--off-white);
+  --_theme---video-border: var(--_colors---swatch--off-white);
+  --_theme---locale-item-hover: var(--_colors---swatch--lime);
+}
+body.theme-dark-grey, .theme-dark-grey {
+  --_theme---background: var(--_colors---swatch--dark-grey); /* #2b2b2b */
+  --_theme---body-text: var(--_colors---swatch--off-white);
+  --_theme---heading: var(--_colors---swatch--off-white);
+  --_theme---locale-bg: white;
+  --_theme---locale-text: var(--_colors---swatch--black);
+}
+body.theme-lime, .theme-lime {
+  --_theme---background: var(--_colors---swatch--lime);
+  --_theme---body-text: var(--_colors---swatch--black);
+  --_theme---heading: var(--_colors---swatch--black);
+  --_theme---button-bg: var(--_colors---swatch--black);
+  --_theme---button-text: white;
+  --_theme---cursor-select-bg: var(--_colors---swatch--black);
+  --_theme---cursor-select-text: var(--_colors---swatch--lime);
+} /* forced on mobile open menu */
+body.theme-media, .theme-media {
+  --_theme---background: var(--_colors---swatch--black);
+  --_theme---body-text: var(--_colors---swatch--lime);
+  --_theme---heading: var(--_colors---swatch--lime);
+  --_theme---border: var(--_colors---swatch--lime);
+  --_theme---locale-text: var(--_colors---swatch--lime);
+}
+body.theme-chrome, .theme-chrome {
+  background-color: var(--_colors---swatch--dark-grey);
+  background-image: linear-gradient(#e3e3e3, #a0a0a0 25%, #d0d0d0 45%, #a1a1a1 63%, #888988 80%, #a9aaa9 94%);
+  --_theme---body-text: white;
+}
+
+/* Text selection */
+::selection { background: var(--_theme---cursor-select-bg); color: var(--_theme---cursor-select-text); } /* typically lime #ecfdad bg / black #181818 text */
+
+/* Typography — font faces (local woff2 under assets/fonts/) */
+@font-face { font-family: "PP Editorial New"; font-weight: 400; src: url("<local>/PPEditorialNew-Regular.woff2"); }
+@font-face { font-family: "PP Neue Montreal"; font-weight: 500; src: url("<local>/PPNeueMontreal-Medium.woff2"); }
+
+:root {
+  --_fonts---fonts--heading: "PP Editorial New", "Times New Roman", sans-serif;
+  --_fonts---fonts--paragraph: "PP Neue Montreal", Arial, sans-serif;
+  --_fonts---fonts--eyebrow: "PP Neue Montreal", Arial, sans-serif;
+  --_fonts---font-weight--thin: 100;
+  --_fonts---font-weight--extra-light: 200;
+  --_fonts---font-weight--light: 300;
+  --_fonts---font-weight--normal: 400;
+  --_fonts---font-weight--medium: 500;
+  --_fonts---font-weight--semi-bold: 600;
+  --_fonts---font-weight--bold: 700;
+  --_fonts---font-weight--extra-bold: 800;
+  --_fonts---font-weight--black: 900;
+}
+
+/* Size scale — em relative to Osmo --size-font root; --_sizes---size--Npx = (N/16)em */
+:root {
+  --_sizes---size--2px: .125em;
+  --_sizes---size--4px: .25em;
+  --_sizes---size--8px: .5em;
+  --_sizes---size--12px: .75em;
+  --_sizes---size--16px: 1em;
+  --_sizes---size--24px: 1.5em;
+  --_sizes---size--32px: 2em;
+  --_sizes---size--40px: 2.5em;
+  --_sizes---size--48px: 3em;
+  --_sizes---size--56px: 3.5em;
+  --_sizes---size--64px: 4em;
+  --_sizes---size--72px: 4.5em;
+  --_sizes---size--80px: 5em;
+  --_sizes---size--88px: 5.5em;
+  --_sizes---size--96px: 6em;
+  --_sizes---size--104px: 6.5em;
+  --_sizes---size--112px: 7em;
+  --_sizes---size--128px: 8em;
+  --_sizes---size--160px: 10em;
+  --_sizes---size--192px: 12em;
+  --_sizes---size--224px: 14em;
+  --_sizes---size--256px: 16em;
+  --_sizes---size--320px: 20em;
+}
+
+/* Heading tokens (resolved) */
+:root {
+  --_headings---heading-xxl--font: var(--_fonts---fonts--heading); --_headings---heading-xxl--font-size: var(--_sizes---size--128px); --_headings---heading-xxl--font-weight: var(--_fonts---font-weight--normal); --_headings---heading-xxl--letter-spacing: -.02em; --_headings---heading-xxl--line-height: .9em;
+  --_headings---heading-xl--font: var(--_fonts---fonts--heading); --_headings---heading-xl--font-size: var(--_sizes---size--96px); --_headings---heading-xl--font-weight: var(--_fonts---font-weight--normal); --_headings---heading-xl--letter-spacing: -.02em; --_headings---heading-xl--line-height: .9em;
+  --_headings---heading-l--font: var(--_fonts---fonts--heading); --_headings---heading-l--font-size: var(--_sizes---size--88px); --_headings---heading-l--font-weight: var(--_fonts---font-weight--normal); --_headings---heading-l--letter-spacing: -.02em; --_headings---heading-l--line-height: .9em;
+  --_headings---heading-m--font: var(--_fonts---fonts--heading); --_headings---heading-m--font-size: var(--_sizes---size--72px); --_headings---heading-m--font-weight: var(--_fonts---font-weight--normal); --_headings---heading-m--letter-spacing: -.02em; --_headings---heading-m--line-height: .9em;
+  --_headings---heading-s--font: var(--_fonts---fonts--heading); --_headings---heading-s--font-size: var(--_sizes---size--64px); --_headings---heading-s--font-weight: var(--_fonts---font-weight--normal); --_headings---heading-s--letter-spacing: -.02em; --_headings---heading-s--line-height: .9em;
+  --_headings---heading-xs--font: var(--_fonts---fonts--heading); --_headings---heading-xs--font-size: var(--_sizes---size--56px); --_headings---heading-xs--font-weight: var(--_fonts---font-weight--normal); --_headings---heading-xs--letter-spacing: -.02em; --_headings---heading-xs--line-height: 1em;
+}
+
+/* Paragraph tokens (resolved) — weight is always --_fonts---font-weight--medium */
+:root {
+  --_paragraphs---paragraph-xl--font: var(--_fonts---fonts--paragraph); --_paragraphs---paragraph-xl--font-size: 2.5em; --_paragraphs---paragraph-xl--font-weight: var(--_fonts---font-weight--medium); --_paragraphs---paragraph-xl--letter-spacing: -.01em; --_paragraphs---paragraph-xl--line-height: 1.2em;
+  --_paragraphs---paragraph-l--font: var(--_fonts---fonts--paragraph); --_paragraphs---paragraph-l--font-size: 2em; --_paragraphs---paragraph-l--font-weight: var(--_fonts---font-weight--medium); --_paragraphs---paragraph-l--letter-spacing: -.01em; --_paragraphs---paragraph-l--line-height: 1.2em;
+  --_paragraphs---paragraph-m--font: var(--_fonts---fonts--paragraph); --_paragraphs---paragraph-m--font-size: 1.5em; --_paragraphs---paragraph-m--font-weight: var(--_fonts---font-weight--medium); --_paragraphs---paragraph-m--letter-spacing: 0em; --_paragraphs---paragraph-m--line-height: 1.3em;
+  --_paragraphs---paragraph-regular--font: var(--_fonts---fonts--paragraph); --_paragraphs---paragraph-regular--font-size: 1.25em; --_paragraphs---paragraph-regular--font-weight: var(--_fonts---font-weight--medium); --_paragraphs---paragraph-regular--letter-spacing: 0em; --_paragraphs---paragraph-regular--line-height: 1.3em;
+  --_paragraphs---paragraph-s--font: var(--_fonts---fonts--paragraph); --_paragraphs---paragraph-s--font-size: 1.125em; --_paragraphs---paragraph-s--font-weight: var(--_fonts---font-weight--medium); --_paragraphs---paragraph-s--letter-spacing: 0em; --_paragraphs---paragraph-s--line-height: 1.3em;
+  --_paragraphs---paragraph-xs--font: var(--_fonts---fonts--paragraph); --_paragraphs---paragraph-xs--font-size: 1em; --_paragraphs---paragraph-xs--font-weight: var(--_fonts---font-weight--medium); --_paragraphs---paragraph-xs--letter-spacing: 0em; --_paragraphs---paragraph-xs--line-height: 1.3em;
+  --_paragraphs---paragraph-xxs--font: var(--_fonts---fonts--paragraph); --_paragraphs---paragraph-xxs--font-size: .875em; --_paragraphs---paragraph-xxs--font-weight: var(--_fonts---font-weight--medium); --_paragraphs---paragraph-xxs--letter-spacing: 0em; --_paragraphs---paragraph-xxs--line-height: 1.4em;
+}
+/* Nav link text (desktop): paragraph-regular font, font-size: 1.25em (tablet/mobile 1em; mobile menu 2em) */
+
+/* Osmo adaptive scaling — fluid body font-size across viewport */
+:root {
+  --size-unit: 16;
+  --size-container-ideal: 2200;
+  --size-container-min: 992px;
+  --size-container-max: 3840px;
+  --size-container: clamp(var(--size-container-min), 100vw, var(--size-container-max));
+  --size-font: calc(var(--size-container) / (var(--size-container-ideal) / var(--size-unit)));
+}
+@media screen and (max-width: 991px) { :root { --size-container-ideal: 991; --size-container-min: 768px; --size-container-max: 991px; } }
+@media screen and (max-width: 767px) { :root { --size-container-ideal: 767; --size-container-min: 480px; --size-container-max: 767px; } }
+@media screen and (max-width: 479px) { :root { --size-container-ideal: 479; --size-container-min: 320px; --size-container-max: 479px; } }
+body { font-size: var(--size-font); } /* MUST bind to --size-font as on live (fluid type across viewport) */
+
+/* Layout — global padding/grid + containers */
+:root { --_layout---padding-global--page-padding: 2em; --_layout---grid--gap: 2em; }
+.padding-global { width: 100%; padding-right: var(--_layout---padding-global--page-padding); padding-left: var(--_layout---padding-global--page-padding); }
+.container-col-12 { width: 100%; max-width: 100%; }
+.container-col-10 { width: 100%; max-width: 83.3333%; }
+/* containers always centered: .container-col-12, .container-col-11, .container-col-10, .container-col-09,
+   .container-col-08, .container-col-07, .container-col-06 */
+.container-col-12, .container-col-11, .container-col-10, .container-col-09, .container-col-08, .container-col-07, .container-col-06 { margin-right: auto !important; margin-left: auto !important; }
+.page-wrapper { overflow: clip; }
+.main-wrapper { position: relative; }
+
+/* Nav */
+.nav { z-index: 100; width: 100%; color: var(--_theme---body-text); background-color: #0000; position: fixed; inset: 0% 0% auto; }
+.nav-inner { z-index: 1; pointer-events: auto; justify-content: space-between; align-items: center; width: 100%; height: 6.5em; display: flex; }
+.nav-logo { z-index: 10; width: 3.5em; height: 3.5em; }
+.nav-links { position: absolute; left: 50%; transform: translate(-50%); height: 6.5em; gap: 1.75em; }
+.nav-link-dot { background-color: var(--_colors---swatch--red); border-radius: 100vw; width: .5em; height: .5em; transform: scale(0); transition: transform .525s cubic-bezier(.175, .885, .32, 1.275); } /* "Back-ish" easing */
+.nav-link.w--current .nav-link-dot, .nav-link:hover .nav-link-dot { transform: scale(1); }
+
+/* Footer */
+.footer { background-color: var(--_theme---background); width: 100%; min-height: 100svh; color: var(--_theme---body-text); position: relative; }
+.footer-logo { z-index: 1; width: 100%; height: 24em; display: flex; justify-content: center; }
+
+/* Breakpoints (Webflow standard, shared CSS) */
+/* max-width: 991px tablet · max-width: 767px mobile landscape · max-width: 479px mobile portrait
+   min-width: 768px Locomotive Scroll enable
+   Hide utilities: .hide-desktop >=992 · .hide-tablet-mobile <=991 · .hide-mobile <=479, etc. */
+
+/* Opacity inventory (exact values from CSS) — 0, .1, .15, .2, .25, .3, .4, .5, .6, .7, .75, .8, 1, and
+   20% (swiper disabled = opacity: 20%). Notable: form placeholder floated 0.5; Bunny dark overlay
+   paused/hover 0.3; Bunny interface hidden while playing opacity 0 + translateY(1em); flick inactive
+   media 0.5, near cards 0.75, active 1; swiper inactive bullets
+   --swiper-pagination-bullet-inactive-opacity: 0.15; hero floating items fade in first 10% of
+   timeline, fade out after fadeOutStart: 0.82. */
+
+/* Easing constants (reuse site-wide) — see instruction.md > Design Tokens > Easing constants for the
+   named-easing table (Expo-ish out, Custom snap, Primary motion, Back-ish, Mask wipe, Elastic flick,
+   GSAP text, GSAP data, Linear) referenced by name throughout Components / Motion & Microinteractions. */

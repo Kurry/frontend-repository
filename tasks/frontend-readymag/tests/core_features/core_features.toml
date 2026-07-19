@@ -1,0 +1,245 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/mcp/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "1_1"
+description = "On load, a sticky white header shows Readymag branding plus a Solutions control and Pricing, Examples, Templates, and Learn navigation links, with Log in and Sign up actions on the right"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "1_2"
+description = "On load, the hero shows the headline \"Design and launch outstanding websites\", the subtitle \"Design, prototype, collaborate, publish.\", and a \"Try Readymag\" button followed by \"or choose your subscription plan\""
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "1_3"
+description = "On load, the oversized accent cluster reads \"Hello!\" in orange followed by \"Ready\" and \"?\" in purple near the hero transition"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "1_4"
+description = "On load, the workflow section shows four feature cards with the exact titles \"Enjoy easy workflow\", \"Streamline teamwork\", \"Attract with interactivity\", and \"Expand functionality to infinity\""
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "1_5"
+description = "When the six-image project slideshow is left running, its active (fully opaque) frame changes on its own about every 2.2 seconds while neighboring frames stay dimmed at 0.35 opacity"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "1_6"
+description = "On load, six color-coded use-case tiles appear with the exact labels Portfolios (#FF88BA), Landing pages (#FFCB00), Editorials (#008BFF), Company websites (#A6A6A6), Design studios (#4AAC54), and by Readymag team (#EC520B), all with white text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "1_7"
+description = "On load, a dark #282828 support band shows \"Get the best support\" with \"around-the-clock support on business days\" emphasized in orange and an animated orange orb traveling a curved path"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "1_8"
+description = "On load, a traveling marquee row cycles through the oversized labels Company websites, Landing pages, Editorials, Presentations, Design studios, and Portfolios"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "1_9"
+description = "On load, the closing call-to-action shows \"Try for free\", a \"Try Readymag\" button, and a \"View pricing\" link"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "1_10"
+description = "On load, the footer ends with \"© 2026 Readymag Inc.\" and \"support@readymag.com\" above four link groups (company, product, resources, solutions)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "1_11"
+description = "When the Solutions control is clicked or focused and Enter pressed, a menu opens with aria-expanded set to true listing Portfolios, Presentations, Editorials, Companies, Freelancers, Students; pressing Escape closes it and returns focus to the trigger"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "1_12"
+description = "After resizing the viewport to about 390px wide, the floating hero card and desktop nav are hidden, the use-case tiles collapse to two columns, and no page-wide horizontal scrollbar appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "1_13"
+description = "When prefers-reduced-motion is enabled, path travel, tilt, and reveal animation stop while every section remains visible in its final resting position"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "1_14"
+description = "On load, every network request is same-origin with the app and the console reports zero errors and no failed asset requests"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "1_15"
+description = "A sticky white header renders Readymag branding, a Solutions control, and Pricing, Examples, Templates, and Learn links, with a Log in link and a Sign up pill button"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "1_16"
+description = "The hero shows the headline \"Design and launch outstanding websites\", the subtitle \"Design, prototype, collaborate, publish.\", and a \"Try Readymag\" button beside \"or choose your subscription plan\""
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "1_17"
+description = "Four feature cards render with the exact titles \"Enjoy easy workflow\", \"Streamline teamwork\", \"Attract with interactivity\", and \"Expand functionality to infinity\" and their described bodies"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "1_18"
+description = "Six use-case tiles render with the exact labels Portfolios, Landing pages, Editorials, Company websites, Design studios, and by Readymag team"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "1_19"
+description = "The support band shows \"Get the best support\" and the sentence \"Our agents offer around-the-clock support on business days and treat you with care.\" with \"around-the-clock support on business days\" emphasized"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "1_20"
+description = "The closing call-to-action shows \"Try for free\", a \"Try Readymag\" button, and a \"View pricing\" link"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "1_21"
+description = "The footer ends with \"© 2026 Readymag Inc.\" and \"support@readymag.com\" above company, product, resources, and solutions link groups"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "1_22"
+description = "The Solutions control is a button with accessible name \"Solutions menu\", aria-haspopup and aria-controls, and opens a menu (Portfolios, Presentations, Editorials, Companies, Freelancers, Students) on click or Enter with aria-expanded flipping to true; Escape closes it and returns focus to the trigger"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "1_23"
+description = "At about 390px width the floating hero card and the desktop nav are hidden, the use-case tiles collapse to two columns, and header controls stay usable without horizontal scrolling"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "1_24"
+description = "The page uses header, nav, main, section, article, and footer landmarks with one page-level heading, and interactive controls are keyboard reachable with visible focus"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "1_25"
+description = "The Solutions control is a plain non-interactive link with no menu, no aria-haspopup, and no synchronized aria-expanded state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.26"
+name = "1_26"
+description = "A homepage interaction leads to an application-error or \"Not found\" page, or a header/footer chrome link is missing so navigation is not present"
+type = "binary"
+weight = 1.0
+negate = true

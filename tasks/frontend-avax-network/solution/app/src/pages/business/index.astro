@@ -1,0 +1,62 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Navigation from "../../components/Navigation.astro";
+import Footer from "../../components/Footer.astro";
+import NewsletterContact from "../../components/forms/NewsletterContact.astro";
+
+const pillars = [
+  { title: "Predictable Performance at Scale", body: "Sub-second finality and throughput designed for production financial and consumer workloads." },
+  { title: "Infrastructure You Control. Standards You Know", body: "Permissioning, compliance controls, and familiar operational patterns for enterprise teams." },
+  { title: "Your Chain, Your Design, Your Economy", body: "Launch sovereign Avalanche L1s with custom gas tokens, fees, and governance." },
+  { title: "Private, Compliant, Connected", body: "Keep sensitive flows private while remaining interoperable across the Avalanche network." },
+];
+
+const verticals = [
+  { title: "Real World Assets", href: "/business/real-world-assets" },
+  { title: "Payments", href: "/business/payments" },
+  { title: "Financial Services", href: "/business/financial-services" },
+  { title: "Loyalty and Rewards", href: "/business/loyalty-and-rewards" },
+  { title: "Sports and Entertainment", href: "/business/sports-and-entertainment" },
+  { title: "Enterprise", href: "/business/enterprise" },
+];
+---
+
+<Layout title="Business | Avalanche" description="Technology built for business. Avalanche powers institutional, payments, and enterprise blockchain infrastructure.">
+  <Navigation />
+  <main class="pt-[var(--navbar-height)]">
+    <section class="group/section animate-in-view mx-[var(--padding-base)] mt-[var(--padding-base)] min-h-[70svh] rounded-[var(--radius-4xl)] bg-dark p-[var(--padding-xl)] lg:p-[var(--padding-3xl)]">
+      <p class="text-[var(--text-sm)] uppercase tracking-widest text-neutral-500">Scroll to explore page</p>
+      <h1 class="font-aeonik split-heading mt-6 max-w-[14ch] text-[var(--text-6xl)] font-black leading-none">Technology Built for business.</h1>
+      <p class="split-text mt-6 max-w-[52ch] text-[var(--text-base)] text-neutral-300 opacity-0">
+        World’s most powerful technology put to use — for institutions, payments networks, and consumer brands that need reliable onchain infrastructure.
+      </p>
+    </section>
+
+    <section class="group/section animate-in-view mx-[var(--padding-base)] mt-px grid grid-cols-1 gap-px md:grid-cols-2">
+      {pillars.map((p, i) => (
+        <article class="reveal-y relative overflow-hidden rounded-[var(--radius-4xl)] bg-dark p-[var(--padding-md)] lg:p-[var(--padding-xl)]" style={`--index:${i}`}>
+          <wm-shape id="solutions" corner={i % 2 === 0 ? "tr" : "tl"} rounded="clamp(1rem, -0.143rem + 1.786vw, 2rem)" corner-rounded="clamp(0.75rem, -0.107rem + 1.339vw, 1.5rem)" corner-size="clamp(3.5rem, 0.606rem + 12.346vw, 8.5rem)" stroke-width="0"></wm-shape>
+          <h2 class="relative z-[1] font-aeonik text-[var(--text-3xl)] font-bold">{p.title}</h2>
+          <p class="relative z-[1] mt-4 max-w-[48ch] text-[var(--text-sm)] text-neutral-400">{p.body}</p>
+        </article>
+      ))}
+    </section>
+
+    <section class="group/section animate-in-view mx-[var(--padding-base)] mt-px section-shell">
+      <h2 class="font-aeonik split-heading text-[var(--text-4xl)] font-bold">Real stories. Real impact.</h2>
+      <p class="mt-3 max-w-[50ch] text-[var(--text-sm)] text-neutral-400">Everything you need to know about businesses building on Avalanche.</p>
+      <div class="mt-[var(--gap-xl)] grid grid-cols-1 gap-px sm:grid-cols-2 lg:grid-cols-3">
+        {verticals.map((v, i) => (
+          <a href={v.href} class="reveal-y rounded-[var(--radius-2xl)] border border-neutral-800 p-5 transition-colors hover:border-red hover:text-red" style={`--index:${i}`}>
+            <span class="font-aeonik text-[var(--text-xl)] font-semibold">{v.title}</span>
+          </a>
+        ))}
+      </div>
+      <div class="mt-[var(--gap-xl)]">
+        <a href="/resource-hub/case-studies" class="btn btn-primary">View case studies</a>
+      </div>
+    </section>
+    <NewsletterContact />
+  </main>
+  <Footer />
+</Layout>

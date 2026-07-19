@@ -1,0 +1,33 @@
+---
+import SolutionLayout from "../../layouts/SolutionLayout.astro";
+import blogPosts from "../../data/blog-posts.json";
+
+const featured = blogPosts.slice(0, 9);
+const rest = blogPosts.slice(9, 40);
+---
+
+<SolutionLayout title="Blog" headline="News & Stories" lede="Announcements, research, and ecosystem coverage from Avalanche.">
+  <section class="group/section animate-in-view mx-[var(--padding-base)] mt-px grid grid-cols-1 gap-px md:grid-cols-2 lg:grid-cols-3">
+    {featured.map((post, i) => (
+      <a href={post.href} class="reveal-y relative min-h-[220px] overflow-hidden rounded-[var(--radius-4xl)] bg-dark p-[var(--padding-md)] transition-colors hover:bg-neutral-900" style={`--index:${i}`}>
+        <wm-shape id="solutions" corner="tr" rounded="clamp(1rem, -0.143rem + 1.786vw, 2rem)" corner-rounded="clamp(0.75rem, -0.107rem + 1.339vw, 1.5rem)" corner-size="clamp(3rem, 0.5rem + 8vw, 6rem)" stroke-width="0"></wm-shape>
+        <p class="relative z-[1] text-[var(--text-xs)] uppercase tracking-widest text-neutral-500">Blog</p>
+        <h2 class="relative z-[1] mt-3 font-aeonik text-[var(--text-xl)] font-bold leading-snug">{post.title}</h2>
+        <span class="relative z-[1] mt-6 inline-block text-[var(--text-sm)] font-semibold text-red">Read</span>
+      </a>
+    ))}
+  </section>
+  <section class="group/section animate-in-view mx-[var(--padding-base)] mt-px section-shell">
+    <h2 class="font-aeonik text-[var(--text-3xl)] font-bold">More from the archive</h2>
+    <ul class="mt-[var(--gap-md)] divide-y divide-neutral-800">
+      {rest.map((post) => (
+        <li>
+          <a href={post.href} class="flex items-center justify-between gap-4 py-4 text-[var(--text-sm)] transition-colors hover:text-red">
+            <span>{post.title}</span>
+            <span class="shrink-0 text-neutral-500">→</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</SolutionLayout>

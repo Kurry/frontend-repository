@@ -1,0 +1,45 @@
+---
+import data from "../data/home.json";
+const { label, items } = data.testimonials;
+const arrow = `<svg class="slider-button_arrow" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="square"/></svg>`;
+const arrowPrev = `<svg class="slider-button_arrow is--prev" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="square"/></svg>`;
+---
+<section class="section_testimonials" data-gsap-ignore>
+  <div style="width:100%">
+    <div class="padding-global">
+      <div class="testimonial-lines" data-testimonial-wrap data-autoplay data-autoplay-duration="5000">
+        <div class="testimonial-lines__main">
+          <div class="testimonial-lines__main-details">
+            <p class="testimonial-lines__p is--faded" data-split-visible>
+              <span class="testimonial-lines__count" data-current>1</span>/<span>{items.length}</span>
+            </p>
+            <p class="testimonial-lines__p" data-split-visible>{label}</p>
+          </div>
+          <div class="testimonial-lines__collection">
+            <div class="testimonial-lines__list" role="list" data-testimonial-list>
+              {items.map((t, i) => (
+                <div class={`testimonial-lines__item${i === 0 ? " is--active" : ""}`} role="listitem" data-testimonial-item>
+                  <h3 class="testimonial-lines__h" data-testimonial-text data-split-visible>{t.text}</h3>
+                  <div class="testimonial-lines__item-details">
+                    <div class="testimonial-lines__item-visual" data-testimonial-img>
+                      <img class="testimonial-lines__item-img" src={t.img} alt="" loading="lazy" />
+                    </div>
+                    <p class="testimonial-lines__p" data-testimonial-split data-split-visible>{t.name}</p>
+                    <p class="testimonial-lines__p is--faded" data-testimonial-split data-split-visible>{t.role}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div class="testimonials-img">
+          <img src="/images/emoji/quote.avif" alt="Quote emoji" loading="lazy" />
+        </div>
+        <div class="slider-buttons">
+          <button class="slider-button" data-prev aria-label="Previous testimonial" set:html={arrowPrev} />
+          <button class="slider-button" data-next aria-label="Next testimonial" set:html={arrow} />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

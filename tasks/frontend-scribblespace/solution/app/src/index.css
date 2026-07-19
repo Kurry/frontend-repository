@@ -1,0 +1,206 @@
+@import "tailwindcss";
+
+:root {
+  --color-primary: #6D5BD0;
+  --color-primary-hover: #5B4AC0;
+  --color-background: #F4F2FB;
+  --color-text-primary: #211D3A;
+  --color-text-secondary: #6B6489;
+  --color-warning: #E0A030;
+  --color-surface: #FFFFFF;
+  --color-border: #D8D4EA;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  min-width: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--color-text-primary);
+  background: var(--color-background);
+}
+
+#root {
+  min-width: 0;
+  min-height: 100%;
+}
+
+/* Visible keyboard focus, distinct from hover, on every control */
+:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* Primary action buttons */
+.btn-primary {
+  background-color: var(--color-primary);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  padding: 0 16px;
+  min-height: 48px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(33, 29, 58, 0.18);
+  white-space: nowrap;
+  transition: background-color 120ms ease, transform 60ms ease;
+}
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+}
+.btn-primary:active {
+  transform: scale(0.97);
+}
+.btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+.btn-primary:disabled:hover {
+  background-color: var(--color-primary);
+}
+
+/* Secondary buttons */
+.btn-secondary {
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  border: 1.5px solid var(--color-text-secondary);
+  border-radius: 8px;
+  padding: 0 14px;
+  min-height: 48px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 120ms ease, transform 60ms ease;
+}
+.btn-secondary:hover {
+  background-color: #EAE6F7;
+}
+.btn-secondary:active {
+  transform: scale(0.97);
+}
+.btn-secondary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+.btn-secondary:disabled:hover {
+  background-color: var(--color-surface);
+}
+
+/* Toggle (tool) buttons */
+.btn-tool {
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  border: 1.5px solid var(--color-text-secondary);
+  border-radius: 8px;
+  padding: 0 14px;
+  min-height: 48px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 120ms ease, transform 60ms ease;
+}
+.btn-tool:hover {
+  background-color: #EAE6F7;
+}
+.btn-tool:active {
+  transform: scale(0.97);
+}
+.btn-tool[aria-pressed="true"] {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #FFFFFF;
+}
+.btn-tool[aria-pressed="true"]:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* Warning (destructive confirm) button */
+.btn-warning {
+  background-color: var(--color-warning);
+  color: var(--color-text-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 0 16px;
+  min-height: 48px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(224, 160, 48, 0.4);
+  white-space: nowrap;
+  transition: filter 120ms ease, transform 60ms ease;
+}
+.btn-warning:hover {
+  filter: brightness(0.92);
+}
+.btn-warning:active {
+  transform: scale(0.97);
+}
+
+.canvas-object:hover {
+  box-shadow: 0 6px 18px rgba(33, 29, 58, 0.25);
+}
+
+.canvas-object-wrapper:focus-visible {
+  outline: 4px solid var(--color-primary);
+  outline-offset: 4px;
+}
+
+@media (max-width: 480px) {
+  .app-shell {
+    min-width: 0;
+  }
+
+  .app-header {
+    align-items: flex-start;
+    column-gap: 8px;
+    row-gap: 8px;
+    padding: 8px;
+  }
+
+  .app-header nav {
+    flex: 1 1 220px;
+  }
+
+  .app-search {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .app-search > div {
+    max-width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .app-search input {
+    width: min(210px, calc(100vw - 96px)) !important;
+  }
+
+  .app-actions {
+    padding: 8px;
+  }
+
+  .app-actions [role="toolbar"] {
+    padding: 8px;
+    justify-content: flex-start;
+  }
+}

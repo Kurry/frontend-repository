@@ -1,0 +1,1 @@
+import{v as o}from"./core.min-C6O5v62Y.js";import{a as r}from"./store-CcC-Cn2p.js";import"./preloader-Bns9QiKi.js";import"./types-BMbUCgPc.js";const p=()=>{const[t]=o();return r(t.state,t.history,"email",t.state.content.contact.email)};export{p as s_7IoMq5GsDtc};

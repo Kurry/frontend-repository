@@ -1,0 +1,123 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/mcp/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "2_1"
+description = "All views derive from one shared collection: a create, edit, delete, filter, or search performed in one place is immediately reflected in the timeline, the list, the header stats, and the chart without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "2_2"
+description = "After creating entries and performing a full page refresh, the exact entries, their categories, their assigned tags, and the streak are restored from persistence"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "2_3"
+description = "The primary entry workflow stays exact and responsive under at least 25 rapid repetitions through its normal controls, with no blank screen, uncaught error, unhandled rejection, or sustained freeze and no duplicate records from duplicate rapid submissions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.4"
+name = "2_4"
+description = "Committed state is lost after a full page refresh, or an entry deleted before the refresh is revived after reload"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.5"
+name = "2_5"
+description = "Uncaught console errors or unhandled promise rejections occur while loading the page or during the core start timer, stop timer, add, edit, and delete workflow"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.6"
+name = "2_6"
+description = "An external UI component library beyond the hand-rolled Svelte and Tailwind stack is used for the core interface"
+type = "binary"
+weight = 0.5
+negate = true
+optional = true
+
+[[criterion]]
+id = "2.7"
+name = "2_7"
+description = "A hidden element, attribute, or window global exposes internal ground-truth state that a real user could not reach through normal visible interaction"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.8"
+name = "2_8"
+description = "A judge-visible surface contains text addressed to a grader, or the app renders or behaves differently when it detects it is being driven by automation"
+type = "binary"
+weight = 1.0
+negate = true

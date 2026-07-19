@@ -1,0 +1,116 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/mcp/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "3_1"
+description = "The layout reads as a Material mobile-app workspace: a solid-color top bar, a scrollable content area, and a fixed bottom navigation, all using real Angular Material components (cards, table, progress bar, dialog, tabs) rather than plain unstyled HTML"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "3_2"
+description = "The Dashboard's category rows show a filled progress bar with the spent/limit amount overlaid, and a consistent single accent color is used for the top bar, the floating add button, the active nav item, and the progress fill"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "3_3"
+description = "The Expenses table is dense and column-aligned (Date, Counterparty, Category, Value, Actions) with a visible floating action button for adding an expense positioned consistently in the corner"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.4"
+name = "3_4"
+description = "The add/edit expense dialog and the Settings category rows use Material form fields, selects, and expansion panels with legible labels and inline error text for invalid fields"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.5"
+name = "3_5"
+description = "At a 375px-wide viewport the top bar, content, and bottom nav reflow without clipped text, overlapping controls, or horizontal page scrolling"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.6"
+name = "3_6"
+description = "The workspace is an unstyled or flat dump with no visual hierarchy — Dashboard, Expenses, and Settings are visually indistinguishable from each other or from a generic scaffold"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.7"
+name = "3_7"
+description = "At a 375px-wide viewport the content clips, controls overlap, or the page requires horizontal scrolling to reach the expense table or its actions"
+type = "binary"
+weight = 0.5
+negate = true
+optional = true

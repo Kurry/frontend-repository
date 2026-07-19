@@ -1,0 +1,39 @@
+- generic [ref=e3]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - heading "FandangoFury" [level=1] [ref=e7]
+      - paragraph [ref=e8]: Hack and slash through the festival town
+    - generic [ref=e9]:
+      - heading "Stage select" [level=2] [ref=e10]
+      - generic [ref=e11]:
+        - button "Play Plaza del Sol" [ref=e12]:
+          - generic [ref=e13]: ⚔️
+          - generic [ref=e14]: "1"
+        - button "Mercado Nocturno locked" [disabled] [ref=e16]:
+          - generic [ref=e17]: 🔒
+          - generic [ref=e18]: "2"
+        - button "Fortaleza Roja locked" [disabled] [ref=e20]:
+          - generic [ref=e21]: 🔒
+          - generic [ref=e22]: "3"
+      - generic [ref=e23]: Plaza del Sol — 3 waves + boss El Bandido
+    - generic [ref=e24]:
+      - generic [ref=e25]:
+        - generic [ref=e26]: 💰
+        - generic [ref=e27]: "0"
+        - generic [ref=e28]: Pesos
+      - generic [ref=e29]:
+        - generic [ref=e30]: 🎭
+        - generic [ref=e31]: "0"
+        - generic [ref=e32]: Masks
+    - generic [ref=e33]:
+      - button "Open cantina shop" [ref=e34]: 🍺 Open cantina
+      - button "Open masks" [ref=e35]: 🎭 Open masks
+      - button "Reset progress" [ref=e36]: 🗑️ Reset progress
+    - generic [ref=e37]:
+      - generic [ref=e38]:
+        - generic [ref=e39]: Z Light strike
+        - generic [ref=e40]: X Heavy strike
+        - generic [ref=e41]: C Block
+        - generic [ref=e42]: Space Dodge
+      - generic [ref=e43]: Light + light + heavy = Fiesta combo
+  - button "Open history panel" [ref=e44]: 📜 History

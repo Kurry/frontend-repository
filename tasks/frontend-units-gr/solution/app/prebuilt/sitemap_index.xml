@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+	<sitemap>
+		<loc>/page-sitemap.xml</loc>
+		<lastmod>2026-07-06T12:08:56+00:00</lastmod>
+	</sitemap>
+	<sitemap>
+		<loc>/unit-sitemap.xml</loc>
+		<lastmod>2026-07-06T12:15:44+00:00</lastmod>
+	</sitemap>
+	<sitemap>
+		<loc>/category-sitemap.xml</loc>
+		<lastmod>2025-11-27T11:24:29+00:00</lastmod>
+	</sitemap>
+	<sitemap>
+		<loc>/faq-category-sitemap.xml</loc>
+		<lastmod>2026-05-20T15:25:32+00:00</lastmod>
+	</sitemap>
+	<sitemap>
+		<loc>/author-sitemap.xml</loc>
+		<lastmod>2025-11-27T11:29:54+00:00</lastmod>
+	</sitemap>
+</sitemapindex>

@@ -1,0 +1,115 @@
+---
+import data from "../data/home.json";
+const { notice, prefsIntro, categories } = data.cookie;
+---
+<div class="rd-cookieflow_component" data-cookieflow>
+  <!-- Zone 1 banner (shown by default) -->
+  <div class="rd-cookie-banner_component is-zone-1 theme-dark" data-cookie-banner="zone-1">
+    <div class="rd-cookie-banner_content">
+      <div class="rd-cookie-banner_content-top">
+        <div class="rd-cookie-banner_top-content">
+          <div class="rd-cookie-banner_top-element">
+            <svg class="icon-18px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="9.5" cy="10" r="1" fill="currentColor"/><circle cx="14" cy="13.5" r="1" fill="currentColor"/><circle cx="11" cy="16" r="1" fill="currentColor"/></svg>
+            <div class="paragraph-s" data-split-visible>Zone 1</div>
+          </div>
+          <div class="re-vertical-separator"></div>
+          <div class="rd-cookie-banner_top-element">
+            <svg class="icon-18px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.4 7.7 8 9 4.6-1.3 8-4 8-9V6l-8-3Z"/></svg>
+            <div class="paragraph-s" data-split-visible>Notice</div>
+          </div>
+        </div>
+      </div>
+      <div class="rd-cookie-banner_content-middle">
+        <div class="paragraph-regular" data-split-visible>{notice}</div>
+      </div>
+      <div class="rd-cookie-banner_buttons-wrapper">
+        <a class="btn-icon-link w-inline-block" href="#" data-cookie-accept>
+          <div class="btn-icon-content">
+            <div class="btn-icon-content__mask">
+              <span class="btn-icon-content__text" data-button-anim-target>Accept</span>
+            </div>
+            <div class="btn-icon-icon" data-icon-size>
+              <div class="btn-icon-icon__bg" data-button-anim-target></div>
+              <div class="btn-icon-icon__wrap">
+                <div class="btn-icon-icon__list">
+                  <svg class="btn-icon-icon__arrow" data-button-anim-target viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"/></svg>
+                </div>
+              </div>
+            </div>
+            <div class="btn-icon-content__bg" data-button-anim-target></div>
+          </div>
+        </a>
+        <a class="btn-icon-link is-outline w-inline-block" href="#" data-cookie-prefs-open>
+          <div class="btn-icon-content is-outline">
+            <div class="btn-icon-content__mask">
+              <span class="btn-icon-content__text" data-button-anim-target>Privacy Settings</span>
+            </div>
+            <div class="btn-icon-content__bg" data-button-anim-target></div>
+          </div>
+        </a>
+      </div>
+    </div>
+    <button class="rd-close_component" data-cookie-close aria-label="Close cookie banner"></button>
+  </div>
+
+  <!-- Zone 2 / Zone 3 banner shells (hidden; zone selection is geo-driven on the real product) -->
+  <div class="rd-cookie-banner_component is-zone-2 theme-dark" data-cookie-banner="zone-2" hidden></div>
+  <div class="rd-cookie-banner_component is-zone-3 theme-dark" data-cookie-banner="zone-3" hidden></div>
+
+  <!-- Preferences modal -->
+  <div class="rd-cookie-prefs_component theme-dark" data-cookie-prefs>
+    <div class="rd-cookie-prefs_overlay" data-cookie-prefs-close-target></div>
+    <form class="rd-cookie-prefs_content rd-cookie-prefs_form" data-name="Privacy Settings" name="wf-form-Privacy-Settings">
+      <button class="rd-close_component" type="button" data-cookie-prefs-close aria-label="Close privacy settings"></button>
+      <div class="rd-cookie-prefs_title-wrap">
+        <div class="heading-s" data-split-visible>Privacy Settings</div>
+        <div class="paragraph-regular opacity-75" data-split-visible>{prefsIntro}</div>
+      </div>
+      <div class="rd-cookie-prefs_list">
+        {categories.map((c) => (
+          <div class="rd-cookie-prefs_category">
+            <div class="rd-cookie-prefs_toggle">
+              <div class="paragraph-m" data-split-visible>{c.name}</div>
+              {c.required ? (
+                <div class="rd-toggle_checkbox is-essential">
+                  <div class="rd-toggle_track is-required"></div>
+                  <div class="rd-toggle_dot is-required"></div>
+                </div>
+              ) : (
+                <label class="rd-toggle_checkbox" data-toggle>
+                  <span class="rd-toggle_label no-label">{c.name} Consent</span>
+                  <input class="rd-toggle_input" type="checkbox" name={c.name.toLowerCase()} />
+                  <div class="rd-toggle_track rd-toggle_background"></div>
+                  <div class="rd-toggle_dot"></div>
+                </label>
+              )}
+            </div>
+            <div class="paragraph-regular opacity-60" data-split-visible>{c.desc}</div>
+          </div>
+        ))}
+      </div>
+      <div class="rd-cookie-prefs_buttons-wrapper">
+        <div class="rd-cookie-prefs_buttons-wrapper-left">
+          <a class="btn-icon-link is-outline w-inline-block" href="#" data-cookie-reject>
+            <div class="btn-icon-content is-outline">
+              <div class="btn-icon-content__mask"><span class="btn-icon-content__text" data-button-anim-target>Reject All</span></div>
+              <div class="btn-icon-content__bg" data-button-anim-target></div>
+            </div>
+          </a>
+          <a class="btn-icon-link w-inline-block" href="#" data-cookie-accept-all>
+            <div class="btn-icon-content is-secondary">
+              <div class="btn-icon-content__mask"><span class="btn-icon-content__text" data-button-anim-target>Accept All</span></div>
+              <div class="btn-icon-content__bg is-secondary" data-button-anim-target></div>
+            </div>
+          </a>
+        </div>
+        <a class="btn-icon-link w-inline-block" href="#" data-cookie-accept-selected>
+          <div class="btn-icon-content">
+            <div class="btn-icon-content__mask"><span class="btn-icon-content__text" data-button-anim-target>Accept selected</span></div>
+            <div class="btn-icon-content__bg" data-button-anim-target></div>
+          </div>
+        </a>
+      </div>
+    </form>
+  </div>
+</div>

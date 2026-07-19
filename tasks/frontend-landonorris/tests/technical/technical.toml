@@ -1,0 +1,143 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/mcp/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "2_1"
+description = "No console errors or unhandled promise rejections appear while the homepage and its interaction workflows are exercised"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "2_2"
+description = "Loading the homepage issues zero network asset requests to a non-origin host; fonts, images, video, CSS, JS, WASM, and GL are all same-origin"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "2_3"
+description = "Fonts resolve to Mona Sans Variable and Brier rather than a Times or system fallback"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.4"
+name = "2_4"
+description = "The brand CSS custom properties compute to their exact hex values, including --color--lime #d2ff00 and --color--dark-green #282c20, and the body background computes to rgb(40, 44, 32)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "2_5"
+description = "No localStorage or sessionStorage entries are written after the homepage workflows are exercised"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "2_6"
+description = "The Rive WASM binary is requested from the same-origin path /vendor/@rive-app/canvas-lite@2.26.4/"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "2.7"
+name = "2_7"
+description = "GL assets are requested from the same-origin path /assets.itsoffbrand.io/lando/gl/**"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "2.8"
+name = "2_8"
+description = "localStorage or sessionStorage is written while the homepage is exercised"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.9"
+name = "2_9"
+description = "The page issues outbound runtime requests to a non-origin host such as cdn.prod.website-files.com, assets.itsoffbrand.io, or player.vimeo.com"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.10"
+name = "2_10"
+description = "The Store button background computes to rgb(210, 255, 0) with text rgb(17, 17, 18), and the menu overlay and footer backgrounds compute to rgb(40, 44, 32)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "2_11"
+description = "The nav bar row is about 100px tall at 1440x900 and the hamburger button is about 60px by 60px"
+type = "binary"
+weight = 0.5
+optional = true

@@ -1,0 +1,210 @@
+---
+const jewel = "/_astro/jewel.Dtl3ZT0A.jpg";
+
+const blockSeed = [
+  { n: "17387435", hash: "0x70bd...6e4fca", txs: "3 TX", ago: "1 second ago" },
+  { n: "69356942", hash: "0xc8cc...ef402c", txs: "5 TX", ago: "1 second ago" },
+  { n: "21390847", hash: "0xc8db...799077", txs: "9 TX", ago: "2 seconds ago" },
+  { n: "69356941", hash: "0xa1f2...3b9c01", txs: "2 TX", ago: "2 seconds ago" },
+  { n: "69356940", hash: "0x88e0...c4d112", txs: "4 TX", ago: "3 seconds ago" },
+  { n: "69356939", hash: "0x12ab...90ef44", txs: "7 TX", ago: "4 seconds ago" },
+  { n: "69356938", hash: "0x55cd...771a09", txs: "1 TX", ago: "5 seconds ago" },
+];
+
+const txSeed = [
+  { hash: "0x05a4...06803a", from: "0x74b2...1327a2", to: "0x0938...4A9bbf", ago: "1 second ago", opacity: "bg-white dark:bg-dark" },
+  { hash: "0x05a4...06803a", from: "0xdD12...64eC92", to: "0xe2Ff...f9A055", ago: "1 second ago", opacity: "bg-white/80 dark:bg-dark/80" },
+  { hash: "0x05a4...06803a", from: "0xDF83...3129FE", to: "0x0938...4A9bbf", ago: "1 second ago", opacity: "bg-white/70 dark:bg-dark/70" },
+  { hash: "0xb2c1...aa1099", from: "0x11aa...22bb33", to: "0x44cc...55dd66", ago: "2 seconds ago", opacity: "bg-white/60 dark:bg-dark/60" },
+  { hash: "0xc3d2...bb2100", from: "0x77ee...88ff99", to: "0x00aa...11bb22", ago: "2 seconds ago", opacity: "bg-white/50 dark:bg-dark/50" },
+  { hash: "0xd4e3...cc3201", from: "0x33cc...44dd55", to: "0x66ee...77ff88", ago: "3 seconds ago", opacity: "bg-white/40 dark:bg-dark/40" },
+  { hash: "0xe5f4...dd4302", from: "0x99aa...00bb11", to: "0x22cc...33dd44", ago: "4 seconds ago", opacity: "bg-white/30 dark:bg-dark/30" },
+];
+---
+
+<section id="numbers" class="relative z-[1] w-full">
+  <div
+    class="relative flex w-full flex-col items-stretch justify-start gap-[var(--gap-xl)] rounded-[var(--radius-4xl)] bg-white p-[var(--padding-md)] transition-mode dark:bg-dark"
+  >
+    <div
+      class="group/section animate-in-view flex w-full flex-col items-start justify-start border-b border-neutral-200 pb-[var(--padding-xl)] transition-mode dark:border-neutral-800"
+    >
+      <h2 class="h1 w-full leading-[80%] uppercase" style="line-height: 80%">
+        <span class="block translate-x-1/2 transition-move group-[.visible]/section:translate-x-0">Avalanche</span>
+        <span class="block -translate-x-1/2 text-right transition-move group-[.visible]/section:translate-x-0">Network</span>
+        <span class="block translate-y-1/2 transition-move group-[.visible]/section:translate-y-0">In Action</span>
+      </h2>
+    </div>
+
+    <div
+      class="group/section animate-in-view grid grid-cols-1 place-items-start gap-[var(--gap-xl)] lg:grid-cols-2 lg:place-items-stretch lg:pl-[var(--padding-2xl)]"
+    >
+      <h3 class="split-text font-aeonik text-4xl antialiased lg:text-5xl">
+        Explore the latest transactions and block data from the network.
+      </h3>
+    </div>
+
+    <div
+      class="group/section animate-in-view flex w-full flex-col items-stretch justify-start gap-[var(--gap-lg)] lg:pl-[var(--padding-2xl)]"
+    >
+      <div
+        class="flex w-[90%] flex-row items-start justify-between gap-[var(--gap-xs)] rounded-2xl border border-neutral-200 bg-white p-[var(--padding-md)] transition-mode group-[.visible]/section:w-full lg:w-2/3 dark:border-neutral-800 dark:bg-dark [transition:background-color_300ms_var(--ease-out-cubic),border-color_300ms_var(--ease-out-cubic),width_0ms_0ms_var(--ease-out-quart)] group-[.visible]/section:[transition:background-color_300ms_var(--ease-out-cubic),border-color_300ms_var(--ease-out-cubic),width_2000ms_0ms_var(--ease-out-quart)]"
+      >
+        <div class="flex flex-row items-start justify-start gap-1">
+          <h3
+            id="total-transactions"
+            class="split-heading text-5xl leading-none uppercase tabular-nums whitespace-nowrap lg:text-7xl"
+          >
+            60,932,291
+          </h3>
+          <div class="overflow-x-clip lg:pt-[var(--padding-base)]">
+            <div
+              class="xs -translate-x-full whitespace-nowrap rounded-full bg-red-700 px-3 py-[var(--padding-xs)] font-aeonik text-xs font-bold text-white transition-transform duration-0 delay-0 ease-out-quart group-[.visible]/section:translate-x-0 group-[.visible]/section:delay-500 group-[.visible]/section:duration-2000 lg:px-[var(--padding-base)]"
+            >
+              Live Stats
+            </div>
+          </div>
+        </div>
+        <h4 class="h6 hidden whitespace-nowrap uppercase md:block">Transactions</h4>
+      </div>
+
+      <div
+        class="group/section animate-in-view grid grid-cols-1 grid-rows-[auto_1fr_auto_1fr] place-items-stretch gap-[var(--gap-xs)] md:grid-cols-2 md:grid-rows-[auto_1fr]"
+      >
+        <h3 class="row-start-1 self-center text-left text-2xl/normal uppercase">Latest blocks</h3>
+        <h3 class="row-start-3 self-center pt-[var(--padding-lg)] text-left text-2xl/normal uppercase md:row-start-1 md:pt-0">
+          Latest transactions
+        </h3>
+
+        <div style="--rows: 7" class="rounded-lg lg:max-h-[calc(3.5rem*var(--rows)+4px)]">
+          <div
+            id="table-blocks"
+            class="flex flex-col gap-px rounded-lg border-x border-neutral-200 bg-neutral-200 pt-px pb-px transition-mode dark:border-neutral-800 dark:bg-neutral-800"
+          >
+            {
+              blockSeed.map((b) => (
+                <div class="grid h-17 grid-cols-[auto_1fr] grid-rows-[auto_1fr_auto] place-items-start gap-x-[var(--gap-xs)] rounded-lg bg-white p-2 transition-mode lg:h-14 lg:grid-cols-[auto_1fr_1fr_auto] lg:grid-rows-1 lg:items-center dark:bg-dark">
+                  <img
+                    src={jewel}
+                    alt="AVAX avatar"
+                    class="block-avatar size-8 row-span-full self-center rounded-full object-cover"
+                    width="32"
+                    height="32"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <div class="mb-1 flex flex-col items-start justify-start gap-1 lg:mb-0">
+                    <div class="font-aeonik text-xs text-neutral-500 transition-mode lg:text-sm dark:text-neutral-300">
+                      <span class="lg:hidden">Block</span>{" "}
+                      <span class="block-number text-sm font-bold text-black underline underline-offset-2 transition-mode dark:text-white">
+                        {b.n}
+                      </span>
+                    </div>
+                    <p class="block-time hidden text-xs text-neutral-500 transition-mode lg:block dark:text-neutral-300">
+                      {b.ago}
+                    </p>
+                  </div>
+                  <div class="row-span-1 row-start-2 grid grid-cols-[auto_1fr] place-items-start gap-1 lg:col-start-3 lg:row-start-1">
+                    <span class="font-aeonik text-xs text-neutral-500 transition-mode lg:text-sm dark:text-neutral-300">Hash</span>
+                    <span class="block-hash transaction-from font-aeonik text-sm font-bold text-black underline underline-offset-2 transition-mode dark:text-white">
+                      {b.hash}
+                    </span>
+                    <span class="block-tx-count font-aeonik text-xs text-neutral-500 transition-mode lg:text-sm dark:text-neutral-300">
+                      {b.txs}
+                    </span>
+                  </div>
+                  <div class="block-symbol row-span-full min-w-24 self-center rounded-md bg-black p-2 text-center font-aeonik text-xs text-white uppercase transition-mode lg:row-span-1 dark:bg-white dark:text-black">
+                    <span class="block-symbol-text">0.01 AVAX</span>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <div style="--rows: 7" class="rounded-lg lg:max-h-[calc(3.5rem*var(--rows)+4px)]">
+          <div
+            id="table-txs"
+            class="flex flex-col gap-px rounded-lg border-x border-neutral-200 bg-neutral-200 pt-px pb-px transition-mode dark:border-neutral-800 dark:bg-neutral-800"
+          >
+            {
+              txSeed.map((t) => (
+                <div
+                  class:list={[
+                    "grid h-17 grid-cols-[auto_1fr] grid-rows-[auto_1fr] place-items-start gap-x-[var(--gap-xs)] rounded-lg p-2 lg:h-14 lg:grid-cols-[auto_1fr_1fr] lg:grid-rows-1 lg:items-center",
+                    t.opacity,
+                  ]}
+                >
+                  <img
+                    src={jewel}
+                    alt="undefined avatar"
+                    class="transaction-avatar size-8 row-span-full self-center rounded-full object-cover"
+                    width="32"
+                    height="32"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <div class="col-start-2 row-span-1 mb-1 flex flex-col items-start justify-start gap-1 lg:mb-0">
+                    <div class="font-aeonik text-xs text-neutral-500 transition-mode lg:text-sm dark:text-neutral-300">
+                      <span class="lg:hidden">Hash</span>{" "}
+                      <span class="transaction-number text-sm font-bold text-black underline underline-offset-2 transition-mode dark:text-white">
+                        {t.hash}
+                      </span>
+                    </div>
+                    <p class="transaction-time hidden text-xs text-neutral-500 transition-mode lg:block dark:text-neutral-300">
+                      {t.ago}
+                    </p>
+                  </div>
+                  <div class="row-span-1 row-start-2 grid grid-cols-[auto_1fr] place-items-start gap-1 lg:col-start-3 lg:row-start-1">
+                    <span class="font-aeonik text-xs text-neutral-500 transition-mode lg:text-sm dark:text-neutral-300">From</span>
+                    <span class="transaction-from font-aeonik text-sm font-bold text-black underline underline-offset-2 transition-mode dark:text-white">
+                      {t.from}
+                    </span>
+                    <span class="font-aeonik text-xs text-neutral-500 transition-mode lg:text-sm dark:text-neutral-300">To</span>
+                    <span class="transaction-to font-aeonik text-sm font-bold text-black underline underline-offset-2 transition-mode dark:text-white">
+                      {t.to}
+                    </span>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import gsap from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+  gsap.registerPlugin(ScrollTrigger);
+
+  const el = document.getElementById("total-transactions");
+  const fmt = (n: number) => n.toLocaleString("en-US");
+
+  async function fetchTotal() {
+    try {
+      const res = await fetch("/api/total-transactions");
+      if (!res.ok) throw new Error(String(res.status));
+      const data = await res.json();
+      if (el) el.textContent = fmt(Number(data.value ?? data));
+    } catch {
+      /* keep SSR seed */
+    }
+  }
+
+  ScrollTrigger.create({
+    trigger: "#numbers",
+    start: "top bottom",
+    end: "bottom top",
+    onEnter: () => {
+      void fetchTotal();
+    },
+    onEnterBack: () => {
+      void fetchTotal();
+    },
+  });
+
+  void fetchTotal();
+</script>

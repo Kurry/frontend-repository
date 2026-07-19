@@ -1,0 +1,30 @@
+---
+import SolutionLayout from "../../layouts/SolutionLayout.astro";
+
+const useCases = [
+  { title: "Cross-Border Payments & Treasury", href: "/payments/crossborder", body: "Move funds across borders instantly with programmable treasury controls." },
+  { title: "Capital Markets & Trade Settlement", href: "/payments/capitalmarkets", body: "Settle trades and securities in real time." },
+  { title: "B2B Payments", href: "/payments/b2b", body: "Automate supplier payments and invoicing on-chain." },
+  { title: "Retail & Merchant Payments", href: "/payments/retail", body: "Accept payments with instant finality and near-zero fees." },
+];
+---
+
+<SolutionLayout
+  title="Avalanche: Built for Payments"
+  headline="Built for Payments"
+  lede="Powering the next generation of global payments. Avalanche brings stablecoin settlement, global payout infrastructure, and 24/7 money movement together on a single platform."
+  video="/videos/payments.mp4"
+>
+  <section class="group/section animate-in-view mx-[var(--padding-base)] mt-px section-shell">
+    <h2 class="font-aeonik split-heading text-[var(--text-4xl)] font-bold">Avalanche Payments Collective</h2>
+    <p class="mt-4 max-w-[60ch] text-neutral-300 text-[var(--text-base)]">A coalition of payment providers, stablecoin issuers, fintechs and infrastructure partners building on Avalanche.</p>
+    <div class="mt-8 grid gap-px sm:grid-cols-2">
+      {useCases.map((u, i) => (
+        <a href={u.href} class="reveal-y rounded-[var(--radius-2xl)] border border-neutral-800 p-5 transition hover:border-red" style={`--index:${i}`}>
+          <h3 class="font-aeonik text-[var(--text-xl)] font-bold">{u.title}</h3>
+          <p class="mt-2 text-[var(--text-sm)] text-neutral-400">{u.body}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+</SolutionLayout>

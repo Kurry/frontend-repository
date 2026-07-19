@@ -1,0 +1,24 @@
+{
+  "name": "razorpay-sprint-26-oracle",
+  "private": true,
+  "version": "2.0.0",
+  "description": "Natively authored Vite + three.js + GSAP rebuild of the Razorpay Sprint 2026 microsite (/sprint/26)",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 3000",
+    "build": "vite build",
+    "verify:build": "vite build",
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "@rive-app/canvas": "2.26.6",
+    "gsap": "3.12.5",
+    "three": "0.160.1"
+  },
+  "devDependencies": {
+    "vite": "^5.4.11"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

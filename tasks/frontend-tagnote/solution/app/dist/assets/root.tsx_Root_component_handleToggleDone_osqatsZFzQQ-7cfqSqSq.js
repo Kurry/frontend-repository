@@ -1,0 +1,1 @@
+import{v as e}from"./core.min-Dne1Y5Yk.js";import{x as l}from"./core.min-Dne1Y5Yk.js";import{m as s}from"./store-CK9GeNlI.js";import"./preloader-Bns9QiKi.js";import"./utils-ah47JOmW.js";const g=o=>{const[t,r]=e();t(s(r.present,o),"Toggled TODO")};export{l as _hW,g as s_osqatsZFzQQ};

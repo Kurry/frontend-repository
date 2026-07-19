@@ -1,0 +1,231 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #F4F7F6;
+  --color-surface: #FFFFFF;
+  --color-primary: #0F9D74;
+  --color-primary-hover: #0B7D5C;
+  --color-secondary: #FFB020;
+  --color-text-primary: #1B2430;
+  --color-text-secondary: #64748B;
+  --color-muted: #E2E8F0;
+  --color-danger: #EF4444;
+  --color-warning: #F59E0B;
+  --font-sans: Manrope, "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+* {
+  font-family: var(--font-sans);
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #F4F7F6;
+  color: #1B2430;
+}
+
+*:focus-visible {
+  outline: 2px solid #0F9D74;
+  outline-offset: 2px;
+}
+
+.btn-primary {
+  min-height: 48px;
+  border-radius: 8px;
+  background-color: #0F9D74;
+  color: #FFFFFF;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.btn-primary:hover {
+  background-color: #0B7D5C;
+}
+
+.btn-primary:active {
+  background-color: #086B50;
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  min-height: 48px;
+  border-radius: 8px;
+  background-color: transparent;
+  border: 1px solid #64748B;
+  color: #1B2430;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.btn-secondary:hover {
+  background-color: #F4F7F6;
+}
+
+.btn-secondary:active {
+  background-color: #E2E8F0;
+  transform: scale(0.98);
+}
+
+.btn-danger {
+  min-height: 48px;
+  border-radius: 8px;
+  background-color: transparent;
+  border: 1px solid #EF4444;
+  color: #EF4444;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.btn-danger:hover {
+  background-color: #FEF2F2;
+}
+
+.btn-danger:active {
+  background-color: #FEE2E2;
+  transform: scale(0.98);
+}
+
+.btn-nav {
+  min-height: 48px;
+  min-width: 48px;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #475569;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+
+.btn-nav:hover {
+  color: #1B2430;
+  background-color: #F4F7F6;
+}
+
+.btn-nav:active {
+  transform: scale(0.98);
+}
+
+.btn-nav-active {
+  background-color: #0F9D74;
+  color: #FFFFFF;
+}
+
+.btn-nav-active:hover {
+  background-color: #0B7D5C;
+  color: #FFFFFF;
+}
+
+.btn-chip {
+  min-height: 48px;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background-color: #FFFFFF;
+  color: #475569;
+  border: 1px solid #E2E8F0;
+  transition: all 0.15s ease;
+}
+
+.btn-chip:hover {
+  border-color: #0F9D74;
+  color: #0F9D74;
+}
+
+.btn-chip-active {
+  background-color: #0F9D74;
+  color: #FFFFFF;
+  border-color: #0F9D74;
+}
+
+.btn-icon {
+  min-height: 48px;
+  min-width: 48px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 3px;
+}
+
+.dragging {
+  opacity: 0.5;
+  transform: scale(0.98);
+}
+
+.drag-over {
+  border-top: 2px solid #0F9D74;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+.shake {
+  animation: shake 0.4s ease-in-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes slideOut {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(20px); opacity: 0; }
+}
+.toast-enter {
+  animation: slideIn 0.3s ease forwards;
+}
+.toast-exit {
+  animation: slideOut 0.3s ease forwards;
+}
+
+.modal-backdrop {
+  background: rgba(27, 36, 48, 0.4);
+}
+
+.habit-card-paused {
+  opacity: 0.55;
+  background-color: #EEF2F1;
+  filter: grayscale(0.35);
+}
+
+.habit-row:hover {
+  box-shadow: 0 4px 12px rgba(27, 36, 48, 0.08);
+}
+
+.complete-btn {
+  min-height: 48px;
+  min-width: 48px;
+}
+
+.complete-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.stepper-btn {
+  min-height: 48px;
+  min-width: 48px;
+}
+
+.stepper-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.stepper-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

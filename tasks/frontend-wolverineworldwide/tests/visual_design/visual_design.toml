@@ -1,0 +1,127 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/mcp/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "2_1"
+description = "The page presents a coherent monochrome editorial system by computed style: body background rgb(255,255,255) and text rgb(1,1,1), the footer surface rgb(1,1,1) with rgb(255,255,255) text, and white type over the full-bleed hero imagery"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "2_2"
+description = "Headings render in the self-hosted ABC Diatype family (computed font-family ABCDiatype) with a clear display-to-body hierarchy: at 1440px the hero display is about 168px weight 700, the portfolio and careers headings about 128px weight 700, and news card titles about 19px weight 400"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "2_3"
+description = "The composition is image-forward and full-bleed: a video hero, a particle/galaxy portfolio field, dense news cards, a market-snapshot stat list, and a dark rounded-top footer slab"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.4"
+name = "2_4"
+description = "The homepage renders its sections top to bottom in the real order inside main: hero, brand portfolio (A portfolio built for every step.), annual report (2025 Annual Report), culture statement (Many brands, one shared culture, limitless innovation.), Market Snapshot, then the Latest News carousel whose cards carry the employee-culture stats and the Company of the Year award, and the Creating Your Future With Us careers panel, ending in the footer"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "2_5"
+description = "At the desktop viewport (1440x900) the layout is a coherent 12-column composition (header spans about 1400px within the 1440 viewport, roughly 82px tall) with consistent spacing rhythm and no malformed or overlapping sections; the market-snapshot meta labels render in ABC Diatype Mono uppercase"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "2_6"
+description = "At the mobile viewport (390px) the sections reflow to a single legible stacked column with the type condensing via clamp() rather than clipping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "2_7"
+description = "The cookie-consent banner is a themed, rounded box consistent with the site (not an unstyled default), appearing on load with We use cookies and its actions"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "2.8"
+name = "2_8"
+description = "The page uses a generic sans-serif or off-palette colors instead of ABC Diatype and the near-black/white monochrome token system"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.9"
+name = "2_9"
+description = "An unintended page-wide horizontal scrollbar appears at 375, 768, or 1440 width (documentElement scrollWidth minus clientWidth exceeds 2px), or sections overlap by more than 8px"
+type = "binary"
+weight = 1.0
+negate = true

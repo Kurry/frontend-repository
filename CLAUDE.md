@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-23 frontend-only Harbor eval tasks (`tasks/frontend-*`). Each task asks a builder agent to rebuild a reference web app from a PRD-style `instruction.md`; an LLM judge (codex, `gpt-5.6-sol`) then grades the built app in a real browser across four dimensions (core_features, technical, visual_design, motion). Everything under `tasks/` is **generated or vendored** — the source of truth for shared pieces lives in `scripts/`.
+65 frontend-only Harbor eval tasks (`tasks/frontend-*`). Each task asks a builder agent to rebuild a reference web app from a PRD-style `instruction.md`; an LLM judge (codex, `gpt-5.6-sol`) then grades the built app in a real browser across four dimensions (core_features, technical, visual_design, motion). Everything under `tasks/` is **generated or vendored** — the source of truth for shared pieces lives in `scripts/`.
+
+Four genres: **good-app** tasks (the original 25, in-memory state, no localStorage), **website-fidelity** tasks (8, pixel-perfect recreations of live sites — landonorris, avax-network, hildenkaira, mosbyfiles, razorpay-sprint-26, readymag, units-gr, wolverineworldwide), **hard browser apps/games** (21, canvas/game/tool apps from zto-phase2 PRDs), and **framework rebuilds** (11, e.g. docuseal, mermaid-live-editor, ghostfolio, plausible-analytics). The latter two genres keep localStorage where their source PRD mandates it — the no-localStorage rule binds only the good-app genre. Any task video that the judge must see rendered needs a VP9 `.webm` source ahead of mp4 — the judge's codec-limited chromium cannot decode h264.
 
 ## Commands
 
@@ -27,7 +29,7 @@ cd ~/harbor && uv run harbor score <trial-or-job-dir> \
 # OPENAI_API_KEY in the host env; the builder agent needs CLAUDE_CODE_OAUTH_TOKEN.
 
 # Capture reference screenshots from every task's solution/app oracle
-# (also a 23-oracle smoke validation: serve + zero console/page errors)
+# (also a per-oracle smoke validation: serve + zero console/page errors)
 node scripts/capture_reference_screenshots.mjs [slug ...]
 python3 scripts/install_reference_screenshots.py [slug ...]   # install into task envs
 
@@ -39,22 +41,22 @@ python3 scripts/regen_dimension_tomls.py [slug ...]
 
 ## Architecture
 
-### Generation pipeline (edit generators, never the 23 copies)
+### Generation pipeline (edit generators, never the per-task copies)
 
-`scripts/package_frontend_tasks.py` is the single source of truth for everything replicated across tasks: `TEST_SH` (tests/test.sh), `TASK_TOML_TMPL` + `ARTIFACT_EXCLUDES` (task.toml), `DOCKERFILE`, the judge `[judge]` header, and `rubric_to_tomls()` which turns authoring rubric+checklist JSON into the four dimension tomls. `scripts/canonical/` holds the authored templates it inlines: `system_prompt.md` (judge prompt), `mcp/reward_mcp_servers.toml` (judge MCP servers fragment), `mcp/webmcp_stdio_server.mjs` (vendored per task into `tests/mcp/`), `test.sh`. All 24 `test.sh` copies and 23 `task.toml`s are byte-identical products of these templates — a unit test enforces the artifact-exclude set, so a drive-by edit to one copy will fail CI-style checks.
+`scripts/package_frontend_tasks.py` is the single source of truth for everything replicated across tasks: `TEST_SH` (tests/test.sh), `TASK_TOML_TMPL` + `ARTIFACT_EXCLUDES` (task.toml), `DOCKERFILE`, the judge `[judge]` header, and `rubric_to_tomls()` which turns authoring rubric+checklist JSON into the four dimension tomls. `scripts/canonical/` holds the authored templates it inlines: `system_prompt.md` (judge prompt), `mcp/reward_mcp_servers.toml` (judge MCP servers fragment), `mcp/webmcp_stdio_server.mjs` (vendored per task into `tests/mcp/`), `test.sh`. All `test.sh` and `task.toml` copies across the 65 tasks are byte-identical products of these templates — a unit test enforces the artifact-exclude set, so a drive-by edit to one copy will fail CI-style checks.
 
 ### Task anatomy
 
 - `instruction.md` — PRD the builder sees. Content sections (`<summary>`, `<core_features>`, `<visual_design>`, `<motion>`, `<requirements>`) are written as observable behaviors (action → expected evidence, quantifiers resolved). Protected sections (`<integrity>`, `<delivery>`, `<webmcp_action_contract>`, `<reference_screenshots>`) are contract/plumbing — the webmcp block is rendered by `scripts/webmcp_h3.py` from `schemas/webmcp-assignments.json` and module specs in `packages/webmcp-contracts`.
 - `environment/` — Dockerfile + `reference-screenshots/` (copied to `/reference-screenshots` in the builder container; images are advisory, instruction text wins).
-- `solution/app` — the oracle (mostly static). Used by `solve.sh`, by the screenshot capture script, and validated to serve with zero console/page errors.
+- `solution/app` — the oracle. Used by `solve.sh`, by the screenshot capture script, and validated to serve with zero console/page errors. Oracles that serve a build output (`vite preview`, `http-server dist`) keep the built `dist/` committed alongside the source so both the capture harness and `test.sh` (`verify:build` then `start`) work.
 - `tests/` — `test.sh` (verifier entry), `system_prompt.md`, `mcp/webmcp_stdio_server.mjs`, and four `<dim>/<dim>.toml` rubrics (31–42 criteria per task).
 
 ### Verifier / judge stack
 
 `tests/test.sh` installs pinned deps (`tasks/_pins.py`; rewardkit is pinned to a SHA of the Kurry/harbor fork on GitHub — bump `HARBOR_REWARDKIT_GIT_SHA` and regenerate test.sh copies together), launches a **shared headless Chrome** with `--remote-debugging-port` and blink pointer-capability flags (without them headless Linux reports `hover: none` and Tailwind v4 strips every `hover:` style — motion criteria then false-fail), exports `WEBMCP_CDP_PORT`/`WEBMCP_CDP_ENDPOINT`, serves the app on port 3000, and runs `rewardkit /tests`.
 
-The judge gets two MCP servers attached to that same Chrome: **playwright** (`@playwright/mcp`, observation + gesture mechanics) and **webmcp** (the task-local CDP bridge), which calls the app's contract-mandated `window.webmcp_session_info/list_tools/invoke_tool` on the *same page* playwright drives — apps are client-side-state SPAs, so a second page would be a different app instance. The judge prompt mandates WebMCP-first for state-changing setup and playwright for anything a criterion grades mechanically, plus accuracy guards (hover verdicts via computed-style-while-hovering, desktop-viewport before layout judgments, count deltas measured immediately around the action).
+The judge gets two MCP servers attached to that same Chrome: **playwright** (`@playwright/mcp`, observation + gesture mechanics) and **webmcp** (the task-local CDP bridge), which calls the app's contract-mandated `window.webmcp_session_info/list_tools/invoke_tool` on the *same page* playwright drives — apps are client-side-state SPAs, so a second page would be a different app instance. The judge prompt mandates WebMCP-first for state-changing setup and playwright for anything a criterion grades mechanically, plus accuracy guards (hover verdicts via computed-style-while-hovering, desktop-viewport before layout judgments, count deltas measured immediately around the action, fresh-load before reveal-state criteria — WebMCP scroll jumps pollute scroll-reveal state — and two-frame early/settled sampling for sub-second intro animations).
 
 ### Rubric conventions (from `.cursor/skills/frontend-good-app-eval/`)
 

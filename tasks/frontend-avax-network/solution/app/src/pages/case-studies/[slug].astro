@@ -1,0 +1,62 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Navigation from "../../components/Navigation.astro";
+import Footer from "../../components/Footer.astro";
+import NewsletterContact from "../../components/forms/NewsletterContact.astro";
+import caseStudies from "../../data/case-studies.json";
+
+export function getStaticPaths() {
+  return caseStudies
+    .filter((entry) => entry.href.startsWith("/case-studies/"))
+    .map((entry) => ({ params: { slug: entry.slug } }));
+}
+
+const { slug } = Astro.params;
+const entry = caseStudies.find((c) => c.slug === slug && c.href.startsWith("/case-studies/"));
+
+if (!entry) {
+  return Astro.redirect("/case-studies");
+}
+
+const descriptions: Record<string, string> = {
+  "how-sk-planet-revolutionized-customer-loyalty-on-chain":
+    "In collaboration with AvaCloud, SK Planet rolled out a pioneering loyalty program on their own Avalanche L1, to revolutionize their customer reward system.",
+  "in-focus-onyx-by-j-p-morgan":
+    "How institutional settlement infrastructure maps onto Avalanche’s high-performance network design.",
+  "in-focus-request-for-streaming-by-citigroup":
+    "Streaming payments and continuous settlement patterns enabled by Avalanche finality.",
+  "the-future-of-fan-engagement":
+    "Onchain experiences that deepen loyalty between fans, teams, and entertainment brands.",
+  "the-future-of-ticketing":
+    "Fraud-resistant ticketing and secondary markets built on Avalanche L1s.",
+};
+
+const description = descriptions[entry.slug] ?? `${entry.title} — Avalanche case study.`;
+---
+
+<Layout title={`${entry.title} | Avalanche`} description={description}>
+  <Navigation />
+  <main class="pt-[var(--navbar-height)]">
+    <article class="group/section animate-in-view mx-[var(--padding-base)] mt-[var(--padding-base)] rounded-[var(--radius-4xl)] bg-dark p-[var(--padding-xl)] lg:p-[var(--padding-3xl)]">
+      <p class="text-[var(--text-sm)] uppercase tracking-widest text-neutral-500">
+        <a href="/case-studies" class="hover:text-red">Case Studies</a>
+      </p>
+      <h1 class="font-aeonik split-heading mt-4 max-w-[18ch] text-[var(--text-5xl)] font-black leading-none lg:text-[var(--text-6xl)]">{entry.title}</h1>
+      <p class="split-text mt-6 max-w-[60ch] text-[var(--text-base)] leading-[1.45] text-neutral-300 opacity-0">{description}</p>
+      <div class="mt-[var(--gap-xl)] max-w-[65ch] space-y-4 text-[var(--text-sm)] leading-[1.5] text-neutral-400">
+        <p>
+          Avalanche L1s give enterprises a sovereign execution environment with institutional-grade performance, while remaining connected to Avalanche’s broader liquidity and messaging fabric.
+        </p>
+        <p>
+          Full narrative body, media embeds, and related-resource modules expand as additional harvest HTML is available for this route.
+        </p>
+      </div>
+      <div class="mt-[var(--gap-xl)] flex flex-wrap gap-3">
+        <a href="/business" class="btn btn-primary">Explore business</a>
+        <a href="/resource-hub" class="btn btn-ghost">Resource hub</a>
+      </div>
+    </article>
+    <NewsletterContact />
+  </main>
+  <Footer />
+</Layout>

@@ -1,0 +1,1 @@
+import{v as l}from"./core.min-C6O5v62Y.js";import{f as i}from"./store-CcC-Cn2p.js";import"./preloader-Bns9QiKi.js";import"./types-BMbUCgPc.js";const u=()=>{const[t,o,e,r,a]=l();i(a.state,a.history,{title:r.value,description:o.value,category:t.value,linkLabel:e.value,linkUrl:e.value?"https://example.com":""}),r.value="",o.value="",t.value="",e.value=""};export{u as s_F5LffitCc24};

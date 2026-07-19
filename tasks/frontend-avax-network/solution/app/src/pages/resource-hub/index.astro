@@ -1,0 +1,60 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Navigation from "../../components/Navigation.astro";
+import Footer from "../../components/Footer.astro";
+import NewsletterContact from "../../components/forms/NewsletterContact.astro";
+
+const topics = [
+  { title: "Avalanche 101 for Business", href: "/resource-hub/avalanche-101", body: "Core concepts for evaluating Avalanche as business infrastructure." },
+  { title: "Case Studies", href: "/resource-hub/case-studies", body: "Real deployments across payments, loyalty, RWAs, and capital markets." },
+  { title: "Guides & Tutorials", href: "/resource-hub", body: "Practical walkthroughs for launching and operating Avalanche L1s." },
+  { title: "Concepts & Terminology", href: "/resource-hub", body: "Shared vocabulary for compliance, settlement, and onchain design." },
+];
+
+const resources = [
+  { title: "Privacy Features: Balancing Transparency with Confidentiality", href: "/resource-hub/resources/privacy-features-balancing-transparency-with-confidentiality" },
+  { title: "Why Launch Your Own Avalanche L1", href: "/resource-hub/resources/why-launch-your-own-avalanche-l1-instead-of-using-public-blockchain" },
+  { title: "User Experience: Making Blockchain Invisible", href: "/resource-hub/resources/user-experience-making-blockchain-invisible-to-end-users" },
+  { title: "Compliance for Financial Institutions", href: "/resource-hub/resources/compliance-and-regulatory-considerations-for-financial-institutions" },
+  { title: "Security Models for Digital Assets", href: "/resource-hub/resources/security-models-protecting-your-digital-assets-and-data" },
+  { title: "Customizing Governance and Control", href: "/resource-hub/resources/customizing-your-network-governance-and-control-options" },
+];
+---
+
+<Layout title="Resource Hub | Avalanche" description="Avalanche Business Knowledge Base — guides, case studies, and concepts for building on Avalanche.">
+  <Navigation />
+  <main class="pt-[var(--navbar-height)]">
+    <section class="group/section animate-in-view mx-[var(--padding-base)] mt-[var(--padding-base)] rounded-[var(--radius-4xl)] bg-dark p-[var(--padding-xl)] lg:p-[var(--padding-3xl)]">
+      <p class="text-[var(--text-sm)] uppercase tracking-widest text-neutral-500">Avalanche Business Knowledge Base</p>
+      <h1 class="font-aeonik split-heading mt-4 max-w-[16ch] text-[var(--text-6xl)] font-black leading-none">Avalanche: Built for Business</h1>
+      <p class="split-text mt-6 max-w-[52ch] text-[var(--text-base)] text-neutral-300 opacity-0">
+        Select a topic to explore Avalanche 101, case studies, guides, and terminology for institutions and enterprises.
+      </p>
+    </section>
+
+    <section class="group/section animate-in-view mx-[var(--padding-base)] mt-px grid grid-cols-1 gap-px md:grid-cols-2 lg:grid-cols-4">
+      {topics.map((t, i) => (
+        <a href={t.href} class="reveal-y relative overflow-hidden rounded-[var(--radius-4xl)] bg-dark p-[var(--padding-md)] transition-colors hover:bg-neutral-900" style={`--index:${i}`}>
+          <wm-shape id="solutions" corner="tr" rounded="clamp(1rem, -0.143rem + 1.786vw, 2rem)" corner-rounded="clamp(0.75rem, -0.107rem + 1.339vw, 1.5rem)" corner-size="clamp(3rem, 0.5rem + 8vw, 6rem)" stroke-width="0"></wm-shape>
+          <h2 class="relative z-[1] font-aeonik text-[var(--text-2xl)] font-bold">{t.title}</h2>
+          <p class="relative z-[1] mt-3 text-[var(--text-sm)] text-neutral-400">{t.body}</p>
+        </a>
+      ))}
+    </section>
+
+    <section class="group/section animate-in-view mx-[var(--padding-base)] mt-px section-shell">
+      <h2 class="font-aeonik split-heading text-[var(--text-4xl)] font-bold">Featured resources</h2>
+      <ul class="mt-[var(--gap-xl)] grid grid-cols-1 gap-px md:grid-cols-2">
+        {resources.map((r, i) => (
+          <li class="reveal-y" style={`--index:${i}`}>
+            <a href={r.href} class="block rounded-[var(--radius-2xl)] border border-neutral-800 p-5 transition-colors hover:border-red hover:text-red">
+              <span class="font-aeonik text-[var(--text-lg)] font-semibold">{r.title}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+    <NewsletterContact />
+  </main>
+  <Footer />
+</Layout>

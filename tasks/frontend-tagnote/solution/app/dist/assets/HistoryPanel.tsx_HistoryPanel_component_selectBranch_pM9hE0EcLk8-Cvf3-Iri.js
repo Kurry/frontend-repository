@@ -1,0 +1,1 @@
+import{v as p}from"./core.min-Dne1Y5Yk.js";import{x as y}from"./core.min-Dne1Y5Yk.js";import{b as i}from"./store-CK9GeNlI.js";import"./preloader-Bns9QiKi.js";import"./utils-ah47JOmW.js";const m=s=>{const[o]=p(),r=o.history.branches.find(t=>t.id===s);r&&o.onHistoryChange(i(o.history,r))};export{y as _hW,m as s_pM9hE0EcLk8};

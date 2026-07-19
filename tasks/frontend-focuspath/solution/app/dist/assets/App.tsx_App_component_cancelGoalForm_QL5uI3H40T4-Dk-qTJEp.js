@@ -1,0 +1,1 @@
+import{v as r}from"./core.min-DB8N_m9v.js";import{x as p}from"./core.min-DB8N_m9v.js";import"./preloader-Bns9QiKi.js";const a=()=>{const[o]=r();o.showGoalForm=!1,o.goalFormError=""};export{p as _hW,a as s_QL5uI3H40T4};

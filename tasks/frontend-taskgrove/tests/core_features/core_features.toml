@@ -1,0 +1,253 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/mcp/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "1_1"
+description = "On load with no data, the tree area shows an empty-state message inviting the user to add the first root task, and the Archive panel shows its own short empty message rather than a blank area"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "1_2"
+description = "After creating a root task and using Add Child twice (child, then grandchild), the tree renders three visibly nested, indented levels"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "1_3"
+description = "After collapsing a node with children via its chevron and refreshing the page, the node is still shown collapsed and its subtree stays hidden"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "1_4"
+description = "When a parent has two leaf children and only one is toggled complete, the parent is not marked complete and its own completion cannot be manually toggled; toggling the second leaf complete auto-completes the parent with no manual action on it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "1_5"
+description = "After toggling half of a 4-leaf parent's children complete, its progress ring visibly fills to about half, and reaches a distinct complete (100%) treatment only once every leaf is done"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "1_6"
+description = "After creating a tag with a distinct color and attaching it to a node, the node's row shows a chip in that exact color; attaching a 6th tag to a node that already has 5 is blocked and the node still shows exactly 5 chips"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "1_7"
+description = "When a tag filter chip is toggled on, the visible tree narrows to only branches containing a match with ancestors auto-expanded, and toggling it off restores the full tree"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "1_8"
+description = "When Smart Search matches one node, that node is highlighted with its ancestor chain auto-expanded while non-matching branches are visibly dimmed but remain present, and clearing the query returns full visibility"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "1_9"
+description = "After using Zoom In on a non-root node, everything outside its branch is hidden and a breadcrumb trail shows the path back to the true root; clicking an ancestor segment zooms back to exactly that level"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "1_10"
+description = "After using Move To on a child of one root task to re-parent it under a second root task, it renders nested under the second root with its own children and tags intact, and no longer appears under the first root"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "1_11"
+description = "A branch with an incomplete leaf shows no Archive control; once every leaf under it is completed, Archive appears; using it moves the branch to the Archive panel, and Restore there returns it to the main tree as a top-level root with its structure intact"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "1_12"
+description = "After building a tree, collapsing a node, attaching a tag, archiving a fully-complete branch, and switching the theme to Forest, refreshing the page restores the tree structure, the tag, the collapsed state, the archived branch (still in the Archive panel, not the main tree), and the Forest theme, all exactly as they were"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "1_13"
+description = "Submitting the New Root Task input with a blank title is rejected with a visible inline error or shake hint, and no blank-titled root is added to the tree"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "1_14"
+description = "At approximately 375px viewport width with a multi-level tree, the app shows no horizontal scrolling and deeply nested rows truncate or wrap their text rather than forcing the page wider"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "1_15"
+description = "Creating a root task then using Add Child twice renders three visibly nested, indented levels (root, child, grandchild)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "1_16"
+description = "Collapsing a node with children hides its entire subtree, and that collapsed state persists across a full page refresh"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "1_17"
+description = "A parent's completion is computed automatically as complete only once every descendant leaf is complete, updating live as leaves toggle"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "1_18"
+description = "A branch progress ring fills proportionally as leaves are toggled and reaches a distinct complete treatment only at 100 percent"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "1_19"
+description = "Zoom In makes a node the temporary root, hides everything outside its branch, and a breadcrumb trail returns to exactly the clicked ancestor level"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "1_20"
+description = "Creating a tag and attaching it to a node shows a chip in that tag's color, and a 6th tag on a node already holding 5 is rejected"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "1_21"
+description = "Toggling a tag filter chip narrows the visible tree to matching branches with ancestors auto-expanded, and toggling it off restores the full tree"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "1_22"
+description = "Smart Search highlights matching node text, auto-expands its ancestor chain, and dims (never removes) non-matching branches"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "1_23"
+description = "Move To re-parents a node together with its whole subtree under a chosen target and removes it from its prior location"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "1_24"
+description = "Archive is gated on full branch completion; using it moves the branch to the Archive panel, and Restore returns it to the main tree with its structure and tags intact"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "1_25"
+description = "Export as Text downloads that node's branch as an indented plain-text outline, one line per node with deeper children indented further"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "1.26"
+name = "1_26"
+description = "A parent's completion checkbox can be manually toggled complete while it still has an incomplete descendant leaf"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.27"
+name = "1_27"
+description = "An Archive control appears on a branch that still has an incomplete descendant leaf"
+type = "binary"
+weight = 1.0
+negate = true

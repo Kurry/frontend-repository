@@ -1,0 +1,1 @@
+import{v as t}from"./core.min-DB8N_m9v.js";import{x as p}from"./core.min-DB8N_m9v.js";import{A as r}from"./store-B4tRoc3j.js";import"./preloader-Bns9QiKi.js";const s=()=>{const[o]=t();o.goalFormData={title:"",targetDate:"",accentColor:r[0].value,motivation:""},o.goalFormError="",o.showGoalForm=!0};export{p as _hW,s as s_7FfGzpbqUV0};

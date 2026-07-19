@@ -1,0 +1,68 @@
+---
+import data from "../data/home.json";
+import Button from "./Button.astro";
+import BunnyBg from "./BunnyBg.astro";
+const { h2, emojis, items } = data.services;
+// Fixed scatter positions for the metallic emoji field (deterministic).
+const emojiSpots = [
+  { top: "12%", left: "8%" },
+  { top: "58%", left: "16%" },
+  { top: "22%", left: "78%" },
+  { top: "66%", left: "72%" },
+  { top: "40%", left: "4%" },
+  { top: "10%", left: "44%" },
+  { top: "74%", left: "44%" },
+  { top: "44%", left: "88%" },
+];
+---
+<section class="section_services theme-dark" data-gsap-ignore>
+  <div class="services_container">
+    <div class="services-heading">
+      <h2 class="heading-m" data-split-visible>{h2}</h2>
+      <div class="services_emojis">
+        <div class="services_emojis-list">
+          {emojis.map((e, i) => (
+            <div class="services_emoji-item" style={`top:${emojiSpots[i].top};left:${emojiSpots[i].left};`} data-emoji-item>
+              <img src={e.src} alt={e.alt} loading="lazy" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+    <div class="services-pin-height" data-services-pin>
+      <div class="services-container">
+        <div class="services-list" role="list">
+          {items.map((item, i) => (
+            <div class={`services-item ${item.theme}`} role="listitem" data-service-index={i}>
+              <div class="service-card">
+                <div class="service-card_top">
+                  <div class="service-card_title">
+                    <h3 class="heading-l" data-split-visible>{item.title}</h3>
+                    <p class="paragraph-m" data-split-visible>{item.sub}</p>
+                  </div>
+                  <div class="service-card_number">
+                    <div class="heading-s" data-split-visible>{item.number[0]}</div>
+                    <div class="heading-s" data-split-visible>{item.number[1]}</div>
+                  </div>
+                </div>
+                <div class="service-card_bottom">
+                  <div class="service-card_body">
+                    <p class="paragraph-regular" data-split-visible>{item.body}</p>
+                    <div class="button-wrap">
+                      <Button label={item.cta.label} href={item.cta.href} variant="secondary" />
+                    </div>
+                  </div>
+                  <div class="service-card_video">
+                    <div class="video-wrap">
+                      <BunnyBg src={item.video} poster={item.poster} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

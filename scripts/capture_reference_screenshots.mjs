@@ -59,7 +59,7 @@ function taskSlugs() {
     .sort();
 }
 
-async function waitForServer(url, timeoutMs = 30000) {
+async function waitForServer(url, timeoutMs = 240000) {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     try {
@@ -77,15 +77,22 @@ function startServer(appDir) {
   if (fs.existsSync(pkgPath)) {
     const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
     const start = pkg.scripts?.start || '';
-    if (start && !start.includes('serve')) {
+    const usesServePkg = /(npx\s+(-y\s+|--yes\s+)?serve\b|\bserve@\d)/.test(start) && !start.includes('&&');
+    if (start && !usesServePkg) {
       // real app server (e.g. vite): needs deps
       if (!fs.existsSync(path.join(appDir, 'node_modules'))) {
         execSync('npm install --no-audit --no-fund', { cwd: appDir, stdio: 'ignore' });
       }
-      // rewrite any hardcoded port via PORT env; vite-style scripts use --port 3000
-      const patched = start.replace(/--port\s+\d+/, `--port ${PORT}`).replace(/-l\s+\d+/, `-l ${PORT}`);
+      // rewrite any hardcoded port via PORT env; vite-style scripts use --port 3000,
+      // http-server uses -p 3000, serve uses -l 3000
+      const patched = start
+        .replace(/--port[= ]\s*\d+/g, `--port ${PORT}`)
+        .replace(/-p\s+\d+/g, `-p ${PORT}`)
+        .replace(/-l\s+\d+/g, `-l ${PORT}`);
       return spawn('sh', ['-c', patched.includes(String(PORT)) ? patched : `${start} --port ${PORT}`], {
         cwd: appDir, stdio: 'ignore', detached: true,
+        env: { ...process.env, PORT: String(PORT),
+               PATH: `${path.join(appDir, 'node_modules', '.bin')}:${process.env.PATH}` },
       });
     }
   }
@@ -106,7 +113,7 @@ async function captureTask(slug) {
   fs.mkdirSync(outDir, { recursive: true });
 
   const result = {
-    slug, served: false, consoleErrors: [], pageErrors: [],
+    slug, served: false, consoleErrors: [], pageErrors: [], failedUrls: [],
     pageHeight: null, segments: 0, capturedAt: null,
   };
 
@@ -122,7 +129,11 @@ async function captureTask(slug) {
   const server = startServer(appDir);
   try {
     result.served = await waitForServer(url);
-    if (!result.served) return result;
+    if (!result.served) {
+      result.capturedAt = new Date().toISOString();
+      fs.writeFileSync(path.join(outDir, 'validation.json'), JSON.stringify(result, null, 2));
+      return result;
+    }
 
     const browser = await chromium.launch({ headless: true });
     try {
@@ -131,6 +142,8 @@ async function captureTask(slug) {
       const page = await ctx.newPage();
       page.on('console', (m) => { if (m.type() === 'error') result.consoleErrors.push(m.text().slice(0, 300)); });
       page.on('pageerror', (e) => result.pageErrors.push(String(e).slice(0, 300)));
+      page.on('response', (r) => { if (r.status() >= 400) result.failedUrls.push(`${r.status()} ${r.url()}`.slice(0, 300)); });
+      page.on('requestfailed', (r) => result.failedUrls.push(`FAIL ${r.url()}`.slice(0, 300)));
       await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
       await page.waitForTimeout(SETTLE_MS);
 

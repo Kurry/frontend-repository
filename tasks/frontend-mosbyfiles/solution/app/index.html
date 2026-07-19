@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mosby's Files—American Modernist Architecture</title>
+  <meta name="description" content="A research-driven archive exploring the architects who built American Modernism—independently of Europe, and on their own radical terms." />
+  <link rel="icon" href="/media/storyblok/f/290489675855311/512x512/e59ab9d052/favicon.svg" />
+  <link rel="stylesheet" href="/assets/styles.css" />
+  <link rel="stylesheet" href="/app.css" />
+</head>
+<body class="__body">
+  <div class="__app is-loading" id="app">
+    <!-- Fixed centered header -->
+    <header class="the-header" id="header">
+      <button type="button" class="the-header__logo" data-nav="home" aria-label="Mosby's Files home">Mosby's Files</button>
+      <nav class="the-nav">
+        <button type="button" class="the-nav__item" data-nav="about">About</button>
+      </nav>
+    </header>
+
+    <!-- Case sub-header (only on case routes) -->
+    <div class="the-sub-header is-hidden" id="subHeader">
+      <button type="button" class="the-sub-header__back" data-nav="home">Mosby's Files</button>
+      <span class="the-sub-header__cat" id="subHeaderCat"></span>
+    </div>
+
+    <main id="views">
+      <!-- HOME -->
+      <section class="view is-active" id="view-home" data-route="home">
+        <div class="section-hero">
+          <h1 class="section-hero__title split-reveal" id="heroTitle">American modernism</h1>
+          <p class="section-hero__desc">A research-driven archive exploring the architects who built American Modernism — independently of Europe, and on their own radical terms.</p>
+        </div>
+        <div class="stack" id="stack"></div>
+      </section>
+
+      <!-- CASE -->
+      <section class="view" id="view-case" data-route="case"></section>
+
+      <!-- ABOUT -->
+      <section class="view" id="view-about" data-route="about"></section>
+    </main>
+
+    <!-- Popup lightbox -->
+    <div class="popup" id="popup" role="dialog" aria-modal="true" aria-label="Media popup">
+      <div class="popup__bg" data-popup-close></div>
+      <div class="popup__box">
+        <button type="button" class="popup__close" data-popup-close aria-label="Close popup">✕</button>
+        <div class="popup__media" id="popupMedia"></div>
+        <div class="popup__info" id="popupInfo"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

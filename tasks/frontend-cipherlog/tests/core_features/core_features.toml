@@ -1,0 +1,271 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/mcp/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "1_1"
+description = "On load with nothing created, the Channels sidebar, the memo list, and the Decommissioned view each show their own distinct empty-state message"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "1_2"
+description = "After using Create New Transmission with the title 'Falcon Handoff' and a body, the memo opens for editing with a monospaced body area and 'Falcon Handoff' appears in the memo list with a body preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "1_3"
+description = "After Add New Channel names a channel 'Ops' and a memo is assigned to Ops via its Channel select, clicking 'Ops' in the sidebar narrows the memo list to that memo"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "1_4"
+description = "When a channel filter is active and a search term matching a different channel's memo is typed, the list shows zero memos; clearing the search and clicking Show All Channels brings the memos back"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "1_5"
+description = "After turning on Lock for a memo and setting a 4-character passcode, the body is replaced by '[ENCRYPTED]' in both the list preview and the full view"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "1_6"
+description = "After entering an incorrect passcode the body stays '[ENCRYPTED]' with a visible error, and after entering the correct passcode the real body is revealed for the session"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "1_7"
+description = "After a full page refresh the previously revealed locked memo shows '[ENCRYPTED]' again while the memo, its lock state, and its passcode requirement all persisted"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "1_8"
+description = "When the Theme Core is switched to 'Blood Red' the accent color on buttons and priority badges changes app-wide with no page reload, and switching to 'Neon Cyan' updates the accent again"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "1_9"
+description = "After setting a memo's priority to High, Standard, then Low, the corner badge on its card updates to a visually distinct color and label for each of the three priorities"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "1_10"
+description = "After Decommission on a memo it disappears from the main list and appears in the Decommissioned view; Restore returns it; Purge removes it permanently only after confirming the irreversible step"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "1_11"
+description = "After creating a memo, editing its body, and saving, Last Modified updates to a newer time while First Transmitted stays exactly as it was at creation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "1_12"
+description = "When submitting a New Transmission with a blank title, the save is blocked with a visible inline error or shake hint and no blank-titled memo is added"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "1_13"
+description = "After creating three channels and dragging the last one to the top, the dragged channel is dimmed and a drop indicator shows its landing position, the sidebar re-orders immediately, and the new order persists after a full page refresh"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "1_14"
+description = "After creating a channel and memos, decommissioning one, and choosing a non-default Theme Core, a full page refresh restores the channel, both memos with lock/priority/marks/timestamps, the Decommissioned list, and the selected Theme Core exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "1_15"
+description = "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "1_16"
+description = "The memo collection supports create through New Transmission, edit of a memo's fields, and decommission removal, with the memo list updating from shared application state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "1_17"
+description = "At least two distinct views exist (the main memo list and the Decommissioned view) reachable through in-app controls without a full page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "1_18"
+description = "Domain state beyond CRUD is present: clicking a channel filters the list and the search field combines with it using AND semantics so a memo must match both to remain visible, and Show All Channels clears the channel restriction"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "1_19"
+description = "Turning on Lock prompts for a 4-character passcode, replaces the memo body with a redacted [ENCRYPTED] placeholder in both list preview and full view, and revealing with the correct passcode shows the real body for that session"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "1_20"
+description = "The Theme Core control offers exactly five named cores (Matrix Green, Neon Cyan, Blood Red, Ghost White, Amber Terminal) and choosing one recolors the accent app-wide immediately with no reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "1_21"
+description = "Submitting a New Transmission with a blank title is blocked with a visible inline error or shake hint and adds no blank-titled memo anywhere in the list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "1_22"
+description = "Decommission moves a memo into the Decommissioned view, Restore returns it, and Purge permanently removes it only after a confirmation step; create, decommission, and purge each show a transient toast confirmation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "1_23"
+description = "Adding a channel whose name duplicates an existing one case-insensitively is rejected with a visible message and adds no channel"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "1.24"
+name = "1_24"
+description = "An open memo offers Export as .txt and Export as .md controls that each trigger a download containing the memo title and body"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "1.25"
+name = "1_25"
+description = "The memo list is static markup with no working create, edit, or decommission against shared state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.26"
+name = "1_26"
+description = "App chrome navigates via real outbound links to other origins instead of changing in-app view state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.27"
+name = "1_27"
+description = "A core workflow shows a success or completion signal (toast, updated count) while the underlying action did not occur, such as a created memo absent after reload or identical output for different inputs"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.28"
+name = "1_28"
+description = "A judge-visible surface (rendered text, DOM comment, alt text, page title, or console output) contains language addressed to an AI judge or grading system rather than a user or developer"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.29"
+name = "1_29"
+description = "The Cipher Lock is presented or implemented as real encryption, cross-device or cross-account protection, or account security, or the app requires any login or account step to use it"
+type = "binary"
+weight = 1.0
+negate = true

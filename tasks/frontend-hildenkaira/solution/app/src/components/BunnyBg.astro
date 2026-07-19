@@ -1,0 +1,24 @@
+---
+// Background looping video with poster placeholder, lazy-activated by JS.
+interface Props {
+  src: string;
+  poster?: string;
+  class?: string;
+}
+const { src, poster, class: extra = "" } = Astro.props;
+---
+<div
+  class={`bunny-bg ${extra}`}
+  data-bunny-background-init
+  data-player-src={src}
+  data-player-status="idle"
+  data-player-lazy
+  data-player-autoplay
+  data-player-activated="false"
+>
+  <video class="bunny-bg__video" muted loop playsinline preload="none"></video>
+  {poster && <img class="bunny-bg__placeholder" src={poster} alt="" loading="lazy" />}
+  <div class="bunny-bg__loading">
+    <svg class="bunny-bg__loading-svg vimeo-player__loading-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5" stroke-dasharray="42" stroke-dashoffset="14"/></svg>
+  </div>
+</div>

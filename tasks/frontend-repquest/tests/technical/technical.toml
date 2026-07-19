@@ -1,0 +1,121 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/mcp/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "2_1"
+description = "No console.error or unhandled promise rejection occurs while logging sets, deleting history, buying/equipping gear, running Undo/Redo, and completing a guarded Reset Quest"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "2_2"
+description = "After logging sets and refreshing the page, lifetime reps, streak, quest points, unlocked zones/gear, equipped gear, and rep history are restored exactly as they were before the refresh"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "2_3"
+description = "The quest map and weekly chart render through hand-written Canvas 2D drawing calls (no chart or game-engine library) and redraw correctly after a viewport resize"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.4"
+name = "2_4"
+description = "Rep input typed before a challenge run started, or left over from an ended run, never mutates lifetime reps or the current run once game state has moved past that phase"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "2_5"
+description = "Lifetime reps, streak, quest points, unlocked zones/gear, or rep history are lost or reset to defaults after a full page refresh"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.6"
+name = "2_6"
+description = "A hidden element, attribute, or window global exposes internal game state (computed totals, boss outcomes, quest points) that a real user could not reach through the visible UI"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.7"
+name = "2_7"
+description = "A success state (Zone Unlocked message, boss-defeated marker, gear unlocked) appears without the underlying condition (reps reached, minimum-rep set logged, quest points spent) actually having been met"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.8"
+name = "2_8"
+description = "The app's behavior or visible controls differ depending on whether navigator.webdriver or another automation signal is present"
+type = "binary"
+weight = 1.0
+negate = true

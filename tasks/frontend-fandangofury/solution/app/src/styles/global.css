@@ -1,0 +1,217 @@
+@import "tailwindcss";
+
+@theme {
+  --color-fury-red: #e63946;
+  --color-fury-orange: #f4a261;
+  --color-fury-gold: #e9c46a;
+  --color-fury-green: #2a9d8f;
+  --color-fury-blue: #264653;
+  --color-fury-dark: #1a1a2e;
+  --color-fury-darker: #0f0f1a;
+  --color-fury-purple: #6a0572;
+  --color-fury-pink: #e76f8a;
+  --color-fury-silver: #c0c0c0;
+  --color-fury-bronze: #cd7f32;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  overflow-x: hidden;
+  background: var(--color-fury-darker);
+  color: #f8fafc;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* ===== Combo Animations ===== */
+@keyframes combo-popup {
+  0% { transform: scale(0.5) translateY(0); opacity: 1; }
+  50% { transform: scale(1.3) translateY(-20px); opacity: 1; }
+  100% { transform: scale(1) translateY(-40px); opacity: 0; }
+}
+
+@keyframes fiesta-flash {
+  0% { opacity: 0; transform: scale(0.8); }
+  20% { opacity: 1; transform: scale(1.2); }
+  50% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+
+@keyframes fury-pulse {
+  0%, 100% { box-shadow: 0 0 5px var(--color-fury-orange), 0 0 10px var(--color-fury-orange); }
+  50% { box-shadow: 0 0 15px var(--color-fury-gold), 0 0 30px var(--color-fury-orange), 0 0 45px var(--color-fury-red); }
+}
+
+@keyframes boss-telegraph {
+  0%, 100% { outline-color: transparent; }
+  50% { outline-color: #ff0000; outline-width: 4px; outline-style: solid; }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+@keyframes dodge-roll {
+  0% { transform: translateX(0) rotate(0deg); }
+  50% { transform: translateX(-40px) rotate(180deg); }
+  100% { transform: translateX(0) rotate(360deg); }
+}
+
+@keyframes light-attack {
+  0% { transform: translateX(0); }
+  30% { transform: translateX(30px) rotate(15deg); }
+  60% { transform: translateX(10px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes heavy-attack {
+  0% { transform: translateX(0) rotate(0deg); }
+  20% { transform: translateX(-10px) rotate(-10deg); }
+  50% { transform: translateX(50px) rotate(30deg); }
+  80% { transform: translateX(10px); }
+  100% { transform: translateX(0) rotate(0deg); }
+}
+
+@keyframes screen-fury {
+  0% { opacity: 0; background: radial-gradient(circle at center, rgba(230,57,70,0.8), transparent 70%); }
+  30% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes enemy-approach {
+  0% { transform: translateX(100px); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes float-up {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-60px); opacity: 0; }
+}
+
+@keyframes node-glow {
+  0%, 100% { box-shadow: 0 0 5px var(--color-fury-green); }
+  50% { box-shadow: 0 0 15px var(--color-fury-green), 0 0 30px rgba(42,157,143,0.5); }
+}
+
+@keyframes coin-spin {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(360deg); }
+}
+
+@keyframes mask-equip-pulse {
+  0%, 100% { box-shadow: 0 0 5px var(--color-fury-gold); }
+  50% { box-shadow: 0 0 20px var(--color-fury-gold), 0 0 40px rgba(233,196,106,0.4); }
+}
+
+/* ===== Utility Classes ===== */
+.combo-popup {
+  animation: combo-popup 0.6s ease-out forwards;
+  pointer-events: none;
+}
+
+.fiesta-flash {
+  animation: fiesta-flash 0.8s ease-out forwards;
+  pointer-events: none;
+}
+
+.fury-ready {
+  animation: fury-pulse 1.5s ease-in-out infinite;
+}
+
+.boss-telegraph {
+  animation: boss-telegraph 0.3s ease-in-out 3;
+}
+
+.shake {
+  animation: shake 0.15s ease-in-out 2;
+}
+
+.dodge-roll {
+  animation: dodge-roll 0.4s ease-out;
+}
+
+.light-attack {
+  animation: light-attack 0.3s ease-out;
+}
+
+.heavy-attack {
+  animation: heavy-attack 0.5s ease-out;
+}
+
+.screen-fury {
+  animation: screen-fury 1s ease-out forwards;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.enemy-enter {
+  animation: enemy-approach 0.5s ease-out;
+}
+
+.float-up {
+  animation: float-up 0.8s ease-out forwards;
+  pointer-events: none;
+}
+
+.node-glow {
+  animation: node-glow 2s ease-in-out infinite;
+}
+
+.coin-spin {
+  animation: coin-spin 1s linear infinite;
+}
+
+.mask-equipped {
+  animation: mask-equip-pulse 2s ease-in-out infinite;
+}
+
+.victory-screen {
+  background: linear-gradient(180deg, rgba(233, 196, 106, 0.08), rgba(26, 26, 46, 1));
+}
+
+/* Focus visible for accessibility */
+*:focus-visible {
+  outline: 2px solid var(--color-fury-gold);
+  outline-offset: 2px;
+}
+
+/* Button hover states */
+.btn-interactive {
+  transition: transform 0.1s, background-color 0.15s, box-shadow 0.15s;
+}
+
+.btn-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.btn-interactive:active {
+  transform: translateY(0);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-fury-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-fury-blue);
+  border-radius: 3px;
+}
+
+/* Narrow viewport */
+@media (max-width: 400px) {
+  .combat-stage {
+    padding: 0.25rem;
+  }
+}

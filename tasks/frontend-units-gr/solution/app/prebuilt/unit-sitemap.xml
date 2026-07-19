@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+	<url>
+		<loc>/en/unit/units-parkside/</loc>
+		<lastmod>2026-07-06T12:08:01+00:00</lastmod>
+		<image:image>
+			<image:loc>/uploads/2026/01/Units_1.jpg</image:loc>
+		</image:image>
+	</url>
+	<url>
+		<loc>/unit/units-parkside/</loc>
+		<lastmod>2026-07-06T12:15:44+00:00</lastmod>
+		<image:image>
+			<image:loc>/uploads/2026/01/Units_1.jpg</image:loc>
+		</image:image>
+	</url>
+</urlset>

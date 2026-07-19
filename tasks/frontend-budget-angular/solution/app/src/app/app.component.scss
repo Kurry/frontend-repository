@@ -1,0 +1,93 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #eeeeee;
+}
+
+.topbar {
+  background: #c2185b;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  height: 64px;
+  flex: 0 0 auto;
+}
+
+.account {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.period-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.period-nav button {
+  color: #fff;
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  padding: 4px 10px;
+}
+
+.period-label {
+  min-width: 72px;
+  text-align: center;
+}
+
+.content {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 16px;
+  max-width: 640px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.bottom-nav {
+  flex: 0 0 auto;
+  display: flex;
+  border-top: 1px solid #ddd;
+  background: #fafafa;
+}
+
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 0 10px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #555;
+  font-size: 12px;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.nav-item .nav-glyph {
+  font-size: 20px;
+}
+
+.nav-item:hover {
+  background: rgba(194, 24, 91, 0.08);
+}
+
+.nav-item.active {
+  color: #c2185b;
+}

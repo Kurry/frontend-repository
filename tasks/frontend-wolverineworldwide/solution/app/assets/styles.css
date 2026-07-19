@@ -1,0 +1,264 @@
+/* ==========================================================================
+   Wolverine Worldwide — exact design-token & component CSS reference.
+   Relocated out of instruction.md for density; every value below is a
+   literal, exact excerpt from the live production site's compiled
+   stylesheet. Quote and reuse exactly — do not approximate. Lines marked
+   "(truncated in source)" were already truncated in the captured excerpt;
+   the properties shown before the truncation point are still exact.
+   ========================================================================== */
+
+/* ---- @font-face (exact) ---- */
+@font-face{font-family:ABCDiatype;src:url(../fonts/ABCDiatype-Medium.woff2)format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:ABCDiatype;src:url(../fonts/ABCDiatype-Bold.woff2)format("woff2");font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:ABCDiatype-Mono;src:url(../fonts/ABCDiatype-Mono.woff2)format("woff2");font-weight:400 700;font-style:normal;font-display:swap}
+
+/* ---- :root design tokens (exact) ---- */
+:root{
+  /* Color */
+  --button-background:#0000001a;
+  --button-border-color:transparent;
+  --button-hocus-background:var(--color-gray-200);
+  --button-hocus-border-color:var(--button-border-color);
+  --button-hocus-text-color:var(--button-text-color);
+  --button-icon-shift:25px;
+  --button-text-color:var(--color-black);
+  --color-black:#010101;
+  --color-gray-200:#ccc;
+  --color-gray-400:#9d9d9d;
+  --color-gray-500:#737373;
+  --color-gray-600:#757575;
+  --color-gray-800:#4d4d4d;
+  --color-white:#fff;
+  --tw-drop-shadow-color:initial;
+
+  /* Typography */
+  --default-font-family:var(--font-sans);
+  --default-mono-font-family:var(--font-mono);
+  --font-mono:"ABCDiatype-Mono",monospace;
+  --font-sans:"ABCDiatype",sans-serif;
+  --font-weight-bold:700;
+  --text-body-lg:clamp(1.0625rem, .8668rem + .9783vw, 1.625rem);
+  --text-body-md:clamp(.875rem, .7663rem + .5435vw, 1.1875rem);
+  --text-body-sm:clamp(.875rem, .8533rem + .1087vw, .9375rem);
+  --text-display-lg:clamp(2.75rem, .9239rem + 9.1304vw, 8rem);
+  --text-display-md:clamp(3.75rem, 2.9239rem + 4.1304vw, 6.125rem);
+  --text-display-xl:clamp(6.25rem, 4.7717rem + 7.3913vw, 10.5rem);
+  --text-heading-2xs:clamp(1.5rem, 1.5rem + 0vw, 1.5rem);
+  --text-heading-lg:clamp(2rem, 1.0652rem + 4.6739vw, 4.6875rem);
+  --text-heading-md:clamp(1.5rem, .7826rem + 3.587vw, 3.5625rem);
+  --text-heading-sm:clamp(1.25rem, .7283rem + 2.6087vw, 2.75rem);
+  --text-heading-xs:clamp(1.25rem, .9674rem + 1.413vw, 2.0625rem);
+  --text-label:clamp(.625rem, .6033rem + .1087vw, .6875rem);
+  --tw-font-weight:initial;
+
+  /* Spacing, grid, radius */
+  --grid-column-width:calc((var(--grid-width) - ((var(--grid-columns) - 1)*var(--grid-gutter)))/var(--grid-columns));
+  --grid-columns:12;
+  --grid-gutter:var(--unit-md);
+  --grid-margin:var(--unit-lg);
+  --grid-width:calc(var(--vw,100vw) - (2*var(--grid-margin)));
+  --padding-x:20px;
+  --padding-y:16px;
+  --radius-2xl:20px;
+  --radius-2xs:4px;
+  --radius-lg:12px;
+  --radius-md:10px;
+  --radius-sm:8px;
+  --radius-xl:16px;
+  --radius-xs:6px;
+  --spacing:.25rem;
+  --spacing-fluid-2xl:clamp(3.5rem, 2.7609rem + 3.6957vw, 5.625rem);
+  --spacing-fluid-2xs:clamp(.375rem, .3315rem + .2174vw, .5rem);
+  --spacing-fluid-3xl:clamp(5.625rem, 4.3207rem + 6.5217vw, 9.375rem);
+  --spacing-fluid-4xl:clamp(9.375rem, 8.288rem + 5.4348vw, 12.5rem);
+  --spacing-fluid-lg:clamp(2rem, 1.8261rem + .8696vw, 2.5rem);
+  --spacing-fluid-md:clamp(1.5rem, 1.3261rem + .8696vw, 2rem);
+  --spacing-fluid-sm:clamp(1rem, .8261rem + .8696vw, 1.5rem);
+  --spacing-fluid-xl:clamp(2.5rem, 2.1522rem + 1.7391vw, 3.5rem);
+  --spacing-fluid-xs:clamp(.5rem, .4565rem + .2174vw, .625rem);
+  --spacing-gutter:var(--grid-gutter);
+  --spacing-unit-lg:var(--unit-lg);
+  --spacing-unit-md:var(--unit-md);
+  --spacing-unit-sm:var(--unit-sm);
+  --unit-lg:48px;
+  --unit-md:20px;
+  --unit-sm:12px;
+
+  /* Motion timing */
+  --anim-delay:0s;
+  --anim-duration:var(--transition-duration-slowest);
+  --anim-scale:.9;
+  --anim-stagger:.1s;
+  --default-transition-duration:.15s;
+  --default-transition-timing-function:cubic-bezier(.4,0,.2,1);
+  --ease:var(--ease-power2-out);
+  --ease-expo-out:cubic-bezier(.19,1,.22,1);
+  --ease-power2-out:cubic-bezier(.215,.61,.355,1);
+  --ease-power3-out:cubic-bezier(.165,.84,.44,1);
+  --ease-power4-out:cubic-bezier(.23,1,.32,1);
+  --ease-sine-out:cubic-bezier(.39,.575,.565,1);
+  --header-transition-duration:.4s;
+  --header-transition-ease:var(--ease);
+  --mobile-menu-transition-duration:var(--transition-duration);
+  --mobile-menu-transition-ease:var(--ease);
+  --transition-duration:.4s;
+  --transition-duration-fast:.2s;
+  --transition-duration-faster:0s;
+  --transition-duration-fastest:0s;
+  --transition-duration-slow:.6s;
+  --transition-duration-slower:.8s;
+  --transition-duration-slowest:1s;
+  --tw-ease:initial;
+
+  /* Z-index */
+  --z-index:0;
+  --z-index-above:1;
+  --z-index-anchors-menu:40;
+  --z-index-below:-1;
+  --z-index-header:50;
+  --z-index-highest:2147480000;
+  --z-index-menu:200;
+  --z-index-modal:700;
+
+  /* Icon dimensions — full raw token set (SVG sprite icon-ids: logo, logotype,
+     logotype-only, arrow-up, chevron-down, close, close-sm, copy, craft,
+     cross, expand, external, instagram, linkedin, minus, plus, sort) */
+  --icon-height:calc(var(--icon-width)*(1/(var(--icon-ratio))));
+  --icon-width:var(--icon-width-logo);
+  --icon-ratio:var(--icon-ratio-logo);
+  --icon-width-arrow-up:10px;   --icon-ratio-arrow-up:10/12;
+  --icon-width-chevron:8px;     --icon-ratio-chevron:1/1;
+  --icon-width-close:12px;      --icon-ratio-close:119/116;
+  --icon-width-close-sm:10px;   --icon-ratio-close-sm:1/1;
+  --icon-width-copy:16px;       --icon-ratio-copy:1/1;
+  --icon-width-craft:34px;      --icon-ratio-craft:1/1;
+  --icon-width-cross:8px;       --icon-ratio-cross:1/1;
+  --icon-width-expand:16px;     --icon-ratio-expand:1/1;
+  --icon-width-external:16px;   --icon-ratio-external:1/1;
+  --icon-width-instagram:20px;  --icon-ratio-instagram:1/1;
+  --icon-width-linkedin:20px;   --icon-ratio-linkedin:1/1;
+  --icon-width-logo:24px;       --icon-ratio-logo:24/16;
+  --icon-width-logotype:252px;      --icon-ratio-logotype:252/16;
+  --icon-width-logotype-only:176px; --icon-ratio-logotype-only:176/9;
+  --icon-width-minus:11px;      --icon-ratio-minus:11/2;
+  --icon-width-plus:11px;       --icon-ratio-plus:1/1;
+  --icon-width-sort:20px;       --icon-ratio-sort:1/1;
+  /* --icon-width-logo drops to 20px at some breakpoints (header uses 24px default) */
+
+  /* Header / layout sizing */
+  --header-dropdown-height:300px; /* 200px on html.has-scrolled; further tuning at >=1400px */
+  --lateral-offset:calc(var(--unit-lg)*-.8);
+  --top-offset:calc(var(--unit-lg)*-.5);
+
+  /* Utility-composition defaults: engine-level identity/"initial" values
+     consumed by transform/filter/backdrop utility classes. Included for
+     completeness — not something you need to functionally replicate beyond
+     keeping the same visual output. */
+  --tw-backdrop-blur:initial; --tw-backdrop-brightness:initial; --tw-backdrop-contrast:initial;
+  --tw-backdrop-grayscale:initial; --tw-backdrop-hue-rotate:initial; --tw-backdrop-invert:initial;
+  --tw-backdrop-opacity:initial; --tw-backdrop-saturate:initial; --tw-backdrop-sepia:initial;
+  --tw-blur:initial; --tw-border-style:solid; --tw-brightness:initial;
+  --tw-content:""; --tw-contrast:initial; --tw-drop-shadow:initial;
+  --tw-drop-shadow-alpha:100%; --tw-drop-shadow-size:initial; --tw-duration:initial;
+  --tw-invert:initial; --tw-opacity:initial; --tw-outline-style:solid;
+  --tw-rotate-x:initial; --tw-rotate-y:initial; --tw-rotate-z:initial;
+  --tw-saturate:initial; --tw-scale-x:1; --tw-scale-y:1; --tw-scale-z:1;
+  --tw-scroll-snap-strictness:proximity; --tw-sepia:initial; --tw-skew-x:initial;
+  --tw-skew-y:initial; --tw-translate-x:0; --tw-translate-y:0; --tw-translate-z:0;
+}
+
+/* Cookie consent theme tokens (vanilla-cookieconsent :root overrides) */
+:root{
+  --cc-bg:#fff;
+  --cc-primary-color:#2c2f31;
+  --cc-secondary-color:#5e6266;
+  --cc-btn-primary-bg:#30363c; /* hover: #000 */
+  --cc-btn-secondary-bg:#eaeff2;
+  --cc-overlay-bg:rgba(0,0,0,.65);
+  --cc-modal-transition-duration:.25s;
+  --cc-z-index:2147483647;
+}
+
+/* Additional concrete opacities observed in CSS utilities:
+   opacity 0, .05, .2, .3, .4, .5, .6, .7, .8, 1; button background #0000001a. */
+
+/* Breakpoints (min-width, from @media rules in the compiled stylesheet):
+   340px small fluid floor | 500px minor layout | 700px `sm:` — team-modal
+   axis, many grid switches, mobile-menu threshold companion | 1000px `md:` —
+   desktop header vs mobile menu (.c-mobile-menu{display:none} at >=1000px) |
+   1200px large desktop | 1400px header scrolled dropdown height changes |
+   1600 / 1800 / 2000 / 2400px fluid upscales.
+   Also: @media (hover:hover), @media (prefers-reduced-motion:reduce). */
+
+/* ---- Scroll-reveal utility classes (exact) ---- */
+.anim-fade{--ease:var(--ease-power2-out);--anim-duration:var(--transition-duration-slow);--anim-delay:0s;opacity:0}
+.anim-fade,.anim-fade.is-inview{opacity:1;transition:opacity var(--anim-duration)var(--anim-delay)var(--ease)}
+
+.anim-up{--ease:var(--ease-expo-out);--anim-duration:var(--transition-duration-slower);--anim-delay:0s;opacity:0;transform:translateY(20%)}
+.anim-up,.anim-up.is-inview{opacity:1;transition:transform var(--anim-duration)var(--anim-delay)var(--ease),opacity var(--anim-duration)var(--anim-delay)var(--ease);transform:translate(0)}
+
+.anim-up-scale{--ease:var(--ease-expo-out);--anim-duration:var(--transition-duration-slower);--anim-delay:0s;--anim-scale:.9;opacity:0;transform:translate3d(0,20%,0)scale(var(--anim-scale))}
+.anim-up-scale,.anim-up-scale.is-inview{opacity:1;transition:transform var(--anim-duration)var(--anim-delay)var(--ease),opacity var(--anim-duration)var(--anim-delay)var(--ease);transform:translate(0)scale(1)}
+
+.anim-fade-scale{--ease:var(--ease-power2-out);--anim-duration:var(--transition-duration-slow);--anim-delay:0s;--anim-scale:.95;opacity:0;transform:scale(var(--anim-scale))}
+.anim-fade-scale,.anim-fade-scale.is-inview{opacity:1;transition:transform var(--anim-duration)var(--anim-delay)var(--ease),opacity var(--anim-duration)var(--anim-delay)var(--ease);transform:scale(1)}
+
+/* Stagger pattern for text items: */
+/* transition-delay:calc(var(--anime-delay,0s) + (var(--index,0)*var(--anim-stagger,.1s))); */
+/* Footer link stagger delays observed: 0ms, 50ms, ... per nth-child. */
+
+/* ==========================================================================
+   Components — exact rules from the live site's compiled stylesheet
+   ========================================================================== */
+
+/* ---- Site Header (c-header) ---- */
+.c-header{--header-transition-duration:.4s;--header-transition-ease:var(--ease);--header-dropdown-height:300px;z-index:var(--z-index-header);width:100%;transition:transform var(--header-transition-duration)var(--header-transition-ease);pointer-events:none;justify-content:center;align-items:center;ma /* (truncated in source) */}
+
+/* max-width steps, one per breakpoint above, ascending 340px -> 2400px */
+@media (min-width:340px){.c-header{max-width:340px}}
+@media (min-width:500px){.c-header{max-width:500px}}
+@media (min-width:700px){.c-header{max-width:700px}}
+@media (min-width:1000px){.c-header{max-width:1000px}}
+@media (min-width:1200px){.c-header{max-width:1200px}}
+@media (min-width:1400px){.c-header{max-width:1400px}}
+@media (min-width:1600px){.c-header{max-width:1600px}}
+@media (min-width:1800px){.c-header{max-width:1800px}}
+@media (min-width:2000px){.c-header{max-width:2000px}}
+@media (min-width:2400px){.c-header{max-width:2400px}}
+
+.c-header{padding-inline:var(--spacing-unit-sm)}
+.c-header{padding-inline:var(--spacing-unit-lg)}
+.c-header:before{content:"";z-index:0;opacity:0;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);z-index:var(--z-index-below);transition:opacity var(--header-transition-duration)var(--header-transition-ease);background:#0003;position:fixed;top:0;right:0;bottom:0;left:0}
+.c-header{padding-top:var(--spacing-fluid-md);padding-bottom:var(--spacing-fluid-md)}
+.c-header:not(:has(:focus-visible)){transform:translateY(-100%)}
+.c-header{padding-top:var(--spacing-gutter);padding-bottom:var(--spacing-gutter)}
+.c-header{--header-dropdown-height:200px}
+.c-header:before{opacity:1}
+.c-header:before{pointer-events:none}
+
+.c-header_inner{gap:var(--spacing-fluid-sm);width:100%;transition:max-width var(--header-transition-duration)var(--header-transition-ease),width var(--header-transition-duration)var(--header-transition-ease),transform var(--header-transition-duration)var(--header-transition-ease);pointer-events:all; /* (truncated in source) */}
+.c-header_inner{transform:translateY(var(--spacing-fluid-sm))}
+.c-header_inner{gap:var(--spacing-fluid-xs);max-width:calc(8/12 * (calc(var(--vw, 1vw) * 100) - 2 * var(--grid-margin, 0px)) - (1 - 8/12) * var(--grid-gutter, 0px) + 0 * var(--grid-gutter, 0px));width:auto;transform:translateY(0)}
+.c-header_inner{color:var(--color-white);padding:0}
+
+/* ---- Mobile Menu (c-mobile-menu) ---- */
+.c-mobile-menu{--mobile-menu-transition-duration:var(--transition-duration);--mobile-menu-transition-ease:var(--ease);z-index:var(--z-index-menu);pointer-events:none;position:fixed;top:0;right:0;bottom:0;left:0}
+.c-mobile-menu:before{content:"";z-index:var(--z-index-below);opacity:0;pointer-events:none;transition:opacity var(--mobile-menu-transition-duration)var(--mobile-menu-transition-ease);background-color:#000c;position:absolute;top:0;right:0;bottom:0;left:0}
+.c-mobile-menu{pointer-events:all}
+.c-mobile-menu:before{opacity:1}
+.c-mobile-menu{display:none} /* at >=1000px (md:) — desktop header replaces the mobile menu */
+.c-mobile-menu_outer{inset:var(--spacing-fluid-xs)var(--grid-margin);color:var(--color-white);z-index:var(--z-index-menu);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);opacity:0;visibility:hidden;clip-path:inset(0 0 100% 0 round var(--radius-lg));transition-property:opacity,clip-path /* (truncated in source) */}
+.c-mobile-menu_outer{opacity:1;visibility:visible;clip-path:inset(0 0 0 0 round var(--radius-lg));transition-duration:var(--mobile-menu-transition-duration),var(--mobile-menu-transition-duration),0s;transition-delay:0s,0s,0s}
+.c-mobile-menu_inner{gap:var(--spacing-fluid-2xl);min-height:100%;padding:var(--spacing-gutter);flex-direction:column;display:flex;position:relative}
+.c-mobile-menu_close{z-index:var(--z-index-above);width:calc(2/4 * (calc(var(--vw, 1vw) * 100) - 2 * var(--grid-margin, 0px)) - (1 - 2/4) * var(--grid-gutter, 0px) + 0 * var(--grid-gutter, 0px));justify-content:space-between;align-items:center;gap:var(--spacing-fluid-2xs);padding:var(--spacing-fluid /* (truncated in source) */}
+.c-mobile-menu_close:before{content:"";opacity:0;z-index:var(--z-index-below);border-radius:var(--radius-md);background-color:currentColor;position:absolute;top:2px;right:2px;bottom:2px;left:2px}
+.c-mobile-menu_close:before{background-color:color-mix(in srgb,currentColor 10%,transparent)}
+.c-mobile-menu_close:hover:before{opacity:1}
+.c-mobile-menu_logo-link{margin-top:var(--spacing-fluid-xl);transform:translate3d(0,calc(-1*var(--spacing-fluid-xl)),0);transition:transform var(--mobile-menu-transition-duration)var(--mobile-menu-transition-ease);align-self:center}
+.c-mobile-menu_logo-link{transform:translate(0)}
+.c-mobile-menu_logo{--icon-width-logo:100px;display:block}
+.c-mobile-menu_main{flex-direction:column;display:flex}
+.c-mobile-menu_main-item{transform:translate3d(0,calc(-1*var(--spacing-fluid-xs)),0);opacity:0;transition:transform var(--mobile-menu-transition-duration)var(--mobile-menu-transition-ease),opacity var(--mobile-menu-transition-duration)var(--mobile-menu-transition-ease);border-bottom:1px solid}
+.c-mobile-menu_main-item{border-bottom:1px solid color-mix(in srgb,currentColor 20%,transparent)}
+.c-mobile-menu_main-item summary{justify-content:space-between;align-items:center;display:flex}
+.c-mobile-menu_main-item summary::marker{display:none}

@@ -1,0 +1,120 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/mcp/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "3_1"
+description = "The brand CSS custom properties compute to their exact hex values including --color-primary #E8536B, --color-secondary #051441, and --color-accent #1ABF68, with a dark navy header and surface pane cards"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "3_2"
+description = "Typography matches the scale: app title 26 to 32px weight 600, pane titles 15px weight 600, body/table text 14px weight 400 in text-secondary, and a counter pane big number 30px weight 700, in the Poppins family"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "3_3"
+description = "Support Tickets status values render as distinguishable pill badges with Resolved in the accent green, Open in the primary pink, and In Progress in a neutral amber"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "3_4"
+description = "Primary actions use a primary-color background with white text and 6px corners while secondary controls use a white background with a border and text-primary text, and each pane renders on a surface card with a 1px border"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "3_5"
+description = "The Share panel's mock link renders in a monospace font inside a bordered box visually distinct from the rest of the panel so it reads as a copyable value"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.6"
+name = "3_6"
+description = "At roughly 375px wide the pane grid collapses to a single column, the page tabs remain usable, and nothing scrolls horizontally at the page level"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "3_7"
+description = "The three status badge colors are not visually distinguishable, or the Resolved, Open, and In Progress statuses do not use the accent, primary, and amber colors"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.8"
+name = "3_8"
+description = "The brand tokens are missing so primary actions, the header, and accents do not read as #E8536B, #051441, and #1ABF68, or the layout overflows horizontally at 375px"
+type = "binary"
+weight = 1.0
+negate = true

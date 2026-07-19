@@ -1,0 +1,32 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import Navigation from "../../../components/Navigation.astro";
+import Footer from "../../../components/Footer.astro";
+import NewsletterContact from "../../../components/forms/NewsletterContact.astro";
+import caseStudies from "../../../data/case-studies.json";
+
+const hubCases = caseStudies.filter((c) => c.href.startsWith("/resource-hub/case-studies/") && c.slug !== "case-studies" && c.slug !== "results");
+---
+
+<Layout title="Case Studies | Resource Hub | Avalanche" description="Avalanche business case studies from the resource hub.">
+  <Navigation />
+  <main class="pt-[var(--navbar-height)]">
+    <section class="group/section animate-in-view mx-[var(--padding-base)] mt-[var(--padding-base)] rounded-[var(--radius-4xl)] bg-dark p-[var(--padding-xl)] lg:p-[var(--padding-3xl)]">
+      <p class="text-[var(--text-sm)] uppercase tracking-widest text-neutral-500"><a href="/resource-hub" class="hover:text-red">Resource Hub</a></p>
+      <h1 class="font-aeonik split-heading mt-4 text-[var(--text-6xl)] font-black leading-none">Case Studies</h1>
+    </section>
+    <section class="group/section animate-in-view mx-[var(--padding-base)] mt-px grid grid-cols-1 gap-px md:grid-cols-2">
+      {hubCases.map((c, i) => (
+        <a href={c.href} class="reveal-y rounded-[var(--radius-4xl)] bg-dark p-[var(--padding-md)] transition-colors hover:bg-neutral-900" style={`--index:${i}`}>
+          <h2 class="font-aeonik text-[var(--text-2xl)] font-bold">{c.title}</h2>
+          <span class="mt-4 inline-block text-[var(--text-sm)] font-semibold text-red">Read</span>
+        </a>
+      ))}
+      <a href="/case-studies" class="reveal-y rounded-[var(--radius-4xl)] border border-neutral-800 p-[var(--padding-md)] hover:border-red" style="--index:8">
+        <h2 class="font-aeonik text-[var(--text-2xl)] font-bold">All public case studies</h2>
+      </a>
+    </section>
+    <NewsletterContact />
+  </main>
+  <Footer />
+</Layout>

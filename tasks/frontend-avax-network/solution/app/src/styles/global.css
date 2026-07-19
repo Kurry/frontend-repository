@@ -1,0 +1,1205 @@
+@import "tailwindcss";
+@import "lenis/dist/lenis.css";
+
+/* Class-based dark mode (live: html.dark) — matches harvest Tailwind contract */
+@custom-variant dark (&:where(.dark, .dark *));
+/* html.mounted entrance state (live: mounted:* utilities) */
+@custom-variant mounted (&:where(html.mounted &));
+/* Prefer group-[.visible]/name:* in markup — built-in group-visible is :visible
+   pseudo and does not emit class-.visible entrance utilities. */
+
+@font-face {
+  font-family: aeonik;
+  src: url("/fonts/Aeonik-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: aeonik;
+  src: url("/fonts/Aeonik-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: aeonik;
+  src: url("/fonts/Aeonik-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: aeonik;
+  src: url("/fonts/Aeonik-Black.woff2") format("woff2");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: Inter;
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url("/fonts/inter-latin-ext-400.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: Inter;
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url("/fonts/inter-latin-400.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: Inter;
+  font-style: normal;
+  font-display: swap;
+  font-weight: 600;
+  src: url("/fonts/inter-latin-ext-600.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: Inter;
+  font-style: normal;
+  font-display: swap;
+  font-weight: 600;
+  src: url("/fonts/inter-latin-600.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@theme {
+  --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-aeonik: "aeonik", system-ui, sans-serif;
+
+  --color-red-200: #fecaca;
+  --color-red-300: #ff9da5;
+  --color-red-500: #ff394a;
+  --color-red-600: #ed1528;
+  --color-red-700: #eb0014;
+  --color-red-800: #d5373d;
+  --color-red: #ff394a;
+  --color-blue: #0061e2;
+  --color-blue-800: #2446a2;
+  --color-success: #4ade80;
+  --color-error: #dc2626;
+  --color-dark: #151413;
+  --color-black: #000;
+  --color-white: #fff;
+  --color-neutral-50: #f6f6f6;
+  --color-neutral-100: #e7e7e7;
+  --color-neutral-200: #d1d1d1;
+  --color-neutral-300: #b0b0b0;
+  --color-neutral-400: #888;
+  --color-neutral-500: #6d6d6d;
+  --color-neutral-600: #5d5d5d;
+  --color-neutral-700: #4f4f4f;
+  --color-neutral-800: #454545;
+  --color-neutral-900: #1a1a1a;
+  --color-neutral-950: #0a0a0a;
+  --color-slate-500: #6e6b7d;
+  --color-slate-600: #3f3d4b;
+  --color-slate-800: #1e1e2a;
+
+  --spacing: 0.25rem;
+  --text-xs: 0.75rem;
+  --text-sm: clamp(0.75rem, calc(0.607rem + 0.223vw), 0.875rem);
+  --text-base: clamp(0.75rem, calc(0.464rem + 0.446vw), 1rem);
+  --text-lg: 1.125rem;
+  --text-xl: clamp(0.75rem, calc(0.179rem + 0.893vw), 1.25rem);
+  --text-2xl: clamp(0.875rem, calc(0.161rem + 1.116vw), 1.5rem);
+  --text-3xl: 1.75rem;
+  --text-4xl: clamp(1.125rem, calc(0.125rem + 1.563vw), 2rem);
+  --text-5xl: clamp(1.5rem, calc(-0.214rem + 2.679vw), 3rem);
+  --text-6xl: clamp(2.125rem, calc(-0.018rem + 3.348vw), 4rem);
+  --text-7xl: clamp(3.25rem, calc(0.107rem + 4.911vw), 6rem);
+  --text-8xl: clamp(4.5rem, calc(0.5rem + 6.25vw), 8rem);
+  --text-9xl: clamp(6.625rem, calc(0.625rem + 9.375vw), 11.875rem);
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: clamp(0.375rem, calc(-0.054rem + 0.67vw), 0.75rem);
+  --radius-2xl: clamp(0.625rem, calc(0.196rem + 0.67vw), 1rem);
+  --radius-3xl: 1.5rem;
+  --radius-4xl: clamp(1rem, calc(-0.143rem + 1.786vw), 2rem);
+
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-cubic: cubic-bezier(0.5, 0, 0.6, 0.2);
+  --ease-out-cubic: cubic-bezier(0.2, 0.6, 0.35, 1);
+  --ease-in-out-cubic: cubic-bezier(0.6, 0, 0.35, 1);
+  --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-in-out-quart: cubic-bezier(0.8, 0, 0.2, 1);
+}
+
+:root {
+  --navbar-height: clamp(3rem, calc(0.143rem + 4.464vw), 5.5rem);
+  --padding-xs: clamp(0.25rem, calc(-0.036rem + 0.446vw), 0.5rem);
+  --padding-sm: clamp(0.5rem, calc(0.214rem + 0.446vw), 0.75rem);
+  --padding-base: clamp(0.5rem, calc(-0.071rem + 0.893vw), 1rem);
+  --padding-2base: clamp(0.75rem, calc(-0.107rem + 1.339vw), 1.5rem);
+  --padding-md: clamp(1rem, calc(-0.143rem + 1.786vw), 2rem);
+  --padding-lg: clamp(1.5rem, calc(-0.214rem + 2.679vw), 3rem);
+  --padding-xl: clamp(2rem, calc(-0.286rem + 3.571vw), 4rem);
+  --padding-2xl: clamp(3.25rem, calc(0.107rem + 4.911vw), 6rem);
+  --padding-3xl: clamp(4.25rem, calc(-0.036rem + 6.696vw), 8rem);
+  --padding-4xl: clamp(5.375rem, calc(0.089rem + 8.259vw), 10rem);
+  --padding-5xl: clamp(6.625rem, calc(-0.089rem + 10.491vw), 12.5rem);
+  --gap-xs: 0.5rem;
+  --gap-sm: clamp(0.5rem, calc(0.214rem + 0.446vw), 0.75rem);
+  --gap-base: clamp(0.5rem, calc(-0.071rem + 0.893vw), 1rem);
+  --gap-2base: clamp(0.75rem, calc(-0.107rem + 1.339vw), 1.5rem);
+  --gap-md: clamp(1rem, calc(-0.143rem + 1.786vw), 2rem);
+  --gap-lg: clamp(1.5rem, calc(-0.214rem + 2.679vw), 3rem);
+  --gap-xl: clamp(2rem, calc(-0.286rem + 3.571vw), 4rem);
+  --gap-2xl: clamp(3.25rem, calc(0.107rem + 4.911vw), 6rem);
+  --gap-3xl: clamp(4.25rem, calc(-0.036rem + 6.696vw), 8rem);
+  --height-button: clamp(2.375rem, calc(-0.054rem + 3.795vw), 4.5rem);
+  --leading-normal: 1.15;
+  --default-transition-duration: 0.15s;
+  --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  --font-aeonik: "aeonik", system-ui, sans-serif;
+  --color-red: #ff394a;
+  --color-dark: #151413;
+  --color-neutral-950: #0a0a0a;
+  --color-neutral-900: #1a1a1a;
+  --color-neutral-800: #454545;
+  --color-neutral-200: #d1d1d1;
+  --color-neutral-100: #e7e7e7;
+  --color-neutral-50: #f6f6f6;
+  --ease-out-cubic: cubic-bezier(0.2, 0.6, 0.35, 1);
+  --ease-in-out-quart: cubic-bezier(0.8, 0, 0.2, 1);
+  --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-in-out-cubic: cubic-bezier(0.6, 0, 0.35, 1);
+  --radius-4xl: clamp(1rem, calc(-0.143rem + 1.786vw), 2rem);
+  --text-sm: clamp(0.75rem, calc(0.607rem + 0.223vw), 0.875rem);
+  --text-base: clamp(0.75rem, calc(0.464rem + 0.446vw), 1rem);
+  --text-xl: clamp(0.75rem, calc(0.179rem + 0.893vw), 1.25rem);
+  --text-2xl: clamp(0.875rem, calc(0.161rem + 1.116vw), 1.5rem);
+  --text-4xl: clamp(1.125rem, calc(0.125rem + 1.563vw), 2rem);
+  --text-5xl: clamp(1.5rem, calc(-0.214rem + 2.679vw), 3rem);
+  --text-6xl: clamp(2.125rem, calc(-0.018rem + 3.348vw), 4rem);
+  --text-7xl: clamp(3.25rem, calc(0.107rem + 4.911vw), 6rem);
+}
+
+/* Live homepage: smaller display scale + denser spacing below lg */
+@media (max-width: 1024px) {
+  :root {
+    --navbar-height: clamp(5rem, calc(4.711rem + 1.235vw), 5.5rem);
+    --text-sm: clamp(0.75rem, calc(0.678rem + 0.309vw), 0.875rem);
+    --text-base: clamp(0.875rem, calc(0.803rem + 0.309vw), 1rem);
+    --text-xl: clamp(1rem, calc(0.855rem + 0.617vw), 1.25rem);
+    --text-2xl: clamp(1.25rem, calc(1.105rem + 0.617vw), 1.5rem);
+    --text-4xl: clamp(1.5rem, calc(1.211rem + 1.235vw), 2rem);
+    --text-5xl: clamp(2rem, calc(1.421rem + 2.469vw), 3rem);
+    --text-6xl: clamp(3rem, calc(2.421rem + 2.469vw), 4rem);
+    --text-7xl: clamp(2rem, calc(-0.315rem + 9.877vw), 6rem);
+    --text-8xl: clamp(3rem, calc(0.106rem + 12.346vw), 8rem);
+    --text-9xl: clamp(2.5rem, calc(-0.683rem + 13.58vw), 8rem);
+    --padding-xs: 0.5rem;
+    --padding-base: 1rem;
+    --padding-2base: clamp(1rem, calc(0.711rem + 1.235vw), 1.5rem);
+    --padding-md: clamp(1.5rem, calc(1.211rem + 1.235vw), 2rem);
+    --padding-xl: clamp(2rem, calc(0.843rem + 4.938vw), 4rem);
+    --padding-2xl: 6rem;
+    --padding-3xl: clamp(4rem, calc(1.685rem + 9.877vw), 8rem);
+    --gap-base: 1rem;
+    --gap-2base: clamp(1rem, calc(0.711rem + 1.235vw), 1.5rem);
+    --gap-md: clamp(1.5rem, calc(1.211rem + 1.235vw), 2rem);
+    --gap-xl: clamp(2rem, calc(1.421rem + 2.469vw), 3rem);
+    --radius-xl: 0.75rem;
+    --radius-2xl: 1rem;
+    --radius-4xl: clamp(1rem, calc(0.421rem + 2.469vw), 2rem);
+    --height-button: clamp(4rem, calc(3.711rem + 1.235vw), 4.5rem);
+  }
+}
+
+html {
+  scrollbar-gutter: stable;
+  touch-action: pan-y;
+  scroll-behavior: smooth;
+  font-family: Inter, system-ui, sans-serif;
+  overflow: clip scroll;
+  background: var(--color-neutral-950);
+  color: #000;
+}
+
+/* Live: disable kerning + optimizeSpeed on text nodes (pixel-critical) */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-kerning: none;
+  -webkit-text-rendering: optimizeSpeed;
+  text-rendering: optimizeSpeed;
+  -webkit-font-smoothing: antialiased;
+}
+html.dark {
+  color: #fff;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.scroll-disabled {
+  touch-action: none;
+  overflow: hidden;
+}
+
+.transition-mode {
+  transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke;
+  transition-duration: 0.3s;
+  transition-timing-function: var(--ease-out-cubic);
+}
+
+.font-aeonik {
+  font-family: var(--font-aeonik);
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Motion contracts from harvest */
+.animate-in-view {
+  visibility: hidden;
+}
+.animate-in-view.visible {
+  visibility: visible;
+}
+
+.split-text,
+.split-heading {
+  opacity: 0;
+}
+.delay-2000 {
+  transition-delay: 2s;
+}
+.delay-1000 {
+  transition-delay: 1s;
+}
+
+/* Harvest: initial offscreen; .visible brings to identity (compositor AA path) */
+.split-line {
+  transform: translateY(-100%);
+}
+.visible .split-line {
+  transition: transform 2s calc(0.15s * calc(var(--index) + 1)) var(--ease-out-cubic);
+  transform: translateY(0);
+}
+.gpu-accelerate {
+  will-change: transform;
+}
+.overflow-y-clip {
+  overflow-y: clip;
+}
+
+@keyframes flash {
+  0%,
+  5% {
+    content: attr(data-char-1);
+  }
+  10% {
+    content: attr(data-char-2);
+  }
+  15% {
+    content: attr(data-char-3);
+  }
+  20% {
+    content: attr(data-char-4);
+  }
+  25% {
+    content: attr(data-char-2);
+  }
+  30% {
+    content: attr(data-char-3);
+  }
+  35% {
+    content: attr(data-char-1);
+  }
+  40%,
+  to {
+    content: attr(data-char-initial);
+    text-transform: uppercase;
+  }
+}
+/* Harvest split-heading: glyphs start transparent; ::before flashes then fills */
+.split-heading .heading-char,
+.split-heading .heading-char::before {
+  color: rgba(0, 0, 0, 0);
+}
+.visible .split-heading .heading-char::before {
+  color: #000;
+  transition: color calc(50ms + ((var(--index) + 1) * 75ms)) calc(var(--index) * 60ms);
+  animation: flash calc(50ms + ((var(--index) + 1) * 75ms)) calc(var(--index) * 60ms) both;
+}
+.dark .visible .split-heading .heading-char::before,
+:is(.dark) .visible .split-heading .heading-char::before {
+  color: #fff;
+}
+.visible .split-heading.text-white .heading-char::before {
+  color: #fff;
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes beat {
+  0%,
+  to {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(var(--scale, 1.1));
+  }
+}
+@keyframes scale-in {
+  0% {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes scale-out {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0.5;
+    transform: scale(0.9);
+  }
+}
+
+.group\/section.visible .reveal-y {
+  transform: translateY(0);
+  opacity: 1;
+}
+.reveal-y {
+  transform: translateY(24px);
+  opacity: 0;
+  transition:
+    transform 2s var(--ease-out-cubic),
+    opacity 0.3s var(--ease-out-cubic);
+  transition-delay: calc(0.15s * var(--index, 0));
+}
+
+.marquee {
+  overflow: hidden;
+  white-space: nowrap;
+}
+.marquee-content {
+  display: inline-flex;
+  animation: marquee var(--duration, 31.5s) linear infinite;
+  animation-direction: var(--direction, normal);
+}
+.marquee:hover .marquee-content,
+.marquee.stop:hover .marquee-content {
+  animation-play-state: paused;
+}
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.logo-gradient {
+  background-image: linear-gradient(to bottom right, var(--from), var(--via), var(--to));
+  clip-path: inset(0 0 0 0 round 9999px);
+}
+@media (min-width: 1025px) {
+  .logo-gradient {
+    clip-path: inset(50% 50% 50% 50% round 9999px);
+  }
+  .group:hover .logo-gradient {
+    clip-path: inset(0 0 0 0 round 9999px);
+  }
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--height-button);
+  padding: 0 var(--padding-md);
+  border-radius: 9999px;
+  font-family: var(--font-aeonik);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  transition:
+    background-color 0.3s var(--ease-out-cubic),
+    color 0.3s var(--ease-out-cubic),
+    border-color 0.3s var(--ease-out-cubic);
+}
+.btn-primary {
+  background: #000;
+  color: #fff;
+}
+html.dark .btn-primary {
+  background: #fff;
+  color: #000;
+}
+.btn-primary:hover {
+  background: var(--color-neutral-800);
+  color: var(--color-red);
+}
+html.dark .btn-primary:hover {
+  background: var(--color-neutral-100);
+  color: var(--color-red);
+}
+.btn-ghost {
+  background: transparent;
+  color: #000;
+  border: 1px solid var(--color-neutral-200);
+}
+html.dark .btn-ghost {
+  color: #fff;
+  border-color: var(--color-neutral-800);
+}
+.btn-ghost:hover {
+  border-color: var(--color-red);
+  color: var(--color-red);
+}
+
+/* Live display / motion utilities */
+.h1 {
+  font-family: var(--font-aeonik), aeonik, system-ui, sans-serif;
+  font-size: var(--text-9xl);
+  /* Harvest .h1 has no font-weight — inherits 400 */
+}
+@layer components {
+  .transition-move {
+    /* Harvest: translate duration stays 0 until group-[.visible]:duration-* applies.
+       Keep in components layer so utilities transition-duration can override. */
+    transition:
+      background-color 0.3s var(--ease-out-cubic),
+      border-color 0.3s var(--ease-out-cubic),
+      translate 0s 0s var(--ease-out-quart);
+  }
+}
+.corner-background-top,
+.corner-background-bottom {
+  pointer-events: none;
+}
+.colorful {
+  /* marker class — insight cards read group-[.colorful]/section */
+}
+
+/* Live mobile APC sibling (class="mobile") — visible below lg only */
+.mobile {
+  display: flex;
+}
+@media (min-width: 1025px) {
+  .mobile {
+    display: none;
+  }
+}
+
+/* Live: h1–h6 use Aeonik + antialiased; .h6 size = --text-4xl */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-aeonik);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.h6 {
+  font-size: var(--text-4xl);
+  line-height: var(--leading-normal);
+}
+.max-w-256 {
+  max-width: 64rem;
+}
+.w-50 {
+  width: 12.5rem;
+}
+/* Tailwind may not emit lg:w-[clamp(...)] for companies logo cells */
+@media (min-width: 1025px) {
+  #companies .marquee-content > .aspect-\[3\/2\],
+  #companies .marquee-content > [class*="aspect-"] {
+    width: clamp(10rem, 0rem + 15.625vw, 18.75rem);
+  }
+}
+.w-256 {
+  width: 64rem;
+}
+.h5 {
+  font-size: var(--text-5xl);
+  line-height: var(--leading-normal);
+}
+.h4 {
+  font-size: var(--text-6xl);
+  /* Harvest .h4 has no font-weight — inherits 400; bold wraps extra lines on tablet */
+}
+.button.red-light {
+  fill: var(--color-red);
+  color: #fff;
+}
+.button.red-light::after {
+  background-color: #000;
+}
+.button.red-light:hover {
+  fill: var(--color-red-600);
+  color: #fff;
+}
+.button.secondary {
+  --tw-translate-y: var(--padding-xs);
+  height: auto;
+  translate: var(--tw-translate-x) var(--tw-translate-y);
+  padding-block: var(--padding-xs);
+  padding-right: clamp(1rem, calc(0.566rem + 1.852vw), 1.75rem);
+  padding-left: 0;
+  color: #000;
+  fill: transparent;
+  stroke: var(--color-neutral-200);
+  border-radius: 0;
+}
+.button.secondary:hover {
+  color: var(--color-red);
+}
+.button.secondary::after {
+  right: 0;
+  background-color: var(--color-red);
+}
+.button.secondary:hover::after {
+  background-color: var(--color-red);
+}
+.dark .button.secondary,
+:is(.dark) .button.secondary,
+.button.secondary:where(.dark, .dark *) {
+  stroke: var(--color-neutral-800);
+  color: #fff;
+}
+@media (min-width: 1025px) {
+  .button.secondary {
+    padding-right: clamp(1rem, calc(0.143rem + 1.339vw), 1.75rem);
+  }
+}
+.button.white {
+  fill: #fff;
+  color: #000;
+}
+.button.empty {
+  aspect-ratio: 1;
+  width: 2.5rem; /* spacing*10 — harvest empty nav arrows */
+  height: 2.5rem;
+  padding: 0;
+  justify-content: center;
+  align-items: center;
+  color: transparent;
+  background-color: transparent;
+  border: 1px solid var(--color-neutral-200);
+  border-radius: 9999px;
+  fill: transparent;
+  stroke: transparent;
+}
+@media (min-width: 1025px) {
+  .button.empty {
+    width: clamp(2.5rem, 1.929rem + 0.893vw, 3rem);
+    height: clamp(2.5rem, 1.929rem + 0.893vw, 3rem);
+  }
+}
+html.dark .button.empty {
+  border-color: var(--color-neutral-800);
+}
+.button.empty:hover {
+  background-color: var(--color-neutral-100);
+}
+html.dark .button.empty:hover {
+  background-color: var(--color-neutral-500);
+}
+.button.empty::after {
+  left: 50%;
+  right: auto;
+  transform: translate(-50%, -50%) rotate(-135deg);
+  background-color: #000;
+}
+html.dark .button.empty::after {
+  background-color: #fff;
+}
+.button.empty.arrow::after {
+  left: 50%;
+  right: auto;
+  translate: 50% -50%;
+  background-color: #000;
+}
+html.dark .button.empty.arrow::after {
+  background-color: #fff;
+}
+.input-tall {
+  min-height: clamp(4rem, 3.429rem + 0.893vw, 4.5rem);
+  padding-top: 0;
+  padding-bottom: 0;
+  font-family: var(--font-aeonik), aeonik, system-ui, sans-serif;
+  font-size: var(--text-base);
+  font-weight: 700;
+}
+@media (min-width: 1025px) {
+  .input-tall {
+    min-height: clamp(3.75rem, 3.429rem + 0.5vw, 4.125rem);
+  }
+}
+
+/* Live typography scale utilities (NOT breakpoint prefixes — harvest `.lg` = text-xl) */
+.xs,
+.text-xs,
+p.text-xs,
+a.text-xs,
+span.text-xs {
+  font-size: var(--text-xs);
+  line-height: 1;
+}
+.md {
+  font-size: var(--text-lg, 1.125rem);
+  line-height: var(--leading-normal);
+}
+.lg {
+  font-size: var(--text-xl);
+  line-height: var(--leading-normal);
+}
+.xl {
+  font-size: var(--text-2xl);
+  line-height: var(--leading-normal);
+}
+p,
+a {
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+}
+/* Beat p/a base line-height — footer links and h2 use leading-none */
+.leading-none,
+a.leading-none,
+p.leading-none,
+h2.leading-none,
+#footer h2,
+#footer a {
+  line-height: 1;
+}
+/* After p/a so size wins; line-height left to leading-* utilities */
+.sm,
+p.sm,
+a.sm,
+span.sm {
+  font-size: var(--text-sm);
+}
+/* Explicit leading utilities — beat p/a/.sm base line-heights */
+.leading-\[80\%\] {
+  line-height: 80%;
+}
+.leading-\[120\%\] {
+  line-height: 120%;
+}
+.leading-\[135\%\] {
+  line-height: 135%;
+}
+.leading-\[150\%\] {
+  line-height: 150%;
+}
+p.lg,
+span.lg,
+.lg {
+  font-size: var(--text-xl);
+  line-height: var(--leading-normal);
+}
+.leading-\[135\%\] {
+  line-height: 135%;
+}
+p.leading-\[135\%\] {
+  line-height: 135%;
+}
+.text-xl\/normal {
+  font-size: var(--text-xl);
+  line-height: var(--leading-normal);
+}
+
+/* Live `.button` — mobile base, desktop @media(min-width:1025px) override */
+.button {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: auto;
+  height: clamp(4rem, calc(3.711rem + 1.235vw), 4.5rem);
+  padding-right: clamp(4rem, calc(3.277rem + 3.086vw), 5.25rem);
+  padding-left: var(--padding-md);
+  font-family: var(--font-aeonik);
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  color: #fff;
+  fill: var(--color-black, #000);
+  cursor: pointer;
+  /* Live body has no .antialiased — button text uses subpixel AA */
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+  transition:
+    color 0.3s var(--ease-out-cubic),
+    fill 0.3s var(--ease-out-cubic),
+    stroke 0.3s var(--ease-out-cubic);
+}
+/* Harvest Start Building uses w-full inside 1fr nav cell — beat width:auto */
+.button.w-full {
+  width: 100%;
+}
+/* Tailwind sm:w-auto is (0,1,0); .button.w-full is (0,2,0) and would win —
+   event "View All Events" stayed full-width on tablet and crushed the heading. */
+@media (min-width: 640px) {
+  .button.sm\:w-auto,
+  .button.w-full.sm\:w-auto {
+    width: auto;
+  }
+}
+@media (min-width: 1025px) {
+  .button {
+    height: clamp(2.375rem, calc(3.795vw - 0.054rem), 4.5rem);
+    padding-right: clamp(2.875rem, calc(0.161rem + 4.241vw), 5.25rem);
+  }
+}
+a.button:not(.hidden),
+button.button:not(.hidden) {
+  display: inline-flex;
+}
+a.button.hidden {
+  display: none;
+}
+@media (min-width: 1025px) {
+  a.button.lg\:flex {
+    display: flex;
+  }
+  /* Beat the :not(.hidden) display:inline-flex above — harvest uses lg:hidden */
+  button.button.lg\:hidden {
+    display: none;
+  }
+}
+/* Mobile hamburger: harvest `.button.aspect-square.px-sm` — must beat .button padding */
+.button.aspect-square {
+  aspect-ratio: 1;
+  width: auto;
+  padding-left: var(--padding-sm);
+  padding-right: var(--padding-sm);
+  justify-content: center;
+  align-items: center;
+}
+.button wm-shape {
+  z-index: -1;
+}
+.button:hover {
+  fill: var(--color-red);
+  color: var(--color-red);
+}
+.button.transparent {
+  color: #000;
+  fill: transparent;
+  stroke: var(--color-neutral-200);
+}
+.button.transparent:hover {
+  fill: #000;
+  color: #fff;
+}
+html.dark .button.transparent {
+  color: #fff;
+  stroke: var(--color-neutral-800);
+}
+html.dark .button.transparent:hover {
+  fill: var(--color-neutral-800);
+  color: #fff;
+}
+.button.arrow::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  right: clamp(2rem, calc(1.711rem + 1.235vw), 2.5rem);
+  width: clamp(0.5rem, calc(0.214rem + 0.446vw), 0.75rem);
+  height: clamp(0.5rem, calc(0.214rem + 0.446vw), 0.75rem);
+  display: inline-block;
+  flex-shrink: 0;
+  translate: 0 -50%;
+  rotate: -135deg;
+  background-color: var(--color-red);
+  -webkit-mask-image: url("/arrow.svg");
+  mask-image: url("/arrow.svg");
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+@media (min-width: 1025px) {
+  .button.arrow::after {
+    right: clamp(1.375rem, calc(0.089rem + 2.009vw), 2.5rem);
+  }
+}
+.button.arrow:hover::after {
+  background-color: currentColor;
+}
+.button.transparent.arrow::after {
+  background-color: var(--color-red);
+}
+.button.transparent.arrow:hover::after {
+  background-color: #fff;
+}
+
+.btn-cut {
+  position: relative;
+  isolation: isolate;
+  min-height: var(--height-button);
+  color: #fff;
+  fill: #000;
+}
+.btn-cut wm-shape {
+  z-index: -1;
+  fill: #000;
+  color: #000;
+}
+html.dark .btn-cut {
+  color: #000;
+  fill: #fff;
+}
+html.dark .btn-cut wm-shape {
+  fill: #fff;
+  color: #fff;
+}
+.btn-cut:hover,
+.group\/button:hover {
+  color: var(--color-red);
+}
+
+/* Fallback pill when wm-shape not ready */
+.btn-cut:not(:has(wm-shape.ready)) {
+  background: #000;
+  border-radius: 9999px;
+  color: #fff;
+}
+html.dark .btn-cut:not(:has(wm-shape.ready)) {
+  background: #fff;
+  color: #000;
+}
+
+/* Live `.arrow:after` — absolute, mask, rotate -135deg (Grants + non-button CTAs) */
+.arrow:not(.button)::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: clamp(0.5rem, calc(0.214rem + 0.446vw), 0.75rem);
+  height: clamp(0.5rem, calc(0.214rem + 0.446vw), 0.75rem);
+  display: inline-block;
+  flex-shrink: 0;
+  translate: 0.5rem -50%;
+  rotate: -135deg;
+  background-color: var(--color-red);
+  -webkit-mask-image: url("/arrow.svg");
+  mask-image: url("/arrow.svg");
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  transition: background-color 0.3s var(--ease-out-cubic);
+}
+@media (max-width: 1024px) {
+  .arrow:not(.button)::after {
+    width: clamp(0.75rem, calc(0.464rem + 0.446vw), 1rem);
+    height: clamp(0.75rem, calc(0.464rem + 0.446vw), 1rem);
+    right: 0.25rem;
+    translate: calc(-1 * var(--padding-2base)) -50%;
+  }
+}
+
+/* Entrance / mounted choreography (harvest parity) */
+#navigation {
+  transition:
+    background-color 500ms var(--ease-out-cubic),
+    translate 2000ms 1000ms var(--ease-in-out-quart),
+    z-index 1ms 500ms;
+}
+@media (min-width: 1025px) {
+  #navigation .nav-link,
+  #navigation a[aria-label="link to Grants"],
+  #navigation a[aria-label="Go back to homepage"] svg,
+  #navigation a[href="https://build.avax.network"].button {
+    color: var(--color-white);
+  }
+  #navigation .nav-link:hover,
+  #navigation a[aria-label="link to Grants"]:hover,
+  #navigation a[href="https://build.avax.network"].button:hover {
+    color: var(--color-red);
+  }
+}
+html.mounted #navigation {
+  translate: 0 0;
+}
+
+/* Legacy hero-* CSS removed in favor of harvest mounted: Tailwind utilities on Hero.astro */
+
+.hero-sequencer-inner {
+  bottom: calc(var(--navbar-height) / -2);
+  translate: -50% calc(var(--navbar-height) / -2);
+  transition:
+    opacity 300ms var(--ease-out-cubic),
+    translate 2000ms 1000ms var(--ease-in-out-quart);
+}
+@media (min-width: 1025px) {
+  .hero-sequencer-inner {
+    bottom: 50%;
+    translate: -50% 50%;
+  }
+}
+
+html.mounted .hero-sequencer-inner {
+  /* keep */
+}
+
+.menu-background.is-open {
+  opacity: 1;
+  visibility: visible;
+  height: calc(var(--max-height, 320px) - var(--navbar-height) / 2 + var(--text-sm) / 2);
+}
+
+/* Patch wm-shape fills — inherit from parent `.button` / panel (do NOT force #000 on all buttons;
+   `.button.transparent` must stay fill:transparent for stroke-only Learn more CTAs) */
+.button wm-shape[id="button"] {
+  fill: inherit;
+  stroke: inherit;
+  color: inherit;
+}
+html.dark .button:not(.transparent) wm-shape[id="button"] {
+  fill: inherit;
+  color: inherit;
+}
+wm-shape[id="solutions"] {
+  fill: inherit;
+  color: inherit;
+}
+wm-shape[id="keep"] {
+  fill: #fff;
+  color: #fff;
+}
+html.dark wm-shape[id="keep"] {
+  fill: var(--color-dark);
+  color: var(--color-dark);
+}
+/* Do not force stroke on all wm-shape paths — live keep/button paths inherit host stroke (often none) */
+
+html.scroll-disabled,
+html.scroll-disabled body {
+  overflow: hidden;
+}
+
+.section-shell {
+  width: 100%;
+  border-radius: var(--radius-4xl);
+  background: #fff;
+  color: #000;
+  padding: var(--padding-3xl) var(--padding-md);
+}
+html.dark .section-shell {
+  background: var(--color-dark);
+  color: #fff;
+}
+@media (min-width: 1025px) {
+  .section-shell {
+    padding: var(--padding-3xl);
+  }
+}
+
+/* Theme toggle: harvest Tailwind classes on the button — avoid duplicate ::after CSS */
+
+/* Nav grants arrow accent — handled above with mask+rotate */
+
+/* Scroll chevron (live SVG bracket) */
+.scroll-bracket {
+  width: clamp(4rem, calc(0rem + 6.25vw), 7.5rem);
+  translate: calc(100% + 1px) 0;
+  transition: translate 2000ms 2000ms var(--ease-out-quart);
+}
+html.mounted .scroll-bracket {
+  translate: 0 0;
+}
+
+.nav-overlay {
+  position: fixed;
+  inset: 0;
+  background: #000000b3;
+  opacity: 0;
+  visibility: hidden;
+  z-index: 40;
+  transition:
+    opacity 0.3s var(--ease-out-cubic),
+    visibility 0.3s;
+}
+.nav-overlay.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+#navigation .menu-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.7s var(--ease-out-cubic);
+  background: var(--color-neutral-950);
+}
+#navigation.opened .menu-panel {
+  max-height: var(--max-height, 80vh);
+}
+
+.accordion .accordion-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.5s var(--ease-out-cubic);
+}
+.accordion.opened .accordion-body {
+  grid-template-rows: 1fr;
+}
+.accordion-body > div {
+  overflow: hidden;
+}
+
+.input {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-xl);
+  padding: 0.875rem 1rem;
+  color: inherit;
+  font-family: var(--font-aeonik), aeonik, system-ui, sans-serif;
+  font-size: var(--text-base);
+  font-weight: 400;
+  transition: border-color 0.3s var(--ease-out-cubic);
+}
+.dark .input,
+:is(.dark) .input,
+.input:where(.dark, .dark *) {
+  border-color: var(--color-neutral-800);
+}
+/* Harvest newsletter first-step fields are h-18 */
+#general-form .input,
+.input.h-18 {
+  height: 4.5rem;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+/* Gold newsletter form sits on a dark card — fields are solid white */
+#general-form .input {
+  background-color: #fff;
+  color: #000;
+  border-color: var(--color-neutral-200);
+}
+#general-form .input:focus {
+  border-color: var(--color-red);
+}
+@media (min-width: 1025px) {
+  #general-form .input,
+  .input.h-18 {
+    height: clamp(4rem, 3.429rem + 0.893vw, 4.5rem);
+  }
+}
+.input:focus {
+  outline: none;
+  border-color: var(--color-red);
+}
+.input.invalid {
+  border-color: var(--color-error) !important;
+}
+/* Gold floating-label inputs: native placeholder is visually hidden */
+.group\/inputWrapper .input::placeholder {
+  visibility: hidden;
+  color: transparent;
+}
+.group\/inputWrapper .input {
+  font-weight: 700;
+  font-family: var(--font-aeonik), aeonik, system-ui, sans-serif;
+}
+.text-success {
+  color: var(--color-success);
+}
+.text-error {
+  color: var(--color-error);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Swiper layout before client CSS hydrates — prevent slides stacking (page blow-up) */
+.swiper {
+  position: relative;
+  overflow: hidden;
+  list-style: none;
+  padding: 0;
+  z-index: 1;
+}
+.swiper-wrapper {
+  position: relative;
+  display: flex;
+  box-sizing: content-box;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  transition-property: transform;
+}
+.swiper-slide {
+  flex-shrink: 0;
+  position: relative;
+  display: block;
+  width: auto;
+  height: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-in-view {
+    /* No !important — capture screenshotMasks must be able to hide subtrees
+       (children that re-assert visibility:visible punch through parent hides). */
+    visibility: visible;
+  }
+  /* Do NOT zero .transition-move — live keeps CSS entrance transitions under
+     reduced-motion; mid/deep captures land mid-flight (group-[.visible] settle). */
+  /* Do NOT force transform:none on .split-line — live keeps identity
+     matrix + will-change under reduced-motion; that compositor path is
+     required for pixelTol=0 glyph AA parity. */
+  .reveal-y,
+  .marquee-content {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+  /* Keep heading-char flash/color under reduced-motion — gold still runs it;
+     forcing settled white glyphs diverges deep/footer stations. */
+}

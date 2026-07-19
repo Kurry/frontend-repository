@@ -1,0 +1,127 @@
+---
+import data from "../data/home.json";
+import Button from "./Button.astro";
+const { h2, lead, cards, form } = data.cta;
+---
+<section class="section_cta theme-dark" data-momentum-hover-init>
+  <div style="width:100%">
+    <div class="padding-global">
+      <div class="container-col-12">
+        <div class="cta_wrapper">
+          <div class="cta_title">
+            <h2 class="heading-l">{h2}</h2>
+            <div class="max-width-960px">
+              <p class="paragraph-m">{lead}</p>
+            </div>
+          </div>
+          <div class="cta-cards" data-gsap-ignore>
+            {cards.map((card) => (
+              <div class="cta-card_wrap" data-momentum-hover-element>
+                <a
+                  class={`cta-card ${card.isForm ? "is-form" : "is-2"} w-inline-block ${card.theme}`}
+                  data-momentum-hover-target
+                  href={card.isForm ? "#" : card.href}
+                  {...(card.isForm ? { "data-cta-popup-open": "" } : {})}
+                >
+                  <h3 class="heading-s" data-split-visible>{card.title}</h3>
+                  <img class="cta-card_emoji" src={card.emoji} alt="" loading="lazy" />
+                  <div class="cta-card_body">
+                    <p class="paragraph-regular" data-split-visible>{card.body}</p>
+                    <Button label={card.button} variant="secondary" asDiv={true} />
+                  </div>
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact popup -->
+  <div class="cta-pop-up" data-cta-popup>
+    <div class="cta-pop-up_form theme-chrome">
+      <div class="cta-pop-up_close" data-cta-popup-close role="button" aria-label="Close contact form"></div>
+      <div class="contact-form">
+        <div class="contact-form_emoji">
+          <img src={form.emoji} alt="High five emoji" loading="lazy" />
+        </div>
+        <div class="contact-form_header">
+          <h4 class="heading-s" data-split-visible>{form.title}</h4>
+          <p class="paragraph-m" data-split-visible>{form.lead}</p>
+        </div>
+        <div class="form-group w-form" data-form-validate>
+          <form class="form" data-name="CTA Form" name="wf-form-CTA-Form" method="post" action="/api/contact" data-contact-form>
+            <div class="form-row">
+              <div class="form-field-group" data-validate="email">
+                <div class="form-field">
+                  <div class="form-input_wrap">
+                    <div class="form-input_placeholder">{form.emailPlaceholder}</div>
+                    <input class="form-input w-input" type="email" name="E-mail" data-name="E-mail" placeholder=" " required />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-field-group" data-validate="phone">
+                <div class="form-field">
+                  <div class="form-input_wrap">
+                    <div class="form-input_placeholder">{form.phonePlaceholder}</div>
+                    <input class="form-input w-input" type="tel" name="Telefoonnummer" data-name="Telefoonnummer" placeholder=" " />
+                    <div class="form-input_placeholder-opt">{form.optional}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="form-row is-submit">
+              <div class="form-field-group" data-validate="terms">
+                <div class="radiocheck-group" data-radiocheck-group>
+                  <label class="w-checkbox radiocheck-field">
+                    <input class="w-checkbox-input checkbox-input" type="checkbox" name="Terms-Conditions" data-name="Terms-Conditions" required />
+                    <span class="radiocheck-label is--small w-form-label">
+                      {form.terms} <a class="text-style-link" href="#">{form.termsLink}</a>
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="form-field-group is-submit">
+              <div class="form-field is-submit">
+                <div class="form-submit-btn" data-submit>
+                  <input type="submit" class="form-submit w-button" data-wait="Please wait..." value="Submit" />
+                  <div class="btn-icon-link">
+                    <div class="btn-icon-content">
+                      <div class="btn-icon-content__mask">
+                        <span class="btn-icon-content__text" data-button-anim-target>{form.submit}</span>
+                      </div>
+                      <div class="btn-icon-icon" data-icon-size>
+                        <div class="btn-icon-icon__bg" data-button-anim-target></div>
+                        <div class="btn-icon-icon__wrap">
+                          <div class="btn-icon-icon__list">
+                            <svg class="btn-icon-icon__arrow" data-button-anim-target viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"/></svg>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="btn-icon-content__bg" data-button-anim-target></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+          <div class="form-notifcation w-form-done theme-white" data-form-success>
+            <div class="form-notifcation_wrapper">
+              <div class="max-width-448px">
+                <h4 class="heading-style-64px-2" data-split-visible>{form.successTitle}</h4>
+              </div>
+              <div class="form-notification-p paragraph-regular" data-split-visible>{form.successBody}</div>
+            </div>
+          </div>
+          <div class="form-notifcation is--error w-form-fail" data-form-error>
+            <div class="form-notification-p paragraph-regular" data-split-visible>{form.errorBody}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

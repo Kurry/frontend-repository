@@ -1,0 +1,1 @@
+const e={header:"Profile Header",projects:"Projects",skills:"Skills",testimonials:"Testimonials",contact:"Contact"};function n(){return Math.random().toString(36).substring(2,11)+Date.now().toString(36)}function r(t){return JSON.parse(JSON.stringify(t))}export{e as S,r as d,n as g};

@@ -1,0 +1,14 @@
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+import App from './App.vue'
+import { useSidedockStore } from './stores/sidedock.js'
+import { registerWebmcp } from './webmcp.js'
+import 'virtual:uno.css'
+
+const app = createApp(App)
+const pinia = createPinia()
+app.use(pinia)
+app.mount('#app')
+
+// Register the WebMCP surface against the live store, after Pinia is active.
+registerWebmcp(useSidedockStore(pinia))

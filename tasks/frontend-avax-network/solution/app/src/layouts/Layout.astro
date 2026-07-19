@@ -1,0 +1,53 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Custom Blockchains for Enterprise | Avalanche",
+  description = "Avalanche is a technology platform built for business. Enterprises, financial institutions, consumer applications, and governments run business infrastructure on Avalanche because it is reliable, compliant, and fast enough for real financial infrastructure. BlackRock, Franklin Templeton, Apollo, FIFA, and the state of Wyoming trust the network.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="bg-neutral-950 dark:bg-neutral-800 text-black dark:text-white transition-mode">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#0A0A0A" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Avalanche" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="/favicon-light.svg" media="(prefers-color-scheme: light)" />
+    <link rel="icon" href="/favicon-dark.svg" media="(prefers-color-scheme: dark)" />
+    <link rel="preload" href="/fonts/Aeonik-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/Aeonik-Bold.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/Aeonik-Black.woff2" as="font" type="font/woff2" crossorigin />
+    <title>{title}</title>
+    <script is:inline>
+      (() => {
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const theme = localStorage?.getItem("theme") ?? prefersDark;
+        if (theme === "dark") {
+          document.documentElement.classList.add("dark");
+          localStorage.setItem("theme", "dark");
+        }
+      })();
+      // Live: html.mounted on DOMContentLoaded (drives entrance clip-path / nav slide-in)
+      document.addEventListener("DOMContentLoaded", () => {
+        document.documentElement.classList.add("mounted");
+      });
+    </script>
+  </head>
+  <body class="bg-transparent text-inherit">
+    <slot />
+    <script src="../scripts/boot.ts"></script>
+    <script src="../scripts/webmcp.ts"></script>
+  </body>
+</html>

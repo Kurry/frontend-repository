@@ -1,0 +1,121 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/mcp/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "3_1"
+description = "The home presents a filing-cabinet stack of four stacked colored category covers with attached paper architect tags, with three-dimensional perspective, not a flat equal-width list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "3_2"
+description = "Case pages present the folder as a portrait-proportion sheet with a texture overlay under a colored cover that opens away from the sheet"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "3_3"
+description = "The palette uses the near-black #191919 background with cream #fdfaf7 text and a translucent blurred dark header bar with a hairline bottom border"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "3_4"
+description = "The home stack renders as an equal-width flat list with no colored category folders or paper tags"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.5"
+name = "3_5"
+description = "Category covers render in wrong or placeholder colors that do not match the four required hex values"
+type = "binary"
+weight = 0.5
+negate = true
+optional = true
+
+[[criterion]]
+id = "3.6"
+name = "3_6"
+description = "Display titles (hero, case name, about) compute to the Founders Grotesk family at weight 700 uppercase; body and tag text compute to Signifier (hero paragraph and tags around 20px at 1440 width); nav, footer, and captions compute to IBM Plex Mono (nav 16px, footer 12px, captions 14px)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "3_7"
+description = "The case folder sheet computes an aspect-ratio of 210 / 297 (measured ratio about 0.707), the fixed header and case sub-header each compute a height of 3.75rem (60px at the desktop root), and the circular close button computes a 54px diameter"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "3_8"
+description = "The root font-size and container offset scale by breakpoint: about 16px root with a 34px container offset at 1440 width, and about 13px root with an 18px container offset at 390 width where the hero paragraph drops to a 16px override"
+type = "binary"
+weight = 0.5
+optional = true

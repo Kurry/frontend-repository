@@ -1,0 +1,158 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/mcp/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "4_1"
+description = "Clicking an architect tag opens the folder with a three-dimensional rotateY cover rotation and position morph revealing the sheet, not a flat opacity crossfade; the opened cover computes a matrix3d transform (rotateY) with a transition of transform 0.8s cubic-bezier(0.33, 1, 0.68, 1)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "4_2"
+description = "The hero title \"American modernism\" reveals by splitting into lines and characters that rise from an offset and fade in with a stagger on load"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "4_3"
+description = "Hovering a home category group lifts and rotates its cover and rotates its chevron; unfolding a group animates its expansion"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "4_4"
+description = "Hovering a real architect tag lifts it upward via a translateY transform toward -10px with a drop shadow"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "4_5"
+description = "Hovering the About navigation item raises its opacity from a rest value of 0.8 toward 1 (opacity 0.65s transition), and the circular close button computes a scale(0.970) transform on hover over a transform 0.325s transition with its icon scaling"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "4_6"
+description = "The About gallery crossfades between its photographs, the images computing a transition of opacity 0.65s cubic-bezier(0.33, 1, 0.68, 1), with the active caption at full opacity and inactive captions hidden"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "4_7"
+description = "Scrapbook notes and photographs can be dragged with the pointer and stay at their released position"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "4_8"
+description = "Media popups enter and leave with a fading dimmed background, a rising info box, fading media, and a close button that scales up from a smaller size"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.9"
+name = "4_9"
+description = "Clicking a sibling tag animates a folder-next re-entry with the architect name re-splitting into characters and the folder and sheet re-entering"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.10"
+name = "4_10"
+description = "The wind roses rotate continuously as ambient motion via a keyframe animation of 40s infinite iteration, and the fixed header hides on scroll-down and returns on scroll-up on the home route while staying forced-hidden on About"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.11"
+name = "4_11"
+description = "The folder open and close is a flat opacity fade with no three-dimensional rotateY rotation or Flip-style morph"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.12"
+name = "4_12"
+description = "Scrapbook items are static and cannot be dragged with the pointer"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.13"
+name = "4_13"
+description = "Hover feedback is missing on architect tags, the navigation item, and the stack covers, so the interface feels static on pointer hover"
+type = "binary"
+weight = 1.0
+negate = true

@@ -1,0 +1,1 @@
+import{v as t}from"./core.min-Dne1Y5Yk.js";import{x as h}from"./core.min-Dne1Y5Yk.js";import"./preloader-Bns9QiKi.js";const e=r=>{const[s]=t();s.past=r.past,s.present=r.present,s.future=r.future,s.branchId=r.branchId,s.branches=r.branches};export{h as _hW,e as s_5JMVZrwNjfs};

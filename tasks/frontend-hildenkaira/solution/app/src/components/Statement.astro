@@ -1,0 +1,42 @@
+---
+import data from "../data/home.json";
+import BunnyBg from "./BunnyBg.astro";
+const { h2, poster, video, testimonials } = data.statement;
+const star = `<svg class="statement_testimonial-star" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.8L18.2 21 12 17.4 5.8 21l1.4-6.8L2 9.4l7-.8L12 2Z"/></svg>`;
+---
+<section class="section_statement theme-media">
+  <div class="bg-video">
+    <div class="bg-overlay"></div>
+    <div class="bg-blur"></div>
+    <div class="image-parallax">
+      <div class="image-parallax_image" data-parallax-image>
+        <BunnyBg src={video} poster={poster} />
+      </div>
+      <div class="image-parallax_trigger is-section-100vh" data-parallax-trigger></div>
+    </div>
+  </div>
+  <div class="statement_wrapper">
+    <div class="padding-global">
+      <div class="container-col-10">
+        <div class="content_wrapper">
+          <div class="max-width-1200">
+            <h2 class="heading-l" data-animate="heading">{h2}</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="statement_testimonials">
+      {testimonials.map((t) => (
+        <div class={`statement_testimonial${t.hideMobile ? " hide-mobile" : ""}`}>
+          <div class="statement_testimonial-stars" set:html={star.repeat(5)} />
+          <blockquote class="statement_testimonial" data-split-visible>{t.quote}</blockquote>
+          <div class="statement_testimonial-caption">
+            <div class="statement_testimonial-div" data-split-visible>-</div>
+            <div class="paragraph-s" data-split-visible>{t.name}</div>
+            <div class="paragraph-xs opacity-60" data-split-visible>{t.role}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

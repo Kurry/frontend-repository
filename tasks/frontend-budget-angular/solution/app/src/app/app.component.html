@@ -1,0 +1,33 @@
+<div class="shell">
+  <header class="topbar">
+    <span class="account">{{ displayName$ | async }}</span>
+    <div class="period-nav" *ngIf="period$ | async as period">
+      <button mat-icon-button aria-label="Previous period" (click)="previousPeriod()">‹</button>
+      <span class="period-label">{{ periodLabel(period) }}</span>
+      <button mat-icon-button aria-label="Next period" (click)="nextPeriod()">›</button>
+    </div>
+  </header>
+
+  <main class="content">
+    <ng-container [ngSwitch]="view$ | async">
+      <app-dashboard *ngSwitchCase="'dashboard'"></app-dashboard>
+      <app-expenses *ngSwitchCase="'expenses'"></app-expenses>
+      <app-settings *ngSwitchCase="'settings'"></app-settings>
+    </ng-container>
+  </main>
+
+  <nav class="bottom-nav" *ngIf="view$ | async as view">
+    <button class="nav-item" [class.active]="view === 'dashboard'" (click)="setView('dashboard')">
+      <span class="nav-glyph">&#8962;</span>
+      <span>Dashboard</span>
+    </button>
+    <button class="nav-item" [class.active]="view === 'expenses'" (click)="setView('expenses')">
+      <span class="nav-glyph">&#9776;</span>
+      <span>Expenses</span>
+    </button>
+    <button class="nav-item" [class.active]="view === 'settings'" (click)="setView('settings')">
+      <span class="nav-glyph">&#9881;</span>
+      <span>Settings</span>
+    </button>
+  </nav>
+</div>

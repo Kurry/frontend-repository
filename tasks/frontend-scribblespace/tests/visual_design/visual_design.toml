@@ -1,0 +1,120 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/mcp/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "3_1"
+description = "Primary toolbar buttons compute to background #6D5BD0 with white text and the canvas background computes to the light lavender #F4F2FB, distinct from any note color."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "3_2"
+description = "Notes and flashcards render with about 8px corner rounding and a visible drop shadow, while the toolbar and mini-map panel use the larger about 12px rounding."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.3"
+name = "3_3"
+description = "Notes, flashcards, and shapes are distinguishable at a glance beyond content (flashcard shows a flip icon and Front/Back label, shapes have no text-editing chrome, circles are round)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "3_4"
+description = "A selected object shows an unmistakable accent selection outline distinct from its unselected resting state, and multiple shift-selected objects all show it simultaneously."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "3_5"
+description = "The active Connect tool and the active board tab are highlighted in the accent color, distinct from their inactive siblings."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "3_6"
+description = "The delete-confirmation UI uses the warning token #E0A030 rather than blending in as a neutral control."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.7"
+name = "3_7"
+description = "At about 375px wide the toolbar and mini-map do not overlap canvas content, no page-level horizontal scroll appears, and text stays legible."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "3_9"
+description = "The accent, canvas-background, and warning colors are not applied to the specified elements (e.g. primary buttons are not #6D5BD0, the canvas is not the light lavender, or notes lack the 8px-radius drop-shadow treatment)."
+type = "binary"
+weight = 1.0
+negate = true

@@ -1,10 +1,11 @@
 # frontend-repository
 
-Frontend-only Harbor eval tasks (`tasks/frontend-*`). Each task asks a builder
-agent to recreate a reference web application from an observable-behavior PRD
-(`instruction.md`), then judges the built app in a real browser across four
-weighted dimensions — core_features, technical, visual_design, motion — with
-`pass` at reward >= 0.7.
+65 frontend-only Harbor eval tasks (`tasks/frontend-*`) in four genres:
+good-app rebuilds, pixel-perfect website-fidelity recreations, hard browser
+apps/games, and framework rebuilds. Each task asks a builder agent to recreate
+a reference web application from an observable-behavior PRD (`instruction.md`),
+then judges the built app in a real browser across four weighted dimensions —
+core_features, technical, visual_design, motion — with `pass` at reward >= 0.7.
 
 ## Quick start
 
@@ -37,7 +38,7 @@ accelerates judging but is never itself a scoring criterion. Criteria live in
 
 ## Repository layout
 
-- `tasks/frontend-*/` — the 23 packaged tasks (instruction, environment with
+- `tasks/frontend-*/` — the 65 packaged tasks (instruction, environment with
   reference screenshots, working oracle under `solution/`, verifier under
   `tests/`). Generated — do not hand-edit shared files.
 - `scripts/` — source of truth: `package_frontend_tasks.py` (all shared

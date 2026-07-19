@@ -1,0 +1,269 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/mcp/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "1_1"
+description = "On load the browser tab title reads exactly 2025 McLaren Formula 1 Driver — Lando Norris"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "1_2"
+description = "On load a full-bleed lime preloader shows the text LOAD NORRIS and then clears within about two seconds to reveal the homepage rather than staying on screen"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "1_3"
+description = "On load the fixed nav shows the stacked LANDO NORRIS wordmark, a centered LN4 monogram mark, a lime STORE button, and a hamburger button"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "1_4"
+description = "After clicking the hamburger, a full-screen dark-green menu overlay opens listing HOME, ON TRACK, OFF TRACK, CALENDAR, the socials TikTok, Instagram, YouTube, Twitch, and business@landonorris.com"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "1_5"
+description = "When the menu is open, the HOME item is marked as the current item with a lime telemetry stroke while the other menu items are not"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "1_6"
+description = "After pressing Escape or clicking the X control, the menu overlay closes and is no longer visible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "1_7"
+description = "On load the hero shows a NEXT RACE widget containing NEXT RACE, SPA GP, and MCLAREN F1 SINCE 2019"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "1_8"
+description = "After scrolling vertically through the horizontal media section, the media row translates sideways so additional photo cards come into view without the page navigating away"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "1_9"
+description = "When hovering a helmet grid card, its base image scales up, a masked reveal image wipes in, and the card index label turns lime"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "1_10"
+description = "When hovering the social video card, the local video plays and the placeholder image fades from opaque to transparent, and leaving the card pauses the video and restores the placeholder"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "1_11"
+description = "After scrolling to the footer, a split-text brand statement fills its characters into the lime-off highlight color and a partner logo marquee scrolls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "1_12"
+description = "When hovering the STORE button and nav or footer text links, a visible hover response (split reveal or color shift toward lime) appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "1_13"
+description = "After exercising the homepage, the brand CSS custom property --color--lime computes to #d2ff00 and the body background computes to rgb(40, 44, 32), and no localStorage or sessionStorage entries have been written"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "1_14"
+description = "After exercising the preloader, menu, hover, scroll, and video workflows, no console errors or unhandled promise rejections have appeared"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "1_15"
+description = "The browser tab title reads exactly 2025 McLaren Formula 1 Driver — Lando Norris"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "1_16"
+description = "A full-bleed lime preloader showing LOAD NORRIS appears on load and then clears to reveal the homepage"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "1_17"
+description = "The fixed nav shows the stacked LANDO NORRIS wordmark, a centered LN4 monogram mark, a lime STORE button, and a hamburger button"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "1_18"
+description = "Clicking the hamburger opens a full-screen menu overlay listing HOME, ON TRACK, OFF TRACK, CALENDAR, the socials TikTok, Instagram, YouTube, Twitch, and business@landonorris.com"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "1_19"
+description = "In the open menu the HOME item is the current item marked with a lime telemetry stroke while ON TRACK, OFF TRACK, and CALENDAR are not"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "1_20"
+description = "The menu overlay closes both when its X control is clicked and when the Escape key is pressed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "1_21"
+description = "The hero shows a NEXT RACE widget containing the labels NEXT RACE, SPA GP, and MCLAREN F1 SINCE 2019"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "1_22"
+description = "A helmet grid shows at least three tall masked helmet cards"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "1_23"
+description = "A collaborators strip shows a marquee of at least five partner logos (Mind, PS4, Quadrant, Tumi, Ralph Lauren)"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "1.24"
+name = "1_24"
+description = "A social video card shows a still placeholder image layered over a muted looping local video element"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "1_25"
+description = "The footer shows a large brand statement, a partner logo marquee, the LANDO NORRIS wordmark, and legal links Privacy Policy, Terms, and Cookies"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "1_26"
+description = "Activating any nav or footer chrome scrolls within the homepage or performs a no-op without reloading the document or leaving the origin"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "1_27"
+description = "The menu overlay never opens or is only a static always-visible list rather than a hamburger-triggered full-screen overlay"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.28"
+name = "1_28"
+description = "Nav or footer chrome uses outbound anchor navigation that reloads the page or leaves the app to another origin"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.29"
+name = "1_29"
+description = "The hero omits the NEXT RACE widget or its SPA GP and MCLAREN F1 SINCE 2019 labels"
+type = "binary"
+weight = 0.5
+negate = true
+optional = true

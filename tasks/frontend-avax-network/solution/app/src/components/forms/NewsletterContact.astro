@@ -1,0 +1,519 @@
+---
+const countries = [
+  "United States",
+  "United Kingdom",
+  "Canada",
+  "Germany",
+  "France",
+  "Japan",
+  "Singapore",
+  "Australia",
+  "Brazil",
+  "India",
+  "South Korea",
+  "Netherlands",
+  "Switzerland",
+  "United Arab Emirates",
+  "Other",
+];
+
+const interests = [
+  "DeFi",
+  "Enterprise & Institutions",
+  "Gaming",
+  "Art & Culture",
+  "Development",
+  "Policy",
+  "Unsure",
+];
+
+const hearAbout = [
+  "Social Media (Twitter/X, LinkedIn, Telegram, etc.)",
+  "Word of Mouth",
+  "Event",
+  "Article, press release, or other news source",
+  "Search engine",
+];
+
+const projectTypes = [
+  "DeFi",
+  "Enterprise & Institutions",
+  "Gaming",
+  "Art & Culture",
+  "Development",
+  "Other",
+];
+
+const btnShape = {
+  rounded: "clamp(0.625rem, 0.196rem + 0.67vw, 1rem)",
+  roundedMobile: "clamp(0.875rem, 0.803rem + 0.309vw, 1rem)",
+  cornerRounded: "clamp(0.25rem, 0.107rem + 0.223vw, 0.375rem)",
+  cornerRoundedMobile: "clamp(0.313rem, 0.276rem + 0.154vw, 0.375rem)",
+  cornerSize: "clamp(1.125rem, -0.161rem + 2.009vw, 2.25rem)",
+  cornerSizeMobile: "clamp(2rem, 1.855rem + 0.617vw, 2.25rem)",
+};
+
+const nextShape = {
+  rounded: "clamp(0.563rem, 0.063rem + 0.781vw, 1rem)",
+  roundedMobile: "clamp(0.875rem, 0.803rem + 0.309vw, 1rem)",
+  cornerRounded: "clamp(0.188rem, -0.027rem + 0.335vw, 0.375rem)",
+  cornerRoundedMobile: "clamp(0.313rem, 0.276rem + 0.154vw, 0.375rem)",
+  cornerSize: "clamp(1.125rem, -0.161rem + 2.009vw, 2.25rem)",
+  cornerSizeMobile: "clamp(2rem, 1.855rem + 0.617vw, 2.25rem)",
+};
+---
+
+<section id="newsletter" class="relative w-full">
+  <div
+    class="group/section animate-in-view relative grid w-full grid-cols-1 place-items-stretch rounded-[var(--radius-4xl)] px-[var(--padding-md)] py-[var(--padding-2xl)] transition-mode lg:grid-cols-2 lg:gap-[var(--gap-md)] lg:p-[var(--padding-2xl)] dark:bg-dark"
+  >
+    <div class="relative flex min-h-0 flex-col items-start justify-between gap-[var(--gap-md)] overflow-hidden rounded-[var(--radius-4xl)] border border-neutral-800 p-[var(--padding-md)] lg:min-h-[26.5625rem] lg:pr-[var(--padding-3xl)]">
+      <div class="absolute inset-0">
+        <img
+          src="/_astro/builders.oWIKOdWm_Z41nrs.webp"
+          alt="builders background"
+          loading="lazy"
+          decoding="async"
+          width="1600"
+          height="962"
+          class="size-[175%] origin-bottom-right rotate-30 object-cover object-[100%_100%] transition-all duration-0 delay-0 ease-out-quart group-[.visible]/section:rotate-0 group-[.visible]/section:object-[0%_0%] group-[.visible]/section:duration-2000"
+        />
+        <div class="absolute inset-0 bg-gradient-to-r from-black to-transparent"></div>
+      </div>
+      <div class="relative z-[1] flex w-full flex-col items-start justify-start gap-[var(--gap-base)]">
+        <h2 class="h4 max-w-full leading-none text-white uppercase">Start building On Avalanche</h2>
+        <p class="lg text-white">Create, scale, and innovate with Avalanche’s powerful builder infrastructure.</p>
+      </div>
+      <a class="group/button button arrow white relative z-[1] inline-flex justify-self-start" href="https://build.avax.network" target="_blank" rel="noopener">
+        <wm-shape
+          id="button"
+          rounded={btnShape.rounded}
+          rounded-mobile={btnShape.roundedMobile}
+          corner-rounded={btnShape.cornerRounded}
+          corner-rounded-mobile={btnShape.cornerRoundedMobile}
+          corner-size={btnShape.cornerSize}
+          corner-size-mobile={btnShape.cornerSizeMobile}
+        ></wm-shape>
+        Get Started
+      </a>
+    </div>
+
+    <div class="relative flex min-h-0 flex-col items-start justify-between gap-[var(--gap-xl)] rounded-[var(--radius-4xl)] border border-neutral-800 py-[var(--padding-md)] lg:min-h-[26.5625rem] lg:gap-[var(--gap-md)]">
+      <div class="absolute inset-0 overflow-hidden rounded-[var(--radius-4xl)]">
+        <img
+          src="/_astro/blue-small.Dg63iOEP_1Vozcs.webp"
+          alt=""
+          loading="lazy"
+          decoding="async"
+          width="800"
+          height="800"
+          class="h-full w-full object-cover opacity-40"
+        />
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent"></div>
+      </div>
+      <div class="relative z-[1] flex w-full flex-col items-start justify-start gap-[var(--gap-xl)] lg:gap-[var(--gap-md)]">
+        <h2 class="h4 px-[var(--padding-md)] leading-none text-balance text-white uppercase lg:pr-[var(--padding-2xl)]">
+          Join the Email List
+        </h2>
+        <p class="lg -mt-[var(--gap-lg)] px-[var(--padding-md)] text-white lg:pr-[var(--padding-2xl)]">
+          Sign up today to stay up to date on the latest network developments.
+        </p>
+        <form
+          id="general-form"
+          style="--step: 1; --total-steps: 5;"
+          class="group/form light flex w-full flex-col items-stretch justify-start gap-[var(--gap-xs)] overflow-x-clip p-[var(--padding-md)] lg:pr-[var(--padding-2xl)]"
+          data-form="newsletter"
+          onsubmit="return false;"
+        >
+          <div
+            id="form-steps-wrapper"
+            class="relative z-[2] flex w-full flex-row items-start justify-start gap-[calc(var(--gap-2xl)+1px)] transition-transform duration-1000 ease-in-out-quart will-change-transform"
+          >
+            <!-- Step 1 -->
+            <div class="grid w-full shrink-0 grid-cols-1 place-items-stretch gap-[var(--gap-xs)] sm:grid-cols-2">
+              <div class="relative group/inputWrapper">
+                <input id="firstname" type="text" name="firstname" placeholder="First Name or Pseudonym" required minlength="2" class="input peer" autocomplete="given-name" />
+                <label for="firstname" class="pointer-events-none absolute top-1/2 left-[var(--padding-md)] origin-top-left -translate-y-1/2 font-aeonik text-base font-bold text-black transition-all duration-500 ease-in-out-cubic peer-placeholder-shown:scale-100 peer-placeholder-shown:opacity-100 peer-focus:scale-75 peer-focus:-translate-y-[150%] peer-focus:opacity-60 peer-[:not(:placeholder-shown)]:scale-75 peer-[:not(:placeholder-shown)]:-translate-y-[150%] peer-[:not(:placeholder-shown)]:opacity-60 dark:group-[.light]/form:text-white">First Name or Pseudonym*</label>
+              </div>
+              <div class="relative group/inputWrapper">
+                <input id="lastname" type="text" name="lastname" placeholder="Last Name" class="input peer" autocomplete="family-name" />
+                <label for="lastname" class="pointer-events-none absolute top-1/2 left-[var(--padding-md)] origin-top-left -translate-y-1/2 font-aeonik text-base font-bold text-black transition-all duration-500 ease-in-out-cubic peer-placeholder-shown:scale-100 peer-placeholder-shown:opacity-100 peer-focus:scale-75 peer-focus:-translate-y-[150%] peer-focus:opacity-60 peer-[:not(:placeholder-shown)]:scale-75 peer-[:not(:placeholder-shown)]:-translate-y-[150%] peer-[:not(:placeholder-shown)]:opacity-60 dark:group-[.light]/form:text-white">Last Name</label>
+              </div>
+              <div class="relative group/inputWrapper">
+                <input id="email" type="email" name="email" placeholder="Email" required class="input peer" autocomplete="email" />
+                <label for="email" class="pointer-events-none absolute top-1/2 left-[var(--padding-md)] origin-top-left -translate-y-1/2 font-aeonik text-base font-bold text-black transition-all duration-500 ease-in-out-cubic peer-placeholder-shown:scale-100 peer-placeholder-shown:opacity-100 peer-focus:scale-75 peer-focus:-translate-y-[150%] peer-focus:opacity-60 peer-[:not(:placeholder-shown)]:scale-75 peer-[:not(:placeholder-shown)]:-translate-y-[150%] peer-[:not(:placeholder-shown)]:opacity-60 dark:group-[.light]/form:text-white">Email*</label>
+              </div>
+              <div class="relative group/inputWrapper">
+                <input id="twitterhandle" type="text" name="twitterhandle" placeholder="Twitter Handle" class="input peer" autocomplete="username" />
+                <label for="twitterhandle" class="pointer-events-none absolute top-1/2 left-[var(--padding-md)] origin-top-left -translate-y-1/2 font-aeonik text-base font-bold text-black transition-all duration-500 ease-in-out-cubic peer-placeholder-shown:scale-100 peer-placeholder-shown:opacity-100 peer-focus:scale-75 peer-focus:-translate-y-[150%] peer-focus:opacity-60 peer-[:not(:placeholder-shown)]:scale-75 peer-[:not(:placeholder-shown)]:-translate-y-[150%] peer-[:not(:placeholder-shown)]:opacity-60 dark:group-[.light]/form:text-white">Twitter Handle</label>
+              </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="grid w-full shrink-0 grid-cols-1 place-items-stretch gap-[var(--gap-xs)] sm:grid-cols-2">
+              <div class="relative group/inputWrapper col-span-full light [--rows:2]">
+                <select id="country" name="country" required class="input peer appearance-none empty" autocomplete="country">
+                  <option value="" selected disabled>Where are you based?*</option>
+                  {countries.map((c) => <option value={c}>{c}</option>)}
+                </select>
+              </div>
+              <div class="group/selectWrapper relative z-[1] col-span-full flex flex-col items-stretch justify-start">
+                <div class="relative z-[2] h-18 lg:h-[clamp(4rem,3.429rem+0.893vw,4.5rem)]">
+                  <div id="select-vertical" data-name="vertical" class="select group/select relative min-h-18 overflow-hidden bg-white p-0 input dark:group-[.light]/form:bg-dark lg:min-h-[clamp(4rem,3.429rem+0.893vw,4.5rem)]">
+                    <button id="select-vertical-button" type="button" class="relative flex h-18 w-full cursor-pointer flex-row items-center justify-between px-[var(--padding-md)] text-left font-aeonik text-base font-bold text-black lg:h-[clamp(4rem,3.429rem+0.893vw,4.5rem)] dark:group-[.light]/form:text-white">
+                      <span class="pointer-events-none pr-[calc(1rem+var(--padding-lg))]">What are you most interested in learning about?*</span>
+                    </button>
+                    <div id="select-vertical-options" class="flex w-full flex-row flex-wrap items-start justify-start gap-0.5 px-[var(--padding-md)] pt-[var(--padding-xs)] pb-[var(--padding-2base)]">
+                      {interests.map((opt) => (
+                        <button type="button" data-option-value={opt} class="option inline-block h-10 cursor-pointer rounded-lg border border-neutral-200 px-[var(--padding-base)] font-aeonik text-xs/none font-bold whitespace-nowrap text-black transition-mode hover:bg-neutral-100 dark:group-[.light]/form:border-neutral-800 dark:group-[.light]/form:text-white dark:group-[.light]/form:hover:bg-neutral-900">
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="grid w-full shrink-0 grid-cols-1 place-items-stretch gap-[var(--gap-xs)] sm:grid-cols-2">
+              <div id="conditional-input-developer_check" class="group/conditional input col-span-full flex items-center justify-between pr-[var(--padding-md)]">
+                <label for="developer_check" class="text-base text-black dark:group-[.light]/form:text-white">Are you a developer?*</label>
+                <input id="developer_check" name="developer_check" type="checkbox" class="size-5 accent-[var(--color-red)]" />
+              </div>
+              <div class="group/conditional input col-span-full flex items-center justify-between pr-[var(--padding-md)]">
+                <label for="devexperience_avalanche" class="text-base text-black dark:group-[.light]/form:text-white">Do you have experience building in Web3?</label>
+                <input id="devexperience_avalanche" name="devexperience_avalanche" type="checkbox" class="size-5 accent-[var(--color-red)]" />
+              </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="grid w-full shrink-0 grid-cols-1 place-items-stretch gap-[var(--gap-xs)] sm:grid-cols-2">
+              <div id="conditional-input-student_check" class="group/conditional input col-span-full flex items-center justify-between pr-[var(--padding-md)]">
+                <label for="student_check" class="text-base text-black dark:group-[.light]/form:text-white">Are you currently a university student?</label>
+                <input id="student_check" name="student_check" type="checkbox" class="size-5 accent-[var(--color-red)]" />
+              </div>
+              <div class="group/selectWrapper relative z-[1] col-span-full flex flex-col items-stretch justify-start">
+                <div class="relative z-[2] h-18 lg:h-[clamp(4rem,3.429rem+0.893vw,4.5rem)]">
+                  <div id="select-source" data-name="source" class="select group/select relative min-h-18 overflow-hidden bg-white p-0 input dark:group-[.light]/form:bg-dark lg:min-h-[clamp(4rem,3.429rem+0.893vw,4.5rem)]">
+                    <button id="select-source-button" type="button" class="relative flex h-18 w-full cursor-pointer flex-row items-center justify-between px-[var(--padding-md)] text-left font-aeonik text-base font-bold text-black lg:h-[clamp(4rem,3.429rem+0.893vw,4.5rem)] dark:group-[.light]/form:text-white">
+                      <span class="pointer-events-none pr-[calc(1rem+var(--padding-lg))]">Where did you hear about Avalanche?</span>
+                    </button>
+                    <div id="select-source-options" class="flex w-full flex-row flex-wrap items-start justify-start gap-0.5 px-[var(--padding-md)] pt-[var(--padding-xs)] pb-[var(--padding-2base)]">
+                      {hearAbout.map((opt) => (
+                        <button type="button" data-option-value={opt} class="option inline-block h-10 cursor-pointer rounded-lg border border-neutral-200 px-[var(--padding-base)] font-aeonik text-xs/none font-bold whitespace-nowrap text-black transition-mode hover:bg-neutral-100 dark:group-[.light]/form:border-neutral-800 dark:group-[.light]/form:text-white">
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="flex w-full shrink-0 flex-col items-start justify-start gap-[var(--gap-xs)] self-end text-white">
+              <label for="general-gdpr" class="group/checkboxWrapper relative flex flex-row items-center justify-start gap-[var(--gap-xs)]">
+                <input id="general-gdpr" name="gdpr" type="checkbox" required class="size-4 accent-[var(--color-red)]" />
+                <span class="text-[var(--text-sm)]">I have read and agree to the privacy policy.</span>
+              </label>
+              <label class="group/checkboxWrapper relative flex flex-row items-center justify-start gap-[var(--gap-xs)]">
+                <input name="marketing_consent" type="checkbox" class="size-4 accent-[var(--color-red)]" />
+                <span class="text-[var(--text-sm)]">I agree to receive marketing emails from the Avalanche Foundation.</span>
+              </label>
+              <label class="group/checkboxWrapper relative flex flex-row items-center justify-start gap-[var(--gap-xs)]">
+                <input name="newsletter" type="checkbox" class="size-4 accent-[var(--color-red)]" />
+                <span class="text-[var(--text-sm)]">I'd also like to subscribe to the Avalanche newsletter.</span>
+              </label>
+            </div>
+
+            <!-- Done placeholder -->
+            <div class="flex w-full shrink-0 flex-row items-center justify-start gap-[var(--gap-base)] self-end text-white"></div>
+          </div>
+
+          <div class="flex flex-row flex-wrap items-center justify-between gap-[var(--gap-xs)] px-px transition-opacity duration-300 ease-out-cubic group-[.done]/form:pointer-events-none group-[.done]/form:opacity-0 sm:flex-nowrap sm:justify-end md:h-[clamp(4rem,3.711rem+1.235vw,4.5rem)] lg:h-[clamp(2.375rem,-0.054rem+3.795vw,4.5rem)]">
+            <button
+              class="group/button button arrow secondary white flip order-3 !translate-y-0 transition-transform duration-1000 ease-in-out-quart sm:order-0"
+              id="form-steps-back"
+              type="button"
+            >
+              <wm-shape
+                id="button"
+                rounded={btnShape.rounded}
+                rounded-mobile={btnShape.roundedMobile}
+                corner-rounded={btnShape.cornerRounded}
+                corner-rounded-mobile={btnShape.cornerRoundedMobile}
+                corner-size={btnShape.cornerSize}
+                corner-size-mobile={btnShape.cornerSizeMobile}
+              ></wm-shape>
+              Back
+            </button>
+            <p id="form-steps-counter" class="text-white">
+              <span class="inline-block w-5 text-right" id="step-counter">1</span> of <span id="total-steps">5</span> Steps
+            </p>
+            <div
+              id="form-steps-progress"
+              class="relative h-px w-full shrink-0 rounded-full bg-neutral-200 sm:flex-1 before:absolute before:-top-px before:left-0 before:h-[3px] before:w-[calc(var(--step)*100%/var(--total-steps))] before:rounded-full before:bg-white before:transition-[width] before:duration-1000 before:ease-in-out-quart"
+            ></div>
+            <button class="group/button button arrow red-light order-4 shrink-0 group-[.loading]/form:animate-pulse" id="form-steps-next" type="button">
+              <wm-shape
+                id="button"
+                rounded={nextShape.rounded}
+                rounded-mobile={nextShape.roundedMobile}
+                corner-rounded={nextShape.cornerRounded}
+                corner-rounded-mobile={nextShape.cornerRoundedMobile}
+                corner-size={nextShape.cornerSize}
+                corner-size-mobile={nextShape.cornerSizeMobile}
+              ></wm-shape>
+              <span class="pointer-events-none absolute transition-opacity duration-300 ease-out-cubic group-[.submit]/form:opacity-0 group-[.error]/form:opacity-0 group-[.done]/form:opacity-0">Next</span>
+              <span class="pointer-events-none absolute opacity-0 transition-opacity duration-300 ease-out-cubic group-[.submit]/form:opacity-100 group-[.done]/form:opacity-0">Submit</span>
+              <span class="pointer-events-none absolute opacity-0 transition-opacity duration-300 ease-out-cubic group-[.done]/form:opacity-100">Success!</span>
+            </button>
+          </div>
+          <p class="success hidden text-[var(--text-sm)] text-success">Thank you for subscribing</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact-us" class="relative w-full">
+  <div
+    class="group/section animate-in-view corner-background-top relative flex h-full w-full flex-col items-stretch justify-start gap-[var(--gap-xl)] rounded-t-[var(--radius-4xl)] fill-white px-[var(--padding-md)] py-[var(--padding-3xl)] transition-mode lg:p-[var(--padding-3xl)] lg:pr-[var(--padding-2xl)] dark:fill-dark"
+  >
+    <wm-shape
+      id="contact-us-background"
+      rounded="clamp(1rem, -0.143rem + 1.786vw, 2rem)"
+      rounded-mobile="clamp(1rem, 0.421rem + 2.469vw, 2rem)"
+      corner-rounded="clamp(0.75rem, -0.107rem + 1.339vw, 1.5rem)"
+      corner-rounded-mobile="clamp(0.75rem, -0.107rem + 1.339vw, 1.5rem)"
+      corner-size="clamp(4.5rem, -0.071rem + 7.143vw, 8.5rem)"
+      corner-size-mobile="clamp(3.5rem, 0.606rem + 12.346vw, 8.5rem)"
+      stroke-width="1"
+      corner="tl"
+    ></wm-shape>
+
+    <div class="grid grid-cols-1 place-items-start gap-[var(--gap-xl)] overflow-x-clip border-b border-neutral-200 pb-[var(--padding-xl)] transition-mode dark:border-neutral-800">
+      <div class="flex flex-col items-start justify-end gap-[var(--gap-xl)] sm:flex-row sm:items-center lg:items-end">
+        <svg
+          viewBox="0 0 128 128"
+          fill="none"
+          class="w-[clamp(4rem,1.975rem+8.642vw,7.5rem)] shrink-0 -translate-x-[calc(100%+1px)] transition-move group-[.visible]/section:translate-x-0 group-[.visible]/section:delay-500 lg:w-[clamp(4rem,0rem+6.25vw,7.5rem)] lg:self-start dark:text-white"
+          aria-hidden="true"
+        >
+          <path d="M8 0V120H24.58H128" stroke="currentColor" stroke-width="12.5%"></path>
+          <path d="M8 120L122.15 5.84961" stroke="currentColor" stroke-width="12.5%"></path>
+        </svg>
+        <h2 class="h4 max-w-256 split-heading text-balance leading-none uppercase dark:text-white">Contact us</h2>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 place-items-stretch items-start gap-[var(--gap-xl)] lg:grid-cols-2">
+      <div class="flex flex-col items-start gap-[var(--gap-md)]">
+        <h3 class="h6 split-text text-balance uppercase">
+          Interested in building your project on Avalanche? Get in touch!
+        </h3>
+      </div>
+      <form id="contact-us-form" class="group/form light grid place-items-stretch gap-[var(--gap-xs)] sm:grid-cols-2" data-form="contact" onsubmit="return false;">
+        <div class="relative group/inputWrapper">
+          <input id="contact-firstname" type="text" name="firstname" placeholder="First Name or Pseudonym" required minlength="2" class="input peer h-18" />
+          <label for="contact-firstname" class="pointer-events-none absolute top-1/2 left-[var(--padding-md)] origin-top-left -translate-y-1/2 font-aeonik text-base font-bold text-black transition-all duration-500 ease-in-out-cubic peer-placeholder-shown:scale-100 peer-placeholder-shown:opacity-100 peer-focus:scale-75 peer-focus:-translate-y-[150%] peer-focus:opacity-60 peer-[:not(:placeholder-shown)]:scale-75 peer-[:not(:placeholder-shown)]:-translate-y-[150%] peer-[:not(:placeholder-shown)]:opacity-60 dark:group-[.light]/form:text-white">First Name or Pseudonym*</label>
+        </div>
+        <div class="relative group/inputWrapper">
+          <input id="contact-lastname" type="text" name="lastname" placeholder="Last Name" required minlength="2" class="input peer h-18" />
+          <label for="contact-lastname" class="pointer-events-none absolute top-1/2 left-[var(--padding-md)] origin-top-left -translate-y-1/2 font-aeonik text-base font-bold text-black transition-all duration-500 ease-in-out-cubic peer-placeholder-shown:scale-100 peer-placeholder-shown:opacity-100 peer-focus:scale-75 peer-focus:-translate-y-[150%] peer-focus:opacity-60 peer-[:not(:placeholder-shown)]:scale-75 peer-[:not(:placeholder-shown)]:-translate-y-[150%] peer-[:not(:placeholder-shown)]:opacity-60 dark:group-[.light]/form:text-white">Last Name*</label>
+        </div>
+        <div class="relative group/inputWrapper col-span-full">
+          <input id="contact-email" type="email" name="email" placeholder="Email" required class="input peer h-18" />
+          <label for="contact-email" class="pointer-events-none absolute top-1/2 left-[var(--padding-md)] origin-top-left -translate-y-1/2 font-aeonik text-base font-bold text-black transition-all duration-500 ease-in-out-cubic peer-placeholder-shown:scale-100 peer-placeholder-shown:opacity-100 peer-focus:scale-75 peer-focus:-translate-y-[150%] peer-focus:opacity-60 peer-[:not(:placeholder-shown)]:scale-75 peer-[:not(:placeholder-shown)]:-translate-y-[150%] peer-[:not(:placeholder-shown)]:opacity-60 dark:group-[.light]/form:text-white">Email*</label>
+        </div>
+
+        <div class="group/selectWrapper relative z-[1] col-span-full flex flex-col items-stretch justify-start transition-[height] duration-750 ease-in-out-quart [--rows:3] lg:[--rows:2]">
+          <div class="relative z-[2] h-18 lg:h-[clamp(4rem,3.429rem+0.893vw,4.5rem)]">
+            <div
+              id="select-project_type"
+              data-name="project_type"
+              class="select group/select relative min-h-18 overflow-hidden bg-white p-0 input dark:group-[.light]/form:bg-dark lg:min-h-[clamp(4rem,3.429rem+0.893vw,4.5rem)]"
+              style="transition: min-height 750ms var(--ease-in-out-quart), border-color 300ms var(--ease-out-cubic), background-color 300ms var(--ease-out-cubic);"
+            >
+              <button
+                id="select-project_type-button"
+                type="button"
+                class="relative flex h-18 w-full cursor-pointer flex-row items-center justify-between px-[var(--padding-md)] text-left font-aeonik text-base font-bold text-black select-none transition-mode lg:h-[clamp(4rem,3.429rem+0.893vw,4.5rem)] dark:group-[.light]/form:text-white"
+              >
+                <span class="pointer-events-none pr-[calc(1rem+var(--padding-lg))] lg:pr-[calc(clamp(0.75rem,0.464rem+0.446vw,1rem)+var(--padding-lg))]">What type of project are you working on?*</span>
+                <svg viewBox="0 0 128 128" fill="none" class="pointer-events-none size-[clamp(0.5rem,0.355rem+0.617vw,0.75rem)] shrink-0 -rotate-45 text-red transition-transform duration-750 ease-in-out-quart group-[.opened]/select:-rotate-225 lg:size-[clamp(0.5rem,0.214rem+0.446vw,0.75rem)]">
+                  <path d="M8 0V120H24.58H128" stroke="currentcolor" stroke-width="12.5%"></path>
+                  <path d="M8 120L122.15 5.84961" stroke="currentcolor" stroke-width="12.5%"></path>
+                </svg>
+              </button>
+              <div id="select-project_type-options" class="flex w-full flex-row flex-wrap items-start justify-start gap-0.5 px-[var(--padding-md)] pt-[var(--padding-xs)] pb-[var(--padding-2base)]">
+                {projectTypes.map((opt) => (
+                  <button type="button" data-option-value={opt} class="option inline-block h-10 cursor-pointer rounded-lg border border-neutral-200 px-[var(--padding-base)] font-aeonik text-xs/none font-bold whitespace-nowrap text-black transition-mode hover:bg-neutral-100 dark:group-[.light]/form:border-neutral-800 dark:group-[.light]/form:text-white dark:group-[.light]/form:hover:bg-neutral-900">
+                    {opt}
+                  </button>
+                ))}
+              </div>
+              <input type="hidden" name="project_type" value="" />
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="project_type_other-wrapper"
+          class="col-span-full h-0 overflow-clip transition-[height] duration-750 ease-in-out-quart [.visible]:h-[calc(4.5rem+var(--padding-xs))] lg:[.visible]:h-[calc(clamp(4rem,3.429rem+0.893vw,4.5rem)+var(--padding-xs))]"
+        >
+          <div class="relative group/inputWrapper">
+            <input id="project_type_other" type="text" name="project_type_other" placeholder="Let us know what type of project you are working on" disabled class="input peer h-18" />
+            <label for="project_type_other" class="pointer-events-none absolute top-1/2 left-[var(--padding-md)] origin-top-left -translate-y-1/2 font-aeonik text-base font-bold text-black peer-placeholder-shown:opacity-100 dark:group-[.light]/form:text-white">Let us know what type of project you are working on</label>
+          </div>
+        </div>
+
+        <div class="relative group/inputWrapper col-span-full -mt-[var(--padding-xs)]">
+          <textarea
+            id="avalanche_contact_message"
+            class="input peer h-[clamp(6rem,4.857rem+1.786vw,7rem)] w-full resize-none py-[var(--padding-md)]"
+            name="avalanche_contact_message"
+            placeholder="Share your message with the team"
+            required
+          ></textarea>
+          <label for="avalanche_contact_message" class="pointer-events-none absolute top-[var(--padding-md)] left-[var(--padding-md)] origin-top-left font-aeonik text-base font-bold text-black transition-all duration-500 ease-in-out-cubic peer-placeholder-shown:opacity-100 peer-focus:scale-75 peer-focus:opacity-60 peer-[:not(:placeholder-shown)]:scale-75 peer-[:not(:placeholder-shown)]:opacity-60 dark:group-[.light]/form:text-white">Share your message with the team*</label>
+        </div>
+
+        <div class="relative col-span-full flex flex-col items-start justify-between gap-[var(--gap-base)] sm:flex-row sm:gap-[var(--gap-xl)]">
+          <div class="flex h-full flex-1 flex-col items-start justify-start gap-[var(--gap-xs)]">
+            <label for="contact-us-gdpr" class="group/checkboxWrapper relative flex flex-row items-center justify-start gap-[var(--gap-xs)] text-[length:var(--text-sm)] leading-[1.2] text-neutral-500 dark:text-neutral-300">
+              <input
+                name="gdpr"
+                id="contact-us-gdpr"
+                type="checkbox"
+                required
+                class="size-6 shrink-0 accent-[var(--color-red)] lg:size-[clamp(0.75rem,-0.107rem+1.339vw,1.5rem)]"
+              />
+              <span>I have read the <a href="/legal/privacy-policy" class="text-red underline">Privacy policy</a>.</span>
+            </label>
+            <label for="contact-us-marketing" class="group/checkboxWrapper relative flex flex-row items-center justify-start gap-[var(--gap-xs)] text-[length:var(--text-sm)] leading-[1.2] text-neutral-500 dark:text-neutral-300">
+              <input
+                name="marketing_consent"
+                id="contact-us-marketing"
+                type="checkbox"
+                class="size-6 shrink-0 accent-[var(--color-red)] lg:size-[clamp(0.75rem,-0.107rem+1.339vw,1.5rem)]"
+              />
+              <span>I consent to receive Avalanche updates from the Avalanche Foundation and understand I can unsubscribe at any time.</span>
+            </label>
+          </div>
+          <button id="contact-us-form-button" type="submit" class="group/button button arrow w-full shrink-0 sm:w-auto">
+            <wm-shape
+              id="button"
+              rounded={btnShape.rounded}
+              rounded-mobile={btnShape.roundedMobile}
+              corner-rounded={btnShape.cornerRounded}
+              corner-rounded-mobile={btnShape.cornerRoundedMobile}
+              corner-size={btnShape.cornerSize}
+              corner-size-mobile={btnShape.cornerSizeMobile}
+            ></wm-shape>
+            Submit
+          </button>
+        </div>
+        <p class="success hidden col-span-full text-[var(--text-sm)] text-success">Success! We'll be in touch.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Newsletter multi-step
+  (() => {
+    const form = document.getElementById("general-form") as HTMLFormElement | null;
+    const wrapper = document.getElementById("form-steps-wrapper") as HTMLElement | null;
+    const next = document.getElementById("form-steps-next") as HTMLButtonElement | null;
+    const back = document.getElementById("form-steps-back") as HTMLButtonElement | null;
+    const counter = document.getElementById("step-counter");
+    if (!form || !wrapper || !next || !back || !counter) return;
+
+    const total = 5;
+    let step = 0;
+    form.style.setProperty("--total-steps", String(total));
+    form.style.setProperty("--step", "1");
+
+    const go = (n: number) => {
+      step = Math.max(0, Math.min(total - 1, n));
+      wrapper.style.transform = `translateX(calc(-${step} * (100% + var(--gap-2xl) + 1px)))`;
+      form.style.setProperty("--step", String(step + 1));
+      counter.textContent = String(step + 1);
+      back.style.visibility = step === 0 ? "hidden" : "visible";
+      form.classList.toggle("submit", step === total - 1);
+    };
+    go(0);
+
+    next.addEventListener("click", () => {
+      if (step < total - 1) {
+        go(step + 1);
+        return;
+      }
+      form.classList.add("loading");
+      setTimeout(() => {
+        form.classList.remove("loading");
+        form.classList.add("done");
+        const success = form.querySelector(".success");
+        success?.classList.remove("hidden");
+      }, 500);
+    });
+    back.addEventListener("click", () => go(step - 1));
+
+    // chip selects inside newsletter
+    document.querySelectorAll("#general-form .select").forEach((sel) => {
+      const btn = sel.querySelector("button");
+      const label = btn?.querySelector("span");
+      sel.querySelectorAll<HTMLButtonElement>(".option").forEach((opt) => {
+        opt.addEventListener("click", () => {
+          sel.querySelectorAll(".option").forEach((o) => o.classList.remove("bg-neutral-100"));
+          opt.classList.add("bg-neutral-100");
+          if (label) label.textContent = opt.dataset.optionValue || label.textContent || "";
+          sel.classList.remove("opened");
+        });
+      });
+      btn?.addEventListener("click", () => sel.classList.toggle("opened"));
+    });
+  })();
+
+  // Contact custom select
+  (() => {
+    const sel = document.getElementById("select-project_type");
+    const btn = document.getElementById("select-project_type-button");
+    const hidden = document.querySelector<HTMLInputElement>('#select-project_type input[name="project_type"]');
+    const otherWrap = document.getElementById("project_type_other-wrapper");
+    const otherInput = document.getElementById("project_type_other") as HTMLInputElement | null;
+    if (!sel || !btn || !hidden) return;
+    const label = btn.querySelector("span");
+    btn.addEventListener("click", () => sel.classList.toggle("opened"));
+    sel.querySelectorAll<HTMLButtonElement>(".option").forEach((opt) => {
+      opt.addEventListener("click", () => {
+        const val = opt.dataset.optionValue || "";
+        hidden.value = val;
+        if (label) label.textContent = val;
+        sel.classList.remove("opened");
+        sel.classList.add("selected");
+        const isOther = val.includes("Other");
+        otherWrap?.classList.toggle("visible", isOther);
+        if (otherInput) {
+          otherInput.disabled = !isOther;
+          if (!isOther) otherInput.value = "";
+        }
+      });
+    });
+  })();
+
+  document.querySelectorAll<HTMLFormElement>("[data-form='contact']").forEach((form) => {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      form.classList.add("loading");
+      const success = form.querySelector(".success");
+      setTimeout(() => {
+        form.classList.remove("loading");
+        success?.classList.remove("hidden");
+        form.reset();
+      }, 600);
+    });
+  });
+</script>

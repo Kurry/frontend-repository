@@ -1,0 +1,128 @@
+[
+  {
+    "alt": "Republic",
+    "stem": "Republic_Image_Z2lOn4B",
+    "from": "#668CFF",
+    "via": "#0049FF",
+    "to": "#003199"
+  },
+  {
+    "alt": "Blackrock",
+    "stem": "8_LEDFE",
+    "from": "#FFE766",
+    "via": "#FFCE00",
+    "to": "#B38F00"
+  },
+  {
+    "alt": "Kinexys",
+    "stem": "Kinexis_Image_Zslq7o",
+    "from": "#66F1F4",
+    "via": "#05E7EC",
+    "to": "#02969A"
+  },
+  {
+    "alt": "Citi",
+    "stem": "9_ZG8gpk",
+    "from": "#6690F0",
+    "via": "#255BE3",
+    "to": "#193B99"
+  },
+  {
+    "alt": "Tixbase",
+    "stem": "29_28A5zg",
+    "from": "#FF090D",
+    "via": "#F48263",
+    "to": "#F48263"
+  },
+  {
+    "alt": "sitickets",
+    "stem": "5__1___1__Z1KzF5O",
+    "from": "#F77A74",
+    "via": "#EE3B33",
+    "to": "#9A211C"
+  },
+  {
+    "alt": "Off The Grid",
+    "stem": "Off_WigCX",
+    "from": "#FF090D",
+    "via": "#77001B",
+    "to": "#77001B"
+  },
+  {
+    "alt": "Gunzilla",
+    "stem": "18__1___1__2OEou",
+    "from": "#D9FF5A",
+    "via": "#AFFF01",
+    "to": "#7A9900"
+  },
+  {
+    "alt": "MapleStory",
+    "stem": "32__1__cOOlt",
+    "from": "#A509FF",
+    "via": "#430076",
+    "to": "#430076"
+  },
+  {
+    "alt": "Beam",
+    "stem": "17__1__l9yT8",
+    "from": "#FF5500",
+    "via": "#88E8B8",
+    "to": "#88E8B8"
+  },
+  {
+    "alt": "LFJ",
+    "stem": "29_1Dt1tL",
+    "from": "#B7B1FF",
+    "via": "#8072FF",
+    "to": "#3A2FCC"
+  },
+  {
+    "alt": "Benqi",
+    "stem": "11_1hF5rL",
+    "from": "#99E4FA",
+    "via": "#00B2EC",
+    "to": "#005A75"
+  },
+  {
+    "alt": "DEXALOT",
+    "stem": "32__1__KkDzy",
+    "from": "#012061",
+    "via": "#3165D1",
+    "to": "#3165D1"
+  },
+  {
+    "alt": "uniswap",
+    "stem": "23__1__1cMKrf",
+    "from": "#FF66A1",
+    "via": "#FF007A",
+    "to": "#B3005A"
+  },
+  {
+    "alt": "euler",
+    "stem": "24_15Ljn5",
+    "from": "#67F0D1",
+    "via": "#2AE5B9",
+    "to": "#1B8F72"
+  },
+  {
+    "alt": "aave",
+    "stem": "34__1__1QqDgO",
+    "from": "#C4C2FF",
+    "via": "#9896FF",
+    "to": "#5B4DCC"
+  },
+  {
+    "alt": "pharaoh",
+    "stem": "36_krOQC",
+    "from": "#F67B7A",
+    "via": "#C9292C",
+    "to": "#8A1B1B"
+  },
+  {
+    "alt": "Zeroone",
+    "stem": "27__1__lw4gI",
+    "from": "#F10349",
+    "via": "#8C002E",
+    "to": "#8C002E"
+  }
+]

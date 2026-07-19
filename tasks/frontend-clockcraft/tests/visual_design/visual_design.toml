@@ -1,0 +1,135 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/mcp/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "3_1"
+description = "The app uses a light neutral background with white surface cards and hairline borders, giving a clean, airy productivity-tool look"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "3_2"
+description = "The three category colors — green for Meaningful, slate for Neutral, and rose for Draining — are distinguishable at a glance on both category chips and Weekly overview segments"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "3_3"
+description = "The live timer digits and the duration numbers use a monospace typeface that is visibly distinct from the sans-serif body and UI text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "3_4"
+description = "Cards and inputs use a consistent rounded corner treatment with buttons slightly tighter, and primary buttons render as a solid dark fill with white text distinct from outlined secondary buttons"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "3_5"
+description = "Timeline entry blocks are visibly proportional to duration and colored by category, with the activity name and duration legible in or beside each block"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "3_6"
+description = "The Meaningful ratio stat visually leans toward whichever side currently has more minutes using the meaningful and draining colors, and the currently selected category filter is visibly highlighted"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "3_7"
+description = "The empty timeline state and the no-results search or filter state are visually present with friendly messaging rather than blank areas"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.8"
+name = "3_8"
+description = "The three category colors are not distinguishable from one another on chips or chart segments"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.9"
+name = "3_9"
+description = "Timeline blocks render at a uniform size regardless of duration, so a 60-minute entry and a 30-minute entry look the same"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.10"
+name = "3_10"
+description = "At approximately 375px wide the document overflows horizontally, or the Start timer and Add entry controls become unusable or illegible"
+type = "binary"
+weight = 1.0
+negate = true

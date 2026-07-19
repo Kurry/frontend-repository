@@ -1,0 +1,23 @@
+{
+  "name": "mermaid-live-editor-oracle",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "verify:build": "vite build",
+    "preview": "vite preview --host --port 3000 --strictPort",
+    "start": "vite build && vite preview --host --port 3000 --strictPort"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^5.0.3",
+    "@tailwindcss/vite": "^4.1.11",
+    "svelte": "^5.36.4",
+    "tailwindcss": "^4.1.11",
+    "vite": "^6.3.5"
+  },
+  "dependencies": {
+    "mermaid": "^11.6.0"
+  }
+}

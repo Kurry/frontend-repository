@@ -1,0 +1,1 @@
+import{v as t}from"./core.min-C6O5v62Y.js";import{x as f}from"./core.min-C6O5v62Y.js";import{h as a}from"./store-CcC-Cn2p.js";import"./preloader-Bns9QiKi.js";import"./types-BMbUCgPc.js";const u=()=>{const[r,o,s]=t(),e=a(s.state,s.history,o.value);e.success?(o.value="",r.value=""):r.value=e.error};export{f as _hW,u as s_5m0yR03alaQ};

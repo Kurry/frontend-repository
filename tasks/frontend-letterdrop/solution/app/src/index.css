@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+:root {
+  --color-primary: #E6EEF7;
+  --color-secondary: #54C3FA;
+  --color-accent: #007AFF;
+  --color-background: #F5F5F7;
+  --color-text-primary: #1D1D1E;
+  --color-link: #007AFF;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, -apple-system, BlinkMacSystemFont, "Apple Color Emoji", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  font-size: 17px;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 {
+  font-size: 34px;
+  font-weight: 700;
+}
+
+h2 {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+button:active:not(:disabled) {
+  filter: brightness(0.88);
+}
+
+/* Primary/secondary action buttons (Start game, Submit Word, Undo Last
+   Tile, Pause/Resume, Play again) drive hover and focus purely through
+   these CSS pseudo-classes rather than JS-mutated inline styles: the game
+   loop re-renders these components on every animation frame while a run is
+   active, and a JS-driven onMouseEnter/onFocus style mutation can visually
+   race against that re-render cycle. A native :hover/:focus-visible rule is
+   applied by the browser's own style engine and can never be missed or
+   clobbered by a React re-render. */
+.ld-btn-primary {
+  background-color: #007AFF;
+}
+.ld-btn-primary:hover:not(:disabled) {
+  background-color: #0056CC;
+}
+.ld-btn-primary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.4);
+}
+
+.ld-btn-secondary {
+  background-color: #E6EEF7;
+}
+.ld-btn-secondary:hover:not(:disabled) {
+  background-color: #D0DCE8;
+}
+.ld-btn-secondary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
+}
+
+/* Toggle-style buttons: view tabs, Solo/Challenge mode, branch selectors.
+   Background and text color live here (not in inline styles) for the same
+   reason as above — so :hover/:focus-visible always visibly apply. */
+.ld-btn-toggle {
+  background-color: #E6EEF7;
+  color: #0055B3;
+}
+.ld-btn-toggle:hover:not(:disabled) {
+  background-color: #D0DCE8;
+}
+.ld-btn-toggle:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
+}
+.ld-btn-toggle-active {
+  background-color: #007AFF;
+  color: #FEFEFE;
+  box-shadow: inset 0 -4px 0 #003F88;
+}
+.ld-btn-toggle-active:hover:not(:disabled) {
+  background-color: #0069DB;
+}
+.ld-btn-toggle-active:focus-visible {
+  outline: none;
+  box-shadow: inset 0 -4px 0 #003F88, 0 0 0 3px rgba(0, 122, 255, 0.3);
+}
+
+.game-canvas:focus-visible,
+canvas[role="application"]:focus-visible {
+  outline: 4px solid #003F88;
+  outline-offset: 3px;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}

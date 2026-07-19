@@ -1,0 +1,106 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/mcp/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "4_1"
+description = "Hovering interactive controls (nav tabs, buttons, tag chips, segmented control) shows a visible hover state, and tabbing through them with the keyboard shows a visible focus outline on each"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "4_2"
+description = "Assigning a spark, creating a thread, setting a status, pinning, merging, or archiving through the real controls surfaces a brief confirmation toast that slides in and auto-dismisses"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "4_3"
+description = "Selecting Merge Into… opens a modal that requires an explicit two-step confirm (Continue, then Confirm Merge) before it executes, and cancelling at either step leaves both threads untouched"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "4_4"
+description = "Thread cards and spark cards raise their shadow on hover and the active nav tab is filled while inactive tabs take a hover wash"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.5"
+name = "4_5"
+description = "Interactive controls show no hover feedback and no visible focus outline when tabbed to with the keyboard"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.6"
+name = "4_6"
+description = "The Merge Into… action executes immediately with no confirmation step, or another destructive action fires without any confirm"
+type = "binary"
+weight = 1.0
+negate = true

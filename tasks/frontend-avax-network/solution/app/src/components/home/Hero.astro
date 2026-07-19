@@ -1,0 +1,239 @@
+---
+const layers = [
+  { id: "layer-1", file: "alpha-reveal", visible: true, desktopOnly: false },
+  { id: "layer-2", file: "alpha-1", visible: false, desktopOnly: false },
+  { id: "layer-3", file: "alpha-2", visible: false, desktopOnly: false },
+  { id: "layer-4", file: "alpha-3", visible: false, desktopOnly: false },
+  { id: "layer-5", file: "alpha-4", visible: false, desktopOnly: false },
+  { id: "layer-6", file: "alpha-5", visible: false, desktopOnly: false },
+  { id: "layer-7", file: "alpha-6", visible: false, desktopOnly: true },
+  { id: "layer-8", file: "alpha-7", visible: false, desktopOnly: true },
+  { id: "layer-9", file: "alpha-8", visible: false, desktopOnly: true },
+];
+const heroFile = "alpha-3";
+---
+
+<section
+  id="hero"
+  class="relative flex h-svh w-full items-end justify-center gap-[var(--gap-md)] pt-[var(--navbar-height)] sm:pt-0"
+>
+  <div
+    id="hero-inner"
+    class="group/section animate-in-view relative grid h-full w-full shrink-0 grid-cols-12 grid-rows-[min-content_1fr_min-content] gap-x-px sm:h-svh sm:grid-rows-[min-content_1fr] lg:gap-0"
+  >
+    <!-- Left column: harvest-exact geometry (justify-self-end + w-[200%]) -->
+    <div
+      id="hero-left"
+      class="col-span-12 col-start-1 row-start-3 row-end-4 flex h-[200%] w-full items-start justify-end justify-self-end self-start transition-[clip-path] delay-1000 duration-2000 ease-in-out-quart [clip-path:inset(50%_0_0_0_round_var(--radius-4xl))] mounted:[clip-path:inset(0_0_50%_0_round_var(--radius-4xl))] sm:col-span-6 sm:row-start-1 sm:row-end-2 sm:items-end sm:self-end sm:[clip-path:inset(0_0_50%_0_round_var(--radius-4xl))] sm:mounted:[clip-path:inset(calc(50%+var(--navbar-height))_0_0_0_round_var(--radius-4xl))] lg:col-span-3 lg:row-end-3 lg:grid lg:h-auto lg:w-[200%] lg:grid-cols-2 lg:grid-rows-2 lg:items-start lg:justify-start lg:self-auto lg:[clip-path:inset(0_50%_0_0_round_var(--radius-4xl))] lg:mounted:[clip-path:inset(var(--navbar-height)_0_0_50%_round_var(--radius-4xl))]"
+    >
+      <div
+        id="hero-left-inner"
+        class="z-[2] flex h-1/2 w-full flex-col items-start justify-start gap-[var(--gap-base)] bg-white p-[var(--padding-md)] transition-mode sm:pt-[calc(var(--navbar-height)+var(--padding-md))] lg:col-start-2 lg:h-[200%] lg:w-full lg:[clip-path:inset(0_0_0_0_round_var(--radius-4xl))] lg:mounted:[clip-path:inset(var(--navbar-height)_0_calc(50%+1px)_0_round_var(--radius-4xl))] dark:bg-dark"
+        style="transition: background-color 300ms var(--ease-out-cubic), clip-path 2000ms 2000ms var(--ease-in-out-quart);"
+      >
+        <p class="split-text leading-[135%] delay-2000 lg" set:html={" Avalanche exists to put the world’s most powerful technology to use. Avalanche is the blockchain platform designed for real businesses solving real problems at scale. Everything we build prioritizes reliability, performance, and outcomes that matter.\n "} />
+      </div>
+
+      <!-- Desktop APC (inside hero grid) -->
+      <div class="col-start-2 hidden w-full translate-y-full flex-col items-stretch justify-start overflow-hidden rounded-[var(--radius-4xl)] bg-white transition-[background-color,translate] delay-1000 duration-2000 ease-in-out-quart mounted:translate-y-0 lg:flex lg:h-full lg:w-full dark:bg-dark">
+        <div class="aspect-video w-full shrink-0 overflow-hidden sm:w-1/2 lg:w-full">
+          <img
+            src="/images/image_Z29wa6.webp"
+            srcset="/images/image_2hwpoS.webp 300w, /images/image_Z29wa6.webp 600w"
+            sizes="(max-width: 400px) 300w, 600w"
+            alt="image"
+            width="600"
+            height="338"
+            loading="eager"
+            decoding="async"
+            class="h-full w-full rounded-b-2xl object-cover sm:rounded-t-4xl sm:rounded-b-4xl lg:rounded-t-none lg:rounded-b-2xl"
+          />
+        </div>
+        <div class="flex flex-1 flex-col items-start justify-between gap-[var(--gap-md)] p-8 pt-4 sm:h-full sm:pt-[var(--padding-md)] lg:h-auto lg:p-[var(--padding-md)] lg:pt-[var(--padding-base)]">
+          <div class="flex flex-col items-start justify-start gap-[var(--gap-xs)]">
+            <h3 class="text-xl/normal uppercase text-black dark:text-white">Avalanche Payments Collective</h3>
+            <p class="line-clamp-3 leading-[135%] text-black dark:text-neutral-300" set:html={" Powering the next generation of global payments. Avalanche brings stablecoin settlement, global payout infrastructure, and 24/7 money movement together on a single platform."} />
+          </div>
+          <a href="/payments" class="group/button button arrow transparent inline-flex">
+            <wm-shape
+              id="button"
+              rounded="clamp(0.625rem, 0.196rem + 0.67vw, 1rem)"
+              rounded-mobile="clamp(0.875rem, 0.803rem + 0.309vw, 1rem)"
+              corner-rounded="clamp(0.25rem, 0.107rem + 0.223vw, 0.375rem)"
+              corner-rounded-mobile="clamp(0.313rem, 0.276rem + 0.154vw, 0.375rem)"
+              corner-size="clamp(1.125rem, -0.161rem + 2.009vw, 2.25rem)"
+              corner-size-mobile="clamp(2rem, 1.855rem + 0.617vw, 2.25rem)"
+            ></wm-shape>
+            Learn more
+            <span class="sr-only">Learn more about Avalanche Payments Collective</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center sequencer -->
+    <div class="relative col-span-12 col-start-1 row-start-2 row-end-3 h-full w-full sm:row-start-2 lg:col-span-6 lg:col-start-4 lg:row-start-1">
+      <div
+        id="hero-sequencer"
+        class="absolute bottom-0 left-1/2 flex h-svh w-full -translate-x-1/2 items-center justify-center rounded-[var(--radius-4xl)] bg-neutral-950 fill-white [clip-path:inset(0_0_0_0_round_var(--radius-4xl))] mounted:w-full mounted:[clip-path:inset(calc(var(--hero-right-height,0px)+var(--navbar-height)+1px)_0_calc(var(--hero-left-height,0px)+1px)_0_round_var(--radius-4xl))] sm:mounted:[clip-path:inset(calc(var(--hero-right-height,0px)+1px)_0_0_0_round_var(--radius-4xl))] lg:h-full lg:w-[200%] lg:mounted:[clip-path:inset(var(--navbar-height)_1px_0_1px_round_var(--radius-4xl))] dark:fill-dark"
+        style="transition: clip-path 2000ms 1000ms var(--ease-in-out-quart), width 2000ms 1000ms var(--ease-in-out-quart), background-color 300ms var(--ease-out-cubic), fill 300ms var(--ease-out-cubic);"
+      >
+        <wm-shape
+          id="keep"
+          rounded="clamp(1rem, -0.143rem + 1.786vw, 2rem)"
+          rounded-mobile="clamp(1rem, 0.421rem + 2.469vw, 2rem)"
+          corner-rounded="clamp(0.75rem, -0.107rem + 1.339vw, 1.5rem)"
+          corner-rounded-mobile="clamp(0.75rem, -0.107rem + 1.339vw, 1.5rem)"
+          corner-size="clamp(4.5rem, -0.071rem + 7.143vw, 8.5rem)"
+          corner-size-mobile="clamp(3.5rem, 0.606rem + 12.346vw, 8.5rem)"
+          stroke-width="1"
+          corner="br"
+        ></wm-shape>
+
+        <div id="hero-sequencer-inner" class="absolute left-1/2 z-[1] h-svh w-3/4 -translate-x-1/2 lg:bottom-1/2 lg:w-[50vw] lg:translate-y-1/2">
+          {layers.map((layer) => (
+            <div
+              id={layer.id}
+              class:list={[
+                "absolute inset-0 flex items-center justify-center",
+                !layer.visible && "invisible",
+                layer.desktopOnly && "hidden lg:flex",
+              ]}
+            >
+              <div class:list={["absolute left-1/2 top-1/2 z-[1] max-h-full w-[85%] -translate-x-1/2 -translate-y-1/2 md:w-[80%]", layer.id === "layer-1" && "scale-75 mounted:scale-100 transition-transform duration-1000 delay-200 ease-out-quart"]}>
+                {layer.id === "layer-1" ? (
+                  <div class="relative w-full scale-[0.2] opacity-0 transition-[opacity,scale] delay-200 duration-1000 ease-out-quart mounted:scale-100 mounted:opacity-100 mounted:delay-1000 mounted:duration-2000 mounted:ease-in-out-quart sm:scale-[0.1] sm:mounted:scale-100">
+                    <svg viewBox="0 0 722 628" class="pointer-events-none absolute left-1/2 top-1/2 w-full -translate-x-1/2 -translate-y-1/2 scale-[0.78] object-contain text-black opacity-40 dark:text-white" aria-hidden="true"><path d="M548.831 381.485C560.015 362.435 587.792 362.435 598.853 381.485L717.703 584.525C728.887 603.575 714.876 627.296 692.63 627.296H454.932C432.686 627.296 418.797 603.575 429.859 584.525L548.831 381.485Z" fill="currentColor"/><path d="M477.034 246.295C487.849 227.367 487.849 204.015 477.034 184.965L379.57 14.9872C368.631 -4.06311 341.346 -4.06311 330.408 14.9872L4.21765 584.407C-6.7209 603.457 6.92156 627.301 28.7987 627.301H223.603C245.358 627.301 265.391 615.625 276.207 596.697L476.911 246.295H477.034Z" fill="currentColor"/></svg>
+                    <video playsinline preload="auto" muted class="relative h-auto w-full object-contain">
+                      <source src={`/videos/${heroFile}.webm`} type="video/webm" />
+                      <source src={`/videos/${heroFile}.mp4`} type="video/mp4" />
+                    </video>
+                  </div>
+                ) : (
+                  <video playsinline preload="auto" muted class="h-full w-full object-contain">
+                    <source src={`/videos/${heroFile}.webm`} type="video/webm" />
+                    <source src={`/videos/${heroFile}.mp4`} type="video/mp4" />
+                  </video>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div class="hud-videos pointer-events-none absolute inset-0 z-[2] opacity-0 transition-opacity duration-700 [.loaded]:opacity-100">
+          <video class="absolute right-[var(--padding-md)] top-[var(--padding-md)] h-auto w-[38%] object-contain mix-blend-screen" playsinline preload="auto" muted loop>
+            <source src="/videos/hud_dark.webm" type="video/webm" />
+            <source src="/videos/hud_dark.mp4" type="video/mp4" />
+          </video>
+          <video class="absolute bottom-[var(--padding-md)] left-[var(--padding-base)] h-auto w-[30%] object-contain mix-blend-screen" playsinline preload="auto" muted loop>
+            <source src="/videos/hud.webm" type="video/webm" />
+            <source src="/videos/hud.mp4" type="video/mp4" />
+          </video>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right column -->
+    <div
+      id="hero-right"
+      class="col-span-12 col-start-1 row-start-1 row-end-2 flex h-[200%] w-full items-end justify-start justify-self-start self-end transition-[clip-path] delay-1000 duration-2000 ease-in-out-quart [clip-path:inset(0_0_50%_0_round_var(--radius-4xl))] mounted:[clip-path:inset(50%_0_0_0_round_var(--radius-4xl))] sm:col-span-6 sm:col-start-7 sm:row-end-2 sm:[clip-path:inset(0_0_50%_0_round_var(--radius-4xl))] sm:mounted:[clip-path:inset(calc(50%+var(--navbar-height))_0_0_0_round_var(--radius-4xl))] lg:col-span-3 lg:col-start-10 lg:row-end-3 lg:h-auto lg:w-[200%] lg:items-stretch lg:self-auto lg:[clip-path:inset(0_0_0_50%_round_var(--radius-4xl))] lg:mounted:[clip-path:inset(var(--navbar-height)_50%_0_0_round_var(--radius-4xl))]"
+    >
+      <div
+        id="hero-right-inner"
+        class="flex h-1/2 w-full flex-row items-stretch justify-between bg-white p-[var(--padding-md)] transition-mode sm:flex-col sm:pt-[calc(var(--navbar-height)+var(--padding-md))] lg:h-auto lg:w-1/2 dark:bg-dark"
+      >
+        <div class="flex flex-col items-stretch justify-start gap-[var(--gap-base)] overflow-clip lg:gap-[var(--gap-md)]">
+          <div class="size-[clamp(2rem,1.711rem+1.235vw,2.5rem)] lg:size-[clamp(1.5rem,0.357rem+1.786vw,2.5rem)] shrink-0 bg-transparent flex items-center justify-center rounded-full hidden sm:block text-red -translate-y-full mounted:translate-y-0 transition-transform duration-2000 delay-2000 ease-out-quart">
+            <svg viewBox="0 0 722 628" class="w-1/2" aria-hidden="true">
+              <path d="M548.831 381.485C560.015 362.435 587.792 362.435 598.853 381.485L717.703 584.525C728.887 603.575 714.876 627.296 692.63 627.296H454.932C432.686 627.296 418.797 603.575 429.859 584.525L548.831 381.485Z" fill="currentcolor"></path>
+              <path d="M477.034 246.295C487.849 227.367 487.849 204.015 477.034 184.965L379.57 14.9872C368.631 -4.06311 341.346 -4.06311 330.408 14.9872L4.21765 584.407C-6.7209 603.457 6.92156 627.301 28.7987 627.301H223.603C245.358 627.301 265.391 615.625 276.207 596.697L476.911 246.295H477.034Z" fill="currentcolor"></path>
+            </svg>
+          </div>
+          <div class="flex flex-col justify-start">
+            <h2 id="current-time" class="h6">--:--</h2>
+            <p id="current-day" class="text-balance leading-[135%] text-neutral-500">—</p>
+          </div>
+        </div>
+        <div class="flex flex-row items-end justify-end gap-[var(--gap-lg)] overflow-clip">
+          <div id="hero-scroll-cue" class="hidden h-full flex-col items-end justify-end sm:flex">
+            <h3 class="text-2xl/normal uppercase split-text delay-2000">Scroll</h3>
+            <p class="split-text text-right leading-[135%] text-neutral-500 delay-2000">to explore page</p>
+          </div>
+          <svg viewBox="0 0 128 128" fill="none" class="w-[clamp(4rem,1.975rem+8.642vw,7.5rem)] translate-x-[calc(100%+1px)] transition-transform delay-2000 duration-2000 ease-out-quart mounted:translate-x-0 lg:w-[clamp(4rem,0rem+6.25vw,7.5rem)]" aria-hidden="true">
+            <path d="M8 0V120H24.58H128" stroke="currentColor" stroke-width="12.5%"></path>
+            <path d="M8 120L122.15 5.84961" stroke="currentColor" stroke-width="12.5%"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{/* Live places mobile APC as a main sibling after #hero (~439px @390w) */}
+<div
+  class="mobile col-start-2 flex w-full translate-y-full flex-col items-stretch justify-start overflow-hidden rounded-[var(--radius-4xl)] bg-white transition-[background-color,translate] delay-1000 duration-2000 ease-in-out-quart mounted:translate-y-0 sm:flex-row lg:hidden dark:bg-dark"
+>
+  <div class="aspect-video w-full shrink-0 overflow-hidden sm:w-1/2">
+    <img
+      src="/images/image_Z29wa6.webp"
+      srcset="/images/image_2hwpoS.webp 300w, /images/image_Z29wa6.webp 600w"
+      sizes="(max-width: 400px) 300w, 600w"
+      alt="image"
+      width="600"
+      height="338"
+      loading="eager"
+      decoding="async"
+      class="h-full w-full rounded-b-2xl object-cover sm:rounded-t-4xl sm:rounded-b-4xl"
+    />
+  </div>
+  <div class="flex flex-1 flex-col items-start justify-between gap-[var(--gap-md)] p-8 pt-4 sm:h-full sm:pt-[var(--padding-md)]">
+    <div class="flex flex-col items-start justify-start gap-[var(--gap-xs)]">
+      <h3 class="text-xl/normal uppercase text-black dark:text-white">Avalanche Payments Collective</h3>
+      <p class="line-clamp-3 leading-[135%] text-black dark:text-neutral-300" set:html={" Powering the next generation of global payments. Avalanche brings stablecoin settlement, global payout infrastructure, and 24/7 money movement together on a single platform."} />
+    </div>
+    <a href="/payments" class="group/button button arrow transparent inline-flex">
+      <wm-shape
+        id="button"
+        rounded="clamp(0.625rem, 0.196rem + 0.67vw, 1rem)"
+        rounded-mobile="clamp(0.875rem, 0.803rem + 0.309vw, 1rem)"
+        corner-rounded="clamp(0.25rem, 0.107rem + 0.223vw, 0.375rem)"
+        corner-rounded-mobile="clamp(0.313rem, 0.276rem + 0.154vw, 0.375rem)"
+        corner-size="clamp(1.125rem, -0.161rem + 2.009vw, 2.25rem)"
+        corner-size-mobile="clamp(2rem, 1.855rem + 0.617vw, 2.25rem)"
+      ></wm-shape>
+      Learn more
+      <span class="sr-only">Learn more about Avalanche Payments Collective</span>
+    </a>
+  </div>
+</div>
+
+<script>
+  function formatTime(d: Date) {
+    return d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+  }
+  function formatDay(d: Date) {
+    return d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+  }
+  const timeEl = document.getElementById("current-time");
+  const dayEl = document.getElementById("current-day");
+  const tick = () => {
+    const now = new Date();
+    if (timeEl) timeEl.textContent = formatTime(now);
+    if (dayEl) dayEl.textContent = formatDay(now);
+  };
+  tick();
+  setInterval(tick, 4000);
+
+  import("../../scripts/animation").then(({ initClockSplit }) => {
+    document.fonts.ready.then(() => {
+      if (timeEl) initClockSplit(timeEl, 2);
+      if (dayEl) initClockSplit(dayEl, 2);
+    });
+  });
+
+  import("../../scripts/hero-sequencer").then(({ initHeroSequencer, initHeroHeights, mountEntrance }) => {
+    mountEntrance();
+    initHeroHeights();
+    initHeroSequencer();
+  });
+</script>

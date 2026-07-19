@@ -1,0 +1,32 @@
+---
+import SolutionLayout from "../layouts/SolutionLayout.astro";
+---
+
+<SolutionLayout
+  title="Institutions and Capital Markets"
+  headline="Institutional-grade Solutions, Powered by Avalanche"
+  lede="Purpose-built blockchains with the speed, security, and performance institutions demand today—while delivering on the scalability and innovation of tomorrow."
+  video="/videos/instititions-capital-markets.mp4"
+  pillars={[
+    { n: "01", title: "Avalanche Layer 1s for Wholesale Banking", body: "Multi-tier permissioning, privacy solutions, custom gas and staking options, and configurable blocktimes." },
+    { n: "02", title: "Horizontal Scalability & Interoperability", body: "Multi-L1 architecture with built-in interoperability for shared infrastructure and liquidity." },
+    { n: "03", title: "EVM Compatibility, Cost & Speed", body: "Deploy any EVM-based application with extremely low transaction costs and sub-second finality." },
+  ]}
+>
+  <section class="group/section animate-in-view mx-[var(--padding-base)] mt-px section-shell">
+    <h2 class="font-aeonik split-heading text-[var(--text-4xl)] font-bold">Trusted by Institutions. Built for the Future.</h2>
+    <div class="mt-8 grid gap-4 md:grid-cols-2">
+      {[
+        { q: "Avalanche provides high-performance infrastructure tailor-made for institutional finance.", a: "Fernando Martinez · CEO · Nonco" },
+        { q: "Avalanche has been a valued partner for Securitize for many years.", a: "Carlos Domingo · CEO · Securitize" },
+        { q: "We look forward to working with Avalanche’s vibrant developer community.", a: "Roger Bayston · Franklin Templeton" },
+        { q: "In selecting a technology partner, Avalanche became an obvious choice.", a: "Santiago Roel Santos · Inversion" },
+      ].map((t, i) => (
+        <blockquote class="reveal-y rounded-[var(--radius-2xl)] border border-neutral-800 p-5" style={`--index:${i}`}>
+          <p class="text-[var(--text-base)] text-neutral-200">“{t.q}”</p>
+          <footer class="mt-3 text-[var(--text-sm)] text-neutral-500">{t.a}</footer>
+        </blockquote>
+      ))}
+    </div>
+  </section>
+</SolutionLayout>

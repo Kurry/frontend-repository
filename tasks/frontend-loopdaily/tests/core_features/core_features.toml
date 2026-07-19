@@ -1,0 +1,244 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/mcp/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "1_1"
+description = "On load with no habits, the main list shows a friendly empty-state message inviting the user to create the first habit"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "1_2"
+description = "After creating a habit with a name, an emoji icon, and the Once a day target, it appears in the list with its chosen icon and a one-tap complete control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "1_3"
+description = "After tapping the one-tap complete control, the habit shows a completed treatment for today and today's weekly-grid cell shows done; tapping it again the same day undoes the completion"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "1_4"
+description = "After creating a numeric-target habit (e.g. target 8) and tapping +1 three times, the fraction reads 3/8 and the habit does not show the complete treatment until the target count is reached"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "1_5"
+description = "After creating a category and assigning a habit to it, selecting that category's filter chip shows only that habit and visibly highlights the active chip; selecting All restores every habit"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "1_6"
+description = "After completing today's check-in and opening the habit's Heatmap view, today's day cell renders a distinctly higher shading intensity than a not-done day in the same month"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "1_7"
+description = "After creating at least two habits and dragging them into a new order, then refreshing the page, the new order persists"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "1_8"
+description = "After creating habits, checking one in, assigning a category, and setting a reminder note, then performing a full page refresh, the habits, their completion state, category assignment, and reminder note are all restored exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "1_9"
+description = "After pausing a habit with an existing streak, it disappears from the main habit list without losing its history; after Resume, it reappears with its prior streak value intact"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "1_10"
+description = "After completing a check-in and opening the Stats view, it shows the number of active current streaks, the longest streak ever recorded, and total completions this calendar month, reflecting the just-recorded check-in"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "1_11"
+description = "After exporting data as JSON and then importing that same file, a confirmation step warns the current data will be replaced before the import proceeds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "1_12"
+description = "When localStorage is seeded with malformed data for the app's storage key and the page is reloaded, the app shows a recovery notice in a role=alert live region with working Retry and Reset controls instead of a blank screen"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "1_13"
+description = "After clicking Load Malformed Sample, a recovery outcome is announced in the role=alert live region rather than the app silently failing or crashing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "1_14"
+description = "Submitting the New Habit form with a blank name is blocked with a visible inline error rather than a silently disabled button, and no phantom habit is added to the list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "1_15"
+description = "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "1_16"
+description = "Creating a habit via the New Habit form with a name, an emoji from the fixed palette, and Once a day adds it to the list with its icon and one-tap complete control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "1_17"
+description = "The one-tap complete control marks today done with a distinct filled treatment on first tap, and undoes it back to not-completed on a second tap the same day"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "1_18"
+description = "A numeric-target habit's stepper updates its n/target fraction with each +1/-1 tap and reaches the complete treatment only once the target count is reached, reverting when it drops below target"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "1_19"
+description = "Creating a category, assigning a habit to it, and selecting its filter chip narrows the list to that category; selecting All restores every habit"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "1_20"
+description = "The Heatmap view renders a full calendar month of day cells whose shading reflects each day's completion, distinguishing fully done, partially done, and not-done"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "1_21"
+description = "The weekly 7-day grid on a habit row distinguishes done, missed, and not-yet-elapsed days, with today's cell distinctly marked"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "1_22"
+description = "Pausing a habit with an existing streak removes it from the main list without deleting its history, and Resume restores it with its prior streak intact"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "1_23"
+description = "The Stats view reports active current streak count, longest streak ever, and this month's total completions, updating immediately after a new check-in"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "1_24"
+description = "Dragging habits by their handle into a new order persists that order across a full page refresh"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "1_25"
+description = "Submitting the New Habit form with a blank name is blocked with a visible inline error or shake, and no phantom habit is added; a valid resubmission adds exactly one habit"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "1_26"
+description = "Completing a habit's check-in changes the visible list order (rather than the completion action leaving order untouched)"
+type = "binary"
+weight = 1.0
+negate = true

@@ -1,0 +1,1 @@
+import{v as r}from"./core.min-C6O5v62Y.js";import{s as e}from"./store-CcC-Cn2p.js";import"./preloader-Bns9QiKi.js";import"./types-BMbUCgPc.js";const m=o=>{const[t]=r();t.project.title=o.target.value,e(t.state)};export{m as s_V42oibnSAjI};

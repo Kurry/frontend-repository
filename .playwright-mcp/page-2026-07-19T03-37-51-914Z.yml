@@ -1,0 +1,301 @@
+- generic [ref=e2]:
+  - banner:
+    - generic [ref=e4]:
+      - link "Home" [ref=e5] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e6]: Home
+        - generic [ref=e7]: WolverineWorldwide
+        - img [ref=e10]
+      - navigation "Primary" [ref=e12]:
+        - list [ref=e13]:
+          - listitem [ref=e14]:
+            - link "About" [ref=e15] [cursor=pointer]:
+              - /url: /about-us
+          - listitem [ref=e16]:
+            - link "Brands" [ref=e17] [cursor=pointer]:
+              - /url: /brands
+          - listitem [ref=e18]:
+            - link "Careers" [ref=e19] [cursor=pointer]:
+              - /url: /careers
+          - listitem [ref=e20]:
+            - button "Responsibility" [ref=e21] [cursor=pointer]:
+              - generic [ref=e22]:
+                - text: Responsibility
+                - img [ref=e24]
+          - listitem [ref=e26]:
+            - link "Investors" [ref=e27] [cursor=pointer]:
+              - /url: https://investors.wolverineworldwide.com/
+              - text: Investors
+              - img [ref=e29]
+  - main [ref=e32]:
+    - generic [ref=e34]:
+      - heading "Make. Every Day. Better." [level=1] [ref=e35]:
+        - generic [ref=e36]: Make.
+        - generic [ref=e37]: Every Day.
+        - generic [ref=e38]: Better.
+      - link "latest news 2025 Annual Report" [ref=e39] [cursor=pointer]:
+        - /url: /d3ql15awrosklt.cloudfront.net/medias/Annual-Report-2026.pdf
+        - generic [ref=e42]:
+          - generic [ref=e43]: latest news
+          - generic [ref=e44]:
+            - generic [ref=e45]:
+              - text: "2025"
+              - text: Annual Report
+            - img [ref=e47]
+    - generic [ref=e52]:
+      - paragraph [ref=e54]: We design trend-right products, build iconic brands, and shape experiences that inspire people to live better. Grounded in craftsmanship and driven by innovation, Wolverine Worldwide continues to evolve with purpose.
+      - link "Learn More About Us" [ref=e56] [cursor=pointer]:
+        - /url: /about-us
+        - generic [ref=e58]:
+          - generic [ref=e59]: →
+          - generic [ref=e60]: Learn More About Us
+          - generic [ref=e61]: →
+    - generic [ref=e63]:
+      - heading "A portfolio built for every step." [level=2] [ref=e64]:
+        - generic [ref=e65]: A portfolio
+        - generic [ref=e66]: built for every
+        - generic [ref=e67]: step.
+      - link "Explore Our Brands" [ref=e68] [cursor=pointer]:
+        - /url: /brands
+        - generic [ref=e70]:
+          - generic [ref=e71]: →
+          - generic [ref=e72]: Explore Our Brands
+          - generic [ref=e73]: →
+    - generic [ref=e175]:
+      - heading "2025 Annual Report" [level=2] [ref=e176]:
+        - text: "2025"
+        - text: Annual Report
+      - generic [ref=e177]:
+        - paragraph [ref=e178]: Our 2025 Annual Report provides a comprehensive overview of our company’s performance, strategic progress, and key achievements over the past year.
+        - link ".PDF Read the Report" [ref=e179] [cursor=pointer]:
+          - /url: /d3ql15awrosklt.cloudfront.net/medias/Annual-Report-2026.pdf
+          - generic [ref=e181]: .PDF
+          - generic [ref=e182]:
+            - generic [ref=e183]: Read the Report
+            - img [ref=e185]
+    - generic [ref=e188]:
+      - heading "Many brands, one shared culture, limitless innovation." [level=2] [ref=e190]:
+        - text: Many brands,
+        - text: one shared culture,
+        - text: limitless innovation.
+      - generic [ref=e191]:
+        - paragraph [ref=e193]: Our culture fuels curiosity, creativity, and collaboration. Across our global campuses, teams push boundaries in product design, brand storytelling, and digital innovation, shaping the future of footwear and apparel.
+        - link "Explore Career Opportunities" [ref=e195] [cursor=pointer]:
+          - /url: /careers
+          - generic [ref=e197]:
+            - img [ref=e199]
+            - generic [ref=e201]: Explore Career Opportunities
+            - img [ref=e203]
+    - generic [ref=e206]:
+      - generic [ref=e207]:
+        - heading "Market Snapshot" [level=2] [ref=e208]
+        - link "Investor Relations" [ref=e210] [cursor=pointer]:
+          - /url: https://investors.wolverineworldwide.com/
+          - generic [ref=e212]:
+            - img [ref=e214]
+            - generic [ref=e216]: Investor Relations
+            - img [ref=e218]
+      - generic [ref=e220]:
+        - generic [ref=e221]:
+          - heading "Wolverine World Wide, Inc. (WWW)" [level=3] [ref=e222]
+          - generic [ref=e223]: Common Stock
+        - generic [ref=e225]:
+          - generic [ref=e226]: "18.16"
+          - generic [ref=e227]: USD
+        - generic [ref=e228]:
+          - generic [ref=e229]:
+            - term [ref=e230]: DAY'S HIGH
+            - definition [ref=e231]: $18.60
+          - generic [ref=e232]:
+            - term [ref=e233]: DAY'S LOW
+            - definition [ref=e234]: $18.16
+          - generic [ref=e235]:
+            - term [ref=e236]: DAY'S VOLUME
+            - definition [ref=e237]: 38,982.00
+          - generic [ref=e238]:
+            - term [ref=e239]: LAST UPDATED
+            - definition [ref=e240]: 2hours ago
+    - generic [ref=e242]:
+      - generic [ref=e243]:
+        - generic [ref=e244]:
+          - heading "Latest News" [level=2] [ref=e245]
+          - link "View All" [ref=e247] [cursor=pointer]:
+            - /url: https://wolverineworldwide.gcs-web.com/press-releases
+            - generic [ref=e248]:
+              - generic [ref=e249]: View All
+              - img [ref=e251]
+        - generic [ref=e253]:
+          - button "Prev." [ref=e255] [cursor=pointer]
+          - button "Next" [ref=e257] [cursor=pointer]
+      - generic [ref=e259]:
+        - article [ref=e260]:
+          - generic [ref=e261]:
+            - generic [ref=e264]: WWW Earns Great Place to Work® Certification™ for Second Consecutive Year
+            - heading "96% of employees said they feel welcomed when they join the Company. 95% say they care about their colleagues. 94% say they’re proud to tell others where they work." [level=3] [ref=e265]
+        - article [ref=e266]:
+          - generic [ref=e267]:
+            - generic [ref=e270]: Footwear News Celebrates Merrell's 45th Anniversary
+            - 'heading "Footwear News'' June 2026 Milestone Issue explores Merrell''s 45th anniversary and how the brand continues to innovate itself while staying true to its mission: It Starts Outside. Global Brand President, Janice Tennant, graces the cover." [level=3] [ref=e271]'
+        - article [ref=e272]:
+          - generic [ref=e273]:
+            - generic [ref=e276]: Saucony Wins Two "Best Shoes Awards 2026" by Runner's World
+            - heading "Saucony's Endorphin Pro 5 wins \"Best Racing Shoe\" and Endorphin Azura wins \"Best Training Shoe\" by Runner's World." [level=3] [ref=e277]
+        - article [ref=e278]:
+          - generic [ref=e279]:
+            - generic [ref=e282]: WWW's In-House Creative Agency and Production Studio Win Four MUSE Creative Awards
+            - heading "The MUSE Creative Awards is a leading international creative awards program recognizing excellence in advertising, design, and digital media worldwide. Saucony, Merrell, and Wolverine work led by The Agency and The Den won Gold and Platinum recognition." [level=3] [ref=e283]
+        - article [ref=e284]:
+          - generic [ref=e285]:
+            - generic [ref=e288]: Saucony Reintroduces Endorphin Azura
+            - heading "The daily running Azura shoe returns to Saucony's Endorphin collection. Lighweight, intense grip, and SPEEDROLL tech built for sharp, efficient runs." [level=3] [ref=e289]
+        - article [ref=e290]:
+          - generic [ref=e291]:
+            - generic [ref=e294]: Merrell Launches Agility Peak 6
+            - heading "The brand's latest trail runner that grips, flexes, and cushions so nothing breaks your flow." [level=3] [ref=e295]
+        - article [ref=e296]:
+          - generic [ref=e297]:
+            - generic [ref=e300]: Wolverine Joins Hit TV Drama, "Landman"
+            - heading "The iconic work boot brand joins season two of Paramount+'s \"Landman\" to celebrate the grit, innovation and resilience of America's modern workforce." [level=3] [ref=e301]
+        - article [ref=e302]:
+          - generic [ref=e303]:
+            - generic [ref=e306]: WWW Wins 2025 "Company of the Year"
+            - heading "WWW was awarded Company of the Year for its \"new, more-focused brand-building model\" at the 2025 Footwear News Achievement Awards (FNAA)." [level=3] [ref=e307]
+    - generic [ref=e314]:
+      - heading "Creating Your Future With Us" [level=2] [ref=e315]:
+        - generic [ref=e316]: Creating
+        - generic [ref=e317]: Your
+        - generic [ref=e318]: Future
+        - generic [ref=e319]: With Us
+      - generic [ref=e320]:
+        - paragraph [ref=e321]: No matter the role, the door is open to you at Wolverine Worldwide to create positive change and leave a lasting impact.
+        - link "Work at Wolverine" [ref=e322] [cursor=pointer]:
+          - /url: https://careers.wolverineworldwide.com/
+          - generic [ref=e324]:
+            - img [ref=e326]
+            - generic [ref=e328]: Work at Wolverine
+            - img [ref=e330]
+  - contentinfo [ref=e332]:
+    - generic [ref=e333]:
+      - generic [ref=e334]:
+        - link "Home" [ref=e335] [cursor=pointer]:
+          - /url: /
+          - img [ref=e336]
+        - navigation "Footer" [ref=e338]:
+          - list [ref=e339]:
+            - listitem [ref=e340]:
+              - link "About Us" [ref=e341] [cursor=pointer]:
+                - /url: /about-us
+            - listitem [ref=e343]:
+              - link "Brands" [ref=e344] [cursor=pointer]:
+                - /url: /brands
+            - listitem [ref=e346]:
+              - link "Careers" [ref=e347] [cursor=pointer]:
+                - /url: /careers
+            - listitem [ref=e349]:
+              - link "Responsibility" [ref=e350] [cursor=pointer]:
+                - /url: /responsibility
+            - listitem [ref=e352]:
+              - link "Investors" [ref=e353] [cursor=pointer]:
+                - /url: https://investors.wolverineworldwide.com/
+                - text: Investors
+                - img [ref=e355]
+            - listitem [ref=e358]:
+              - link "Contact" [ref=e359] [cursor=pointer]:
+                - /url: /contact
+      - generic [ref=e360]:
+        - generic [ref=e361]:
+          - paragraph [ref=e362]: Few companies can say they have the world at their feet, both literally and figuratively. As a global marketer of branded footwear, apparel, and accessories, this apt saying speaks to our focus on building great brands and making amazing products, and the bright future before us.
+          - navigation "Social" [ref=e363]:
+            - list [ref=e364]:
+              - listitem [ref=e365]:
+                - link "@wolverineworldwide" [ref=e366] [cursor=pointer]:
+                  - /url: https://www.instagram.com/wolverineworldwide
+                  - img [ref=e368]
+                  - text: "@wolverineworldwide"
+              - listitem [ref=e370]:
+                - link "@lifeatwww" [ref=e371] [cursor=pointer]:
+                  - /url: https://www.instagram.com/lifeatwww/
+                  - img [ref=e373]
+                  - text: "@lifeatwww"
+              - listitem [ref=e375]:
+                - link "wolverineworldwide" [ref=e376] [cursor=pointer]:
+                  - /url: https://linkedin.com/company/wolverineworldwide/
+                  - img [ref=e378]
+                  - text: wolverineworldwide
+        - navigation "Brand sites" [ref=e380]:
+          - list [ref=e381]:
+            - listitem [ref=e382]:
+              - link "Merrell" [ref=e383] [cursor=pointer]:
+                - /url: http://www.merrell.com/
+                - text: Merrell
+                - img [ref=e385]
+            - listitem [ref=e387]:
+              - link "Saucony" [ref=e388] [cursor=pointer]:
+                - /url: http://www.saucony.com/
+                - text: Saucony
+                - img [ref=e390]
+            - listitem [ref=e392]:
+              - link "Wolverine" [ref=e393] [cursor=pointer]:
+                - /url: https://www.wolverine.com/US/en/home
+                - text: Wolverine
+                - img [ref=e395]
+            - listitem [ref=e397]:
+              - link "Sweaty Betty" [ref=e398] [cursor=pointer]:
+                - /url: https://www.sweatybetty.com/
+                - text: Sweaty Betty
+                - img [ref=e400]
+            - listitem [ref=e402]:
+              - link "CAT Footwear" [ref=e403] [cursor=pointer]:
+                - /url: http://www.catfootwear.com/
+                - text: CAT Footwear
+                - img [ref=e405]
+            - listitem [ref=e407]:
+              - link "Chaco" [ref=e408] [cursor=pointer]:
+                - /url: http://www.chacos.com/
+                - text: Chaco
+                - img [ref=e410]
+            - listitem [ref=e412]:
+              - link "Hush Puppies" [ref=e413] [cursor=pointer]:
+                - /url: http://www.hushpuppies.com/
+                - text: Hush Puppies
+                - img [ref=e415]
+            - listitem [ref=e417]:
+              - link "Stride Rite" [ref=e418] [cursor=pointer]:
+                - /url: https://www.striderite.com/
+                - text: Stride Rite
+                - img [ref=e420]
+            - listitem [ref=e422]:
+              - link "HYTEST" [ref=e423] [cursor=pointer]:
+                - /url: https://www.hytest.com/
+                - text: HYTEST
+                - img [ref=e425]
+            - listitem [ref=e427]:
+              - link "Harley-Davidson" [ref=e428] [cursor=pointer]:
+                - /url: https://www.harley-davidson.com/us/en/shop/c/mens-motorcycle-footwear
+                - text: Harley-Davidson
+                - img [ref=e430]
+            - listitem [ref=e432]:
+              - link "Bates" [ref=e433] [cursor=pointer]:
+                - /url: https://www.wolverine.com/US/en/bates-by-wolverine/
+                - text: Bates
+                - img [ref=e435]
+      - generic [ref=e437]:
+        - generic [ref=e439]: © 2026 Wolverine World Wide, Inc.
+        - link "Terms & Conditions" [ref=e441] [cursor=pointer]:
+          - /url: /terms-and-conditions
+        - link "Anti-Human Trafficking and Transparency in Supply Chain Statement" [ref=e443] [cursor=pointer]:
+          - /url: /ca-supply
+        - link "Patents" [ref=e445] [cursor=pointer]:
+          - /url: /patents
+        - link "Privacy Policy" [ref=e447] [cursor=pointer]:
+          - /url: /privacy-policy
+        - link "Customer Returns" [ref=e449] [cursor=pointer]:
+          - /url: /customer-returns
+        - link "Retail Vendor Partners" [ref=e451] [cursor=pointer]:
+          - /url: /retail-vendor-partners
+        - button "Manage Cookies" [ref=e453] [cursor=pointer]
+    - generic [ref=e456]:
+      - generic:
+        - generic: WolverineWorldwide
+        - generic:
+          - img

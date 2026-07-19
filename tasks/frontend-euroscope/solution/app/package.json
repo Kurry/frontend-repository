@@ -1,0 +1,23 @@
+{
+  "name": "custom-euroscope",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "start": "vite --host 0.0.0.0 --port 3000",
+    "build": "vite build",
+    "verify:build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "solid-js": "^1.8.22"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.11",
+    "tailwindcss": "^4.1.11",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.10",
+    "vite-plugin-solid": "^2.10.2"
+  }
+}

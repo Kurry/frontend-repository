@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+/* ── ClockCraft Design Tokens ── */
+:root {
+	--color-bg: #F9FAFB;
+	--color-surface: #FFFFFF;
+	--color-border: #E5E7EB;
+	--color-text-primary: #111827;
+	--color-text-muted: #6B7280;
+	--color-meaningful: #16A34A;
+	--color-neutral: #64748B;
+	--color-draining: #E11D48;
+	--color-control-border: #64748B;
+}
+
+/* ── Base Typography ── */
+body {
+	font-family: ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	background-color: var(--color-bg);
+	color: var(--color-text-primary);
+	margin: 0;
+	padding: 0;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	overflow-x: hidden;
+}
+
+.mono {
+	font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
+}
+
+/* ── Shape System ── */
+.radius-card { border-radius: 8px; }
+.radius-btn { border-radius: 6px; }
+
+/* ── Focus Ring ── */
+*:focus-visible {
+	outline: 2px solid var(--color-text-primary);
+	outline-offset: 2px;
+}
+
+/* ── Smooth transitions ── */
+button, a, input, select, .entry-block, .chip {
+	transition: all 150ms ease;
+}
+
+button {
+	min-height: 48px;
+}
+
+button:active {
+	transform: translateY(1px) scale(0.98);
+}
+
+button:disabled:active {
+	transform: none;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+	width: 6px;
+}
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+::-webkit-scrollbar-thumb {
+	background: var(--color-border);
+	border-radius: 3px;
+}

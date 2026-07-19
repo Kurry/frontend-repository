@@ -1,0 +1,186 @@
+/*
+ * Lando Norris homepage — exact per-selector CSS, relocated verbatim from
+ * the PRD's Design Tokens section for density. This is the full
+ * per-component application of the design tokens documented in
+ * instruction.md > Design Tokens (color palette, motion timing/easing,
+ * type scale, fluid-scaling variables, breakpoints, radii). Consult this
+ * file directly for exact property values; consult Design Tokens for the
+ * core design-system values these rules apply.
+ *
+ * Section order mirrors the PRD's former embed names:
+ * Nav, css-root, css-utils, css-split-type, css-lenis, css-nav,
+ * css-buttons, css-home, css-breakpoints, css-safari.
+ *
+ * Omitted on purpose: the `css-editmode` embed (Webflow Designer/Editor-only
+ * chrome — `.wf-design-mode`, `[data-edit="true"]` — stripped from every
+ * published page, never rendered in production) and three orphaned
+ * out-of-scope-route rules (`--on-t-nav-spacer`, `.c.is-off-t-hero-scroll-media`)
+ * that nothing else in this build references.
+ */
+
+/* Nav — navigation component classes */
+.nav { z-index: 120; pointer-events: none; justify-content: space-between; align-items: center; display: flex; position: fixed; inset: 0% 0% auto; }
+.nav-ham { aspect-ratio: 1; width: 3.75rem; height: 3.75rem; color: var(--color--black); border-radius: .74rem; justify-content: center; align-items: center; display: flex; }
+.nav-brand { height: 3.75rem; }
+.nav-middle { pointer-events: auto; grid-column-gap: var(--gap); grid-row-gap: var(--gap); justify-content: center; align-items: center; display: flex; }
+.nav-inner { z-index: 50; width: 100%; padding-left: var(--gap); padding-right: var(--gap); padding-top: var(--gap); padding-bottom: var(--gap); justify-content: space-between; align-items: center; display: flex; position: relative; inset: 0% 0% auto; }
+.nav-brand-link { pointer-events: auto; transform-origin: 0 0; mix-blend-mode: normal; }
+.nav-brand-link.w--current { perspective-origin: 0 0; transform-origin: 0 0; }
+.nav-rive-w { width: 3.75rem; height: 3.75rem; }
+.nav-menu-img-w { clip-path: ellipse(120% 100% at 50% 20%); flex: none; width: 23rem; height: 25rem; position: relative; }
+.nav-menu-w { z-index: 25; background-color: var(--color--dark-green); pointer-events: auto; width: 100vw; color: var(--color--white); height: calc(var(--vh, 1vh) * 100); clip-path: ellipse(120% 100% at 50% 20%); justify-content: center; align-items: center; display: none; position: fixed; inset: 0%; overflow: clip; }
+.nav-menu-inner { height: 100%; padding: 1.25rem; display: flex; }
+.nav-menu-inner.c { justify-content: center; align-items: center; max-height: 80rem; margin-top: auto; margin-bottom: auto; padding-top: 2.5rem; padding-bottom: 2rem; }
+.nav-menu-grid { grid-column-gap: var(--gap); grid-row-gap: var(--gap); grid-template-rows: auto; grid-template-columns: 1fr 1fr; grid-auto-columns: 1fr; justify-content: space-between; width: 100%; height: 100%; padding-left: 2.25rem; padding-right: 8rem; display: flex; }
+.nav-menu-links-w { text-align: center; flex-flow: column; justify-content: space-between; align-items: center; display: flex; }
+.nav-menu-links-list { color: var(--color--green-off-white-1); flex-flow: column; justify-content: flex-start; align-items: center; display: flex; }
+.nav-menu-links-col { grid-column-gap: calc(var(--gap) * 2); grid-row-gap: calc(var(--gap) * 2); flex-flow: column; justify-content: flex-start; align-items: center; width: 100%; display: flex; }
+.nav-menu-link-w { cursor: pointer; position: relative; overflow: clip; }
+.nav-menu-link-w:hover { color: var(--color--lime-off); }
+.nav-menu-link-w.w--current { pointer-events: none; color: var(--color--green-off-white-2); cursor: auto; }
+.nav-menu-social-w { grid-column-gap: var(--padding--small); grid-row-gap: var(--padding--small); flex-flow: column; justify-content: flex-start; align-items: center; display: flex; }
+.nav-helmet-rive-w { color: var(--color--green-off-white-2); grid-column-gap: var(--gap); grid-row-gap: var(--gap); flex-flow: column; display: flex; position: relative; }
+.nav-menu-images-w { max-height: 100%; height: calc(calc(var(--vh, 1vh) * 100) - var(--gap) * 2); flex-flow: column; justify-content: flex-start; align-items: flex-start; display: flex; position: relative; }
+.nav-menu-images-track { grid-column-gap: calc(var(--gap) * 3); grid-row-gap: calc(var(--gap) * 3); flex: none; justify-content: flex-start; align-items: center; height: 100%; max-height: 100%; display: flex; }
+.nav-menu-images-col { grid-column-gap: calc(var(--gap) * 3); grid-row-gap: calc(var(--gap) * 3); flex-flow: column; flex: none; justify-content: center; align-items: center; height: auto; display: flex; }
+.nav-menu-spacer { height: 1.25rem; }
+
+/* css-root — root resets (page embed) */
+/* Note: this embed also defines :root token blocks for --cubic-default /
+   --duration-default / --animation-default / --section-padding /
+   --container-padding / --gap and the fluid-scaling variables — these
+   duplicate the canonical values in Design Tokens (Motion tokens, Fluid
+   scaling) and the per-breakpoint --min-width/--max-width/--design-unit
+   table there; not repeated here. --nav-height is folded into Design
+   Tokens > Motion tokens as the one place it's defined. */
+html { font-size: var(--fluid-font); scroll-behavior: initial; }
+body { min-height: 0vw; }
+* { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; margin: 0; padding: 0; }
+*:before, *:after { -webkit-box-sizing: inherit; -moz-box-sizing: inherit; box-sizing: inherit; }
+[data-theme="dark"] { background-color: var(--color--dark-green); color: var(--color--white); }
+[data-theme="light"] .nav { color: var(--color--black); }
+[data-theme="light"] .nav-brand path, [data-theme="light"] .nav-ln4-svg path { fill: currentColor; }
+
+/* css-utils — utilities (page embed) */
+a { color: inherit; }
+::selection { background-color: var(--color--lime); color: var(--color--black); text-shadow: none; } /* Selection */
+::-moz-selection { background-color: var(--color--lime); color: var(--color--black); text-shadow: none; }
+[data-theme="lime"] *::selection { background-color: var(--color--black); color: var(--color--lime); text-shadow: none; } /* Dark theme selection */
+[data-theme="lime"] *::-moz-selection { background-color: var(--color--black); color: var(--color--lime); text-shadow: none; }
+img::selection, svg::selection { background: transparent; }
+.display-none, [display-none] { display: none !important; }
+.visibility-hidden, [visibility-hidden] { visibility: hidden; }
+:where(svg) { height: 100%; width: 100%; max-width: none; box-sizing: border-box; vertical-align: middle; }
+:where(:focus-visible) { outline: 2px solid var(--color--lime); outline-offset: 2px; }
+:where(button) { background-color: transparent; }
+:where([screen-reader]:not(:focus, :active, :focus-within), .screen-reader:not(:focus, :active, :focus-within)) { clip-path: inset(50%) !important; height: 1px !important; width: 1px !important; overflow: hidden !important; position: absolute !important; white-space: nowrap !important; border: 0 !important; }
+.w-lightbox-close { right: 5em; height: 5em; outline: transparent; }
+body ::-webkit-scrollbar, body::-webkit-scrollbar { display: none; } /* Chrome, Safari, Opera — hide scrollbar */
+body { -ms-overflow-style: none; } /* IE & Edge */
+html { scrollbar-width: none; } /* Firefox */
+[pointer-none] { pointer-events: none; user-select: none; }
+[pointer-auto] { pointer-events: auto; }
+[overflow-clip="x"] { overflow-x: clip; }
+[overflow-clip="y"] { overflow-y: clip; }
+p, .text-small, .text-regular, .text-medium, .text-large, .text-xlarge { text-wrap: pretty; } /* ensures nice wrapping */
+textarea { resize: vertical; } /* forms */
+*[tabindex]:focus-visible, input[type="file"]:focus-visible { outline: 0.1em solid var(--color--primary); outline-offset: 0.1em; }
+.rich-text p, .rich-text ol, .rich-text li { line-height: 1.6; } /* rich text: line heights in rtf */
+.rich-text strong { } /* bolds in rtf */
+.rich-text .w-embed { } /* embed spacing in rtf */
+.rich-text a { text-decoration: none; }
+.rich-text a:hover { text-decoration: underline; }
+[data-video-stream] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; background-color: #000; } /* video */
+[data-video-stream-wrap] .iframe-wrapper { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; height: 100%; }
+[data-video-stream] iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+/* css-split-type — split text / impact type (page embed) */
+[split-text]:not[data-oval-scroll] .line { position: relative; clip-path: polygon(0 -2%, 0 94%, 100% 94%, 100% -2%); white-space: nowrap; }
+.btn-text { --text-offset: var(--text--btn-primary); }
+.btn-text.is-footer { --text-offset: var(--text--btn-footer); }
+.btn-text.is-nav { --text-offset: var(--text--btn-nav); }
+[split-text].btn-text { text-shadow: 0px var(--text-offset) currentColor; }
+[data-anim-high] .line { width: auto !important; display: inline-block !important; }
+.text-eyebrow.flex .line { display: flex !important; }
+[split-text] .char { display: inline-block; }
+.impact-content-w.is-home .text-impact-lg-mona strong { color: var(--color--lime-off); font-family: Brier; font-size: 8.25rem; line-height: 83%; letter-spacing: -0.1875rem; } /* impact text */
+.impact-content-w.on-track .text-impact-lg-mona strong { color: var(--color--grey-on-track); font-family: Brier; font-size: 8.25rem; line-height: 83%; letter-spacing: -0.1875rem; }
+.impact-content-w.off-track .text-impact-lg-mona strong { color: var(--color--green-off-white-2); font-family: Brier; font-size: 8.25rem; line-height: 83%; letter-spacing: -0.1875rem; }
+@media screen and (max-width: 991px) { .impact-content-w .text-impact-lg-mona strong { font-size: inherit !important; } }
+[split-text] { white-space: pre-line; } /* preserves line breaks */
+
+/* css-lenis — smooth scroll (page embed) */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: clip; }
+.lenis.lenis-smooth iframe { pointer-events: none; }
+/* Commented out in source (present but inert on the live site):
+   [data-nav-group] { transition: transform var(--animation-default); }
+   .lenis-top [data-nav-group="brand"] { transform: scale(1.2); }
+   .lenis-top [data-nav-group="btns"] { transform: scale(1.2); } */
+
+/* css-nav — nav theming (page embed) */
+[data-nav-theme] .nav-brand path { transition: fill var(--animation-default); }
+[data-nav-theme="light"] .nav-brand [nav-brand-path="1"] { fill: var(--color--grey-2); }
+[data-nav-theme="light"] .nav-brand [nav-brand-path="2"] { fill: var(--color--grey-1); }
+[data-nav-theme="dark"] .nav-brand [nav-brand-path="1"] { fill: var(--color--dark-green); }
+[data-nav-theme="dark"] .nav-brand [nav-brand-path="2"] { fill: var(--color--dark-green); }
+.nav-middle { transition: color var(--animation-default); }
+[data-nav-theme="light"] .nav-middle { color: var(--color--white); }
+[data-nav-theme="dark"] .nav-middle { color: var(--color--dark-green); }
+.nav-ham { transition: border-color var(--animation-default), background-color var(--animation-default); }
+[data-nav-theme="dark"] .nav-ham { border-color: var(--color--dark-green); background-color: transparent; }
+[data-nav-theme="light"] .nav-ham { border-color: var(--color--white); }
+[data-nav-wrap] canvas { width: 100%; height: 100%; }
+.nav-menu-link-current-svg { visibility: hidden; }
+.nav-menu-link-w.w--current .nav-menu-link-current-svg { visibility: visible; }
+.footer-layout-clip { --mask-url: url('/cdn.prod.website-files.com/67b5a02dc5d338960b17a7e9/67d2dd47cfe84bed1dce9542_ln4-footer-mask-desktop.svg'); -webkit-mask-image: var(--mask-url); mask-image: var(--mask-url); -webkit-mask-size: cover; mask-size: cover; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; } /* see Brand Assets: point at local assets/images/masks/footer-mask-desktop.svg instead of this hashed CDN path */
+@media only screen and (max-width: 479px) { .footer-layout-clip { --mask-url: url('/cdn.prod.website-files.com/67b5a02dc5d338960b17a7e9/67e4213817c888515fa4855b_ln4-footer-mask-mobile.svg'); } } /* local: assets/images/masks/footer-mask-mobile.svg */
+[data-footer-theme="white"] { background-color: var(--color--white); }
+[data-footer-theme="black"] { background-color: var(--color--black); }
+[data-footer-theme="black"] .footer-layout-clip { background-color: var(--color--black); }
+[data-footer-theme="green"] { background-color: var(--color--dark-green); }
+.kl-teaser-XpbhAP { opacity: 0 !important; pointer-events: none !important; }
+
+/* css-buttons — buttons (page embed) */
+[data-btn-rive-rotate="true"] .btn-rive-w { transform: rotate(180deg); }
+[data-btn-rive-rotate="90"] .btn-rive-w { transform: rotate(90deg); }
+[data-rive-btn-invert="true"] .btn-icon-w { filter: invert(1); }
+
+/* css-home — home sections (page embed) */
+/* On Track / Off Track / Partnerships page CSS is out of scope for this homepage-only build and is omitted. */
+[data-helmet-item] { --mask-url: url('/cdn.prod.website-files.com/67b5a02dc5d338960b17a7e9/67e2c781c4c953cd9e74eda5_ln4-2-helm-mask-fill.svg'); -webkit-mask-image: var(--mask-url); mask-image: var(--mask-url); -webkit-mask-size: cover; mask-size: cover; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; } /* local: assets/images/masks/helmet-mask-fill.svg */
+@media only screen and (max-width: 479px) { [data-helmet-item] { --mask-url: url('/cdn.prod.website-files.com/67b5a02dc5d338960b17a7e9/67eea130c0f25ef68ac8889e_ln4-helm-mob-refactor-lime-fill.svg'); } } /* local: assets/images/masks/helmet-mask-fill-mobile.svg */
+.home-hero-next-race-w { transition: clip-path var(--animation-default); }
+.helmet-grid-item-reveal-img { transition: clip-path var(--animation-default), transform var(--animation-default); }
+[data-helmet-item]:hover .helmet-grid-item-reveal-img { clip-path: ellipse(100% 120% at 50% 0%); transform: scale(1); }
+.helmet-grid-item-img-helmet { transition: transform var(--animation-default); }
+.helmet-grid-item-w:hover .helmet-grid-item-img-helmet { transform: scale(1.1); }
+.helmet-grid-frame.is-overlay, .helmet-grid-extender-img.is-overlay { transition: opacity var(--animation-default); }
+.helmet-grid-extender-img { transition: color var(--animation-default); }
+.helmet-grid-item-w:hover .helmet-grid-extender-img { color: var(--color--lime); }
+.helmet-grid-item-w:hover .helmet-grid-frame.is-overlay, .helmet-grid-item-w:hover .helmet-grid-extender-img.is-overlay { opacity: 1; }
+canvas[data-rive-object], canvas[data-rive-primary] { width: 100%; height: 100%; }
+@media (min-width: 1920px) { .marquee-offest-w { -webkit-mask-image: linear-gradient(90deg, hsla(0, 0%, 100%, 0), white 7.5%, white 92.5%, hsla(0, 0%, 100%, 0)); mask-image: linear-gradient(90deg, hsla(0, 0%, 100%, 0), white 7.5%, white 92.5%, hsla(0, 0%, 100%, 0)); -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-size: 100% 100%; mask-size: 100% 100%; } }
+@keyframes translateXLeft { to { transform: translateX(-100%); } }
+@keyframes translateXRight { to { transform: translateX(100%); } }
+[data-css-marquee-list="left"] { animation: translateXLeft 30s linear; animation-iteration-count: infinite; animation-play-state: paused; }
+[data-css-marquee-list="right"] { animation: translateXRight 30s linear; animation-iteration-count: infinite; animation-play-state: paused; justify-content: flex-end; }
+.c.home-hero { min-height: 100vh !important; }
+
+/* css-breakpoints — visibility utilities (page embed) */
+@media only screen and (min-width: 992px) { [data-hide="d"] { display: none; } } /* desktop only */
+@media only screen and (max-width: 991px) { [data-hide="t"] { display: none; } } /* tablet */
+@media screen and (max-width: 767px) { [data-hide="ml"] { display: none; } } /* mobile landscape */
+@media screen and (max-width: 497px) { [data-hide="m"] { display: none; } } /* mobile */
+/* Commented out in source (present but inert on the live site):
+   @media screen and (min-width:1920px) { body { font-size: 1.111111111111111rem; } } */
+
+/* css-safari — iPhone / Safari fixes (page embed) */
+.is-safari { }
+.is-iphone { }
+@media only screen and (max-width: 479px) { .is-safari .footer-layout-clip { aspect-ratio: 382.94/627.49; } .is-iphone .footer-layout-clip { aspect-ratio: 382.94/627.49; } }
+.is-safari .footer-marquee-svg, .is-iphone .footer-marquee-svg { width: 6rem; }
+.is-safari .home-collab-marquee-svg, .is-iphone .home-collab-marquee-svg { width: 9rem; }
+.is-safari .marquee-spacer, .is-iphone .marquee-spacer { width: 5rem; }
+.is-safari .nav-brand { width: 8.2rem; }

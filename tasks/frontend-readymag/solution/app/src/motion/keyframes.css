@@ -1,0 +1,92 @@
+/* Shared @keyframes for the homepage motion system. */
+
+/* Homepage path / tilt animations */
+@keyframes animation_1_1 {
+  0% { opacity: 1; offset-distance: 0px; animation-timing-function: linear; }
+  100% { opacity: 1; offset-distance: 1496px; }
+}
+@keyframes animation_2_1 {
+  0% { opacity: 1; offset-distance: 0px; animation-timing-function: linear; }
+  100% { opacity: 1; offset-distance: 1655px; }
+}
+@keyframes animation_3_1 {
+  0% { opacity: 1; offset-distance: 0px; animation-timing-function: linear; }
+  100% { opacity: 1; offset-distance: 1696px; }
+}
+@keyframes animation_4_1 {
+  0% { transform: rotate(0deg) scale(1); opacity: 1; offset-distance: 0px; animation-timing-function: ease-in-out; }
+  100% { transform: rotate(-6deg) scale(1); opacity: 1; offset-distance: 17px; }
+}
+@keyframes animation_5_1 {
+  0% { transform: rotate(0deg) scale(1); opacity: 1; offset-distance: 0px; animation-timing-function: ease-in-out; }
+  100% { transform: rotate(6deg) scale(1); opacity: 1; offset-distance: 17.88854381999832px; }
+}
+@keyframes animation_6_1 {
+  0% { transform: rotate(0deg) scale(1); opacity: 1; offset-distance: 0px; animation-timing-function: ease-in-out; }
+  100% { transform: rotate(-6deg) scale(1); opacity: 1; offset-distance: 8.48528137423857px; }
+}
+@keyframes animation_7_1 {
+  0% { opacity: 1; offset-distance: 0px; animation-timing-function: linear; }
+  100% { opacity: 1; offset-distance: 1561px; }
+}
+
+/* Viewer runtime */
+@keyframes spin {
+  0% { transform: rotate(0); }
+  to { transform: rotate(360deg); }
+}
+@keyframes preloader_rotation {
+  0% { transform: rotate(0); }
+  to { transform: rotate(360deg); }
+}
+@keyframes preloading_rotation {
+  0% { transform: rotate(0); }
+  to { transform: rotate(360deg); }
+}
+@keyframes soundcite-spin {
+  0% { transform: rotate(0); }
+  50% { transform: rotate(180deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes move {
+  0% { transform: translateY(0); animation-timing-function: ease-in; }
+  to { transform: translateY(10px); animation-timing-function: ease-out; }
+}
+@keyframes dot-anim {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+}
+@keyframes shake {
+  8%, 41% { transform: translate(-10px); }
+  25%, 58% { transform: translate(10px); }
+  75% { transform: translate(-5px); }
+  92% { transform: translate(5px); }
+  0%, to { transform: translate(0); }
+}
+@keyframes loader {
+  0% { transform: rotate(0); }
+  to { transform: rotate(360deg); }
+}
+@keyframes formsloadingindicatoranimation {
+  0% { transform: translate(-50%) translateY(-50%) rotate(0); }
+  to { transform: translate(-50%) translateY(-50%) rotate(360deg); }
+}
+
+/* Scroll-linked helpers for oracle recreation */
+@keyframes fade-up-load {
+  0% { opacity: 0; transform: translateY(24px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rm-anim-path,
+  .rm-anim-tilt,
+  .rm-anim-load {
+    animation: none !important;
+    offset-distance: 0 !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+  .rm-custom-cursor { display: none !important; }
+  body.rm-cursor-on { cursor: auto !important; }
+}

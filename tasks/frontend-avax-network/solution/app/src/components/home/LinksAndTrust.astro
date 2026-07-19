@@ -1,0 +1,154 @@
+---
+import logos from "../../data/logos.json";
+
+const cards = [
+  {
+    title: "Set up a wallet",
+    body: "To connect to the Avalanche ecosystem, set up a non-custodial wallet to store your crypto assets, approve transactions, track your network activity and more.",
+    cta: "Create a Wallet",
+    href: "https://core.app",
+    icon: "/_astro/Small_Icons_1hiqaE.svg",
+    alt: "Set up a wallet icon",
+  },
+  {
+    title: "The AVAX Token",
+    body: "AVAX powers the Avalanche network—used for paying fees, securing the platform, and fueling custom blockchain operations.",
+    cta: "Learn More",
+    href: "https://coinmarketcap.com/currencies/avalanche/",
+    icon: "/_astro/avax-token_ZNPrE8.svg",
+    alt: "The AVAX Token icon",
+  },
+  {
+    title: "Explore the Ecosystem",
+    body: "Discover the expanding web of applications, tools and experiences across the Avalanche network.",
+    cta: "Start Exploring",
+    href: "https://core.app/discover/",
+    icon: "/_astro/advisory_Z18SnDj.svg",
+    alt: "Explore the Ecosystem icon",
+  },
+];
+
+const track = [...logos, ...logos];
+---
+
+<section id="links" class="relative w-full">
+  <div class="group/section animate-in-view relative grid w-full grid-cols-1 gap-px sm:grid-cols-3">
+    {
+      cards.map((c, i) => (
+        <div
+          style={`--index: ${i};`}
+          class="links-card relative flex translate-y-1/2 flex-col items-start justify-between gap-[var(--gap-xl)] rounded-[var(--radius-4xl)] p-[var(--padding-md)] pr-[var(--padding-2xl)] transition-move group-[.visible]/section:translate-y-0 group-[.visible]/section:duration-[calc(2000ms+(400ms*var(--index)))] before:absolute before:inset-0 before:rounded-[var(--radius-4xl)] before:bg-white before:transition-mode lg:translate-y-0 lg:transition-none lg:group-[.visible]/section:duration-0 dark:before:bg-dark"
+        >
+          <div class="relative flex flex-col items-start justify-start gap-[var(--gap-lg)]">
+            <img
+              src={c.icon}
+              alt={c.alt}
+              loading="lazy"
+              decoding="async"
+              width="65"
+              height="66"
+              class="h-16 w-auto transition-filter duration-300 ease-out-cubic lg:h-[clamp(2.25rem,0.25rem+3.125vw,4rem)] dark:invert"
+            />
+            <h2 class="h6 uppercase">{c.title}</h2>
+            <p class="-mt-[var(--padding-md)] leading-[135%]">{c.body}</p>
+          </div>
+          <a class="group/button button arrow inline-flex w-auto" href={c.href} target="_blank" rel="noopener">
+            <wm-shape
+              id="button"
+              rounded="clamp(0.625rem, 0.196rem + 0.67vw, 1rem)"
+              rounded-mobile="clamp(0.875rem, 0.803rem + 0.309vw, 1rem)"
+              corner-rounded="clamp(0.25rem, 0.107rem + 0.223vw, 0.375rem)"
+              corner-rounded-mobile="clamp(0.313rem, 0.276rem + 0.154vw, 0.375rem)"
+              corner-size="clamp(1.125rem, -0.161rem + 2.009vw, 2.25rem)"
+              corner-size-mobile="clamp(2rem, 1.855rem + 0.617vw, 2.25rem)"
+            ></wm-shape>
+            {c.cta}
+            <span class="sr-only">about {c.title}</span>
+          </a>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<section id="companies" class="relative w-full will-change-transform">
+  <div
+    class="group/section animate-in-view relative flex w-full flex-col items-stretch justify-start overflow-clip rounded-[var(--radius-4xl)] bg-white px-[var(--padding-md)] pb-0 pt-[var(--padding-3xl)] text-black transition-mode lg:p-[var(--padding-3xl)] lg:pb-0 lg:pr-[var(--padding-md)]"
+  >
+    <div class="grid place-items-start gap-[var(--gap-xl)] overflow-x-clip border-none pb-[var(--padding-xl)] lg:grid-cols-[5fr_2fr]">
+      <div class="flex flex-col items-start justify-end gap-[var(--gap-xl)] sm:flex-row sm:items-center lg:col-start-1 lg:items-end">
+        <svg
+          viewBox="0 0 120 120"
+          fill="none"
+          class="w-[clamp(4rem,1.975rem+8.642vw,7.5rem)] shrink-0 -translate-x-[calc(100%+1px)] stroke-[1rem] transition-move group-[.visible]/section:translate-x-0 group-[.visible]/section:delay-500 lg:w-[clamp(4rem,0rem+6.25vw,7.5rem)] lg:self-start dark:text-white"
+          aria-hidden="true"
+        >
+          <path d="M61.25 55.3594L6.25001 114M6.25 6L43.1843 45.6563" stroke="currentcolor" fill="none"></path>
+        </svg>
+        <h2 class="h4 max-w-256 split-heading text-balance text-left leading-none uppercase dark:text-white">
+          Avalanche is Trusted by Businesses Worldwide
+        </h2>
+      </div>
+      <p class="split-text sm:text-balance leading-[135%] lg:self-end">
+        Founders, developers and business leaders across the globe chose Avalanche for their digital asset operations, backed by a reliable, enterprise-grade blockchain network.
+      </p>
+    </div>
+
+    <div
+      id="marquee"
+      class="marquee flex w-max select-none flex-row items-stretch justify-center overflow-clip border-t border-neutral-200 bg-neutral-200"
+      style="--duration: 31.5s; --direction: normal;"
+    >
+      <div class="marquee-content flex h-full shrink-0 items-center justify-start gap-px pr-px" style="--duration: 31.5s; --direction: normal;">
+        {
+          track.map((logo) => (
+            <div class="group relative flex aspect-[3/2] w-50 shrink-0 items-center justify-center overflow-clip rounded-2xl bg-white transition-mode lg:w-[clamp(10rem,0rem+15.625vw,18.75rem)] dark:bg-dark">
+              <div
+                class="logo-gradient pointer-events-none absolute left-1/2 top-1/2 aspect-square min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 scale-[1.4] overflow-clip opacity-0 transition-[clip-path,opacity] duration-300 ease-out-quart group-hover:opacity-100 lg:opacity-100 lg:duration-1000"
+                style={`--from:${logo.from};--via:${logo.via};--to:${logo.to};`}
+              ></div>
+              <img
+                src={`/images/logos/${logo.stem}.webp`}
+                alt={logo.alt}
+                width="300"
+                height="200"
+                loading="eager"
+                decoding="async"
+                class="pointer-events-none relative h-[90%] w-auto select-none transition-all duration-300 ease-out-cubic group-hover:invert lg:h-[80%] lg:duration-1000"
+              />
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import gsap from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+  gsap.registerPlugin(ScrollTrigger);
+
+  const setup = () => {
+    if (window.innerWidth <= 1024) return;
+    const cards = document.querySelectorAll(".links-card");
+    const companies = document.getElementById("companies");
+    const nav = document.getElementById("navigation-inner");
+    if (!cards.length || !companies) return;
+    const n = (cards[0] as HTMLElement).clientHeight;
+    companies.style.setProperty("--y", String(n * 2));
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: "#links",
+        start: "top bottom",
+        end: `top ${(nav?.clientHeight || 0) - 1}`,
+        scrub: true,
+      },
+    });
+    cards.forEach((card, i) => {
+      tl.from(card, { yPercent: 100 * i }, "<");
+    });
+    tl.from(companies, { y: n * 2 }, "<");
+  };
+  window.addEventListener("load", setup);
+</script>

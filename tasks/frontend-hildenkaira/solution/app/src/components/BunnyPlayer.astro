@@ -1,0 +1,86 @@
+---
+// Custom in-card video player: play/pause, timeline scrub, mute, fullscreen,
+// caption + likes overlay. All behavior is wired up in scripts/player.js.
+interface Props {
+  src: string;
+  poster?: string;
+  caption?: string;
+  pf?: string;
+  likes?: string;
+  class?: string;
+}
+const { src, poster, caption, pf, likes, class: extra = "" } = Astro.props;
+---
+<div
+  class={`bunny-player is-bts ${extra}`}
+  data-bunny-player-init
+  data-player-src={src}
+  data-player-status="idle"
+  data-player-muted="true"
+  data-player-fullscreen="false"
+  data-player-activated="false"
+  data-player-hover
+  data-player-lazy
+>
+  <video class="bunny-player__video" muted loop playsinline preload="none" poster={poster}></video>
+  {poster && <img class="bunny-player__placeholder" src={poster} alt="" loading="lazy" />}
+  <div class="bunny-player__dark"></div>
+
+  <div class="bunny-player__interface">
+    <div class="bunny-player__interface-fade"></div>
+    {caption && (
+      <div class="bunny-player__caption">
+        <p class="paragraph-xs text-clamp-line-03" data-split-visible>{caption}</p>
+        <div class="bunny-player__caption-side">
+          {pf && (
+            <div class="bunny-player__caption-pf">
+              <img class="image" src={pf} alt="" loading="lazy" />
+            </div>
+          )}
+          <div class="bunny-player__caption-likes">
+            <svg class="icon-24px" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 21s-7.5-4.7-9.7-9C.7 8.7 2.3 5 5.7 5c2 0 3.3 1 4.3 2.6h4C15 6 16.3 5 18.3 5c3.4 0 5 3.7 3.4 7-2.2 4.3-9.7 9-9.7 9Z" transform="scale(.92) translate(1 .5)"/></svg>
+            <div class="paragraph-xs" data-split-visible>{likes}</div>
+          </div>
+        </div>
+      </div>
+    )}
+    <div class="bunny-player__interface-bottom">
+      <div class="bunny-player__toggle-playpause" data-player-control="playpause" role="button" aria-label="Play or pause">
+        <svg class="bunny-player__pause-svg" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+        <svg class="bunny-player__play-svg" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display:none"><path d="M7 4v16l13-8L7 4Z"/></svg>
+      </div>
+      <div class="bunny-player__time">
+        <p class="bunny-player__text" data-player-time-progress data-split-visible>00:00</p>
+        <p class="bunny-player__text is--transparent" data-split-visible>/</p>
+        <p class="bunny-player__text is--transparent" data-player-time-duration data-split-visible>00:00</p>
+      </div>
+      <div class="bunny-player__timeline" data-player-timeline>
+        <div class="bunny-player__timeline-bar">
+          <div class="bunny-player__timeline-bg"></div>
+          <div class="bunny-player__timeline-buffered" data-player-buffered></div>
+          <div class="bunny-player__timeline-progress" data-player-progress></div>
+        </div>
+        <div class="bunny-player__timeline-handle" data-player-timeline-handle></div>
+      </div>
+      <div class="bunny-player__interface-btns">
+        <div class="bunny-player__toggle-mute" data-player-control="mute" role="button" aria-label="Mute or unmute">
+          <svg class="bunny-player__volume-up-svg" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display:none"><path d="M4 9v6h4l5 4V5L8 9H4Zm12.5 3a3.5 3.5 0 0 0-2-3.2v6.3a3.5 3.5 0 0 0 2-3.1Z"/></svg>
+          <svg class="bunny-player__volume-mute-svg" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Zm12 0 4 6m0-6-4 6" stroke="currentColor" stroke-width="1.8"/></svg>
+        </div>
+        <div class="bunny-player__toggle-fullscreen" data-player-control="fullscreen" role="button" aria-label="Toggle fullscreen">
+          <svg class="bunny-player__fullscreen-scale-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5m11-5v5h-5"/></svg>
+          <svg class="bunny-player__fullscreen-shrink-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display:none"><path d="M9 4v5H4m16 0h-5V4M9 20v-5H4m16 0h-5v5"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bunny-player__playpause" data-player-control="big-playpause">
+    <div class="bunny-player__big-btn">
+      <svg class="bunny-player__play-svg" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M7 4v16l13-8L7 4Z"/></svg>
+    </div>
+  </div>
+  <div class="bunny-player__loading">
+    <svg class="bunny-player__loading-svg vimeo-player__loading-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5" stroke-dasharray="42" stroke-dashoffset="14"/></svg>
+  </div>
+</div>

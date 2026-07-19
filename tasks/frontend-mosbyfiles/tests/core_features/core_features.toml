@@ -1,0 +1,276 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/mcp/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "1_1"
+description = "On load the document title is exactly \"Mosby's Files—American Modernist Architecture\" and the hero shows the display title \"American modernism\""
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "1_2"
+description = "On load the home stack shows four category groups named exactly \"Organic & Early Modernism\", \"Expressive\", \"Monumental Modernism\", and \"Place / culture continuity\""
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "1_3"
+description = "On load all eight architect names appear as tags across the four categories: Frank Lloyd Wright, Irving Gill, Frank Gehry, Louis Kahn, I. M. Pei, Paul Rudolph, Louis Sullivan, and Mary Colter"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "1_4"
+description = "The category covers compute their exact fills: Organic & Early Modernism #1E4BD7, Expressive #0C7866, Monumental Modernism #581E70, and Place / culture continuity #D71E1E"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "1_5"
+description = "After clicking the Louis Kahn tag, the visible route swaps to a case page (no full page reload) showing the heading \"Louis Kahn\" and a case document title of \"Louis Kahn—Mosby's Files\""
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "1_6"
+description = "After opening a case via a tag, the folder cover transforms in 3D (a rotateY matrix3d transform), not a flat opacity fade, revealing the portrait sheet with a born/died line and biography"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "1_7"
+description = "After opening the Louis Kahn case, rotated sibling tags for I. M. Pei and Paul Rudolph are shown, and clicking one swaps to that sibling case"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "1_8"
+description = "After opening the Louis Kahn case and clicking the audio scrapbook item, a waveform audio player opens offering parts louis_kahn_part_1 and louis_kahn_part_2 with a working play control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "1_9"
+description = "After opening a video case (e.g. Frank Gehry) and its video poster item, a media popup opens with a local video player and no live external video iframe; the close button and backdrop both close it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "1_10"
+description = "After navigating to About, the document title is \"About Mosby's Files—The Archive & The Idea\", the fixed header is hidden, and the essay plus a photo gallery with captions and a Tubik Studio signature are shown"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "1_11"
+description = "When hovering a home category group its cover lifts and its chevron rotates, and when hovering the About nav item its opacity rises from 0.8 to 1"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "1_12"
+description = "When dragging a scrapbook note or photo with the pointer, the item follows and stays at its released position"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "1_13"
+description = "After exercising navigation, popups, and media across the home, about, and case routes, the network log contains zero non-candidate-origin asset requests (no Storyblok, Vercel Blob, Vimeo, or web font hosts) and localStorage and sessionStorage remain empty"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "1_14"
+description = "All eight case routes (frank-lloyd-wright, irving-gill, frank-gehry, louis-kahn, i-m-pei, paul-rudolph, louis-sullivan, mary-colter) render their architect heading without error"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "1_15"
+description = "The document title is exactly \"Mosby's Files—American Modernist Architecture\" and the home hero shows the display title \"American modernism\" with a supporting paragraph"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "1_16"
+description = "The home stack shows four category groups named exactly \"Organic & Early Modernism\", \"Expressive\", \"Monumental Modernism\", and \"Place / culture continuity\""
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "1_17"
+description = "All eight architect names appear as tags mapped to the correct categories: Frank Lloyd Wright and Irving Gill under Organic & Early Modernism, Frank Gehry under Expressive, Louis Kahn and I. M. Pei and Paul Rudolph under Monumental Modernism, Louis Sullivan and Mary Colter under Place / culture continuity"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "1_18"
+description = "Clicking an architect tag swaps the visible route to that case page without a full page reload, showing the architect name as the largest heading and the matching case document title (e.g. \"Louis Kahn—Mosby's Files\")"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "1_19"
+description = "Each case route reveals a portrait sheet carrying the architect photo, a born and died line, and a biography, sitting under a folder cover in the architect's category color"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "1_20"
+description = "Each case shows rotated sibling tags for the other architects in its category, and clicking a sibling tag swaps to that sibling case (Louis Kahn, I. M. Pei, and Paul Rudolph link to each other)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "1_21"
+description = "Each case shows a scrapbook of loose positioned items drawn from notes, photographs, a paperclip, a plan or drawing, and per architect a video poster, a PDF preview, or an audio card"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "1_22"
+description = "The Louis Kahn case opens a waveform audio player with two parts louis_kahn_part_1 and louis_kahn_part_2 that draw waveform bars from local data and play and pause local audio"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "1_23"
+description = "A video case (e.g. Frank Gehry) opens a media popup that plays a local video with a local poster image, and the red close button and the dimmed backdrop both close the popup and stop the media"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "1_24"
+description = "The About route shows the title \"About Mosby's Files—The Archive & The Idea\", a long-form essay rejecting a Bauhaus-only origin and closing that the folder is open, a photo gallery with captions naming the Salk Institute, the Dhaka Assembly, Yale Art & Architecture, and the Pei East Building, and a Sergii Valiukh / Tubik Studio signature"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "1_25"
+description = "All ten routes are reachable and every one of the eight case routes (frank-lloyd-wright, irving-gill, frank-gehry, louis-kahn, i-m-pei, paul-rudolph, louis-sullivan, mary-colter) renders its architect heading without error"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "1_26"
+description = "Triggering the overscroll affordance at the bottom of a case advances to the next architect case in sequence"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "1.27"
+name = "1_27"
+description = "The footer shows two wind rose graphics, an architectural scale graphic, a masked signature, and a Tubik Studio credit that navigates outbound to tubikstudio.com"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "1.28"
+name = "1_28"
+description = "One or more of the eight case routes fails to render its architect content"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.29"
+name = "1_29"
+description = "Case routes navigate via outbound anchor href full page loads instead of an in-app route swap"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.30"
+name = "1_30"
+description = "The popup video embeds a live player.vimeo.com iframe or other remote video player instead of a local poster and local video"
+type = "binary"
+weight = 1.0
+negate = true

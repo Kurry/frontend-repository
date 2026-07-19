@@ -1,0 +1,19 @@
+---
+import SolutionLayout from "../../layouts/SolutionLayout.astro";
+import pressPosts from "../../data/press-posts.json";
+---
+
+<SolutionLayout title="Press" headline="Press" lede="Coverage and announcements from Avalanche and Ava Labs.">
+  <section class="group/section animate-in-view mx-[var(--padding-base)] mt-px section-shell">
+    <ul class="divide-y divide-neutral-800">
+      {pressPosts.map((post, i) => (
+        <li class="reveal-y" style={`--index:${i}`}>
+          <a href={post.href} class="flex items-center justify-between gap-4 py-5 transition-colors hover:text-red">
+            <span class="font-aeonik text-[var(--text-lg)] font-semibold">{post.title}</span>
+            <span class="shrink-0 text-neutral-500">→</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</SolutionLayout>

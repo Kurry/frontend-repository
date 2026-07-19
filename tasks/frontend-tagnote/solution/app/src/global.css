@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+:root {
+  --color-primary: #E6EEF7;
+  --color-secondary: #FFCC00;
+  --color-accent: #007AFF;
+  --color-background: #F5F5F7;
+  --color-text-primary: #1D1D1E;
+  --color-link: #007AFF;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: SF Pro, -apple-system, BlinkMacSystemFont, Apple Color Emoji, SF Pro, Helvetica Neue, Helvetica, Arial, sans-serif;
+  font-size: 17px;
+  color: var(--color-text-primary);
+  background: var(--color-background);
+  margin: 0;
+}
+
+button:focus-visible,
+input:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.shake {
+  animation: shake 0.3s ease-in-out;
+}

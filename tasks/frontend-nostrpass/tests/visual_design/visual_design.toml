@@ -1,0 +1,129 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/mcp/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "3_1"
+description = "A persistent left sidebar shows a vault brand mark and a vertical nav list (Dashboard, Identities, Permissions, Audit log, Settings) with the active item visually distinct"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "3_2"
+description = "The dashboard's public-key and private-key surfaces render in a monospace typeface distinct from the rest of the UI's default sans type"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "3_3"
+description = "The active identity's card in the Identities grid is visually highlighted (distinct border/background) and carries an Active badge"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "3_4"
+description = "Per-app permission state is shown with badge or switch styling that visually differs between granted and revoked states"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "3_5"
+description = "Both light and dark theme surfaces are fully styled (backgrounds, borders, text contrast) with no unstyled or broken-looking regions in either theme"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "3_6"
+description = "Stat tiles (identity count, connected-app count, audit-entry count) are visually distinct compact cards, not plain inline text"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.7"
+name = "3_7"
+description = "The Permissions view groups all four named applications in a single panel naming the active identity, not scattered across unrelated views"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.8"
+name = "3_8"
+description = "The layout is an unstyled or default-browser-styling list with no card, panel, or badge treatment for identities, keys, or permissions"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.9"
+name = "3_9"
+description = "The dark theme leaves any region with unreadable low-contrast text against its background"
+type = "binary"
+weight = 0.5
+negate = true
+optional = true

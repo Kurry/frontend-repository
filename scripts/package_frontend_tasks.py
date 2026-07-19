@@ -317,6 +317,1930 @@ TASK_SPECS: dict[str, dict] = {
     },
 }
 
+# Website-fidelity tasks converted from website-prds (pixel-perfect genre).
+TASK_SPECS.update({
+    "frontend-avax-network": {
+        "source": "AvaxNetwork",
+        "description": "Avalanche network marketing homepage fidelity eval.",
+        "modules": [
+            "browse-query-v1",
+            "form-workflow-v1"
+        ],
+        "bindings": {
+            "destinations": [
+                "hero",
+                "solutions-insights",
+                "links",
+                "companies",
+                "developers-hub",
+                "numbers",
+                "blog",
+                "solutions",
+                "community",
+                "event",
+                "questions",
+                "newsletter",
+                "contact-us",
+                "footer"
+            ],
+            "themes": [
+                "light",
+                "dark"
+            ],
+            "form_fields": [
+                "firstname",
+                "lastname",
+                "email",
+                "twitterhandle",
+                "country",
+                "vertical",
+                "project_type",
+                "avalanche_contact_message",
+                "gdpr",
+                "marketing_consent",
+                "newsletter"
+            ],
+            "form_operations": [
+                "validate",
+                "submit",
+                "cancel",
+                "reset",
+                "advance",
+                "return"
+            ],
+            "workflow_steps": [
+                "step-1",
+                "step-2",
+                "step-3",
+                "step-4",
+                "step-5"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Hero clipped-panel entrance + layered alpha video sequence + HUD reveal stay Playwright-observed",
+            "Scroll-reveal line reveals and split-heading character flash stay Playwright-observed (real scroll path only)",
+            "Blog Swiper drag/arrow paging and reset-to-slide-0 on upward exit stay Playwright-observed",
+            "Logo marquee (31.5s) and footer wordmark marquee (5s) pause-on-hover stay Playwright-observed",
+            "Theme cross-fade timing (~0.3s) stays Playwright-observed",
+            "Desktop links card scrub / companies rise stays Playwright-observed"
+        ]
+    },
+    "frontend-hildenkaira": {
+        "source": "Hildenkaira",
+        "description": "Hilden & Kaira social-media agency homepage fidelity eval.",
+        "modules": [
+            "browse-query-v1",
+            "form-workflow-v1",
+            "command-session-v1"
+        ],
+        "bindings": {
+            "browsable_entity": "clients",
+            "destinations": [
+                "hero",
+                "statement",
+                "client",
+                "services",
+                "testimonials",
+                "cta",
+                "footer"
+            ],
+            "locales": [
+                "en",
+                "fi"
+            ],
+            "form_fields": [
+                "email",
+                "phone",
+                "terms"
+            ],
+            "form_operations": [
+                "validate",
+                "submit",
+                "reset"
+            ],
+            "session_operations": [
+                "start",
+                "pause",
+                "resume",
+                "stop"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Flick-card elastic reshuffle coordinate transforms stay Playwright-only",
+            "Swiper client/testimonial scale (1 / 0.94) and paging stay Playwright-observed",
+            "Hero floating letterform/thumbnail loops stay Playwright-only",
+            "Nav-theme scroll-sync class swap stays Playwright-observed",
+            "Bunny player timeline drag/scrub and interface hide-show stay Playwright-only",
+            "Momentum/inertia hover stays Playwright-only",
+            "Dynamic counter ticking stays Playwright-observed",
+            "Mobile lime menu open animation stays Playwright-only",
+            "SplitText line-mask reveals stay Playwright-only"
+        ]
+    },
+    "frontend-landonorris": {
+        "source": "LandoNorris",
+        "description": "Lando Norris F1 driver homepage fidelity eval.",
+        "modules": [
+            "browse-query-v1",
+            "command-session-v1"
+        ],
+        "bindings": {
+            "destinations": [
+                "hero",
+                "horizontal-media",
+                "helmet-grid",
+                "collabs",
+                "social-stream",
+                "footer",
+                "menu"
+            ],
+            "session_operations": [
+                "start",
+                "pause",
+                "restart"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Menu overlay open/close slide stays Playwright-observed",
+            "Horizontal-track and helmet-grid scroll-linked motion stays Playwright-observed",
+            "Social hover-to-play and placeholder fade stays Playwright-observed",
+            "WebGL / Rive rendering stays Playwright-observed"
+        ]
+    },
+    "frontend-mosbyfiles": {
+        "source": "MosbyFiles",
+        "description": "Mosby's Files American Modernist architecture editorial archive fidelity eval.",
+        "modules": [
+            "browse-query-v1",
+            "command-session-v1"
+        ],
+        "bindings": {
+            "destinations": [
+                "home",
+                "about",
+                "frank-lloyd-wright",
+                "irving-gill",
+                "frank-gehry",
+                "louis-kahn",
+                "i-m-pei",
+                "paul-rudolph",
+                "louis-sullivan",
+                "mary-colter"
+            ],
+            "session_operations": [
+                "play-video",
+                "pause-video",
+                "play-audio",
+                "pause-audio",
+                "open-popup",
+                "close-popup",
+                "advance-case"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Folder-open/close Flip transition stays Playwright-observed",
+            "Scrapbook Draggable stays Playwright-observed",
+            "Stack hover/unfold and tag hover lift stay Playwright-observed",
+            "Gallery crossfade and hero SplitText reveal stay Playwright-observed",
+            "Overscroll scroll-linked motion stays Playwright-observed"
+        ]
+    },
+    "frontend-razorpay-sprint-26": {
+        "source": "RazorpaySprint26",
+        "description": "Razorpay Sprint 2026 marketing microsite fidelity eval.",
+        "modules": [
+            "browse-query-v1",
+            "command-session-v1"
+        ],
+        "bindings": {
+            "destinations": [
+                "hero",
+                "agentic-stack",
+                "international",
+                "payment-gateway",
+                "d2c",
+                "marketing",
+                "business-banking"
+            ],
+            "session_operations": [
+                "start",
+                "stop",
+                "trigger_demo"
+            ],
+            "demos": [
+                "mobile-menu"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Preloader translateY exit stays Playwright-observed",
+            "Three.js scroll-hero camera scrub / desktop mouse parallax stays Playwright-observed",
+            "GSAP section pinning + parallax reveal stays Playwright-observed",
+            "Rive lazy hydration + hover scale(1.03) stays Playwright-observed",
+            "Word-reveal heading sequencing stays Playwright-observed",
+            "Video-modal scroll lock stays Playwright-observed"
+        ]
+    },
+    "frontend-readymag": {
+        "source": "Readymag",
+        "description": "Readymag design-tool marketing homepage fidelity eval.",
+        "modules": [
+            "browse-query-v1",
+            "command-session-v1"
+        ],
+        "bindings": {
+            "destinations": [
+                "hero",
+                "workflow",
+                "teams",
+                "support",
+                "closing"
+            ],
+            "session_operations": [
+                "advance"
+            ],
+            "demos": [
+                "solutions-menu"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Offset-path gallery marquees stay Playwright-observed",
+            "Tilt accents (hero card / Ready / question mark) stay Playwright-observed",
+            "Support orb path travel stays Playwright-observed",
+            "Slideshow 2200ms timing stays Playwright-observed",
+            "Reveal-on-scroll (feature cards) stays Playwright-observed",
+            "Custom cursor follow / hover-swap stays Playwright-observed"
+        ]
+    },
+    "frontend-units-gr": {
+        "source": "UnitsGr",
+        "description": "units.gr all-inclusive student-housing marketing homepage fidelity eval.",
+        "modules": [
+            "browse-query-v1"
+        ],
+        "bindings": {
+            "browsable_entity": "sections",
+            "destinations": [
+                "home-hero",
+                "locations",
+                "living",
+                "typical-unit",
+                "community",
+                "what-we-stand-for",
+                "insta-feed",
+                "book-cta",
+                "menu"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Custom cursor press/scale gesture stays Playwright-observed",
+            "Shape-overlay path morph on hover stays Playwright-observed",
+            "Home skeleton intro timeline stays Playwright-observed",
+            "Marquee infinite horizontal loop stays Playwright-observed",
+            "Swiper drag/slide transition stays Playwright-observed"
+        ]
+    },
+    "frontend-wolverineworldwide": {
+        "source": "WolverineWorldwide",
+        "description": "Wolverine Worldwide corporate marketing homepage fidelity eval.",
+        "modules": [
+            "browse-query-v1"
+        ],
+        "bindings": {
+            "browsable_entity": "homepage-section",
+            "destinations": [
+                "hero",
+                "brand-portfolio",
+                "annual-report",
+                "culture-statement",
+                "market-snapshot",
+                "latest-news",
+                "culture-stats",
+                "awards",
+                "careers-cta",
+                "mobile-menu",
+                "responsibility-dropdown"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Header scroll-morph timing stays Playwright-observed",
+            "Particles rAF parallax stays Playwright-observed",
+            "Hero-home GSAP intro timing stays Playwright-observed",
+            "Carousel drag geometry stays Playwright-observed",
+            "Mobile-menu clip-path stagger stays Playwright-observed",
+            "Cookie-consent modal transition stays Playwright-observed"
+        ]
+    }
+})
+
+
+# Hard browser_* and framework-rebuild conversions (2026-07-19 wave).
+TASK_SPECS.update({
+    "frontend-focuspath": {
+        "source": "Focuspath",
+        "description": "FocusPath goal decomposition and roadmap tool good-app eval.",
+        "modules": [
+            "entity-collection-v1",
+            "browse-query-v1",
+            "command-session-v1"
+        ],
+        "bindings": {
+            "entity": [
+                "goal",
+                "milestone",
+                "step"
+            ],
+            "entity_operations": [
+                "create",
+                "select",
+                "update",
+                "delete",
+                "toggle",
+                "reorder"
+            ],
+            "destinations": [
+                "goals-overview",
+                "goal-detail",
+                "completed-goals"
+            ],
+            "session_operations": [
+                "start",
+                "pause",
+                "resume",
+                "connect",
+                "disconnect"
+            ],
+            "demos": [
+                "deliver-out-of-order"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Milestone-complete node fill-in animation stays Playwright-observed",
+            "Overview-detail view transition stays Playwright-observed",
+            "Narrow-viewport horizontal-vertical path reflow stays Playwright-observed",
+            "Hover/focus washes on nodes, rows, and toggles stay Playwright-observed"
+        ]
+    },
+    "frontend-mineclash": {
+        "source": "Mineclash",
+        "description": "Dueling minefield puzzle game good-app eval.",
+        "modules": [
+            "command-session-v1",
+            "browse-query-v1"
+        ],
+        "bindings": {
+            "session_operations": [
+                "start",
+                "pause",
+                "resume",
+                "restart",
+                "stop"
+            ],
+            "destinations": [
+                "game-board",
+                "stats"
+            ],
+            "filters": [
+                "difficulty"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Tile reveal click + adjacency/ore reveal stays Playwright-observed",
+            "Flag Mode toggle + flagged-tile behavior stays Playwright-observed",
+            "Rival AI thinking-delay animation + heuristic timing stays Playwright-observed",
+            "Hint reveal, Strike-icon fill animation, and Web Audio tones stay Playwright-observed",
+            "Narrow-viewport grid scaling stays Playwright-observed"
+        ]
+    },
+    "frontend-letterdrop": {
+        "source": "Letterdrop",
+        "description": "LetterDrop falling-tile canvas word game good-app eval.",
+        "modules": [
+            "command-session-v1",
+            "browse-query-v1"
+        ],
+        "bindings": {
+            "session_operations": [
+                "start",
+                "pause",
+                "resume",
+                "restart"
+            ],
+            "destinations": [
+                "game-board",
+                "match-history",
+                "achievements"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Falling-tile canvas physics/timing and gradual acceleration stay Playwright-observed",
+            "Tile tap selection and word-tray build stay Playwright-observed",
+            "Danger-line crossing to Game Over stays Playwright-observed",
+            "Combo streak meter animation, power-tile toasts, invalid-word tray shake stay Playwright-observed",
+            "Undo Last Tile and narrow-viewport canvas scaling stay Playwright-observed"
+        ]
+    },
+    "frontend-frameflick": {
+        "source": "Frameflick",
+        "description": "FrameFlick screenshot-dressing canvas compositor good-app eval.",
+        "modules": [
+            "structured-editor-v1",
+            "entity-collection-v1"
+        ],
+        "bindings": {
+            "editor_operations": [
+                "update_property",
+                "switch_mode",
+                "set_content",
+                "preview"
+            ],
+            "editor_properties": [
+                "background",
+                "custom-background",
+                "padding",
+                "corner-radius",
+                "shadow",
+                "frame-style",
+                "caption-text",
+                "caption-position",
+                "caption-size",
+                "caption-color",
+                "watermark",
+                "watermark-text",
+                "watermark-opacity",
+                "watermark-corner",
+                "zoom"
+            ],
+            "editor_modes": [
+                "square",
+                "widescreen",
+                "story",
+                "original"
+            ],
+            "value_bounds": [
+                "padding 0-25",
+                "corner-radius 0-48",
+                "shadow 0-10",
+                "caption-size 12-64",
+                "watermark-opacity 5-100",
+                "zoom 20-200"
+            ],
+            "entity": "preset",
+            "entity_operations": [
+                "create",
+                "select",
+                "delete"
+            ],
+            "entity_fields": [
+                "name",
+                "settings"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Drag-to-reposition and the Zoom slider gesture stay Playwright-only",
+            "Drag-and-drop upload stays Playwright-observed",
+            "Live canvas render fidelity, Download PNG 2x rasterization, and Copy Image clipboard stay Playwright-only",
+            "Collaboration Scenario merge convergence stays Playwright-only"
+        ]
+    },
+    "frontend-dare-night": {
+        "source": "DareNight",
+        "description": "Dare Night pass-the-device party card game good-app eval.",
+        "modules": [
+            "command-session-v1",
+            "entity-collection-v1",
+            "form-workflow-v1"
+        ],
+        "bindings": {
+            "session_operations": [
+                "start",
+                "pause",
+                "resume",
+                "stop",
+                "restart",
+                "advance",
+                "trigger_demo",
+                "connect",
+                "disconnect"
+            ],
+            "demos": [
+                "deliver-out-of-order"
+            ],
+            "entity_operations": [
+                "create",
+                "select",
+                "update",
+                "delete",
+                "toggle"
+            ],
+            "entity_fields": [
+                "prompt",
+                "category",
+                "intensity",
+                "name",
+                "outcome"
+            ],
+            "form_operations": [
+                "validate",
+                "submit",
+                "cancel",
+                "reset"
+            ],
+            "form_fields": [
+                "player-name",
+                "card-prompt",
+                "card-category",
+                "card-intensity"
+            ],
+            "workflow_steps": [
+                "player-setup",
+                "start-game",
+                "add-custom-card"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Card-flip / toast / timer-pulse animation timing stays Playwright-observed",
+            "Live-stream tick timing stays Playwright-observed"
+        ]
+    },
+    "frontend-lineforge": {
+        "source": "Lineforge",
+        "description": "LineForge chess opening study app good-app eval.",
+        "modules": [
+            "browse-query-v1",
+            "entity-collection-v1",
+            "command-session-v1"
+        ],
+        "bindings": {
+            "browsable_entity": "openings",
+            "destinations": [
+                "library",
+                "explorer",
+                "practice",
+                "notable-games",
+                "saved-lines"
+            ],
+            "filters": [
+                "favorites",
+                "family"
+            ],
+            "themes": [
+                "classic",
+                "forest",
+                "slate"
+            ],
+            "entity": "saved-line",
+            "entity_operations": [
+                "create",
+                "select",
+                "update",
+                "delete",
+                "toggle"
+            ],
+            "entity_fields": [
+                "name"
+            ],
+            "session_operations": [
+                "start",
+                "pause",
+                "resume",
+                "disconnect",
+                "restart",
+                "advance",
+                "trigger_demo"
+            ],
+            "demos": [
+                "deliver-out-of-order"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Board move animation, piece-lift, and practice green/red flash timing stay Playwright-observed (gesture/transient mechanics)"
+        ]
+    },
+    "frontend-notenest": {
+        "source": "Notenest",
+        "description": "Nested-folder note-taking app good-app eval.",
+        "modules": [
+            "entity-collection-v1",
+            "browse-query-v1",
+            "structured-editor-v1"
+        ],
+        "bindings": {
+            "browsable_entity": "notes",
+            "destinations": [
+                "all-notes",
+                "trash"
+            ],
+            "entity": "note",
+            "entity_operations": [
+                "create",
+                "select",
+                "update",
+                "delete",
+                "toggle"
+            ],
+            "entity_fields": [
+                "title",
+                "body",
+                "folder",
+                "pinned",
+                "color",
+                "checklist-item"
+            ],
+            "editor_object_types": [
+                "checklist-block"
+            ],
+            "editor_operations": [
+                "set_content",
+                "add"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Bold/Italic/Bulleted-List formatting stays Playwright-driven (selection-dependent, mechanism matters)",
+            "Load 10,000 Items virtualized scroll/overscan geometry stays Playwright-observed",
+            "Raw image blobs / file paths must not appear in WebMCP args"
+        ]
+    },
+    "frontend-feltrun": {
+        "source": "Feltrun",
+        "description": "Single-player Texas hold'em poker table good-app eval.",
+        "modules": [
+            "command-session-v1",
+            "browse-query-v1",
+            "structured-editor-v1"
+        ],
+        "bindings": {
+            "session_operations": [
+                "start",
+                "advance",
+                "restart",
+                "trigger_demo",
+                "connect",
+                "disconnect"
+            ],
+            "destinations": [
+                "table",
+                "stats",
+                "hand-history",
+                "badges",
+                "collaboration"
+            ],
+            "editor_operations": [
+                "add",
+                "update_property"
+            ],
+            "editor_object_types": [
+                "shared-note"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Hand-equity meter transition on each new street stays Playwright-observed",
+            "Badge-unlock toast and showdown reveal stay Playwright-observed",
+            "Concurrent-merge delivery ordering and same-note conflict resolution stay Playwright-driven"
+        ]
+    },
+    "frontend-cipherlog": {
+        "source": "Cipherlog",
+        "description": "CipherLog covert-transmissions memo log good-app eval.",
+        "modules": [
+            "entity-collection-v1",
+            "browse-query-v1"
+        ],
+        "bindings": {
+            "entity": "memo",
+            "entity_operations": [
+                "create",
+                "select",
+                "update",
+                "delete"
+            ],
+            "entity_fields": [
+                "title",
+                "body",
+                "priority",
+                "channel"
+            ],
+            "value_bounds": {
+                "priority": [
+                    "high",
+                    "standard",
+                    "low"
+                ]
+            },
+            "browsable_entity": "memos",
+            "destinations": [
+                "transmissions",
+                "decommissioned"
+            ],
+            "filters": [
+                "channel"
+            ],
+            "themes": [
+                "default",
+                "matrix-green",
+                "neon-cyan",
+                "blood-red",
+                "ghost-white",
+                "amber-terminal"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Channel drag-and-drop reorder stays Playwright-observed",
+            "Text-selection marking toolbar (Mark Classified / Mark Priority) stays Playwright-observed",
+            "Cipher-lock passcode set/reveal gesture stays Playwright-observed"
+        ]
+    },
+    "frontend-tagnote": {
+        "source": "Tagnote",
+        "description": "TagNote inline-tag note timeline good-app eval.",
+        "modules": [
+            "entity-collection-v1",
+            "browse-query-v1"
+        ],
+        "bindings": {
+            "browsable_entity": "notes",
+            "destinations": [
+                "timeline",
+                "calendar",
+                "archived"
+            ],
+            "filters": [
+                "tag"
+            ],
+            "entity": "note",
+            "entity_operations": [
+                "create",
+                "select",
+                "update",
+                "delete",
+                "toggle"
+            ],
+            "entity_fields": [
+                "text",
+                "tags"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Attach File native OS file picker stays Playwright-observed",
+            "Make-TODO tag-rail toggle and Open/Done split stays Playwright-observed",
+            "Calendar day-marker selection and month navigation stays Playwright-observed",
+            "Toast auto-dismiss and blank-submit shake animation timing stays Playwright-observed",
+            "Undo/Redo branch traversal in the History panel stays Playwright-observed"
+        ]
+    },
+    "frontend-markupflow": {
+        "source": "Markupflow",
+        "description": "Solid.js image annotation and markup studio good-app eval.",
+        "modules": [
+            "structured-editor-v1",
+            "entity-collection-v1"
+        ],
+        "bindings": {
+            "editor_object_types": [
+                "rectangle",
+                "oval",
+                "line",
+                "arrow",
+                "text",
+                "blur",
+                "pixelate",
+                "spotlight",
+                "loupe",
+                "highlighter"
+            ],
+            "editor_properties": [
+                "color",
+                "stroke-width",
+                "text-style",
+                "font-size"
+            ],
+            "editor_operations": [
+                "select",
+                "add",
+                "delete",
+                "update_property",
+                "switch_mode",
+                "preview"
+            ],
+            "editor_modes": [
+                "edit",
+                "preview"
+            ],
+            "value_bounds": {
+                "font-size": [
+                    10,
+                    72
+                ],
+                "stroke-width": [
+                    "thin",
+                    "medium",
+                    "thick"
+                ],
+                "text-style": [
+                    "plain",
+                    "bold-caption",
+                    "outline",
+                    "highlight-box",
+                    "shadow"
+                ]
+            },
+            "entity": "project",
+            "entity_operations": [
+                "create",
+                "select",
+                "update",
+                "delete"
+            ],
+            "entity_fields": [
+                "name"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Shape/effect click-drag drawing and Loupe click placement stay Playwright-observed",
+            "Layer-reorder drag-and-drop gesture stays Playwright-observed"
+        ]
+    },
+    "frontend-swiftnote": {
+        "source": "Swiftnote",
+        "description": "Keyboard-first SwiftNote note app good-app eval.",
+        "modules": [
+            "entity-collection-v1",
+            "browse-query-v1"
+        ],
+        "bindings": {
+            "entity": "note",
+            "entity_operations": [
+                "create",
+                "select",
+                "update",
+                "delete",
+                "toggle"
+            ],
+            "entity_fields": [
+                "title",
+                "body"
+            ],
+            "browsable_entity": "notes",
+            "destinations": [
+                "editor",
+                "quick-switcher",
+                "shortcuts",
+                "focus-mode"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Quick Switcher arrow-key navigation, wrap, and re-clamp stay Playwright-driven",
+            "Focus Mode / mobile drawer slide and sidebar collapse stay Playwright-observed",
+            "Toast and Saved-indicator appearance/timing stay Playwright-observed",
+            "Drag-and-drop image embedding stays Playwright-observed",
+            "10,000-item virtualization scroll windowing stays Playwright-observed"
+        ]
+    },
+    "frontend-sidedock": {
+        "source": "Sidedock",
+        "description": "SideDock color-coded workspace bookmark manager good-app eval.",
+        "modules": [
+            "browse-query-v1",
+            "entity-collection-v1",
+            "artifact-transfer-v1"
+        ],
+        "bindings": {
+            "browsable_entity": "bookmarks",
+            "destinations": [
+                "default-view",
+                "sidebar-view"
+            ],
+            "filters": [
+                "search-scope"
+            ],
+            "entity": "bookmark",
+            "entity_operations": [
+                "create",
+                "select",
+                "update",
+                "delete",
+                "toggle",
+                "reorder"
+            ],
+            "entity_fields": [
+                "url",
+                "title",
+                "note",
+                "pinned",
+                "folder"
+            ],
+            "artifact_operations": [
+                "import",
+                "export"
+            ],
+            "import_modes": [
+                "netscape-html"
+            ],
+            "export_formats": [
+                "netscape-html"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Drag-move/reorder gestures stay Playwright-observed",
+            "Inline-rename keystrokes stay Playwright-driven",
+            "Virtualized scroll windowing stays Playwright-observed"
+        ]
+    },
+    "frontend-mindthread": {
+        "source": "Mindthread",
+        "description": "MindThread thought-capture and idea-threading good-app eval.",
+        "modules": [
+            "browse-query-v1",
+            "entity-collection-v1",
+            "form-workflow-v1"
+        ],
+        "bindings": {
+            "browsable_entity": "sparks",
+            "destinations": [
+                "home",
+                "today",
+                "archived",
+                "thread-detail"
+            ],
+            "filters": [
+                "tag"
+            ],
+            "entity": "spark",
+            "entity_operations": [
+                "create",
+                "select",
+                "update",
+                "delete",
+                "toggle"
+            ],
+            "entity_fields": [
+                "text",
+                "tags",
+                "thread",
+                "status",
+                "pinned",
+                "archived"
+            ],
+            "form_fields": [
+                "spark-text",
+                "thread-title"
+            ],
+            "form_operations": [
+                "validate",
+                "submit",
+                "cancel"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Merge-confirm and toast animation stay Playwright-observed",
+            "Virtualized scroll stays Playwright-observed",
+            "Badge-color and reflection-tint treatments stay Playwright-observed"
+        ]
+    },
+    "frontend-scribblespace": {
+        "source": "Scribblespace",
+        "description": "ScribbleSpace freeform infinite-canvas notes board good-app eval.",
+        "modules": [
+            "structured-editor-v1",
+            "entity-collection-v1",
+            "command-session-v1"
+        ],
+        "bindings": {
+            "editor_object_types": [
+                "note",
+                "flashcard",
+                "shape"
+            ],
+            "editor_operations": [
+                "add",
+                "select",
+                "delete",
+                "update_property",
+                "set_content",
+                "switch_mode",
+                "preview"
+            ],
+            "editor_properties": [
+                "color",
+                "text",
+                "front",
+                "back",
+                "z-order"
+            ],
+            "editor_modes": [
+                "select",
+                "connect"
+            ],
+            "entity": "board",
+            "entity_operations": [
+                "create",
+                "select",
+                "update",
+                "delete"
+            ],
+            "session_operations": [
+                "start",
+                "pause",
+                "connect",
+                "disconnect",
+                "advance"
+            ],
+            "demos": [
+                "deliver-out-of-order",
+                "reconnect"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Canvas pan/zoom and object drag/resize stay Playwright-driven",
+            "Connect click-sequence stays Playwright-driven",
+            "Mini-map click and search pan stay Playwright-observed",
+            "Live-tick timing stays Playwright-observed"
+        ]
+    },
+    "frontend-panecraft": {
+        "source": "Panecraft",
+        "description": "PaneCraft mock-data dashboard builder good-app eval.",
+        "modules": [
+            "entity-collection-v1",
+            "form-workflow-v1",
+            "command-session-v1"
+        ],
+        "bindings": {
+            "entity": "pane",
+            "entity_operations": [
+                "create",
+                "select",
+                "update",
+                "delete",
+                "reorder"
+            ],
+            "entity_fields": [
+                "source",
+                "type",
+                "metric",
+                "dimension",
+                "size",
+                "refresh-interval"
+            ],
+            "value_bounds": {
+                "size": [
+                    "small",
+                    "medium",
+                    "large"
+                ],
+                "refresh-interval": [
+                    "off",
+                    "30s",
+                    "5m"
+                ],
+                "type": [
+                    "line",
+                    "bar",
+                    "donut",
+                    "table",
+                    "counter"
+                ]
+            },
+            "form_fields": [
+                "data-source",
+                "pane-type",
+                "metric-column",
+                "dimension-column"
+            ],
+            "form_operations": [
+                "validate",
+                "submit",
+                "cancel",
+                "advance",
+                "return"
+            ],
+            "workflow_steps": [
+                "choose-source",
+                "choose-type",
+                "configure"
+            ],
+            "session_operations": [
+                "start",
+                "pause",
+                "stop",
+                "connect",
+                "disconnect",
+                "advance"
+            ],
+            "demos": [
+                "refresh-tick",
+                "collaboration-scenario",
+                "go-offline",
+                "go-online"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Date-range recompute and chart hover stay Playwright-observed",
+            "Refresh-tick timing stays Playwright-observed",
+            "Merge convergence visuals stay Playwright-observed",
+            "Page-tab reorder/scroll stays Playwright-driven"
+        ]
+    },
+    "frontend-repquest": {
+        "source": "Repquest",
+        "description": "RepQuest fitness-quest canvas game-sim good-app eval.",
+        "modules": [
+            "browse-query-v1",
+            "entity-collection-v1",
+            "command-session-v1"
+        ],
+        "bindings": {
+            "destinations": [
+                "quest",
+                "history",
+                "gear",
+                "settings"
+            ],
+            "entity": "rep-set",
+            "entity_operations": [
+                "create",
+                "delete",
+                "select",
+                "toggle"
+            ],
+            "entity_fields": [
+                "reps",
+                "setId",
+                "gearId"
+            ],
+            "value_bounds": {
+                "reps": {
+                    "min": 1,
+                    "max": 9999
+                }
+            },
+            "session_operations": [
+                "start",
+                "pause",
+                "resume",
+                "stop",
+                "restart",
+                "trigger_demo"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Undo/Redo branch restoration and History-state panel stay Playwright-observed",
+            "Character glide animation stays Playwright-observed",
+            "Zone-unlock palette and boss-defeated marker stay Playwright-observed"
+        ]
+    },
+    "frontend-loopdaily": {
+        "source": "Loopdaily",
+        "description": "LoopDaily habit tracker with malformed-data recovery good-app eval.",
+        "modules": [
+            "browse-query-v1",
+            "entity-collection-v1",
+            "form-workflow-v1",
+            "artifact-transfer-v1"
+        ],
+        "bindings": {
+            "destinations": [
+                "habits",
+                "stats",
+                "import",
+                "heatmap"
+            ],
+            "filters": [
+                "category"
+            ],
+            "entity": "habit",
+            "entity_operations": [
+                "update",
+                "delete",
+                "toggle",
+                "quantity"
+            ],
+            "entity_fields": [
+                "name",
+                "reminder",
+                "paused"
+            ],
+            "secondary_entity": "category",
+            "secondary_entity_operations": [
+                "create",
+                "delete"
+            ],
+            "form_fields": [
+                "name",
+                "icon",
+                "target-type",
+                "target-count",
+                "category",
+                "reminder"
+            ],
+            "form_operations": [
+                "validate",
+                "submit",
+                "cancel"
+            ],
+            "artifact_operations": [
+                "import",
+                "export"
+            ],
+            "import_modes": [
+                "file",
+                "malformed-sample"
+            ],
+            "export_formats": [
+                "json"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Habit drag-handle reorder stays Playwright-observed (no reorder tool exposed)",
+            "File-picker Import stays Playwright-only per artifact-transfer no-raw-file-contents restriction; webmcp only drives Load Malformed Sample and its confirm dialog",
+            "Toast/hover/focus timing stays Playwright-observed"
+        ]
+    },
+    "frontend-taskgrove": {
+        "source": "Taskgrove",
+        "description": "TaskGrove hierarchical task-tree planner good-app eval.",
+        "modules": [
+            "entity-collection-v1",
+            "browse-query-v1"
+        ],
+        "bindings": {
+            "entity": "task",
+            "entity_operations": [
+                "create",
+                "select",
+                "update",
+                "delete",
+                "toggle"
+            ],
+            "entity_fields": [
+                "title",
+                "parentId",
+                "completed",
+                "collapsed",
+                "tags"
+            ],
+            "browsable_entity": "task branch",
+            "destinations": [
+                "root",
+                "node"
+            ],
+            "filters": [
+                "tag"
+            ],
+            "themes": [
+                "light",
+                "dark",
+                "forest"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Chevron rotate/collapse animation stays Playwright-observed",
+            "Progress ring fill animation stays Playwright-observed",
+            "Search dimming/highlight treatment stays Playwright-observed",
+            "Move Up/Down sibling reorder stays Playwright-only (not exposed as a tool)"
+        ]
+    },
+    "frontend-clockcraft": {
+        "source": "Clockcraft",
+        "description": "Personal time-tracking productivity app with branching edit history good-app eval.",
+        "modules": [
+            "entity-collection-v1",
+            "browse-query-v1",
+            "command-session-v1"
+        ],
+        "bindings": {
+            "entity": "entry",
+            "entity_operations": [
+                "create",
+                "select",
+                "update",
+                "delete"
+            ],
+            "entity_fields": [
+                "name",
+                "category",
+                "tag",
+                "duration",
+                "start-time"
+            ],
+            "browsable_entity": "entries",
+            "destinations": [
+                "timeline",
+                "weekly-chart",
+                "tag-manager"
+            ],
+            "filters": [
+                "category"
+            ],
+            "session_operations": [
+                "start",
+                "stop",
+                "restart"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Undo/Redo/branch selection and the History panel stay Playwright-driven via the real controls",
+            "Live per-second timer tick stays Playwright-observed",
+            "Duration-proportional timeline block sizing stays Playwright-observed"
+        ]
+    },
+    "frontend-fandangofury": {
+        "source": "Fandangofury",
+        "description": "FandangoFury side-scrolling hack-and-slash festival combat game good-app eval.",
+        "modules": [
+            "command-session-v1",
+            "browse-query-v1",
+            "entity-collection-v1"
+        ],
+        "bindings": {
+            "session_operations": [
+                "start",
+                "restart",
+                "advance",
+                "stop"
+            ],
+            "destinations": [
+                "stage-map",
+                "masks",
+                "cantina"
+            ],
+            "entity": "mask",
+            "entity_operations": [
+                "select",
+                "toggle"
+            ],
+            "entity_fields": [
+                "name",
+                "bonus",
+                "equipped"
+            ]
+        },
+        "mechanics_exclusions": [
+            "All combat (light/heavy attacks, Fiesta Combo chain, block/dodge cooldown, Fury meter fill, Fiesta Fury, boss telegraph, health depletion) stays Playwright-driven",
+            "Undo/Redo/branch selection and the History panel stay Playwright-driven via the real controls",
+            "Cantina upgrade purchase (escalating cost) stays Playwright-driven via the real Buy control",
+            "Reset Progress (confirmation-guarded) stays Playwright-driven"
+        ]
+    },
+    "frontend-portfolioframe": {
+        "source": "Portfolioframe",
+        "description": "Resume-and-portfolio builder good-app eval.",
+        "modules": [
+            "structured-editor-v1",
+            "entity-collection-v1"
+        ],
+        "bindings": {
+            "editor_object_types": [
+                "header",
+                "projects",
+                "skills",
+                "testimonials",
+                "contact"
+            ],
+            "editor_operations": [
+                "select",
+                "update_property",
+                "switch_mode",
+                "preview"
+            ],
+            "editor_properties": [
+                "name",
+                "title",
+                "bio",
+                "email",
+                "location",
+                "theme",
+                "density",
+                "visibility",
+                "order"
+            ],
+            "editor_modes": [
+                "compact",
+                "spacious"
+            ],
+            "entity": "portfolio-item",
+            "entity_operations": [
+                "create",
+                "select",
+                "update",
+                "delete"
+            ],
+            "entity_fields": [
+                "project",
+                "testimonial",
+                "skill",
+                "draft"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Undo/Redo/branch selection and History panel stay Playwright-driven via real controls",
+            "Download PDF (window.print) stays Playwright-observed",
+            "Horizontal testimonials scroll stays Playwright-observed",
+            "Section reorder animation stays Playwright-observed when gesture matters"
+        ]
+    },
+    "frontend-euroscope": {
+        "source": "Euroscope",
+        "description": "Custom EuroScope air-traffic-client theme and icon patcher good-app eval.",
+        "modules": [
+            "form-workflow-v1",
+            "structured-editor-v1",
+            "artifact-transfer-v1"
+        ],
+        "bindings": {
+            "workflow_steps": [
+                "upload-euroscope-executable",
+                "update-theme-colours",
+                "update-embedded-bitmaps",
+                "download-new-executable"
+            ],
+            "form_operations": [
+                "advance",
+                "return"
+            ],
+            "editor_object_types": [
+                "base-theme",
+                "base-icon-set"
+            ],
+            "editor_operations": [
+                "select",
+                "update_property",
+                "switch_mode",
+                "preview"
+            ],
+            "editor_properties": [
+                "backdrop-darkest",
+                "backdrop-darker",
+                "backdrop-main",
+                "backdrop-lighter",
+                "backdrop-lightest",
+                "foreground-secondary"
+            ],
+            "editor_modes": [
+                "theme-colours",
+                "embedded-bitmaps"
+            ],
+            "artifact_operations": [
+                "export"
+            ],
+            "export_formats": [
+                "patched-executable"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Native file-picker / download interaction stays Playwright-driven"
+        ]
+    },
+    "frontend-docuseal": {
+        "source": "Docuseal",
+        "description": "Docuseal PDF form builder and document signing workspace good-app eval.",
+        "modules": [
+            "structured-editor-v1",
+            "entity-collection-v1",
+            "form-workflow-v1"
+        ],
+        "bindings": {
+            "editor_object_types": [
+                "text",
+                "signature",
+                "initials",
+                "date",
+                "number",
+                "checkbox",
+                "radio",
+                "select",
+                "image",
+                "file",
+                "phone",
+                "cells",
+                "stamp"
+            ],
+            "editor_properties": [
+                "name",
+                "required",
+                "submitter"
+            ],
+            "editor_operations": [
+                "add",
+                "select",
+                "delete",
+                "update_property",
+                "preview",
+                "switch_mode"
+            ],
+            "entity": "submitter",
+            "entity_operations": [
+                "create",
+                "select",
+                "update",
+                "delete"
+            ],
+            "entity_fields": [
+                "name",
+                "color"
+            ],
+            "form_operations": [
+                "validate",
+                "submit",
+                "advance"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Field drag-to-reposition gesture on the canvas stays Playwright when mechanism matters",
+            "Hover halo / press feedback and toast fade timing stay Playwright-observed"
+        ]
+    },
+    "frontend-mermaid-live-editor": {
+        "source": "MermaidLiveEditor",
+        "description": "Mermaid live diagram source editor with preview good-app eval.",
+        "modules": [
+            "structured-editor-v1",
+            "browse-query-v1",
+            "artifact-transfer-v1"
+        ],
+        "bindings": {
+            "editor_object_types": [
+                "diagram"
+            ],
+            "editor_operations": [
+                "set_content",
+                "switch_mode",
+                "preview"
+            ],
+            "editor_modes": [
+                "code",
+                "config"
+            ],
+            "destinations": [
+                "flowchart",
+                "class",
+                "sequence",
+                "entity-relationship",
+                "state",
+                "mindmap",
+                "pie",
+                "gantt"
+            ],
+            "themes": [
+                "light",
+                "dark"
+            ],
+            "artifact_operations": [
+                "export",
+                "copy"
+            ],
+            "export_formats": [
+                "svg",
+                "png"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Preview pan/zoom and rendered-diagram hover stay Playwright-observed"
+        ]
+    },
+    "frontend-md-uy": {
+        "source": "MdUy",
+        "description": "md.uy collaborative markdown editor good-app eval.",
+        "modules": [
+            "structured-editor-v1",
+            "artifact-transfer-v1"
+        ],
+        "bindings": {
+            "editor_object_types": [
+                "markdown-document"
+            ],
+            "editor_operations": [
+                "set_content",
+                "switch_mode",
+                "preview"
+            ],
+            "editor_modes": [
+                "edit",
+                "preview",
+                "presentation"
+            ],
+            "artifact_operations": [
+                "export",
+                "copy"
+            ],
+            "export_formats": [
+                "markdown"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Live-sync/peer collaboration stays chrome-only and Playwright-observed; Present-mode slide gestures stay Playwright-driven"
+        ]
+    },
+    "frontend-ghostfolio": {
+        "source": "Ghostfolio",
+        "description": "Ghostfolio wealth portfolio dashboard good-app eval.",
+        "modules": [
+            "browse-query-v1",
+            "entity-collection-v1"
+        ],
+        "bindings": {
+            "destinations": [
+                "portfolio-overview"
+            ],
+            "filters": [
+                "asset-class"
+            ],
+            "entity": "holding",
+            "entity_operations": [
+                "create",
+                "select",
+                "update",
+                "delete"
+            ],
+            "entity_fields": [
+                "name",
+                "symbol",
+                "asset-class",
+                "quantity",
+                "unit-price"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Allocation bars and hover feedback stay Playwright-observed"
+        ]
+    },
+    "frontend-plausible-analytics": {
+        "source": "PlausibleAnalytics",
+        "description": "Plausible privacy web-analytics dashboard good-app eval.",
+        "modules": [
+            "browse-query-v1"
+        ],
+        "bindings": {
+            "destinations": [
+                "example.com",
+                "blog.example.com",
+                "shop.example.com"
+            ],
+            "browsable_entity": "visitor-sessions",
+            "filters": [
+                "source",
+                "page",
+                "country",
+                "period"
+            ],
+            "sorts": [
+                "most-visitors",
+                "fewest-visitors",
+                "name-az"
+            ],
+            "themes": [
+                "light",
+                "dark"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Chart bar hover/tooltip stays Playwright-observed"
+        ]
+    },
+    "frontend-ghostty-config": {
+        "source": "GhosttyConfig",
+        "description": "Ghostty terminal configuration generator with live preview good-app eval.",
+        "modules": [
+            "structured-editor-v1",
+            "artifact-transfer-v1",
+            "browse-query-v1"
+        ],
+        "bindings": {
+            "editor_operations": [
+                "select",
+                "update_property",
+                "delete",
+                "preview"
+            ],
+            "editor_object_types": [
+                "application",
+                "terminal",
+                "clipboard",
+                "window",
+                "colors",
+                "fonts",
+                "keybinds",
+                "mouse",
+                "gtk",
+                "linux",
+                "macos"
+            ],
+            "editor_properties": [
+                "font-family",
+                "font-size",
+                "font-thicken",
+                "cursor-style",
+                "cursor-color",
+                "cursor-opacity",
+                "cursor-style-blink",
+                "background",
+                "foreground",
+                "background-opacity",
+                "theme",
+                "window-padding-x",
+                "window-padding-y",
+                "window-decoration",
+                "scrollback-limit",
+                "mouse-scroll-multiplier",
+                "clipboard-read",
+                "clipboard-write",
+                "copy-on-select"
+            ],
+            "artifact_operations": [
+                "export",
+                "copy"
+            ],
+            "destinations": [
+                "application",
+                "terminal",
+                "clipboard",
+                "window",
+                "colors",
+                "fonts",
+                "keybinds",
+                "mouse",
+                "gtk",
+                "linux",
+                "macos"
+            ],
+            "themes": [
+                "Dracula",
+                "Nord",
+                "Gruvbox Dark",
+                "Catppuccin Mocha",
+                "Solarized Dark - Patched",
+                "Builtin Dark"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Terminal-preview cursor blink stays Playwright-observed",
+            "Dock open/close stays Playwright-observed",
+            "Color-picker/slider drag stays Playwright-driven"
+        ]
+    },
+    "frontend-vert": {
+        "source": "Vert",
+        "description": "VERT private local file converter good-app eval.",
+        "modules": [
+            "artifact-transfer-v1",
+            "entity-collection-v1",
+            "command-session-v1"
+        ],
+        "bindings": {
+            "artifact_operations": [
+                "import",
+                "convert",
+                "export"
+            ],
+            "conversion_modes": [
+                "png-to-jpeg",
+                "png-to-webp",
+                "jpeg-to-png",
+                "jpeg-to-webp",
+                "webp-to-png",
+                "webp-to-jpeg",
+                "gif-to-png",
+                "bmp-to-png",
+                "svg-to-png"
+            ],
+            "export_formats": [
+                "png",
+                "jpeg",
+                "jpg",
+                "webp"
+            ],
+            "entity": "file",
+            "entity_operations": [
+                "create",
+                "select",
+                "update",
+                "delete"
+            ],
+            "entity_fields": [
+                "name",
+                "from",
+                "to",
+                "status"
+            ],
+            "session_operations": [
+                "start",
+                "stop"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Drag-drop drop-zone and native file-picker stay Playwright-observed",
+            "Theme recolor stays Playwright-observed",
+            "Queue reorder is not offered"
+        ]
+    },
+    "frontend-nostrpass": {
+        "source": "Nostrpass",
+        "description": "Native local Nostr identity and key manager good-app eval.",
+        "modules": [
+            "browse-query-v1",
+            "entity-collection-v1"
+        ],
+        "bindings": {
+            "destinations": [
+                "dashboard",
+                "identities",
+                "permissions",
+                "audit-log",
+                "settings"
+            ],
+            "themes": [
+                "light",
+                "dark"
+            ],
+            "entity": "identity",
+            "entity_operations": [
+                "create",
+                "select",
+                "toggle"
+            ],
+            "entity_fields": [
+                "label",
+                "npub"
+            ],
+            "apps": [
+                "damus",
+                "snort",
+                "coracle",
+                "iris"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Reveal-key and theme-toggle animation stay Playwright-observed"
+        ]
+    },
+    "frontend-weblink": {
+        "source": "Weblink",
+        "description": "Weblink peer-to-peer WebRTC chat and file-transfer client good-app eval.",
+        "modules": [
+            "command-session-v1",
+            "artifact-transfer-v1"
+        ],
+        "bindings": {
+            "session_operations": [
+                "connect",
+                "disconnect"
+            ],
+            "artifact_operations": [
+                "import"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Real peer connection and file-picker interaction stay Playwright-observed",
+            "Tool output cannot prove a peer connected"
+        ]
+    },
+    "frontend-budget-angular": {
+        "source": "BudgetAngular",
+        "description": "Native personal expense and budget tracker good-app eval.",
+        "modules": [
+            "entity-collection-v1",
+            "form-workflow-v1",
+            "browse-query-v1"
+        ],
+        "bindings": {
+            "entity": "expense",
+            "entity_operations": [
+                "create",
+                "update",
+                "delete"
+            ],
+            "entity_fields": [
+                "value",
+                "datetime",
+                "categoryId",
+                "counterparty"
+            ],
+            "form_fields": [
+                "amount",
+                "date",
+                "category"
+            ],
+            "form_operations": [
+                "validate",
+                "submit",
+                "cancel",
+                "reset"
+            ],
+            "destinations": [
+                "dashboard",
+                "expenses",
+                "settings"
+            ],
+            "filters": [
+                "reporting-period"
+            ]
+        },
+        "mechanics_exclusions": [
+            "Material dialog + snackbar + progress-bar fill + expansion-panel transitions stay Playwright-observed"
+        ]
+    }
+})
+
+
 CRITERION_MAP = {
     "Core Features": "core_features",
     "Visual Design": "visual_design",
@@ -326,6 +2250,9 @@ CRITERION_MAP = {
 
 SKIP_NAMES = {
     "instruction.md",
+    "NATIVE_REWRITE.md",
+    "OFFLINE_STUBS.md",
+    "PRICING-AMOUNTS.txt",
     "rubric.json",
     "verifier_checklist.json",
     "README.md",
@@ -335,9 +2262,13 @@ SKIP_NAMES = {
     "generate_scenes.py",
     ".DS_Store",
 }
-SKIP_PREFIXES = ("_source-capture",)
+SKIP_PREFIXES = ("_source-capture", "cdn-")
 SKIP_DIRS = {
     "__pycache__",
+    "node_modules",
+    "environment",
+    "screenshots",
+    "form-submissions",
     "theme-generator",  # nested task; only when packaging DaisyUI parent
     ".git",
     ".cursor",
@@ -737,7 +2668,7 @@ def verify_task_criteria_coverage(task_dir: Path, *, slug: str | None = None) ->
         cid = numbered_criterion_id(1, idx)
         if f'id = "{cid}"' not in cf_text:
             errors.append(f"core_features missing checklist criterion {cid}")
-        elif item["title"] not in cf_text:
+        elif toml_escape(item["title"]) not in cf_text:
             errors.append(f"core_features checklist {cid} title mismatch")
     if len(toml_ids) != len(expected_ids) or toml_ids != expected_ids:
         errors.append(
@@ -1017,6 +2948,7 @@ TASK_TOML_TMPL = textwrap.dedent(
 
     [verifier.env]
     OPENAI_API_KEY = "${{OPENAI_API_KEY:-}}"
+    CODEX_AUTH_JSON = "${{CODEX_AUTH_JSON:-}}"
     REWARDKIT_MODEL = "${{REWARDKIT_MODEL:-}}"
 
     [environment]
@@ -1169,6 +3101,35 @@ def package_task(slug: str, spec: dict) -> list[str]:
     from install_reference_screenshots import install as install_ref_screenshots
 
     install_ref_screenshots(slug)
+
+    # Website-fidelity builder kits: curated brand assets and reference-site
+    # screenshots from the authoring folder ride in the environment image.
+    env_dir = out / "environment"
+    copy_pairs = []
+    if (src / "environment").is_dir():
+        for sub in (src / "environment").iterdir():
+            if sub.name == "Dockerfile" or sub.name.startswith("."):
+                continue
+            copy_pairs.append((sub, env_dir / sub.name, f"/{sub.name}"))
+    if (src / "screenshots").is_dir():
+        copy_pairs.append((src / "screenshots", env_dir / "site-screenshots", "/site-screenshots"))
+    if (src / "assets").is_dir() and not (src / "environment" / "assets").is_dir():
+        copy_pairs.append((src / "assets", env_dir / "assets", "/assets"))
+    if copy_pairs:
+        docker_lines = []
+        for source, target, mount in copy_pairs:
+            if target.exists():
+                shutil.rmtree(target) if target.is_dir() else target.unlink()
+            if source.is_dir():
+                shutil.copytree(source, target, ignore=shutil.ignore_patterns("node_modules", ".DS_Store"))
+            else:
+                shutil.copy2(source, target)
+            docker_lines.append(f"COPY {target.name}/ {mount}/")
+        dtext = dockerfile_path.read_text()
+        for line in docker_lines:
+            if line not in dtext:
+                dtext += ("\n" if dtext.endswith("\n") else "\n\n") + line + "\n"
+        dockerfile_path.write_text(dtext)
 
     test_sh = out / "tests" / "test.sh"
     test_sh.write_text(TEST_SH)

@@ -1,0 +1,31 @@
+.account-panel,
+.categories-panel {
+  padding: 16px 4px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.add-category-card {
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.add-category-card h2 {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0 0 8px;
+}
+
+.add-actions,
+.panel-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.reporting-currency {
+  color: #666;
+  margin: 8px 0 16px;
+}

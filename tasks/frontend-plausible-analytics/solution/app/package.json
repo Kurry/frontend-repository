@@ -1,0 +1,11 @@
+{
+  "name": "plausible-analytics-oracle",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "verify:build": "node -e \"const f=require('fs');['index.html','src/app.js','src/data.js','src/styles.css','server.js'].forEach(p=>{if(!f.existsSync(p)){console.error('missing '+p);process.exit(1)}});process.exit(0)\""
+  }
+}

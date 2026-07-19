@@ -1,0 +1,49 @@
+---
+import SolutionLayout from "../../layouts/SolutionLayout.astro";
+
+const verticals: Record<string, { title: string; lede: string }> = {
+  "real-world-assets": {
+    title: "Real World Assets",
+    lede: "Tokenize and settle real-world assets on Avalanche with institutional-grade performance.",
+  },
+  payments: {
+    title: "Payments",
+    lede: "Stablecoin settlement, global payouts, and 24/7 money movement on Avalanche.",
+  },
+  "financial-services": {
+    title: "Financial Services",
+    lede: "Capital markets infrastructure built for compliance, speed, and control.",
+  },
+  "loyalty-and-rewards": {
+    title: "Loyalty and Rewards",
+    lede: "Onchain loyalty programs that scale across markets and partners.",
+  },
+  "sports-and-entertainment": {
+    title: "Sports and Entertainment",
+    lede: "Fan engagement, ticketing, and media experiences on Avalanche L1s.",
+  },
+  enterprise: {
+    title: "Enterprise",
+    lede: "Private, compliant, connected chains for enterprise operations.",
+  },
+};
+
+export function getStaticPaths() {
+  return [
+    "real-world-assets",
+    "payments",
+    "financial-services",
+    "loyalty-and-rewards",
+    "sports-and-entertainment",
+    "enterprise",
+  ].map((slug) => ({ params: { slug } }));
+}
+
+const slug = Astro.params.slug ?? "";
+const entry = verticals[slug];
+if (!entry) {
+  return Astro.redirect("/business");
+}
+---
+
+<SolutionLayout title={entry.title} headline={entry.title} lede={entry.lede} />

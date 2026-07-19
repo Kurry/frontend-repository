@@ -1,0 +1,61 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.summary-card,
+.categories-card {
+  padding: 16px 20px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 16px;
+}
+
+.categories-card h2 {
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0 0 12px;
+}
+
+.category-row {
+  padding: 10px 0;
+}
+
+.category-heading {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.category-name {
+  font-weight: 500;
+}
+
+.category-left {
+  font-style: italic;
+  color: #555;
+}
+
+.progress-wrap {
+  position: relative;
+}
+
+.progress-wrap mat-progress-bar {
+  height: 22px;
+  border-radius: 4px;
+}
+
+.progress-label {
+  position: absolute;
+  left: 8px;
+  top: 2px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
+}

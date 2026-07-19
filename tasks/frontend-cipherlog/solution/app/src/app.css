@@ -1,0 +1,163 @@
+@import "tailwindcss";
+
+:root {
+  --color-primary: #E6EEF7;
+  --color-secondary: #041A17;
+  --color-accent: #007AFF;
+  --color-background: #F5F5F7;
+  --color-text-primary: #1D1D1E;
+  --color-link: #007AFF;
+
+  /* Derived accent roles. The base chrome uses the blue accent; a selected
+     Theme Core overrides all four roles together. */
+  --color-on-accent: #FEFEFE;
+  --color-accent-ink: #007AFF;
+  --color-accent-soft: #E6EEF7;
+  --color-focus: #1D1D1E;
+  --color-border-strong: #6E6E73;
+}
+
+.theme-matrix-green {
+  --color-accent: #00FF41;
+  --color-on-accent: #04180B;
+  --color-accent-ink: #00802B;
+  --color-accent-soft: #E0F8E7;
+}
+.theme-neon-cyan {
+  --color-accent: #00FFFF;
+  --color-on-accent: #04181B;
+  --color-accent-ink: #00747F;
+  --color-accent-soft: #DCF6F8;
+}
+.theme-blood-red {
+  --color-accent: #FF1744;
+  --color-on-accent: #FFFFFF;
+  --color-accent-ink: #C4001D;
+  --color-accent-soft: #FCE3E8;
+}
+.theme-ghost-white {
+  --color-accent: #F0F0F0;
+  --color-on-accent: #1D1D1E;
+  --color-accent-ink: #5E5E66;
+  --color-accent-soft: #ECECEF;
+}
+.theme-amber-terminal {
+  --color-accent: #FFB300;
+  --color-on-accent: #231A00;
+  --color-accent-ink: #8A5A00;
+  --color-accent-soft: #FAF0D7;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Apple Color Emoji", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+  background-color: var(--color-background);
+  max-width: 100%;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 { font-size: 34px; }
+h2 { font-size: 17px; }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.15); border-radius: 3px; }
+
+.redacted {
+  display: inline-block;
+  background: #1D1D1E;
+  color: #F5F5F7;
+  font-family: monospace;
+  padding: 2px 10px;
+  border-radius: 3px;
+  letter-spacing: 3px;
+  font-weight: 700;
+}
+
+.mark-classified {
+  filter: blur(5px);
+  transition: filter 0.2s ease;
+  cursor: default;
+}
+.mark-classified:hover { filter: blur(0); }
+
+.mark-priority {
+  font-weight: 700;
+  color: var(--color-accent-ink);
+}
+
+*:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+button, input, select {
+  max-width: 100%;
+  scroll-margin-top: 96px;
+}
+
+.btn-primary {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  border: 1px solid var(--color-accent-ink);
+  border-radius: 1000px;
+  padding: 12px 22px;
+  min-height: 48px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+  font-family: inherit;
+  box-shadow: none;
+}
+.btn-primary:hover { opacity: 0.85; }
+.btn-primary:active { opacity: 0.7; }
+
+.btn-secondary {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-ink);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 1000px;
+  padding: 12px 22px;
+  min-height: 48px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+  font-family: inherit;
+  box-shadow: none;
+}
+.btn-secondary:hover { opacity: 0.85; }
+.btn-secondary:active { opacity: 0.7; }
+
+.btn-danger {
+  background: #C4001D;
+  color: #FFFFFF;
+  border: 1px solid #8F0015;
+  border-radius: 1000px;
+  padding: 12px 22px;
+  min-height: 48px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+  font-family: inherit;
+}
+.btn-danger:hover { opacity: 0.85; }
+.btn-danger:active { opacity: 0.7; }
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+.shake { animation: shake 0.5s ease; }

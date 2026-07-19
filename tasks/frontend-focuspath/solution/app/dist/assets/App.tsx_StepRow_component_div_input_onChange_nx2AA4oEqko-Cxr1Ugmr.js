@@ -1,0 +1,1 @@
+import{v as o}from"./core.min-DB8N_m9v.js";import{e as t,f as s}from"./store-B4tRoc3j.js";import"./preloader-Bns9QiKi.js";const i=()=>{const[e]=o();t(e.step,!e.step.completed),e.milestone.completed=s(e.milestone),e.persist$()};export{i as s_nx2AA4oEqko};

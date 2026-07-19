@@ -1,0 +1,47 @@
+<div class="settings">
+  <mat-tab-group>
+    <mat-tab label="Account">
+      <div class="account-panel">
+        <form [formGroup]="displayNameForm" (ngSubmit)="saveDisplayName()">
+          <mat-form-field class="full-width">
+            <mat-label>Display name</mat-label>
+            <input matInput type="text" formControlName="displayName" name="displayName" />
+          </mat-form-field>
+          <div class="reporting-currency">Reporting currency: USD</div>
+          <button mat-button color="primary" type="submit">Save</button>
+        </form>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Categories">
+      <div class="categories-panel">
+        <mat-card class="add-category-card">
+          <h2>Add new category</h2>
+          <mat-form-field class="full-width">
+            <mat-label>Category name</mat-label>
+            <input matInput type="text" name="newCategoryName" [(ngModel)]="newCategoryName" (keyup.enter)="addCategory()" />
+          </mat-form-field>
+          <div class="add-actions">
+            <button mat-button color="primary" (click)="addCategory()">Add</button>
+          </div>
+        </mat-card>
+
+        <mat-accordion>
+          <mat-expansion-panel *ngFor="let c of categories$ | async" (opened)="startEdit(c)">
+            <mat-expansion-panel-header>
+              <mat-panel-title>{{ c.name }}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <mat-form-field class="full-width">
+              <mat-label>Category name</mat-label>
+              <input matInput type="text" name="editingName" [(ngModel)]="editingName" />
+            </mat-form-field>
+            <div class="panel-actions">
+              <button mat-button color="primary" (click)="saveEdit(c.id)">Update</button>
+              <button mat-button color="warn" (click)="deleteCategory(c.id)">Delete</button>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

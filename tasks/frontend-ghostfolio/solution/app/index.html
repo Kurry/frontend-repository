@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ghostfolio — Portfolio overview</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f766e'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <div id="app" class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span class="brand-text">
+            <span class="brand-name">Ghostfolio</span>
+            <span class="brand-sub">Portfolio overview</span>
+          </span>
+        </div>
+        <div class="filter-wrap">
+          <label class="sr-only" for="class-filter">Filter by asset class</label>
+          <select id="class-filter" class="class-filter" aria-label="Filter by asset class"></select>
+        </div>
+      </header>
+
+      <section class="summary-card" aria-labelledby="net-worth-label">
+        <div class="summary-left">
+          <p id="net-worth-label" class="eyebrow">Net worth</p>
+          <p id="net-worth" class="net-worth-value">$0</p>
+          <p id="portfolio-meta" class="summary-meta"></p>
+        </div>
+        <div class="summary-right" aria-labelledby="allocation-label">
+          <p id="allocation-label" class="eyebrow">Allocation</p>
+          <ul id="allocation-list" class="allocation-list"></ul>
+        </div>
+      </section>
+
+      <div class="grid">
+        <section class="holdings-card" aria-labelledby="holdings-title">
+          <div class="holdings-head">
+            <h1 id="holdings-title" class="card-title">Holdings</h1>
+            <button id="add-holding-btn" type="button" class="btn btn-secondary">Add holding</button>
+          </div>
+
+          <form id="holding-form" class="holding-form" novalidate>
+            <div class="field">
+              <label class="field-label" for="f-name">Name</label>
+              <input id="f-name" name="name" class="input" type="text" placeholder="Name" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label class="field-label" for="f-symbol">Symbol</label>
+              <input id="f-symbol" name="symbol" class="input" type="text" placeholder="Symbol" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label class="field-label" for="f-class">Class</label>
+              <select id="f-class" name="assetClass" class="input"></select>
+            </div>
+            <div class="field field-row">
+              <div class="field-col">
+                <label class="field-label" for="f-qty">Qty</label>
+                <input id="f-qty" name="quantity" class="input" type="number" step="any" min="0" placeholder="Qty" inputmode="decimal" />
+              </div>
+              <div class="field-col">
+                <label class="field-label" for="f-price">Unit price</label>
+                <input id="f-price" name="unitPrice" class="input" type="number" step="any" min="0" placeholder="Unit price" inputmode="decimal" />
+              </div>
+            </div>
+            <p id="form-error" class="form-error" role="alert" hidden></p>
+            <button id="save-holding-btn" type="submit" class="btn btn-primary btn-block">Save holding</button>
+          </form>
+
+          <div class="table-scroll">
+          <table class="holdings-table">
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Symbol</th>
+                <th scope="col">Class</th>
+                <th scope="col" class="num">Qty</th>
+                <th scope="col" class="num">Value</th>
+              </tr>
+            </thead>
+            <tbody id="holdings-body"></tbody>
+          </table>
+          </div>
+          <p id="empty-state" class="empty-state" hidden>No holdings in this class yet. Add one to get started.</p>
+        </section>
+
+        <aside class="detail-card" aria-labelledby="detail-name">
+          <p class="eyebrow">Selected</p>
+          <h2 id="detail-name" class="detail-name">No holding selected</h2>
+          <dl id="detail-list" class="detail-list" hidden>
+            <div class="detail-row"><dt>Symbol</dt><dd id="d-symbol"></dd></div>
+            <div class="detail-row"><dt>Class</dt><dd id="d-class"></dd></div>
+            <div class="detail-row"><dt>Quantity</dt><dd id="d-qty" class="num"></dd></div>
+            <div class="detail-row"><dt>Unit price</dt><dd id="d-price" class="num"></dd></div>
+            <div class="detail-row"><dt>Market value</dt><dd id="d-value" class="num"></dd></div>
+          </dl>
+          <p id="detail-empty" class="detail-empty">Select a holding to see its details, edit it, or remove it.</p>
+          <div id="detail-actions" class="detail-actions" hidden>
+            <button id="delete-holding-btn" type="button" class="btn btn-danger">Delete holding</button>
+          </div>
+        </aside>
+      </div>
+
+      <div id="live-region" class="sr-only" aria-live="polite" role="status"></div>
+    </div>
+    <script type="module" src="/src/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,30 @@
+<div class="dashboard" *ngIf="summary$ | async as summary">
+  <mat-card class="summary-card">
+    <div class="summary-row">
+      <span>Total budget</span>
+      <strong>${{ summary.totalBudget.toFixed(2) }}</strong>
+    </div>
+    <div class="summary-row">
+      <span>Total expenses</span>
+      <strong>${{ summary.totalExpenses.toFixed(2) }}</strong>
+    </div>
+    <div class="summary-row">
+      <span>Total left</span>
+      <strong>${{ summary.totalLeft.toFixed(2) }}</strong>
+    </div>
+  </mat-card>
+
+  <mat-card class="categories-card">
+    <h2>Budgets by category</h2>
+    <div class="category-row" *ngFor="let row of budgetsByCategory$ | async">
+      <div class="category-heading">
+        <span class="category-name">{{ row.name }}</span>
+        <span class="category-left">left ${{ row.left.toFixed(2) }}</span>
+      </div>
+      <div class="progress-wrap">
+        <mat-progress-bar mode="determinate" [value]="row.leftPercentage" [attr.aria-label]="row.name + ' budget progress'"></mat-progress-bar>
+        <span class="progress-label">${{ row.currentExpenses.toFixed(2) }} / ${{ row.maxExpenses.toFixed(2) }}</span>
+      </div>
+    </div>
+  </mat-card>
+</div>

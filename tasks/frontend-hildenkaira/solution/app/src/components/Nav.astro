@@ -1,0 +1,78 @@
+---
+import data from "../data/home.json";
+const { links, cta } = data.nav;
+---
+<div class="nav" data-nav-root data-gsap-ignore>
+  <div class="nav-menu-bg"></div>
+
+  <nav class="nav-links" aria-label="Main">
+    <div class="nav-links_wrapper">
+      {links.map((l, i) => (
+        <a class={`nav-link w-inline-block${i === 99 ? " w--current" : ""}`} href={l.href}>
+          <div class="nav-link-dot_wrap"><div class="nav-link-dot"></div></div>
+          <div class="nav-link-text" data-nav="link">{l.label}</div>
+        </a>
+      ))}
+      <div class="nav-menu-button hide-desktop hide-tablet-mobile"></div>
+    </div>
+  </nav>
+
+  <div class="padding-global">
+    <div class="container-col-12">
+      <div class="nav-container">
+        <div class="nav-inner">
+          <a class="nav-logo w-inline-block w--current" href="/" aria-label="Hildén &amp; Kaira home">
+            <img src="/logo/letter-and.avif" alt="Hildén &amp; Kaira logo icon" />
+          </a>
+          <div class="nav-button">
+            <div class="locales-wrapper" data-locale-dropdown>
+              <div class="locale-dropdown" data-locale-root>
+                <div class="locale-dropdown_toggle" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false">
+                  <svg class="locale-globe-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3Z"/></svg>
+                  <div class="paragraph-xs" data-locale-current>EN</div>
+                  <svg class="locale-chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                </div>
+                <nav class="locales-dropdown-list" aria-label="Locales">
+                  <div class="locales-list" role="list">
+                    <div class="locale-item" role="listitem">
+                      <a class="locale-link w-inline-block w--current" hreflang="en-GB" href="/" data-locale-option="EN"><div class="paragraph-xs">EN</div></a>
+                    </div>
+                    <div class="locale-item" role="listitem">
+                      <a class="locale-link w-inline-block" hreflang="fi-FI" href="/fi" data-locale-option="FI"><div class="paragraph-xs">FI</div></a>
+                    </div>
+                  </div>
+                </nav>
+              </div>
+            </div>
+            <div class="nav-button_wrap">
+              <a class="btn-icon-link w-inline-block" href={cta.href}>
+                <div class="btn-icon-content">
+                  <div class="btn-icon-content__mask">
+                    <span class="btn-icon-content__text" data-button-anim-target>{cta.label}</span>
+                  </div>
+                  <div class="btn-icon-icon" data-icon-size>
+                    <div class="btn-icon-icon__bg" data-button-anim-target></div>
+                    <div class="btn-icon-icon__wrap">
+                      <div class="btn-icon-icon__list">
+                        <svg class="btn-icon-icon__arrow" data-button-anim-target viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"/></svg>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="btn-icon-content__bg" data-button-anim-target></div>
+                </div>
+              </a>
+            </div>
+          </div>
+          <div class="menu-button" data-menu-toggle>
+            <div class="btn-icon-link pointer-events-off">
+              <div class="btn-icon-content is-menu">
+                <div class="btn-icon_menu-div is-top"></div>
+                <div class="btn-icon_menu-div is-bottom"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -113,6 +113,21 @@ authority. Prefer `browser_evaluate` for objective DOM/style/state checks when v
 pixels are not decisive. Observe transient / auto-dismissing UI (toasts, banners,
 validation flashes) immediately after the triggering action — before extra round-trips
 that let it expire.
+Transient-motion measurement: animations must be measured AS transients, never
+from their settled end state. One-shot load intros: sample the animating element
+within the first ~300-800ms of a fresh navigation and again after settle — an
+early value below the settled value proves the animation ran; waiting out an
+intro and then reading the settled state can only false-fail it. Staggered
+reveals: read each item's computed transitionDelay/transitionDuration (present
+even at rest) or sample mid-animation — items sampled after settle always read
+uniform. Gesture-triggered transitions: perform the real gesture, wait just past
+the declared duration, then read the end state and any class flips.
+Reveal-state discipline: entrance/scroll-reveal Motion criteria must be judged on
+a FRESH page load using real, incremental scrolling BEFORE any webmcp navigation
+or programmatic jump — browse_open-style scrollIntoView jumps fire every
+intersection observer en route and permanently mark content as revealed, after
+which "elements below the viewport start unrevealed" can only false-fail. If you
+have already jumped around the page, reload it before grading reveal criteria.
 Viewport discipline: before judging ANY layout, composition, or density criterion,
 resize to a desktop viewport (at least 1280x800) and confirm the size with
 `browser_evaluate` (window.innerWidth) — a narrow default viewport legitimately

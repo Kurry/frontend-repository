@@ -1,0 +1,1 @@
+import{v as e}from"./core.min-Dne1Y5Yk.js";import{x as n}from"./core.min-Dne1Y5Yk.js";import"./preloader-Bns9QiKi.js";const s=()=>{const[o]=e();o.onCancel(),o.open.value=!1};export{n as _hW,s as s_x9ZaWORxvlE};

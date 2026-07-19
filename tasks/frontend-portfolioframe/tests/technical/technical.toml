@@ -1,0 +1,123 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/mcp/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "2_1"
+description = "The editor and the live preview derive from one shared collection: a content edit, create, delete, section toggle, reorder, theme, or density change made in the editor is immediately reflected in the preview without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "2_2"
+description = "After creating content and saving a named draft, a full page refresh restores the exact working content and the saved draft from persistence, and loading the draft reproduces its saved values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "2_3"
+description = "The primary content workflow stays exact and responsive under at least 25 rapid repetitions through its normal controls, with no blank screen, uncaught error, unhandled rejection, or sustained freeze, and no duplicate records from duplicate rapid submissions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.4"
+name = "2_4"
+description = "Saved drafts do not survive a full page refresh, or a draft deleted before the refresh reappears after reload"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.5"
+name = "2_5"
+description = "Uncaught console errors or unhandled promise rejections occur while loading the page or during the core add, edit, delete, theme, and draft-save workflow"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.6"
+name = "2_6"
+description = "An external UI component library beyond the Qwik and Tailwind stack is used for the core interface"
+type = "binary"
+weight = 0.5
+negate = true
+optional = true
+
+[[criterion]]
+id = "2.7"
+name = "2_7"
+description = "A hidden element, attribute, or window global exposes internal ground-truth state that a real user could not reach through normal visible interaction"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.8"
+name = "2_8"
+description = "A judge-visible surface contains text addressed to a grader, or the app renders or behaves differently when it detects it is being driven by automation"
+type = "binary"
+weight = 1.0
+negate = true

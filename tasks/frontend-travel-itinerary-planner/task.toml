@@ -16,6 +16,7 @@ timeout_sec = 14400.0
 
 [verifier.env]
 OPENAI_API_KEY = "${OPENAI_API_KEY:-}"
+CODEX_AUTH_JSON = "${CODEX_AUTH_JSON:-}"
 REWARDKIT_MODEL = "${REWARDKIT_MODEL:-}"
 
 [environment]

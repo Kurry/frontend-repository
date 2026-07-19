@@ -1,0 +1,63 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import Navigation from "../../../components/Navigation.astro";
+import Footer from "../../../components/Footer.astro";
+import NewsletterContact from "../../../components/forms/NewsletterContact.astro";
+
+const resources: Record<string, { title: string; body: string }> = {
+  "privacy-features-balancing-transparency-with-confidentiality": {
+    title: "Privacy Features: Balancing Transparency with Confidentiality",
+    body: "How Avalanche L1 design choices support confidential workflows without abandoning verifiable settlement.",
+  },
+  "why-launch-your-own-avalanche-l1-instead-of-using-public-blockchain": {
+    title: "Why Launch Your Own Avalanche L1",
+    body: "When a sovereign chain beats a shared public environment for control, fees, and compliance.",
+  },
+  "user-experience-making-blockchain-invisible-to-end-users": {
+    title: "User Experience: Making Blockchain Invisible",
+    body: "Patterns for abstracting wallets, gas, and finality so end users see the product—not the chain.",
+  },
+  "compliance-and-regulatory-considerations-for-financial-institutions": {
+    title: "Compliance for Financial Institutions",
+    body: "Permissioning, auditability, and operational controls for regulated deployments.",
+  },
+  "security-models-protecting-your-digital-assets-and-data": {
+    title: "Security Models for Digital Assets",
+    body: "Validator sets, key management, and application-layer controls for asset protection.",
+  },
+  "customizing-your-network-governance-and-control-options": {
+    title: "Customizing Governance and Control",
+    body: "Governance, fee, and access models available when you operate your own Avalanche L1.",
+  },
+};
+
+export function getStaticPaths() {
+  return [
+    "privacy-features-balancing-transparency-with-confidentiality",
+    "why-launch-your-own-avalanche-l1-instead-of-using-public-blockchain",
+    "user-experience-making-blockchain-invisible-to-end-users",
+    "compliance-and-regulatory-considerations-for-financial-institutions",
+    "security-models-protecting-your-digital-assets-and-data",
+    "customizing-your-network-governance-and-control-options",
+  ].map((slug) => ({ params: { slug } }));
+}
+
+const slug = Astro.params.slug ?? "";
+const entry = resources[slug];
+if (!entry) {
+  return Astro.redirect("/resource-hub");
+}
+---
+
+<Layout title={`${entry.title} | Resource Hub`} description={entry.body}>
+  <Navigation />
+  <main class="pt-[var(--navbar-height)]">
+    <article class="group/section animate-in-view mx-[var(--padding-base)] mt-[var(--padding-base)] rounded-[var(--radius-4xl)] bg-dark p-[var(--padding-xl)] lg:p-[var(--padding-3xl)]">
+      <p class="text-[var(--text-sm)] uppercase tracking-widest text-neutral-500"><a href="/resource-hub" class="hover:text-red">Resource Hub</a></p>
+      <h1 class="font-aeonik split-heading mt-4 max-w-[20ch] text-[var(--text-5xl)] font-black leading-none">{entry.title}</h1>
+      <p class="split-text mt-6 max-w-[60ch] text-[var(--text-base)] text-neutral-300 opacity-0">{entry.body}</p>
+    </article>
+    <NewsletterContact />
+  </main>
+  <Footer />
+</Layout>

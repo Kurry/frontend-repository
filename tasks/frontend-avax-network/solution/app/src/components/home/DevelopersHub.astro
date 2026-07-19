@@ -1,0 +1,159 @@
+---
+const tools = [
+  {
+    letter: "A",
+    title: "Academy",
+    body: "Avalanche Academy is a suite of courses for developers of all experience levels to hone their skills, while the Codebase Entrepreneur Academy offers the foundational knowledge needed to launch and grow your Web3 startup on Avalanche.",
+    href: "https://build.avax.network/academy",
+    img: "/_astro/academy_Z9GrUn.webp",
+    duration: "0ms",
+  },
+  {
+    letter: "B",
+    title: "Builder Console",
+    body: "Manage your Avalanche L1s, validators, and deployments from one central location.",
+    href: "https://build.avax.network/console",
+    img: "/images/builder-kit_9kkX7.webp",
+    duration: "2000ms",
+  },
+  {
+    letter: "D",
+    title: "Documentation",
+    body: "Get the full-stack of Avalanche documentation, all in one place.",
+    href: "https://build.avax.network/docs",
+    img: "/images/documentation_Z14uTGD.webp",
+    duration: "3000ms",
+  },
+  {
+    letter: "I",
+    title: "Integrations",
+    body: "Discover best-in-class integrations for your Avalanche project and learn how to implement them.",
+    href: "https://build.avax.network/integrations",
+    img: "/images/integrations_1FLXW6.webp",
+    duration: "0ms",
+  },
+  {
+    letter: "T",
+    title: "tools",
+    body: "Find everything you need to launch, test, and manage Avalanche L1s and dApps—from faucet access to full deployment tools.",
+    href: "https://build.avax.network/tools",
+    img: "/images/tools_ZSm5Ou.webp",
+    duration: "2000ms",
+  },
+];
+---
+
+<section id="developers-hub" class="relative w-full">
+  <div
+    id="developers-hub-inner"
+    class="group/section animate-in-view relative flex w-full flex-col items-stretch justify-start gap-[var(--gap-xl)] rounded-[var(--radius-4xl)] fill-white px-[var(--padding-md)] py-[var(--padding-3xl)] transition-mode lg:p-[var(--padding-3xl)] lg:pr-[var(--padding-md)] dark:fill-dark"
+  >
+    <wm-shape
+      rounded="clamp(1rem, -0.143rem + 1.786vw, 2rem)"
+      rounded-mobile="clamp(1rem, 0.421rem + 2.469vw, 2rem)"
+      corner-rounded="clamp(0.75rem, -0.107rem + 1.339vw, 1.5rem)"
+      corner-rounded-mobile="clamp(0.75rem, -0.107rem + 1.339vw, 1.5rem)"
+      corner-size="clamp(4.5rem, -0.071rem + 7.143vw, 8.5rem)"
+      corner-size-mobile="clamp(3.5rem, 0.606rem + 12.346vw, 8.5rem)"
+      stroke-width="1"
+      corner="tl"
+    ></wm-shape>
+
+    <div
+      class="grid grid-cols-1 place-items-start gap-[var(--gap-xl)] overflow-x-clip border-b border-neutral-200 pb-[var(--padding-xl)] transition-mode lg:grid-cols-[5fr_2fr] lg:grid-rows-1 lg:place-items-start dark:border-neutral-800"
+    >
+      <div
+        class="flex flex-col items-start justify-end gap-[var(--gap-xl)] sm:flex-row sm:items-center lg:col-start-1 lg:row-start-1 lg:items-end"
+      >
+        <svg
+          viewBox="0 0 120 120"
+          fill="none"
+          class="w-[clamp(4rem,1.975rem+8.642vw,7.5rem)] shrink-0 -translate-x-[calc(100%+1px)] stroke-[1rem] transition-move group-[.visible]/section:translate-x-0 group-[.visible]/section:delay-500 lg:w-[clamp(4rem,0rem+6.25vw,7.5rem)] lg:self-start dark:text-white"
+          aria-hidden="true"
+        >
+          <path
+            d="M60 120V82.0388L82.5962 58.8235H120M60 0L60 37.9612L37.4038 61.1765L0 61.1765"
+            stroke="currentcolor"
+            fill="none"
+          ></path>
+        </svg>
+        <h2 class="h4 max-w-256 split-heading text-balance text-left leading-none uppercase dark:text-white">
+          Build on the Network Designed for Big Ideas
+        </h2>
+      </div>
+    </div>
+
+    <div
+      class="grid grid-cols-1 place-items-start gap-[var(--gap-xl)] lg:grid-cols-[2fr_5fr] lg:place-items-stretch"
+    >
+      <p
+        class="split-text max-w-[25rem] leading-[135%] lg:max-w-[clamp(15rem,3.571rem+17.857vw,25rem)]"
+      >
+        Avalanche is the platform for developers looking to build, launch and scale without sacrificing speed, flexibility, or control. Start today and explore Avalanche’s full-stack of developer tools and resources.
+      </p>
+      <div class="grid grid-cols-1 place-items-stretch sm:grid-cols-2 md:grid-cols-3">
+        {
+          tools.map((t, i) => (
+            <a
+              href={t.href}
+              target="_blank"
+              rel="noopener"
+              style={`--index: ${i}; --duration: ${t.duration};`}
+              class="group relative flex w-full shrink-0 translate-y-1/2 flex-col items-stretch justify-start overflow-clip rounded-2xl p-[var(--padding-xs)] pb-[var(--padding-base)] transition-move group-[.visible]/section:translate-y-0 group-[.visible]/section:duration-[calc(2000ms+(200ms*var(--index)))] before:absolute before:inset-0 before:rounded-2xl before:border before:border-neutral-200 before:bg-white before:transition-mode hover:before:bg-neutral-50 md:group-[.visible]/section:delay-[calc(100ms*(var(--index)-2))] md:group-[.visible]/section:duration-[var(--duration)] dark:before:border-neutral-800 dark:before:bg-dark dark:hover:before:bg-neutral-950"
+            >
+              <div class="relative flex flex-row items-center justify-start overflow-hidden rounded-xl bg-neutral-500 px-[var(--padding-md)] py-[var(--padding-base)]">
+                <img
+                  src={t.img}
+                  alt={t.title}
+                  loading="lazy"
+                  decoding="async"
+                  width="856"
+                  height="416"
+                  class="absolute inset-0 h-full w-full scale-101 object-cover"
+                />
+                <h3 class="h5 relative text-white">{t.letter}</h3>
+              </div>
+              <div class="relative flex flex-1 flex-col items-start justify-between gap-[var(--gap-xl)] p-[var(--padding-base)]">
+                <div class="flex w-full flex-col items-start justify-start gap-[var(--gap-xs)]">
+                  <h4 class="text-xl/normal uppercase">{t.title}</h4>
+                  <p class="sm leading-[150%] text-neutral-500 transition-mode dark:text-neutral-300">{t.body}</p>
+                </div>
+                <span class="group/button button arrow secondary pointer-events-none inline-flex">
+                  <wm-shape
+                    id="button"
+                    rounded="clamp(0.625rem, 0.196rem + 0.67vw, 1rem)"
+                    rounded-mobile="clamp(0.875rem, 0.803rem + 0.309vw, 1rem)"
+                    corner-rounded="clamp(0.25rem, 0.107rem + 0.223vw, 0.375rem)"
+                    corner-rounded-mobile="clamp(0.313rem, 0.276rem + 0.154vw, 0.375rem)"
+                    corner-size="clamp(1.125rem, -0.161rem + 2.009vw, 2.25rem)"
+                    corner-size-mobile="clamp(2rem, 1.855rem + 0.617vw, 2.25rem)"
+                  ></wm-shape>
+                  Learn More
+                  <span class="sr-only"> about {t.title.toLowerCase() === "tools" ? "tools" : t.title}</span>
+                </span>
+              </div>
+            </a>
+          ))
+        }
+        <div
+          style="--index: 5; --duration: 3000ms;"
+          class="group/tile relative flex w-full shrink-0 translate-y-1/2 flex-col items-start justify-between gap-[var(--gap-md)] rounded-2xl p-[var(--padding-md)] transition-move group-[.visible]/section:translate-y-0 group-[.visible]/section:duration-[calc(2000ms+(200ms*var(--index)))] before:absolute before:inset-0 before:rounded-2xl before:border before:border-neutral-200 before:bg-white before:transition-mode md:group-[.visible]/section:delay-[calc(100ms*(var(--index)-2))] md:group-[.visible]/section:duration-[var(--duration)] lg:pr-[var(--padding-2xl)] dark:before:border-neutral-800 dark:before:bg-dark dark:hover:before:bg-neutral-950"
+        >
+          <h3 class="relative h6 uppercase">Learn More About Building on Avalanche</h3>
+          <a class="group/button button arrow red" href="https://build.avax.network" target="_blank" rel="noopener">
+            <wm-shape
+              id="button"
+              rounded="clamp(0.625rem, 0.196rem + 0.67vw, 1rem)"
+              rounded-mobile="clamp(0.875rem, 0.803rem + 0.309vw, 1rem)"
+              corner-rounded="clamp(0.25rem, 0.107rem + 0.223vw, 0.375rem)"
+              corner-rounded-mobile="clamp(0.313rem, 0.276rem + 0.154vw, 0.375rem)"
+              corner-size="clamp(1.125rem, -0.161rem + 2.009vw, 2.25rem)"
+              corner-size-mobile="clamp(2rem, 1.855rem + 0.617vw, 2.25rem)"
+            ></wm-shape>
+            Start Building
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,22 @@
+{
+  "name": "astro6-svelte-tailwind",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "astro build",
+    "start": "astro preview --host 0.0.0.0 --port 3000",
+    "dev": "astro dev --host 0.0.0.0 --port 3000",
+    "verify:build": "astro build"
+  },
+  "dependencies": {
+    "@astrojs/svelte": "8.1.2",
+    "@tailwindcss/vite": "4.3.2",
+    "astro": "6.4.8",
+    "svelte": "5.56.4",
+    "tailwindcss": "4.3.2"
+  },
+  "devDependencies": {
+    "typescript": "6.0.3"
+  }
+}

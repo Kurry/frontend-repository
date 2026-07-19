@@ -1,0 +1,1 @@
+import{v as r}from"./core.min-Dne1Y5Yk.js";import{x as c}from"./core.min-Dne1Y5Yk.js";import"./preloader-Bns9QiKi.js";const p=()=>{const[o]=r();return o.onToggleArchive(o.note.id)};export{c as _hW,p as s_db8V0vAd05c};

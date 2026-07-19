@@ -1,0 +1,150 @@
+/*
+ * Avalanche homepage rebuild — verbatim design-token reference.
+ * Relocated from instruction.md's "Design Tokens" section to keep the PRD
+ * dense. Every value below is REQUIRED and exact (from the live site) —
+ * copy the declarations you need into src/styles/global.css unchanged.
+ * This is a reference/token catalog, not a drop-in stylesheet: not every
+ * rule here needs a matching selector in your markup, but every token
+ * value it declares must be preserved somewhere in your build.
+ */
+
+/* ---- Document shell (exact) ---- */
+html { scrollbar-gutter: stable; touch-action: pan-y; scroll-behavior: smooth; font-family: Inter, system-ui, sans-serif; overflow: clip scroll; }
+html, body { height: 100%; margin: 0; }
+html.lenis, html.lenis body { height: auto; }
+.scroll-disabled { touch-action: none; overflow: hidden; }
+/* Homepage root (exact classes): <html lang="en" class="bg-neutral-950 dark:bg-neutral-800 text-black dark:text-white transition-mode">
+   theme-color meta: #0A0A0A (= --color-neutral-950) */
+
+/* ---- Color tokens (exact) ---- */
+:root {
+  --color-red-200: #fecaca; --color-red-300: #ff9da5; --color-red-500: #ff394a; --color-red-600: #ed1528; --color-red-700: #eb0014; --color-red-800: #d5373d;
+  --color-red: #ff394a; /* primary accent / CTA hover text */
+  --color-blue: #0061e2; --color-blue-800: #2446a2;
+  --color-success: #4ade80; --color-error: #dc2626;
+  --color-dark: #151413; --color-black: #000; --color-white: #fff;
+  --color-neutral-50: #f6f6f6; --color-neutral-100: #e7e7e7; --color-neutral-200: #d1d1d1; --color-neutral-300: #b0b0b0; --color-neutral-400: #888;
+  --color-neutral-500: #6d6d6d; --color-neutral-600: #5d5d5d; --color-neutral-700: #4f4f4f; --color-neutral-800: #454545; --color-neutral-900: #1a1a1a;
+  --color-neutral-950: #0a0a0a; /* default page bg via bg-neutral-950 */
+  --color-slate-500: #6e6b7d; --color-slate-600: #3f3d4b; --color-slate-800: #1e1e2a;
+  --color-green-900: oklch(39.3% .095 152.535);
+  --color-sky-500: oklch(68.5% .169 237.323);
+}
+/* Alpha/opacity hex literals used in CSS (MUST preserve): #0000, #0003, #0009, #0000001a, #00000026, #0000004d,
+   #00000080, #000000b3, #000000bf, #151413b3, #151413cc, #151413e6, #1a1a1acc, #ff394a1a, #ff394a33, #ff394a4d,
+   #fff3, #fff6, #fffc, #ffffff1a, #ffffff4d, #ffffff80, #ffffffb3, #ffffffe6, #00a5ef4d, #001EFF / #001eff.
+   Opacity property values observed: 0, .5, .6, 1 (plus !important variants).
+   Keyframe pulse: 50%{opacity:.5}. Keyframe scale-out end state: opacity:.5. */
+
+/* ---- Typography tokens (exact) ---- */
+:root {
+  --font-aeonik: "aeonik", system-ui, sans-serif;
+  --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-weight-normal: 400; --font-weight-medium: 500; --font-weight-semibold: 600; --font-weight-bold: 700; --font-weight-black: 900;
+  --leading-normal: 1.15;
+}
+@font-face { font-family: aeonik; font-weight: 400; font-display: swap; src: url(/_astro/Aeonik-Regular.BrwPaXO-.woff2) format("woff2"); }
+@font-face { font-family: aeonik; font-weight: 500; font-display: swap; src: url(/_astro/Aeonik-Medium.CIh7H8Ki.woff2) format("woff2"); }
+@font-face { font-family: aeonik; font-weight: 700; font-display: swap; src: url(/_astro/Aeonik-Bold.7n7eSZdF.woff2) format("woff2"); }
+@font-face { font-family: aeonik; font-weight: 900; font-display: swap; src: url(/_astro/Aeonik-Black.VWdYmYtW.woff2) format("woff2"); }
+/* Inter: weights 400 and 600, unicode-range subsetted woff2+woff under /_astro/inter-*-{400|600}-normal.*.woff2 (latin + latin-ext). */
+
+/* ---- Type scale (base / mobile-first clamps, :root,:host) — exact ---- */
+:root, :host {
+  --text-xs: .75rem;   /* 12px, line-height 1 */
+  --text-sm: clamp(.75rem, calc(.607rem + .223vw), .875rem);   /* line-height 1 */
+  --text-base: clamp(.75rem, calc(.464rem + .446vw), 1rem);    /* line-height 1 */
+  --text-lg: 1.125rem;   /* line-height 1 */
+  --text-xl: clamp(.75rem, calc(.179rem + .893vw), 1.25rem);   /* line-height 1 */
+  --text-2xl: clamp(.875rem, calc(.161rem + 1.116vw), 1.5rem); /* line-height 1 */
+  --text-3xl: 1.75rem;   /* line-height 1 */
+  --text-4xl: clamp(1.125rem, calc(.125rem + 1.563vw), 2rem);  /* line-height 1 */
+  --text-5xl: clamp(1.5rem, calc(-.214rem + 2.679vw), 3rem);   /* line-height 1 */
+  --text-6xl: clamp(2.125rem, calc(-.018rem + 3.348vw), 4rem); /* line-height: inherit scale */
+  --text-7xl: clamp(3.25rem, calc(.107rem + 4.911vw), 6rem);   /* line-height 1 */
+  --text-8xl: clamp(4.5rem, calc(.5rem + 6.25vw), 8rem);       /* line-height 1 */
+  --text-9xl: clamp(6.625rem, calc(.625rem + 9.375vw), 11.875rem); /* line-height: display */
+}
+
+/* ---- @media (max-width: 1024px) :root overrides — MUST apply ---- */
+@media (max-width: 1024px) {
+  :root {
+    --navbar-height: clamp(5rem, calc(4.711rem + 1.235vw), 5.5rem);
+    --text-sm: clamp(.75rem, calc(.678rem + .309vw), .875rem);
+    --text-base: clamp(.875rem, calc(.803rem + .309vw), 1rem);
+    --text-xl: clamp(1rem, calc(.855rem + .617vw), 1.25rem);
+    --text-2xl: clamp(1.25rem, calc(1.105rem + .617vw), 1.5rem);
+    --text-4xl: clamp(1.5rem, calc(1.211rem + 1.235vw), 2rem);
+    --text-5xl: clamp(2rem, calc(1.421rem + 2.469vw), 3rem);
+    --text-6xl: clamp(3rem, calc(2.421rem + 2.469vw), 4rem);
+    --text-7xl: clamp(2rem, calc(-.315rem + 9.877vw), 6rem);
+    --text-8xl: clamp(3rem, calc(.106rem + 12.346vw), 8rem);
+    --text-9xl: clamp(2.5rem, calc(-.683rem + 13.58vw), 8rem);
+    /* plus padding/gap/radius/button overrides in same file on the live site */
+  }
+}
+
+/* ---- Spacing, radius, layout tokens (exact) ---- */
+:root {
+  --spacing: .25rem; /* 4px base */
+  --navbar-height: clamp(3rem, calc(.143rem + 4.464vw), 5.5rem); /* desktop base; mobile override above */
+  /* --padding-xs … --padding-5xl, --margin-xs … --margin-xl, --gap-xs: .5rem, --gap-sm … --gap-4xl: exact clamps preserved from the live site's token table */
+  --radius-sm: .25rem; --radius-md: .375rem; --radius-lg: .5rem;
+  --radius-xl: clamp(.375rem, calc(-.054rem + .67vw), .75rem);
+  --radius-2xl: clamp(.625rem, calc(.196rem + .67vw), 1rem);
+  --radius-3xl: 1.5rem;
+  --radius-4xl: clamp(1rem, calc(-.143rem + 1.786vw), 2rem);
+  --height-button: clamp(2.375rem, calc(-.054rem + 3.795vw), 4.5rem);
+  --width-icon: clamp(4rem, calc(0rem + 6.25vw), 7.5rem);
+  --insight-card-height: 100lvh; /* 60lvh in some contexts */
+  --tile-width: min(1920px, (100% - .75rem) * .75);
+  --tile-move: min(1920px, (100vw - .75rem) * .75);
+}
+/* Max widths observed: 640px, 768px, 1025px, 1366px, 1440px, 1920px, 2560px, 380px, plus ch caps 8ch–96ch,
+   and calc(var(--spacing)*64|98|140|180|240|256|1920). */
+
+/* ---- Motion easing & default transition tokens (exact) ---- */
+:root {
+  --default-transition-duration: .15s;
+  --default-transition-timing-function: cubic-bezier(.4, 0, .2, 1);
+  --ease-out: cubic-bezier(0, 0, .2, 1);
+  --ease-in-cubic: cubic-bezier(.5, 0, .6, .2);
+  --ease-out-cubic: cubic-bezier(.2, .6, .35, 1);
+  --ease-in-out-cubic: cubic-bezier(.6, 0, .35, 1);
+  --ease-out-quart: cubic-bezier(.165, .84, .44, 1);
+  --ease-in-out-quart: cubic-bezier(.8, 0, .2, 1);
+  --animate-spin: spin 1s linear infinite;
+  --animate-pulse: pulse 2s cubic-bezier(.4, 0, .6, 1) infinite;
+  --blur-sm: 8px; --blur-lg: 16px; --blur-xl: 24px;
+  --aspect-video: 16/9;
+  --scale: 1.01; /* beat keyframe uses var(--scale, 1.1) */
+}
+
+.transition-mode {
+  transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;
+  --tw-duration: .3s; --tw-ease: var(--ease-out-cubic);
+  transition-duration: .3s; transition-timing-function: var(--ease-out-cubic);
+}
+
+/* ---- Breakpoints (exact media queries in the live CSS) ----
+   (hover: hover) | (max-width: 1024px) — primary mobile/tablet; Lenis OFF; nav drawer | (min-width: 380px) |
+   (min-width: 640px) sm | (min-width: 768px) md | (min-width: 1025px) lg desktop interactions |
+   (min-width: 1366px) | (min-width: 1440px) | (min-width: 1920px) | (min-width: 2560px)
+   JS breakpoint mirror: window.innerWidth > 1024 / < 1025 / matchMedia("(max-width: 1024px)") in the SVG corner component. */
+
+/* ---- Gradients ----
+   Preserve all linear-gradient / radial-gradient / conic-gradient strings from the live global stylesheet
+   (6 unique gradient functions detected). Tailwind gradient CSS vars: --tw-gradient-from, --tw-gradient-via,
+   --tw-gradient-to with stop positions 0%/20%/50%/60%/75%/100%. */
+
+/* ---- Utility class → token reference (Tailwind utility classes seen in the live HTML) ----
+   bg-neutral-950 -> background-color: #0a0a0a | dark:bg-neutral-800 -> #454545 (.dark / dark variant)
+   text-black / dark:text-white -> #000 / #fff | hover:text-red -> #ff394a | hover:bg-neutral-50 -> #f6f6f6
+   dark:hover:bg-neutral-900 -> #1a1a1a | rounded-4xl -> border-radius: var(--radius-4xl)
+   gap-xl -> gap: var(--gap-xl) | gap-px -> 1px hairline grids
+   p-md / px-md / py-3xl / lg:p-3xl -> --padding-* tokens
+   fill-white dark:fill-dark -> SVG icon fills #fff / #151413
+   border-neutral-200 #d1d1d1 / dark:border-neutral-800 #454545
+   bg-white dark:bg-dark (section cards) -> #fff / #151413
+   sm:h-svh -> hero height 100svh */

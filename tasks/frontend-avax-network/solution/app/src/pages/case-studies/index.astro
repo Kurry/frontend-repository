@@ -1,0 +1,32 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Navigation from "../../components/Navigation.astro";
+import Footer from "../../components/Footer.astro";
+import NewsletterContact from "../../components/forms/NewsletterContact.astro";
+import caseStudies from "../../data/case-studies.json";
+
+const publicCases = caseStudies.filter((c) => c.href.startsWith("/case-studies/"));
+---
+
+<Layout title="Case Studies | Avalanche" description="Real Avalanche deployments across loyalty, payments, capital markets, and entertainment.">
+  <Navigation />
+  <main class="pt-[var(--navbar-height)]">
+    <section class="group/section animate-in-view mx-[var(--padding-base)] mt-[var(--padding-base)] rounded-[var(--radius-4xl)] bg-dark p-[var(--padding-xl)] lg:p-[var(--padding-3xl)]">
+      <h1 class="font-aeonik split-heading max-w-[14ch] text-[var(--text-6xl)] font-black leading-none">Case Studies</h1>
+      <p class="split-text mt-6 max-w-[52ch] text-[var(--text-base)] text-neutral-300 opacity-0">
+        How leading brands and institutions put Avalanche to work in production.
+      </p>
+    </section>
+    <section class="group/section animate-in-view mx-[var(--padding-base)] mt-px grid grid-cols-1 gap-px md:grid-cols-2">
+      {publicCases.map((c, i) => (
+        <a href={c.href} class="reveal-y relative overflow-hidden rounded-[var(--radius-4xl)] bg-dark p-[var(--padding-md)] transition-colors hover:bg-neutral-900 lg:p-[var(--padding-xl)]" style={`--index:${i}`}>
+          <wm-shape id="solutions" corner="tr" rounded="clamp(1rem, -0.143rem + 1.786vw, 2rem)" corner-rounded="clamp(0.75rem, -0.107rem + 1.339vw, 1.5rem)" corner-size="clamp(3rem, 0.5rem + 8vw, 6rem)" stroke-width="0"></wm-shape>
+          <h2 class="relative z-[1] font-aeonik text-[var(--text-2xl)] font-bold">{c.title}</h2>
+          <span class="relative z-[1] mt-4 inline-block text-[var(--text-sm)] font-semibold text-red">Read case study</span>
+        </a>
+      ))}
+    </section>
+    <NewsletterContact />
+  </main>
+  <Footer />
+</Layout>

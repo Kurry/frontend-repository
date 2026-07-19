@@ -1,0 +1,285 @@
+{
+  "hero": {
+    "h1": "If you can't reach a million people with 0€ ad spend, your branding sucks.",
+    "lead": "We will 10x your social presence or work for free until it’s done.",
+    "buttons": [
+      { "label": "Our approach", "href": "/our-approach", "variant": "secondary" },
+      { "label": "Work with us", "href": "/contact", "variant": "primary" }
+    ],
+    "floating": [
+      { "src": "/images/hero/hero-thumb-01.avif", "zone": "left" },
+      { "src": "/images/hero/hero-thumb-02.avif", "zone": "right" },
+      { "src": "/images/hero/hero-thumb-03.avif", "zone": "left" },
+      { "src": "/images/hero/hero-thumb-04.avif", "zone": "right" },
+      { "src": "/images/hero/hero-thumb-05.avif", "zone": "left" },
+      { "src": "/images/hero/hero-thumb-06.avif", "zone": "right" },
+      { "src": "/images/hero/hero-thumb-07.avif", "zone": "left" }
+    ]
+  },
+  "statement": {
+    "h2": "Content only you can post because it's built around your people.",
+    "poster": "/images/posters/statement-bg.webp",
+    "video": "/videos/case-01.mp4",
+    "testimonials": [
+      {
+        "quote": "Hildén & Kaira understands our audience and voice, and delivers results",
+        "name": "Alma Rapakko",
+        "role": "CMO, Kuntokeskus Liikku"
+      },
+      {
+        "quote": "We’ve reached a huge audience fast, with total peace of mind",
+        "name": "Nea Mertsalmi",
+        "role": "CMO, Finlayson & Co",
+        "hideMobile": true
+      }
+    ]
+  },
+  "decks": [
+    {
+      "client": "finlayson",
+      "title": "Finlayson's social media is built to carry the spirit of a bold brand.",
+      "pf": "/images/clients/finlayson.avif",
+      "caseHref": "/work/finlayson",
+      "views": "2,148,665",
+      "likes": "80,216",
+      "cards": [
+        { "video": "/videos/case-01.mp4", "poster": "/images/posters/flick-01.webp", "caption": "Jukka Kurttila kävi Puoli seitsemässä puhumassa Temusta. Haastatteluklippi ohjelmasta Puoli seitsemän 21.4.2026. Videolähde: Yle / Yle Areena.", "cardLikes": "27k+", "age": "27 days ago", "cardViews": "765k+" },
+        { "video": "/videos/case-02.mp4", "poster": "/images/posters/flick-02.webp", "caption": "Jukkaa ottaa päähän, että äärioikeisto omii itselleen, alun perin hyvään tarkoitukseen tehtyjä, suomalaisia symboleita. Finlayson.", "cardLikes": "14k+", "age": "12 days ago", "cardViews": "164k+" },
+        { "video": "/videos/case-01.mp4", "poster": "/images/posters/flick-03.webp", "caption": "Jukka kertoo ottaneensa 24 vuoden yrittäjyytensä aikana vastuuta yrityksen taloudesta, henkilöstöstä, strategisista päätöksistä sekä brändin kehittämisestä ja ylläpitämisestä.", "cardLikes": "12k+", "age": "17 days ago", "cardViews": "372k+" }
+      ]
+    },
+    {
+      "client": "kierratyskeskus",
+      "title": "Kierrätyskeskus put their people at the center and went viral.",
+      "pf": "/images/clients/kierratyskeskus.png",
+      "caseHref": "/work/kierke",
+      "views": "1,670,545",
+      "likes": "28,178",
+      "cards": [
+        { "video": "/videos/case-02.mp4", "poster": "/images/posters/flick-04.webp", "caption": "Kierrätyskeskuksen keräysauton kevätkierros on päättynyt, mutta palaamme syksyllä! Keräysautolle voi tuoda maksutta käyttökelpoista, siistiä ja ehjää kodin käyttö- ja sisustustavaraa.", "cardLikes": "5947", "age": "11 days ago", "cardViews": "346k+" },
+        { "video": "/videos/case-01.mp4", "poster": "/images/posters/flick-05.webp", "caption": "Kiitos kysymyksestä. Koulukiusaaminen on valitettavasti Ronille tuttu juttu. ☹️ Roni työskentelee Nihtisillan Kierrätyskeskuksen kirjaosastolla.", "cardLikes": "5995", "age": "20 days ago", "cardViews": "233k+" },
+        { "video": "/videos/case-02.mp4", "poster": "/images/posters/flick-06.webp", "caption": "Niina kaipaa teidän neuvoja, tuliko lahjoituksessa papin kaapu vai mikä tämä on? 🤔 Kierrätyskeskukselle tulee usein erilaisia univormuja ja virka-asuja lahjoitusten mukana.", "cardLikes": "1856", "age": "26 days ago", "cardViews": "278k+" }
+      ]
+    },
+    {
+      "client": "uusi-juttu",
+      "title": "Uusi Juttu builds the relationship between journalist and reader through social media journalism that stands out.",
+      "pf": "/images/clients/uusi-juttu.png",
+      "caseHref": "/work/uusi-juttu",
+      "views": "1,310,867",
+      "likes": "33,405",
+      "cards": [
+        { "video": "/videos/case-01.mp4", "poster": "/images/posters/flick-07.webp", "caption": "Miksi koko maailma puhuu Dubaista, vaikka kukaan ei oikein tunne sitä? Toimittajamme Oskari Onninen pureutuu siihen, miksi Dubai ei ole tavallinen kaupunki vaan yritys.", "cardLikes": "8935", "age": "22 days ago", "cardViews": "274k+" },
+        { "video": "/videos/case-02.mp4", "poster": "/images/posters/flick-08.webp", "caption": "Mitä DOGE sai aikaiseksi ja mitä kulissien takana oikeasti tapahtui? Toimittajamme Anu Partanen kertoo, miten Elon Musk hyödynsi leikkausprojektia omiin tarkoituksiinsa.", "cardLikes": "2825", "age": "28 days ago", "cardViews": "89k+" },
+        { "video": "/videos/case-01.mp4", "poster": "/images/posters/flick-09.webp", "caption": "Muuttiko #metoo-liike oikeasti naisten kohtelua? Näyttelijätaiteen professori Elina Knihtilä kertoo, mitä viimeisen 10 vuoden aikana on tapahtunut.", "cardLikes": "5984", "age": "29 days ago", "cardViews": "142k+" }
+      ]
+    },
+    {
+      "client": "autoliitto",
+      "title": "Autoliitto turns roadside assistance into scroll-stopping POV-content.",
+      "pf": "/images/clients/autoliitto.png",
+      "caseHref": "/work/autoliitto",
+      "views": "996,001",
+      "likes": "17,406",
+      "cards": [
+        { "video": "/videos/case-02.mp4", "poster": "/images/posters/flick-10.webp", "caption": "Asiakkaan auton hyytynyttä akkua vaihdettaessa paljastui yllättäen oravanpesä. Autoliitto auttaa 24/7. Kattava Plus-jäsenyys tarjoaa turvaa tien päälle. Jäsenyys vain 133€ / 12kk.", "cardLikes": "4230", "age": "14 days ago", "cardViews": "217k+" },
+        { "video": "/videos/case-01.mp4", "poster": "/images/posters/flick-11.webp", "caption": "Pitäisikö ajokortti poistaa yli 45-vuotiailta? Toimitusjohtajamme Pasi Nieminen ei ainakaan ole samaa mieltä ja avaa millaisia eri-ikäiset kuskit ovat ajokäytökseltään.", "cardLikes": "1000", "age": "18 days ago", "cardViews": "94k+" },
+        { "video": "/videos/case-02.mp4", "poster": "/images/posters/flick-12.webp", "caption": "Asiakkaan sähköauto ei lähtenyt kunnolla käyntiin vaan hälytti vain useita merkkivaloja. Autoliitto auttaa 24/7. Kattava Plus-jäsenyys tarjoaa turvaa tien päälle. Jäsenyys vain 133€ / 12kk.", "cardLikes": "1501", "age": "13 days ago", "cardViews": "119k+" }
+      ]
+    },
+    {
+      "client": "liikku",
+      "title": "Finland's largest gym chain: \"This is how social media should be done\"",
+      "pf": "/images/clients/liikku.png",
+      "caseHref": "/work/liikku",
+      "views": "797,961",
+      "likes": "14,432",
+      "cards": [
+        { "video": "/videos/case-01.mp4", "poster": "/images/posters/flick-13.webp", "caption": "Liikkun soittolistaan voi vaikuttaa antamalla palautetta tai toiveita suoraan Liikkun asiakaspalveluun. Soittolistan tavoitteena on luoda energinen ja motivoiva ilmapiiri kuntosalille.", "cardLikes": "3555", "age": "6 days ago", "cardViews": "130k+" },
+        { "video": "/videos/case-02.mp4", "poster": "/images/posters/flick-14.webp", "caption": "Ennen Liikkua Heikki pelasi ammattilätkää ja Johanna johti perheyrityksen liikuntakeskusta. Sitten laitettiin kaikki yhteen koriin, myytiin korut ja perustettiin Liikku.", "cardLikes": "1009", "age": "21 days ago", "cardViews": "70k+" },
+        { "video": "/videos/case-01.mp4", "poster": "/images/posters/flick-15.webp", "caption": "Heikki kertoo mistä Liikku sai ensimmäiset 50 000 euroa.", "cardLikes": "1322", "age": "16 days ago", "cardViews": "71k+" }
+      ]
+    }
+  ],
+  "services": {
+    "h2": "Our services",
+    "emojis": [
+      { "src": "/images/emoji/heart.avif", "alt": "Metallic Heart Emoji" },
+      { "src": "/images/emoji/heart.avif", "alt": "Metallic Heart Emoji" },
+      { "src": "/images/emoji/clap.avif", "alt": "Clapping hands emoji" },
+      { "src": "/images/emoji/wink.avif", "alt": "Wink smiley emoji" },
+      { "src": "/images/emoji/fire.avif", "alt": "Fire Emoji" },
+      { "src": "/images/emoji/pigeon.avif", "alt": "Pigeon emoji" },
+      { "src": "/images/emoji/podcast.avif", "alt": "Podcast Emoji" },
+      { "src": "/images/emoji/eyes-left.avif", "alt": "Eyes look left emoji" }
+    ],
+    "items": [
+      {
+        "theme": "theme-turquoise",
+        "title": "Training",
+        "sub": "We'll help your team understand social",
+        "number": ["0", "3"],
+        "body": "If your in-house media team struggles with organic results, we can help you think like us, blueprint your content strategy, and follow up at regular intervals to ensure you stay on track.",
+        "cta": { "label": "Get in touch", "href": "/contact" },
+        "video": "/videos/case-02.mp4",
+        "poster": "/images/posters/service-training.jpg"
+      },
+      {
+        "theme": "theme-white",
+        "title": "Ads for social",
+        "sub": "(and why your ad creatives benefit more from clarity than novelty)",
+        "number": ["0", "2"],
+        "body": "Organic is where you build interest. Ads layer on top of that, taking your best-performing faces, locations, hooks, and topics and presenting your offer in a clear, feed-native way.",
+        "cta": { "label": "Discover our approach", "href": "/our-approach" },
+        "video": "/videos/case-01.mp4",
+        "poster": "/images/posters/service-ads.avif"
+      },
+      {
+        "theme": "theme-lime",
+        "title": "Organic content",
+        "sub": "Let's build an engaged audience for your brand.",
+        "number": ["0", "1"],
+        "body": "A strong organic presence brings you closer to your customers at scale. We'll help you build one that's visually polished and feels authentic to you.",
+        "cta": { "label": "Discover our approach", "href": "/our-approach" },
+        "video": "/videos/case-02.mp4",
+        "poster": "/images/posters/service-organic.avif"
+      }
+    ]
+  },
+  "testimonials": {
+    "label": "What our clients say:",
+    "items": [
+      {
+        "text": "Hildén & Kaira has been with us through critical moments on Uusi Juttu's journey, from our founding campaign to our first-year membership campaign. Together we've been able to develop our own voice on social media in a style that suits a startup: we've tested and experimented, and doubled down on what works. We've made many viral hits together, and the results speak for themselves.",
+        "img": "/images/testimonials/jussi-sippola.avif",
+        "name": "Jussi Sippola",
+        "role": "Co-Founder"
+      },
+      {
+        "text": "Hildén & Kaira believed from day one that we could turn even our critics into supporters through TikTok, and that's exactly what happened. Over the course of the campaign, the harshest voices faded and genuine support grew in their place. They work at the same relentless pace as a presidential campaign demands, delivering in hours what would take others days. In a race like this, that was invaluable.",
+        "img": "/images/testimonials/pekka-haavisto.avif",
+        "name": "Pekka Haavisto",
+        "role": "Personal Envoy of the UN Secretary-General for Sudan"
+      },
+      {
+        "text": "They have a knack for finding the topics, people, and angles that bring out the different dimensions of what we do in an authentic, distinctive voice. I could almost say Hildén & Kaira has helped us find our identity. And the social media audience is loving it: our social visibility is on a completely different level than before the partnership.",
+        "img": "/images/testimonials/seija-vennervirta.avif",
+        "name": "Seija Vennervirta",
+        "role": "Director of Communications"
+      },
+      {
+        "text": "Results speak for themselves. We've reached a massive audience and broken into traditional media's awareness in just a few months. The best part of the collaboration is peace of mind: we can trust their expertise. They know how to reach a wide audience with our messages.",
+        "img": "/images/testimonials/nea-mertsalmi.avif",
+        "name": "Nea Mertsalmi",
+        "role": "CMO, Finlayson & Co"
+      },
+      {
+        "text": "Hildén & Kaira has succeeded in bringing the expertise and knowledge at the core of our work to a wide audience, and the results have followed. We especially value their ability to understand our customers and the way Liikku speaks. They is serving our audience alongside us. This is how social media should be done.",
+        "img": "/images/testimonials/alma-rapakko.avif",
+        "name": "Alma Rapakko",
+        "role": "CMO, Kuntokeskus Liikku"
+      }
+    ]
+  },
+  "about": {
+    "h2": "Does your brand have self-esteem issues?",
+    "body": "Companies think their work, vision and people are not interesting. That they need expensive brand campaigns to look cool. We believe it's lying, stupid and a waste of money.",
+    "poster": "/images/posters/about-bg.webp",
+    "video": "/videos/case-02.mp4",
+    "imgLeft": "/images/about/about-left.webp",
+    "imgRight": "/images/about/about-right.webp",
+    "buttons": [
+      { "label": "Read our story", "href": "/our-story", "variant": "secondary" },
+      { "label": "Get in touch", "href": "/contact", "variant": "primary" }
+    ]
+  },
+  "cta": {
+    "h2": "Ready to work with us?",
+    "lead": "Choose how you would like to get in touch.",
+    "cards": [
+      {
+        "theme": "theme-lime",
+        "title": "We'll call you",
+        "emoji": "/images/emoji/call-me.webp",
+        "body": "We audit your social presence and contact you with clarifying questions for a final proposal.",
+        "button": "Share your contact info",
+        "isForm": true
+      },
+      {
+        "theme": "theme-dark-grey",
+        "title": "Contact us",
+        "emoji": "/images/emoji/email.webp",
+        "body": "Email or call us to start the discussion right away.",
+        "button": "Contact information",
+        "href": "/contact"
+      }
+    ],
+    "form": {
+      "emoji": "/images/emoji/high-five.avif",
+      "title": "Contact us",
+      "lead": "Best social media content is real and useful. Our client companies grow loyal audiences faster than anyone else.",
+      "emailPlaceholder": "Enter your email",
+      "phonePlaceholder": "Enter your phone number",
+      "optional": "Optional",
+      "terms": "I agree with the",
+      "termsLink": "Privacy Policy.",
+      "submit": "Get in touch",
+      "successTitle": "Thanks for your submission!",
+      "successBody": "We aim to reply to you as soon as possible.",
+      "errorBody": "Something went wrong while submitting."
+    }
+  },
+  "footer": {
+    "sitemapTitle": "Sitemap",
+    "sitemap": [
+      { "label": "Home", "href": "/" },
+      { "label": "Our approach", "href": "/our-approach" },
+      { "label": "Our story", "href": "/our-story" },
+      { "label": "Work", "href": "/work" },
+      { "label": "Blog", "href": "/blog" },
+      { "label": "Contact", "href": "/contact" }
+    ],
+    "podcast": {
+      "title": "Podcast",
+      "emoji": "/images/emoji/podcast.avif",
+      "links": [
+        { "kind": "spotify", "href": "https://open.spotify.com/show/61gSZDVJ3TFkuSJT7wvPVy?si=d0be4d3ef0804c61" },
+        { "kind": "youtube", "href": "https://youtube.com/@hildenkaira" },
+        { "kind": "apple", "href": "https://podcasts.apple.com/us/podcast/hild%C3%A9n-kaira-podcast/id1673731056" }
+      ]
+    },
+    "social": {
+      "title": "Social",
+      "emoji": "/images/emoji/heart.avif",
+      "links": [
+        { "kind": "instagram", "href": "https://instagram.com/hildenkaira" },
+        { "kind": "tiktok", "href": "https://tiktok.com/@hildenkaira" },
+        { "kind": "facebook", "href": "https://www.facebook.com/hildenkaira/" }
+      ]
+    },
+    "legal": [
+      { "label": "Privacy Policy", "href": "#" },
+      { "label": "Cookies", "href": "#" }
+    ],
+    "credit": { "label": "©Design by Dylan", "href": "https://dylanbrouwer.design/" }
+  },
+  "cookie": {
+    "notice": "Hildén & Kaira uses cookies and similar technologies to improve your experience, analyze traffic, and to show you relevant content and advertising.",
+    "prefsIntro": "We use cookies and other technologies across categories below. Toggle any to accept or reject related data collection.",
+    "categories": [
+      { "name": "Essential", "desc": "Necessary for basic website functionality.", "required": true },
+      { "name": "Marketing", "desc": "Helps deliver targeted ads that are relevant to you." },
+      { "name": "Analytics", "desc": "Provides insights on your usage and site interaction." },
+      { "name": "Personalization", "desc": "Tailors your experience by remembering your settings." }
+    ]
+  },
+  "nav": {
+    "links": [
+      { "label": "Our approach", "href": "/our-approach" },
+      { "label": "Story", "href": "/our-story" },
+      { "label": "Work", "href": "/work" },
+      { "label": "Blog", "href": "/blog" }
+    ],
+    "cta": { "label": "Get in touch", "href": "/contact" }
+  }
+}
