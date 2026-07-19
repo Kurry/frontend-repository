@@ -82,6 +82,24 @@ rendered image is the one the user came for; rubric probes must verify (a) two
 different edit states produce two visibly different exported images, and (b)
 the exported image matches what the on-screen preview showed.
 
+**Fourth worked example — games play for real.** A game task must deliver the
+complete competitive loop, not a board that shuffles pieces. Chess is the
+standard: the user plays a REAL engine opponent end-to-end (an engine of
+Stockfish's class compiled to WASM, shipped npm-local, running client-side),
+with full rules enforcement (legal-move generation, check, checkmate,
+stalemate, draw conditions), genuine WINNERS AND LOSERS (the game reaches a
+decided end state — mate, resignation, draw — announced visibly with the
+result), and a reset/new-game control that returns to a clean starting
+position with no state leaking from the previous game. Depth follows: move
+history in standard notation, undo/takeback, difficulty levels that observably
+change engine strength, and the exportable artifact is the game itself — a PGN
+the user can load into any chess tool. An in-progress game must also be
+SAVEABLE and RESUMABLE: save the position/state (via the genre's persistence
+rule, or an exportable state file the app can re-import) and resume later
+exactly where it left off — same position, same side to move, same clock/
+history. The same reading applies to every game genre: a real opponent/
+challenge loop, decided outcomes, a clean restart, and save/resume.
+
 ## Workflow
 
 1. **Audit the task** against the too-easy signals: no import/export artifact,
