@@ -70,6 +70,18 @@ config files, itineraries → ICS + JSON, ledgers → CSV, schemas → JSON-Sche
 text, boards → structured JSON, palettes → CSS vars/Tailwind config/SCSS,
 datasets → CSV + dataset card, prompts → markdown/package JSON.
 
+**Third worked example — photo editing, with TRUE editing.** An image editor
+must perform real pixel transformations: adjustments (exposure, color, crop,
+masks) are applied to the actual bitmap client-side (canvas/WebGL image
+processing), and the user downloads the FINISHED RESULT — a PNG/JPEG whose
+pixels carry every edit — via a real download control. A CSS filter on a
+preview element, an overlay trick, or a settings recipe alone is NOT editing:
+the exported file must contain the edits when opened anywhere else. The edit
+stack (a settings JSON enabling re-edit) is a worthy second artifact, but the
+rendered image is the one the user came for; rubric probes must verify (a) two
+different edit states produce two visibly different exported images, and (b)
+the exported image matches what the on-screen preview showed.
+
 ## Workflow
 
 1. **Audit the task** against the too-easy signals: no import/export artifact,
