@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "2.2"
 name = "shared_state_coherence_dials_preview_meter"
-description = "Dial, slider, look-pack, snapshot, and preset changes from any control update one shared state: preview, meter, histogram, EV, and export artifacts never disagree with each other."
+description = "Dial, slider, scene, zebra, bracket, A/B, look-pack, snapshot, and preset changes from any control update one shared state: preview, meter, histogram, EV, and export artifacts never disagree with each other."
 type = "binary"
 weight = 1.0
 
@@ -85,7 +85,7 @@ weight = 1.0
 [[criterion]]
 id = "2.4"
 name = "reload_resets_all_facets_to_seed"
-description = "After changing several independent facets (step two dials, move a light slider, create a preset, save a snapshot, apply a look pack), a page reload returns the app coherently to its seeded state."
+description = "After changing several independent facets (step two dials, move a light slider, select a non-default scene, turn on a zebra toggle, fill an A/B slot, create a preset, save a snapshot, apply a look pack), a page reload returns the app coherently to its seeded state — default dials, zeroed sliders, Daylight Courtyard scene, zebra toggles off, empty A/B slots, empty snapshots, and exactly the seeded presets."
 type = "binary"
 weight = 1.0
 
