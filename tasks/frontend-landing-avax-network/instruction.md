@@ -5,7 +5,8 @@ Build a single continuous scrolling fictional Astra Network marketing homepage u
 <reference_screenshots>
 Screenshots of the reference application are provided in-container at
 /reference-screenshots/: overview.png is a full-page desktop-layout
-overview (downscaled); segment-NN.png are full-resolution 1440x900 sections
+overview (downscaled); overview-tablet.png and overview-mobile.png are full-page responsive
+reflows at 1024x768 (tablet) and 390x844 (mobile) viewports; segment-NN.png are full-resolution 1440x900 sections
 in top-to-bottom order with slight overlap. They are part of this instruction:
 recreate their composition, density, proportions, and motion. Any legible
 source name, token, logo, partner, social handle, article title, typeface,

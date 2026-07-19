@@ -75,10 +75,99 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.3"
-name = "layout_pixel_match_reference_screenshots"
-description = "At 1440 desktop width, composition matches /reference-screenshots/ overview and segment panels to near pixel-parity for preloader/hero, segment nav, stacked bands, feature grids, and footer density/proportions (Novapay replacement assets holding the same sizes and placements)."
-type = "binary"
+id = "3.21"
+name = "block_fidelity_preloader_boot"
+description = "Block: preloader boot screen — Full-viewport solid-black boot screen with a centered white Novapay / SPRINT'26 wordmark lockup (fictional equivalent of the source wordmark) above a thin progress track that fills electric blue (reference: segment-01.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.22"
+name = "block_fidelity_nav_segment_header"
+description = "Block: segment nav header — Fixed full-width top nav on black with the wordmark at left and six hairline-divided mono-uppercase section cells running 01.AGENTIC STACK through 06.BUSINESS BANKING, the active cell filled electric blue (reference: persistent across segments, clearest in segment-07.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.23"
+name = "block_fidelity_hero_3d_scroll_scene"
+description = "Block: hero 3D scroll scene — Full-bleed electric-blue 3D wireframe world with a giant mannequin figure, a floating black billboard reading SPRINT 26 / 100+ LAUNCHES & UPDATES, checkout/commerce prop cards, and a bottom-center dark SCROLL TO SEE 100+ UPDATES pill (reference: segment-02.png–segment-08.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.24"
+name = "block_fidelity_agentic_payments_band"
+description = "Block: agentic payments band — Section 01/A dark band pairing in-app-chat payments copy with a blue wireframe grocery-bag phone, a partner logo row, and a card row for LLM payments, chat-app payments, and voice payments with phone mockups (reference: segment-07.png–segment-08.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.25"
+name = "block_fidelity_agentic_platform_studio_bands"
+description = "Block: agentic platform and studio bands — Blue 01/B band with an onboarding KYC-doc card flowing into dark 01/C cards for an AI assistant, smart assist, a copilot code panel, and complaint-triage mockups (reference: segment-10.png–segment-11.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.26"
+name = "block_fidelity_builders_and_agent_bands"
+description = "Block: builders and agent bands — Light-grey 01/D Payment for Builders band with a node-canvas automation mockup and an MCP-server connect panel, closing with text-only 01/E bookkeeping and reporting agent cards (reference: segment-13.png–segment-15.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.27"
+name = "block_fidelity_international_payments_section"
+description = "Block: international payments section — Section 02 index and tagline with an executive video still on blue plus wallet checkout-sheet mockups, followed by a dense multi-column text card grid covering risk screening, chargeback protection, saved cards, and intelligent routing (reference: segment-15.png–segment-17.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.28"
+name = "block_fidelity_payment_gateway_section"
+description = "Block: payment gateway section — Section 03 dark band with biometric card authentication around a checkout card mockup, a bank card plus face-authentication chip, and card mockups for reserve pay, card sync, and retry engine settings (reference: segment-19.png–segment-21.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.29"
+name = "block_fidelity_d2c_section"
+description = "Block: D2C section — Section 04 light band with an executive video still accompanied by mono name/role text and a pull quote, a checkout-of-choice headline, a shopping mockup, and a POS/omnichannel card grid (reference: segment-21.png–segment-23.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.30"
+name = "block_fidelity_marketing_section"
+description = "Block: marketing section — Section 05 dark band with a rewards marketplace showing a gift-card/brand-offer promo mockup with an unlock toggle, plus a lounge photo card, a gift-cards card, and a refund-issue panel (reference: segment-25.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.31"
+name = "block_fidelity_business_banking_section"
+description = "Block: business banking section — Section 06 white band with an executive quote, a headline reading Don't let banking weigh you down, a blue FIX THIS keyboard-key illustration with a stressed worker, and a banking card grid (reference: segment-27.png–segment-29.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.32"
+name = "block_fidelity_footer_wordmark"
+description = "Block: footer wordmark — Electric-blue footer with a mission line, a GET ACCESS link, copyright, social links, and an oversized tonal /SPRINT'26 wordmark bleeding off the bottom edge (reference: segment-29.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
 weight = 1.0
 
 [[criterion]]
@@ -166,14 +255,6 @@ weight = 1.0
 id = "3.n5"
 name = "controls_use_browser_defaults"
 description = "Segment nav, GET ACCESS rail, pills, or modal chrome use unstyled browser default appearance when the reference uses the Novapay-token restyled chrome."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n6"
-name = "layout_misaligned_vs_screenshots"
-description = "At 1440 the hero/nav/stacked-band/feature-grid composition is grossly misaligned versus /reference-screenshots/ segment panels."
 type = "binary"
 negate = true
 weight = 1.0

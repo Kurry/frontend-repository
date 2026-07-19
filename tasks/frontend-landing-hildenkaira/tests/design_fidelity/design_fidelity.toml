@@ -75,10 +75,83 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.3"
-name = "layout_pixel_match_reference_screenshots"
-description = "At 1440 desktop width, composition matches /reference-screenshots/ overview and segment panels to near pixel-parity for the broken-grid hero, client deck density, pinned services trio, about flanking images, and full-height footer proportions — using fictional Cinder & Bloom assets, not source pixels."
-type = "binary"
+id = "3.11"
+name = "block_fidelity_nav_header"
+description = "Block: nav header — fixed transparent nav with a small chrome monogram at left (fictional Cinder & Bloom mark in place of the source monogram), centered links (Our approach / Story / Work / Blog), a globe 'EN' locale dropdown, and a 'Get in touch' CTA that swaps lime/black by section theme (reference: segment-01.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.12"
+name = "block_fidelity_hero"
+description = "Block: hero — off-white surface with a full-width liquid-chrome lettermark across the top (fictional Cinder & Bloom equivalent of the source wordmark), a small chrome flame glyph, a large serif provocation H1 with a lead line, and two CTAs (reference: segment-01.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.13"
+name = "block_fidelity_statement_band"
+description = "Block: statement band — full-bleed dark media band showing an elderly reader among bookshelves, overlaid with a lime serif heading and a black-boxed subtitle (reference: segment-02.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.14"
+name = "block_fidelity_client_deck_carousel"
+description = "Block: client deck carousel — five-star testimonial blurbs flanking a client card with a 'Show case' button, a stacked flick-deck of vertical videos with a custom player, prev/next arrows, and lime 'Organic views' and chrome 'Likes' stat tiles (reference: segment-03.png, segment-04.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.15"
+name = "block_fidelity_services_intro"
+description = "Block: services intro — centered serif 'Our services' heading on black scattered with floating chrome 3D objects (heart, dove, gloved hand, flame, speakers, microphone) as the first lime service card begins to rise (reference: segment-05.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.16"
+name = "block_fidelity_services_trio"
+description = "Block: services trio — pinned stacked service cards thrown one over the next (lime 'Organic content 01', white 'Ads for social 02', turquoise 'Training 03'), each with an index number, description, CTA button, and vertical video (reference: segment-06.png–segment-09.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.17"
+name = "block_fidelity_testimonials"
+description = "Block: testimonials — off-white rotator labeled '2/5 What our clients say:' with a large serif quote, a chrome quotation-mark glyph, an author avatar with name and role, and black prev/next arrow buttons (reference: segment-10.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.18"
+name = "block_fidelity_about_band"
+description = "Block: about band — full-bleed blurred portrait/forest media field with a lime serif 'self-esteem' H2, supporting copy, 'Read our story' and 'Get in touch' CTAs, and two flanking rectangular photos (reference: segment-11.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.19"
+name = "block_fidelity_cta_block"
+description = "Block: CTA block — dark section with a centered serif 'Ready to work with us?' heading and two choice cards, a lime 'We'll call you' card with a chrome phone image and a dark 'Contact us' card with a chrome heart-envelope (reference: segment-12.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.20"
+name = "block_fidelity_footer"
+description = "Block: footer — full-height footer re-assembling the liquid-chrome lettermark on a metallic surface (fictional Cinder & Bloom lettermark in place of the source wordmark), with Sitemap links, Podcast and Social panels with icon rows, and a design credit (reference: segment-13.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
 weight = 1.0
 
 [[criterion]]
@@ -166,14 +239,6 @@ weight = 1.0
 id = "3.n5"
 name = "controls_use_browser_defaults"
 description = "Primary CTAs, contact fields, or cookie controls use unstyled browser default appearance when the reference uses token-styled chrome."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n6"
-name = "layout_misaligned_vs_screenshots"
-description = "At 1440 the hero/client-deck/services/about/footer composition is grossly misaligned versus /reference-screenshots/ segment panels."
 type = "binary"
 negate = true
 weight = 1.0

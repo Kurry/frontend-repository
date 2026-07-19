@@ -75,10 +75,59 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.3"
-name = "layout_pixel_match_reference_screenshots"
-description = "At 1440 desktop width, composition matches /reference-screenshots/ overview and segment panels to near pixel-parity for the home stack, case broken-grid, about two-column layout, header bar, and footer density/proportions — while identity/content follow the instruction's fictional Field Notes Archive."
-type = "binary"
+id = "3.41"
+name = "block_fidelity_home_header_bar"
+description = "Block: home header bar — fixed centered translucent dark bar with a hairline bottom border, monospace FIELD NOTES ARCHIVE wordmark centered-left and a single About nav item at right (reference: segment-01.png, also atop segment-02.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.42"
+name = "block_fidelity_hero_title_paragraph"
+description = "Block: hero title and paragraph — near-black page opening with a huge two-line condensed uppercase display title AMERICAN MODERNISM in cream above a centered gray serif supporting paragraph (reference: segment-01.png–segment-02.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.43"
+name = "block_fidelity_cover_organic_early_modernism"
+description = "Block: first filing cover — blue (#1E4BD7) ORGANIC & EARLY MODERNISM cover at the top of the four-cover stack with its thesis line, right chevron affordance, and two rounded white paper tag tabs (reference: segment-01.png–segment-02.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.44"
+name = "block_fidelity_cover_expressive"
+description = "Block: second filing cover — teal (#0C7866) EXPRESSIVE cover with its thesis line, chevron affordance, and a single rounded paper tag tab (reference: segment-01.png–segment-02.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.45"
+name = "block_fidelity_cover_monumental_modernism"
+description = "Block: third filing cover — purple (#581E70) MONUMENTAL MODERNISM cover with its thesis line, chevron affordance, and three rounded paper tag tabs (reference: segment-01.png–segment-02.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.46"
+name = "block_fidelity_cover_place_culture_continuity"
+description = "Block: fourth filing cover — red (#D71E1E) PLACE / CULTURE CONTINUITY cover with its thesis line, chevron affordance, and two rounded paper tag tabs closing the stack (reference: segment-02.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.47"
+name = "block_fidelity_footer_unfolded_cover"
+description = "Block: footer inside the unfolded fourth cover — IBM-Plex-Mono-styled uppercase micro-type with two rotating wind rose graphics, an architectural scale graphic, a masked archivist signature, and a fictional studio credit mark, revealed below the stack when the red cover unfolds (reference: below the red cover of segment-02.png, visible only in the unfolded state). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
 weight = 1.0
 
 [[criterion]]
@@ -166,14 +215,6 @@ weight = 1.0
 id = "3.n5"
 name = "header_or_close_use_browser_defaults"
 description = "The fixed header or red circular close button render as unstyled browser-default chrome instead of the specified translucent bar / 54px red circle."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n6"
-name = "layout_misaligned_at_1440"
-description = "At 1440 desktop width the home stack, case broken-grid, or about two-column layout is misaligned versus the reference composition."
 type = "binary"
 negate = true
 weight = 1.0

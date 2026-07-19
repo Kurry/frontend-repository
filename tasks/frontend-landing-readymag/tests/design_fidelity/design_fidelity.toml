@@ -75,10 +75,91 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.3"
-name = "layout_pixel_match_reference_screenshots"
-description = "At desktop width, composition matches /reference-screenshots/ overview and segment panels to near pixel-parity for sticky header, oversized hero with marquees and floating media card, workflow cards, use-case tiles, support band, traveling marquee, closing CTA, and multi-column footer density/proportions — with Canvasly identity replacing any source branding."
-type = "binary"
+id = "3.12"
+name = "block_fidelity_sticky_header_nav"
+description = "Block: sticky header nav — Sticky white bar with a hairline bottom border holding a round monogram logo at left, a centered Solutions / Pricing / Examples / Templates / Learn nav, and a Log in link beside a dark Sign up pill at right (reference: segment-01.png, persists in all segments). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.13"
+name = "block_fidelity_hero_gallery_marquees"
+description = "Block: hero gallery marquees — Three stacked marquee rows of colorful project thumbnails scrolling across the top of the hero (reference: segment-01.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.14"
+name = "block_fidelity_hero_headline_cta"
+description = "Block: hero headline and CTA — Oversized black headline reading Design and launch outstanding websites over a grey subtitle, a dark Try pill with an underlined subscription-plan link, and a tilted orange floating Mobile editor media card overlapping the right edge (reference: segment-01.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.15"
+name = "block_fidelity_hello_ready_accent_cluster"
+description = "Block: Hello/Ready accent cluster — Oversized playful grid-breaking type placing an orange Hello! beside a tilted purple Ready? on white whitespace (reference: segment-02.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.16"
+name = "block_fidelity_workflow_feature_cards"
+description = "Block: workflow feature cards — An Enjoy easy workflow heading and intro paragraph followed by four scroll-reveal feature cards in two columns covering easy workflow, streamlined teamwork, attracting with interactivity, and expanded functionality (reference: segment-02.png–segment-03.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.17"
+name = "block_fidelity_project_slideshow_strip"
+description = "Block: project slideshow strip — Horizontal six-frame project slideshow with the active frame opaque and its neighbors dimmed to roughly 0.35 opacity (reference: segment-03.png–segment-04.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.18"
+name = "block_fidelity_teams_usecase_tiles"
+description = "Block: teams use-case tiles — A Teams of all sizes heading over a 3x2 grid of color-coded rounded tiles with white labels for Portfolios (pink), Landing pages (yellow), Editorials (blue), Company websites (grey), Design studios (green), and an orange by-team tile (reference: segment-04.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.19"
+name = "block_fidelity_support_band"
+description = "Block: support band — Full-width dark #282828 panel with centered white support copy featuring orange-emphasized phrases and an animated orange orb traveling a curved path below (reference: segment-05.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.20"
+name = "block_fidelity_usecase_marquee_row"
+description = "Block: use-case marquee row — Traveling row of oversized non-wrapping black labels on white naming Presentations, Design studios, Portfolios, Company websites, Landing pages, and Editorials (reference: segment-05.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.21"
+name = "block_fidelity_closing_cta"
+description = "Block: closing CTA — Centered closing block on white with a large Try for free heading, a grey subscription line, a dark CTA pill with an underlined View pricing link, and the instruction-mandated embedded trial-brief panel below the heading (reference: segment-05.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.22"
+name = "block_fidelity_footer_multicolumn"
+description = "Block: footer multicolumn — Dark #282828 footer with four link-label groups and a bottom row placing copyright at left and a support email at right (reference: segment-05.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
 weight = 1.0
 
 [[criterion]]
@@ -166,14 +247,6 @@ weight = 1.0
 id = "3.n5"
 name = "controls_use_browser_defaults"
 description = "Primary CTAs or pills use unstyled browser default appearance when the reference uses dark #282828 pill styling."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n6"
-name = "layout_misaligned_vs_screenshots"
-description = "At desktop width the header/hero/workflow/tiles/footer composition is grossly misaligned versus /reference-screenshots/ segment panels."
 type = "binary"
 negate = true
 weight = 1.0

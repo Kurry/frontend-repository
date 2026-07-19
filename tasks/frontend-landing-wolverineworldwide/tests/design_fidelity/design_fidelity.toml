@@ -75,10 +75,91 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.3"
-name = "layout_pixel_match_reference_screenshots"
-description = "At 1440 desktop width, composition matches /reference-screenshots/ overview and segment panels to near pixel-parity for sticky header, full-bleed hero, portfolio particle field, market snapshot, news carousel, careers push, and dark footer density/proportions."
-type = "binary"
+id = "3.12"
+name = "block_fidelity_sticky_header"
+description = "Block: sticky header — sticky top bar with the Northstar Collective wordmark plus compact monogram at the start and right-aligned nav links About, Brands, Careers, Responsibility (chevron), Investors (external-link icon), morphing to a dark compact bar on scroll (reference: segment-01.png, persists across segments). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.13"
+name = "block_fidelity_video_hero"
+description = "Block: video hero — full-viewport muted brand-montage video with the huge white three-line headline Make. Every Day. Better. and a lower-right latest-news annual-report card with sunrise trail-runner thumbnail (reference: segment-01.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.14"
+name = "block_fidelity_mission_statement"
+description = "Block: mission statement — right-aligned large grey mission paragraph above a pill Learn More About Us button on white (reference: segment-02.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.15"
+name = "block_fidelity_brand_portfolio"
+description = "Block: brand portfolio — scattered particle/galaxy field of small brand and product photos surrounding the giant three-line stepped heading A portfolio built for every step. with a grey Explore Our Brands pill (reference: segment-03.png, segment-04.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.16"
+name = "block_fidelity_annual_report"
+description = "Block: annual report — black rounded panel pairing a large sunrise trail-runner photo with a white annual-report heading, comprehensive-overview lede, and a read-the-report PDF affordance (reference: segment-04.png, segment-05.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.17"
+name = "block_fidelity_culture_statement"
+description = "Block: culture statement — left black heading Many brands, one shared culture, limitless innovation. beside a large grey culture paragraph and an Explore Career Opportunities pill (reference: segment-05.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.18"
+name = "block_fidelity_market_snapshot"
+description = "Block: market snapshot — Market Snapshot heading with security line and stock-symbol label, a giant USD quote value, an Investor Relations pill, and a mono stat row for day's high, low, and volume (reference: segment-05.png, segment-06.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.19"
+name = "block_fidelity_latest_news"
+description = "Block: latest news — Latest News heading with View All link and Prev./Next controls above a horizontal carousel of image news cards with mono kicker titles and body copy (reference: segment-06.png, segment-07.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.20"
+name = "block_fidelity_careers_cta"
+description = "Block: careers CTA — dark full-bleed running-legs/road photo panel with the giant white headline Creating Your Future With Us, supporting copy, and a white pill CTA (reference: segment-07.png, segment-08.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.21"
+name = "block_fidelity_footer_nav"
+description = "Block: footer nav — black rounded-top footer slab with the monogram and large white stacked links (About Us, Brands, Careers, Responsibility, Investors, Contact) plus a two-column multi-brand link grid (reference: segment-09.png, segment-10.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.22"
+name = "block_fidelity_footer_legal_wordmark"
+description = "Block: footer legal wordmark — footer lower zone with a short blurb, social handles, copyright line, mono legal-link row, and an oversized Northstar Collective wordmark set over a navy street photo (reference: segment-10.png, segment-11.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
 weight = 1.0
 
 [[criterion]]
@@ -166,14 +247,6 @@ weight = 1.0
 id = "3.n5"
 name = "controls_use_browser_defaults"
 description = "Primary CTAs, cookie modal, or carousel controls use unstyled browser default appearance when the reference uses token-styled controls."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n6"
-name = "layout_misaligned_vs_screenshots"
-description = "At 1440 the header/hero/portfolio/news/footer composition is grossly misaligned versus /reference-screenshots/ segment panels."
 type = "binary"
 negate = true
 weight = 1.0

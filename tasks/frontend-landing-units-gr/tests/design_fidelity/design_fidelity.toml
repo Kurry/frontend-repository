@@ -75,10 +75,99 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.3"
-name = "layout_pixel_match_reference_screenshots"
-description = "At 1440 desktop width, composition matches /reference-screenshots/ overview and segment panels to near pixel-parity for the fixed sidebar shell (~122px / ~167px main offset), hero, marquees, living carousel, studios, community, and footer density/proportions."
-type = "binary"
+id = "3.12"
+name = "block_fidelity_sidebar_nav_header"
+description = "Block: sidebar nav header — fixed left column of four numbered rounded nav cards (01 blue, 02 yellow, 03 orange/red, 04 green) each with an up-right arrow, above the black Noma wordmark and unique student homes tagline at top-left, persisting down the page (reference: segment-01.png, visible in all segments). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.13"
+name = "block_fidelity_hero"
+description = "Block: hero — full-bleed colorful student-lounge photo (blue coffered ceiling, green/orange walls, yellow crate seating) behind a huge white display headline, a Greek all-inclusive supporting line, and a dark rounded Book your Unit pill overlapping the photo's lower edge (reference: segment-01.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.14"
+name = "block_fidelity_locations_map"
+description = "Block: locations map — large yellow rounded info card (location chip, Greek heading and paragraph, two pill chips) beside a light gridded map panel with an orange location marker and a coming-soon marker (reference: segment-02.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.15"
+name = "block_fidelity_red_marquee"
+description = "Block: red marquee — full-width red (#ea3737) rounded band with yellow looping phrases (private kitchen and bathroom, 24/7 security, fast maintenance, smart living, social areas) separated by diamond and lightning glyphs (reference: segment-02.png, segment-03.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.16"
+name = "block_fidelity_living_carousel"
+description = "Block: living carousel — tall orange/red info card with an All-inclusive Living chip, a One Unit. An entire universe. display heading, and a Greek subtitle and paragraph, beside a swipeable amenity carousel of photo slides with amenity lists (reference: segment-03.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.17"
+name = "block_fidelity_blue_marquee"
+description = "Block: blue marquee — full-width blue (#0072e3) band with green looping phrases (electric bike stations, elevator access, super-fast WiFi, 24/7 hot water) with diamond separators (reference: segment-03.png, segment-04.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.18"
+name = "block_fidelity_typical_studio"
+description = "Block: typical studio — units chip, Greek heading, eight-icon feature grid, three-tier monthly pricing list, and a right-side multi-tile photo gallery (reference: segment-04.png, segment-05.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.19"
+name = "block_fidelity_community"
+description = "Block: community — two dark exterior/rooftop lifestyle photos flanking a salmon-red rounded info card with community chip, Greek heading and paragraph, and a grey CTA button (reference: segment-05.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.20"
+name = "block_fidelity_values_cards"
+description = "Block: values cards — blue rounded band with a Greek values heading flanked by yellow down-arrow groups, followed by three light-blue cards each with a pixel-art icon (green smiley, red arrow, yellow heart) and paragraph (reference: segment-05.png, segment-06.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.21"
+name = "block_fidelity_social_feed"
+description = "Block: social feed — black Our way of living strip above a colored mosaic with a purple panel holding an Instagram chip and Staying connected heading beside purple, yellow, and green feed tiles (reference: segment-07.png, segment-08.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.22"
+name = "block_fidelity_book_cta_band"
+description = "Block: book CTA band — orange (#ff5c38) rounded band with centered Book your Unit text and up-right arrow, flanked by blue down-arrow groups (reference: segment-08.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.23"
+name = "block_fidelity_footer"
+description = "Block: footer — warm-canvas footer with address block, email/phone line, links list, and a Greek policies list (reference: segment-08.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
 weight = 1.0
 
 [[criterion]]
@@ -166,14 +255,6 @@ weight = 1.0
 id = "3.n5"
 name = "controls_use_browser_defaults"
 description = "Primary CTAs, chips, or cards use unstyled browser default appearance when the reference uses token-styled pills/cards."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n6"
-name = "layout_misaligned_vs_screenshots"
-description = "At 1440 the sidebar/hero/marquee/living/studio composition is grossly misaligned versus /reference-screenshots/ segment panels."
 type = "binary"
 negate = true
 weight = 1.0

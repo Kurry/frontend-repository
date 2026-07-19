@@ -1,11 +1,12 @@
 <summary>
-Build a single-page long-scroll fintech launch-event marketing microsite (one document at /sprint/26 only — no other product pages or client routes) using Astro with static delivery and vanilla TypeScript island scripts for interactivity, Tailwind CSS 4.3.2, and DaisyUI, with GSAP with ScrollTrigger, Three.js with GLTFLoader and DRACOLoader, and Rive as the motion and 3D runtime.
+Build a single-page long-scroll fintech launch-event marketing microsite (one document at /sprint/26 only — no other product pages or client routes) using Astro with static delivery and vanilla TypeScript island scripts for interactivity, Tailwind CSS 4.3.2, and DaisyUI, with GSAP with ScrollTrigger, Three.js with GLTFLoader and DRACOLoader, and Rive as the motion and 3D runtime. The app produces the operator's Sprint launch brief — a downloadable, copyable JSON and Markdown artifact compiled live from the session shortlist, compare set, theme filter, search, and watch log.
 </summary>
 
 <reference_screenshots>
 Screenshots of the reference application are provided in-container at
 /reference-screenshots/: overview.png is a full-page desktop-layout
-overview (downscaled); segment-NN.png are full-resolution 1440x900 sections
+overview (downscaled); overview-tablet.png and overview-mobile.png are full-page responsive
+reflows at 1024x768 (tablet) and 390x844 (mobile) viewports; segment-NN.png are full-resolution 1440x900 sections
 in top-to-bottom order with slight overlap. They are part of this instruction:
 recreate their composition, proportions, density, and motion. The screenshots'
 source wordmarks, people, photography, video, UI marks, and card artwork are
@@ -36,6 +37,20 @@ Feature: Copy anchors —
 - Section taglines and callouts appear verbatim, including Your business has a new co-founder and it's AI-native., Checkout of choice for top brands., Curated rewards for your users., and Don't let banking weigh you down.
 - Feature names appear verbatim within their sections, including Agentic Payments cards (Payments on In-App Chats, Payments on LLMs, Novapay for ChatGPT Apps, Voice Payments); Agentic Platform cards (Agentic Onboarding, Ray Smart Assist, Agentic Integration, Ray Customer Support, Agentic Dashboard, Novapay Dashboard on Claude); Agent Studio cards (Dispute Auto-Responder, Cashflow Insights Agent, RTO Shielder Agent, Subscription Recovery Agent); Payment for Builders cards (Novapay Node for n8n, Novapay x Replit, Novapay MCP, Novapay MCP 1.0, Remote MCP); Agentic Business Banking cards (Insights Agent, Receivables Agent, Payouts Agent, Bookkeeping Agent, Reporting Agent); International Payments cards (Localised Checkout, Apple Pay now on Novapay, Google Pay now on Novapay, Chargeback Fraud Protection, Saved Cards, Intelligent Routing, In-House Cards Switch, New Global Accounts, Smart AML Risk Screening, Exporter Dashboard 2.0, Optimised Messaging); Payment Gateway cards (Biometric Card Authentication, UPI Reserve Pay, Novapay CardSync with CRED, Intelligent Retry Engine, Enterprise-Grade SSO, Card Support for 8 & 9-Digit BINs, Upgraded Card Retry for Recurring Payments, Intelligent Downtime Handling, ₹1 Registrations for UPI Autopay, UPI Mandate Cancellation APIs, Higher Card Auto-Debit Limits, Copilot-Powered Card Migration); D2C cards (Quick Buy 2.0, Buyer Protection, Login with Novapay, Omnichannel Payments, Self Healing POS, POS Command Centre, Growth DQR, Remote Trouble Shooting, Order Milestone Badges, Checkout Payment Configuration, ClickPost × Novapay, Divyang Drishti Pay); Marketing cards (Rewards Marketplace 2.0, Omni-channel Gift cards, Wallet-Based Refunds, Lounge Connect); and Business Banking cards (Bank Account Verification for Employees, Corporate Card, Payroll Engine 2.0, AI Payslip, Payroll Approvals Agent, DirectToPhone Payouts, Instant Reimbursements for Employees, Automated TDS Payments and Filing, Smart Collect 2.0, AI-powered Multi-Bank Routing)
 - EXPLORE and READ MORE calls to action on cards use an underline plus chevron affordance and point only to fictional .example destinations in a new tab
+Feature: Shortlist, compare, filter, search, and watch log —
+- Every feature card exposes Pin to shortlist / Unpin and Add to compare controls. Pinning Voice Payments then Quick Buy 2.0 raises a Shortlist tray count from 0 to 1 to 2, marks those cards pinned, and lists both names in pin order; unpinning Voice Payments drops the count to 1 and removes only that name. Pinning the same feature twice does not duplicate its name or inflate the count past a single pin for that card
+- Add to compare accepts up to three feature names in a Compare tray; attempting a fourth shows Compare is full (3/3) and leaves the tray at exactly three names
+- A Theme filter closed select offers All, Agentic Stack, International Payments, Payment Gateway, D2C, Marketing, and Business Banking. Choosing Payment Gateway hides non-Payment-Gateway feature cards while section chrome stays; typing into Launch search (string ≤120 characters) further narrows visible cards to name matches; choosing All and clearing search restores every card
+- Opening an executive video modal appends that executive's name to a Watch log (closed set: Arjun Mehta, Rohan Iyer, Nikhil Rao, Kabir Menon, Dev Sharma, Meera Nair); closing the modal leaves the entry present. Opening Nikhil Rao's Payment Gateway video appends Nikhil Rao
+- Undo and Redo reverse shortlist pin/unpin mutations: pinning Voice Payments then Undo returns the Shortlist tray count to 0 and clears the pin mark; Redo restores the pin and count together. With an empty undo history Undo is disabled or inert
+- Command palette (Ctrl+K / Cmd+K): opens with search focused; choosing Jump to Payment Gateway closes the palette and scrolls that section into view with its nav cell active; choosing Open sprint brief opens the Sprint launch brief panel; Escape closes the palette
+Feature: Sprint launch brief field contract (useful end state) —
+- Export sprint brief opens a panel with JSON and Markdown preview tabs plus Download, Copy, Import brief, and Load sample brief controls. The JSON document is an API-shaped session export compiled live from the store and MUST include exactly these required keys: brand (required string, exactly Novapay), event (required string, exactly Sprint 26), shortlistedFeatures (required array of catalog feature-name strings, pin order), compareFeatures (required array of catalog feature-name strings, length 0–3), watchedExecutives (required array of names from the closed executive set above), themeFilter (required closed enum: All, Agentic Stack, International Payments, Payment Gateway, D2C, Marketing, Business Banking), searchQuery (required string, length 0–120), generatedAt (required ISO-8601 UTC timestamp string ending in Z). Cross-field rules: every shortlistedFeatures and compareFeatures entry MUST be a feature name that appears on the page catalog; compareFeatures length MUST be ≤3; watchedExecutives entries MUST be from the closed executive set. An export that omits a session shortlist, compare, theme filter, search, or watch-log mutation is invalid
+- After pinning Voice Payments and Quick Buy 2.0, adding Biometric Card Authentication to compare, setting Theme filter Payment Gateway, typing Card into Launch search, and watching Nikhil Rao's video, those live values appear in the JSON with a fresh generatedAt
+- Download on the JSON tab offers a real file download named novapay-sprint-26-brief.json whose body matches the live schema-valid preview; Copy copies that same JSON text and shows a visible Copied confirmation; the Markdown tab shows the same facts under headings Shortlisted launches, Compare set, Theme filter, Search, and Watched executives
+- Import brief accepts a previously exported contract-valid JSON packet and restores shortlist, compare, theme filter, search, watchedExecutives/Watch log, and pinned marks so trays and both preview tabs match; Load sample brief loads a built-in valid sample through the same restore path
+- Importing a contract-invalid brief (brand not Novapay, event not Sprint 26, themeFilter outside the closed enum, compareFeatures longer than 3, a shortlistedFeatures or compareFeatures name not on the page catalog, a watchedExecutives name outside the closed executive set, generatedAt not an ISO-8601 UTC string ending in Z, or missing a required key) leaves shortlist, compare, theme filter, search, and watch log unchanged and shows an inline import error naming the offending field or rule
+- With an empty shortlist, Export sprint brief still produces schema-valid JSON whose shortlistedFeatures is [], brand is Novapay, event is Sprint 26, and other required keys reflect the live session
 </core_features>
 
 <user_flows>
@@ -45,15 +60,26 @@ User flows (each flow tracks visible state across the hero, the nav, and the sec
 - Section navigation flow: from the hero, clicking 03.PAYMENT GATEWAY scrolls the payment gateway section into view, that nav cell flashes the click-active blue and is marked active, and the section's index numeral, executive block, and card grid are visible; continuing to scroll manually into the D2C section moves the scroll-spy highlight from 03.PAYMENT GATEWAY to 04.D2C without any click; clicking the wordmark then returns the page to the hero
 - Video modal flow: in any section, clicking the executive play control opens the full-viewport video modal with that section's VP9 WebM playing; while the modal is open the page behind cannot be scrolled and the nav state is unchanged; closing the modal stops playback, unlocks scrolling, and leaves the page at the same section so the scroll-spy highlight is unchanged
 - Mobile menu flow: at a viewport narrower than 768px, the desktop segment nav is gone and a hamburger control is present; opening it lists I.AGENTIC STACK through VI.BUSINESS BANKING; choosing V.MARKETING closes the menu and scrolls the Marketing section into view
+- Shortlist and compare flow: pin Voice Payments then Quick Buy 2.0 (count 2, both names listed); add Biometric Card Authentication to compare; unpin Voice Payments — count returns to 1 and that name disappears from the tray and both brief preview tabs without a reload
+- Sprint brief export flow: after shortlist, compare, theme filter, search, and watch mutations, open Export sprint brief; JSON matches the Sprint launch brief field contract with brand Novapay, event Sprint 26, matching shortlistedFeatures, compareFeatures, themeFilter, searchQuery, watchedExecutives, and ISO-8601 UTC generatedAt ending in Z; Download offers novapay-sprint-26-brief.json; Copy shows Copied; Markdown shows the same facts under Shortlisted launches, Compare set, Theme filter, Search, and Watched executives
+- Import round-trip flow: with a non-empty shortlist, compare set, and Watch log entry, Download JSON, clear both trays and the Watch log, then Import that file; Shortlist tray, Compare tray, Watch log, pinned marks, and both preview tabs match the exported session again; a follow-up Import of themeFilter NotATheme, four compareFeatures, or a catalog-illegal shortlistedFeatures name keeps trays and Watch log unchanged and shows a named-field import error
+- Command palette flow: press Ctrl+K, type Payment, choose Jump to Payment Gateway; palette closes and payment-gateway is in view with its nav cell active; reopen palette and choose Open sprint brief to open the brief panel
+- Undo flow: pin Voice Payments, then Undo — Shortlist count returns to 0, pin clears, brief shortlistedFeatures is []; Redo restores the pin and preview together
+- Reload baseline for session chrome: pinning features, setting Theme filter, typing a search query, and watching a video, then reloading, coherently resets shortlist, compare, theme filter, search, Watch log, brief/palette closed, and empty undo/redo — never a mixed partial survival
 </user_flows>
 
 <edge_cases>
 - After the preloader exits it no longer intercepts pointer or keyboard input anywhere on the page
 - Deep-linking a hash URL such as /sprint/26#payment-gateway renders the same view as in-app navigation: the target section is in view and its nav cell is highlighted
-- Rapid successive clicks across several nav labels settle on the last clicked section with exactly one nav cell marked active
+- Rapid successive clicks across three or more nav labels settle on the last clicked section with exactly one nav cell marked active
 - Closing and reopening the video modal plays the video from a clean state, and body scroll is never left locked after a close
 - Resizing the viewport across the 768px breakpoint swaps between the desktop and mobile nav treatments without a page reload and without console errors
 - If WebGL is unavailable, the hero region falls back to a static composition with its heading text still present, and every section, nav link, and CTA below remains reachable and usable
+- Pinning the same feature twice in a row does not duplicate its name in the shortlist or inflate the count past a single pin for that card
+- Adding a fourth compare feature shows Compare is full (3/3) and the Compare tray still holds exactly three names
+- Opening Export sprint brief with an empty shortlist still produces schema-valid JSON whose shortlistedFeatures is [], brand is Novapay, event is Sprint 26, themeFilter is the live closed-enum value, generatedAt is an ISO-8601 UTC string ending in Z, and other required keys reflect the live session without crashing or showing lorem
+- Importing a malformed or contract-invalid brief JSON (missing required string brand or required array shortlistedFeatures, brand not Novapay, themeFilter outside the closed enum, compareFeatures longer than 3, a feature name not on the page catalog, a watchedExecutives name outside the closed executive set, or generatedAt not ending in Z) does not apply partial state; shortlist, compare, theme filter, search, and watch log stay unchanged and an inline import error names the offending field or rule
+- Importing a brief whose themeFilter is NotATheme keeps Theme filter and trays unchanged and shows an inline import error that names themeFilter (or the enum rule)
 </edge_cases>
 
 <visual_design>
@@ -73,6 +99,7 @@ Tolerance: EXACT match is required for colors, copy, font families, structure, r
 - A flash-of-unstyled-content guard in the head presets the resting opacity, color, and background of animated elements so nothing flashes unstyled on load
 - No third-party site-builder attribution badge appears anywhere on the page
 - Text and controls on dark, blue, white, and light-grey bands meet WCAG AA contrast against their immediate backgrounds
+- Shortlist tray, Compare tray, Theme filter, Launch search, command palette, and Sprint launch brief panel share the Novapay electric-blue token system: dark-band tray surfaces with #305eff accents on active pins and focus rings; JSON tab monospaced; Markdown tab display/body type — integrated into the long-scroll composition rather than a mismatched default dialog kit
 </visual_design>
 
 <motion>
@@ -93,6 +120,7 @@ Motion contracts (observable timings; approximate similar values are not accepta
 - The GET ACCESS rail rests at #0039ff (rgb(0,57,255)) and its background transitions to #305eff over the measured 0.3s on real pointer hover (required hover feedback)
 - The video modal opens on a play-button click and locks the underlying page scroll while open, unlocking it again on close
 - The footer gradient overlay fades in relative to scroll position with an ease-out settle
+- Via the real UI path, command palette and Sprint launch brief panel open and close with a short about 0.2s opacity/translate transition using inertial easing; pin/unpin updates the Shortlist tray count without a full-page reload flash; Copied confirmation fades in and out on the brief Copy control
 </motion>
 
 <responsiveness>
@@ -101,6 +129,7 @@ Motion contracts (observable timings; approximate similar values are not accepta
 - On mobile the pinned hero lockup repositions to top 20px, left 20px, width 120px and the pill moves to bottom 24px; the mobile hero pill background is rgba(10,10,10,0.82)
 - On mobile (max-width 767px) the stacked-section overlap is removed so sections stack edge-to-edge
 - At 375px width no content clips or overflows the viewport and no horizontal scrolling appears
+- At 375px width, Shortlist tray, Compare tray, Theme filter, Launch search, command palette, and Sprint launch brief panel remain fully usable without clipping controls or requiring horizontal scroll
 </responsiveness>
 
 <accessibility>
@@ -111,6 +140,8 @@ Motion contracts (observable timings; approximate similar values are not accepta
 - Every interactive control is reachable with the keyboard and shows a visible focus outline (the #305eff outline color); the video modal's close control is keyboard-focusable and operable
 - Text and control labels meet WCAG AA contrast against their band backgrounds, including white text on dark and blue bands and dark text on white and light-grey bands
 - No page-chrome outbound navigation exists except the declared signup and card CTA links
+- Command palette, Sprint launch brief panel, Shortlist tray, and Compare tray trap focus while open, close on Escape, and return focus to the control that opened them; Pin, Unpin, Add to compare, Theme filter, Launch search, Export, Download, Copy, Import, Undo, and Redo expose accessible names
+- Copied confirmations and import errors are announced through a polite live region as well as shown visually
 </accessibility>
 
 <performance>
@@ -119,13 +150,19 @@ Motion contracts (observable timings; approximate similar values are not accepta
 - Continuous scrolling from top to bottom shows no visible hitching or dropped frames through the hero scrub, the pinned sections, and the card grids
 - Lazy hydration of the feature-card canvas animations keeps scrolling smooth; cards far below the fold do not run animations before they are reached
 - After first paint, no visible layout jumps occur as fonts, images, or the 3D scene finish loading
+- Opening the command palette, regenerating the Sprint launch brief after shortlist and filter mutations, and rapid Undo/Redo never freeze the page or drop nav or rail responsiveness
 </performance>
 
 <writing>
 - All rendered copy uses the exact strings this instruction specifies: nav labels with their numeric prefixes, section taglines, executive quotes with their attributions, feature-card names, and footer lines appear verbatim with their original punctuation and capitalization
 - Uppercase label styling (nav segments, the SCROLL TO SEE 100+ UPDATES pill, GET ACCESS) is applied consistently wherever those elements appear
 - No lorem ipsum, placeholder-text markers, or unfinished copy appears anywhere in the shipped UI
+- Where the app renders shortlist, compare, filter, palette, and brief chrome, labels stay specific (Pin to shortlist, Unpin, Add to compare, Export sprint brief, Download, Copy, Import brief, Load sample brief, Undo, Redo, No launches pinned yet, Compare is full (3/3), Copied) rather than generic Submit/OK alone
 </writing>
+
+<innovation>
+Optional enhancements that are not required to pass: keyboard shortcut hints in the command palette, richer Markdown brief formatting, or coachmarks for first-time shortlist use. Do not substitute these for the required shortlist, compare, filter, watch-log, or Sprint launch brief field-contract behaviors above. Score execution quality of the useful end state: the live JSON/Markdown preview, Download/Copy, and shortlist/compare trays should feel finished and coherent with the Novapay Sprint narrative rather than unfinished stubs.
+</innovation>
 
 <requirements>
 - Copyright and rights-clearance prohibition: apart from required npm dependency code and explicitly specified open-license fonts or generic utility icons used under their licenses, every creative asset and every piece of visible editorial copy must be newly authored or generated specifically for this fictional build. Do not use scraped, stock, press, social-media, portfolio, source-site, screenshot-derived, copyrighted, trademarked, or otherwise third-party-controlled creative material, and do not make a trace, near-copy, style-identical imitation, or recognizable derivative of it. This applies to raster pixels, individual video frames and audio, SVG paths, canvas/WebGL/Rive artboards and textures, 3D geometry/materials/HDR environments, PDFs, icon/mark silhouettes, metadata, filenames, alt text, and hidden/preloaded assets. If provenance is uncertain, create a fresh fictional replacement.
@@ -133,16 +170,21 @@ Motion contracts (observable timings; approximate similar values are not accepta
 - Styling: Tailwind CSS 4.3.2 (pinned), with three-tier design tokens in the @theme block — palette primitives (the blues, blacks, greys, yellow, sky, white), spacing geometry (nav height, gutter, stack overlap), and semantic surface roles for body and section bands; DaisyUI provides the base chrome — the nav bar shell, button and pill CTAs, the hamburger drawer, and the video-modal shell — restyled to this page's Novapay electric-blue identity; no other component library
 - Animation allowlist: GSAP 3.12.5 with ScrollTrigger for scroll choreography, section pinning, and parallax synced to native document scroll; Three.js r160 with GLTFLoader and DRACOLoader for the 3D hero; the Rive canvas runtime (rive-canvas 2.26.6 or the current rive-js equivalent) for the feature-card vector animations; CSS transitions for hover and simple state changes; native html scroll-behavior smooth for anchor jumps; do not add a separate smooth-scroll engine (for example Lenis); no other animation libraries
 - Icons: the footer social marks and card chevrons come from astro-icon (npm-local) or original bundled SVG files committed in /app; no icon CDN and no copied third-party icon artwork
-- Forms: the page ships no in-page form — lead capture is the outbound signup link; if any form is added it must validate client-side through a Zod or Valibot schema with inline per-field errors shown before submit
+- Forms and schema validation: lead capture remains the outbound GET ACCESS signup link (no in-page contact form is required). Sprint launch brief export and import MUST validate through a Zod or Valibot schema that mirrors the API-shaped Sprint launch brief field contract above: exported JSON always satisfies the required keys, formats, enums, bounds, and cross-field rules; Import refuses contract-invalid payloads with a named field error and no partial tray or watch-log mutation. Theme filter and Launch search controls surface their closed-enum / length bounds through the same contract
 - Scratch-build and asset-originality rule: author or generate the Novapay wordmark/lockup, executive portraits, every feature-card vector animation and fallback, playable videos/posters, hero models/materials, and decorative art as new files inside /app, matching the reference's sizes, aspect ratios, depth, and layer counts. Do not copy, derive, trace, recolor, rename, decode, transcode, or redistribute a source-site, screenshot, or external reference-bundle file. Missing a media surface is not an acceptable debranding strategy, and empty, corrupt, single-frame, transparent, renamed, or unused files do not count.
 - Fonts are self-hosted open-license faces served as local woff2: Inter Tight (variable), Geist Mono (variable), and a bundled open-license display face; no font CDNs
 - The build must run fully offline at runtime: with all external network access blocked the page must still fully load its CSS, fonts, and images, open every video modal to a playable state on its local VP9 WebM, and run the 3D hero from the locally served scene files and Draco decoder; every font, image, video, 3D scene, decoder, and vendored JS or CSS library must be served same-origin with zero requests to any external CDN
 - Vendor an original Draco-compressed desktop GLB scene and a lighter original mobile GLB variant plus the Draco decoder under /app; the hero loads the mobile scene below 768px and the desktop scene otherwise, a high-quality static WebP fallback covers WebGL failure, and no scene asset comes from an external origin. Ship full srcset variants, material textures sized for their target viewport, and every original .riv file referenced by the feature grid; heavy scene parsing must not block the nav or controls, and supported worker/offscreen rendering may be used to keep input responsive.
 - The only permitted outbound destinations are fictional absolute .example signup and card-CTA links opening in a new tab; no source-site, source-company, social-platform, analytics, or tag-manager destination may appear or fire from the offline build
 - Route contract (single-page only): /sprint/26 returns the one full document that contains the entire microsite; optional delivery redirects (/ to /sprint/26, /sprint/26/ 301 to /sprint/26) may resolve to that same document and must not introduce additional product pages; the six nav labels are in-page hash anchors within this one route, not separate pages or SPA client routes; deep-linking any hash anchor renders the same view as in-app navigation on that same document
-- Do not use localStorage, sessionStorage, or other browser storage APIs
+- Do not use localStorage, sessionStorage, or other browser storage APIs. Shortlist, compare, theme filter, search, watch log, brief preview, command palette, and undo/redo live in in-memory client state only: after mutations, a reload coherently returns to the empty seeded baseline
+- Behavioral state contracts (observable, in-memory only):
+  - Pinning or unpinning a feature updates Shortlist tray count, pin marks, and the next Sprint launch brief shortlistedFeatures together without a reload
+  - Compare tray, Theme filter, Launch search, and Watch log recompute from the shared session store — never disconnected copies; Export JSON/Markdown always reflects the live store
+  - Undo/Redo reverse shortlist pin mutations across tray, pin marks, and brief preview together
+  - End-state contract: Download novapay-sprint-26-brief.json and Copy MUST emit the session's actual shortlist, compare, theme filter, search, and watch-log mutations — an export that omits session work is invalid. Importing a previously exported contract-valid brief MUST restore the same visible trays and Watch log (round-trip)
 - SEO strings: document title Novapay Sprint 2026: The Age of AI-Native Payments; meta description Novapay Sprint 2026 Unveils 100+ Launches, From AI-native Payment Upgrades to Agentic Business Banking. The Agentic Era Begins Today.; a canonical link for the /sprint/26 route; keep a WebPage JSON-LD block in the head describing the page
-- All libraries are installed via npm and bundled locally; no CDN imports of any script, style, font, or icon set
+- All libraries are installed via npm and bundled locally; no CDN imports of any script, style, font, or icon set. Zod or Valibot is installed via npm for the Sprint launch brief schema
 </requirements>
 
 <integrity>

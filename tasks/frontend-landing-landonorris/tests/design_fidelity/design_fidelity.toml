@@ -75,10 +75,67 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.3"
-name = "layout_matches_reference_screenshots"
-description = "At 1440 desktop width, composition matches /reference-screenshots/ overview and segment panels to near pixel-parity for fixed nav, cream hero with NEXT RACE widget, pinned horizontal media, impact statement, helmet grid, collaborators, social video, and footer density/proportions — using fictional Avery Vale assets, not source branding."
-type = "binary"
+id = "3.12"
+name = "block_fidelity_fixed_nav_bar"
+description = "Block: fixed nav bar — pinned top chrome with the stacked serif/heavy-sans AVERY VALE wordmark at left, centered monogram mark, filled lime STORE pill with bag icon, and square outlined hamburger at right, sitting over both cream and dark-green sections (reference: segment-01.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.13"
+name = "block_fidelity_hero_next_race_widget"
+description = "Block: hero with NEXT RACE widget — full-viewport cream band with faint contour lines, large racer silhouette center-right, and a bordered lower-left NEXT RACE widget carrying an eyebrow, circuit squiggle, event label, laurel mark, and team line (reference: segment-01.png–segment-02.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.14"
+name = "block_fidelity_horizontal_media_strip"
+description = "Block: pinned horizontal media strip — dark-green pinned section with a row of at least six tall rounded editorial cards (ON TRACK, SPEED, OFF TRACK, FOCUS, GARAGE, PODIUM) in duotone lime tint with lower-left labels, travelling sideways on vertical scroll (reference: segment-02.png–segment-06.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.15"
+name = "block_fidelity_impact_statement"
+description = "Block: impact statement — oversized centered serif NO LIMITS display headline in lime-off green on the dark-green background, isolated with generous vertical whitespace (reference: segment-06.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.16"
+name = "block_fidelity_helmet_grid"
+description = "Block: helmet grid — THE HELMET eyebrow over three tall portrait cards masked to helmet silhouettes, each a distinct fictional livery with a numbered 01/02/03 index label in the lower-left (reference: segment-07.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.17"
+name = "block_fidelity_collaborators_marquee"
+description = "Block: collaborators marquee — COLLABS eyebrow over an edge-faded horizontal marquee row of at least five monochrome fictional partner symbols/wordmarks on the dark-green ground (reference: segment-08.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.18"
+name = "block_fidelity_social_video_card"
+description = "Block: social video card — SOCIAL eyebrow over a single large rounded video card with a reflective helmet poster image and a lime HOVER TO PLAY pill badge in the lower-right corner (reference: segment-08.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
+weight = 1.0
+
+[[criterion]]
+id = "3.19"
+name = "block_fidelity_footer_statement_newsletter"
+description = "Block: footer statement and newsletter — large split-text serif brand statement DRIVEN BY THE FANS. BUILT FOR THE FUTURE. with the first word filled lime, a second partner-mark marquee, the AVERY VALE wordmark, newsletter signup, and a bottom legal row with copyright (reference: segment-08.png and the tail of overview.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced."
+type = "likert"
+points = 5
 weight = 1.0
 
 [[criterion]]
@@ -166,14 +223,6 @@ weight = 1.0
 id = "3.n5"
 name = "controls_use_browser_defaults"
 description = "STORE, hamburger, or newsletter controls use unstyled browser default appearance when the spec styles them with the lime/token system."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n6"
-name = "layout_misaligned_vs_screenshots"
-description = "At 1440 the nav/hero/media/helmet/footer composition is grossly misaligned versus /reference-screenshots/ segment panels."
 type = "binary"
 negate = true
 weight = 1.0

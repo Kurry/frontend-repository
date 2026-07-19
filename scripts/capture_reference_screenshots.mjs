@@ -15,14 +15,20 @@
 //      - segment-NN.png — 1440x900 viewport captures stepping down the page
 //        with 100px overlap. Each is fully legible under Claude's ~1568px
 //        long-edge budget and cheap for GPT-style 512px tiling.
+//      - overview-tablet.png / overview-mobile.png — full-page RESPONSIVE
+//        reflows at 1024x768 (tablet) and 390x844 (mobile) viewports, so
+//        fidelity judging can compare real breakpoint layouts, not a
+//        shrunken desktop render.
 //   4. Write validation.json (served, console/page errors, page height,
-//      segment count) next to the images.
+//      segment count, viewports) next to the images.
 //
 // Output: reference-screenshots/<slug>/ at the repo root — intentionally
 // OUTSIDE tasks/ so screenshots can never bloat task packages or artifacts.
 //
-// Usage: node scripts/capture_reference_screenshots.mjs [slug ...]
-//        (no args = every tasks/*/solution/app)
+// Usage: node scripts/capture_reference_screenshots.mjs [--viewports=desktop,tablet,mobile] [slug ...]
+//        (no args = every tasks/*/solution/app; default captures all three
+//        viewports — pass --viewports to restrict, e.g. --viewports=desktop
+//        for the legacy desktop-only output)
 
 import { createRequire } from 'node:module';
 import { execSync, spawn } from 'node:child_process';
@@ -38,6 +44,13 @@ const VIEWPORT = { width: 1440, height: 900 };
 const OVERLAP = 100;
 const OVERVIEW_WIDTH = 768;
 const SETTLE_MS = 1500;
+// Responsive overview presets: real viewport reflows (deviceScaleFactor 1),
+// captured full-page as overview-<name>.png.
+const RESPONSIVE_VIEWPORTS = {
+  tablet: { width: 1024, height: 768 },
+  mobile: { width: 390, height: 844 },
+};
+const ALL_VIEWPORTS = ['desktop', ...Object.keys(RESPONSIVE_VIEWPORTS)];
 
 function resolvePlaywright() {
   const candidates = [
@@ -106,7 +119,7 @@ function stopServer(proc) {
   try { process.kill(-proc.pid, 'SIGKILL'); } catch { try { proc.kill('SIGKILL'); } catch { /* gone */ } }
 }
 
-async function captureTask(slug) {
+async function captureTask(slug, viewports = ALL_VIEWPORTS) {
   const appDir = path.join(ROOT, 'tasks', slug, 'solution', 'app');
   const outDir = path.join(OUT_ROOT, slug);
   fs.rmSync(outDir, { recursive: true, force: true });
@@ -114,7 +127,7 @@ async function captureTask(slug) {
 
   const result = {
     slug, served: false, consoleErrors: [], pageErrors: [], failedUrls: [],
-    pageHeight: null, segments: 0, capturedAt: null,
+    pageHeight: null, segments: 0, viewports, capturedAt: null,
   };
 
   const url = `http://localhost:${PORT}`;
@@ -137,7 +150,9 @@ async function captureTask(slug) {
 
     const browser = await chromium.launch({ headless: true });
     try {
-      // segments + validation at desktop viewport
+      // segments + validation at desktop viewport (error listeners live here;
+      // the overview passes below reuse the same server and stay listener-free
+      // so errors are not double-counted)
       const ctx = await browser.newContext({ viewport: VIEWPORT });
       const page = await ctx.newPage();
       page.on('console', (m) => { if (m.type() === 'error') result.consoleErrors.push(m.text().slice(0, 300)); });
@@ -166,15 +181,30 @@ async function captureTask(slug) {
       await ctx.close();
 
       // overview: desktop layout downscaled to 768px width
-      const scale = OVERVIEW_WIDTH / VIEWPORT.width;
-      const octx = await browser.newContext({ viewport: VIEWPORT, deviceScaleFactor: scale });
-      const opage = await octx.newPage();
-      await opage.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
-      await opage.waitForTimeout(SETTLE_MS);
-      await opage.screenshot({
-        path: path.join(outDir, 'overview.png'), fullPage: true, scale: 'device',
-      });
-      await octx.close();
+      if (viewports.includes('desktop')) {
+        const scale = OVERVIEW_WIDTH / VIEWPORT.width;
+        const octx = await browser.newContext({ viewport: VIEWPORT, deviceScaleFactor: scale });
+        const opage = await octx.newPage();
+        await opage.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+        await opage.waitForTimeout(SETTLE_MS);
+        await opage.screenshot({
+          path: path.join(outDir, 'overview.png'), fullPage: true, scale: 'device',
+        });
+        await octx.close();
+      }
+
+      // responsive overviews: real reflows at tablet/mobile viewports
+      for (const [name, vp] of Object.entries(RESPONSIVE_VIEWPORTS)) {
+        if (!viewports.includes(name)) continue;
+        const rctx = await browser.newContext({ viewport: vp });
+        const rpage = await rctx.newPage();
+        await rpage.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+        await rpage.waitForTimeout(SETTLE_MS);
+        await rpage.screenshot({
+          path: path.join(outDir, `overview-${name}.png`), fullPage: true,
+        });
+        await rctx.close();
+      }
     } finally {
       await browser.close();
     }
@@ -187,11 +217,29 @@ async function captureTask(slug) {
   return result;
 }
 
-const slugs = process.argv.slice(2).length ? process.argv.slice(2) : taskSlugs();
+const rawArgs = process.argv.slice(2);
+let viewports = ALL_VIEWPORTS;
+const slugArgs = [];
+for (let i = 0; i < rawArgs.length; i += 1) {
+  const a = rawArgs[i];
+  if (a === '--viewports') {
+    viewports = String(rawArgs[++i] || '').split(',').map((v) => v.trim()).filter(Boolean);
+  } else if (a.startsWith('--viewports=')) {
+    viewports = a.slice('--viewports='.length).split(',').map((v) => v.trim()).filter(Boolean);
+  } else {
+    slugArgs.push(a);
+  }
+}
+const badViewports = viewports.filter((v) => !ALL_VIEWPORTS.includes(v));
+if (badViewports.length || !viewports.length) {
+  console.error(`invalid --viewports value(s): ${badViewports.join(', ') || '(empty)'} — allowed: ${ALL_VIEWPORTS.join(', ')}`);
+  process.exit(2);
+}
+const slugs = slugArgs.length ? slugArgs : taskSlugs();
 let failures = 0;
 for (const slug of slugs) {
   try {
-    const r = await captureTask(slug);
+    const r = await captureTask(slug, viewports);
     const status = !r.served ? 'SERVE-FAIL'
       : r.pageErrors.length ? 'PAGE-ERRORS'
       : r.consoleErrors.length ? 'CONSOLE-ERRORS' : 'OK';
