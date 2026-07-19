@@ -62,94 +62,94 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "12.1"
-name = "mandated_modules_are_bound"
-description = "All contract-mandated modules are initialized and bound."
+name = "four_mandated_modules_bound"
+description = "All four contract-mandated modules are initialized and bound: browse-query-v1, entity-collection-v1, command-session-v1, and artifact-transfer-v1, with tools discoverable via webmcp_list_tools under the browse_*, entity_*, session_*, and artifact_* prefixes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.2"
-name = "handlers_match_visible_ui_logic"
-description = "Exposed tool handlers match visible UI command logic."
+name = "handlers_match_cost_dashboard_ui_logic"
+description = "Exposed tool handlers call the same application logic as the visible UI: browse navigation and filtering, entity operations on usage-event, the run-schedule-now demo, and artifact export change the same KPI tiles, charts, team budget panel, anomaly list, event table, and report history the visible controls use."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.3"
-name = "only_documented_operations_exist"
-description = "Only documented operations and routes are available."
+name = "only_declared_ops_and_bindings"
+description = "Only documented operations from the bindings are available: browse open/apply_filter/clear_filter/sort over destinations spend-overview, spend-over-time, dimension-breakdown, team-budgets, anomaly-list, event-table, unit-cost-explorer, and report-history with the declared filters (date-range, breakdown-dimension, series-toggle, drill-down-chip, anomaly-day, saved-view, period-compare-toggle) and sorts; entity select/update/create/delete on usage-event (fields team, feature, tag, team-ceiling, what-if-rate, budget-cap, saved-view-name, formula-expression, report-frequency, report-sections); session trigger_demo with the run-schedule-now demo; artifact export with formats cost-report-json and cost-report-csv — no invented routes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.4"
-name = "contract_is_automation_exercisable"
-description = "The contract can be fully exercised via automation."
+name = "bulk_recategorization_reaggregates_everywhere"
+description = "The contract can be fully exercised via automation: an invoked bulk recategorization updates every selected event and re-aggregates the KPI tiles, both charts, the team budget panel, the anomaly list, and the formula result in one pass, and Undo returns each surface to its exact prior value."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.5"
-name = "declared_entity_operations_work"
-description = "Entity operations declared in the contract, including create, update, delete, and reorder, all work."
+name = "what_if_and_ceiling_updates_propagate"
+description = "Declared entity updates propagate live: a what-if rate change reprices KPI tiles, chart heights, table costs, and the estimator with a visible what-if active indicator and Revert restores every derived number exactly; editing a team ceiling re-renders its projection bar, overage state, and attainment ring immediately."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.6"
-name = "form_flow_operations_are_bound"
-description = "Form submission validation, error, and cancel operations are clearly bound."
+name = "report_snapshot_demo_is_bound"
+description = "The run-schedule-now demo is bound to the real report pipeline: invoking it appends exactly one report snapshot to report history whose totals match the live dashboard at generation time, and the capacity gauge fill advances."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.7"
-name = "queries_match_allowed_spec"
-description = "Query destinations and filters match the allowed specification."
+name = "saved_views_and_dimensions_match_spec"
+description = "Query destinations and filters match the allowed specification: applying a saved view restores exactly its captured filters, dimension, and range; deleting an applied view keeps the filters active; the breakdown dimension stays inside {model, feature, team}."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.8"
 name = "capabilities_stay_declared"
-description = "No extra or undeclared module routes or capabilities are exposed."
+description = "No extra or undeclared capabilities are exposed: recategorization only targets the seeded closed team and feature sets, models stay inside the five seeded names, export is the only artifact operation (formats cost-report-json and cost-report-csv), and deletes require confirm=true."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.9"
 name = "session_tool_and_invoke_apis_work"
-description = "Session info, tool list, and invocation are correctly surfaced."
+description = "window.webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool are correctly surfaced on the app page and return complete data for the bound browse, entity, session, and artifact tools."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.10"
-name = "mcp_initializes_without_harness_edits"
-description = "MCP initialization works without manual editing or test harness changes."
+name = "init_clean_and_exclusions_honored"
+description = "MCP initialization works on a plain page load without manual editing or harness changes, and tools stay inside the mechanics exclusions: chart hover tooltips, KPI count-up and grow-from-zero animations, what-if slider scrubbing as a gesture, per-keystroke estimator updates, and undo/redo through the real controls are left to Playwright-driven interaction."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.n1"
-name = "mcp_tools_missing_or_noop"
-description = "MCP tooling is unbound, missing, or a no-op."
+name = "cost_analytics_tools_missing_or_noop"
+description = "WebMCP tooling for usage-event recategorization, budgets, saved views, the report demo, or export is unbound, missing, or a no-op that reports success while the tiles, charts, or report history stay unchanged."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n2"
-name = "handlers_diverge_from_ui_logic"
-description = "Handlers do not match UI logic because actions mismatch or state does not sync."
+name = "handlers_diverge_from_dashboard_ui"
+description = "A tool handler bypasses the UI's logic: for example an invoked what-if rate change alters tool output while the KPI tiles, chart heights, and estimator keep the old prices, or a recategorization skips re-aggregating the anomaly list and formula result."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n3"
-name = "undeclared_capabilities_exposed"
-description = "Undeclared destinations or entity operations are exposed."
+name = "undeclared_cost_capabilities_exposed"
+description = "Undeclared capabilities are exposed, such as import or copy artifact operations, destinations beyond the eight declared ones, recategorization to teams or features outside the seeded sets, or a generic state setter."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,15 +157,15 @@ weight = 1.0
 [[criterion]]
 id = "12.n4"
 name = "automation_cannot_exercise_contract"
-description = "The contract cannot be exercised from automation."
+description = "Declared tools error, hang, or demand raw DOM selectors instead of the declared binding arguments when invoked through webmcp_invoke_tool, so the contract cannot be exercised from automation."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n5"
-name = "validation_bypass_desyncs_state"
-description = "Validation bypasses lead to inconsistent MCP and UI state."
+name = "budget_bounds_bypassed_via_tools"
+description = "A tool accepts values outside the declared bounds — a zero or negative budget cap, team ceilings summing over the monthly cap without the excess named, a date range whose end precedes its start, a formula outside the five declared expressions, or negative token counts — leaving MCP-visible state inconsistent with the UI."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n6"
 name = "session_or_tool_api_errors"
-description = "The session or tool API returns errors or incomplete data."
+description = "webmcp_session_info, webmcp_list_tools, or webmcp_invoke_tool returns errors or incomplete data for the declared browse, entity, session, or artifact tools."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,15 +181,15 @@ weight = 1.0
 [[criterion]]
 id = "12.n7"
 name = "mcp_relies_on_undocumented_hacks"
-description = "MCP relies on manual or undocumented test hacks."
+description = "MCP registration or invocation relies on manual edits or undocumented hacks such as console flags or hidden query parameters."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "12.n8"
-name = "required_contract_module_missing"
-description = "No module contract is implemented where one is declared required."
+name = "declared_module_entirely_missing"
+description = "One of the four declared modules (browse-query-v1, entity-collection-v1, command-session-v1, artifact-transfer-v1) is entirely unimplemented, with no tools registered under its prefix."
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,15 +197,15 @@ weight = 1.0
 [[criterion]]
 id = "12.n9"
 name = "mcp_is_stubbed_or_commented_out"
-description = "The MCP interface is commented out or only stubbed."
+description = "The MCP interface is commented out or only stubbed: tools are listed but their handlers are empty or disconnected from the spend, budget, and report state."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n10"
-name = "automated_contract_validation_fails"
-description = "The project fails automated MCP contract validation."
+name = "excluded_mechanics_faked_or_validation_fails"
+description = "A WebMCP tool drives or fakes an excluded mechanic — synthesizing chart hover tooltips, replaying the what-if slider drag when smoothness is graded, or driving undo/redo instead of the real controls — or the build fails automated MCP contract validation."
 type = "binary"
 negate = true
 weight = 1.0

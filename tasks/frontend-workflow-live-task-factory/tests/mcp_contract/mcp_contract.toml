@@ -63,153 +63,133 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "12.1"
 name = "mandated_modules_are_bound"
-description = "All contract-mandated modules are initialized and bound."
+description = "All contract-mandated modules are initialized and bound: entity-collection-v1, form-workflow-v1, command-session-v1, and artifact-transfer-v1"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.2"
 name = "handlers_match_visible_ui_logic"
-description = "Exposed tool handlers match visible UI command logic."
+description = "Exposed tool handlers for entity select/delete on library-package, form validate/submit/cancel/reset, workflow steps accept-pr/reject-pr/undo-triage/queue-batch/disconnect-credential/reset-coachmarks, session start/pause/resume, and artifact export/import/copy call the same application logic as the visible UI"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.3"
 name = "only_documented_operations_exist"
-description = "Only documented operations and routes are available."
+description = "Only documented operations from the contract are available — entity select/delete, form validate/submit/cancel/reset, session start/pause/resume, artifact export/copy/import, and the declared demos — with no undeclared entity types or routes"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.4"
 name = "contract_is_automation_exercisable"
-description = "The contract can be fully exercised via automation."
+description = "The contract can be fully exercised via automation through webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool on the bound tools"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.5"
-name = "declared_entity_operations_work"
-description = "Entity operations declared in the contract, including create, update, delete, and reorder, all work."
+name = "entity_library_package_ops_work"
+description = "Entity tools select and delete library-package records using entity fields repository, pr-number, difficulty, language, and created-date; delete requires explicit confirm=true and updates the Library list the same way as the visible delete confirmation"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.6"
 name = "form_flow_operations_are_bound"
-description = "Form submission validation, error, and cancel operations are clearly bound."
+description = "Form tools expose validate, submit, cancel, and reset over form fields repository, github-token, ai-base-url, ai-api-key, and reject-reason with value bounds still enforced — reject-reason limited to too-few-files, too-many-files, docs-only, and no-linked-issue; repository must match owner/name with exactly one slash"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.7"
-name = "queries_match_allowed_spec"
-description = "Query destinations and filters match the allowed specification."
+name = "session_pipeline_ops_and_demos_bound"
+description = "Session tools start, pause, and resume drive the same pipeline controls as the UI, and demos demo-pipeline-run, rate-limit-retry-driftline-pr-58, generate-failure-retry-petrel-pr-31, trivial-verdict-run, and batch-run are bound to the corresponding fixture paths"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.8"
-name = "capabilities_stay_declared"
-description = "No extra or undeclared module routes or capabilities are exposed."
+name = "artifact_export_import_copy_bound"
+description = "Artifact tools expose export, import, and copy for export formats instruction-document-text, task-config-toml, package-bundle-json, and batch-run-report-json and import mode package-bundle-json without returning raw file, blob, or base64 contents"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.9"
 name = "session_tool_and_invoke_apis_work"
-description = "Session info, tool list, and invocation are correctly surfaced."
+description = "Session info, tool list, and invocation are correctly surfaced for the four bound modules"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.10"
 name = "mcp_initializes_without_harness_edits"
-description = "MCP initialization works without manual editing or test harness changes."
+description = "MCP initialization works without manual editing or test harness changes"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.n1"
 name = "mcp_tools_missing_or_noop"
-description = "MCP tooling is unbound, missing, or a no-op."
+description = "MCP tooling for entity, form, session, or artifact modules is unbound, missing, or a no-op"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "12.n2"
 name = "handlers_diverge_from_ui_logic"
-description = "Handlers do not match UI logic because actions mismatch or state does not sync."
+description = "Handlers do not match UI logic because triage, pipeline start/pause/resume, export, or import actions mismatch or state does not sync with the visible surfaces"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "12.n3"
 name = "undeclared_capabilities_exposed"
-description = "Undeclared destinations or entity operations are exposed."
+description = "Undeclared entity types, form fields, session demos, or artifact formats beyond the contract bindings are exposed"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "12.n4"
 name = "automation_cannot_exercise_contract"
-description = "The contract cannot be exercised from automation."
+description = "The contract cannot be exercised from automation via the webmcp session/list/invoke APIs"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "12.n5"
 name = "validation_bypass_desyncs_state"
-description = "Validation bypasses lead to inconsistent MCP and UI state."
+description = "Form validation bypasses via MCP accept reject-reason values outside the closed set, malformed repository strings, or import payloads that violate the TaskPackageBundle field contract, leaving MCP and UI state inconsistent"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "12.n6"
 name = "session_or_tool_api_errors"
-description = "The session or tool API returns errors or incomplete data."
+description = "The session or tool API returns errors or incomplete data for the mandated modules"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "12.n7"
 name = "mcp_relies_on_undocumented_hacks"
-description = "MCP relies on manual or undocumented test hacks."
+description = "MCP relies on manual or undocumented test hacks"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "12.n8"
 name = "required_contract_module_missing"
-description = "No module contract is implemented where one is declared required."
+description = "entity-collection-v1, form-workflow-v1, command-session-v1, or artifact-transfer-v1 is not implemented where declared required"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "12.n9"
 name = "mcp_is_stubbed_or_commented_out"
-description = "The MCP interface is commented out or only stubbed."
+description = "The MCP interface is commented out or only stubbed"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "12.n10"
 name = "automated_contract_validation_fails"
-description = "The project fails automated MCP contract validation."
+description = "The project fails automated MCP contract validation against the declared bindings"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "mcp_contract.catchall"
 name = "mcp_contract_catchall"

@@ -63,93 +63,93 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "12.1"
 name = "four_mandated_modules_bound"
-description = "All four contract-mandated modules are initialized and bound: structured-editor-v1, command-session-v1, entity-collection-v1, and artifact-transfer-v1 (tools discoverable via webmcp_list_tools with editor_*, session_*, entity_*, and artifact_* prefixes)."
+description = "All four contract-mandated modules are initialized and bound: structured-editor-v1, command-session-v1, entity-collection-v1, and artifact-transfer-v1, with tools discoverable via webmcp_list_tools under the editor_*, session_*, entity_*, and artifact_* prefixes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.2"
-name = "handlers_match_visible_schema_ui_logic"
-description = "Exposed tool handlers call the same application logic as the visible UI: editor/session/entity/artifact operations change the same schema tree, field nodes, library schemas, validation run, and export/import state the visible controls use."
+name = "handlers_match_schema_ui_logic"
+description = "Exposed tool handlers call the same application logic as the visible UI: editor operations on the schema tree, session validation-run controls, entity operations on library schemas, and artifact import/export change the same shared tree, compiled schema text, example payload, and format instruction the visible controls use."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.3"
 name = "only_declared_ops_and_bindings"
-description = "Only documented operations from the bindings are available: editor select/add/delete/update_property/set_content/switch_mode/preview on schema, field-node, metadata-field, and version (properties including key-name, type, required, description, enum-values, minimum, maximum, pattern, schema-package-json; modes schema-text, example, format-prompt, diff, playground, import); session start/pause/resume/advance; entity create/select/update/delete on schema (fields name, fields, metadata); artifact export/import/copy with export formats compiled-schema-json|schema-package-json|validation-report-text|format-instruction-text and import modes example-json|schema-package — no invented destinations."
+description = "Only documented operations from the bindings are available: editor select/add/delete/update_property/set_content/switch_mode/preview on schema, field-node, metadata-field, and version (modes schema-text, example, format-prompt, diff, playground, import); session start/pause/resume/advance plus demos validation-run, regenerate-example, and apply-import-draft; entity create/select/update/delete on schema (fields name, fields, metadata); artifact export/import/copy with export formats compiled-schema-json, schema-package-json, validation-report-text, and format-instruction-text and import modes example-json and schema-package — no invented routes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.4"
-name = "contract_exercisable_via_webmcp"
-description = "The contract can be fully exercised via automation: webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool succeed for the bound editor, session, entity, and artifact tools."
+name = "tree_edits_propagate_to_all_derived_surfaces"
+description = "The contract can be fully exercised via automation, and every invoked tree or configuration edit updates the compiled draft-07 schema text, the example payload, the format instruction, and the SchemaPackage export within a beat, all from the one shared tree."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.5"
-name = "entity_schema_create_select_update_delete"
-description = "Entity operations declared for entity schema work: create, select, update, and delete (delete requires confirm=true) update the visible library list and active tree state."
+name = "schema_entity_operations_work"
+description = "Declared entity operations on schema all work: create, select, update, and delete (delete requires confirm=true) update the visible library list and active tree exactly as the sidebar controls do."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.6"
-name = "editor_and_session_ops_bound"
-description = "Editor operations for schema/field-node/metadata-field/version and session operations start/pause/resume/advance are bound and update the visible tree, configuration, panes, and validation run controls when invoked through WebMCP (drag reorder, slider scrubbing, and animation mechanics remain Playwright-observed)."
+name = "validation_run_session_controls_are_bound"
+description = "Session operations are bound to the real validation run: a completed run maps per-field pass/fail annotations onto the tree naming the field path and violated constraint keyword with its bound; pause freezes at the current step and resume continues there, with the rollup and event timeline agreeing with the step list."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.7"
-name = "artifact_export_import_copy_bound"
-description = "Artifact operations export, import, and copy are bound (export formats compiled-schema-json, schema-package-json, validation-report-text, format-instruction-text; import modes example-json and schema-package) and invoke without throwing when called through WebMCP (clipboard contents and download file picker remain Playwright responsibilities)."
+name = "package_round_trip_and_diff_match_spec"
+description = "Artifact operations match the declared spec: exporting then importing a schema-package reconstructs the same tree, compiled text, example payload, and format instruction; the SchemaPackage preview shows schemaVersion schema-package-v1 with all required keys; diffing two saved versions color-codes added, removed, and changed fields and a self-diff shows the explicit no-differences state."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.8"
-name = "no_undeclared_modules_or_ops"
-description = "No extra modules beyond structured-editor-v1, command-session-v1, entity-collection-v1, and artifact-transfer-v1, and no undeclared operations beyond the Bindings list, are exposed on the WebMCP surface."
+name = "capabilities_stay_declared"
+description = "No extra or undeclared capabilities are exposed: no generic state setter, versions are never edited in place, the root node has no delete, and export/import stay inside the four declared formats and two declared import modes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.9"
-name = "session_info_list_tools_invoke_work"
-description = "window.webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool are correctly surfaced and return coherent session/tool data for this app."
+name = "session_tool_and_invoke_apis_work"
+description = "window.webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool are correctly surfaced on the app page and return complete data for the bound editor, session, entity, and artifact tools."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.10"
-name = "mcp_init_without_harness_edits"
-description = "MCP initialization works from the app's own registration without requiring manual edits to /tests harness files."
+name = "init_clean_and_exclusions_honored"
+description = "MCP initialization works on a plain page load without manual editing or harness changes, and tools stay inside the mechanics exclusions: node drag-to-reorder gestures, history-timeline slider scrubbing, undo/redo keyboard shortcuts, and panel animations are left to real UI interaction, and no tool returns clipboard or downloaded file contents."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.n1"
-name = "mcp_tools_missing_or_noop"
-description = "WebMCP tooling for structured-editor-v1, command-session-v1, entity-collection-v1, or artifact-transfer-v1 is unbound, missing, or a no-op when invoked."
+name = "schema_tools_missing_or_noop"
+description = "WebMCP tooling for the schema tree, validation run, library schemas, or import/export is unbound, missing, or a no-op that reports success while the tree, compiled text, or SchemaPackage preview stays unchanged."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n2"
-name = "handlers_diverge_from_ui_state"
-description = "Invoking a bound editor/session/entity/artifact tool leaves schema tree, library, validation run, or export state diverging from what the equivalent visible UI control would produce."
+name = "handlers_diverge_from_schema_ui"
+description = "A tool handler bypasses the UI's logic: for example an invoked update_property changes tool output while the compiled schema text, example payload, or format instruction stays stale, or apply-import-draft replaces the tree with fields the reviewed draft did not accept."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n3"
-name = "undeclared_capabilities_exposed"
-description = "Undeclared modules, destinations, or operations beyond the Bindings (editor select/add/delete/update_property/set_content/switch_mode/preview on schema/field-node/metadata-field/version; session start/pause/resume/advance; entity create/select/update/delete; artifact export/import/copy) are exposed."
+name = "undeclared_schema_capabilities_exposed"
+description = "Undeclared capabilities are exposed, such as in-place version editing, a root-node delete, raw JSON blob injection outside the declared import modes, or a generic state setter."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,15 +157,15 @@ weight = 1.0
 [[criterion]]
 id = "12.n4"
 name = "automation_cannot_exercise_contract"
-description = "webmcp_list_tools / webmcp_invoke_tool cannot exercise the declared editor, session, entity, and artifact bindings."
+description = "Declared tools error, hang, or demand raw DOM selectors instead of the declared binding arguments when invoked through webmcp_invoke_tool, so the contract cannot be exercised from automation."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n5"
-name = "mcp_update_bypasses_shared_state"
-description = "An editor update_property or entity create/select invocation updates a parallel copy of state, leaving visible tree/compiled text/library showing stale values that disagree with the MCP result (MCP/UI desync)."
+name = "schema_bounds_bypassed_via_tools"
+description = "A tool accepts values outside the declared bounds — a field key over 40 characters or duplicated among siblings, minimum exceeding maximum, empty enum entries, a delete of a node with descendants without confirm=true, or a non-conforming schema-package import that mutates the tree — leaving MCP-visible state inconsistent with the UI."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n6"
 name = "session_or_tool_api_errors"
-description = "webmcp_session_info or webmcp_list_tools returns errors or incomplete data for the mandated modules."
+description = "webmcp_session_info, webmcp_list_tools, or webmcp_invoke_tool returns errors or incomplete data for the declared editor, session, entity, or artifact tools."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,15 +181,15 @@ weight = 1.0
 [[criterion]]
 id = "12.n7"
 name = "mcp_relies_on_undocumented_hacks"
-description = "MCP relies on manual or undocumented test hacks."
+description = "MCP registration or invocation relies on manual edits or undocumented hacks such as console flags or hidden query parameters."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "12.n8"
-name = "required_contract_module_missing"
-description = "No module contract is implemented where one is declared required among structured-editor-v1, command-session-v1, entity-collection-v1, and artifact-transfer-v1."
+name = "declared_module_entirely_missing"
+description = "One of the four declared modules (structured-editor-v1, command-session-v1, entity-collection-v1, artifact-transfer-v1) is entirely unimplemented, with no tools registered under its prefix."
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,15 +197,15 @@ weight = 1.0
 [[criterion]]
 id = "12.n9"
 name = "mcp_is_stubbed_or_commented_out"
-description = "The MCP interface is commented out or only stubbed."
+description = "The MCP interface is commented out or only stubbed: tools are listed but their handlers are empty or disconnected from the schema tree and validation state."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n10"
-name = "automated_contract_validation_fails"
-description = "The project fails automated MCP contract validation."
+name = "excluded_mechanics_faked_or_validation_fails"
+description = "A WebMCP tool drives or fakes an excluded mechanic — replaying node drag-reorder, scrubbing the history-timeline slider, or returning export file contents in tool results — or the build fails automated MCP contract validation."
 type = "binary"
 negate = true
 weight = 1.0

@@ -62,94 +62,94 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "12.1"
-name = "mandated_modules_are_bound"
-description = "All contract-mandated modules are initialized and bound."
+name = "four_mandated_modules_bound"
+description = "All four contract-mandated modules are initialized and bound: browse-query-v1, form-workflow-v1, command-session-v1, and artifact-transfer-v1, with tools discoverable via webmcp_list_tools under the browse_*, form_*, session_*, and artifact_* prefixes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.2"
-name = "handlers_match_visible_ui_logic"
-description = "Exposed tool handlers match visible UI command logic."
+name = "handlers_match_review_ui_logic"
+description = "Exposed tool handlers call the same application logic as the visible UI: browse navigation across review surfaces, the recommendation and step form flows, gate-re-run session controls, and the summary copy change the same portfolio rows, gate board, verdict hero banner, fix list, stepper, and timeline the visible controls use."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.3"
-name = "only_documented_operations_exist"
-description = "Only documented operations and routes are available."
+name = "only_declared_ops_and_bindings"
+description = "Only documented operations from the bindings are available: browse open/apply_filter/clear_filter over destinations portfolio, bundle-workspace, gate-board, trial-inspector, fix-list, verdict-panel, bundle-summary, and timeline with filters hero-state, gate-plus-status, and timeline-event-kind; form validate/submit/cancel over recommendation, override-justification, and step-notes across workflow steps resolve-fix-item, unresolve-fix-item, select-recommendation, override-constraint, mark-step-done, unmark-step-done, and complete-bundling; session start/pause/resume with demos gate-re-run and re-run-step-retry; artifact copy of review-summary-text — no invented routes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.4"
-name = "contract_is_automation_exercisable"
-description = "The contract can be fully exercised via automation."
+name = "gate_rerun_shows_declared_postconditions"
+description = "The contract can be fully exercised via automation: a completed re-run of ember-relay-router's Difficulty — Quartz-Mini gate leaves it inconclusive and recomputes the verdict hero banner, allowed recommendation set, constraint explanation, portfolio row gate chip and hero state, rollup counts, and calibration strip without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.5"
-name = "declared_entity_operations_work"
-description = "Entity operations declared in the contract, including create, update, delete, and reorder, all work."
+name = "fix_item_and_step_operations_work"
+description = "Declared workflow steps all work: resolving or unresolving a fix item immediately recomputes the allowed recommendation set and its plain-language explanation with a REDESIGN resolution updating the hero banner and portfolio row; marking a step done unlocks the next step and updates the portfolio review-progress indicator, and un-marking re-locks all later steps while preserving their notes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.6"
-name = "form_flow_operations_are_bound"
-description = "Form submission validation, error, and cancel operations are clearly bound."
+name = "recommendation_form_validation_is_bound"
+description = "Form validation, error, and cancel operations are clearly bound: only the currently allowed recommendation set is selectable, an out-of-set choice requires the override toggle plus a justification of at least 20 characters, and turning the override toggle off with an out-of-set recommendation saved reverts the recommendation to unset and removes the Override badge."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.7"
-name = "queries_match_allowed_spec"
-description = "Query destinations and filters match the allowed specification."
+name = "bundling_gate_matches_spec"
+description = "Sequencing rules match the allowed specification: a step can be marked done only when every earlier step is done, Complete bundling succeeds only when Verdict is done with a recorded recommendation, and completing it appends a timestamped bundling event to the timeline and flips the portfolio row to the Bundled badge."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.8"
 name = "capabilities_stay_declared"
-description = "No extra or undeclared module routes or capabilities are exposed."
+description = "No extra or undeclared capabilities are exposed: gate evidence is read-only — no tool edits a gate's score, status, reasons, or evidence text — copy of review-summary-text is the only artifact operation, and judge models stay limited to Sable-4 and Quartz-Mini."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.9"
 name = "session_tool_and_invoke_apis_work"
-description = "Session info, tool list, and invocation are correctly surfaced."
+description = "window.webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool are correctly surfaced on the app page and return complete data for the bound browse, form, session, and artifact tools."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.10"
-name = "mcp_initializes_without_harness_edits"
-description = "MCP initialization works without manual editing or test harness changes."
+name = "init_clean_and_exclusions_honored"
+description = "MCP initialization works on a plain page load without manual editing or harness changes, and tools stay inside the mechanics exclusions: trial diff-mode picking, trial and criterion selection, and the three-pane highlight linkage stay driven through the visible selectors and breadcrumb, and chip animations, banner cross-fades, retry ticks, modal transitions, and clipboard stay Playwright territory."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.n1"
-name = "mcp_tools_missing_or_noop"
-description = "MCP tooling is unbound, missing, or a no-op."
+name = "review_tools_missing_or_noop"
+description = "WebMCP tooling for fix items, recommendations, steps, gate re-runs, or the summary copy is unbound, missing, or a no-op that reports success while the gate board, hero banner, or portfolio row stays unchanged."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n2"
-name = "handlers_diverge_from_ui_logic"
-description = "Handlers do not match UI logic because actions mismatch or state does not sync."
+name = "handlers_diverge_from_review_ui"
+description = "A tool handler bypasses the UI's logic: for example an invoked resolve-fix-item changes tool output while the allowed recommendation set and its explanation stay stale, or complete-bundling reports success without the timeline event and Bundled badge."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n3"
-name = "undeclared_capabilities_exposed"
-description = "Undeclared destinations or entity operations are exposed."
+name = "gate_evidence_mutated_or_undeclared_routes"
+description = "Undeclared capabilities are exposed, such as a tool that mutates a gate's score, status, reasons, or evidence text, destinations beyond the eight declared ones, or export operations beyond the single copy of review-summary-text."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,15 +157,15 @@ weight = 1.0
 [[criterion]]
 id = "12.n4"
 name = "automation_cannot_exercise_contract"
-description = "The contract cannot be exercised from automation."
+description = "Declared tools error, hang, or demand raw DOM selectors instead of the declared binding arguments when invoked through webmcp_invoke_tool, so the contract cannot be exercised from automation."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n5"
-name = "validation_bypass_desyncs_state"
-description = "Validation bypasses lead to inconsistent MCP and UI state."
+name = "review_sequencing_bypassed_via_tools"
+description = "A tool accepts input outside the declared bounds — an out-of-set recommendation saved without the override toggle and a 20-character justification, a step marked done before every earlier step, or bundling completed without a recorded recommendation — leaving MCP-visible state inconsistent with the UI."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n6"
 name = "session_or_tool_api_errors"
-description = "The session or tool API returns errors or incomplete data."
+description = "webmcp_session_info, webmcp_list_tools, or webmcp_invoke_tool returns errors or incomplete data for the declared browse, form, session, or artifact tools."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,15 +181,15 @@ weight = 1.0
 [[criterion]]
 id = "12.n7"
 name = "mcp_relies_on_undocumented_hacks"
-description = "MCP relies on manual or undocumented test hacks."
+description = "MCP registration or invocation relies on manual edits or undocumented hacks such as console flags or hidden query parameters."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "12.n8"
-name = "required_contract_module_missing"
-description = "No module contract is implemented where one is declared required."
+name = "declared_module_entirely_missing"
+description = "One of the four declared modules (browse-query-v1, form-workflow-v1, command-session-v1, artifact-transfer-v1) is entirely unimplemented, with no tools registered under its prefix."
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,15 +197,15 @@ weight = 1.0
 [[criterion]]
 id = "12.n9"
 name = "mcp_is_stubbed_or_commented_out"
-description = "The MCP interface is commented out or only stubbed."
+description = "The MCP interface is commented out or only stubbed: tools are listed but their handlers are empty or disconnected from the gate, verdict, and bundling state."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n10"
-name = "automated_contract_validation_fails"
-description = "The project fails automated MCP contract validation."
+name = "excluded_mechanics_faked_or_validation_fails"
+description = "A WebMCP tool drives or fakes an excluded mechanic — driving trial diff-mode picking or the three-pane highlight linkage that stays with the visible selectors, or returning clipboard contents in tool results — or the build fails automated MCP contract validation."
 type = "binary"
 negate = true
 weight = 1.0

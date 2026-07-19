@@ -62,94 +62,94 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "12.1"
-name = "mandated_modules_are_bound"
-description = "All contract-mandated modules are initialized and bound."
+name = "four_mandated_modules_bound"
+description = "All four contract-mandated modules are initialized and bound: browse-query-v1, structured-editor-v1, command-session-v1, and artifact-transfer-v1, with tools discoverable via webmcp_list_tools under the browse_*, editor_*, session_*, and artifact_* prefixes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.2"
-name = "handlers_match_visible_ui_logic"
-description = "Exposed tool handlers match visible UI command logic."
+name = "handlers_match_script_studio_ui_logic"
+description = "Exposed tool handlers call the same application logic as the visible UI: browse navigation, editor operations on scripts, steps, schedules, and the playground, session run controls, and artifact export/copy change the same script library, step editor, console, run history, and export panes the visible controls use."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.3"
-name = "only_documented_operations_exist"
-description = "Only documented operations and routes are available."
+name = "only_declared_ops_and_bindings"
+description = "Only documented operations from the bindings are available: browse open/search/apply_filter/clear_filter over destinations step-editor, playground, runs, scheduled-queue, and export with filters timeline-status and compare-pair; editor select/add/delete/update_property/set_content/switch_mode/preview on script, step, schedule, and playground (modes edit, version-preview, diff); session start/pause/resume/restart plus demos script-run, trigger-now, save-version, and restore-version; artifact export/copy with formats definition-json and run-report-json — no invented routes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.4"
-name = "contract_is_automation_exercisable"
-description = "The contract can be fully exercised via automation."
+name = "contract_exercisable_with_visible_postconditions"
+description = "The contract can be fully exercised via automation: webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool succeed, and an invoked editor add of a script adds exactly one library entry with its step count and selects it, while delete (confirm=true) removes it from the library, run history, and schedule queue together."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.5"
-name = "declared_entity_operations_work"
-description = "Entity operations declared in the contract, including create, update, delete, and reorder, all work."
+name = "editor_operations_update_visible_script_state"
+description = "Declared editor operations on scripts, steps, schedules, and the playground all work: update_property edits (step-type, url, selector, text, variable, ms, expected-text, disabled, order, schedule fields, mock-html) are reflected in the visible step editor and in the Definition JSON export alongside disabled flags, version number, and schedule."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.6"
-name = "form_flow_operations_are_bound"
-description = "Form submission validation, error, and cancel operations are clearly bound."
+name = "session_run_controls_are_bound"
+description = "Session operations are bound to the real run lifecycle: start highlights steps in sequence, streams console lines, fills the extracted-values table, updates the n-of-m rollup, and writes one run record into the Runs view; pause freezes at the current step and resume continues from exactly that step; save-version grows the Versions panel by one and restore copies the old steps into a new version."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.7"
-name = "queries_match_allowed_spec"
-description = "Query destinations and filters match the allowed specification."
+name = "browse_destinations_match_declared_set"
+description = "Browse tools navigate only the declared destinations (step-editor, playground, runs, scheduled-queue, export) and filters (timeline-status, compare-pair), and visible navigation state updates through the same handlers as the UI controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.8"
 name = "capabilities_stay_declared"
-description = "No extra or undeclared module routes or capabilities are exposed."
+description = "No extra or undeclared capabilities are exposed: no arbitrary URL or selector runner, step types stay inside {navigate, click, type, extract, wait, screenshot, assert_text}, and no export formats beyond definition-json and run-report-json."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.9"
 name = "session_tool_and_invoke_apis_work"
-description = "Session info, tool list, and invocation are correctly surfaced."
+description = "window.webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool are correctly surfaced on the app page and return complete data for the bound browse, editor, session, and artifact tools."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.10"
-name = "mcp_initializes_without_harness_edits"
-description = "MCP initialization works without manual editing or test harness changes."
+name = "init_clean_and_exclusions_honored"
+description = "MCP initialization works on a plain page load without manual editing or harness changes, and tools stay inside the mechanics exclusions: step drag-to-reorder gestures, console streaming cadence, Ctrl+K palette mechanics, and undo/redo or history-timeline rollback are left to real UI interaction, and no tool returns Copy-export clipboard contents."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.n1"
-name = "mcp_tools_missing_or_noop"
-description = "MCP tooling is unbound, missing, or a no-op."
+name = "automation_studio_tools_missing_or_noop"
+description = "WebMCP tooling for scripts, steps, schedules, runs, or exports is unbound, missing, or a no-op that reports success while the library, step editor, console, or Runs view stays unchanged."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n2"
-name = "handlers_diverge_from_ui_logic"
-description = "Handlers do not match UI logic because actions mismatch or state does not sync."
+name = "handlers_diverge_from_run_ui"
+description = "A tool handler bypasses the UI's logic: for example an invoked script-run demo reports completion while the per-step grid, console rollup, and Runs view record stay unchanged, or a schedule edit changes tool output but not the sidebar clock badge and Scheduled-queue countdown."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n3"
-name = "undeclared_capabilities_exposed"
-description = "Undeclared destinations or entity operations are exposed."
+name = "undeclared_routes_or_runner_exposed"
+description = "Undeclared capabilities are exposed, such as arbitrary URL/selector destinations beyond the five declared ones, step types outside the seven-value enum, or a generic state setter."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,15 +157,15 @@ weight = 1.0
 [[criterion]]
 id = "12.n4"
 name = "automation_cannot_exercise_contract"
-description = "The contract cannot be exercised from automation."
+description = "Declared tools error, hang, or demand raw DOM selectors instead of the declared binding arguments when invoked through webmcp_invoke_tool, so the contract cannot be exercised from automation."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n5"
-name = "validation_bypass_desyncs_state"
-description = "Validation bypasses lead to inconsistent MCP and UI state."
+name = "script_bounds_bypassed_via_tools"
+description = "A tool accepts values outside the declared bounds — a non-positive wait ms, an unparseable target-url, a schedule interval outside {hourly, daily, weekly}, an enabled schedule without a time, or a delete without confirm=true — leaving MCP-visible state inconsistent with the UI."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n6"
 name = "session_or_tool_api_errors"
-description = "The session or tool API returns errors or incomplete data."
+description = "webmcp_session_info, webmcp_list_tools, or webmcp_invoke_tool returns errors or incomplete data for the declared browse, editor, session, or artifact tools."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,15 +181,15 @@ weight = 1.0
 [[criterion]]
 id = "12.n7"
 name = "mcp_relies_on_undocumented_hacks"
-description = "MCP relies on manual or undocumented test hacks."
+description = "MCP registration or invocation relies on manual edits or undocumented hacks such as console flags or hidden query parameters."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "12.n8"
-name = "required_contract_module_missing"
-description = "No module contract is implemented where one is declared required."
+name = "declared_module_entirely_missing"
+description = "One of the four declared modules (browse-query-v1, structured-editor-v1, command-session-v1, artifact-transfer-v1) is entirely unimplemented, with no tools registered under its prefix."
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,15 +197,15 @@ weight = 1.0
 [[criterion]]
 id = "12.n9"
 name = "mcp_is_stubbed_or_commented_out"
-description = "The MCP interface is commented out or only stubbed."
+description = "The MCP interface is commented out or only stubbed: tools are listed but their handlers are empty or disconnected from the script, run, and schedule state."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n10"
-name = "automated_contract_validation_fails"
-description = "The project fails automated MCP contract validation."
+name = "excluded_mechanics_faked_or_validation_fails"
+description = "A WebMCP tool drives or fakes an excluded mechanic — replaying the step drag-reorder gesture, fabricating console stream output, or returning clipboard contents in tool results — or the build fails automated MCP contract validation."
 type = "binary"
 negate = true
 weight = 1.0

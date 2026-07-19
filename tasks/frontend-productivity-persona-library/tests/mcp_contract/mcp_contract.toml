@@ -62,30 +62,150 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "12.1"
-name = "no_contract_declared_ui_complete"
-description = "This task declares no WebMCP action contract. Every state-changing feature — persona CRUD, cloning, traits, variants, composition, test bench runs, polls, bulk actions, undo/redo, export, attachment — is fully drivable through the visible UI controls alone, with no functionality gated behind a hidden automation interface"
+name = "four_mandated_modules_bound"
+description = "All four contract-mandated modules are initialized and bound: browse-query-v1, entity-collection-v1, command-session-v1, and artifact-transfer-v1, with tools discoverable via webmcp_list_tools under the browse_*, entity_*, session_*, and artifact_* prefixes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.2"
-name = "graceful_absence_of_tooling"
-description = "If WebMCP endpoints (webmcp_session_info, webmcp_list_tools, webmcp_invoke_tool) are absent or empty, the app itself remains fully functional — nothing in the product depends on automation tooling being present"
+name = "handlers_match_persona_ui_logic"
+description = "Exposed tool handlers call the same application logic as the visible UI: browse navigation and filtering, entity operations on persona, test-bench session controls, and artifact export/copy change the same grid, facet counts, comparison slots, test bench, and export drawers the visible controls use."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.3"
+name = "only_declared_ops_and_bindings"
+description = "Only documented operations from the bindings are available: browse open/search/apply_filter/clear_filter over destinations library, test-bench, compare, export-drawer, and attacher-drawer with filters name-role-search, role-category, tag-facet, and archived-toggle; entity create/select/update/toggle/delete on persona (fields including name, role, tone, tags, constraints, goals, examples, prompt-body, active-variant, the five traits, archived, blend fields, comparison-slot, test-bench-slot); session start/stop/trigger_demo with demos test-bench-run and iteration-poll; artifact export/copy with formats persona-pack-json and comparison-report-text — no invented routes."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.4"
+name = "persona_crud_shows_declared_postconditions"
+description = "The contract can be fully exercised via automation: an invoked persona create, edit, clone, archive, or delete updates the grid, facet counts, comparison slots, test bench slot, and both export tabs without a reload, with clone suffixing the name ' (copy)' and always active even from an archived source."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.5"
+name = "trait_and_blend_updates_propagate"
+description = "Declared entity updates propagate from shared values: a trait update redraws the trait radar, the comparison deltas and overlay chart, and the Persona pack traits object; saving a blend adds a blended-badge card whose traits match the preview, with 0 and 100 percent blends matching the sources exactly."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.6"
+name = "test_bench_session_controls_are_bound"
+description = "Session operations are bound to the real test bench: a stopped test-bench run freezes the transcript and appends one run-history entry with persona, scenario, timestamp, and length; when an iteration-poll closes, the winning iteration gains the promoted badge on detail and card, and a second poll can move it."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.7"
+name = "filters_govern_export_scope"
+description = "Browse filters match the allowed specification: persona-pack-json contains one payload object per currently visible (filtered) persona with name, role, tone, tags, constraints, goals, examples, five numeric traits 0-100, variants, and active iteration, and a bulk Add tag on 3 selected personas raises that tag's facet count by exactly 3 and clears the selection."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.8"
+name = "capabilities_stay_declared"
+description = "No extra or undeclared capabilities are exposed: roles stay inside {Coder, Writer, Analyst, Reviewer} and tones inside {formal, neutral, casual, assertive}, scenario choices come from the seeded scenarios, and delete or bulk delete requires explicit confirm=true naming the count."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.9"
+name = "session_tool_and_invoke_apis_work"
+description = "window.webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool are correctly surfaced on the app page and return complete data for the bound browse, entity, session, and artifact tools."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.10"
+name = "init_clean_and_exclusions_honored"
+description = "MCP initialization works on a plain page load without manual editing or harness changes, and tools stay inside the mechanics exclusions: card flip rotation, streaming pacing and auto-follow, dragging from the attacher drawer, rich-text toolbar formatting round-trips, radar morphs, and undo/redo are left to real UI interaction, and no tool returns Copy clipboard contents."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.n1"
-name = "undeclared_automation_mutates_state"
-description = "The page exposes undeclared automation globals or hidden endpoints that mutate application state outside the visible UI command paths"
+name = "persona_tools_missing_or_noop"
+description = "WebMCP tooling for persona CRUD, filtering, test-bench runs, or export is unbound, missing, or a no-op that reports success while the grid, facet counts, or export tabs stay unchanged."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n2"
-name = "automation_bypasses_validation"
-description = "Some exposed programmatic path creates or mutates personas while bypassing the validation the visible forms enforce, leaving UI and state inconsistent"
+name = "handlers_diverge_from_persona_ui"
+description = "A tool handler bypasses the UI's logic: for example an invoked trait update changes tool output while the radar, comparison overlay, and Persona pack traits stay stale, or a blend save adds a card whose traits differ from the preview."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "12.n3"
+name = "undeclared_persona_capabilities_exposed"
+description = "Undeclared capabilities are exposed, such as destinations beyond the five declared ones, a generic state setter or arbitrary patch object, or export formats beyond persona-pack-json and comparison-report-text."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "12.n4"
+name = "automation_cannot_exercise_contract"
+description = "Declared tools error, hang, or demand raw DOM selectors instead of the declared binding arguments when invoked through webmcp_invoke_tool, so the contract cannot be exercised from automation."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "12.n5"
+name = "trait_bounds_bypassed_via_tools"
+description = "A tool accepts values outside the declared bounds — a trait outside 0-100 or non-numeric without a rejection naming the trait, a role or tone outside its enum, a blend-weight outside 0-100 percent, or a delete without confirm=true naming the count — leaving MCP-visible state inconsistent with the UI."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "12.n6"
+name = "session_or_tool_api_errors"
+description = "webmcp_session_info, webmcp_list_tools, or webmcp_invoke_tool returns errors or incomplete data for the declared browse, entity, session, or artifact tools."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "12.n7"
+name = "mcp_relies_on_undocumented_hacks"
+description = "MCP registration or invocation relies on manual edits or undocumented hacks such as console flags or hidden query parameters."
+type = "binary"
+negate = true
+weight = 0.5
+
+[[criterion]]
+id = "12.n8"
+name = "declared_module_entirely_missing"
+description = "One of the four declared modules (browse-query-v1, entity-collection-v1, command-session-v1, artifact-transfer-v1) is entirely unimplemented, with no tools registered under its prefix."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "12.n9"
+name = "mcp_is_stubbed_or_commented_out"
+description = "The MCP interface is commented out or only stubbed: tools are listed but their handlers are empty or disconnected from the persona, comparison, and test-bench state."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "12.n10"
+name = "excluded_mechanics_faked_or_validation_fails"
+description = "A WebMCP tool drives or fakes an excluded mechanic — synthesizing the card flip, replaying the attacher-drawer drag, driving undo/redo, or returning clipboard contents in tool results — or the build fails automated MCP contract validation."
 type = "binary"
 negate = true
 weight = 1.0
@@ -93,7 +213,7 @@ weight = 1.0
 [[criterion]]
 id = "mcp_contract.catchall"
 name = "mcp_contract_catchall"
-description = "The app deviates from its automation posture (no declared contract; UI-drivable state only) in a significant, browser-observable way that is NOT covered by any other criterion in this file. If present, name the deviation and cite the concrete evidence (global, endpoint, element) that demonstrates it. If the deviation is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in the declared MCP contract that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0
