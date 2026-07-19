@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,22 +62,22 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_and_no_results_states"
+description = "With no notes the sidebar empty-state and welcome panel render; a search matching nothing shows an explicit no-results message rather than a blank list."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "field_contracts_validate_inline"
+description = "Export as .txt filename, over-length title, and Import Workspace each show inline validation naming the offending field before any commit or download."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "validation_names_field_and_fix"
+description = "Validation messages for filename, title, body length, non-image drop, and import name the field and the fix rather than only saying Invalid."
 type = "binary"
 weight = 1.0
 
@@ -181,7 +181,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n7"
 name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+description = "Filename, title-length, import, or non-image validation feedback is missing or delayed with no UI indication."
 type = "binary"
 negate = true
 weight = 1.0
@@ -208,6 +208,20 @@ name = "affordances_hidden_or_inaccessible"
 description = "Interactive affordances are visually hidden or inaccessible."
 type = "binary"
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "import_rejects_bad_workspace_json"
+description = "Importing Workspace JSON with wrong schemaVersion, missing notes, or a note missing required id/title/bodyHtml/pinned fields shows an inline error naming the import field and leaves note count unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "overlength_title_blocked"
+description = "A title longer than 200 characters after trim shows an inline message naming the title field and does not become the saved sidebar title"
+type = "binary"
 weight = 1.0
 
 [[criterion]]

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,224 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "For landing pages, evaluate the land → scroll → interact → submit → confirm flow. Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "land_scroll_interact_submit_confirm"
+description = "Starting on a fresh load: scroll through the landing chapters, open the mega-menu and light-dismiss it, then submit a valid contact form and see an in-page success confirmation without navigating away."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "create_event_increments_manager_and_listings"
+description = "Opening Events Manager and submitting a valid new upcoming event closes the form, increases the manager row count by exactly one, and the same event appears in Global Events landing listings whose status filter matches — all without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "edit_event_updates_all_surfaces"
+description = "Editing an event's title or status in Events Manager updates that same record everywhere it appears — the manager row, the landing listings, and any featured slot — without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "delete_event_removes_everywhere"
+description = "Deleting an event removes its row from Events Manager, decreases the visible count by exactly one, and removes it from landing listings and featured slots in the same session."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "filter_flow_status_then_category"
+description = "Applying a status filter in Events Manager narrows the rows; switching to a category filter recomputes the rows from the same shared collection; clearing all filters restores the full seeded-plus-created list exactly."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "theme_toggle_recolors_without_reload"
+description = "Toggling to dark mode recolors the sticky chrome, hero, chapters, and Events Manager together without reloading the document; toggling back restores the light styling; the events collection and any active filters remain unchanged by the toggle."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "marketing_and_manager_mode_switch"
+description = "Switching between Marketing Scroll mode and Events Manager mode (via Global Events View all or a header control) changes the visible context without a full page reload, and returning to Marketing Scroll keeps the shared events collection intact."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "mega_menu_open_close_preserves_scroll"
+description = "Opening the hamburger mega-menu (Build, Solutions, Community, About panels) and closing it via light-dismiss or Escape restores the prior page scroll position and leaves landing chapters operable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "invalid_create_blocks_and_names_field"
+description = "Submitting an event create with an empty title or missing date does not add an event — the visible count stays unchanged and an inline validation message names the offending field."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "reload_returns_seeded_baseline"
+description = "After creating an event, applying a filter, opening the mega-menu, and toggling theme, a page reload returns the app to its seeded baseline: at least 6 seeded events, default theme, closed mega-menu, and default filters."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "primary_manager_or_contact_flow_unavailable"
+description = "Events Manager create/edit/delete is unreachable from the UI, or a valid contact submit finishes with no in-page success confirmation."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "created_event_missing_or_duplicated"
+description = "After a valid event create, the new event fails to appear in the manager list, appears duplicated, or is absent from matching Global Events listings."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "edit_or_delete_desyncs_surfaces"
+description = "After editing or deleting an event, the manager row, landing listings, and featured slots disagree about whether that event still exists or what its title/status is."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "mode_switch_breaks_or_loses_collection"
+description = "Switching between Marketing Scroll and Events Manager breaks layout or loses the shared events collection (rows vanish or reset incorrectly without a reload)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_manager_breaks_ui"
+description = "After deleting all events, Events Manager shows a broken or blank UI with no empty-state message and no control to open the create flow."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "filters_disagree_with_collection"
+description = "Status and category filters show disagreeing row sets for the same shared collection, or clearing filters fails to restore the full seeded-plus-created list."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "mega_menu_cannot_reopen_or_close"
+description = "The mega-menu cannot be re-opened after close, or once open it cannot be closed via light-dismiss or Escape."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "mega_menu_blocks_with_no_exit"
+description = "The open mega-menu overlay blocks navigation with no exit path (light-dismiss, Escape, or close control all fail)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "failed_create_or_contact_lacks_feedback"
+description = "An invalid event create or invalid contact submit produces no inline field-naming errors and no visible failure feedback."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "flow_dead_end_requires_reload"
+description = "After opening the mega-menu, switching to Events Manager, or submitting a form, recovering normal homepage interaction requires a full page reload."
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "6.11"
+name = "export_flow_reflects_session"
+description = "After creating or editing events and capturing at least one contact lead, opening Export catalog shows a JSON preview whose events and leads arrays reflect those session mutations and an ICS preview with matching VEVENT SUMMARY lines; Copy JSON shows a copied confirmation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "import_round_trip_restores_catalog"
+description = "Exporting the catalog to JSON, deleting an event so the manager count drops, then importing that JSON restores the prior event set — the same titles and count reappear in Events Manager and matching landing listings."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "undo_redo_round_trip_on_delete"
+description = "Deleting an event and pressing Undo restores it across manager, rollups, and landing listings; pressing Redo removes it again from all three."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "bulk_delete_and_sort_flow"
+description = "Selecting at least two events and choosing Delete selected drops the manager count by the selected count; afterward, sorting the remaining rows by title reorders them from the shared collection without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "command_palette_to_export_catalog"
+description = "Opening the command palette with Ctrl+K / Cmd+K, choosing Events Manager, then choosing Export catalog reaches those surfaces in-page; Escape closes the palette."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.16"
+name = "contact_lead_then_download_leads_json"
+description = "Submitting a valid contact payload shows an in-page success state, appends one Session leads row (total +1), and Download leads JSON produces ridge-session-leads.json whose leads array includes that payload with counts.total matching the panel."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.17"
+name = "second_lead_export_contains_both"
+description = "After two successful contact submits with different emails, a subsequent Download leads JSON leads array contains both distinct payloads and counts.total equals 2; Undo last lead then omits the newest from the next export."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "export_flow_stale_or_missing"
+description = "Export catalog or Session leads download is unreachable, or after session mutations the JSON/ICS/leads preview stays identical to the pre-mutation seed while Copy leaves no copied confirmation visible."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n12"
+name = "import_or_undo_breaks_collection"
+description = "Import round-trip or Undo after delete leaves manager rows, rollups, and landing listings disagreeing about the event set."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n13"
+name = "lead_export_flow_unavailable_after_submit"
+description = "After a successful contact submit, Download leads JSON / Copy leads JSON leave the Session leads total unchanged and produce an empty or seed-only leads array that omits the just-submitted payload."
 type = "binary"
 negate = true
 weight = 1.0

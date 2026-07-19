@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,77 +63,77 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "7.1"
 name = "layout_adapts_desktop_to_mobile"
-description = "Layout adapts gracefully from 1440px desktop to 375px mobile."
+description = "At approximately 375px wide the three-region shell adapts: the folder tree collapses behind a Folders button rather than squeezing the note view; at desktop widths the sidebar, list, and editor remain side by side."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
 name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+description = "At 375px, New Note, Folders, Export Nest, Undo/Redo, and batch tray controls remain large enough to activate without mis-taps."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
 name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+description = "At 375px note titles, folder labels, and count badges stay legible and truncate with trailing ellipsis rather than overflowing."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
 name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+description = "At 375px no content clips or overflows the viewport and no horizontal scrolling appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
 name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+description = "Export Nest drawer, command palette, multi-select tray, and Undo/Redo remain reachable at 375px without covering the primary note list permanently."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.6"
 name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+description = "Narrow viewport stacking keeps editor and note list usable after the folder panel collapses."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.7"
 name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+description = "Folders toggle, note selection, and swatch/picker controls work with tap/click at narrow width."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.8"
 name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+description = "At 375px the page does not require horizontal scrolling to reach Export Nest, Import Nest, or the editor."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.9"
-name = "media_and_canvases_resize"
-description = "Images, grids, and canvases size responsively to fit the layout."
+name = "export_drawer_fits_narrow"
+description = "Export Nest tabs, preview, Copy, and Download fit within a 375px-wide viewport without horizontal scroll."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.10"
 name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
+description = "Fixed or sticky chrome (Folders button, selection tray) remain accessible and do not permanently obscure the note editor at 375px."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.n1"
 name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+description = "At 375px or desktop widths the shell layout breaks (overlapping panes, unreachable editor)."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n2"
 name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+description = "At 375px primary controls are too small or misaligned to use reliably."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n3"
 name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+description = "Note titles, folder labels, or badges become illegibly small at 375px."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +157,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n4"
 name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+description = "Content is cropped or unnecessary horizontal scrollbars appear at 375px."
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +165,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n5"
 name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
+description = "The folder panel cannot open/close correctly via Folders at narrow width."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n6"
 name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
+description = "Fixed Export Nest, tray, or Folders controls permanently obscure the note list or editor."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +181,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n7"
 name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
+description = "Sidebar, list, editor, or export drawer overlap illegibly at some viewport size."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,15 +189,15 @@ weight = 1.0
 [[criterion]]
 id = "7.n8"
 name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
+description = "Required narrow-width actions (Folders toggle, note select, Export Nest) cannot be completed."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n9"
-name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
+name = "export_drawer_offscreen_narrow"
+description = "Export Nest drawer or command palette renders off-screen or unusable at 375px."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n10"
 name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
+description = "Undo/Redo, Export Nest, or multi-select tray disappear at some viewport size with no alternate path."
 type = "binary"
 negate = true
 weight = 1.0
@@ -213,7 +213,7 @@ weight = 1.0
 [[criterion]]
 id = "responsiveness.catchall"
 name = "responsiveness_catchall"
-description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable responsiveness defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

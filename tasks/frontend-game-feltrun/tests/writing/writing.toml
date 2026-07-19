@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.5
@@ -63,89 +63,89 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "15.1"
-name = "headings_use_consistent_capitalization"
-description = "For games, self-scoping applies to text-light play. Where the app renders headings and section titles, they use consistent capitalization (one convention — title case or sentence case — throughout)."
+name = "panel_headings_consistent_case"
+description = "Where the app renders headings such as Session stats, Hand history, Badges, and Export, they use one consistent capitalization convention"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.2"
-name = "actions_use_specific_labels"
-description = "Where the app renders button or action labels, they are specific verbs ('Add expense', 'Start session'), not generic ('Submit', 'OK') when a specific label is possible."
+name = "action_labels_specific"
+description = "Where the app renders actions, labels are specific verbs such as Deal first hand, Undo last action, Save table, and Export Copy rather than generic Submit or OK when a specific label is possible"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.3"
 name = "errors_name_problem_and_fix"
-description = "Where the app renders error messages, they name the problem and the fix ('Amount must be a positive number'), not just a rejection ('Invalid')."
+description = "Where the app renders raise-amount or import errors, they name the problem and the fix (for example naming amount or the import field), not only Invalid"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.4"
-name = "empty_states_explain_next_step"
-description = "Where the app renders empty states, the copy explains what belongs there and how to add it."
+name = "empty_history_explains_next_step"
+description = "Where Hand history is empty, the copy \"No hands played yet\" (or equivalent) explains what belongs there; the pre-deal table shows Deal first hand guidance"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.5"
-name = "body_copy_is_well_written"
-description = "Where the app renders body or marketing copy, rate how free it is of spelling and grammatical errors."
+name = "body_copy_quality"
+description = "Where the app renders body or instructional copy on the table chrome, rate how free it is of spelling and grammatical errors"
 type = "likert"
 points = 5
 weight = 0.5
 
 [[criterion]]
 id = "15.6"
-name = "terminology_is_consistent"
-description = "Where the app renders labels for the same concept in multiple places, terminology is consistent (not 'task' here and 'todo' there)."
+name = "hand_type_labels_readable"
+description = "Where showdown hand-type labels appear (for example Two pair or Flush), they read as finished poker terminology rather than placeholder tokens"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.7"
-name = "numbers_dates_and_units_are_consistent"
-description = "Where the app renders numbers, dates, and units, formatting is consistent (same date format, same decimal precision, units labeled)."
+name = "badge_names_specific"
+description = "Where achievement badges are listed, names such as First win or Comeback kid are specific rather than Badge 1 style placeholders"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.8"
-name = "success_messages_are_specific"
-description = "Where the app renders confirmation and success messages, they state what happened ('Entry saved'), not vague affirmations."
+name = "export_labels_clear"
+description = "Where Export Copy, Download, and Import labels appear, they clearly describe the session-artifact action"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.n1"
-name = "placeholder_copy_is_visible"
-description = "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI."
+name = "placeholder_copy_visible"
+description = "Lorem ipsum, TODO, asdf, or template variables like {{title}} are visible in the shipped UI"
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n2"
-name = "prominent_copy_has_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as headings, hero text, or primary buttons."
+name = "generic_only_action_labels"
+description = "Primary actions are labeled only with generic Submit or OK where Deal, Raise, Export, or Save labels are possible"
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n3"
-name = "concept_names_are_inconsistent"
-description = "The same concept is named inconsistently across surfaces."
+name = "errors_say_only_invalid"
+description = "Raise or import errors say only Invalid with no field or fix named"
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n4"
-name = "copy_is_truncated_or_overflowing"
-description = "Truncated or overflowing text renders copy unreadable."
+name = "empty_state_silent"
+description = "Empty Hand history shows no explanatory copy"
 type = "binary"
 negate = true
 weight = 0.5
@@ -153,7 +153,7 @@ weight = 0.5
 [[criterion]]
 id = "writing.catchall"
 name = "writing_catchall"
-description = "The app exhibits a significant, browser-observable defect in rendered copy quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable writing defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5

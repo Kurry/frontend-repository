@@ -1,0 +1,219 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "all_controls_keyboard_operable"
+description = "Every interactive control — portfolio rows and filters, gate cards and evidence links, re-run/retry/pause controls, trial and criterion selectors, diff pickers, fix checkboxes, recommendation controls, the override toggle and form, stepper controls, and the copy and bundling controls — is reachable and operable with Tab, Shift+Tab, Enter, or Space, with a visible focus indicator at each stop"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "modals_manage_focus"
+description = "The override justification form and diff picker trap focus while open, close on Escape, and return focus to the control that opened them"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "icons_and_badges_have_names"
+description = "Icon-only controls and status badges (gate chips, warning badges, valid/invalid badges, category tags) expose descriptive accessible names or labels"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "live_region_announcements"
+description = "A gate status change from a re-run, the completion of bundling, and a recommendation becoming disallowed are announced through an aria-live region as well as shown visually"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "forms_have_explicit_labels"
+description = "The override justification field, step notes fields, and filter controls have visible labels, and each validation message is associated with its field so it names the field it belongs to"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "headings_follow_logical_order"
+description = "Headings follow a logical order across the portfolio and workspace with no skipped levels"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "breadcrumb_is_navigation_landmark"
+description = "The breadcrumb renders as a navigation landmark whose segments are keyboard-operable links, and skip-to-content or landmark structure (nav, main) is present"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "text_and_controls_have_contrast"
+description = "All text and controls — including text on hero banners, status chips, and highlight treatments — have sufficient color contrast"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "status_never_color_only"
+description = "Hero states, gate statuses, check outcomes, and category tags each carry a text label or icon in addition to their color treatment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "reduced_motion_is_respected"
+description = "With prefers-reduced-motion set, animations are removed while every state change still lands visibly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n1"
+name = "controls_unreachable_by_keyboard"
+description = "A required control (a resolve checkbox, evidence link, retry control, or recommendation button) cannot be reached or activated via keyboard"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n2"
+name = "focus_indicators_missing_or_obscured"
+description = "Focus indicators are missing or visually obscured on some interactive controls"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n3"
+name = "custom_controls_lack_semantics"
+description = "Custom controls (gate cards, stepper items, diff pickers) use non-semantic tags and lack ARIA roles or labels"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n4"
+name = "state_uses_color_only"
+description = "A status distinction (pass vs fail chips, valid vs invalid trials, enabled vs disabled recommendations) is conveyed by color alone"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n5"
+name = "modals_fail_to_trap_focus"
+description = "An open overlay lets keyboard focus escape into the background content"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n6"
+name = "poor_contrast_makes_text_unreadable"
+description = "Text is unreadable due to poor contrast, including labels on colored banners or chips"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n7"
+name = "errors_are_visual_only"
+description = "Validation or state-change feedback is visual only, with no screen-reader accessible representation"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n8"
+name = "media_is_missing_alt_text"
+description = "Icon or image content that conveys meaning is missing an accessible name or alt text"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n9"
+name = "heading_order_is_skipped"
+description = "Headings are skipped or unordered, such as jumping from H1 to H3"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n10"
+name = "animations_ignore_reduced_motion"
+description = "Animations continue to play with the reduced-motion preference set"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "accessibility.catchall"
+name = "accessibility_catchall"
+description = "The app exhibits a significant accessibility barrier that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the barrier and cite the concrete evidence (element, page state, interaction attempted) that demonstrates it. If the barrier is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

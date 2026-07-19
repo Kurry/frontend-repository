@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "4.1"
 name = "4_1"
-description = "Buttons, filter chips, and timeline entry blocks each show a visibly distinct hover state such as a background, border, or shadow change when the pointer is over them"
+description = "Buttons, filter chips, timeline entry blocks, and heat-map cells each show a visibly distinct hover state such as a background, border, or shadow change when the pointer is over them"
 type = "binary"
 weight = 1.0
 
@@ -121,7 +121,7 @@ weight = 0.5
 [[criterion]]
 id = "4.9"
 name = "overlays_enter_transition_and_dismiss"
-description = "The edit dialog, delete confirmation, tag manager, and history panel each appear as overlays anchored above the page with a brief enter transition, and each dismisses on cancel, on backdrop click, and on Escape"
+description = "The edit dialog, delete confirmation, tag manager, history panel, export drawer, import confirmation, interruption reason step, and command palette each appear as overlays anchored above the page with a brief enter transition, and each dismisses on cancel, on backdrop click, and on Escape"
 type = "binary"
 weight = 1.0
 
@@ -131,6 +131,13 @@ name = "reduced_motion_instant_and_usable"
 description = "With prefers-reduced-motion enabled on a fresh load, list, toast, and overlay animations are removed and state changes apply instantly while every feature remains fully usable"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "export_import_toasts_animate"
+description = "Export copy/download and Import completion each surface a transient toast that eases in and dismisses on its own"
+type = "binary"
+weight = 0.5
 
 [[criterion]]
 id = "4.catchall"

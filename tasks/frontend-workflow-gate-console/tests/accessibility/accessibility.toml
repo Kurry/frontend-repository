@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,14 +63,14 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+description = "Run rows, stage segments, gate rows, what-if, filters, Add note, Export acceptance package, Import acceptance package, and copy controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
 name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+description = "The note form dialog and export/import drawers trap focus while open, close on Escape, and return focus to the originating control."
 type = "binary"
 weight = 1.0
 
@@ -84,14 +84,14 @@ weight = 1.0
 [[criterion]]
 id = "1.4"
 name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+description = "Rejection banners and copy, note, and import confirmations are conveyed both visually and via an aria-live region."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
 name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+description = "GateNote text and category fields and the import paste surface use explicit labels associated with their controls."
 type = "binary"
 weight = 1.0
 

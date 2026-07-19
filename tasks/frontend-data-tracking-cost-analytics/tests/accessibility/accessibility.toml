@@ -1,0 +1,233 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "keyboard_reaches_everything"
+description = "Tiles, the range picker, legend entries, sliders, table headers, row checkboxes, bulk actions, disclosures, and all form fields are reachable and operable with Tab, Shift+Tab, Enter, and Space"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "modals_manage_focus"
+description = "The save-view form, schedule form, menus, and confirmation dialogs trap focus while open, close on Escape, and return focus to the control that opened them"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "icons_have_labels"
+description = "Trend arrows, anomaly markers, and action icons carry accessible names or labels"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "key_events_announced"
+description = "Crossing the budget cap, completing a bulk recategorization, and generating a report are announced through an aria-live region as well as shown visually"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "forms_have_explicit_labels"
+description = "The cap, range, save-view, schedule, and formula fields have visible labels, and validation messages are programmatically associated so each names its field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "headings_follow_order"
+description = "Panel and section headings follow a logical order with no skips"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "landmarks_present"
+description = "Landmark structure (nav, main) or a skip link is present"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "contrast_sufficient"
+description = "Tile values, chart labels, chips, and table text meet sufficient contrast against their backgrounds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "semantic_roles_used"
+description = "Interactive elements use semantic roles — real buttons for actions, real checkboxes for selection, a table role for the event table"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "reduced_motion_respected"
+description = "Animations respect prefers-reduced-motion: count-ups, chart growth, and sweeps apply instantly with flows intact"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "sliders_keyboard_adjustable"
+description = "The what-if rate sliders are adjustable with arrow keys, with their current value exposed to assistive tech"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "charts_not_color_only"
+description = "Series, anomaly, and over-budget distinctions are carried by more than color alone — labels, icons, or patterns accompany the hue"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n1"
+name = "keyboard_unreachable_controls"
+description = "Any legend toggle, chip, slider, checkbox, or disclosure cannot be reached or activated via keyboard"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n2"
+name = "focus_indicators_missing"
+description = "Focus indicators are missing or obscured on table rows, chips, or header controls"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n3"
+name = "custom_controls_lack_semantics"
+description = "Custom chart or table controls use non-semantic tags without ARIA roles or labels"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n4"
+name = "state_uses_color_only"
+description = "Over-budget, anomaly, or series identity is conveyed by color alone"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n5"
+name = "modals_leak_focus"
+description = "A form or menu lets focus escape behind the overlay while open"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n6"
+name = "unreadable_contrast"
+description = "Chips, delta values, or chart labels are unreadable due to poor contrast"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n7"
+name = "errors_visual_only"
+description = "Validation or formula errors are visual only with no screen-reader path"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n8"
+name = "icons_missing_alt"
+description = "Trend, anomaly, or action icons lack any accessible name"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n9"
+name = "heading_order_skipped"
+description = "Headings jump levels (for example H1 to H3) in the panel structure"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n10"
+name = "reduced_motion_ignored"
+description = "Count-up, chart, or ring animations ignore the reduced-motion setting"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "accessibility.catchall"
+name = "accessibility_catchall"
+description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

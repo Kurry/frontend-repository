@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,126 +62,140 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "For games, evaluate the start → play → pause → end → restart flow. Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "stage1_victory_unlocks_next"
+description = "Start → play → Victory flow: starting Stage 1, clearing every wave, defeating the Boss, and pressing Continue returns to the Stage-select map with Pesos increased by exactly the Victory amount, owned-Masks updated, and the next Stage unlocked and selectable without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "fighter_settings_invalid_inline"
+description = "Invalid Fighter Settings submission (empty name, name outside 2–20 characters, or effectsIntensity outside 0–100) keeps Save disabled and shows an inline validation message naming the offending field with no partial save"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "cantina_edit_updates_map_and_hud"
+description = "Buying a Cantina upgrade updates the Pesos balance on both the Cantina and Stage-select map, raises the upgrade level and next cost, and the next run HUD reflects the purchased effect without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "reset_clears_campaign_surfaces"
+description = "Confirming Reset Progress clears Stage unlocks, Masks, Pesos, upgrades, and any checkpoint from the Stage-select map, Masks screen, and Cantina together, and Resume Run is gone"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "pause_resume_retains_run_state"
+description = "Pause mid-run then Resume: the view switches to the Pause overlay and back to combat with Health, Fury, wave/boss phase, and enemies retained — no lost selection of the active run"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "no_checkpoint_hides_resume"
+description = "When checkpoint is null (fresh load or after Abandon/Reset), Resume Run is hidden or disabled and the Stage map still shows Stage 1 unlocked without a broken empty combat scene"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "mask_equip_changes_fury_everywhere"
+description = "Equipping a Mask updates the Masks screen equipped treatment and changes the Fiesta Fury full-screen effect color in the next combat run without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "history_panel_preserves_workflow"
+description = "Opening and closing the History panel (and using Undo/Redo inside it) preserves Stage-map workflow continuity — returning to the map leaves Pesos and unlocks coherent"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
 name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+description = "Cantina, Masks, Fighter Settings, Export Campaign, Import Campaign, Pause, History, and reset-confirmation overlays support their flows (buy, equip, save, export/import, resume, undo, confirm/cancel) and close without trapping the user"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "abandon_or_error_recovers_without_reload"
+description = "Cancelling Abandon Run or Reset confirmation, or failing an Import validation, recovers to a usable Stage map or Pause overlay without requiring a full page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "export_import_artifact_end_state"
+description = "Artifact end-state flow: mutate display name and a Cantina upgrade, open Export Campaign and confirm Campaign JSON contains those values and schemaVersion fandangofury.campaign.v1, Copy confirms, Download then Import reconstructs the same visible campaign surfaces"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "save_checkpoint_resume_after_refresh_flow"
+description = "Pause → Save Checkpoint → refresh → Resume Run restores the same Stage, wave or boss phase, Health, and Fury, then combat continues"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "primary_combat_flows_unavailable"
+description = "Start Stage, Pause/Resume, Victory/Derrota, or Export/Import Campaign primary flows are not enabled from the UI"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "victory_rewards_missing_or_duplicated"
+description = "After a real Boss defeat and Continue, Pesos or Mask rewards are missing from the Stage map, or the same reward is applied twice"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "cantina_and_map_pesos_desync"
+description = "After a Cantina purchase, the Pesos balance on the Cantina and Stage-select map disagree until reload"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "pause_resume_breaks_run"
+description = "Pause or Resume loses the active run, snaps to a different wave, or returns to Stage-select without Save/Abandon"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_masks_breaks_ui"
+description = "With no owned Masks, the Masks screen crashes, blanks, or hides Stage-map chrome"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "export_preview_disagrees_with_map"
+description = "Export Campaign JSON pesos, unlocks, or fighter.displayName disagree with the Stage-select map values shown at the same moment"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "history_panel_cannot_reopen"
+description = "After closing the History panel it cannot be reopened, or Undo/Redo leave the app unable to return to the Stage map"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,15 +203,15 @@ weight = 1.0
 [[criterion]]
 id = "6.n8"
 name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+description = "An open overlay blocks returning to the Stage map or combat with no close path (close control and Escape both fail)"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "failed_import_lacks_feedback"
+description = "A failed Campaign Import shows no visible validation feedback naming a field"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +219,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n10"
 name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+description = "A Victory, Derrota, Pause, or Import failure leaves a dead end that requires a full page reload to continue"
 type = "binary"
 negate = true
 weight = 1.0
@@ -213,7 +227,8 @@ weight = 1.0
 [[criterion]]
 id = "user_flows.catchall"
 name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in user-flow behavior that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0
+

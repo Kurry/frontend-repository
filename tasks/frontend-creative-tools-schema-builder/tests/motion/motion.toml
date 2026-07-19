@@ -1,0 +1,147 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "8.1"
+name = "add_field_height_expand"
+description = "Adding a field through the real Add Field control animates the new row in with a height expansion of roughly 150 milliseconds rather than appearing instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.2"
+name = "remove_field_height_collapse"
+description = "Removing a field through the real Delete flow collapses its height over roughly 120 milliseconds before it disappears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.3"
+name = "drag_reorder_slides_siblings"
+description = "Drag reordering with the real pointer slides sibling nodes into their new positions over roughly 200 milliseconds rather than snapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.4"
+name = "panel_slide_and_tab_crossfade"
+description = "The configuration panel slides in when a node is selected and out when dismissed, and switching between the schema text, example, and format instruction tabs crossfades briefly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.5"
+name = "annotations_pop_in_step_order"
+description = "During a validation run started from the real Run validation control, tree annotations appear with a short pop-in in step order as each field's step completes, not all at once"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.6"
+name = "countdown_ticks_and_status_fades"
+description = "The retry backoff countdown ticks visibly and a completing step's status transitions with a short fade rather than snapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.7"
+name = "history_slider_scrubs_continuously"
+description = "Dragging the history timeline slider updates the tree continuously as it moves, not only on release"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.8"
+name = "hover_system_required"
+description = "While hovering with the real pointer: buttons ease background and shadow with a slight press effect on activation, tree rows, library entries, and version rows take a full-width hover wash, and form controls show focus rings — verified via computed styles while hovering"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.9"
+name = "toasts_slide_and_dismiss"
+description = "Toasts for copies, saves, inserts, and deletions slide in, remain readable, and auto-dismiss with a fade"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.10"
+name = "reduced_motion_complete"
+description = "With prefers-reduced-motion set, expansions, collapses, reorders, tab switches, and annotations apply instantly while every feature remains fully usable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.n1"
+name = "motion_absent_without_preference"
+description = "With prefers-reduced-motion NOT set, field additions, removals, reorders, and the configuration panel all snap instantly with no transition anywhere, so the specified motion system does not exist"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "8.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

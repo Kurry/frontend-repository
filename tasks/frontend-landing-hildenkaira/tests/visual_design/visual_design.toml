@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -260,6 +260,21 @@ description = "Inspecting computed styles in the browser, differently themed sec
 type = "binary"
 weight = 0.5
 optional = true
+
+[[criterion]]
+id = "2.30"
+name = "shortlist_brief_chrome_matches_theme"
+description = "Shortlist controls, the Shortlist panel, Export brief chrome, and the discovery brief panel use the page's token-driven editorial surfaces (off-white/near-black or chrome/dark cookie language) rather than unstyled browser-default dialog chrome that breaks the Cinder & Bloom system."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.n30"
+name = "operator_chrome_breaks_editorial_system"
+description = "Shortlist, command palette, or discovery brief chrome introduces a conflicting unrelated palette (e.g. default system dialogs) that visibly breaks the editorial lime/turquoise/chrome token system."
+type = "binary"
+negate = true
+weight = 0.5
 
 [[criterion]]
 id = "2.catchall"

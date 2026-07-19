@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,158 +62,75 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "9.1"
-name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+name = "interactive_within_two_seconds"
+description = "The app is interactive within 2 seconds of a local cold load, opening directly into the setup screen."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
-name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+name = "console_clean_full_exercise"
+description = "No console errors or uncaught exceptions appear during a full exercise covering setup, rounds, pause/resume, hints, flags, undo/redo, match completion, export/import, save/resume, Match log, and Stats."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
-name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+name = "rapid_reveal_stress_stable"
+description = "At least 25 rapid deterministic reveal/turn repetitions through normal controls leave an exact final visible state with responsive controls and no blank screen, uncaught error, or sustained freeze."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.4"
-name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+name = "responsive_during_rival_delay"
+description = "The board, score panels, and history panel stay responsive during the Rival thinking delay; queued Player input never fires during the Rival turn."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.5"
-name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "9.6"
-name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "9.7"
-name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "9.8"
-name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+name = "export_import_no_freeze"
+description = "Export Match, Export Archive, Import, Save Progress, and Resume Saved Match complete without a sustained UI freeze or blank screen."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.n1"
-name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+name = "cold_load_over_two_seconds"
+description = "Cold load to interactive setup exceeds 2 seconds on a local serve."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n2"
-name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+name = "console_errors_during_play"
+description = "Console errors or uncaught exceptions appear during normal match play or export/save flows."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n3"
-name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+name = "rapid_input_freezes_or_blanks"
+description = "Rapid reveal/turn input produces a blank screen, sustained freeze, or unresponsive controls."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n4"
-name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
+name = "rival_delay_blocks_ui_thread"
+description = "During Rival thinking the HUD becomes unresponsive or Player clicks fire mid-Rival-turn."
 type = "binary"
-negate = true
 weight = 1.0
-
-[[criterion]]
-id = "9.n5"
-name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
-type = "binary"
 negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n6"
-name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n7"
-name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n8"
-name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n9"
-name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n10"
-name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
-type = "binary"
-negate = true
-weight = 1.0
 
 [[criterion]]
 id = "performance.catchall"
 name = "performance_catchall"
-description = "The app exhibits a significant, browser-observable defect in performance or stability that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable performance or stability defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true

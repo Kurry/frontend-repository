@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -145,6 +145,21 @@ id = "3.12"
 name = "spacing_and_radius_scale"
 description = "Panels and cards share a consistent base border radius of about 8px and spacing/padding steps in multiples of the 4px base unit, rather than arbitrary one-off values that vary from panel to panel."
 type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.13"
+name = "export_preview_monospace_block"
+description = "The Export preview renders style JSON in a monospaced read-only block consistent with the FrameFlick tool surfaces."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.n13"
+name = "undo_export_icons_inconsistent"
+description = "Undo/Redo, Before/After, or export controls use a different icon set or visual language from the rest of the panel icons."
+type = "binary"
+negate = true
 weight = 0.5
 
 [[criterion]]

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,150 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "breakdown_rows_keyboard_filter"
+description = "Breakdown rows are keyboard operable: focus shows a visible indicator, and Enter or Space applies the row filter"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "selectors_keyboard_operable"
+description = "Site, date-range, and sort selectors open with the keyboard, move with arrows, commit with Enter, and close with Escape"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "top_bar_controls_focus_rings"
+description = "Undo, Redo, Compare previous, bounce-rate ceiling, Export report, and the theme toggle show a visible focus ring on keyboard focus"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "core_flow_keyboard_and_pointer"
+description = "The core flow (choose site, choose range, apply a row filter, clear it, open export, copy) is completable with the keyboard alone and with the pointer alone"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+name = "dialogs_trap_focus"
+description = "Add site and the export drawer trap focus while open, close on Escape, and return focus to the opener"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+name = "validation_assistive"
+description = "Inline validation for Add site, bounce-rate ceiling, and import is exposed to assistive technology as well as shown visually"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "high_bounce_and_chips_not_color_only"
+description = "High bounce and compare percent-change chips convey state with text in addition to color"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+name = "export_live_region"
+description = "Export copy and import completion are announced through an aria-live region as well as shown visually"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "form_labels_present"
+description = "Add site fields (site name, domain, timezone) and the bounce-rate ceiling control have visible labels associated with their inputs"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "landmark_or_main"
+description = "The dashboard main content is in a main landmark or equivalent so the analytics region is identifiable"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
-name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+name = "controls_not_keyboard_reachable"
+description = "Export report, Undo, or breakdown rows cannot be reached or activated via keyboard"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n2"
-name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+name = "focus_indicators_missing"
+description = "Focused interactive controls show no visible focus indicator"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n3"
-name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+name = "nonsemantic_custom_controls"
+description = "Custom filter rows or export actions use non-semantic tags without ARIA roles or names"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+name = "color_only_high_bounce"
+description = "High bounce is conveyed by color alone with no High bounce text label"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "dialog_no_focus_trap"
+description = "While Add site or the export drawer is open, Tab moves focus to controls outside the overlay"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+name = "poor_contrast_tiles"
+description = "Metric tile numbers or labels fail readable contrast against their card surface in the active theme"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+name = "validation_visual_only"
+description = "Add site or import validation is visual only with no accessible name or live-region exposure"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+name = "export_copy_not_announced"
+description = "Export copy confirmation is not announced to assistive technology"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+name = "escape_does_not_close_drawer"
+description = "Pressing Escape leaves the export drawer or Add site dialog open"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n10"
-name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+name = "reduced_motion_ignored_a11y"
+description = "With prefers-reduced-motion set, motion still runs at full intensity while state changes lag or fail to apply"
 type = "binary"
 negate = true
 weight = 1.0
@@ -213,7 +213,8 @@ weight = 1.0
 [[criterion]]
 id = "accessibility.catchall"
 name = "accessibility_catchall"
-description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0
+

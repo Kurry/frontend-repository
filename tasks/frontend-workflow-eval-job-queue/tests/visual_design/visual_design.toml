@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "3.1"
 name = "monitor_shell_composition"
-description = "The app presents a monitor composition: a header with the app name and Submit job control, a main jobs table with its filter toolbar above it, a provider lanes panel visible alongside or above the table, and Aggregates and Timeline reachable as views or tabs without a reload"
+description = "The app presents a monitor composition: a header with the app name, Submit job control, and Export queue / Import queue controls, a main jobs table with its filter toolbar above it, a provider lanes panel visible alongside or above the table, and Aggregates and Timeline reachable as views or tabs without a reload"
 type = "binary"
 weight = 1.0
 
@@ -91,14 +91,14 @@ weight = 1.0
 [[criterion]]
 id = "3.5"
 name = "config_preview_monospace_surface"
-description = "The configuration preview renders on a visually distinct monospaced surface with an indented key-value structure, and cards and panels across the app use consistent borders, radii, and subtle shadows with one consistent icon set"
+description = "The configuration preview and the Export queue JSON preview each render on a visually distinct monospaced surface with an indented key-value structure; the import surface uses the same visual language; cards and panels across the app use consistent borders, radii, and subtle shadows with one consistent icon set"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.6"
 name = "responsive_reflow_clean"
-description = "At 768 pixels and below the lanes panel stacks above or below the table and the filter toolbar wraps; at 375 pixel width no content clips or overflows the viewport, no page-level horizontal scrolling appears, and the jobs table and trial grid scroll within their own containers"
+description = "At 768 pixels and below the lanes panel stacks above or below the table and the filter toolbar wraps; at 375 pixel width no content clips or overflows the viewport, no page-level horizontal scrolling appears, and the jobs table, trial grid, and export preview scroll within their own containers"
 type = "binary"
 weight = 1.0
 

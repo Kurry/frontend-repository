@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,109 +63,116 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "3.1"
 name = "accent_and_canvas_tokens"
-description = "Primary toolbar buttons compute to background #6D5BD0 with white text and the canvas background computes to the light lavender #F4F2FB, distinct from any note color."
+description = "Primary accent #6D5BD0 is applied to primary buttons, active tool, focus rings, connector lines, and selection outlines; canvas background is #F4F2FB distinct from note colors; text primary #211D3A and secondary #6B6489 are used for ink and muted chrome."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
 name = "radius_and_shadow_system"
-description = "Notes and flashcards render with about 8px corner rounding and a visible drop shadow so they read as raised above the canvas, while the toolbar and mini-map panel use the larger about 12px rounding."
+description = "Notes and flashcards use border-radius 8px with a visible drop shadow; toolbar and mini-map use border-radius 12px; primary buttons are #6D5BD0 with #FFFFFF text, border-radius 8px, and a subtle shadow."
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "3.3"
 name = "object_types_distinguishable"
-description = "Notes, flashcards, and shapes are distinguishable at a glance beyond content (flashcard shows a flip icon and Front/Back label, shapes have no text-editing chrome, circles render as full circles)."
+description = "Flashcards show a small flip icon and Front/Back side label, shapes have no text-editing chrome, and circles render as full circles so object types are distinguishable at a glance."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.4"
 name = "selection_outline_and_handles"
-description = "A selected object shows an unmistakable accent selection outline distinct from its unselected resting state, multiple shift-selected objects all show it simultaneously, and a singly selected object additionally shows square corner handles."
+description = "A selected object shows an unmistakable accent outline distinct from its resting state, and a singly selected object additionally shows square corner handles."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
 name = "active_tool_and_tab_accent"
-description = "The active Connect tool and the active board tab are highlighted in the accent color, distinct from their inactive siblings, so the current mode and board are always clear."
+description = "The active Connect tool and the active board tab are visually highlighted in the accent color so mode and board are always clear."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.6"
 name = "delete_confirm_warning_token"
-description = "The delete-confirmation UI uses the warning token #E0A030 rather than blending in as a neutral control."
+description = "The delete-confirmation state uses warning #E0A030 distinctly from the primary accent."
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "3.7"
 name = "narrow_layout_stays_usable"
-description = "At about 375px wide the toolbar stays reachable via wrapping or horizontal scroll, the toolbar and mini-map do not overlap canvas content, the canvas stays pannable, and no page-level horizontal scroll appears."
+description = "At about 375px wide the toolbar stays reachable, the mini-map and toolbar do not overlap canvas content, and no page-level horizontal scroll appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.9"
 name = "color_tokens_misapplied"
-description = "The specified color tokens are misapplied: primary buttons render in a color other than #6D5BD0, the canvas background renders in a color other than the light lavender #F4F2FB, or notes lack the raised 8px-radius drop-shadow treatment."
+description = "Primary accent, canvas background, or warning tokens are applied so inconsistently that chrome and canvas read as an unrelated palette from the specified tokens."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "3.10"
 name = "typography_scale_and_muted_ink"
-description = "UI chrome renders in an Inter-first sans-serif stack, note and flashcard body text is visibly larger (about 16px) than the compact toolbar labels (about 14px), and muted ink such as the zoom readout and board-tab labels computes to the secondary color #6B6489."
+description = "UI chrome uses the Inter / system-ui stack; note and flashcard body text is about 16px and toolbar labels about 14px; muted ink uses the secondary text token."
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "3.11"
 name = "single_icon_set_with_labels"
-description = "Every toolbar control, board tab, and panel action pairs an icon with its label, and all icons come from one visually consistent set with no control mixing icons from visibly different sets."
+description = "Every toolbar control, board tab, and panel action pairs a consistent icon from one single icon set with its label; no control mixes icons from visibly different sets."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.12"
 name = "stream_status_badge_colors"
-description = "The live-event status renders as a distinct colored badge per state, so Active, Paused, Disconnected, Replaying, and Caught up are each visibly different."
+description = "Live-event status badges for Active, Paused, Disconnected, Replaying, and Caught up are each visibly different colored treatments."
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "3.13"
 name = "controls_survive_resize"
-description = "Resizing between about 1440px and 375px wide keeps every control available (nothing disappears without a reachable replacement), and open dialogs and popovers stay fully on-screen."
+description = "Between about 1440px and 375px wide no required control disappears without a reachable replacement, and dialogs stay fully on-screen."
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "3.14"
 name = "empty_states_explicit"
-description = "A brand-new empty board shows the centered add-something hint, and a search matching nothing shows an explicit no-results message, each rendered as deliberate styled copy rather than a blank area."
+description = "Empty board, no-results search, and empty Archive each show explicit empty-state copy rather than a blank region."
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "3.15"
 name = "placeholder_text_shipped"
-description = "Placeholder or debug copy (lorem ipsum, 'TODO', 'asdf', unresolved template variables like {{title}}) is visible anywhere in the shipped UI, or prominent copy contains spelling errors."
+description = "Lorem ipsum or placeholder template text is visible in the shipped UI chrome or canvas hints."
 type = "binary"
-weight = 0.5
 negate = true
-optional = true
+weight = 1.0
+
+[[criterion]]
+id = "3.16"
+name = "export_modal_preview_surface"
+description = "The Export workspace modal shows format tabs and a monospace preview on a recessed surface distinct from the canvas, with Copy and Download controls."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.17"
+name = "undo_redo_disabled_appearance"
+description = "Undo and Redo show a dimmed disabled appearance when their stacks are empty, distinct from the enabled resting state."
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "3.catchall"

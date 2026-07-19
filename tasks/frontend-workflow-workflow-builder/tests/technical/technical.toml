@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -70,35 +70,42 @@ weight = 1.0
 [[criterion]]
 id = "4.2"
 name = "console_clean_full_exercise"
-description = "No console errors, warnings, or unhandled promise rejections appear on load or during a full exercise: canvas edits, connections, configuration saves, runs with retries, pause/resume, retry-from-failed, save/load, and timeline filtering"
+description = "No console errors, warnings, or unhandled promise rejections appear on load or during a full exercise: canvas edits, multi-select bulk delete, connections, configuration saves, runs with retries, pause/resume, retry-from-failed, undo/redo, save/load, import/export, and timeline filtering"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
 name = "state_coherence_across_surfaces"
-description = "Node state changes reflect everywhere immediately without reload: a badge change on the canvas is matched by the rollup values and a corresponding timeline entry in the same moment, and a configuration save updates the node badge the canvas shows"
+description = "Node state changes reflect everywhere immediately without reload: a badge change on the canvas is matched by the rollup and a timeline entry; a configuration save updates the node badge and both artifact previews; undo/redo reverts or reapplies canvas and artifact texts together"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
 name = "reload_returns_seeded_baseline"
-description = "A page reload after authoring, running, and saving workflows returns the app to its seeded baseline (the example workflow, empty timeline, no saved-run state), with no partial mixture of old and new state"
+description = "A page reload after authoring, running, saving, importing, and undoing returns the app to its seeded baseline (example workflow, empty timeline, no saved-run state, empty undo/redo, artifact previews matching the seed), with no partial mixture of old and new state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
 name = "dialog_and_live_region_semantics"
-description = "Modal dialogs expose role dialog with aria-modal true, trap focus while open, close on Escape, and return focus to their opener; validation messages are associated with their fields and run state transitions are announced via an aria-live region"
+description = "Modal dialogs expose role dialog with aria-modal true, trap focus while open, close on Escape, and return focus to their opener; validation messages are associated with their fields; run state transitions, copy confirmation, and import failures are announced via an aria-live region"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
 name = "rapid_input_stability"
-description = "The UI stays responsive and consistent under rapid repeated input — rapid node drags, spamming Pause/Resume, filtering the timeline mid-run — with no hangs, dropped interactions, or a rollup that desyncs from canvas badges; selecting a timeline entry whose node was deleted after the run behaves inertly (no crash, no console exception, no dangling highlight)"
+description = "The UI stays responsive under rapid node drags, Pause/Resume spam, rapid undo/redo, and timeline filtering mid-run — no hangs, dropped interactions, or rollup/artifact desync from canvas badges; selecting a timeline entry whose node was deleted behaves inertly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "api_shaped_schema_validation_observable"
+description = "Forms and Import enforce the Workflow Definition field contract observably: timeout_seconds outside 1–300, empty title, or invalid node type on import each show a field-named inline error and refuse the mutation"
 type = "binary"
 weight = 1.0
 
@@ -107,21 +114,29 @@ id = "4.8"
 name = "storage_apis_used"
 description = "After a full exercise of the app, localStorage, sessionStorage, or another browser storage API contains app data (this task mandates in-memory state only)"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "4.9"
 name = "outbound_requests_or_navigation"
 description = "The app issues network requests to non-local origins (CDN scripts, fonts, icons, APIs) or app chrome navigates to an external origin during use"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
-id = "4.catchall"
+id = "4.n3"
+name = "artifact_preview_stale_until_reload"
+description = "After a graph or configuration edit, Workflow Definition JSON or Mermaid still shows stale values until a full page reload"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "technical.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network request, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0

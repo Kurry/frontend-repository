@@ -1,0 +1,162 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "shared_state_coherence"
+description = "All surfaces derive from one shared state: advancing samples updates the progress bars, event timeline, and monitoring chart together; flagging an outlier updates the summary strip, charts, matrix, radial wheels, and export content together; and an experiment edit, archive, or decision is reflected in every view where it appears, all without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "no_storage_reload_seeded"
+description = "No browser storage is used: localStorage and sessionStorage remain empty after creating, editing, running, pausing, flagging, deciding, archiving, and exporting, and a page reload returns the app to its seeded state (seeded experiments and criteria, default view, no unseeded decisions or flags)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "storage_persistence_used"
+description = "localStorage or sessionStorage holds experiments, runs, flags, decisions, or UI state after exercising the app"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.4"
+name = "external_network_requests"
+description = "The devtools network log shows requests to external origins or third-party CDNs (scripts, styles, fonts, icons, or data) during load or a full exercise of the app"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.5"
+name = "console_clean"
+description = "The console is free of errors and warnings on first load and stays clean while designing, previewing, running, pausing, flagging, deciding, undoing, archiving, and exporting experiments and switching tabs"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "cold_load_interactive_2s"
+description = "The app is interactive (library table and toolbar controls respond) within 2 seconds of a local cold load"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "responsive_during_run"
+description = "While a run is filling progress bars, the UI stays responsive under rapid repeated input — quick tab switches, rapid sort clicks, fast filter toggles — with no hangs, dropped interactions, or views showing stale data another view already updated"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "statistics_react_to_data"
+description = "The p-value, confidence interval, win rate, and matrix values are computed from the current sample data: flagging outliers or completing additional samples changes them, and the same quantities agree wherever they are shown"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "keyboard_operability_focus"
+description = "Every interactive control — table rows and headers, filters, bulk actions, designer fields and allocation sliders, tabs, flag controls, pause/resume, undo/redo, and export — is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space, arrow keys on sliders), with a visible focus indicator at each stop"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "modal_focus_trap_escape"
+description = "The designer, decision, and confirmation modals trap keyboard focus while open, close on the Escape key, and return focus to the control that opened them"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "aria_live_announcements"
+description = "Run completion, a decision being recorded, and the significance verdict activating are announced through an aria-live region in addition to their visual indication"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.12"
+name = "labels_slider_values_errors"
+description = "Form fields in the designer, criterion form, and decision dialog have visible labels, the allocation sliders expose their current value to assistive technology, and each validation message names the field or rule it belongs to and renders in association with it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.13"
+name = "fictional_model_names_only"
+description = "Every model name rendered anywhere in the UI is fictional; no real AI provider or model brand names appear"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

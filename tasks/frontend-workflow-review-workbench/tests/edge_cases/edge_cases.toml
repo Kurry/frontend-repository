@@ -1,0 +1,219 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "empty_states_present_everywhere"
+description = "Empty states render where the spec calls for them: a no-match portfolio filter shows an empty state naming the active filters with a Clear filters control, a timeline filtered to an empty event kind shows an empty state message, and a READY bundle with no fix items states that no fixes are required"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "override_form_validates_inline"
+description = "The override justification form validates inline before saving: an empty, under-20-character, or whitespace-only justification shows a message naming the justification field and saves nothing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "errors_are_actionable"
+description = "Validation and locked-state messages are actionable: the justification error states the minimum length, and a locked step's notice names the step that must be finished first"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "actions_show_confirmation"
+description = "Copying the summary, completing bundling, saving an override, and a re-run finishing each produce a visible confirmation (toast, badge change, or timeline entry)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "rerun_shows_progress_affordances"
+description = "The simulated re-run shows deliberate progress affordances throughout: pending/running step indicators, the backoff countdown while retrying, and a completing publish step — never a frozen or blank region while work is simulated"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "destructive_or_reverting_actions_are_guarded"
+description = "Reverting actions behave safely: turning the override toggle off with an out-of-set recommendation saved reverts to unset with the Override badge removed, and un-marking Verdict after bundling re-locks Bundle while the timeline keeps the historical bundling event"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "double_activation_is_idempotent"
+description = "Rapidly double-activating Re-run gate starts exactly one re-run, and activating it while that gate's re-run is running leaves the running re-run untouched instead of restarting it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "self_diff_prevented"
+description = "In trial diff mode the second picker excludes the already-picked trial or shows an inline message, and no self-diff of a trial against itself renders"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "long_text_handled"
+description = "A fix-item title longer than 80 characters truncates with an ellipsis in the list and shows in full in the item's expanded detail, and long reasoning or answer text scrolls within its pane rather than breaking the layout"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "overlays_close_all_paths"
+description = "Overlay surfaces (override form, diff picker, confirmations) close via their close control, the Escape key, and — where a dimmed backdrop exists — a backdrop click, without saving partial state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n1"
+name = "empty_regions_render_blank"
+description = "An empty filter result, empty timeline kind, or empty fix list renders as a blank region with no explanatory feedback"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n2"
+name = "errors_only_reach_console"
+description = "A failed or blocked action surfaces its error only in the browser console with no visible UI feedback"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n3"
+name = "silent_success_or_failure"
+description = "Resolving a fix item, saving an override, copying the summary, or completing bundling succeeds or fails silently with no visible change"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n4"
+name = "invalid_override_saves"
+description = "An override with an empty, under-length, or whitespace-only justification saves anyway, or a disabled recommendation can be recorded without the override toggle"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n5"
+name = "interactive_elements_use_nonsemantic_tags"
+description = "Non-semantic div or span tags wrap primary interactive elements (gate cards, fix checkboxes, recommendation controls, stepper controls) without button roles or keyboard semantics"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n6"
+name = "modal_not_keyboard_dismissible"
+description = "The override form or diff picker cannot be dismissed via keyboard"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n7"
+name = "validation_feedback_missing_or_delayed"
+description = "Validation feedback on the override form is missing, or appears only after a save attempt with no inline indication"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n8"
+name = "button_text_ambiguous_or_missing"
+description = "Primary controls carry ambiguous or missing labels (icon-only with no accessible name, or generic labels where the spec names specific ones)"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n9"
+name = "double_rerun_duplicates_state"
+description = "Double-activating Re-run gate or Complete bundling produces duplicated runs, duplicate timeline entries, or a double-stamped Bundled state"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n10"
+name = "affordances_hidden_or_inaccessible"
+description = "A required affordance (evidence link, retry control, resolve checkbox, override toggle) is visually hidden or unreachable in some state of the app"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "edge_cases.catchall"
+name = "edge_cases_catchall"
+description = "The app exhibits a significant, browser-observable defect in edge-case UX or feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

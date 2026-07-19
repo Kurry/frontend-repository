@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,185 +63,159 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "loads_into_study_interface_with_header"
-description = "On load at /, the study interface appears with no login, registration, or backend call; the header reads LineForge and includes a Board theme selector and a View saved lines control showing the current saved-line count"
+description = "On load at /, the study interface appears with no login, registration, or backend call; the header reads LineForge and includes a Board theme selector, Undo and Redo controls, a command-palette affordance, an Export center control, and a View saved lines control showing the current saved-line count"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.2"
 name = "library_grouped_openings_listing"
 description = "On load, the Opening Library lists at least 12 openings grouped under family headings (Open Games, Semi-Open Games, Closed Games, Flank Openings), each showing a name, a short code, and a move sequence in algebraic notation"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.3"
 name = "search_narrows_with_previews"
 description = "Typing in the library search field narrows the list to openings whose name, code, or family matches, and each match still shows its name, code, and move preview"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.4"
 name = "opening_selection_renders_tree"
 description = "After selecting an opening, the move tree renders as an indented clickable structure with a Main line row of move chips and labeled branch variations, and the board shows that opening's position"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.5"
 name = "tree_node_click_jumps_board"
 description = "After clicking a non-root move-tree node, the board jumps to that exact position and the clicked node is visibly marked as selected, with only one node marked selected at a time"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.6"
 name = "legal_move_flow_illegal_rejected"
 description = "Clicking an own piece highlights its legal destination squares and clicking a highlighted square plays the move; clicking a non-legal target square is rejected with a visible message, the piece stays on its original square, and the position remains uncorrupted"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.7"
 name = "offbook_move_creates_your_line"
 description = "After playing a legal move that matches no bundled continuation, a New Line badge appears and the move is appended under a Your Line branch labeled session-only"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.8"
 name = "statistics_panel_stacked_bar"
 description = "When an opening is selected, the Statistics panel shows a single horizontal stacked bar of three proportional segments (White win / Draw / Black win) whose widths track their percentages, the numeric White/Draw/Black figures, a Games in database count, and a visible Illustrative sample data label"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.9"
 name = "notable_games_listed_and_replayable"
 description = "Each opening lists 3 bundled notable games showing Players, Event, Year, and Result, and Loading one replays it move-by-move on the board via the Previous move and Next move controls"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.10"
 name = "practice_feedback_flash_and_toast"
 description = "After starting Practice this line and playing the correct move, the board flashes green and a Correct! toast appears; after an incorrect legal move the board flashes red, shows Try again, and reverts to retry"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.11"
 name = "practice_lifecycle_streak_accuracy"
 description = "Starting Practice this line and playing a correct move increments the streak counter by exactly one and raises the session accuracy; a subsequent incorrect legal move resets the streak to zero and lowers the accuracy; loading a different opening returns both readouts to their starting values"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.12"
 name = "saved_line_save_load_rename_delete"
-description = "Save this line opens a save form with a prefilled editable name and stores the displayed move sequence into My Saved Lines; the entry can be Loaded back (restoring its exact ply and highlighted tree node), Renamed, and Deleted"
+description = "Save this line opens a save form with SavedLine fields and stores the displayed move sequence into My Saved Lines; the entry can be Loaded back (restoring its exact ply and highlighted tree node), Renamed, and Deleted"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.13"
 name = "favorites_star_and_filter_live"
 description = "After starring openings and enabling Favorites Only, the list narrows to starred openings and updates live when a star is unmarked"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.14"
-name = "persistence_facets_survive_refresh"
-description = "After selecting a non-default Board theme, favoriting an opening, saving a line, and opening a specific opening, a full page refresh restores the theme, the favorite, the saved line, and the last-opened opening exactly"
+name = "reload_resets_to_seeded_baseline"
+description = "After starring an opening, saving a line, choosing Forest theme, and opening Export center, a full page reload returns empty Favorites, empty My Saved Lines, Classic board theme, and Study pack JSON with empty favorites and savedLines"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.15"
 name = "live_relay_ordering_and_catchup"
 description = "When the Live relay is Started, then events are Delivered out of order and Reconnected, the applied events resolve into logical-timestamp order with duplicates ignored and catch-up applied exactly once"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.20"
 name = "book_move_advances_and_tally_counts"
 description = "Playing a legal move on the board that matches a bundled continuation updates the position and advances the selected tree node, and a capturing move increments the running captured-piece tally cumulatively"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.24"
 name = "practice_hides_upcoming_moves"
 description = "Practice this line hides upcoming moves and shows a Your move prompt; a correct move advances the drill and an incorrect legal move reverts the board so it can be retried"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.26"
 name = "board_controls_flip_reset_scrub"
 description = "Flip board reverses orientation, Reset to start returns the board to the opening's first position, and the Previous/Next scrubber steps through the loaded line"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.33"
 name = "save_line_flow_multi_surface"
-description = "After exploring an opening to a chosen ply, activating Save this line and submitting a valid name adds exactly one entry to My Saved Lines and increases the header saved-line count by exactly one; after a full page refresh the entry is still listed and Loading it restores the board to that exact ply with the matching tree node highlighted"
+description = "After exploring an opening to a chosen ply, activating Save this line and submitting a valid SavedLine adds exactly one entry to My Saved Lines and increases the header saved-line count by exactly one; Loading it restores the board to that exact ply with the matching tree node highlighted"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.34"
 name = "favorites_roundtrip_multi_surface"
-description = "Starring an opening immediately fills its star and the Favorites Only filter includes it without a reload; after a full page refresh the star remains filled; unstarring it while Favorites Only is active removes it from the filtered list immediately and the visible opening count decreases by exactly one"
+description = "Starring an opening immediately fills its star and the Favorites Only filter includes it without a reload; unstarring it while Favorites Only is active removes it from the filtered list immediately and the visible opening count decreases by exactly one"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.35"
-name = "deviation_lifecycle_session_only"
-description = "Playing an off-book legal move shows the New Line badge, adds a Your Line branch to the move tree, and updates the board; after a full page refresh the Your Line branch is gone while the last-opened opening, Favorites, My Saved Lines, and the selected Board theme are all restored exactly as they were"
+name = "deviation_lifecycle_and_pgn"
+description = "Playing an off-book legal move shows the New Line badge, adds a Your Line branch to the move tree, updates the board, and the Export center Current line PGN includes those off-book SAN moves from the displayed sequence"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.36"
-name = "board_themes_switch_and_persist"
-description = "The Board theme selector offers at least 3 distinct themes (Classic, Forest, Slate); choosing a different theme re-skins the board squares immediately with no page reload, and after a full page refresh the same theme is still applied to the board"
+name = "board_themes_switch_and_export_field"
+description = "The Board theme selector offers at least 3 distinct themes (Classic, Forest, Slate); choosing a different theme re-skins the board squares immediately with no page reload, and the Study pack JSON boardTheme field shows that same theme value"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.37"
 name = "empty_name_inline_validation"
-description = "Submitting the save-line form with an empty name shows an inline validation message naming the name field, saves nothing, and keeps the save control disabled until the name is non-empty; renaming a saved entry to an empty name is rejected with the same inline message and the entry keeps its previous name"
+description = "Submitting the save-line form with an empty name shows an inline validation message naming the name field, saves nothing, and keeps the save control disabled until the name is non-empty and within 1 to 80 characters; renaming a saved entry to an empty name is rejected with the same inline message and the entry keeps its previous name"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.38"
 name = "double_save_creates_one_entry"
 description = "Double-activating the save control creates exactly one saved entry: the header saved-line count increases by exactly one and exactly one new entry appears in My Saved Lines"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.39"
 name = "saved_lines_empty_state_roundtrip"
 description = "With no saved lines, My Saved Lines shows an empty-state message explaining how to save one, and deleting the last saved entry returns the panel to that empty state"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.40"
 name = "search_no_match_empty_state"
 description = "A library search that matches no opening shows an empty-state message in the list region, and clearing the search restores the full grouped list exactly"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.41"
 name = "favorites_filter_empty_state"
@@ -249,35 +223,87 @@ description = "With nothing favorited, enabling the Favorites Only filter shows 
 type = "binary"
 weight = 0.5
 optional = true
-
+[[criterion]]
+id = "1.42"
+name = "saved_line_field_contract_validation"
+description = "Submitting a save with notes longer than 280 characters or more than 8 tags shows an inline message naming notes or tags and saves nothing; a valid save produces a My Saved Lines entry whose Study pack JSON record includes name, openingCode, moves, ply, sideToMove, and any tags/notes"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "1.43"
+name = "export_center_study_pack_and_pgn"
+description = "Opening Export center shows live Study pack JSON and Current line PGN previews; after starring an opening, saving a named tagged line, and choosing Forest, the Study pack JSON contains those favorites, that savedLines record, and boardTheme forest, and the PGN contains the displayed SAN moves"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "1.44"
+name = "import_study_pack_round_trip"
+description = "After exporting a Study pack with at least one favorite and one saved line, clearing favorites and deleting saved lines, then Import study pack of that JSON reconstructs the same favorites, boardTheme, and My Saved Lines entries including tags and notes, and the header saved-line count matches"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "1.45"
+name = "undo_redo_saved_line_and_favorite"
+description = "Saving a line then Undo removes that entry and restores the prior saved-line count; Redo brings it back; starring then Undo restores the unstarred state across the star and Favorites Only filter; Undo and Redo disable when their stacks are empty"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "1.46"
+name = "bulk_tag_selected_saved_lines"
+description = "Selecting 2 saved lines and applying Add tag with study shows study on both entries and in the Study pack JSON savedLines tags; the bulk bar shows a live selected count of 2 then clears after the action"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "1.47"
+name = "command_palette_opens_and_loads"
+description = "Pressing Ctrl+K or Cmd+K opens the command palette with a focused search input; typing part of a bundled opening name and pressing Enter on the match loads that opening into the explorer; choosing Export center from the palette opens that panel"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "1.48"
+name = "copy_export_shows_confirmation"
+description = "Activating Copy on the Study pack JSON or Current line PGN puts the exact visible preview text on the clipboard path and shows a visible confirmation that reverts after a moment"
+type = "binary"
+weight = 1.0
 [[criterion]]
 id = "1.30"
 name = "static_tree_no_board_sync"
 description = "The opening list is a static display with a non-functional move tree — clicking a node does not move the board or mark a selection"
 type = "binary"
-weight = 1.0
 negate = true
-
+weight = 1.0
 [[criterion]]
 id = "1.31"
 name = "deviation_detection_absent"
 description = "A legal move that departs from every bundled continuation produces no New Line badge and no Your Line branch (deviation detection is absent)"
 type = "binary"
-weight = 1.0
 negate = true
-
+weight = 1.0
 [[criterion]]
 id = "1.32"
 name = "practice_accepts_wrong_moves"
 description = "Practice mode reports a wrong move as Correct, or accepts any move as correct regardless of the expected move"
 type = "binary"
-weight = 1.0
 negate = true
-
+weight = 1.0
+[[criterion]]
+id = "1.n4"
+name = "export_omits_session_mutations"
+description = "After saving a line, starring an opening, or changing Board theme, the Export center Study pack JSON omits that session mutation from favorites, savedLines, or boardTheme"
+type = "binary"
+negate = true
+weight = 1.0
+[[criterion]]
+id = "1.n5"
+name = "import_accepts_invalid_pack"
+description = "Import study pack accepts malformed JSON or a payload that violates the StudyPackDocument / SavedLine field contract without showing a visible field-named error, or mutates favorites/saved lines despite the invalid payload"
+type = "binary"
+negate = true
+weight = 1.0
 [[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0

@@ -1,0 +1,163 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "8.1"
+name = "import_batches_animate"
+description = "Committing an import through the real wizard Commit control animates rows into the grid in batches of 10, each batch fading in over roughly 100 milliseconds rather than all rows appearing at once"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.2"
+name = "single_row_slide_in"
+description = "A row added through the real Add Row flow slides in from opacity 0 over roughly 200 milliseconds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.3"
+name = "modal_enter_exit_transition"
+description = "Modals (New Dataset, Add Row, Edit Row, merge, attach) enter with a short opacity and scale transition of roughly 200 to 300 milliseconds and exit the same way, never snapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.4"
+name = "tray_and_drawer_slides"
+description = "The bulk tray slides up when the first row is selected and slides away when the selection clears, and the export drawer and threshold, splits, and snapshot panels slide in from the side rather than snapping open"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.5"
+name = "toggle_and_flag_transitions"
+description = "The verified toggle animates its state change with a short tick transition, and a cell newly flagged by a threshold rule transitions its background rather than snapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.6"
+name = "scan_stage_activity"
+description = "During a duplicate scan started from the real control, the running stage shows continuous activity and stage status changes animate rather than snapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.7"
+name = "gauge_animates_to_value"
+description = "The capacity gauge animates toward its new value when rows are added, imported, or deleted rather than jumping instantly"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "8.8"
+name = "hover_system"
+description = "While actually hovering: buttons ease background and shadow with a slight press effect on activation, sidebar entries, grid rows, and panel list items take a full-width hover wash, and form controls show focus rings (verify via computed style while the pointer is over the element)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.9"
+name = "toast_lifecycle"
+description = "Toasts after import, merge, bulk apply, attach, and copy slide in, remain readable, and auto-dismiss with a fade"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.10"
+name = "reduced_motion_instant"
+description = "With prefers-reduced-motion set, imported rows and batches appear instantly and modal, drawer, tray, and gauge transitions apply immediately while every feature remains fully usable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.n1"
+name = "no_hover_or_press_feedback"
+description = "Buttons, sidebar entries, or grid rows show no hover, focus, or press feedback beyond browser defaults when exercised with the real pointer"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "8.n2"
+name = "animation_blocks_or_janks"
+description = "An animation visibly janks the layout, blocks input while running, or leaves elements misaligned after settling (for example import batches shifting the grid or the drawer trapping clicks mid-slide)"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "8.n3"
+name = "state_snap_shortcut"
+description = "A specified transition (import batches, row slide-in, modal enter, tray slide) is absent when driven through the real UI control path — the state simply snaps"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "motion.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -77,7 +77,7 @@ weight = 1.0
 [[criterion]]
 id = "1.3"
 name = "invalid_create_validation"
-description = "Attempting to submit New Suite with an empty suite name shows an inline validation message that names the suite name field, and the suite list gains no entry"
+description = "Attempting to submit New Suite with an empty suite name, a name longer than 80 characters, or zero prompts selected shows an inline validation message naming the offending field, and the suite list gains no entry"
 type = "binary"
 weight = 1.0
 
@@ -196,7 +196,7 @@ weight = 1.0
 [[criterion]]
 id = "1.20"
 name = "night_scheduling_flow"
-description = "The Night Window settings form saves a start and end time and shows the configured window in the toolbar, rejecting a missing time or an end not after the start with inline messages naming the field; toggling Night Mode on a suite shows a moon icon badge on the entry and toggling it off removes the badge"
+description = "The Night Window settings form saves startTime and endTime as HH:MM with end after start and shows the configured window in the toolbar, rejecting a missing time, a non-HH:MM value, or an end not after the start with inline messages naming the field; toggling Night Mode on a suite shows a moon icon badge on the entry and toggling it off removes the badge"
 type = "binary"
 weight = 1.0
 
@@ -247,6 +247,64 @@ negate = true
 id = "1.27"
 name = "identical_rerun_output"
 description = "Running the same suite twice yields byte-identical scores, latencies, and per-model averages both times, indicating hardcoded rather than simulated results"
+type = "binary"
+weight = 1.0
+negate = true
+
+
+[[criterion]]
+id = "1.28"
+name = "suite_payload_field_contract"
+description = "A valid New Suite submit requires name (1 to 80 characters after trim) and at least one promptId; the new list entry shows that name and a prompt count matching the selected prompts"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "export_results_json_csv_live"
+description = "After a completed run, Export results opens a drawer whose JSON tab shows version 1 with suite, run, and results fields matching the normative export shape, the CSV tab has header promptTitle,model,score,latencyMs,tokens,passFail, and the results array length and scores match the visible results table"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "export_download_and_copy"
+description = "In the export drawer, Download JSON offers eval-run-results.json matching the JSON tab, Download CSV offers eval-run-results.csv matching the CSV tab, and Copy on the active tab shows a visible Copied confirmation that clears within 5 seconds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "import_results_round_trip"
+description = "Importing a previously exported results JSON replaces the selected suite's latest-run results so the table, charts, suite average score badge, and a subsequent export match the imported document"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "import_rejects_invalid_payload"
+description = "Importing malformed JSON, a document missing required keys, a score outside 0 to 100, or a passFail that disagrees with its score shows an inline error naming the import field and leaves the current results unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "undo_redo_suite_mutations"
+description = "After creating a suite, Undo removes that suite and decreases the list count by one; Redo restores the same suite name and prompt count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "result_row_field_contract"
+description = "Each results table row exposes prompt title, model, score 0 to 100, latency in ms, tokens, and pass/fail consistent with score at or above 70 marking Pass; the detail panel shows promptText, response, and a scoringBreakdown with at least one dimension score"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "export_omits_session_results"
+description = "After completing a new run, the export JSON results array contains wrong scores relative to the visible results table, with a result count mismatched against the visible row count"
 type = "binary"
 weight = 1.0
 negate = true

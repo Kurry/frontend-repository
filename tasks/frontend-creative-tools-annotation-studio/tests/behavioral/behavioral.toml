@@ -1,0 +1,164 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "14.1"
+name = "multi_facet_reload_reset"
+description = "Configure several facets — switch to the Agreement view, submit one annotation, dispute one item, create one taxonomy class — then reload; every facet coherently resets to the seeded baseline (seeded counts, seeded taxonomy, empty undo stack), never a mix of kept and reset state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.2"
+name = "tier_and_history_ordering_live"
+description = "Dispute two different items in sequence and confirm the Disputed tier lists the most recently disputed first; resolve one and confirm the ordering and counts recompute from live state rather than a fixed list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.3"
+name = "agreement_summary_input_sensitivity"
+description = "Switch the Agreement suite selector between two suites with different seeded data and confirm the table rows, agreement percentage, and flagged count all change to match; then flag one row and confirm the flagged count and percentage move accordingly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.4"
+name = "cross_view_echo_to_export"
+description = "Submit an annotation with a metadata value and confirm, without a reload, the same datum appears in the History entry and inside the Labels JSON export preview; resolve a dispute and confirm the Stats summary disputed count matches the Review queue tier count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.5"
+name = "count_delta_exact_on_submit"
+description = "Measure a suite queue badge and the export annotation count immediately before and after one Submit & Next; both change by exactly one with no lag"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.6"
+name = "different_annotations_different_export"
+description = "Annotate two different items with different ratings, slider values, and comments, then compare their entries in the Labels JSON preview: the two objects differ exactly in the ways the inputs differed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.7"
+name = "interleaved_annotation_and_taxonomy"
+description = "Start annotating an item (rating chosen, sliders moved), switch to Taxonomy and create a class, then return: the in-progress card state is intact and submitting uses it; the new class is available in the picker"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.8"
+name = "empty_and_repopulate_round_trip"
+description = "Annotate every item in one suite to empty its queue, confirm the badge reaches zero and the completion state shows, then undo repeatedly: the queue repopulates, badges and export counts track back exactly through the transitions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "full_pipeline_probe_to_export_text"
+description = "Chain the full pipeline: create a class, draw a region with it on an image item, set a metadata value, submit, run Assist to completion on the suite, accept one suggestion and submit it, flag and resolve one dispute, then open Export: the Labels JSON text contains the new class, the region entry, and the metadata value, and the Stats summary reflects the two new submissions and the resolved dispute; copy the export and confirm the clipboard text equals the visible preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n1"
+name = "partial_reset_incoherent"
+description = "After a reload, some user-made changes survive while others reset, producing incoherent partial persistence"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n2"
+name = "derived_surface_static"
+description = "A derived surface (agreement summary, review tiers, export stats, run rollup) renders identically regardless of its inputs"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n3"
+name = "identical_output_for_different_input"
+description = "Repeating a workflow with different inputs (two different annotations, two different assist runs) yields byte-identical output"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n4"
+name = "stale_cross_view_state"
+description = "A state change appears in one view but not another until reload"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "behavioral.catchall"
+name = "behavioral_catchall"
+description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

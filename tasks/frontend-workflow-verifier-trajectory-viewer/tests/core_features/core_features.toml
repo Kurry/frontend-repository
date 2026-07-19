@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -60,6 +60,7 @@ allowed_tools = [
 [scoring]
 aggregation = "weighted_mean"
 
+
 [[criterion]]
 id = "1.1"
 name = "seeded_tasks_and_trial_table"
@@ -70,14 +71,14 @@ weight = 1.0
 [[criterion]]
 id = "1.2"
 name = "split_layout_pane_switcher"
-description = "The review workspace presents the agent trajectory and the judge trajectory either side by side at a wide viewport or in switchable panes with a persistent pane switcher, the focused trajectory is visibly indicated, and switching panes never triggers a full page reload"
+description = "The review workspace presents the agent trajectory and the scorer trajectory either side by side at a wide viewport or in switchable panes with a persistent pane switcher, the focused trajectory is visibly indicated, and switching panes never triggers a full page reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
 name = "trajectory_step_counts_and_types"
-description = "Every trial's agent trajectory lists at least 12 ordered steps of mixed types (reasoning, tool call, observation, terminal output, screenshot) and its judge trajectory lists at least 8 probe steps carrying tool invocation panels with name, status, input summary, and expandable output, observation text, and placeholder screenshot frames"
+description = "Every trial's agent trajectory lists at least 12 ordered steps of mixed types (reasoning, tool call, observation, terminal output, screenshot) and its scorer trajectory lists at least 8 inspection steps carrying tool invocation panels with name, status, input summary, and expandable output, observation text, and placeholder screenshot frames"
 type = "binary"
 weight = 1.0
 
@@ -112,7 +113,7 @@ weight = 1.0
 [[criterion]]
 id = "1.8"
 name = "linked_highlighting_both_sides"
-description = "Clicking a verdict row's evidence link jumps the judge trajectory to the probe step that produced it and highlights that step, selecting the criterion also scrolls to and outlines any implicated agent step at the same time, and clearing the selection removes both highlights"
+description = "Clicking a verdict row's evidence link jumps the scorer trajectory to the inspection step that produced it and highlights that step, selecting the criterion also scrolls to and outlines any implicated agent step at the same time, and clearing the selection removes both highlights"
 type = "binary"
 weight = 1.0
 
@@ -146,8 +147,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "adjudication_form_validation"
-description = "The adjudicate control on a flipped or failed criterion opens a form with a classification select offering exactly agent-bug, rubric-bug, and judge-error plus a rationale text field; submitting with the select unset or the rationale shorter than 20 characters shows inline per-field messages naming each invalid field and records nothing"
+name = "adjudication_form_field_contract"
+description = "The adjudicate control on a flipped or failed criterion opens a form whose payload matches the adjudication create field contract: classification is exactly one of agent-bug, rubric-bug, or scorer-error; rationale must be trimmed 20–2000 characters; optional evidenceStepIds must be valid step indices; submitting with classification unset, rationale under 20 or over 2000 characters, or an invalid evidence step index shows inline per-field messages naming each invalid field and records nothing"
 type = "binary"
 weight = 1.0
 
@@ -155,6 +156,20 @@ weight = 1.0
 id = "1.14"
 name = "adjudication_rolls_up_and_badges"
 description = "Scripted probe: record the summary panel counts and the trial's adjudication badge in the task's trial table, submit a valid adjudication on one criterion, then confirm the criterion row shows its classification, the matching summary count increased by exactly one, and the trial's badge in the task table reflects the new review progress — all without a reload; re-adjudicating the same criterion replaces the record instead of double-counting"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "batch_adjudication_apply"
+description = "With flips-only active, selecting at least two flipped criteria and submitting Apply classification to selected with a valid classification and shared rationale (20–2000 characters) marks every selected row, updates summary counts by the number of newly classified criteria without double-counting replacements, and updates the trial badge in the same interaction"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "undo_redo_adjudications"
+description = "After recording or bulk-applying an adjudication, Undo restores the prior adjudication set, summary counts, row marks, and trial badge, and Redo reapplies the mutation; Undo and Redo controls are disabled when their stacks are empty"
 type = "binary"
 weight = 1.0
 
@@ -170,6 +185,50 @@ negate = true
 id = "1.18"
 name = "double_submit_double_counts"
 description = "Rapidly double-activating the adjudication submit control records the same criterion twice, inflating the summary panel counts"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.19"
+name = "review_package_export_live"
+description = "Export review package opens with Review Package JSON and Review Memo Markdown tabs regenerated live from the store; the JSON preview shows schemaVersion exactly review-package/v1, exportedAt, taskId, trialId, model, activeLabel, comparedLabels, dimensionRollup matching the rollup bar, adjudications conforming to the create field contract, summaryCounts matching the panel, and flipCriterionIds; after recording an adjudication, reopening Export includes that adjudication in both formats"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "export_copy_and_download"
+description = "Each export format tab offers Copy, which places the exact visible preview text on the clipboard with visible confirmation, and Download, which starts a real file download whose contents match that preview text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "review_package_import_round_trip"
+description = "Importing a previously exported valid Review Package JSON reconstructs the open trial's adjudications so row marks, summary counts, the trial badge, and the next Export preview match the imported adjudications array and summaryCounts"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "command_palette_jump_and_actions"
+description = "Ctrl+K or Cmd+K opens a command palette listing Jump to trial entries for the active task plus Export review package, Import review package, Undo, Redo, and Toggle flips-only; choosing Export opens the export drawer and Escape closes the palette without changing adjudications"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "export_omits_session_adjudications"
+description = "After recording a valid adjudication through a real control, reopening Export review package shows JSON and Markdown that omit that criterionId or still show pre-adjudication summaryCounts, proving the export is stale or hardcoded"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.24"
+name = "import_accepts_invalid_contract"
+description = "Importing malformed JSON or a document that violates the Review Package field contract (wrong schemaVersion, classification outside the closed enum, rationale outside 20–2000 characters, summaryCounts disagreeing with adjudications, or comparedLabels not exactly two distinct trial labels) mutates adjudications or clears them without showing field-named validation"
 type = "binary"
 weight = 1.0
 negate = true

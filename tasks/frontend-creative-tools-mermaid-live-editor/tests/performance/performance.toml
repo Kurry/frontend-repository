@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,150 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "9.1"
-name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+name = "cold_start_under_two_seconds"
+description = "On a local cold load the workspace becomes interactive within 2 seconds, with both the seeded Christmas flowchart source and its rendered diagram visible."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
-name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+name = "console_clean_during_full_exercise"
+description = "No console errors or warnings appear during a full exercise of editing source, switching Code/Config, invalid syntax and recovery, sample switching, theme toggle, SVG/PNG/MMD/Session JSON export, Session JSON or mmd import, copy, and reload restoration; the console also stays free of hydration mismatch errors or warnings on first load and after in-app view changes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
-name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+name = "preview_rerender_feels_immediate"
+description = "After a valid source edit settles, the preview re-render response feels immediate (under about 100ms of UI lag) rather than blocking the editor."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.4"
-name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+name = "shell_visible_while_settling"
+description = "While the app settles after first paint, the header, editor, and preview regions remain visible rather than a blank white screen with no controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.5"
-name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+name = "sample_switches_without_lag"
+description = "Clicking through several sample diagrams (Flowchart, Sequence, Mindmap) in succession re-renders without perceived multi-second lag."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.6"
-name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+name = "typing_stays_responsive_during_rerender"
+description = "Typing in the editor stays responsive during preview re-renders: rapid keystrokes are never dropped and the editor never visibly freezes while the diagram redraws."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
-name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+name = "preview_redraw_holds_stable_frame_rate"
+description = "Driven through real source edits or sample clicks, preview re-renders maintain a smooth frame rate without visible hitching during continuous typing."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.8"
-name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+name = "rapid_input_never_hangs"
+description = "Rapid consecutive edits and sample switches keep the UI responsive with no hangs and leave editor and preview in agreement with the final source."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+name = "extended_editor_session_stable"
+description = "After an extended session of many edits, sample switches, theme toggles, and config changes, the tab remains responsive without runaway memory growth that freezes the UI."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+name = "no_flash_between_paint_and_interactive"
+description = "The content visible at first paint does not flash or get replaced by different content once the app becomes interactive: the header, seeded source, and layout hold steady between first render and full interactivity."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.n1"
-name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+name = "cold_load_exceeds_two_seconds"
+description = "More than 2 seconds pass after local cold load before the editor or preview can be operated, or the seeded source/diagram are not yet visible."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n2"
-name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+name = "console_errors_during_editor_flows"
+description = "Console errors, warnings, hydration mismatches, or unhandled rejections appear during edit, sample, theme, export, config, or reload flows."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n3"
-name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+name = "preview_rerender_blocks_ui"
+description = "Preview re-render after a source edit or sample click blocks the main thread so subsequent keystrokes queue with visible lag."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n4"
-name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
+name = "diagram_redraw_hangs_editor"
+description = "Updating the live preview after a source edit hangs or freezes the editor until the redraw completes."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n5"
-name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+name = "sample_switch_janks"
+description = "Switching among sample diagrams produces sustained frame-rate collapse or multi-second jank."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n6"
-name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
+name = "animation_blocks_editor_input"
+description = "While preview dim/cross-fade or error-region transitions run, the source editor ignores typed input."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n7"
-name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
+name = "settle_blocks_first_paint_of_controls"
+description = "The UI blocks rendering of header, editor, and preview until all assets finish loading, leaving a blank interactive void."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n8"
-name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
+name = "runaway_resources_after_rapid_edits"
+description = "Rapid typing or sample switching causes visible memory/CPU runaway that degrades or crashes the tab."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n9"
-name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
+name = "blank_while_loading"
+description = "Nothing is displayed (blank page) while the app loads — no header or editor/preview skeleton."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n10"
-name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+name = "crash_under_rapid_or_edge_use"
+description = "The app crashes or becomes permanently unresponsive under rapid consecutive edits, empty-source clearing, or invalid-config entry."
 type = "binary"
 negate = true
 weight = 1.0

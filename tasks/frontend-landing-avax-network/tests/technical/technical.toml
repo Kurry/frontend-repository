@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -84,7 +84,7 @@ weight = 1.0
 [[criterion]]
 id = "2.4"
 name = "client_side_schema_validation_behavior"
-description = "An invalid contact submit is blocked entirely client-side (no network request) with custom inline per-field error messages naming each field rather than only native browser bubbles, and the newsletter validates its collected fields on final submit while Next/Back navigation never blocks on per-step validity"
+description = "An invalid contact submit is blocked entirely client-side (no network request) with custom inline per-field error messages naming each field (including otherDetail when required) rather than only native browser bubbles, and the newsletter validates its full collected subscribe payload on final submit while Next/Back navigation never blocks on per-step validity"
 type = "binary"
 weight = 1.0
 
@@ -186,6 +186,74 @@ id = "2.17"
 name = "required_authored_asset_files_load"
 description = "Browser network evidence shows the required Astra marks, panel art, illustrations, thumbnails, avatars, and icons loading successfully from same-origin paths with no 404, transparent/broken response, or image decode error"
 type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "2.18"
+name = "in_memory_storage_stays_empty"
+description = "After exercising theme toggle, newsletter steps, contact submit (appending a session lead), Session leads Download/Copy/Undo, carousel paging, and drawer open/close, localStorage and sessionStorage remain empty (behavioral state is in-memory only per the PRD)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n18"
+name = "browser_storage_nonempty_after_exercise"
+description = "After exercising theme, newsletter, contact, session-lead export/undo, carousel, or drawer flows, localStorage or sessionStorage is non-empty."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "10.m1"
+name = "hydration_clean_console"
+description = "The console is hydration-clean: no hydration mismatch errors or warnings on first load of /, and none after theme toggle or in-page interactions that re-render client islands."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.m2"
+name = "deep_link_homepage_parity"
+description = "Loading / directly renders the same single continuous homepage view, state baseline, and chrome as remaining on / after in-page navigation — no route 404 and no half-rendered shell."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.m3"
+name = "flash_on_hydrate_mismatched_content"
+description = "Server-rendered or statically exported content visibly flashes and is replaced by different client content after hydration (mismatched text, reflowing layout, or restyled elements between first paint and interactive)."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.19"
+name = "lead_log_and_export_share_one_store"
+description = "Shared-state coherence: after a successful contact or newsletter submit, the Session leads list/total and a Download/Copy JSON export agree on counts and payload fields without reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n19"
+name = "lead_list_and_export_desync"
+description = "After a successful submit or Undo last lead, the Session leads panel count/list disagrees with the contents of a subsequent astra-session-leads.json export."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.20"
+name = "export_json_schema_keys_and_payload_shape"
+description = "After a successful newsletter or contact submit, the downloaded or copied astra-session-leads.json includes top-level version 1, theme matching the document root, counts with total/newsletter/contact that sum correctly, and a newest-first leads entry with non-empty id, kind newsletter or contact, ISO-8601 submittedAt, and a payload object matching that kind's request-body field contract."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n20"
+name = "export_missing_required_schema_keys"
+description = "After a successful submit, astra-session-leads.json is missing version, theme, counts, or leads entries, or a lead entry lacks id, kind, submittedAt, or payload fields required by the session export contract."
+type = "binary"
+negate = true
 weight = 1.0
 
 [[criterion]]

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,86 +62,86 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "library_controls_keyboard_operable"
+description = "Every interactive control — Nomenclature/Palette/Swatch view toggles, Filter by Period, swatches, painting-title controls, palette editor fields and submit, MENU, CART, and favorite/featured toggles — is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space), each showing a visible focus indicator when focused."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "overlay_dialogs_trap_and_return_focus"
+description = "The cart drawer, subscribe popup, and Detail/Editor overlay behave as dialogs: focus moves into them when opened, stays trapped while open, and returns to the invoking control on close."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "period_filter_keyboard_operable"
+description = "The period filter is operable with the keyboard alone: it opens, moves through period options, and applies a selection without a pointer."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "copy_and_validation_announced_live"
+description = "The on-swatch copied confirmation and palette create/edit form validation errors are shown visually and announced through an aria-live region (or equivalent live announcement)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+name = "editor_fields_explicitly_labeled"
+description = "Palette create/edit form fields (name, period, swatches) and the subscribe email field use explicit label elements associated with their controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+name = "swatches_named_with_hex"
+description = "Each swatch control carries an accessible name that includes its hex value so assistive technology can identify the color being activated."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "library_landmarks_present"
+description = "The app exposes semantic landmarks (for example header/nav for sticky chrome and main for the library region) so assistive technology can navigate the editorial library."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+name = "cream_field_text_contrast"
+description = "Near-black foreground text, control labels, and primary chrome on the cream editorial field meet sufficient contrast against their surfaces."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "view_toggles_and_overlays_semantic"
+description = "View toggles, period filter, MENU/CART, and overlay dismiss controls use button/role semantics with accessible names rather than unlabeled clickable divs."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion set, scroll reveals and palette card enter/exit animations are removed and state changes apply instantly while every feature — views, filter, create/edit/delete, copy, overlays — remains reachable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
-name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+name = "library_controls_unreachable_by_keyboard"
+description = "A view toggle, period filter, swatch, painting title, editor field, MENU, CART, or favorite control cannot be reached or activated via keyboard alone."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n2"
-name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+name = "focus_indicators_missing_on_controls"
+description = "Focused view toggles, period filter, swatches, editor fields, or header controls show no visible focus indicator or the indicator is obscured."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,55 +149,55 @@ weight = 1.0
 [[criterion]]
 id = "1.n3"
 name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+description = "View toggles, swatches, or overlay triggers use non-semantic tags without ARIA roles or accessible names."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+name = "active_view_or_error_color_only"
+description = "The active view indicator or a form validation error is conveyed by color alone with no text, filled indicator state, or other non-color cue."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "overlay_fails_to_trap_focus"
+description = "With the cart drawer, subscribe popup, or Detail/Editor overlay open, Tab moves focus to controls behind the overlay without trapping focus in the dialog."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+name = "unreadable_contrast_on_editorial_field"
+description = "Intro copy, control labels, or nomenclature/meta text is unreadable due to poor contrast against the cream field or swatch surfaces."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+name = "validation_or_copy_feedback_visual_only"
+description = "Copied confirmation or form validation feedback is visual only and is not announced via an aria-live region or equivalent assistive association."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+name = "swatches_missing_hex_accessible_name"
+description = "Swatch controls that copy a hex lack an accessible name that includes the hex value."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+name = "heading_order_skipped"
+description = "Editorial or library headings skip levels (for example jumping H1 to H3) or have no coherent order."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n10"
 name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+description = "With prefers-reduced-motion set, scroll reveals or palette card enter/exit animations still run fully instead of applying instant state changes."
 type = "binary"
 negate = true
 weight = 1.0

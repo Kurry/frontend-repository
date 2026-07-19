@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,21 +63,21 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "3.1"
 name = "spacing_and_sizing_follow_scale"
-description = "Spacing and sizing follow the design system's scale, with no arbitrary one-off values visible in computed styles."
+description = "Spacing follows the 4px base and 8px-scale card radii from the visual design section."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
 name = "typography_matches_spec"
-description = "Typography matches the spec for all headings and body copy."
+description = "Typography matches the instruction: system sans for UI, monospace for timer digits and durations."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
 name = "layout_matches_reference"
-description = "Layout matches reference screenshots to within a small tolerance at all specified breakpoints; fidelity tasks achieve near pixel-parity."
+description = "Desktop layout matches /reference-screenshots overview and segments for the ClockCraft dashboard composition (header stats, timer, timeline, weekly chart, entry list) within a small tolerance; instruction text wins on conflicts."
 type = "binary"
 weight = 1.0
 
@@ -98,7 +98,7 @@ weight = 1.0
 [[criterion]]
 id = "3.6"
 name = "control_styling_matches_spec"
-description = "Button and form radii, padding, and shadows conform to the spec."
+description = "Cards/inputs use ~8px radius and buttons a tighter ~6px radius with primary filled dark buttons as specified."
 type = "binary"
 weight = 1.0
 
@@ -119,7 +119,7 @@ weight = 1.0
 [[criterion]]
 id = "3.9"
 name = "surface_treatments_match_spec"
-description = "Color, depth, and border treatments are precise per the design."
+description = "Light #F9FAFB background, white cards, #E5E7EB borders, and Meaningful/Neutral/Draining category colors match the visual design tokens."
 type = "binary"
 weight = 1.0
 

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,109 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "keyboard_operable_lab_controls"
+description = "Every stepper, mode switch, help trigger, reset, light slider, look pack, Before/After, snapshot, undo/redo, export/import, and preset control is reachable and operable with the keyboard alone, each showing a visible focus indicator."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "help_panel_focus_trap_and_return"
+description = "The help panel is announced as a dialog or complementary region; opening it via the ? trigger moves keyboard focus into the panel, and closing it (glyph reads X) returns focus to the trigger."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "preview_imagery_has_accessible_name"
+description = "The photo preview stack imagery exposes a descriptive accessible name or alt text so assistive technology can identify the preview surface."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "preset_validation_announced"
+description = "Preset form, snapshot name, and import validation messages are shown visually and associated with their fields so assistive technology announces them."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+name = "preset_form_fields_explicitly_labeled"
+description = "Every preset create/edit form field (name, aperture, shutter, ISO, lookTag) uses an explicit label associated with the control."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+name = "dial_and_slider_readouts_real_text"
+description = "Each dial's current value and each light-slider readout is readable as real DOM text by assistive technology."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "export_controls_accessible_names"
+description = "Download PNG, Download JPEG, Download edit stack, Copy edit stack, and Import edit stack expose accessible names that identify the action."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+name = "lab_landmarks_present"
+description = "The lab exposes semantic landmarks (for example main for the simulator stage and complementary/dialog for help)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "dial_and_meter_text_contrast"
+description = "Dial titles, value readouts, meter captions (UNDER EXPOSED / OVER EXPOSED), and primary controls meet sufficient contrast against the dark chrome and photo preview."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "semantic_buttons_for_controls"
+description = "Steppers, mode switches, reset, help trigger, look packs, export actions, and preset actions are exposed as buttons (or equivalent interactive roles), not unlabeled clickable divs."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "reduced_motion_respected_for_lab"
+description = "With prefers-reduced-motion set, dial, meter, preview, histogram, help-panel, and list animations are removed or instant while every control remains operable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
-name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+name = "lab_controls_unreachable_by_keyboard"
+description = "A stepper, mode switch, help trigger, reset, light slider, export control, or preset control cannot be reached or activated via keyboard alone."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n2"
-name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+name = "help_focus_lost_on_close"
+description = "Closing the help panel leaves keyboard focus stranded or jumps to an unrelated control instead of returning to the trigger."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n3"
-name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+name = "validation_not_announced"
+description = "Preset or import validation errors are visual-only with no programmatic association or live-region announcement."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n10"
-name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+name = "export_controls_unlabeled"
+description = "Download PNG, Download JPEG, or edit-stack export/import controls lack accessible names identifying the action."
 type = "binary"
 negate = true
 weight = 1.0
@@ -213,7 +172,7 @@ weight = 1.0
 [[criterion]]
 id = "accessibility.catchall"
 name = "accessibility_catchall"
-description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant accessibility defect not covered by any other criterion in this file. If present, name the defect and cite evidence. If already covered, answer no."
 type = "binary"
 negate = true
 weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -63,157 +63,84 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+name = "delightful_challenge_moments"
+description = "Beyond the required Victory confetti, the challenge loop includes an extra delightful moment (for example a distinct Victory sting, streak flourish, or boss intro) that feels intentional"
 type = "binary"
-weight = 1.0
-
+weight = 0.5
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "advanced_map_or_chart_polish"
+description = "The quest map or weekly chart includes polish beyond the minimum (parallax sky, waypoint pulse, chart hover readout) that aids readability"
 type = "binary"
-weight = 1.0
-
+weight = 0.5
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+name = "guided_first_run_help"
+description = "A brief first-run tip or coachmark explains Log Reps or Challenge without blocking core play"
 type = "binary"
-weight = 1.0
-
+weight = 0.5
 [[criterion]]
 id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+name = "enhanced_heatmap_interaction"
+description = "Heat-map cells expose day totals on hover or focus beyond the minimum static grid"
 type = "binary"
-weight = 1.0
-
+weight = 0.5
 [[criterion]]
 id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+name = "keyboard_power_user_paths"
+description = "Power-user keyboard shortcuts (beyond Tab) accelerate Log Reps or mode switching without breaking mouse play"
 type = "binary"
-weight = 1.0
-
+weight = 0.5
 [[criterion]]
 id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+name = "preference_personalization_extra"
+description = "An optional preference (theme accent, reminder copy style, or chart density) personalizes the chrome beyond the required settings payload"
 type = "binary"
-weight = 1.0
-
+weight = 0.5
 [[criterion]]
 id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+name = "quest_narrative_flavor"
+description = "Zone unlock or boss copy carries light quest narrative flavor that stays consistent with RepQuest's fitness-quest identity"
 type = "binary"
-weight = 1.0
-
+weight = 0.5
 [[criterion]]
 id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+name = "export_preview_polish"
+description = "Export surfaces include a live preview pane of Quest Log JSON or CSV before download, updating as sets are logged"
 type = "binary"
-weight = 1.0
-
+weight = 0.5
 [[criterion]]
 id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+name = "genre_appropriate_extras"
+description = "A genre-appropriate extra (personal-best toast, weekly summary blurb, or difficulty tip) adds value without cluttering the first viewport"
 type = "binary"
-weight = 1.0
-
+weight = 0.5
 [[criterion]]
 id = "11.10"
 name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+description = "Overall execution shows competition-level craft: cohesive motion, clear competitive loop, and a useful export end state working together"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n1"
 name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+description = "The build meets only the thinnest literal checklist with no extra polish, guidance, or craft beyond a bare functional shell"
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
+name = "experience_is_generic_template"
+description = "The UI reads as a generic dashboard template with no RepQuest-specific quest identity, competitive loop, or export-centered end state"
 type = "binary"
 negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
-type = "binary"
-negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
-description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The implementation includes a meaningful, browser-observable innovation or polish beyond the written specification that improves the RepQuest experience and is NOT covered by any other criterion in this file. If present, name it and cite concrete evidence. If nothing beyond the spec is present, answer no."
 type = "binary"
 weight = 1.0

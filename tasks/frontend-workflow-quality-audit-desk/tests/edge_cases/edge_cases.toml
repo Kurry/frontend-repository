@@ -1,0 +1,219 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "empty_states_present"
+description = "Empty state UI renders where specified: the queue shows an empty state with Clear filters when filters match nothing, and the report appendix explains that audited records will appear there before any record is touched"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "all_forms_validate_inline"
+description = "The feedback form, fail-rationale field, escalation form, and resolution form all validate inline before submit, with per-field messages"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "errors_are_actionable"
+description = "Validation messages name the field and the rule — the 15-character rationale minimum and the 20-character findings and summary minimums — rather than only saying invalid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "actions_show_confirmation"
+description = "Visible confirmation follows actions: toasts after adding an entry, completing a run, escalating, resolving, and copying the report"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "simulated_async_shows_progress"
+description = "Simulated async work shows progress affordances: run steps advance visibly with statuses, the retry countdown ticks, and batch runs show task m of n"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "forms_support_cancel"
+description = "The escalation and resolution forms can be canceled, leaving the record's stage and data unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "guidance_available_for_non_obvious_controls"
+description = "Non-obvious surfaces carry in-app guidance: criterion guidance disclosures show guidance text, chart bars show tooltips on hover, and the rubric panel explains why toggles are disabled before the first run"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "controls_use_semantic_tags"
+description = "Buttons, inputs, selects, and labels use semantic elements rather than bare divs and spans"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "modal_supports_close_paths"
+description = "Modals and overlay forms close via their close control, Escape, and (where a scrim is shown) a background click"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "boundary_values_enforced_exactly"
+description = "Boundary validation is exact: a 14-character rationale is rejected and 15 accepted; a findings entry under 20 characters is rejected with a message naming the findings field and adds no entry"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n1"
+name = "empty_collection_has_no_feedback"
+description = "An empty result set (filters matching nothing, an untouched report appendix, an empty timeline filter) renders as a blank region with no explanatory feedback"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n2"
+name = "errors_only_reach_console"
+description = "A validation or runtime problem is surfaced only in the browser console, with nothing shown in the UI"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n3"
+name = "actions_lack_visible_feedback"
+description = "Submitting an entry, escalating, resolving, or copying the report silently succeeds or fails with no visible feedback"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n4"
+name = "stage_changing_actions_lack_guard"
+description = "Stage-changing actions (escalate, resolve, apply fixes) fire irreversibly from a single stray click with neither a form step nor a cancel path"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n5"
+name = "interactive_elements_use_nonsemantic_tags"
+description = "Interactive elements are built from non-semantic div or span tags without roles, so they are invisible to semantics-based interaction"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n6"
+name = "modal_not_keyboard_dismissible"
+description = "An open modal or overlay form cannot be dismissed with the keyboard"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n7"
+name = "validation_feedback_missing_or_delayed"
+description = "Validation feedback is missing, or appears only after a delay with no indication, so the user cannot tell why submit is blocked"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n8"
+name = "button_text_ambiguous_or_missing"
+description = "Buttons render with ambiguous or missing text (icon-only actions with no accessible name or label)"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n9"
+name = "slug_truncation_missing"
+description = "A task slug longer than 32 characters overflows or clips its queue cell instead of truncating with an ellipsis, or the detail view fails to show the full slug"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n10"
+name = "double_activation_duplicates_work"
+description = "Double-activating Run checks starts two runs, or double-activating a form submit appends two entries"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "edge_cases.catchall"
+name = "edge_cases_catchall"
+description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

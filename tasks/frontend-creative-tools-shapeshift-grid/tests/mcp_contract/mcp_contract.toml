@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,78 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "12.1"
-name = "mandated_modules_are_bound"
-description = "All contract-mandated modules are initialized and bound."
+name = "structured_editor_and_command_session_bound"
+description = "Contract modules structured-editor-v1 and command-session-v1 are initialized and bound (webmcp_session_info / webmcp_list_tools show tools for both editor and session prefixes)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.2"
-name = "handlers_match_visible_ui_logic"
-description = "Exposed tool handlers match visible UI command logic."
+name = "handlers_match_visible_ui"
+description = "Exposed editor and session tool handlers drive the same visible UI logic as on-page controls (grid-cell color updates, paint/erase mode switches, preview, and session start/stop/restart/trigger_demo)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.3"
-name = "only_documented_operations_exist"
-description = "Only documented operations and routes are available."
+name = "only_documented_editor_and_session_ops"
+description = "Only documented editor operations (select, update_property, switch_mode, preview) and session operations (start, stop, restart, trigger_demo) are available — no undeclared routes or modules."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.4"
-name = "contract_is_automation_exercisable"
-description = "The contract can be fully exercised via automation."
+name = "contract_exercisable_via_automation"
+description = "The contract can be fully exercised via webmcp_invoke_tool for editor select / update_property / switch_mode / preview and session start / stop / restart / trigger_demo against the bound values."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.5"
-name = "declared_entity_operations_work"
-description = "Entity operations declared in the contract, including create, update, delete, and reorder, all work."
+name = "editor_grid_cell_operations_work"
+description = "Editor operations select, update_property (color on grid-cell), switch_mode (paint / erase), and preview update the paint stage the same way as the visible toolbar and canvas controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.6"
-name = "form_flow_operations_are_bound"
-description = "Form submission validation, error, and cancel operations are clearly bound."
+name = "editor_modes_paint_and_erase"
+description = "Editor switch_mode is bound for paint and erase modes and matches the visible Color Brush / Eraser (or equivalent) tool selection on the toolbar."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.7"
-name = "queries_match_allowed_spec"
-description = "Query destinations and filters match the allowed specification."
+name = "session_ops_and_fill_demo_bound"
+description = "Session operations start, stop, restart, and trigger_demo are bound; trigger_demo exercises the declared fill-demo without inventing undeclared demos or destinations."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.8"
-name = "capabilities_stay_declared"
-description = "No extra or undeclared module routes or capabilities are exposed."
+name = "no_extra_undeclared_modules"
+description = "No extra modules, destinations, or operations beyond structured-editor-v1 / command-session-v1 and the declared Bindings (grid-cell, color, paint/erase, fill-demo) are exposed."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.9"
 name = "session_tool_and_invoke_apis_work"
-description = "Session info, tool list, and invocation are correctly surfaced."
+description = "webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool correctly surface session info, the tool list, and successful invocations for the bound editor and session tools."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.10"
 name = "mcp_initializes_without_harness_edits"
-description = "MCP initialization works without manual editing or test harness changes."
+description = "MCP initialization works from the app's own registration without manual editing or test harness changes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.n1"
 name = "mcp_tools_missing_or_noop"
-description = "MCP tooling is unbound, missing, or a no-op."
+description = "MCP tooling for structured-editor-v1 or command-session-v1 is unbound, missing, or a no-op."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n2"
 name = "handlers_diverge_from_ui_logic"
-description = "Handlers do not match UI logic because actions mismatch or state does not sync."
+description = "An editor or session tool handler updates a different cell/mode, applies a mismatched color, or leaves the paint stage out of sync with the invoked action."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n3"
 name = "undeclared_capabilities_exposed"
-description = "Undeclared destinations or entity operations are exposed."
+description = "Undeclared modules, destinations, or operations beyond the Bindings block (grid-cell / color / paint / erase / select / update_property / switch_mode / preview / start / stop / restart / trigger_demo / fill-demo) are exposed."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,15 +157,15 @@ weight = 1.0
 [[criterion]]
 id = "12.n4"
 name = "automation_cannot_exercise_contract"
-description = "The contract cannot be exercised from automation."
+description = "webmcp_invoke_tool cannot exercise bound editor select/update_property/switch_mode/preview or session start/stop/restart/trigger_demo operations."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n5"
-name = "validation_bypass_desyncs_state"
-description = "Validation bypasses lead to inconsistent MCP and UI state."
+name = "mcp_ui_state_desync"
+description = "Invoking an editor update_property or switch_mode leaves MCP-reported state inconsistent with the visible canvas tool/color (for example erase mode in UI while paint remains active)."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n6"
 name = "session_or_tool_api_errors"
-description = "The session or tool API returns errors or incomplete data."
+description = "webmcp_session_info or webmcp_list_tools returns errors or an incomplete tool list for the mandated modules."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +181,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n7"
 name = "mcp_relies_on_undocumented_hacks"
-description = "MCP relies on manual or undocumented test hacks."
+description = "MCP only works through manual or undocumented test hacks rather than the app's registered tool handlers."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n8"
 name = "required_contract_module_missing"
-description = "No module contract is implemented where one is declared required."
+description = "structured-editor-v1 or command-session-v1 is not implemented despite being declared required."
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,15 +197,15 @@ weight = 1.0
 [[criterion]]
 id = "12.n9"
 name = "mcp_is_stubbed_or_commented_out"
-description = "The MCP interface is commented out or only stubbed."
+description = "The MCP interface is commented out or only stubbed: listed tools leave the live SHAPESHIFT Grid Tool UI unchanged when invoked."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n10"
-name = "automated_contract_validation_fails"
-description = "The project fails automated MCP contract validation."
+name = "drag_paint_faked_via_webmcp"
+description = "WebMCP is used to fake success for the mechanics-excluded drag-paint / brush stroke geometry path instead of leaving continuous stroke painting Playwright-only."
 type = "binary"
 negate = true
 weight = 1.0

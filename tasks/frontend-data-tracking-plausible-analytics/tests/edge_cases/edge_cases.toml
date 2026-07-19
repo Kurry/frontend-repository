@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,110 +62,110 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_new_site_state"
+description = "A newly added site with no seeded traffic shows zero-value metric tiles and empty breakdown panels with an explanatory message, not leftover prior-site numbers"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "add_site_inline_validation_all_fields"
+description = "Inline validation appears on Add site for empty name, malformed domain, and missing timezone before submit"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "validation_messages_name_fields"
+description = "Validation and import errors name the specific field (domain, timezone, bounce-rate ceiling, or import) rather than only saying Invalid"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "export_copy_confirmation"
+description = "After Copy in the export drawer, a brief copied confirmation is visible"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "single_filter_no_stack"
+description = "Clicking a second breakdown row while a filter is active shows only one filter pill (the latest), never stacked filters"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "undo_available_after_mutation"
+description = "After add site, apply/clear filter, ceiling change, or compare toggle, Undo is enabled and reverses that action"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "ceiling_bounds_help"
+description = "The bounce-rate ceiling control communicates the 0 through 100 bound via validation when out of range"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "semantic_controls"
+description = "Breakdown rows, Export report, Undo, Redo, and Compare previous use semantic button or equivalent operable controls with accessible names"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "dialogs_close_on_escape"
+description = "Add site and the export drawer close on Escape and via an explicit close control"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "empty_breakdown_csv_header_only"
+description = "When panels are empty for a new site, Breakdown CSV still compiles with the header line dimension,name,visitors and no stale prior-site data lines"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_site_no_feedback"
+description = "An empty newly added site shows a blank main region with no zero tiles and no empty-state message"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "errors_only_in_console"
+description = "Add site, ceiling, or import errors appear only in the browser console with no inline UI message"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "silent_failed_import"
+description = "Import of malformed Stats JSON silently fails with no visible feedback and no unchanged-state guarantee"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "undo_missing_after_add_site"
+description = "After adding a site there is no Undo control or Undo does nothing"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "nonsemantic_filter_rows"
+description = "Breakdown filter rows are non-semantic div or span elements without button/role semantics"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,39 +173,39 @@ weight = 1.0
 [[criterion]]
 id = "4.n6"
 name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+description = "Add site or export drawer cannot be dismissed via Escape"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "validation_missing_or_delayed"
+description = "Invalid domain or timezone input reaches a successful submit with no inline field message, or the only feedback appears after a site was already added"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "ambiguous_export_actions"
+description = "Export drawer Copy or Download labels are missing or generic (e.g. only Submit) so the action is unclear"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "stacked_filters_allowed"
+description = "Two filter pills remain visible at once after clicking a second breakdown row"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "ceiling_oob_still_applies"
+description = "A bounce-rate ceiling outside 0 through 100 still applies and toggles High bounce without inline validation"
 type = "binary"
 negate = true
 weight = 1.0
@@ -217,3 +217,4 @@ description = "The app exhibits a significant, browser-observable defect in edge
 type = "binary"
 negate = true
 weight = 1.0
+

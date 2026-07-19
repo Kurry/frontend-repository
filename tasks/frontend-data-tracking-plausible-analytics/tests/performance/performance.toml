@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,150 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "9.1"
-name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+name = "interactive_within_two_seconds"
+description = "The dashboard is interactive within 2 seconds of a local cold load"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
-name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+name = "console_clean_on_load"
+description = "No console errors, warnings, or hydration mismatch messages appear on load"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
-name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+name = "console_clean_during_exercise"
+description = "No console errors or warnings appear during a full exercise including export drawer open and format tab switches"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.4"
-name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+name = "rapid_filter_responsive"
+description = "Rapid repeated filter, sort, site, theme, compare, and ceiling changes stay responsive with no hangs"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.5"
-name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+name = "no_post_hydration_flash"
+description = "After first paint there is no post-hydration content flash: the shell does not visibly re-render or shift as the app becomes interactive"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.6"
-name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+name = "export_preview_regenerates_smoothly"
+description = "Opening the export drawer and switching between Stats JSON and Breakdown CSV regenerates the preview without freezing the UI"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
-name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+name = "direct_url_full_shell"
+description = "Loading the served URL directly always renders the full dashboard shell promptly"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.8"
-name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+name = "import_does_not_freeze"
+description = "Importing a Stats JSON report completes without freezing the UI for multiple seconds"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+name = "theme_switch_responsive"
+description = "Theme toggle recolors surfaces without multi-second jank"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+name = "add_site_submit_responsive"
+description = "Add site submit updates the selector without a multi-second hang"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.n1"
-name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+name = "cold_load_over_two_seconds"
+description = "The dashboard is not interactive within 2 seconds of a local cold load"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n2"
-name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+name = "console_errors_on_load"
+description = "Console errors or hydration mismatches appear on load"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n3"
-name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+name = "export_tab_switch_freezes"
+description = "Switching between Stats JSON and Breakdown CSV freezes the UI"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n4"
-name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
+name = "rapid_input_drops_interactions"
+description = "Rapid filter or ceiling changes drop interactions or leave stale panels"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n5"
-name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+name = "hydration_content_flash"
+description = "A visible post-hydration content flash replaces placeholder content after first paint"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n6"
-name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
+name = "import_hangs"
+description = "Import hangs the UI indefinitely or for many seconds without feedback"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n7"
-name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
+name = "theme_toggle_jank"
+description = "Theme toggle causes multi-second jank or blank frames"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n8"
-name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
+name = "chart_recompute_hangs"
+description = "Recomputing the trend chart after a filter hangs the UI"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n9"
-name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
+name = "memory_leak_repeated_export"
+description = "Repeatedly opening and closing the export drawer degrades interaction until the tab is unusable within a short exercise"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n10"
-name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+name = "selector_open_jank"
+description = "Opening site or date-range selectors hitch for multiple seconds"
 type = "binary"
 negate = true
 weight = 1.0
@@ -213,7 +213,8 @@ weight = 1.0
 [[criterion]]
 id = "performance.catchall"
 name = "performance_catchall"
-description = "The app exhibits a significant, browser-observable defect in performance or stability that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable performance defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0
+

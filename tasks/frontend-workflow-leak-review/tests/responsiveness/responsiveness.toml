@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "7.1"
 name = "layout_adapts_desktop_to_mobile"
-description = "Layout adapts gracefully from 1440px desktop to 375px mobile."
+description = "At 1440px the evidence panes render side by side; at 768px and below they stack; at 375px no page-level horizontal scrolling appears and the queue table scrolls in its own container if needed."
 type = "binary"
 weight = 1.0
 
@@ -84,7 +84,7 @@ weight = 1.0
 [[criterion]]
 id = "7.4"
 name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+description = "At 375px width no content clips or overflows the viewport and no page-level horizontal scrolling appears."
 type = "binary"
 weight = 1.0
 

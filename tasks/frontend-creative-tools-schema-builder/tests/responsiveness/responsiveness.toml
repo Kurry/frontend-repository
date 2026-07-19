@@ -1,0 +1,219 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "7.1"
+name = "layout_adapts_desktop_to_mobile"
+description = "The sidebar-tree-panes layout adapts gracefully from 1440px desktop to 375px mobile without breaking the editor, playground, or version surfaces"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.2"
+name = "mobile_tap_targets_are_large_enough"
+description = "At mobile width, tree-row toggles, chevrons, checkboxes, and tab headers are tap targets of at least 44px"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.3"
+name = "typography_resizes_across_breakpoints"
+description = "Tree rows, badges, code surfaces, and body text resize appropriately between desktop and mobile and remain readable at both"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.4"
+name = "content_avoids_clipping_and_overflow"
+description = "No tree row, panel, tab strip, or code surface clips or overflows the viewport at any width between 1440px and 375px"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.5"
+name = "chrome_adapts_below_768"
+description = "At widths of 768 pixels and below the sidebar collapses behind a toggle that opens it as an overlay and the right panes stack below the tree as full-width tabs; at desktop widths all three regions are visible together"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.6"
+name = "stacking_reflows_logically"
+description = "At narrow widths the regions stack in a logical order — tree first, then the panes — with the configuration panel reachable as an overlay rather than interleaving arbitrarily"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.7"
+name = "deep_nesting_stays_usable"
+description = "Deeply nested tree levels remain readable and operable at narrow widths — indentation compresses or scrolls within the tree container rather than pushing rows off screen"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.8"
+name = "small_screens_avoid_horizontal_scroll"
+description = "At 375px width there is no page-level horizontal scrolling anywhere in the app"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.9"
+name = "code_surfaces_scroll_contained"
+description = "The compiled text, example payload, and report surfaces scroll within their own containers at every width"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.10"
+name = "fixed_controls_remain_accessible"
+description = "Undo/redo, the history slider, and the run controls remain reachable at every viewport size"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.n1"
+name = "layout_breaks_at_breakpoints"
+description = "The layout breaks or overflows at a common breakpoint (1440, 1024, 768, or 375 pixels)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "7.n2"
+name = "mobile_controls_too_small_or_misaligned"
+description = "Controls are too small to tap or visibly misaligned at mobile width"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "7.n3"
+name = "text_too_small_on_devices"
+description = "Tree, badge, or code text becomes too small to read at some viewport size"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "7.n4"
+name = "content_cropped_or_unnecessary_scrollbars"
+description = "Content is cropped or unnecessary scrollbars appear at some width"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "7.n5"
+name = "sidebar_or_panel_breaks_by_width"
+description = "The collapsed sidebar toggle or the overlay configuration panel is missing or nonfunctional at some width"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "7.n6"
+name = "fixed_positions_obscure_content"
+description = "A fixed element (action bar, toasts, panel) obscures tree rows or controls at some viewport size"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "7.n7"
+name = "elements_overlap_at_some_size"
+description = "Tree rows, badges, panels, or tabs overlap each other at some viewport size"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "7.n8"
+name = "drag_unusable_at_some_width"
+description = "Drag reordering becomes impossible at some viewport width with no alternative reordering path"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "7.n9"
+name = "fixed_size_media_overflows"
+description = "A fixed-size pane or code surface overflows the viewport instead of sizing responsively"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "7.n10"
+name = "controls_disappear_at_sizes"
+description = "A specified control (Add Field, Run validation, Save version, the tabs) disappears entirely at some viewport size with no alternative access"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "responsiveness.catchall"
+name = "responsiveness_catchall"
+description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

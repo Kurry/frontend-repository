@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,67 +63,76 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "3.1"
 name = "hover_feedback_required"
-description = "Hovering with the real pointer (verify computed styles while hovering): buttons ease background/shadow with a slight press effect, cards lift subtly, toolbar controls and menu rows take a visible hover wash, and form controls show focus rings"
+description = "Hovering with the real pointer (verify computed styles while hovering): buttons ease background and shadow with a slight press effect; cards lift subtly; toolbar controls and menu rows take a visible hover wash; form controls show focus rings"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.2"
 name = "drop_settle_transition"
 description = "After a real pointer drag, the dropped card settles into its new position with a transition of roughly 200 milliseconds rather than snapping, and surrounding cards in both columns animate to their new positions"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.3"
 name = "keyboard_move_animates"
-description = "Moving a card via its keyboard move control (not a drag) animates the card to its destination with the same settle motion as a drop, rather than teleporting instantly"
+description = "Moving a card via its keyboard move control (not a drag and not a WebMCP shortcut) animates the card to its destination with the same settle motion as a drag"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.4"
 name = "create_card_animates_in"
 description = "Submitting the Add Card form makes the new card animate in from opacity 0 over roughly 150 milliseconds at the top of its column"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.5"
-name = "modal_and_panel_transitions"
-description = "The create and detail modals enter and exit with a short opacity/scale transition of roughly 200 to 300 milliseconds, and the prompt side panel slides in from the edge and slides out on close"
+name = "modal_panel_and_export_transitions"
+description = "Create and detail modals enter and exit with a short opacity/scale transition of roughly 200 to 300 milliseconds; the prompt side panel slides in/out; the Export drawer and bulk action bar enter and exit with a short opacity transition of roughly 150 to 250 milliseconds"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.6"
 name = "subitem_tick_animation"
-description = "During a real Run triggered from the card's Run control, each sub-item completion animates its check state (tick or fill transition) and the card's progress indicator animates its increment rather than flipping instantly; status chip changes transition their color rather than hard-swapping and the retry backoff countdown visibly ticks down once per second"
+description = "During a real Run triggered from the card Run control, each sub-item completion animates its check state rather than flipping instantly, and the card progress indicator animates its increment"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.8"
 name = "toasts_slide_and_dismiss"
-description = "Feedback toasts after create, save, and failed runs slide in, remain readable, and auto-dismiss with a fade"
+description = "Feedback toasts after create, save, failed runs, copy export, and successful import slide in, remain readable, and auto-dismiss with a fade"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.9"
 name = "reduced_motion_respected"
 description = "With prefers-reduced-motion set, card movements, modal transitions, and check animations apply instantly while all state changes and countdown text still occur"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.10"
 name = "no_transition_snapping"
-description = "Card drops, column reflows, or modal open/close snap instantly with no transition anywhere in the app under default motion settings"
+description = "Card drops, column reflows, modal open/close, or Export drawer open/close snap instantly with no transition while prefers-reduced-motion is unset"
 type = "binary"
 weight = 1.0
 negate = true
-
+[[criterion]]
+id = "3.11"
+name = "wip_breach_fades_in"
+description = "When a column crosses its WIP limit via a real move or create, the amber breach background fades in rather than hard-swapping"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "3.12"
+name = "status_chip_color_transitions"
+description = "Status chip changes (pending to running, running to complete, retrying to failed) transition their color rather than hard-swapping, observed during a real Run"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "3.13"
+name = "backoff_countdown_ticks"
+description = "On the seeded failing card during a real Run, the retry backoff countdown visibly ticks down once per second until the next attempt starts"
+type = "binary"
+weight = 1.0
 [[criterion]]
 id = "3.catchall"
 name = "motion_catchall"

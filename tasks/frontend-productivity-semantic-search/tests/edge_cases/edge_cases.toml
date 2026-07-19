@@ -1,0 +1,219 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "no_match_empty_state_present"
+description = "A query that matches nothing even by keyword renders a designed empty state explaining that no documents matched and suggesting removing filters or lowering the threshold, with a working recovery control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "forms_validate_inline_before_submit"
+description = "The Save search and Add document forms validate inline before submit — required-field errors name the field, and the submit controls stay disabled until the form is valid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "errors_are_actionable"
+description = "Error and notice copy is actionable: the unknown-token notice names the unmatched value, the duplicate saved-search message names the conflict, and the failed-step summary explains what failed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "actions_show_confirmation"
+description = "Saving a search, copying a report, deleting entries, and completing a re-index each produce visible success feedback (toast or inline confirmation)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "simulated_work_shows_progress"
+description = "The simulated re-index shows live progress affordances — per-step statuses, the M/N status bar, and the backoff countdown — rather than an unexplained wait"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "destructive_actions_guarded_and_undoable"
+description = "Destructive actions are guarded and recoverable: single and bulk deletions require confirmation naming the scope, and document deletions can be reverted via Undo"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "syntax_and_shortcuts_discoverable"
+description = "Non-obvious features are discoverable in-app: the search syntax (tag:, type:, before:) and the Cmd+K shortcut are surfaced through placeholder text, hints, or tooltips"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "controls_use_semantic_tags"
+description = "Buttons, inputs, checkboxes, and the slider use semantic interactive elements with real labels rather than bare div or span wrappers"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "overlays_support_close_paths"
+description = "The export modal, save-search form, and command palette close via their close control, Escape, and (for modals) a background click"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "boundary_values_handled"
+description = "Boundary inputs behave: threshold at exactly 0.0 shows all results and at 1.0 hides all but perfect scores, a title longer than 80 characters truncates with an ellipsis on the card and shows in full in the panel, and undo/redo at empty stacks are disabled"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n1"
+name = "empty_regions_render_blank"
+description = "An empty results list, empty history, empty saved list, or empty compare selection renders as a blank region with no explanatory feedback"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.n2"
+name = "errors_only_reach_console"
+description = "A failure (invalid form, failed ingest step, invalid token) is surfaced only in the browser console with no visible UI feedback"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.n3"
+name = "actions_lack_visible_feedback"
+description = "Copy, save, delete, or feedback actions complete silently with no visible confirmation or state change"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.n4"
+name = "destructive_actions_lack_warning"
+description = "A single or bulk deletion executes immediately with no confirmation step"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.n5"
+name = "interactive_elements_use_nonsemantic_tags"
+description = "Interactive affordances (cards, chips, feedback controls, palette rows) are plain div or span elements with no role, keyboard handling, or label"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.n6"
+name = "modal_not_keyboard_dismissible"
+description = "The export modal, palette, or a confirmation dialog cannot be dismissed with the keyboard"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.n7"
+name = "validation_feedback_missing_or_delayed"
+description = "Form validation feedback is missing, or appears only after a successful-looking submit with no inline indication"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.n8"
+name = "button_text_ambiguous_or_missing"
+description = "Buttons render with ambiguous or missing text (icon-only destructive actions with no accessible name, or generic labels where the action is specific)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.n9"
+name = "double_activation_duplicates_effects"
+description = "Double-activating Search, Save search, Add document, or Index Now produces duplicated entries or overlapping runs"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.n10"
+name = "affordances_hidden_or_inaccessible"
+description = "A specified affordance (Reset Feedback, bulk action bar, breadcrumbs, the unknown-token notice) is visually hidden or unreachable in practice"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "edge_cases.catchall"
+name = "edge_cases_catchall"
+description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

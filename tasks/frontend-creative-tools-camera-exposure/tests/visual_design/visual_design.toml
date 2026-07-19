@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,101 +62,95 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
-description = "Full-viewport lab composition with overlaid dials and a dense presets list/panel remains tool-like"
+name = "full_viewport_lab_composition"
+description = "The first viewport reads as one full-viewport lab composition: edge-to-edge photo preview behind overlaid dials, not a dashboard card grid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
-description = "Empty presets state is visually present when the collection is empty"
+name = "condensed_display_type_dark_chrome"
+description = "Condensed display UI type (Oswald/Bebas-style) with dark chrome dials, white values, and red accent on help trigger and meter emphasis is visible."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
-description = "Replaces the lab with a marketing card grid and no live exposure preview"
+name = "three_circular_dials_and_meter"
+description = "Three circular dial controls titled APERTURE / SPEED / ISO with up/down chevron steppers and large value readouts are present; vertical exposure meter on the left shows UNDER EXPOSED / OVER EXPOSED captions."
 type = "binary"
 weight = 1.0
-negate = true
 
 [[criterion]]
 id = "3.4"
-name = "condensed_display_type_dark_chrome_red_accent"
-description = "The UI uses a condensed display typeface (Oswald / Bebas-style) for dial titles and readouts, dark chrome dials with white values, and a red accent on the help trigger and meter emphasis"
+name = "ev_histogram_sliders_in_chrome"
+description = "EV readout, live histogram, Contrast/Highlights/Shadows sliders, look-pack chips, Before/After, Snapshots strip, Undo/Redo, and export controls sit in the lab chrome without breaking the overlaid dial composition."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "dial_and_meter_anatomy_matches_reference"
-description = "Three circular dial controls titled APERTURE / SPEED / ISO each show up/down chevron steppers and a large value readout (f/16, 1/60, 100 at defaults), and a vertical exposure meter sits on the left with UNDER EXPOSED / OVER EXPOSED end captions and a centered rest marker"
+name = "help_glyph_badge"
+description = "Help trigger is a compact glyph badge showing ? that reads X while the panel is open."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.6"
-name = "presets_mode_dense_list_with_badges"
-description = "Presets/Compare mode presents the looks as a dense list or strip where each entry shows a name, a stop readout, and favorite/tag badges"
+name = "presets_dense_list_not_cards"
+description = "Presets/Compare mode uses a dense list or strip of looks with name, stop readout, and favorite/tag badges — not a marketing card grid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.7"
-name = "inert_brand_chip_label"
-description = "A small red-tinted, uppercase, bottom-centered brand chip reads 'Camera Exposure Simulator' as inert styled text (clicking it navigates nowhere), and no marketing sections or competing hero cards appear"
+name = "motion_stack_local_imagery"
+description = "The preview shows a motion stack of local frames plus depth plate and tiled noise overlay from local assets."
 type = "binary"
-weight = 0.5
+weight = 1.0
 
 [[criterion]]
 id = "3.8"
-name = "component_state_treatments_distinct"
-description = "Steppers, buttons, and form fields show distinct default, hover, focus (visible ring), disabled, and error treatments"
+name = "brand_chip_bottom_centered"
+description = "An inert brand chip reading Camera Exposure Simulator appears as a small red-tinted uppercase bottom-centered label."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.9"
-name = "mobile_375_layout_operable_no_overflow"
-description = "At 375px width the preview stays edge-to-edge, the dials and meter remain visible and operable, no content clips or produces horizontal scrolling, and a separate mobile help trigger opens the same help panel content"
+name = "component_state_treatments"
+description = "Steppers, buttons, sliders, and form fields show distinct default, hover, focus (visible ring), disabled, and error treatments."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.10"
-name = "desktop_1440_matches_reference_composition"
-description = "At 1440px width the layout matches the reference composition: exposure meter on the left, dials overlaid on the photo preview, and the help trigger in its corner position"
+id = "3.n1"
+name = "dashboard_card_grid_layout"
+description = "The lab is presented as a dashboard of equal-weight cards that breaks the full-viewport overlaid composition."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "3.11"
-name = "copy_consistent_case_specific_verbs"
-description = "Dial titles, meter captions, and mode labels keep one consistent uppercase convention; buttons use specific verbs such as 'Apply preset' and 'Reset'; and the three help explainer paragraphs are distinct, plain-language explanations of aperture, shutter speed, and ISO"
-type = "binary"
-weight = 0.5
-
-[[criterion]]
-id = "3.12"
-name = "placeholder_or_filler_text_shipped"
-description = "Placeholder or filler text (lorem ipsum, 'TODO', template variable names, or obviously duplicated explainer paragraphs) is visible anywhere in the shipped UI"
-type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
-id = "3.13"
-name = "messages_name_problem_and_fix"
-description = "Validation and empty-state messages name the problem and the fix (e.g. the empty presets state explains that no presets exist and how to create one)"
+id = "3.n2"
+name = "missing_dial_or_meter_chrome"
+description = "One or more of the three titled dials or the vertical exposure meter with UNDER/OVER captions is missing from Meter/Lab."
 type = "binary"
-weight = 0.5
+negate = true
+weight = 1.0
 
 [[criterion]]
-id = "3.catchall"
+id = "3.n3"
+name = "marketing_hero_competes"
+description = "Marketing sections or competing hero cards crowd out the edge-to-edge photo preview lab."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "visual_design.catchall"
 name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant visual-design defect not covered by any other criterion in this file. If present, name the defect and cite evidence. If already covered, answer no."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0

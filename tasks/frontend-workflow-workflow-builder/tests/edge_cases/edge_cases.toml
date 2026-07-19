@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,134 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_canvas_run_message"
+description = "Pressing Run with an empty canvas (all nodes deleted) shows a visible message that there is nothing to run and starts no execution"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "delete_node_removes_edges"
+description = "Deleting a node that has edges removes those edges in the same interaction; the edge count visibly drops"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "run_pause_resume_availability"
+description = "The Run control is disabled while a run is already in progress; Pause is only available during a run and Resume only while paused"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "save_empty_name_validation"
+description = "Saving a workflow with an empty name shows an inline validation message naming the name field and stores nothing"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "timeline_entry_deleted_node_inert"
+description = "Selecting a timeline entry whose node was deleted after the run shows the entry as inert (no crash, no dangling highlight)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "undo_redo_empty_stacks_disabled"
+description = "Undo with an empty stack and Redo with an empty redo stack are disabled and produce no console errors"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "import_malformed_rejects"
+description = "Import with malformed JSON or a payload missing required keys shows an inline message naming the problem and leaves the canvas unchanged"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "artifact_empty_canvas_state"
+description = "Opening the Artifact panel with an empty canvas shows an empty-state line naming how to add nodes from the palette (or disables Download with a visible reason) — never a blank crash"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "copy_exports_visible_text"
+description = "Copying the export mid-edit copies exactly the text currently visible in the preview block"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "timeout_out_of_bounds_named"
+description = "Entering timeout_seconds outside 1–300 on an Agent node shows an inline message naming timeout_seconds and keeps Save disabled"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "double_run_starts_two_executions"
+description = "Double-activating Run starts two overlapping executions with duplicate rollup sequences or interleaved timeline chaos"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "import_accepts_invalid_type_enum"
+description = "Import accepts a node type outside prompt|agent|eval|condition|output and still mutates the canvas"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "empty_name_silently_saves"
+description = "Saving with an empty workflow name stores an entry in Saved Workflows with no validation feedback"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "pause_available_when_idle"
+description = "Pause is clickable and appears active while no run is in progress"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "delete_leaves_orphan_edges"
+description = "Deleting a connected node leaves orphan edges pointing at missing nodes"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "validation_says_only_invalid"
+description = "Configuration or import validation shows only a generic Invalid message with no field name"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "undo_during_run_scrambles_badges"
+description = "Activating Undo during an in-progress run rewinds execution badges or scrambles the rollup"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "multi_select_delete_noops"
+description = "Delete selected with two nodes multi-selected leaves both nodes on the canvas"
 type = "binary"
 negate = true
 weight = 1.0
@@ -213,7 +197,7 @@ weight = 1.0
 [[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable edge-case or recovery defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

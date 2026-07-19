@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,154 +62,134 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "spacing_and_sizing_follow_scale"
-description = "Spacing and sizing follow the design system's scale, with no arbitrary one-off values visible in computed styles."
+name = "column_tiles_match_spec"
+description = "Columns render as fixed-width tiles in a horizontal board scroller with internally scrollable card lists, matching the visual_design layout contract"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.2"
-name = "typography_matches_spec"
-description = "Typography matches the spec for all headings and body copy."
+name = "typography_hierarchy_matches_spec"
+description = "Board title is larger than column headers, which are larger than card titles, which are larger than metadata text"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.3"
-name = "layout_matches_reference"
-description = "Layout matches reference screenshots to within a small tolerance at all specified breakpoints; fidelity tasks achieve near pixel-parity."
+name = "accent_borders_match_columns"
+description = "Card left accent borders match the column color coding — gray Backlog, blue In Progress, yellow Review, green Done — and update when a card moves"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.4"
-name = "specified_state_changes_animate"
-description = "Transitions or animations are applied to the state changes the spec calls out, such as add, delete, filter, or view switch."
+name = "specified_motions_present"
+description = "Drop settle (~200ms), create fade-in (~150ms), modal enter/exit, and status chip color transitions are present for the state changes the instruction calls out"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.5"
-name = "responsive_behavior_matches_reference"
-description = "Responsive behavior matches reference patterns."
+name = "responsive_board_matches_spec"
+description = "At 768px and 375px the toolbar stacking and board-internal horizontal scroll behave as specified in responsiveness"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.6"
-name = "control_styling_matches_spec"
-description = "Button and form radii, padding, and shadows conform to the spec."
+name = "controls_match_carbon_chrome"
+description = "Buttons, selects, tags, and modals show designed Carbon-style chrome rather than bare browser defaults"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.7"
-name = "typography_has_clear_hierarchy"
-description = "Typography has a clear hierarchy that distinguishes section and body text."
+name = "count_and_wip_badges_styled"
+description = "Column count badges and WIP/breach labels read as compact designed tags adjacent to column names"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.8"
 name = "component_states_match_spec"
-description = "Component states (default, hover, active, disabled) match the spec where specified."
+description = "Buttons and inputs show distinct default, hover, focus ring, disabled, and error treatments as specified"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.9"
-name = "surface_treatments_match_spec"
-description = "Color, depth, and border treatments are precise per the design."
+name = "export_drawer_matches_spec"
+description = "Export drawer shows format tabs, monospaced preview, and Copy/Download/Import actions as a coherent designed surface"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.10"
-name = "microinteractions_match_spec"
-description = "Microinteraction feedback for hover and press follows the spec in duration and motion."
+name = "drag_ghost_matches_spec"
+description = "During drag, raised shadow and ghost placeholder match the specified insertion affordance"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.n1"
-name = "sizing_or_spacing_contradicts_scale"
-description = "Visible sizing or spacing values contradict the specified scale."
+name = "columns_not_fixed_width_tiles"
+description = "Columns stretch unboundedly or fail to scroll internally, contradicting the fixed-width tile spec"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "3.n2"
-name = "colors_fall_outside_palette"
-description = "Colors appear outside the specified palette."
+name = "accent_colors_wrong"
+description = "Card accent borders use colors outside the gray/blue/yellow/green column mapping"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "3.n3"
-name = "sizing_mismatches_spec"
-description = "Sizing mismatches the spec."
+name = "typography_flat_hierarchy"
+description = "Board title, column headers, and card titles are visually indistinguishable in size/weight"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "3.n4"
-name = "required_animations_missing_or_wrong"
-description = "Animations are missing or incorrect where the spec requires them."
+name = "required_motions_missing"
+description = "Drop settle, create enter, or modal transitions are missing where specified"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "3.n5"
-name = "specified_controls_use_browser_defaults"
-description = "Form or button controls use browser default styles when the spec styles them."
+name = "browser_default_controls"
+description = "Primary buttons, selects, or inputs use bare browser default styles"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "3.n6"
-name = "layout_misaligned_at_breakpoints"
-description = "The grid or layout is misaligned at reference breakpoints."
+name = "layout_breaks_vs_spec"
+description = "At specified breakpoints the board layout contradicts the responsiveness contract"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "3.n7"
-name = "elements_are_clipped_or_offscreen"
-description = "Elements render off-screen or clipped."
+name = "export_drawer_undesigned"
+description = "Export is an unstyled dump without tabs/preview/actions described in visual_design"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "3.n8"
-name = "structure_deviates_from_reference"
-description = "Section order, content, or structure deviates from the reference on fidelity tasks."
+name = "mixed_icon_styles"
+description = "Prompt, move, run, and toolbar icons mix inconsistent icon styles"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "3.n9"
-name = "heading_and_body_text_undifferentiated"
-description = "Heading and body text have no distinction."
+name = "status_palette_inconsistent"
+description = "Status chip colors are inconsistent across card and detail views"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "3.n10"
-name = "microinteractions_deviate_from_reference"
-description = "Microinteractions are missing or deviate from the provided reference."
+name = "wip_breach_unstyled"
+description = "WIP breach has no deep amber treatment or visible breach label when count exceeds 3"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "design_fidelity.catchall"
 name = "design_fidelity_catchall"

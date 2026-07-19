@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,86 +62,93 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "keyboard_operable_archive_controls"
+description = "Every interactive control — view toggles, period filter, name sort, vision simulation, undo/redo, selection checkboxes, batch actions, swatches, favorite flags, editor fields, export controls, and popup controls — is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space), each showing a visible focus indicator when focused."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "editor_export_popup_focus_trap"
+description = "The Detail/Editor panel, Export drawer, batch-delete confirmation, and the subscribe popup use dialog semantics: focus moves into them on open, stays trapped while open, and returns to the invoking control on close."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "chrome_icons_have_accessible_names"
+description = "Icon-only chrome controls (MENU, CART, favorite flags, undo/redo, and similar) expose descriptive accessible names or labels so assistive technology can identify them."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "swatch_and_export_copy_announced_live"
+description = "Copying a swatch's hex and copying export preview text announce the confirmation through an aria-live polite region in addition to the visible label."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+name = "editor_subscribe_import_fields_labeled"
+description = "Every palette create/edit field (name, artist, period, swatches), the subscribe email field, and the archive import field uses an explicit label element associated with the control."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
 name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+description = "Archive headings (editorial intro through library sections and export) follow a logical order with no skips such as H1 jumping directly to H3."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "landmarks_present"
+description = "The page exposes semantic landmarks (for example main for the library and complementary/dialog for Detail/Editor, Export, or subscribe) so assistive technology can navigate the chrome."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+name = "auto_contrast_swatch_labels"
+description = "Auto-contrast swatch labels keep legible contrast against every swatch color, including very light and very dark swatches, and chrome text meets sufficient contrast on the cream field."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "semantic_roles_for_controls"
+description = "View toggles, period filter, name sort, favorite flags, batch actions, and primary actions use semantic HTML roles such as button, and the page uses nav/main landmarks rather than unlabeled div soup for structure."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion set, scroll reveals and list animations are removed and state changes apply instantly while every feature (views, filter, sort, editor, export, copy, favorites, vision simulation) stays reachable — verified on a fresh load."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "contrast_matrix_not_color_only"
+description = "Contrast-matrix pass/fail marks include a text label such as Pass or Fail alongside any color cue — not color alone."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
 name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+description = "View toggles, period filter, name sort, vision simulation, undo/redo, selection checkboxes, batch actions, swatches, favorite flags, editor fields, export controls, or popup controls cannot be activated or reached via keyboard."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n2"
-name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+name = "focus_indicators_missing"
+description = "Focused interactive controls lack a visible focus indicator or the indicator is fully obscured."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,55 +156,55 @@ weight = 1.0
 [[criterion]]
 id = "1.n3"
 name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+description = "Custom view toggles, favorite flags, batch actions, or swatch buttons use non-semantic tags and lack ARIA roles or accessible names."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+name = "period_favorite_or_passfail_color_only"
+description = "Active period filter, favorite state, or contrast-matrix pass/fail is conveyed by color alone with no text, icon change, or other non-color cue."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "overlays_fail_to_trap_focus"
+description = "Detail/Editor, Export drawer, batch-delete confirmation, or the subscribe popup leaves keyboard focus outside the dialog or allows Tab to escape the overlay while open."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+name = "swatch_labels_unreadable_contrast"
+description = "Hex or historical-name labels on very light or very dark swatches are unreadable due to poor contrast."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+name = "copy_feedback_visual_only"
+description = "Swatch or export copy confirmation is visual only with no aria-live or equivalent announcement for assistive technology."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+name = "icon_controls_missing_names"
+description = "Icon-only MENU, CART, undo/redo, or favorite controls are missing accessible names."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+name = "heading_order_skipped"
+description = "Headings are skipped or unordered, such as jumping from H1 to H3 across the editorial intro and library."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +212,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n10"
 name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+description = "With prefers-reduced-motion set, scroll reveals or list enter/exit animations still play on a fresh load."
 type = "binary"
 negate = true
 weight = 1.0
@@ -217,3 +224,4 @@ description = "The app exhibits a significant, browser-observable defect in acce
 type = "binary"
 negate = true
 weight = 1.0
+

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,86 +62,86 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "12.1"
-name = "mandated_modules_are_bound"
-description = "All contract-mandated modules are initialized and bound."
+name = "mandated_modules_bound"
+description = "Contract modules command-session-v1, browse-query-v1, structured-editor-v1, and artifact-transfer-v1 are initialized and bound"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.2"
-name = "handlers_match_visible_ui_logic"
-description = "Exposed tool handlers match visible UI command logic."
+name = "handlers_match_visible_ui"
+description = "WebMCP session start/advance/restart, browse open to destinations, editor shared-note ops, and artifact export/import/copy invoke the same application logic as the visible Deal, panel, collaboration, and Export controls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.3"
-name = "only_documented_operations_exist"
-description = "Only documented operations and routes are available."
+name = "only_documented_ops_exist"
+description = "Only documented session operations, browse destinations (table, stats, hand-history, badges, export, collaboration), editor shared-note ops, and artifact operations export/import/copy with json / session-json are available"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.4"
-name = "contract_is_automation_exercisable"
-description = "The contract can be fully exercised via automation."
+name = "contract_automation_exercisable"
+description = "webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool can exercise the declared Feltrun contract without manual harness edits"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.5"
-name = "declared_entity_operations_work"
-description = "Entity operations declared in the contract, including create, update, delete, and reorder, all work."
+name = "session_ops_drive_table"
+description = "Declared session operations start, advance, restart, pause, and resume drive the same table lifecycle as the visible Deal / session controls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.6"
-name = "form_flow_operations_are_bound"
-description = "Form submission validation, error, and cancel operations are clearly bound."
+name = "artifact_export_import_bound"
+description = "artifact-transfer-v1 export (format json), import (mode session-json), and copy are bound and invoke the same Export panel handlers as the visible Copy/Download/Import controls (without returning raw file bytes in tool results)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.7"
-name = "queries_match_allowed_spec"
-description = "Query destinations and filters match the allowed specification."
+name = "browse_destinations_match"
+description = "browse open destinations match the allowed set: table, stats, hand-history, badges, export, collaboration"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.8"
-name = "capabilities_stay_declared"
-description = "No extra or undeclared module routes or capabilities are exposed."
+name = "no_undeclared_capabilities"
+description = "No extra undeclared modules, destinations, or artifact formats beyond the Feltrun contract bindings are exposed"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.9"
-name = "session_tool_and_invoke_apis_work"
-description = "Session info, tool list, and invocation are correctly surfaced."
+name = "session_tool_invoke_apis_work"
+description = "webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool succeed for the declared Feltrun tools"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.10"
-name = "mcp_initializes_without_harness_edits"
-description = "MCP initialization works without manual editing or test harness changes."
+name = "mcp_init_without_harness_edits"
+description = "MCP initialization works from the delivered app without manual editing of test harness files"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.n1"
 name = "mcp_tools_missing_or_noop"
-description = "MCP tooling is unbound, missing, or a no-op."
+description = "MCP tooling for session, browse, editor, or artifact-transfer is unbound, missing, or a no-op"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n2"
-name = "handlers_diverge_from_ui_logic"
-description = "Handlers do not match UI logic because actions mismatch or state does not sync."
+name = "handlers_diverge_from_ui"
+description = "A WebMCP session, browse, editor, or artifact invoke mutates state differently from the matching visible UI control"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,23 +149,23 @@ weight = 1.0
 [[criterion]]
 id = "12.n3"
 name = "undeclared_capabilities_exposed"
-description = "Undeclared destinations or entity operations are exposed."
+description = "Undeclared destinations, session operations, or artifact formats are exposed beyond the contract bindings"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n4"
-name = "automation_cannot_exercise_contract"
-description = "The contract cannot be exercised from automation."
+name = "automation_cannot_exercise"
+description = "The declared Feltrun contract cannot be exercised from automation via webmcp_list_tools / webmcp_invoke_tool"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n5"
-name = "validation_bypass_desyncs_state"
-description = "Validation bypasses lead to inconsistent MCP and UI state."
+name = "artifact_bypass_desyncs_export"
+description = "Invoking artifact export/import via WebMCP leaves the Export panel preview or table state desynced from the visible UI"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n6"
 name = "session_or_tool_api_errors"
-description = "The session or tool API returns errors or incomplete data."
+description = "webmcp_session_info or webmcp_list_tools returns errors or omits the mandated Feltrun modules"
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,23 +181,23 @@ weight = 1.0
 [[criterion]]
 id = "12.n7"
 name = "mcp_relies_on_undocumented_hacks"
-description = "MCP relies on manual or undocumented test hacks."
+description = "MCP relies on manual or undocumented test harness hacks to appear bound"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n8"
-name = "required_contract_module_missing"
-description = "No module contract is implemented where one is declared required."
+name = "required_module_missing"
+description = "command-session-v1, browse-query-v1, structured-editor-v1, or artifact-transfer-v1 is declared but not implemented"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n9"
-name = "mcp_is_stubbed_or_commented_out"
-description = "The MCP interface is commented out or only stubbed."
+name = "mcp_stubbed_or_commented_out"
+description = "The MCP interface is commented out or only stubbed"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n10"
 name = "automated_contract_validation_fails"
-description = "The project fails automated MCP contract validation."
+description = "The project fails automated MCP contract validation for the Feltrun assignment"
 type = "binary"
 negate = true
 weight = 1.0

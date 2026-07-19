@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -63,153 +63,52 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+name = "export_summary_strip"
+description = "Beyond the required export drawer, a structured export summary strip names event count and current year window above the preview"
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "undo_redo_keyboard_shortcuts"
+description = "Beyond the required Undo/Redo controls, keyboard shortcuts trigger Undo and Redo and are discoverable in the UI or About copy"
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+name = "activity_chip_last_mutation"
+description = "Beyond the required chrome, a compact activity chip shows the last mutating action (for example Created event or Batch delete) in a browser-observable way"
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+name = "polished_curator_microinteraction"
+description = "A polished curator microinteraction beyond the spec helps an operator trust the timeline artifact without replacing a required behavior"
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+name = "enhanced_era_or_density_affordance"
+description = "An extra era-band or density-strip affordance beyond the required tally improves scanning of the corpus"
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
-type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.n1"
 name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+description = "The timeline tool ships as a bare CRUD demo with no curator polish beyond the minimum required controls"
 type = "binary"
 negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
-type = "binary"
-negate = true
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "innovation.catchall"

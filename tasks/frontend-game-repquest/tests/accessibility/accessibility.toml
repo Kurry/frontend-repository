@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,158 +62,115 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "Canvas play is exempt from per-element semantics; menus, pause screens, and score readouts must be keyboard-reachable and announced. All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "controls_keyboard_accessible"
+description = "Every interactive control (tabs, form fields, buttons, toggles, Export/Import, Difficulty, Save Progress, Resume Saved Run) is reachable and operable with the keyboard alone, with a visible focus indicator"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "reset_dialog_focus_trap"
+description = "The Reset Quest confirmation dialog traps focus while open, closes on Escape, and returns focus to the Reset Quest control on close"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "icons_have_accessible_names"
+description = "Icon-only controls expose accessible names (aria-label or equivalent) so their purpose is available to assistive tech"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "notifications_aria_live"
+description = "Transient notification banners (zone unlocked, boss defeated, gear bought, quest reset, daily reminder, export/import feedback, Victory, Defeat) are announced through an aria-live region as well as shown visually"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.5"
 name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+description = "Log Reps, Settings (dailyGoal, reminderEnabled, reminderHour), and note fields use explicit labels associated with their inputs"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.6"
 name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+description = "Visible headings follow a logical order without skipping levels across Quest, History, Gear, and Settings"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "landmark_navigation_present"
+description = "Primary regions use landmark structure (main/nav or equivalent roles) so tabs and play surfaces are reachable by landmark navigation"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.8"
 name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+description = "Body text, totals, and primary controls maintain readable contrast against their backgrounds"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "canvas_labels_and_text_mirror"
+description = "Each canvas surface (quest map, weekly summary chart) carries an accessible label describing what it shows, and today's total, lifetime reps, and per-day totals are also available as visible text outside the canvas"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "victory_defeat_not_color_only"
+description = "Victory versus Defeat is distinguishable by text (the words Victory and Defeat), not by color alone"
 type = "binary"
 weight = 1.0
-
+[[criterion]]
+id = "1.11"
+name = "heatmap_has_text_summary"
+description = "The streak heat-map exposes a text summary of recent day totals or an accessible description so the pattern is not color-only"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "1.12"
+name = "reduced_motion_respected"
+description = "When prefers-reduced-motion is enabled, non-essential motion (confetti loops, attention pulses) is reduced or disabled while controls remain usable"
+type = "binary"
+weight = 1.0
 [[criterion]]
 id = "1.n1"
 name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+description = "A primary control cannot be reached or activated via keyboard"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "1.n2"
-name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+name = "focus_indicators_missing"
+description = "Focus indicators are missing or obscured on tabs or primary buttons"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "1.n3"
-name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+name = "state_uses_color_only"
+description = "Victory/Defeat, gear locked/unlocked, or heat-map day status uses color alone with no text or shape cue"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+name = "modals_fail_to_trap_focus"
+description = "The Reset Quest dialog leaves keyboard focus free to leave the dialog while open, or fails to restore focus to the Reset Quest control on close"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n7"
 name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+description = "Validation or import errors are visual only with no accessible name or live-region announcement path"
 type = "binary"
 negate = true
 weight = 1.0
-
-[[criterion]]
-id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n10"
-name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
-type = "binary"
-negate = true
-weight = 1.0
-
 [[criterion]]
 id = "accessibility.catchall"
 name = "accessibility_catchall"
-description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "A significant accessibility defect is present that is NOT covered by any other criterion in this file. If present, name it and cite concrete evidence. If already covered, answer no here."
 type = "binary"
 negate = true
 weight = 1.0

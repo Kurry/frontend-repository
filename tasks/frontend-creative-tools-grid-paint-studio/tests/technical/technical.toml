@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,21 +63,21 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.1"
 name = "coherent_board_and_gallery_state"
-description = "A board change made through painting, loading, saving, renaming, deleting, favoriting, or filtering is reflected immediately and consistently across the canvas, toolbar indicators, Gallery rows, thumbnails, counts, and active mode without reload"
+description = "A board change made through painting, filling, loading, saving, renaming, deleting, favoriting, filtering, bulk actions, import, or version snap is reflected immediately and consistently across the canvas, toolbar indicators, histogram, Gallery rows, Export center text, thumbnails, counts, and active mode without reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
 name = "in_memory_reload_rule"
-description = "After changing board cells, undo history, active tool, palette, saved boards, mode, favorite state, and filters, a fresh page load resets all facets coherently to the seeded in-memory baseline rather than retaining a partial mixture"
+description = "After changing board cells, undo/redo history, active tool, palette, mirror, vision, saved boards, versions, mode, favorite state, and filters, a fresh page load resets all facets coherently to the seeded in-memory baseline rather than retaining a partial mixture"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
 name = "forbidden_browser_storage"
-description = "After exercising painting, gallery CRUD, favorites, filters, and mode changes, localStorage, sessionStorage, IndexedDB, or another browser persistence store contains app board or UI state"
+description = "After exercising painting, gallery CRUD, favorites, filters, export/import, versions, and mode changes, localStorage, sessionStorage, IndexedDB, or another browser persistence store contains app board or UI state"
 type = "binary"
 weight = 1.0
 negate = true
@@ -85,123 +85,103 @@ negate = true
 [[criterion]]
 id = "2.4"
 name = "cross_surface_state_desync"
-description = "The same board datum shows conflicting values between the canvas, saved thumbnail, Gallery metadata, filters, count, or active selection during a normal interaction flow"
+description = "The same board datum shows conflicting values between the canvas, histogram, saved thumbnail, Gallery metadata, Export center Project JSON, filters, count, or active selection during a normal interaction flow"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "2.5"
-name = "stroke_batched_undo_history"
-description = "Each completed pointer stroke pushes exactly one undo step and Undo (or Backspace) reverts the whole most-recent stroke rather than a single cell"
+name = "stroke_batched_undo_redo_history"
+description = "Each completed pointer stroke, fill, or mirror-expanded write pushes exactly one undo step; Undo (or Backspace/Ctrl+Z) reverts the whole most-recent step; Redo restores it; a new paint after undo clears the redo stack"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.6"
 name = "undo_capacity_and_rapid_input"
-description = "After more than 100 short completed strokes, the app remains responsive, preserves a bounded history of approximately 100 steps, and repeated Undo never corrupts the remaining canvas or toolbar state"
+description = "After more than 100 short completed strokes, the app remains responsive, preserves a bounded history of approximately 100 undo steps, and repeated Undo never corrupts the remaining canvas or toolbar state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.7"
 name = "local_asset_and_qr_network_hygiene"
-description = "From a fresh load through QR painting, icons, dialogs, camera chrome, and animation interactions, the network log shows only same-origin app assets; QR glyph generation and the fixed studio payload cause no backend, CDN, font, icon, script, or image request"
+description = "From a fresh load through QR painting, icons, dialogs, camera chrome, command palette, and animation interactions, the network log shows only same-origin app assets; QR glyph generation and the fixed studio payload cause no backend, CDN, font, icon, script, or image request"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.8"
 name = "console_clean_full_flow"
-description = "No console errors or unhandled promise rejections appear from first load through paint/undo/clear, resolution, upload, camera cancel, Gallery CRUD/filter/load, toolbar drag, and download/share-fallback flows"
+description = "No console errors or unhandled promise rejections appear from first load through paint/fill/undo/redo/clear, resolution, upload, camera cancel, Gallery CRUD/bulk/filter/load, Export center copy/download, Import Project, toolbar drag, and share-fallback flows"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.9"
 name = "inline_form_validation_runtime"
-description = "Saved-board create and rename controls expose visible field-level validation before invalid submission can mutate the collection, and correcting the field clears the error and permits the change"
+description = "Saved-board create/rename (name uniqueness, max 40, closed-enum tag), version name (max 40), and Import Project error paths (including cells/cellSize cross-field mismatch) expose visible field-level validation before invalid submission can mutate collections, and correcting the field clears the error and permits the change"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.10"
 name = "keyboard_and_pointer_handler_parity"
-description = "For QR/Color/Eraser, grid toggle, Undo, and palette 1–7, invoking a keyboard shortcut and its corresponding visible toolbar control from equivalent starting states produces the same active indicator and canvas result"
+description = "For QR/Color/Flood Fill/Eraser, grid toggle, Mirror, Undo/Redo, palette 1–7, and Ctrl/Cmd+K, invoking a keyboard shortcut and its corresponding visible control from equivalent starting states produces the same active indicator and result"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.11"
 name = "large_grid_interaction_performance"
-description = "At the smallest allowed desktop cell size, continuous pointer painting, grid-overlay toggling, undo, and Gallery switching remain responsive with no visible freeze, skipped stroke segments, or stale canvas redraw"
+description = "At the smallest allowed desktop cell size, continuous pointer painting, flood fill, grid-overlay toggling, undo/redo, and Gallery/Export switching remain responsive with no visible freeze, skipped stroke segments, or stale canvas redraw"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.12"
-name = "external_runtime_dependency"
-description = "The app requires an outbound CDN, backend, or other external origin to obtain styling, QR output, icons, fonts, scripts, or product content, causing a missing or degraded interface when that request is blocked"
+name = "export_derives_from_live_store"
+description = "Export center Project JSON and CSS palette text recompile from the live shared session state: painting a cell or saving a board changes the visible export text without a reload"
 type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
 id = "2.13"
-name = "runtime_exception_or_broken_load"
-description = "A normal instructed interaction produces a console exception, blank canvas or Gallery, frozen control, or full-page navigation that breaks the editing session"
+name = "api_shaped_project_schema_coherence"
+description = "After a valid Save board, the gallery card's name, tag, and favorite match the corresponding boards entry in Export center Project JSON under the same SavedBoard field names (request-body shape); Import of that ProjectDocument restores the same name, tag, favorite, and cells without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n1"
+name = "partial_state_after_reload"
+description = "After a full interaction session, reload leaves some user mutations persisted while others reset, or seeded boards are missing while canvas art remains"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
-id = "2.14"
-name = "keyboard_reachability_and_focus_visible"
-description = "Every toolbar control, palette swatch, gallery action, and save/rename form field can be reached and operated with the keyboard alone (Tab/Shift+Tab plus Enter/Space), and the focused control always shows a visible focus indicator"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "2.15"
-name = "camera_overlay_focus_trap"
-description = "While the camera overlay is open, Tab keeps focus inside the overlay (modal focus trap), and closing it via Cancel or capture returns keyboard focus to the Camera button"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "2.16"
-name = "accessible_names_and_selected_state"
-description = "Palette swatches and tool toggles expose accessible names and a programmatically discernible selected state (e.g. aria-pressed or aria-selected) in the accessibility tree, so the active choice is not conveyed by color alone"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "2.17"
-name = "validation_announced_aria_live"
-description = "Save and rename validation messages are exposed through an aria-live polite region in the DOM in addition to being shown visually"
-type = "binary"
-weight = 0.5
-
-[[criterion]]
-id = "2.18"
-name = "cold_load_interactive_2s"
-description = "On a local cold load, the app renders and responds to a first interaction (e.g. selecting a tool) within 2 seconds"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "2.19"
-name = "grid_rebuild_freezes_page"
-description = "Moving the Cell control to the largest allowed cell count freezes or visibly hangs the page while the grid rebuilds"
+id = "2.n2"
+name = "cdn_or_external_asset_fetch"
+description = "During normal studio use, the network log shows CDN, font, icon, or script fetches from a non-same-origin host for app assets"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
-id = "2.catchall"
+id = "2.n3"
+name = "console_errors_during_flows"
+description = "Console errors or unhandled rejections appear during paint, gallery, export, or import flows"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "technical.catchall"
 name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick or unverifiable implementation preference. If present, name the defect and cite the concrete browser evidence (console entry, network request, storage entry, runtime state, performance trace, or interaction result) that demonstrates it. If the defect is already covered—even partially—by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable technical or state-management defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0
+

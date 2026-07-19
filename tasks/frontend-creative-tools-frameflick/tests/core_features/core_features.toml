@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -282,6 +282,138 @@ name = "caption_position_above_below_switch"
 description = "With caption text present, switching the caption position control between Above and Below moves the rendered caption from above the screenshot to below it on the canvas, and back."
 type = "binary"
 weight = 0.5
+
+[[criterion]]
+id = "1.42"
+name = "export_scale_and_style_aware_png"
+description = "An Export scale control offers 1x, 2x (default), and 3x; Download PNG triggers a download named frameflick-export.png at the selected scale; two different style configurations (Night/padding 4 versus Ocean/padding 20 with Browser frame) produce visibly different exported PNG compositions."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "style_recipe_json_live_export"
+description = "Download style JSON downloads frameflick-style.json compiled live from current settings, Copy style JSON shows Copied style!, and the Export preview panel updates when Ocean and padding 16 are set so the JSON contains those values."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "style_json_import_round_trip"
+description = "After exporting a style recipe with Ocean, padding 16, Browser frame, and a caption, changing settings and importing that JSON restores those exact visible settings without a page reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "undo_redo_style_mutations"
+description = "After changing background Night to Ocean and padding 8 to 18, Undo restores Night and padding 8 on the canvas and in the Export preview JSON; Redo reapplies Ocean and padding 18; Undo/Redo are disabled when their stacks are empty."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "before_after_and_reset_style"
+description = "After dressing an uploaded image, activating Before shows the earlier undressed look and returning to After shows the current dressed look with settings retained; Reset style restores defaults for a fresh upload while keeping the current image."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "snapshots_save_apply_delete"
+description = "Save snapshot with a valid name adds an entry to Snapshots (distinct from Saved presets); Apply restores that combination; Del with confirm removes it; an empty name is rejected with an inline message naming the name field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "copy_paste_settings_groups"
+description = "After Copy settings on a Night-plus-Browser look, changing background and padding, then Paste settings with only Background checked restores Night while padding stays at the changed value."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n42"
+name = "style_json_omits_session_mutations"
+description = "After changing Night to Ocean and padding to 16, the Export preview or downloaded style JSON omits those values or still shows the prior settings."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n43"
+name = "undo_does_not_restore_style"
+description = "After a style mutation, Undo leaves the canvas and Export preview JSON at the post-mutation values instead of restoring the prior look."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n44"
+name = "different_styles_identical_png_export"
+description = "Exporting PNG for two clearly different style configurations yields visually identical compositions."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "style_json_api_field_contract"
+description = "The Export preview shows a RenderSettings object with every required field-contract key by name — backgroundPreset or customBackground, padding, cornerRadius, shadow, frame, canvasSize, captionText, captionPosition, captionSize, captionColor, watermarkEnabled, watermarkText, watermarkColor, watermarkOpacity, watermarkCorner, zoom, positionX, positionY, and exportScale — and after setting Ocean and padding 16 those values appear under the matching keys while every required key remains present."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "preset_create_payload_settings_complete"
+description = "Saving a preset named Warm Card after configuring Night background, padding 12, Browser frame, a caption, and an enabled watermark with a distinct watermark color stores a PresetCreate record (name + RenderSettings) whose Apply restores every settings field in that combination including watermarkColor, matching the PresetCreate field contract."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "hex_named_field_error_not_generic"
+description = "Entering an invalid custom-background, caption-color, or watermark-color hex shows Invalid color. Enter six hexadecimal digits after # as a named field error next to that hex input rather than only a generic schema or form-level message, and the Export preview never shows that invalid hex as a valid #RRGGBB value."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n45"
+name = "style_json_missing_api_keys"
+description = "After configuring distinctive settings, the Export preview style JSON uses opaque or renamed keys so the documented RenderSettings names (padding, frame, captionColor, watermarkColor, watermarkCorner, and siblings) are not readable in the preview text."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n46"
+name = "hex_error_generic_schema_only"
+description = "An invalid hex entry shows only a generic schema or Invalid form message with no named field error and without Invalid color. Enter six hexadecimal digits after #."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.52"
+name = "import_rejects_invalid_render_settings"
+description = "Import style JSON with parseable JSON that fails the RenderSettings field contract — missing a required key, frame/canvasSize/captionPosition/watermarkCorner/exportScale outside their closed enums, padding/cornerRadius/shadow/captionSize/watermarkOpacity/zoom outside their integer bounds, a hex that is not #RRGGBB, or a backgroundPreset/customBackground cross-field violation — shows a visible error naming the offending field (or Invalid style JSON when unparseable) and leaves the canvas settings unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.53"
+name = "preset_create_name_bounds"
+description = "Saving a preset with a name over 40 characters or whitespace-only shows an inline message naming the name field and leaves the Saved presets count unchanged; a valid trimmed unique name at or under 40 characters creates exactly one entry."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n47"
+name = "import_accepts_out_of_contract_payload"
+description = "Import style JSON with an out-of-enum frame, out-of-bounds padding, invalid hex, or backgroundPreset/customBackground cross-field violation applies the payload to the canvas without a named field or Invalid style JSON rejection."
+type = "binary"
+negate = true
+weight = 1.0
 
 [[criterion]]
 id = "1.catchall"

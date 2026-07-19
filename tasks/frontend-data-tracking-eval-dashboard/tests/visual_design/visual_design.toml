@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -123,6 +123,20 @@ description = "At 1440 pixel width, any panel heading, table cell, badge, chart 
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "3.10"
+name = "export_drawer_visual"
+description = "The export drawer shows JSON and CSV tabs with a scrollable preview plus Download and Copy affordances, visually consistent with other Carbon overlays in the app"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "toolbar_export_undo_present"
+description = "The toolbar shows Export results, Import results, Undo, and Redo controls alongside the existing night-window and comparison controls without crowding or orphaned chrome"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "3.catchall"

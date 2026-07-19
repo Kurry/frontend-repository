@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,28 +63,28 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.1"
 name = "root_url_reaches_interactive_screen"
-description = "Loading the root URL reaches an interactive product screen rather than a blank page or a framework error overlay"
+description = "Loading the root URL reaches an interactive document-editor screen rather than a blank page or a framework error overlay"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
 name = "field_lifecycle_without_exceptions"
-description = "Opening a template, placing a field, reassigning its submitter, and deleting it complete without any uncaught JavaScript exception interrupting the interaction"
+description = "Opening a template, placing a field, reassigning its submitter, duplicating it, and deleting it complete without any uncaught JavaScript exception interrupting the interaction"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
 name = "reload_restores_persisted_state"
-description = "After placing a field, a full page reload restores the placed field, its submitter assignment, and the signing status rather than resetting to the seed"
+description = "After placing a field and changing signing status, a full page reload restores the placed field, its submitter assignment, submitters, and the signing status rather than resetting to the seed"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.4"
 name = "shared_state_coherence_across_views"
-description = "A change made once (a field's submitter) is reflected everywhere it appears — the field box colour on the canvas, the panel control, and the per-submitter count — from shared state without a reload"
+description = "A change made once (a field submitter) is reflected everywhere it appears — the field box colour on the canvas, the panel control, the per-submitter count, and Export previews — from shared state without a reload"
 type = "binary"
 weight = 1.0
 
@@ -131,7 +131,7 @@ negate = true
 [[criterion]]
 id = "2.10"
 name = "keyboard_only_operability"
-description = "Every interactive control — top-bar actions, template rows, submitter rows, palette buttons, and the properties-panel inputs and buttons — is reachable and operable with the keyboard alone (Tab/Shift+Tab plus Enter or Space), with a visible focus indicator on each"
+description = "Every interactive control — top-bar actions including Undo, Redo, Export and Import, template rows, submitter rows, palette buttons, and the properties-panel inputs and buttons — is reachable and operable with the keyboard alone (Tab/Shift+Tab plus Enter or Space), with a visible focus indicator on each"
 type = "binary"
 weight = 1.0
 
@@ -145,14 +145,14 @@ weight = 1.0
 [[criterion]]
 id = "2.12"
 name = "toast_is_aria_live_status_region"
-description = "The action-feedback toast surface is exposed as an aria-live status region (role=status or aria-live) so field placements, reassignments, and deletions are announced to assistive technology as well as shown"
+description = "The action-feedback toast surface is exposed as an aria-live status region (role=status or aria-live) so field placements, reassignments, deletions, exports and imports are announced to assistive technology as well as shown"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "2.13"
 name = "validation_visible_text_not_colour_alone"
-description = "Inline validation messages in the field editor are rendered as visible text associated with their input, not conveyed by colour alone (e.g. only a red border)"
+description = "Inline validation messages in the field editor, template name, and Import are rendered as visible text associated with their input, not conveyed by colour alone"
 type = "binary"
 weight = 0.5
 
@@ -166,7 +166,7 @@ weight = 1.0
 [[criterion]]
 id = "2.15"
 name = "console_errors_or_warnings_during_full_exercise"
-description = "Console errors or warnings appear during a full exercise of the app — placing, renaming, reassigning, and deleting fields, switching templates, sending for signing, advancing the signing status, and switching Build/Preview modes"
+description = "Console errors or warnings appear during a full exercise of the app — placing, renaming, reassigning, duplicating, deleting fields, undoing, switching templates, sending for signing, advancing status, exporting both formats, importing Template JSON, and switching Build/Preview"
 type = "binary"
 weight = 1.0
 negate = true
@@ -181,7 +181,36 @@ weight = 1.0
 [[criterion]]
 id = "2.17"
 name = "outbound_navigation_from_app_chrome"
-description = "Clicking any app-chrome control or link navigates the browser away from the app's origin, or an outbound network request other than same-origin resources appears while exercising the app"
+description = "Clicking any app-chrome control or link navigates the browser away from the app origin, or an outbound network request other than same-origin resources appears while exercising the app"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.18"
+name = "export_texts_derived_from_shared_state"
+description = "Template JSON and Signing summary Export previews are derived from the same shared open-template state the canvas shows — editing a field name updates the open Export preview without a separate disconnected copy"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.19"
+name = "field_form_validation_matches_field_contract"
+description = "Empty, whitespace-only, and over-80-character field names are rejected with validation naming the name field; valid names apply to the canvas and appear in Template JSON under fields[].name"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.20"
+name = "status_cross_field_matches_export"
+description = "After Send for signing the Template JSON status field shows pending; after advancing to Completed it shows completed — matching the status pill without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.21"
+name = "import_accepts_schema_invalid_payload"
+description = "Import accepts a Template JSON document that fails the field contract (illegal status, illegal type, unmatched submitter, or empty name) and still mutates the workspace"
 type = "binary"
 weight = 1.0
 negate = true
@@ -189,7 +218,7 @@ negate = true
 [[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

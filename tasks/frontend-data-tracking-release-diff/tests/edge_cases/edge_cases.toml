@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,21 +63,21 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "4.1"
 name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+description = "When a diff pair or filter matches nothing, or a list region has no entries, a designed empty state explains what belongs there rather than a blank region."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
 name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+description = "Cut form and import validation show inline messages naming the offending field (name, notes, schemaVersion, contentDigest, or splitTags) before commit, and invalid submit or import does not mutate versions."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
 name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+description = "Cut and import validation messages name the field and the fix (for example valid semver required, version already exists, notes too long, or schemaVersion must be larkspur-release-pack/v1) rather than only saying Invalid."
 type = "binary"
 weight = 1.0
 
@@ -98,7 +98,7 @@ weight = 1.0
 [[criterion]]
 id = "4.6"
 name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+description = "Cancel on the cut form and Escape/close on Export and Import panels leave the versions collection, rotation, and timeline unchanged."
 type = "binary"
 weight = 1.0
 
@@ -119,14 +119,14 @@ weight = 1.0
 [[criterion]]
 id = "4.9"
 name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+description = "The cut dialog and Export/Import panels close via their close control and Escape, returning focus to the control that opened them."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
 name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+description = "A running cut shows the four step badges advancing pending to running to complete, and a failed rank-stability step shows Retry check with an inline explanation naming the value and 0.95 threshold."
 type = "binary"
 weight = 1.0
 
@@ -181,7 +181,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n7"
 name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+description = "An invalid cut submit or non-conforming Release pack import commits anyway with no inline field-named validation."
 type = "binary"
 negate = true
 weight = 1.0
@@ -206,6 +206,29 @@ weight = 1.0
 id = "4.n10"
 name = "affordances_hidden_or_inaccessible"
 description = "Interactive affordances are visually hidden or inaccessible."
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "4.11"
+name = "overlong_notes_rejected"
+description = "Submitting the cut form with notes longer than 500 characters shows an inline message naming the notes field, starts no cut, and leaves the sidebar version count unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "invalid_import_leaves_state"
+description = "Importing Release pack JSON with wrong schemaVersion or an illegal splitTags value shows an inline validation message and leaves version count, rotation cycle, and timeline length unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "invalid_import_mutates_session"
+description = "A non-conforming Release pack import still replaces versions, rotation, or timeline despite the field-contract violation"
 type = "binary"
 negate = true
 weight = 1.0

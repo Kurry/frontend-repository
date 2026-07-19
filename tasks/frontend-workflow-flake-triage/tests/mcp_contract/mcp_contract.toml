@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,63 +63,63 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "12.1"
 name = "mandated_modules_are_bound"
-description = "All contract-mandated modules are initialized and bound."
+description = "browse-query-v1, entity-collection-v1, command-session-v1, and artifact-transfer-v1 are initialized and bound as declared in the contract."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.2"
 name = "handlers_match_visible_ui_logic"
-description = "Exposed tool handlers match visible UI command logic."
+description = "Exposed tool handlers for reason update, suite or filter browse, re-run session start/stop, and artifact export/copy/import invoke the same store commands as the visible controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.3"
 name = "only_documented_operations_exist"
-description = "Only documented operations and routes are available."
+description = "Only documented destinations (triage-queue, test-detail, quarantine-map, audit-timeline), entity operations (select, update), session operations (start, stop), and artifact operations (export, copy, import) are available."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.4"
 name = "contract_is_automation_exercisable"
-description = "The contract can be fully exercised via automation."
+description = "webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool can exercise the declared tools against the same page Playwright drives."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.5"
-name = "declared_entity_operations_work"
-description = "Entity operations declared in the contract, including create, update, delete, and reorder, all work."
+name = "entity_select_and_update_work"
+description = "Entity select and update for the test entity work: selecting a test opens detail state and updating reason within the closed vocabulary updates the queue via the same path as the UI."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.6"
-name = "form_flow_operations_are_bound"
-description = "Form submission validation, error, and cancel operations are clearly bound."
+name = "rerun_and_import_validation_stay_ui"
+description = "Re-run runCount validation and Import triage report field-contract rejection remain Playwright-graded UI paths as declared in mechanics exclusions, not bypassed by tool results inventing success."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.7"
-name = "queries_match_allowed_spec"
-description = "Query destinations and filters match the allowed specification."
+name = "browse_filters_and_sorts_match_spec"
+description = "Browse filters (verdict, reason, suite, timeline-entry-type), sort (divergence), themes (light, dark), and destinations match the allowed specification."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.8"
 name = "capabilities_stay_declared"
-description = "No extra or undeclared module routes or capabilities are exposed."
+description = "No extra undeclared module routes, destinations, or entity fields beyond reason and the declared value bounds are exposed."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.9"
 name = "session_tool_and_invoke_apis_work"
-description = "Session info, tool list, and invocation are correctly surfaced."
+description = "Session info, tool list, and invocation correctly surface browse, entity, session, and artifact tools for this contract."
 type = "binary"
 weight = 1.0
 
@@ -131,9 +131,16 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "12.11"
+name = "artifact_export_formats_bound"
+description = "Artifact export formats quarantine-text and triage-report-json and import mode replace-suite are bound so automation can trigger export/copy/import without inventing formats."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "12.n1"
 name = "mcp_tools_missing_or_noop"
-description = "MCP tooling is unbound, missing, or a no-op."
+description = "MCP tooling for browse, entity, session, or artifact modules is unbound, missing, or a no-op."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +148,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n2"
 name = "handlers_diverge_from_ui_logic"
-description = "Handlers do not match UI logic because actions mismatch or state does not sync."
+description = "Tool handlers update reason, start re-run, or export without matching the visible UI outcome on the same page."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +156,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n3"
 name = "undeclared_capabilities_exposed"
-description = "Undeclared destinations or entity operations are exposed."
+description = "Undeclared destinations, entity operations, or artifact formats beyond the contract are exposed."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +164,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n4"
 name = "automation_cannot_exercise_contract"
-description = "The contract cannot be exercised from automation."
+description = "The contract cannot be exercised from automation via webmcp_list_tools / webmcp_invoke_tool."
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +172,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n5"
 name = "validation_bypass_desyncs_state"
-description = "Validation bypasses lead to inconsistent MCP and UI state."
+description = "A tool path bypasses reason or runCount validation and leaves MCP-visible state disagreeing with the UI."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +180,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n6"
 name = "session_or_tool_api_errors"
-description = "The session or tool API returns errors or incomplete data."
+description = "The session or tool API returns errors or incomplete data for the declared modules."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +196,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n8"
 name = "required_contract_module_missing"
-description = "No module contract is implemented where one is declared required."
+description = "browse-query-v1, entity-collection-v1, command-session-v1, or artifact-transfer-v1 is missing where declared required."
 type = "binary"
 negate = true
 weight = 1.0

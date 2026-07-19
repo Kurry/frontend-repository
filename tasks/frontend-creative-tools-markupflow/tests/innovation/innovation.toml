@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -63,153 +63,117 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+name = "draw_preview_delight_beyond_minimum"
+description = "Beyond the required live dashed draw preview, shape drawing includes an extra delightful microinteraction on commit (for example a brief settle flash, ink-pop, or subtle stroke ease) that remains browser-observable (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "loupe_or_spotlight_storytelling_polish"
+description = "Loupe or Spotlight offers an advanced transition or storytelling beat beyond basic placement — for example a memorable magnifier expand or dimming wipe — verified through real tool interaction (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+name = "guided_first_run_for_annotation_studio"
+description = "A brief guided first-run or coachmark flow introduces Try sample image, the tool rail groups, and Layers without blocking the studio (bonus beyond required empty-state copy)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+name = "histogram_or_annotation_aid_extra_usability"
+description = "An interactive graphic beyond the required canvas — for example an annotation count chip, color-usage strip, or zoom mini-map — adds usability while staying local and browser-observable (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+name = "alternate_annotation_input_beyond_drag"
+description = "Beyond basic click-drag drawing, the studio supports an alternate annotation input such as keyboard nudging of a selected shape or numeric size entry (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+name = "session_personalization_beyond_requirements"
+description = "Within the session, the app offers a small personalization beyond requirements (for example remembering last active tool or last stroke width after reload via the mandated persistence) that improves return use (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+name = "branded_markupflow_narrative_polish"
+description = "The MarkupFlow title, dark studio chrome, and three-region composition read as a cohesive branded annotation instrument rather than generic unstyled controls (bonus execution quality)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+name = "theme_toggle_craft_beyond_bare_swap"
+description = "Theme toggle craft goes beyond bare dark/light compliance — cohesive tokenized accents across header, panels, and Layers without inventing a conflicting second product (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+name = "local_platform_enhancement"
+description = "A genre-appropriate local enhancement (for example high-quality local icon rendering or offline-capable app shell assets) is visible without CDN dependence (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+name = "competition_level_annotation_studio_feel"
+description = "The overall studio feels competition-grade: draw preview feel, layer reorder polish, Export PNG, Export project JSON round-trip, presets, and snapshot/compare flows read as a professional image annotation instrument rather than a wired demo (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+name = "barebones_unstyled_form_only"
+description = "The shipped UI is a bare unstyled form or plain text controls with no three-region annotation studio, canvas drop zone, or Layers immersion."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
+name = "generic_dashboard_template_look"
+description = "The experience is a generic dashboard/card-grid template that ignores the specified MarkupFlow annotation-studio composition (header above tool rail | canvas | Layers)."
 type = "binary"
 negate = true
 weight = 1.0
 
-[[criterion]]
-id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
-type = "binary"
-negate = true
-weight = 1.0
+# HARDEN_MARKUPFLOW_V1
 
 [[criterion]]
-id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
+id = "11.11"
+name = "preset_recipe_craft_beyond_bare_add"
+description = "Markup presets go beyond bare list append — for example a brief placement guide, smart default sizing relative to the image, or coordinated Callout arrow text placement that reads intentional (bonus)"
 type = "binary"
-negate = true
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
-id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
+id = "11.12"
+name = "compare_and_history_power_user_polish"
+description = "Compare and History feel power-user grade: clear active Compare treatment and scannable History labels that match tool names (bonus execution quality)"
 type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
-type = "binary"
-negate = true
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "innovation.catchall"

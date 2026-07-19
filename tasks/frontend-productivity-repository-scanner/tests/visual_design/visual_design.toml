@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,70 +63,70 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.1"
 name = "two_panel_composition"
-description = "At a 1440px desktop viewport the layout composes as a left repository-list panel with consistent structured row anatomy and a right panel that switches between the document tree and the file viewer without a full page reload"
+description = "At desktop width the left panel is the repository list with consistent row anatomy including checkboxes, and the right panel switches between the document tree and the file viewer without a full page reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
 name = "progress_and_inline_loading_render"
-description = "Scan progress renders as a determinate progress bar in the scan panel plus an inline loading indicator inside the scanning repository's row, both styled consistently with the rest of the app"
+description = "Scan progress renders as a determinate progress bar in the scan panel plus an inline loading indicator in the scanning repository's row"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
 name = "accordion_groups_with_counts"
-description = "Document type groups render as accordion sections with rotating chevrons and visible per-group counts, sharing one consistent section anatomy"
+description = "Document type groups render as accordion sections in the tree panel with rotating chevrons and per-group counts"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.4"
 name = "code_viewer_monospace_surface"
-description = "The file viewer renders content in a monospace type treatment with visible line numbers on a contrasting code surface distinct from the surrounding UI"
+description = "The file viewer renders content in a monospace type treatment with visible line numbers on a contrasting code surface"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.5"
 name = "status_chip_language_with_labels"
-description = "Pending, running, complete, failed, and retrying step statuses are each visually distinct, share one chip-and-icon system, and carry visible text labels rather than color alone"
+description = "Step statuses use one consistent chip and icon language: pending, running, complete, failed, and retrying are each visually distinct and carry a visible text label, not color alone"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.6"
 name = "typography_hierarchy"
-description = "Panel titles are visibly larger and heavier than row text, and repository rows, document rows, and timeline entries share one compact body size consistently across panels"
+description = "Typography keeps a clear hierarchy: panel titles visibly larger and heavier than row text; repository rows, document rows, and timeline entries share one compact body size"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.7"
 name = "focus_ring_and_danger_treatment"
-description = "Interactive controls show a visible focus ring on keyboard focus (verified by tabbing), and failed steps and validation messages use one consistent danger red treatment"
+description = "All interactive controls show a visible focus ring on keyboard focus; failed steps and validation messages use one consistent danger red treatment"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.8"
 name = "single_icon_set_consistency"
-description = "One icon set is used consistently across the toolbar, repository rows, step statuses, and timeline entries, with no mixed icon styles, emoji stand-ins, or blurry raster icons"
+description = "One icon set is used consistently across toolbar, rows, steps, timeline entries, export, and palette"
 type = "binary"
-weight = 0.5
+weight = 1.0
 
 [[criterion]]
 id = "2.9"
-name = "responsive_stacking"
-description = "Below 1024px the repository list and the tree/viewer panel stack vertically with the repository list first, and at 375px the file viewer scrolls its long lines within its own container"
+name = "export_and_palette_surfaces"
+description = "Export appears as a panel or modal with format tabs (Scan Index JSON / Inventory Markdown), a scrollable preview block, and Copy/Download affordances; the command palette renders as a centered overlay with a filter input and highlighted action list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.n1"
 name = "mobile_overflow_or_clipping"
-description = "At 375px width, content clips, overlaps, or overflows the viewport, or page-level horizontal scrolling appears"
+description = "At 375px width content clips or overflows the viewport, or page-level horizontal scrolling appears"
 type = "binary"
 weight = 1.0
 negate = true
@@ -134,7 +134,7 @@ negate = true
 [[criterion]]
 id = "2.n2"
 name = "unstyled_default_register"
-description = "Controls, dialogs, tables, or the viewer render as unstyled browser defaults or visually clashing one-off styles instead of one coherent design language across the app"
+description = "Primary scanner chrome (list, buttons, progress, export tabs) renders as unstyled browser-default controls without a coherent designed visual system"
 type = "binary"
 weight = 1.0
 negate = true
@@ -142,7 +142,7 @@ negate = true
 [[criterion]]
 id = "2.catchall"
 name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable visual design defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

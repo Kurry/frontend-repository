@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.5
@@ -63,89 +63,126 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "15.1"
-name = "headings_use_consistent_capitalization"
-description = "For fidelity tasks, rendered copy must match the reference. Where the app renders headings and section titles, they use consistent capitalization (one convention — title case or sentence case — throughout)."
+name = "headings_casing_matches_reference"
+description = "Where the app renders headings and section titles, they keep the reference casing conventions consistently (uppercase mono meta labels such as DAY'S HIGH; sentence-case body; exact section headings as specified)."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.2"
-name = "actions_use_specific_labels"
-description = "Where the app renders button or action labels, they are specific verbs ('Add expense', 'Start session'), not generic ('Submit', 'OK') when a specific label is possible."
+name = "action_labels_specific"
+description = "Where the app renders button or action labels, they use specific mandated wording (Accept all, Reject all, Manage preferences, Prev./Next, View All, Careers CTA) rather than generic Submit/OK alone when a specific label is specified."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.3"
-name = "errors_name_problem_and_fix"
-description = "Where the app renders error messages, they name the problem and the fix ('Amount must be a positive number'), not just a rejection ('Invalid')."
+name = "consent_feedback_names_problem"
+description = "Where the app renders cookie-preferences validation or error feedback, it names the problem with actionable text (for example that necessary must remain enabled or that a category is required) rather than only saying Invalid."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.12"
+name = "import_errors_name_problem"
+description = "Where the app renders Investor briefing Import errors, the message names the import problem in plain language (for example schemaVersion or consent) rather than silent failure or only the word Error."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.4"
-name = "empty_states_explain_next_step"
-description = "Where the app renders empty states, the copy explains what belongs there and how to add it."
+name = "cookie_banner_copy_intentional"
+description = "Where the app renders the cookie banner, the heading We use cookies and the three actions read as intentional product copy rather than a broken missing-content stub."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.5"
-name = "body_copy_is_well_written"
-description = "Where the app renders body or marketing copy, rate how free it is of spelling and grammatical errors."
+name = "marketing_copy_spelling_grammar"
+description = "Where the app renders body or marketing copy (culture statement, careers push, news cards, market snapshot), rate how free it is of spelling and grammatical errors."
 type = "likert"
 points = 5
 weight = 0.5
 
 [[criterion]]
 id = "15.6"
-name = "terminology_is_consistent"
-description = "Where the app renders labels for the same concept in multiple places, terminology is consistent (not 'task' here and 'todo' there)."
+name = "northstar_terminology_consistent"
+description = "Where the app renders the corporate and portfolio identity, terminology stays consistent as Northstar Collective and the eleven fictional brand names (Trailmark, Cadence, Forgeworks, Alder & Ash, Ironcat, Solstice, Hearthstep, First Mile, Highline, Wildhorse, Foundry) without leftover source-company naming."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.7"
-name = "numbers_dates_and_units_are_consistent"
-description = "Where the app renders numbers, dates, and units, formatting is consistent (same date format, same decimal precision, units labeled)."
+name = "market_snapshot_numbers_exact"
+description = "Where the app renders Market Snapshot figures, they match exactly: primary quote 18.16 USD; DAY'S HIGH $18.60; DAY'S LOW $18.16; DAY'S VOLUME 38,982.00; LAST UPDATED 2hours ago; security name Northstar Collective, Inc. (NST); label Common Stock."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.8"
-name = "success_messages_are_specific"
-description = "Where the app renders confirmation and success messages, they state what happened ('Entry saved'), not vague affirmations."
+name = "mandated_headlines_exact"
+description = "Where the app renders mandated headlines, they match exactly: Make. Every Day. Better.; A portfolio built for every step.; 2025 Annual Report; Many brands, one shared culture, limitless innovation.; Market Snapshot; Latest News; Creating Your Future With Us."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.9"
+name = "news_card_titles_exact"
+description = "Where the app renders Latest News card titles, they match exactly: Northstar Earns People-First Workplace Certification; Trailmark Celebrates 45 Years Outside; Cadence Velocity Pro Wins Best Racing Shoe; Northstar Studio Receives Four Creative Honors; Cadence Brings the Daily Runner Back; Trailmark Launches a Flow-Focused Trail Shoe; Forgeworks Steps Onto the Small Screen; and Northstar Named Company of the Year."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.10"
+name = "footer_legal_and_copyright_exact"
+description = "Where the app renders footer legal and copyright copy, the copyright line is exactly © 2026 Northstar Collective, Inc. and the legal group includes Privacy Policy, Terms & Conditions, Patents, Supply Chain Transparency, Customer Returns, and Retail Partners."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.n1"
-name = "placeholder_copy_is_visible"
-description = "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI."
+name = "placeholder_copy_visible"
+description = "Lorem ipsum or placeholder text (TODO, Lorem, asdf, or template variables like {{title}}) is visible anywhere in the shipped UI."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n2"
-name = "prominent_copy_has_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as headings, hero text, or primary buttons."
+name = "prominent_copy_has_typos"
+description = "Spelling or grammatical errors appear in prominent copy such as Make. Every Day. Better., Market Snapshot, Creating Your Future With Us, or primary cookie/carousel labels."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n3"
-name = "concept_names_are_inconsistent"
-description = "The same concept is named inconsistently across surfaces."
+name = "source_brand_names_in_copy"
+description = "Rendered copy still names a source company, source brand, real ticker, or real social-platform branding instead of the fictional Northstar Collective system."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n4"
-name = "copy_is_truncated_or_overflowing"
-description = "Truncated or overflowing text renders copy unreadable."
+name = "copy_truncated_or_overflowing"
+description = "Truncated or overflowing text renders mandated headings, news titles, market figures, or cookie copy unreadable at 1440 or 375."
+type = "binary"
+negate = true
+weight = 0.5
+
+
+[[criterion]]
+id = "15.11"
+name = "consent_and_briefing_labels_exact"
+description = "Where the app renders consent and briefing chrome, category names Necessary / Analytics / Marketing / Functional, empty-state No stories pinned yet, palette empty-state No matching commands, and tab labels JSON / Markdown render exactly as specified."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.n5"
+name = "briefing_placeholder_copy"
+description = "The Investor briefing preview, shortlist, or command palette shows lorem ipsum, TODO, or template placeholder text."
 type = "binary"
 negate = true
 weight = 0.5

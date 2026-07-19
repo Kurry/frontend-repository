@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "1.2"
 name = "table_cells_and_header_metadata"
-description = "Each experiment-table cell shows the selected label's total reward for that trial with a distinct pass or fail badge at the 0.70 threshold, and each label column header shows the label name, judge model (a fictional name), config note, mean reward, and total judge cost that match the underlying results"
+description = "Each experiment-table cell shows the selected label's total reward for that trial with a distinct pass or fail badge at the 0.70 threshold, and each label column header shows the label name, scorer model (a fictional name), config note, mean reward, and total scoring cost that match the underlying results"
 type = "binary"
 weight = 1.0
 
@@ -98,7 +98,7 @@ weight = 1.0
 [[criterion]]
 id = "1.7"
 name = "summary_strip_derives_live"
-description = "The Compare summary strip shows mean delta, win/loss/tie counts, total judge cost under each label, and the cost delta, all consistent with the visible paired rows, and switching to a different label pair changes these numbers accordingly without a reload"
+description = "The Compare summary strip shows mean delta, win/loss/tie counts, total scoring cost under each label, and the cost delta, all consistent with the visible paired rows, and switching to a different label pair changes these numbers accordingly without a reload"
 type = "binary"
 weight = 1.0
 
@@ -119,21 +119,21 @@ weight = 1.0
 [[criterion]]
 id = "1.10"
 name = "flip_reasoning_side_by_side"
-description = "Activating a flip row expands it to show both judges' reasoning snippets side by side, each labeled with its label name, and activating it again collapses them"
+description = "Activating a flip row expands it to show both labels' reasoning snippets side by side, each labeled with its label name, and activating it again collapses them"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
 name = "attribution_form_validates_and_tags"
-description = "Submitting the attribution form with no cause selected shows an inline message naming the cause field and saves nothing; saving with a cause (judge noise, rubric change effect, or harness change effect) tags the flip visibly on its row, the pair's attribution rollup total and per-cause counts update immediately by exactly one without a reload, and reopening the form allows changing the cause"
+description = "Submitting the attribution form with no cause selected shows an inline message naming the cause field and saves nothing; saving with a cause (scorer noise, rubric change effect, or harness change effect) tags the flip visibly on its row, the pair's attribution rollup total and per-cause counts update immediately by exactly one without a reload, and reopening the form allows changing the cause"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.13"
 name = "rescore_form_unique_label_validation"
-description = "Submitting the rescore form with a label name matching an existing label (including a different letter case) shows an inline message naming the label field, creates no label, and starts no run; the judge model select offers exactly the three fictional models and is required; rapidly double-activating a valid submit starts exactly one run and creates exactly one label"
+description = "Submitting the rescore form with a label name matching an existing label (including a different letter case) shows an inline message naming the label field, creates no label, and starts no run; the scorer model select offers exactly the three fictional models and is required; rapidly double-activating a valid submit starts exactly one run and creates exactly one label"
 type = "binary"
 weight = 1.0
 
@@ -161,7 +161,7 @@ weight = 1.0
 [[criterion]]
 id = "1.17"
 name = "cost_chart_and_sources_disclosure"
-description = "The Cost view charts cumulative judge cost per label across rescore events with a legend that toggles each series, each series' end value equals that label's total cost shown elsewhere, and activating a cost total's disclosure in Compare opens a list of contributing trials whose entries highlight or scroll to the trial's row in-app"
+description = "The Cost view charts cumulative scoring cost per label across rescore events with a legend that toggles each series, each series' end value equals that label's total cost shown elsewhere, and activating a cost total's disclosure in Compare opens a list of contributing trials whose entries highlight or scroll to the trial's row in-app"
 type = "binary"
 weight = 1.0
 
@@ -176,6 +176,36 @@ weight = 1.0
 id = "1.19"
 name = "self_compare_blocked_and_designed_states"
 description = "Selecting the same label for both A and B in Compare is impossible (the already-chosen label is disabled in the other picker or the selection is rejected with a visible message, and no self-comparison table ever renders); before a full pair is picked the Compare region shows a designed empty state naming what to pick; a trial pair with zero flips shows a designed agreement state; a pair with no tagged flips shows a zero-state rollup naming how to tag one; and deselecting every Cost series leaves a designed empty chart state that returns when a series is re-enabled"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "lab_results_api_shaped_field_contract"
+description = "The Export lab results JSON preview is a single object whose visible text includes the required field contract: schemaVersion exactly rescore-ab-lab-v1; labels entries with name, scorerModel in {Sable 4, Quartz Mini, Onyx Pro}, configNote, meanReward, totalCost; trials with id, taskName, and per-label results carrying totalReward, pass, dimensions, scorerCost, and exactly 16 criteria; attributions with trialId, criterionId, labelA, labelB, cause in {scorer-noise, rubric-change-effect, harness-change-effect}, note; compareSummary null or a pair summary; savedPairs with name/labelA/labelB; and generatedAt as an ISO-8601 datetime string"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "export_reflects_session_and_import_round_trip"
+description = "Scripted probe: complete a rescore with a unique label and attribute one flip under Baseline versus that label; open Export lab results and confirm the JSON names the new label under labels, includes its trial results, lists the attribution, and still shows schemaVersion rescore-ab-lab-v1; then attribute under Baseline versus Rubric v2, save that pair, Download lab-results.json, reload, Import the file, and confirm the attribution tag, rollup, and saved-pair menu entry return"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "pass_rate_wheel_and_saved_pairs"
+description = "In Compare, the pass-rate wheel shows two rings for labels A and B matching the share of visible paired trials that pass at 0.70, and redraws when the pair or filters change; Save pair with a valid unique name at most 40 characters adds a menu entry that restores A and B and regenerates summary, chart, rollup, and wheel; empty, duplicate, overlong, or equal-labelA/labelB names show an inline message naming the field and save nothing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "undo_redo_and_command_palette"
+description = "After saving an attribution, Undo removes the tag and decrements the pair rollup, and Redo restores them; Undo and Redo are disabled when their stacks are empty; Control-K or Command-K opens the command palette which fuzzy-matches Experiments, Compare, Cost, Rescore with new label, Export lab results, and label names, and choosing Cost lands on the Cost view with the palette closed"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "1.22"
@@ -189,6 +219,22 @@ negate = true
 id = "1.23"
 name = "instant_run_without_steps"
 description = "The rescore run completes instantly or near-instantly with no visible pending/running step progression, no progress indicator, or no retry behavior — the new label simply appears without an observable simulated run"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.24"
+name = "export_omits_field_contract_or_session"
+description = "After a rescore or attribution mutation, the Export lab results JSON omits a required field-contract key (schemaVersion, labels, trials, attributions, compareSummary, savedPairs, or generatedAt), shows schemaVersion other than rescore-ab-lab-v1, or omits the session's new label or attribution"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.25"
+name = "import_accepts_invalid_lab_results"
+description = "Import accepts parseable JSON that violates the lab results field contract (wrong schemaVersion, cause outside the closed enum, note longer than 200 characters, or pass inconsistent with totalReward) and still mutates attributions or saved pairs"
 type = "binary"
 weight = 1.0
 negate = true

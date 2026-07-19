@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -255,6 +255,71 @@ description = "Search matches only note titles and fails to return a note whose 
 type = "binary"
 weight = 1.0
 negate = true
+
+
+[[criterion]]
+id = "1.38"
+name = "export_nest_two_format_tabs"
+description = "Export Nest opens an artifact drawer with Nest JSON and Markdown vault tabs, each showing a monospaced preview regenerated from the current store, plus Copy and Download controls."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "export_reflects_session_mutations"
+description = "After creating a note with a distinctive title, pinning it, assigning color blue, and filing it in a folder, the Nest JSON preview contains that title with pinned true and color blue under schemaVersion \"notenest-v1\", and the Markdown vault preview shows the title under that folder path — before any download or copy."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "nest_json_field_contract_visible"
+description = "The Nest JSON preview is a single object showing required keys schemaVersion (exactly \"notenest-v1\"), folders, notes, and trash; a note object in the preview shows id, title, body, folderId, pinned, color, checklist, images, and updatedAt field names."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "import_nest_applies_workspace"
+description = "Import Nest of a valid Nest JSON document replaces the in-memory workspace so the folder tree, All Notes list, pins, colors, and both export previews match the imported payload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "command_palette_navigates_note"
+description = "Pressing Ctrl+K or Cmd+K (or activating Command Palette) opens the palette; typing part of an existing note title lists that note; choosing it selects the note in the editor without a reload; Escape closes the palette."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "batch_trash_exact_count_delta"
+description = "Selecting two notes and confirming Batch Trash decreases the active note count by exactly two, adds exactly two Trash entries, and decreases affected folder badges accordingly; the selection tray hides after completion."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "session_undo_restores_batch_trash"
+description = "After Batch Trash of two notes, Session Undo restores both notes to their prior folders and badge counts and removes them from Trash; Nest JSON notes/trash membership matches the restored state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "export_omits_session_mutations"
+description = "After a visible create, pin, color, move, or batch mutation, the Nest JSON or Markdown vault export preview still omits that session mutation (stale or seed-only export text)."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.46"
+name = "batch_color_updates_edge_bars"
+description = "Selecting multiple notes and applying Batch Color to one closed-list color updates the left-edge bar on every selected note in All Notes and in each note's folder list without a reload."
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "1.catchall"

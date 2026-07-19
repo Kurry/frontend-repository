@@ -1,0 +1,148 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "diff_crossfade_150ms"
+description = "Changing a version picker through the real control cross-fades the diff panel contents over roughly 150 milliseconds rather than snapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "counter_scroll_pulse_400ms"
+description = "Clicking a summary counter scrolls the diff to the first change of that type and highlights the target block with a roughly 400 millisecond background pulse before settling"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "unified_toggle_animates"
+description = "Toggling between split and unified modes through the real toggle animates the pane transition rather than snapping between layouts"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "merge_resolution_motion"
+description = "Choosing a side for a merge region slides the chosen content into the result preview and the resolved-progress indicator fills smoothly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "graph_node_animates_in"
+description = "After completing a merge or restore through the real controls, the version graph animates the new node and its edges into place rather than redrawing instantly"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.6"
+name = "annotation_marker_thread_motion"
+description = "Annotation markers fade in when posted, and threads expand and collapse with a short height transition and a rotating chevron"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "hover_animations_required"
+description = "Buttons ease background and shadow with a slight press effect on hover; history rows, search results, and graph nodes take a visible hover treatment; and form controls show focus rings"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "toasts_slide_autodismiss"
+description = "Toasts after merges, restores, and exports slide in, remain readable long enough to scan, and auto-dismiss with a fade"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion set, the diff cross-fade, counter pulse, mode-toggle transition, and thread animations apply instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n1"
+name = "animation_jank_or_blocking"
+description = "Animations cause visible layout jank or flicker, or block input, while the diff re-renders or the merge flow advances"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.n2"
+name = "pulse_never_settles"
+description = "The counter-click pulse leaves a permanent highlight on the target block, or the scroll lands on the wrong change type"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction performed, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

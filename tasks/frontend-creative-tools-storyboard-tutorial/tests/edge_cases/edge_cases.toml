@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,118 +62,118 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_board_state_after_delete_all"
+description = "Deleting every scene leaves a visible empty-board state that explains the board is empty and offers a way to add a scene."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "create_form_inline_validation"
+description = "The Add Scene form validates title and description inline before submit: an empty required field shows a per-field message naming that field, and the submit control stays disabled until both fields are valid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "empty_fields_block_scene_create"
+description = "Submitting the create form with an empty required title or description adds no scene: the visible scene count is unchanged and an inline validation message names the empty field."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "double_submit_adds_exactly_one_scene"
+description = "Double-activating the create form's submit control adds exactly one scene: the count increases by one and one new card appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "slide_bounds_disable_without_wrap"
+description = "In Slide mode the previous control is disabled at the first scene and the next control is disabled at the last scene; arrow keys at the bounds leave the centered scene unchanged (no wrap)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "inert_header_tools_toast_demo_only"
+description = "Clicking an inert header utility control (notifications bell, dashboard, account, or kebab) raises a demo-only toast instead of navigating away or breaking the board."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "submit_disabled_until_create_valid"
+description = "On the Add Scene form, the submit control remains disabled while title or description is empty/invalid and enables only after both fields are valid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "board_controls_use_semantic_tags"
+description = "Header tools, Tile/List/Slide toggles, Add Scene, slide previous/next, and create-form fields use semantic button/input/label elements rather than unlabeled decorative wrappers."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "create_form_cancel_leaves_board_unchanged"
+description = "Cancelling or dismissing the Add Scene form without a valid submit leaves the scene count and board cards unchanged."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "slide_counter_tracks_bounds"
+description = "In Slide mode the N / total counter tracks the centered scene; at the first scene N is 1 and previous is disabled, and at the last scene N equals total and next is disabled."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_board_has_no_feedback"
+description = "After deleting every scene, the board region shows nothing and provides no empty-state feedback."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "validation_errors_only_in_console"
+description = "Add Scene validation failures are surfaced only in the browser console with no visible inline message naming the empty field."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "create_or_delete_silent_failure"
+description = "A valid Add Scene submit or a scene delete fails silently: the board cards and scene count stay unchanged with no visible feedback."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "delete_lacks_destructive_affordance"
+description = "Scene delete proceeds with no clear destructive affordance when that action is exposed on a scene card."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "interactive_controls_nonsemantic_only"
+description = "Primary interactive controls (view toggles, Add Scene, slide nav, create fields) are non-semantic div/span wrappers with no button/input/label role."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "create_form_not_keyboard_dismissible"
+description = "The open Add Scene form cannot be dismissed via keyboard (Escape or an equivalent cancel path)."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,31 +181,31 @@ weight = 1.0
 [[criterion]]
 id = "4.n7"
 name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+description = "Create-form validation feedback is missing or delayed with no UI indication while the submit control remains enabled for an empty required field."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "primary_actions_ambiguous_labels"
+description = "Primary Add Scene, Tile/List/Slide, or slide previous/next labels are missing or so generic that the action is ambiguous."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "slide_wraps_at_bounds"
+description = "At the first or last scene in Slide mode, previous/next or Left/Right arrow keys wrap to the opposite end of the board."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "double_submit_creates_duplicates"
+description = "Double-activating the create form's submit control creates more than one scene or increases the count by more than one."
 type = "binary"
 negate = true
 weight = 1.0

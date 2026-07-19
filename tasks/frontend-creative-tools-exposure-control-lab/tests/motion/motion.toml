@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -69,7 +69,7 @@ weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "4_2"
+name = "mode_switch_keeps_hover_feedback"
 description = "Mode switches update without full reload and keep hover feedback"
 type = "binary"
 weight = 0.5
@@ -77,7 +77,7 @@ optional = true
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
+name = "missing_hover_feedback_on_controls"
 description = "Omits hover feedback on steppers or preset rows so controls feel static on pointer hover"
 type = "binary"
 weight = 1.0
@@ -85,7 +85,7 @@ negate = true
 
 [[criterion]]
 id = "4.4"
-name = "4_4"
+name = "meter_eases_and_preset_apply_eases"
 description = "The exposure meter indicator travels continuously along its track (not hard jumps) as exposure changes, and applying a preset eases the dials and preview to the saved stops"
 type = "binary"
 weight = 0.5
@@ -129,9 +129,32 @@ weight = 1.0
 [[criterion]]
 id = "4.10"
 name = "reduced_motion_instant_but_usable"
-description = "With prefers-reduced-motion set, easing and travel animations are removed and dial, meter, preview, and list state changes apply instantly while the app remains fully usable"
+description = "With prefers-reduced-motion set, easing and travel animations are removed and dial, meter, preview, histogram, before/after, and list state changes apply instantly while the app remains fully usable"
 type = "binary"
 weight = 1.0
+
+
+[[criterion]]
+id = "4.11"
+name = "before_hold_crossfade_via_real_control"
+description = "Driven through the real Before control (not a state shortcut): pressing Before crossfades the preview stack toward the default exposure, and releasing crossfades back to the current stops"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "histogram_eases_on_stop_change"
+description = "Pressing a real stepper eases histogram bars into their new shape on stop changes rather than snapping instantly (unless prefers-reduced-motion is set)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "before_hold_snaps_without_crossfade"
+description = "Pressing or releasing the real Before control snaps the preview with no crossfade or easing when reduced motion is not set"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.catchall"

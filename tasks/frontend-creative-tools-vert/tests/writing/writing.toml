@@ -63,64 +63,71 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "15.1"
-name = "headings_use_consistent_capitalization"
-description = "Where the app renders headings and section titles, they use consistent capitalization (one convention — title case or sentence case — throughout)."
+name = "sentence_case_microcopy"
+description = "Where the app renders headings, section titles, and UI microcopy, they follow a consistent sentence-case convention (hero, drop-zone title, empty state, catalog headings, Session export labels) rather than mixing random capitalization styles."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.2"
-name = "actions_use_specific_labels"
-description = "Where the app renders button or action labels, they are specific verbs ('Add expense', 'Start session'), not generic ('Submit', 'OK') when a specific label is possible."
+name = "verb_first_action_labels"
+description = "Where the app renders button or action labels, they use specific verb-first labels such as Convert, Download, Remove, Clear queue, Batch set format, Batch remove, Download all done, Undo, Redo, Save preset, Apply preset, Copy, and Download session rather than generic Submit/OK when a specific label is possible."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.3"
-name = "errors_name_problem_and_fix"
-description = "Where the app renders error messages, they name the problem and the fix ('Amount must be a positive number'), not just a rejection ('Invalid')."
+name = "errors_state_problem_plainly"
+description = "Where the app renders error, Unsupported, or field-validation messages (including Settings quality, empty preset name, and session import), they name the field or problem plainly without codes or blame, not only a bare rejection like 'Invalid'."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.4"
-name = "empty_states_explain_next_step"
-description = "Where the app renders empty states, the copy explains what belongs there and how to add it."
+name = "empty_queue_explains_next_step"
+description = "Where the app renders the empty queue state, the copy includes \"Your conversion queue is empty\" and guidance that a local file is needed."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.5"
-name = "body_copy_is_well_written"
-description = "Where the app renders body or marketing copy, rate how free it is of spelling and grammatical errors."
+name = "hero_and_help_copy_polished"
+description = "Where the app renders the hero headline, drop-zone helper text, About/Privacy copy, and catalog labels, rate how free the text is of spelling and grammatical errors."
 type = "likert"
 points = 5
 weight = 0.5
 
 [[criterion]]
 id = "15.6"
-name = "terminology_is_consistent"
-description = "Where the app renders labels for the same concept in multiple places, terminology is consistent (not 'task' here and 'todo' there)."
+name = "terminology_consistent"
+description = "Where the app renders labels for the same concept in multiple places (Convert to, queued/ready/done counts, Ready/Converting/Done statuses, presets, session export), terminology stays consistent rather than inventing conflicting names."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.7"
-name = "numbers_dates_and_units_are_consistent"
-description = "Where the app renders numbers, dates, and units, formatting is consistent (same date format, same decimal precision, units labeled)."
+name = "numeral_counters_consistent"
+description = "Where the app renders numeral counters and sizes, formatting is consistent (for example \"1 queued, 0 ready, 1 done\" style counts and readable input/output sizes)."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.8"
-name = "success_messages_are_specific"
-description = "Where the app renders confirmation and success messages, they state what happened ('Entry saved'), not vague affirmations."
+name = "status_and_success_copy_specific"
+description = "Where the app renders status or completion feedback (Done status, enabled Download, counts updates, copied confirmation), the copy/state names what happened rather than a vague affirmation alone."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.9"
+name = "batch_and_preset_copy_names_fields"
+description = "Where the app renders Session export labels, batch confirmation copy, and preset validation, the copy names the field or count involved rather than generic Submit or OK."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.n1"
-name = "placeholder_copy_is_visible"
+name = "placeholder_copy_visible"
 description = "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI."
 type = "binary"
 negate = true
@@ -128,24 +135,24 @@ weight = 0.5
 
 [[criterion]]
 id = "15.n2"
-name = "prominent_copy_has_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as headings, hero text, or primary buttons."
+name = "prominent_copy_has_spelling_errors"
+description = "Spelling or grammatical errors appear in prominent copy such as \"The file converter you'll love.\", \"Drop or click to convert\", Convert, Download, Remove, Batch set format, or Clear queue."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n3"
-name = "concept_names_are_inconsistent"
-description = "The same concept is named inconsistently across surfaces."
+name = "inconsistent_concept_naming"
+description = "The same queue, preset, or format concept is named inconsistently across the drop zone, queue rows, counts line, batch tray, and Settings in a way that would confuse a user."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n4"
-name = "copy_is_truncated_or_overflowing"
-description = "Truncated or overflowing text renders copy unreadable."
+name = "truncated_or_overflowing_labels"
+description = "Button labels, validation messages, or section titles (not intentional long-filename ellipsis in queue rows) are truncated or overflowing so the copy is unreadable."
 type = "binary"
 negate = true
 weight = 0.5
@@ -153,7 +160,7 @@ weight = 0.5
 [[criterion]]
 id = "writing.catchall"
 name = "writing_catchall"
-description = "The app exhibits a significant, browser-observable defect in rendered copy quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app's rendered text exhibits a significant copy-quality defect not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

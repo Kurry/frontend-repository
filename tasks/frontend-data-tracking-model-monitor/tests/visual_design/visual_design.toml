@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -119,14 +119,28 @@ weight = 0.5
 
 [[criterion]]
 id = "2.9"
+name = "export_panel_designed_chrome"
+description = "The export panel shows format tabs, a monospaced preview block, and Copy / Download / Import actions that match the app's surface and border language rather than unstyled browser defaults; currency values use one consistent dollar format across sidebar, feed, budget, and exports"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "over_budget_error_treatment"
+description = "When over budget, the remaining-budget readout uses a 2 pixel error-colored border and an Over budget label that is not color-only"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
 name = "desktop_layout_broken"
-description = "At 1440 pixel width, any table, sidebar, feed, or modal text overlaps another element, is clipped by its container, or renders visibly misaligned"
+description = "At 1440 pixel width, any table, sidebar, feed, modal, or export panel text overlaps another element, is clipped by its container, or renders visibly misaligned"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
-id = "2.10"
+id = "2.12"
 name = "mobile_overflow_present"
 description = "At 375 pixel width, page-level horizontal scrolling appears or content clips outside the viewport instead of the table scrolling within its own container and the sidebar collapsing into a toggleable panel"
 type = "binary"
@@ -140,3 +154,4 @@ description = "The app exhibits a significant, browser-observable defect in visu
 type = "binary"
 weight = 1.0
 negate = true
+

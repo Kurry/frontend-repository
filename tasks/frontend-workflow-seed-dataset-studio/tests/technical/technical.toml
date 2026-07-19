@@ -1,0 +1,177 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "shared_state_coherence"
+description = "All surfaces derive from one shared state: a triage action updates the queue row, the rollup figures, and the seed's timeline together; a workbench edit updates the panes, the gate banner, the queue row, and the next export's manifest together; and a harvest step advancing updates the step list, golden pane, and timeline together — all without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "no_storage_reload_seeded"
+description = "No browser storage is used: localStorage and sessionStorage remain empty after triaging, authoring, harvesting, and exporting, and a page reload returns the app to its seeded state — the seeded manifest with its original statuses and counts, the default queue view, no saved filter chips, and no in-progress harvests"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "storage_persistence_used"
+description = "localStorage or sessionStorage holds seeds, packages, chips, harvest state, or UI state after exercising the app"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.4"
+name = "external_network_requests"
+description = "The devtools network log shows requests to external origins or third-party CDNs (scripts, styles, fonts, icons, or data) during load or a full exercise of the app"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.5"
+name = "console_clean"
+description = "The console is free of errors and warnings on first load and stays clean while filtering, sorting, triaging, batch rejecting, undoing, authoring, harvesting, and exporting"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "cold_load_interactive_2s"
+description = "The app is interactive (queue rows, filters, and top-bar controls respond) within 2 seconds of a local cold load with all 60 or more seeds present"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "responsive_under_rapid_input"
+description = "The UI stays responsive under rapid repeated input — fast filter toggles, rapid sort clicks, quick pane switches, repeated batch selections — with no hangs, dropped interactions, or views showing stale data another view already updated, including while a harvest simulation is running"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "queue_scroll_performance"
+description = "Scrolling the queue through all 60 or more rows stays smooth, with row rendering keeping up with fast scrolling and no blank stalls or layout jumps"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "keyboard_operability_focus"
+description = "Every interactive control — queue rows and checkboxes, column headers, filter and chip controls, triage and batch actions, workbench fields, harvest controls, copy controls, and timeline filters — is reachable and operable with the keyboard alone, with a visible focus indicator at each stop"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "dialog_focus_trap_escape"
+description = "The reject form and confirmation dialogs trap keyboard focus while open, close on the Escape key, and return focus to the control that opened them"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "aria_live_announcements"
+description = "Triage status changes, the gate reaching all-clear, harvest completion, and a harvest step entering the failed state are announced through an aria-live region in addition to their visual indication"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.12"
+name = "labels_and_error_association"
+description = "Form fields in the reject form, workbench editors, and harvest-pending justification have visible labels, and each validation message names the field it belongs to and renders in association with that field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.13"
+name = "badges_not_color_only_lock_exposed"
+description = "Status and difficulty badges convey their meaning with text rather than color alone, and the locked state of rubric criterion 1.4 is exposed to assistive technology rather than only as an icon"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.14"
+name = "commit_hashes_valid_and_unique"
+description = "Seed detail surfaces show commit hashes that are exactly 40 lowercase hexadecimal characters, and different seeds show different hashes"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.n1"
+name = "invalid_submit_mutates_state"
+description = "Submitting a form with invalid fields (empty required field, short justification, out-of-bounds cap, or a value outside a closed enum) still changes a seed, a package, or a rollup figure"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

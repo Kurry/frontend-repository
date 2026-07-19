@@ -1,0 +1,179 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+weight = 0.25
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "11.1"
+name = "delightful_microinteractions"
+description = "Where the build goes beyond the spec, it adds unique, delightful microinteractions — for example a satisfying gate all-clear moment or tactile chip and badge feedback beyond the required transitions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.2"
+name = "advanced_motion_mechanics"
+description = "Where present beyond the spec, advanced animation mechanics (choreographed pane transitions, staggered rollup updates, animated count-ups) elevate the studio's motion language"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.3"
+name = "guided_onboarding_or_shortcuts"
+description = "Where present, a guided first-run tour of the triage-to-export pipeline or a keyboard-first triage mode with an on-screen shortcut reference goes beyond the specification"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.4"
+name = "dataset_health_visualization"
+description = "Where present, a dataset health view — status distribution charted over the session or repositories flagged for skewed reject rates — provides interactive insight beyond the required rollup"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.5"
+name = "manifest_diff_preview"
+description = "Where present, a diff-style preview showing what changed in the manifest since the seed's previous export goes beyond the required export flow"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.6"
+name = "preference_personalization"
+description = "Where present, a configurable studio theme or density mode beyond the base requirement personalizes the workspace"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.7"
+name = "polished_product_narrative"
+description = "Where present, the studio carries a polished product identity and narrative — cohesive naming, purposeful empty states, and copy that makes the dataset-factory story legible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.8"
+name = "power_user_affordances"
+description = "Where present, power-user affordances beyond the spec — command palette, bulk keyboard selection, smart chip suggestions — speed up expert triage"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.9"
+name = "platform_features_where_apt"
+description = "Where the genre allows, web platform features (clipboard-rich exports, print-friendly manifest view) are used to genuine benefit"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.10"
+name = "competition_level_innovation"
+description = "Competition-level innovation beyond the specification is visible to users"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.n1"
+name = "demo_is_bare_spec_only"
+description = "The build is purely spec-compliant, barebones, and unenhanced."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "11.n2"
+name = "experience_is_generic_or_copied"
+description = "Interactions and visuals are generic, templated, or copied."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "11.n3"
+name = "experience_lacks_polish_guidance_story"
+description = "The app has no polish, guidance, or story."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "11.n4"
+name = "interface_is_flat_and_static"
+description = "The UI is flat and static with no immersion."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "11.n5"
+name = "effort_stops_at_mvp"
+description = "The app shows minimal effort beyond the MVP or deliverable."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "innovation.catchall"
+name = "innovation_catchall"
+description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0

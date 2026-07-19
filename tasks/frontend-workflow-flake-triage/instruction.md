@@ -222,13 +222,14 @@ Bindings:
 - Session operations: start; stop
 - Workflow completion: re-run writes results one run at a time; matrix, verdict chip, quarantine lists, and timeline update coherently
 - Workflow completion: stop freezes completed run results; remaining runs never fill in
-- Artifact operations: export; copy
-- Export formats: quarantine-text
+- Artifact operations: export; copy; import
+- Export formats: quarantine-text; triage-report-json
+- Import modes: replace-suite
 
 Mechanics exclusions:
-- Re-run form validation mechanics (run-count select required, disabled submit, inline error naming the field) are graded through the real form via Playwright
+- Re-run form validation mechanics (runCount select required, disabled submit, inline error naming the field) and Import triage report field-contract rejection are graded through the real forms via Playwright
 - Per-run tick-in entrance transitions and progress-indicator smoothness stay Playwright-observed
-- Clipboard contents of the quarantine export copy are verified via Playwright, never returned in WebMCP results
+- Clipboard contents and downloaded file bytes of the quarantine text and triage-report JSON exports are verified via Playwright, never returned in WebMCP results
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

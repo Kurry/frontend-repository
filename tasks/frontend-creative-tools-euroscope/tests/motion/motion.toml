@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,14 +62,14 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
+name = "button_hover_press_ease"
 description = "Hovering and pressing the wizard's actual buttons eases their border, shadow, and scale, and the press feedback appears immediately on pointer-down"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "4_2"
+name = "row_full_width_hover_wash"
 description = "Swatch rows and per-bitmap rows take a full-width hover wash when the pointer moves over them"
 type = "binary"
 weight = 0.5
@@ -77,14 +77,14 @@ optional = true
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
+name = "visible_keyboard_focus_ring"
 description = "Tabbing through the interactive controls shows a clearly visible keyboard focus ring distinct from the hover state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "4_4"
+name = "step_swap_in_place"
 description = "Advancing or returning between steps using the visible Continue, Generate, and Back buttons swaps the active step body in place without a full page reload and updates the progress bar to the current step"
 type = "binary"
 weight = 1.0
@@ -134,7 +134,7 @@ weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "4_5"
+name = "no_hover_or_focus_feedback"
 description = "Interactive controls show no hover or focus feedback, so buttons and rows read as static under pointer and keyboard interaction"
 type = "binary"
 weight = 1.0
@@ -142,11 +142,33 @@ negate = true
 
 [[criterion]]
 id = "4.6"
-name = "4_6"
+name = "step_change_full_reload"
 description = "Changing the step triggers a full page reload or outbound navigation instead of swapping the step body in place"
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "4.13"
+name = "command_palette_enter_transition"
+description = "Opening the command palette via the visible Ctrl+K / Cmd+K path enters the overlay with a brief opacity/scale transition rather than an instant hard cut (verified through the real keyboard path on a fresh interaction)."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.14"
+name = "copy_export_confirmation_motion"
+description = "Activating Copy export via the visible control shows a short confirmation that appears and then resets, rather than snapping with no feedback."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.n3"
+name = "palette_snaps_open_closed"
+description = "The command palette overlay snaps open or closed with no transition when prefers-reduced-motion is not set."
+type = "binary"
+negate = true
+weight = 0.5
 
 [[criterion]]
 id = "4.catchall"

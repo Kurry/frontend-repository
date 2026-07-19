@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,150 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_state_before_first_habit"
+description = "Before any habit exists, the main list shows a friendly empty-state message inviting the user to create the first habit rather than a blank area"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "habit_form_field_contract_inline_errors"
+description = "Submitting the New Habit form with a blank name, a name longer than 80 characters, a targetCount outside 1–100, once with targetCount not equal to 1, or a reminder longer than 40 characters shows an inline error naming the offending field and adds no habit"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "field_contract_errors_name_the_field"
+description = "Field-contract validation errors name the offending field (name, icon, targetCount, reminder, or category name) and the rule that failed rather than only saying Invalid"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "create_export_import_toasts"
+description = "Creating a habit, exporting Workspace JSON, and completing a valid Import each produce a transient visible confirmation toast"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "stats_empty_message"
+description = "The Stats view with no habits created yet shows its own short message instead of blank numbers"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "import_cancel_leaves_data"
+description = "Cancelling the Import confirmation step leaves the current habits, categories, and history untouched"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "category_name_field_contract"
+description = "Creating a category with a blank or over-40-character name is rejected with an inline error naming the name field and no category chip is added"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "stepper_floor_at_zero"
+description = "A minus-one tap when a stepper habit's count for today is already zero leaves the count at zero rather than going negative"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "import_confirm_modal_dismiss"
+description = "The Import confirmation dialog can be dismissed via Cancel or backdrop without replacing data"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "import_field_contract_rejection"
+description = "Importing malformed Workspace JSON, or JSON that fails the field contract (wrong schemaVersion, missing habits or categories, targetType outside once|count, unresolved categoryId, or illegal completions), leaves habits, categories, Stats, and history unchanged and shows validation naming the offending field"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_habit_list_blank"
+description = "Before any habit exists, the main list is a blank area with no empty-state invitation to create the first habit"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "field_contract_errors_console_only"
+description = "Field-contract validation failures for New Habit, category create, or Import are surfaced only in the browser console with no inline or role=alert UI feedback"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "invalid_habit_still_added"
+description = "Submitting an invalid New Habit payload (blank name, illegal targetCount, or over-length reminder) still adds a habit to the list"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "import_replaces_without_warning"
+description = "Import replaces the current habits and categories with no confirmation warning that current data will be overwritten"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "invalid_import_mutates_workspace"
+description = "Importing JSON that fails the Workspace JSON field contract still mutates habits, categories, or Stats"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "import_dialog_traps_without_escape"
+description = "The Import confirmation dialog cannot be dismissed via Cancel or Escape and blocks further interaction"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "blank_name_silent_reject"
+description = "Submitting the New Habit form with a blank name is blocked with no visible inline error naming the name field"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "generic_or_missing_action_labels"
+description = "Primary actions use only generic labels such as Submit or OK instead of specific labels such as Export as JSON or Load Malformed Sample"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "recovery_path_crashes_app"
+description = "Load Malformed Sample or corrupted localStorage recovery crashes or blanks the app instead of reporting in the role=alert live region"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "stepper_goes_negative"
+description = "A minus-one tap when a stepper habit's count for today is already zero drives the count below zero"
 type = "binary"
 negate = true
 weight = 1.0

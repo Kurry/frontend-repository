@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.5
@@ -63,97 +63,97 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "15.1"
-name = "headings_use_consistent_capitalization"
-description = "Where the app renders headings and section titles, they use consistent capitalization (one convention — title case or sentence case — throughout)."
+name = "consistent_capitalization_studio_labels"
+description = "Where the app renders headings and section titles (rubric name, Tune, Export, Rationale notes, history summaries), they use one consistent capitalization convention throughout."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.2"
-name = "actions_use_specific_labels"
-description = "Where the app renders button or action labels, they are specific verbs ('Add expense', 'Start session'), not generic ('Submit', 'OK') when a specific label is possible."
+name = "specific_verbs_on_actions"
+description = "Where the app renders button or action labels, they use specific labels such as Add criterion, Export, and Copy rather than generic Submit/OK when a specific label is possible."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.3"
-name = "errors_name_problem_and_fix"
-description = "Where the app renders error messages, they name the problem and the fix ('Amount must be a positive number'), not just a rejection ('Invalid')."
+name = "validation_names_problem_and_fix"
+description = "Where the app renders criterion-form or version-bump validation messages, they name the field or violation kind (name, description, id, minor bump required, major bump required) and the fix, not only a bare rejection like Invalid."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.4"
 name = "empty_states_explain_next_step"
-description = "Where the app renders empty states, the copy explains what belongs there and how to add it."
+description = "Where the app renders empty states for an empty criteria list, empty Tune case set, or empty preview panel, the copy explains what belongs there and how to add or include content."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.5"
-name = "body_copy_is_well_written"
-description = "Where the app renders body or marketing copy, rate how free it is of spelling and grammatical errors."
+name = "studio_copy_is_well_written"
+description = "Where the app renders body copy (criterion descriptions, Rationale notes, history summaries, empty-state text), rate how free the text is of spelling and grammatical errors."
 type = "likert"
 points = 5
 weight = 0.5
 
 [[criterion]]
 id = "15.6"
-name = "terminology_is_consistent"
-description = "Where the app renders labels for the same concept in multiple places, terminology is consistent (not 'task' here and 'todo' there)."
+name = "terminology_consistent_across_surfaces"
+description = "Where the app renders labels for the same concept in multiple places (criterion vs criteria, must have vs nice to have, weighted mean / required-pass / all-pass), terminology stays consistent rather than inventing conflicting names."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.7"
-name = "numbers_dates_and_units_are_consistent"
-description = "Where the app renders numbers, dates, and units, formatting is consistent (same date format, same decimal precision, units labeled)."
+name = "version_and_metric_formatting_consistent"
+description = "Where the app renders semantic versions, weights, and Tune precision/recall/F1 numbers, formatting is consistent across the rail badge, header, history entries, and bars (same decimal style and version shape)."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.8"
 name = "success_messages_are_specific"
-description = "Where the app renders confirmation and success messages, they state what happened ('Entry saved'), not vague affirmations."
+description = "Where the app renders confirmation feedback after save, delete, or copy, the copy states what happened rather than a vague affirmation alone."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.n1"
-name = "placeholder_copy_is_visible"
+name = "placeholder_copy_visible"
 description = "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI."
 type = "binary"
-negate = true
 weight = 0.5
+negate = true
 
 [[criterion]]
 id = "15.n2"
-name = "prominent_copy_has_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as headings, hero text, or primary buttons."
+name = "prominent_copy_has_spelling_errors"
+description = "Spelling or grammatical errors appear in prominent copy such as seeded rubric names (Response Quality, Code Review Depth, Safety Screening, Summarization Fidelity), Add criterion, Export, or Rationale notes."
 type = "binary"
-negate = true
 weight = 0.5
+negate = true
 
 [[criterion]]
 id = "15.n3"
-name = "concept_names_are_inconsistent"
-description = "The same concept is named inconsistently across surfaces."
+name = "inconsistent_concept_naming"
+description = "The same rubric or criterion concept is named inconsistently across the rail, header, Tune, preview, and export in a way that would confuse a user."
 type = "binary"
-negate = true
 weight = 0.5
+negate = true
 
 [[criterion]]
 id = "15.n4"
-name = "copy_is_truncated_or_overflowing"
-description = "Truncated or overflowing text renders copy unreadable."
+name = "truncated_or_overflowing_labels"
+description = "Section titles, validation messages, or primary button labels are truncated or overflowing so the copy is unreadable."
 type = "binary"
-negate = true
 weight = 0.5
+negate = true
 
 [[criterion]]
 id = "writing.catchall"
 name = "writing_catchall"
-description = "The app exhibits a significant, browser-observable defect in rendered copy quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app's rendered text exhibits a significant copy-quality defect not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true

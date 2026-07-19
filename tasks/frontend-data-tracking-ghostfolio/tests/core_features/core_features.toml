@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,7 +62,7 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
+name = "overview_at_root_no_gate"
 description = "On load, the root URL shows the portfolio overview (net-worth summary, allocation, holdings table, detail panel) with no login, signup, or onboarding gate."
 type = "binary"
 weight = 1.0
@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "1.2"
 name = "seeded_holdings_span_four_classes"
-description = "On load, the holdings table lists at least four seeded holdings spanning the classes Equity, ETF, Cash, and Crypto, each row showing name, symbol, asset class, quantity, and market value."
+description = "On load, the holdings table lists at least four seeded holdings spanning the classes Equity, ETF, Cash, and Crypto, each row showing name, symbol, asset class, quantity, currency, and market value."
 type = "binary"
 weight = 1.0
 
@@ -83,50 +83,50 @@ weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
-description = "On load, the allocation breakdown shows a percentage per visible asset class and those percentages sum to 100."
+name = "allocation_percentages_sum_100"
+description = "On load, the allocation breakdown shows one entry per visible asset class with a proportional bar and a percentage, and those percentages sum to 100."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
+name = "class_filter_recomputes_derived"
 description = "After filtering to one asset class, the table narrows to that class and the net worth, meta line, and allocation recompute over the visible set."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
+name = "clear_filter_restores_full_list"
 description = "After clearing the filter back to All classes, the full list of holdings reappears with no duplicated rows."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
-description = "After selecting a holding, the detail panel shows that holding's symbol, class, quantity, unit price, and market value and the row is visibly marked as selected."
+name = "selection_fills_detail_panel"
+description = "After selecting a holding, the detail panel shows that holding's name, symbol, class, quantity, unit price, currency, data source, and market value and the row is visibly marked as selected."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
+name = "reselect_replaces_detail_fields"
 description = "After selecting one holding and then another, every field in the detail panel switches to the second holding with no stale values from the first."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
+name = "add_holding_updates_totals"
 description = "After using Add holding and saving a valid holding, the new row appears in the table and the net worth and allocation percentages update together."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
-description = "After submitting the Add holding form with an empty name, an inline validation message appears at the form and no new row is added."
+name = "empty_name_blocks_add"
+description = "After submitting the Add holding form with an empty name, or a name longer than 80 characters, an inline validation message naming the name field appears and no new row is added."
 type = "binary"
 weight = 1.0
 
@@ -197,7 +197,7 @@ weight = 1.0
 [[criterion]]
 id = "1.35"
 name = "inline_error_names_field_and_rule"
-description = "Typing an invalid value (empty symbol or a non-positive quantity) shows an inline validation message directly at that field, naming the field and the rule it breaks, before the form is submitted."
+description = "Typing an invalid value (empty or malformed symbol, non-positive quantity, or negative unit price) shows an inline validation message directly at that field, naming the field and the rule it breaks, before the form is submitted."
 type = "binary"
 weight = 1.0
 
@@ -225,7 +225,7 @@ weight = 1.0
 [[criterion]]
 id = "1.39"
 name = "long_name_truncated_with_ellipsis"
-description = "A holding whose name is longer than 40 characters is truncated with an ellipsis in its table row and shown in full in the detail panel."
+description = "A holding whose name is longer than 40 characters and at most 80 is truncated with an ellipsis in its table row and shown in full in the detail panel."
 type = "binary"
 weight = 0.5
 
@@ -238,9 +238,109 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "1.41"
+name = "holding_field_contract_enums"
+description = "The Add holding form requires currency as one of USD, EUR, CHF and data source as one of MANUAL, YAHOO, COINGECKO; saving with values outside those enums is blocked with an inline validation message and adds no holding."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "holding_cross_field_rules"
+description = "Saving a holding that breaks a cross-field rule (Cash symbol not matching currency, Crypto with YAHOO data source, or Equity with COINGECKO data source) shows an inline validation message naming the field and rule and adds no holding."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "transactions_ledger_seeded"
+description = "On load, the transactions ledger lists at least four seeded activities, each showing the activity fields currency, data source, date, fee, quantity, symbol, type, and unit price."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "activity_field_contract_validation"
+description = "The Add activity form enforces the activity field contract: type in BUY/SELL/DIVIDEND/FEE/INTEREST/LIABILITY, ISO-8601 date ending with Z, fee >= 0, quantity > 0, and FEE/INTEREST requiring unit price 0; invalid values show inline messages and add no activity."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "buy_activity_updates_holding"
+description = "Saving a valid BUY activity for an existing symbol increases that holding's quantity and market value, appends one ledger row, and updates net worth and allocation without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "export_drawer_three_formats"
+description = "Export portfolio opens a drawer with Portfolio JSON, Holdings CSV, and Activities CSV tabs; each shows a monospaced preview compiled live from the current store, with Copy and Download controls."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "portfolio_json_schema_keys"
+description = "Portfolio JSON preview is an object with meta, holdings, and activities keys; each holding includes name, symbol, assetClass, quantity, unitPrice, currency, dataSource, and marketValue; each activity includes currency, dataSource, date, fee, quantity, symbol, type, unitPrice, and comment."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "csv_headers_match_contracts"
+description = "Holdings CSV preview starts with header name,symbol,assetClass,quantity,unitPrice,currency,dataSource,marketValue; Activities CSV preview starts with header currency,dataSource,date,fee,quantity,symbol,type,unitPrice,comment."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "export_reflects_session_mutations"
+description = "After creating or editing a holding or saving an activity, the Portfolio JSON and matching CSV previews include that session mutation before Copy or Download."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "import_round_trip_portfolio_json"
+description = "After mutating holdings or activities, importing a previously exported Portfolio JSON restores the holdings table, ledger, net worth, and all three export previews to match the pre-export mutated state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "undo_reverses_mutation"
+description = "After adding a holding or activity, Undo restores the prior holdings, activities, net worth, and export previews in one step, and shows enabled/disabled state matching availability."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n2"
+name = "export_omits_session_work"
+description = "After a visible holding create/edit/delete or activity save, the export preview omits that session mutation or still shows the deleted record."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n3"
+name = "invalid_contract_payload_accepted"
+description = "A holding or activity save accepts values outside the field contracts (invalid enum, non-positive quantity, or broken cross-field rule) and adds a row anyway."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.52"
+name = "live_market_value_readout"
+description = "While the Add or Edit holding form is open, a visible market-value readout equals quantity times unit price and updates as those inputs change; after save the same market value appears on the table row and in the detail panel."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in its core features or end-to-end flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in its core features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -222,7 +222,7 @@ weight = 1.0
 [[criterion]]
 id = "1.26"
 name = "utility_strip_and_board_header_controls"
-description = "The right rail shows a utility strip of Search, GitHub, Backlog, Archive, Objectives, and Calendar buttons, and the board header shows Today, Filter, and Board controls"
+description = "The right rail shows a utility strip of Search, GitHub, Backlog, Archive, Objectives, and Calendar buttons, and the board header shows Today, Filter, Board, Export, Undo, and Redo controls"
 type = "binary"
 weight = 0.5
 
@@ -295,6 +295,93 @@ name = "opens_directly_on_home_board_no_gate"
 description = "Loading the app opens straight onto the Home board — left nav rail, central multi-day board, and right calendar rail all visible — with no login, signup, or onboarding gate blocking the board"
 type = "binary"
 weight = 1.0
+
+
+[[criterion]]
+id = "1.37"
+name = "task_field_contract_gates_submit"
+description = "In Add task or edit, an empty title, an out-of-enum channel, or a plannedTime of 13:00 shows an inline error naming that field, keeps submit disabled or rejects the submit, and adds or saves no invalid task"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "channel_filter_and_search_narrow_board"
+description = "Opening Filter and choosing channel work leaves only #work tasks visible across columns; switching to personal hides the seeded #work tasks; clearing channel and search restores all four seeded tasks, and column planned-time footers reflect only currently visible tasks"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "bulk_complete_selected_updates_board_and_calendar"
+description = "Selecting Daily planning and Work and activating Complete selected marks both cards completed on the board, and Work's block on the July 20 calendar day reflects the completed state without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "rollover_moves_incomplete_past_tasks_to_today"
+description = "After adding an incomplete task titled Carry me to the July 17 column and activating Rollover incomplete, Carry me appears in the July 18 column and is gone from July 17, with both columns' planned-time footers updated without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "undo_redo_round_trips_delete"
+description = "After deleting Weekly planning from July 18, Undo restores the card and the July 18 footer; Redo removes Weekly planning again"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "export_canvas_shows_live_ics_and_planner_json"
+description = "Opening Export shows ICS and Planner JSON tabs with live-compiled monospaced previews: the ICS payload begins with BEGIN:VCALENDAR and contains one VEVENT per task with SUMMARY equal to the task title, and the planner JSON has schemaVersion 1, board title Cadence, and a tasks array whose objects match the Task field contract"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "export_reflects_session_mutations"
+description = "After renaming Work to Deep work, changing its plannedTime to 1:30, and creating a new task on July 21, the ICS preview includes a VEVENT whose SUMMARY is Deep work and a VEVENT for the new task, and the planner JSON tasks array contains Deep work with plannedTime 1:30 and the new task — proving exports are compiled from live session state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "download_and_copy_export_artifacts"
+description = "Download ICS and Download planner JSON offer real downloads, and Copy on either tab puts the exact visible preview text on the clipboard and shows a brief copied confirmation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "import_planner_json_reconstructs_board"
+description = "Importing a valid previously exported planner JSON reconstructs board cards, column footers, calendar blocks, and both export previews to match the imported document"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "schedule_conflict_drawer_lists_collisions"
+description = "When two incomplete tasks on the same day share the same startTime, a Conflicts control shows a count greater than zero and opening it lists each colliding pair by title; changing one task's startTime drops that pair and decrements the count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "export_omits_session_mutations"
+description = "After creating or renaming a task, the ICS or planner JSON export preview is unchanged from before the mutation — the artifact is static or omits the session's work"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.48"
+name = "undo_fails_to_restore_deleted_task"
+description = "After deleting a task and pressing Undo, the task stays missing from its column, the calendar panel, or the column footer"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.catchall"

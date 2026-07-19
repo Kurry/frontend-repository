@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,64 +63,64 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.2"
 name = "shared_state_coherence_without_storage"
-description = "A change made in one view (palette edit, theme create/delete, type toggle) is immediately reflected in every other view showing that data without a reload, while localStorage and sessionStorage remain empty after a full exercise of the app"
+description = "Saved themes, active options, tab/device/template, undo history, contrast matrix, color-blindness mode, before/after flag, command palette query, and Theme Files export text stay coherent through shared client state without using localStorage, sessionStorage, or other browser storage APIs (good-app in-memory rule)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
-name = "2_3"
-description = "Uses localStorage or sessionStorage to persist themes or editor state"
+name = "browser_storage_populated_after_use"
+description = "After exercising create/edit/delete, palette edits, export/import, or snapshots, localStorage or sessionStorage is non-empty — violating the good-app in-memory-only rule."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "2.4"
 name = "reload_restores_seeded_baseline"
-description = "Scripted probe: create a theme, edit a palette color, and switch tabs, then reload the page; the app returns to its seeded state with the seeded saved themes present and the unsaved edits gone - all facets reset coherently, never a mix"
+description = "A page reload returns the app to its seeded state: seeded saved themes present, unsaved edits/snapshots/import drafts/undo history gone."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.5"
 name = "keyboard_operability_with_focus_ring"
-description = "Every interactive control (main tabs, device toggles, Palette accordion rows, editor toolbar, saved theme actions) is reachable and operable with the keyboard alone, showing a visible focus indicator at each stop"
+description = "Primary interactive controls are keyboard operable with a visible focus indicator."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.6"
 name = "tutorial_modal_dialog_semantics"
-description = "The Tutorial modal exposes role='dialog' with aria-modal='true', traps focus while open, closes on Escape, and returns focus to the Tutorial control on close"
+description = "Tutorial, Theme Files, and Command palette overlays expose dialog semantics (role dialog / aria-modal) while open."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.7"
 name = "accordion_exposes_expanded_state"
-description = "Palette accordion rows expose their expanded/collapsed state to assistive technology (e.g. aria-expanded) and toggle with Enter or Space"
+description = "Palette accordion rows expose expanded/collapsed state to assistive technology."
 type = "binary"
-weight = 0.5
+weight = 1.0
 
 [[criterion]]
 id = "2.8"
 name = "validation_announced_via_live_region"
-description = "New Theme validation messages are shown visually and announced through an aria-live region"
+description = "New Theme / Snapshot / Import validation is announced via an aria-live region (or equivalent) in addition to visual feedback."
 type = "binary"
-weight = 0.5
+weight = 1.0
 
 [[criterion]]
 id = "2.9"
 name = "interactive_within_two_seconds"
-description = "The app is interactive within 2 seconds of a local cold load"
+description = "The app is interactive within 2 seconds of a local cold load."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.10"
 name = "console_errors_during_full_exercise"
-description = "Console errors or warnings appear during a full exercise of the app (tab switches, palette edits, source edits, saved theme create/load/delete)"
+description = "Console errors or warnings appear during a full exercise of tabs, palette edits, source edits, saved-theme CRUD, export/import, presets, snapshots, or command palette."
 type = "binary"
 negate = true
 weight = 1.0
@@ -128,14 +128,14 @@ weight = 1.0
 [[criterion]]
 id = "2.11"
 name = "rapid_input_stays_responsive"
-description = "Rapid successive palette changes and continuous typing in the source editor stay responsive with no hangs, freezes, or dropped interactions"
+description = "Rapid palette changes, continuous typing in the source editor, and history timeline scrubbing stay responsive with no hangs or dropped interactions."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.12"
 name = "outbound_network_requests_present"
-description = "After settle and a full exercise of the app, devtools shows outbound network requests to other origins (font CDNs, analytics, remote assets) beyond the app's own origin"
+description = "After settle, the app issues navigational outbound network requests or loads fonts/icons from CDNs instead of staying self-contained."
 type = "binary"
 negate = true
 weight = 1.0
@@ -143,14 +143,44 @@ weight = 1.0
 [[criterion]]
 id = "2.13"
 name = "document_title_matches_spec"
-description = "The browser document title reads 'Material UI Theme Creator' after load"
+description = "Document title is Material UI Theme Creator and the product header shows Material-UI Theme Creator."
 type = "binary"
-weight = 0.5
+weight = 1.0
+
+[[criterion]]
+id = "2.14"
+name = "export_import_derived_from_shared_options"
+description = "Theme Files JSON/CSS and Import apply through the same shared options as the editor and preview — exporting after a palette edit contains the edit under themeOptions.palette.*.main as #RRGGBB, and importing a schema-valid package updates every derived surface together."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.15"
+name = "api_shaped_schemas_enforce_theme_package_contract"
+description = "New Theme, Snapshot, and Import validation enforce the same API-shaped Theme package field contract as Theme Files export: required trimmed unique name at most 64 characters, paletteType light|dark, themeOptions with palette.type matching paletteType and the Light/Dark Type control, #RRGGBB mains, optional typography.fontSize 10–24 when present, and required shape.borderRadius 0–24 — invalid values surface inline errors naming the field and leave collections/options unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n1"
+name = "disconnected_editor_and_preview_copies"
+description = "Editor source and tool controls hold a private disconnected copy of options that disagree with preview, Components demos, or Theme Files export after an edit."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n2"
+name = "import_accepts_schema_invalid_theme_package"
+description = "Import accepts a package with paletteType outside light/dark, themeOptions.palette.type disagreeing with paletteType, a non-#RRGGBB primary.main, fontSize outside 10–24 when present, or shape.borderRadius outside 0–24 and still mutates the live theme."
+type = "binary"
+negate = true
+weight = 1.0
 
 [[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, console line, network entry, page state) that demonstrates it. If the defect is already covered - even partially - by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in technical quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

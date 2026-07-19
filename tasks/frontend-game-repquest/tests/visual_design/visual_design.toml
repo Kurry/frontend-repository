@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,109 +63,95 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "3.1"
 name = "zone_palettes_distinct"
-description = "Each unlocked zone (Foothills, Canyon, Summit) paints the quest map canvas with its own visually distinct sky/ground palette so the current region is identifiable at a glance"
+description = "Each unlocked zone (Foothills, Canyon, Summit) paints the quest map canvas with its own distinct sky/ground palette so the current region is identifiable at a glance"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.2"
 name = "boss_marker_distinction"
 description = "Boss Challenge waypoints render visibly larger and in a different color than normal waypoints, with a clearly different defeated treatment once cleared"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.3"
 name = "goal_progress_color_thresholds"
-description = "The daily-goal progress fill uses a clear color threshold that visually distinguishes below-half, at/above-half, and at/above-goal progress without reading the numbers"
+description = "The daily-goal progress fill uses a clear color threshold (below half, at/above half, at/above goal) so progress reads without checking the numbers"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.4"
 name = "gear_locked_unlocked_treatment"
-description = "Locked Gear Shop items show a muted/grayscale treatment that turns full color once unlocked, and the currently equipped item is clearly marked as selected among the unlocked options"
+description = "Locked outfits in the Gear Shop show a muted/grayscale treatment that turns to full color once unlocked; the equipped outfit is clearly marked as selected among unlocked options"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.5"
 name = "empty_states_render"
-description = "Before any set is logged, the History tab shows a friendly placeholder message and the weekly summary chart shows all-zero bars rather than a blank area"
+description = "Before any set is logged, the History tab shows a friendly placeholder message, and the weekly summary chart shows all-zero bars rather than a blank area"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.6"
-name = "feedback_copy_names_problem_and_fix"
-description = "Validation and feedback messages name the problem and the fix (which field is invalid and what a valid value looks like), and the History empty state explains what belongs there and how to log a first set, rather than generic copy like 'Invalid'"
+name = "active_tab_visually_distinct"
+description = "Tab navigation (Quest / History / Gear / Settings) is visually distinct for the active tab versus inactive tabs"
 type = "binary"
-weight = 0.5
-optional = true
-
+weight = 1.0
 [[criterion]]
 id = "3.7"
-name = "gear_states_indistinguishable"
-description = "Locked and unlocked Gear Shop items are visually indistinguishable, or the equipped item is not visibly marked among the unlocked options"
+name = "meta_screens_cohesive_styling"
+description = "Meta screens (tab bar, Settings forms, Gear Shop cards, History list, dialogs, notification banners, Export/Import controls, Personal Records, and streak heat-map) share cohesive component styling distinct from the hand-rendered canvas play surfaces"
 type = "binary"
 weight = 1.0
-negate = true
-
 [[criterion]]
 id = "3.8"
-name = "mobile_layout_overflows"
-description = "At a ~375px-wide viewport, the app requires horizontal scrolling, or rep totals, streak counts, history entry labels, or settings labels are clipped or truncated instead of reflowing or scaling to fit"
+name = "victory_defeat_visually_distinct"
+description = "Victory and Defeat result panels are visually distinct from each other (success-toned vs warning/defeat-toned) so the decided outcome reads at a glance"
 type = "binary"
 weight = 1.0
-negate = true
-
 [[criterion]]
 id = "3.9"
-name = "active_tab_visually_distinct"
-description = "In the tab navigation (Quest / History / Gear / Settings), the active tab is visually distinct from the inactive tabs"
+name = "heatmap_cell_treatments_distinct"
+description = "Heat-map cells for empty, below-goal, and at-or-above-goal days are visually distinct by fill intensity or color"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.10"
-name = "meta_screens_cohesive_styling"
-description = "The meta screens (tab bar, Settings forms, Gear Shop cards, History list, dialogs, and notification banners) share one cohesive component styling with consistent surfaces, borders, and spacing, visually distinct from the hand-rendered canvas play surfaces"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "3.11"
 name = "single_consistent_icon_set"
-description = "Icons across tabs, buttons, and status indicators come from a single consistent icon style; no visibly mismatched icon styles appear together"
-type = "binary"
-weight = 0.5
-
-[[criterion]]
-id = "3.12"
-name = "mobile_canvas_and_forms_scale"
-description = "At a ~375px-wide viewport, the quest map canvas, forms, and weekly chart scale to fit their container, and rep totals, streak, history entries, and settings labels stay legible"
+description = "Icons appear from a single consistent icon set across tabs, buttons, and status indicators with no mismatched icon styles"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
-id = "3.13"
-name = "consistent_capitalization_convention"
-description = "Headings, tab labels, and button labels follow one consistent capitalization convention (title case or sentence case) throughout the app"
+id = "3.n1"
+name = "gear_states_indistinguishable"
+description = "Locked and unlocked gear cards are visually indistinguishable, or the equipped outfit has no selected mark"
 type = "binary"
-weight = 0.5
-
+negate = true
+weight = 1.0
 [[criterion]]
-id = "3.14"
+id = "3.n2"
+name = "zone_palettes_identical"
+description = "Different unlocked zones reuse the same sky/ground palette so region identity is unclear"
+type = "binary"
+negate = true
+weight = 1.0
+[[criterion]]
+id = "3.n3"
+name = "victory_defeat_look_identical"
+description = "Victory and Defeat panels share the same visual treatment with no distinct success vs defeat styling"
+type = "binary"
+negate = true
+weight = 1.0
+[[criterion]]
+id = "3.n4"
 name = "placeholder_text_shipped"
-description = "Placeholder or lorem-ipsum text (e.g. 'Lorem', 'TODO', 'asdf', or template variable names) is visible somewhere in the shipped UI"
+description = "Placeholder or lorem-ipsum text appears in the shipped UI"
 type = "binary"
-weight = 1.0
 negate = true
-
+weight = 1.0
 [[criterion]]
-id = "3.catchall"
+id = "visual_design.catchall"
 name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "A significant visual-design defect is present that is NOT covered by any other criterion in this file. If present, name it and cite concrete evidence. If already covered, answer no here."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -66,42 +66,36 @@ name = "cold_load_interactive"
 description = "The app serves via its documented start path and is interactive within 2 seconds of a local cold load"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.2"
 name = "console_clean_full_exercise"
-description = "No console errors, warnings, or unhandled promise rejections appear on load or during a full exercise of the board: drags, keyboard moves, create/edit/delete flows, runs with retries, and filtering"
+description = "No console errors, warnings, or unhandled promise rejections appear on load or during a full exercise of the board: drags, keyboard moves, create/edit, runs with retries, filtering, bulk moves, undo/redo, and export/import"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.3"
 name = "state_coherence_across_surfaces"
-description = "A change made in one surface reflects everywhere immediately without reload: moving a card updates both column counts, editing in the detail modal updates the board card, and a completed run updates the card chip, progress indicator, and any filtered view showing that card"
+description = "A change made in one surface reflects everywhere immediately without reload: moving a card updates both column counts and the export preview; editing in the detail modal updates the board card and export; a completed run updates the card chip, progress indicator, and export status fields"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.4"
 name = "reload_returns_seeded_baseline"
-description = "A page reload after creating, moving, and running cards returns the app to its seeded baseline (in-memory state only), with no partial mixture of old and new state"
+description = "A page reload after creating, moving, running, selecting, and opening Export returns the app to its seeded baseline (in-memory state only): seeded cards/columns, no filters, empty undo/redo, no selection, Export closed — with no partial mixture of old and new state"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.5"
 name = "keyboard_and_dialog_semantics"
-description = "Modal dialogs expose role dialog with aria-modal true, trap focus while open, close on Escape, and return focus to their opener; validation messages are associated with their fields and execution state changes are announced via an aria-live region"
+description = "Modal dialogs and the Export drawer expose role dialog with aria-modal true, trap focus while open, close on Escape, and return focus to their opener; validation messages are associated with their fields and execution/WIP state changes are announced via an aria-live region"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.6"
 name = "rapid_input_stability"
-description = "The UI stays responsive and consistent under rapid repeated input — rapid drags, rapid filter toggling, and starting a run while filtering — with no hangs, dropped interactions, or desynced counts"
+description = "The UI stays responsive and consistent under rapid repeated input — rapid drags, rapid filter toggling, bulk moves, and starting a run while filtering — with no hangs, dropped interactions, or desynced counts"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.7"
 name = "storage_apis_used"
@@ -109,7 +103,6 @@ description = "After a full exercise of the app, localStorage, sessionStorage, o
 type = "binary"
 weight = 1.0
 negate = true
-
 [[criterion]]
 id = "4.8"
 name = "outbound_requests_or_navigation"
@@ -117,7 +110,18 @@ description = "The app issues network requests to non-local origins (CDN scripts
 type = "binary"
 weight = 1.0
 negate = true
-
+[[criterion]]
+id = "4.9"
+name = "export_field_contract_visible"
+description = "The board JSON export preview visibly includes the declared API-shaped field names and enums (column ids, status values, tasks.attempts, comments.created_at) matching the instruction field contract"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.10"
+name = "form_rejects_overlong_title"
+description = "Submitting Add Card with a title longer than 120 characters shows an inline validation message naming title and does not add a card"
+type = "binary"
+weight = 1.0
 [[criterion]]
 id = "4.catchall"
 name = "technical_catchall"

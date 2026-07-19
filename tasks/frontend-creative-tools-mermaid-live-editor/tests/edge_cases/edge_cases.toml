@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,99 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_source_stable_feedback"
+description = "Clearing the source to empty leaves the app stable: the preview shows the error treatment or an empty-source message rather than a stale diagram presented as current, export controls become unavailable, and no uncaught errors appear in the console."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "invalid_config_json_inline_validation"
+description = "Entering configuration text that is not valid JSON, or valid JSON that fails the Mermaid Config field contract (missing theme, theme outside default|base|dark|forest|neutral, or a non-object root), shows an inline validation message under the Config pane naming the theme field or the config document before apply, and the invalid configuration is not applied."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "syntax_error_names_parser_message"
+description = "When source syntax is invalid, the error region uses a Syntax error heading and surfaces the parser's actual message rather than only a bare 'Invalid'."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "copy_image_shows_confirmation"
+description = "With valid source, Copy image shows a visible confirmation that the diagram was copied."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "rapid_edits_settle_to_one_render"
+description = "Typing at least three quick consecutive source changes leaves exactly one rendered diagram matching the final source, with no overlapping or duplicated renders in the preview region."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "invalid_config_keeps_last_valid"
+description = "Invalid JSON in the Config tab never breaks the workspace: the diagram keeps rendering with the last valid configuration and the Code tab remains fully usable while the config error is shown."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "large_diagram_stays_contained"
+description = "Rendering a sample with at least eight nodes (for example Mindmap or Class) keeps the drawing inside the preview region without overflowing the page or forcing horizontal scrolling of the whole document."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "editor_controls_use_semantic_tags"
+description = "Code/Config tabs, sample buttons, SVG/PNG/MMD/Session JSON/Import/Copy image actions, and the theme toggle use semantic button/input elements rather than unlabeled decorative wrappers."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "exports_blocked_on_syntax_error"
+description = "While a Syntax error is shown, SVG, PNG, Copy image, and MMD are unavailable; correcting the source re-enables them."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "undo_after_edit_restores_prior"
+description = "After editing the source, pressing the undo keyboard shortcut restores the previous source and the preview follows that prior diagram."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "4.11"
+name = "config_theme_enum_rejected"
+description = "A Config document that parses as JSON but sets theme outside default|base|dark|forest|neutral (or omits theme) is rejected with validation naming the theme field or the config document, is not applied, and leaves the last valid configuration on the preview."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "session_json_import_rejects_bad_contract"
+description = "Importing malformed Session JSON, or JSON that fails the MermaidSession field contract (wrong schemaVersion, missing required keys, illegal config.theme/appTheme/activeTab/diagramType), leaves source, config, theme, tab, and badge unchanged and shows visible validation naming the offending field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "empty_mmd_import_stable"
+description = "Importing an empty or whitespace-only mmd payload leaves the workspace stable with the same empty-source or error treatment as clearing Code, without an uncaught console error or crash."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_source_shows_nothing"
+description = "Clearing the source to empty leaves the preview blank with no error treatment or empty-source message, or silently keeps a stale diagram as if current."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,71 +162,87 @@ weight = 1.0
 [[criterion]]
 id = "4.n2"
 name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+description = "Invalid Mermaid syntax, invalid Config JSON, Mermaid Config field-contract failures, or Session JSON import field-contract failures surface only in the browser console with no visible inline feedback."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "sample_or_edit_silent_failure"
+description = "Clicking a sample or applying a valid source edit produces no visible change to editor, preview, or badge (silent failure)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "exports_remain_enabled_on_error"
+description = "SVG, PNG, Copy image, or MMD remains enabled while the source has a syntax error."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "interactive_controls_are_nonsemantic"
+description = "Primary interactive controls (tabs, samples, exports, theme toggle) are non-semantic div/span click targets without button/role semantics."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "invalid_config_breaks_code_tab"
+description = "Entering invalid Config JSON breaks the Code tab or blanks the workspace so the diagram source cannot be edited until reload."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "rapid_edits_leave_overlapping_renders"
+description = "After at least three rapid consecutive edits, the preview shows overlapping or duplicated diagram renders instead of a single diagram matching the final source."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "ambiguous_or_missing_action_labels"
+description = "Primary actions show blank, placeholder, or ambiguous labels such as 'Submit', 'OK', or 'Button' instead of specific labels like SVG, PNG, or Copy image."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "large_diagram_overflows_document"
+description = "A sample with at least eight nodes forces horizontal scrolling of the whole document or overflows outside the preview region onto the page."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "empty_source_throws_console_errors"
+description = "Clearing the source to empty produces uncaught errors or unhandled rejections in the console."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "illegal_config_theme_applied"
+description = "A Config theme outside default|base|dark|forest|neutral, or a missing theme key, is applied to the preview without visible field-level validation."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n12"
+name = "bad_session_import_mutates_workspace"
+description = "Importing Session JSON that fails the field contract still mutates source, config, theme, tab, or badge."
 type = "binary"
 negate = true
 weight = 1.0

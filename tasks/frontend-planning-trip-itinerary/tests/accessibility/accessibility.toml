@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -208,6 +208,35 @@ name = "animations_ignore_reduced_motion"
 description = "Animations ignore reduced-motion settings."
 type = "binary"
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "spreadsheet_grid_keyboard_operable"
+description = "The spreadsheet matrix is keyboard operable: arrow keys move the active cell, the active cell is programmatically distinguishable, and inline editing starts and commits from the keyboard alone."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "import_wizard_keyboard_and_associated_errors"
+description = "The import wizard and its diagnostics screen are keyboard operable, and each diagnostic error message is programmatically associated with its cell input so assistive technology announces it."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n11"
+name = "financial_figures_graphics_only"
+description = "The debt visualizer, burn-rate chart, or pie conveys its key figures (balances, totals, transaction count) only graphically, with no rendered text or accessible label exposing them."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "export_import_controls_keyboard_live"
+description = "Export and import controls (format tabs, Download, Copy, Import) are keyboard operable with a visible focus indicator, and export copy confirmations plus import errors are announced through a polite live region."
+type = "binary"
 weight = 1.0
 
 [[criterion]]

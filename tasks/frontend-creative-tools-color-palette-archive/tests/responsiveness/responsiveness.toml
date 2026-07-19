@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,157 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "7.1"
-name = "layout_adapts_desktop_to_mobile"
-description = "Layout adapts gracefully from 1440px desktop to 375px mobile."
+name = "layout_adapts_1440_to_375"
+description = "Resizing from 1440px desktop to 375px mobile keeps a usable archive: sticky header, library controls, and the active Browse layout remain present and operable at both widths."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
-name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+name = "mobile_tap_targets_adequate"
+description = "At 375px width, view toggles, period filter, name sort, vision simulation, undo/redo, favorite flags, editor fields, export controls, and primary chrome controls present tap targets at least 44px in at least one dimension."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
-name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+name = "type_readable_both_widths"
+description = "Editorial intro type, nomenclature labels, and hex meta remain legible at both 1440px and 375px — type scales or reflows without becoming unreadably small on mobile."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
-name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+name = "no_clip_or_overflow_at_375"
+description = "At 375px width no content clips or overflows the viewport and no horizontal scrolling appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
-name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+name = "sticky_header_and_controls_usable_narrow"
+description = "Below 768px the sticky header (script lockup, MENU, CART) and library controls row remain usable; chrome adapts rather than disappearing or becoming unreachable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.6"
-name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+name = "nomenclature_reflows_below_768"
+description = "Below 768px the nomenclature index reflows so each entry keeps its swatch chip, hex, historical name with note, and source legible without truncating mid-word; at desktop widths the four-column index layout holds."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.7"
-name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+name = "swatch_and_card_tap_works_narrow"
+description = "At 375px width, tapping a swatch still copies hex with visible confirmation, and palette cards remain tappable to open Detail/Editor."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.8"
-name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+name = "no_horizontal_scroll_at_375"
+description = "At 375px width the page has no horizontal scrolling while browsing Nomenclature, Palette, or Swatch layouts, or while Export drawer and Detail/Editor are open."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.9"
-name = "media_and_canvases_resize"
-description = "Images, grids, and canvases size responsively to fit the layout."
+name = "palette_and_swatch_grids_reduce_columns"
+description = "Palette cards and swatch tiles reduce their column count at narrower widths so tiles stay legible and fit the layout without overflowing."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.10"
-name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
+name = "detail_editor_export_fit_375"
+description = "The Detail/Editor panel, contrast matrix, and Export drawer fit within a 375px-wide viewport with all fields and controls reachable without horizontal scrolling."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.11"
+name = "selection_tray_undo_reachable_375"
+description = "The multi-select tray and undo/redo controls remain reachable at 375px width without permanently covering primary actions."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.n1"
 name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+description = "At 1440px, 768px, or 375px the archive layout breaks or overflows the viewport."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n2"
-name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+name = "mobile_controls_too_small"
+description = "At 375px, view toggles, period filter, name sort, export, or editor controls are too small or misaligned for reliable tapping."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n3"
-name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+name = "mobile_text_unreadable"
+description = "At 375px, nomenclature historical names, hex labels, contrast-matrix text, or editorial intro text are too small to read."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n4"
-name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+name = "content_cropped_or_forced_hscroll"
+description = "At 375px, library, export, or editor content is cropped or forces unnecessary horizontal scrollbars."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n5"
-name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
+name = "header_or_controls_missing_narrow"
+description = "At narrow widths the sticky header or library controls row is missing, unresponsive, or unreachable."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n6"
-name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
+name = "sticky_header_obscures_library"
+description = "The sticky header permanently obscures library rows or editor fields so content cannot be read or reached."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n7"
-name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
+name = "overlap_at_narrow_width"
+description = "At 375px or below 768px, nomenclature columns, palette cards, swatch tiles, or the selection tray overlap or stack illegibly."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n8"
-name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
+name = "swatch_tap_broken_on_mobile"
+description = "At 375px width, tapping a swatch fails to copy hex or show confirmation when the desktop path works."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n9"
-name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
+name = "fixed_size_tiles_overflow"
+description = "Palette cards or swatch tiles keep a static desktop column size and overflow the viewport at 375px."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n10"
-name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
+name = "editor_or_export_controls_disappear_at_375"
+description = "At 375px, Detail/Editor fields, contrast matrix, Export drawer controls, or save/close controls disappear or become unreachable."
 type = "binary"
 negate = true
 weight = 1.0
@@ -217,3 +224,4 @@ description = "The app exhibits a significant, browser-observable defect in resp
 type = "binary"
 negate = true
 weight = 1.0
+

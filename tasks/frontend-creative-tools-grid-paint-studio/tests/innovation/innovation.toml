@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -63,157 +63,101 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+name = "qr_brush_recolor_craft"
+description = "Beyond bare cell fills, QR Brush mask recoloring with the active swatch (white→black glyph on white, black→white glyph on black, color→colored glyph on white) feels like a polished creative mechanic."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "typewriter_bracket_intro"
+description = "The angle-bracket typewriter intro (e.g. <YOU ARE THE ALGORITHM>) reads as intentional brand motion beyond a static headline."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+name = "draggable_toolbar_craft"
+description = "The floating /GRID PAINT TOOLS panel that drags and clamps within the stage feels like a finished creative-tool workspace, not a static bar."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+name = "gallery_thumbnail_workflow"
+description = "Saved-board thumbnails plus favorite/tag filter and bulk selection form a delightful recall workflow beyond a minimal name-only list."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+name = "camera_capture_pixelize_polish"
+description = "In-toolbar camera overlay with Capture center-crop pixelization feels like a thoughtful import path, not a stub file picker only."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+name = "export_center_artifact_craft"
+description = "Export center with live Project JSON, CSS palette vars, branded PNG, and copy confirmation elevates export beyond a silent dump."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+name = "saturated_blue_studio_identity"
+description = "The saturated blue page field, light paint stage, and condensed angle-bracket branding read as a cohesive Grid Paint Studio identity rather than a default admin template."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+name = "symmetry_fill_histogram_craft"
+description = "Mirror symmetry, Flood Fill, and the live histogram together feel like intentional painting craft rather than a minimal three-tool sketch pad."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+name = "vision_and_versions_craft"
+description = "Color-blindness Vision preview plus named version snapshots with Compare feel like thoughtful accessibility and iteration tools beyond the baseline paint loop."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+name = "competition_level_tool_feel"
+description = "Taken together, QR Brush, Flood Fill, Mirror, Export center, command palette, and gallery bulk actions present competition-level creative-tool craft visible to a real user."
 type = "binary"
-weight = 1.0
+weight = 0.5
+
+[[criterion]]
+id = "11.11"
+name = "optional_undo_timeline_bonus"
+description = "Optional: a scrubbable undo timeline slider previews board states while dragging — bonus polish beyond the required Undo/Redo controls."
+type = "binary"
+weight = 0.5
 
 [[criterion]]
 id = "11.n1"
 name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+description = "The demo is purely barebones: painting may work but typewriter intro, toolbar drag polish, Export center craft, and histogram/vision surfaces are all absent."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
+name = "experience_is_generic_template"
+description = "The UI reads as a generic unbranded form/template with none of Grid Paint Studio's saturated-blue stage identity or angle-bracket tool character."
 type = "binary"
 negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
-type = "binary"
-negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
-description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the Grid Paint Studio spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
+

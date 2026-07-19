@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,92 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "create_note_updates_all_surfaces"
+description = "Create flow: New Note increases footer count by one, clears the empty hint, adds an Outline row with the color name, and Workspace JSON export preview gains a note entry — all without reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "invalid_board_rename_inline"
+description = "Create/rename flow: submitting an empty or over-60-character board name shows inline validation naming the board-name field and does not change the tab label."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "edit_note_echoes_outline_export"
+description = "Edit flow: changing a note's body and color updates the Outline row and the Workspace JSON / Plain text export previews to match without reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "delete_updates_archive_and_surfaces"
+description = "Delete flow: confirming Delete Selected removes the object from canvas and Outline, moves it into Archive, updates the footer count, and removes it from export previews of the active board."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "canvas_outline_view_switch_keeps_state"
+description = "View switch: toggling between Canvas and Outline keeps the same objects and selection-relevant state; edits in one view remain visible in the other without reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "last_delete_reveals_empty_hint"
+description = "Edge: after deleting or archiving the last object on a board, the empty-canvas hint returns and the footer reads '0 objects'."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "search_filters_highlights_matches"
+description = "Search flow: typing a query highlights matching notes/flashcards, updates the match count, and a no-match query shows 'No results for the query'."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "live_panel_preserves_workflow"
+description = "The Show live events panel can be opened and used (Start/Pause) without losing board objects or selection, and closing/hiding it returns to the canvas workflow."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
 name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+description = "Delete confirmation, Export workspace, Import, rename popover, shape menu, and Command palette open, complete or cancel, and dismiss without trapping the user."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "failed_import_recovers_without_reload"
+description = "Recovery: a rejected Import leaves the prior workspace intact and the user can continue editing or open a valid Import without reloading the page."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "export_import_end_to_end"
+description = "Artifact flow: create objects on two boards, Download Workspace JSON, mutate the workspace, Import the file, and confirm boards and objects match the downloaded artifact."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "undo_redo_in_session_flow"
+description = "Undo flow: place two objects, Undo once (count and Outline drop by one), Redo restores; a new create after undo disables Redo."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
 name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+description = "New Note / New Flashcard / New Shape, Export workspace, or Import workspace are not enabled from the UI."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +155,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n2"
 name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+description = "New notes fail to show up on canvas/Outline/export, or a single New Note creates duplicates."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +163,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n3"
 name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+description = "Canvas, Outline, footer count, and export previews disagree about the same board's objects during a normal flow."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +171,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n4"
 name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+description = "Switching Canvas ↔ Outline breaks layout or loses objects until reload."
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,23 +179,23 @@ weight = 1.0
 [[criterion]]
 id = "6.n5"
 name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+description = "Emptying the active board produces a blank broken UI instead of the empty-canvas hint."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "search_and_outline_disagree"
+description = "Search highlights and Outline rows disagree about which objects match or exist."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "live_panel_cannot_reopen"
+description = "After closing the live-events panel it cannot be re-opened."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +203,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n8"
 name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+description = "An open dialog or palette blocks all navigation with no Escape or close control."
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +211,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n9"
 name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+description = "A failed board rename or Import provides no visible user feedback."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +219,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n10"
 name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+description = "A failed or canceled flow leaves a dead end that requires a full page reload to recover."
 type = "binary"
 negate = true
 weight = 1.0

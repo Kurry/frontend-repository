@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,92 +62,86 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "14.1"
-name = "multi_facet_round_trip"
-description = "Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline — never a mix."
+name = "reload_resets_in_memory_facets"
+description = "After creating a card, applying an assignee filter, opening Export, and selecting cards, a page reload returns every facet to the seeded baseline together — seeded cards and columns, no filters, empty undo/redo, no selection, Export closed — never a mix of old and new state"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "14.2"
-name = "sort_reversal_proves_live_data"
-description = "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders."
+name = "keyboard_reorder_proves_live_order"
+description = "Using Move down then Move up on a card in a column with at least three cards reverses the relative order correctly both ways, proving order is live board state rather than two hardcoded lists"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "14.3"
-name = "derived_view_responds_to_input"
-description = "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input."
+name = "export_tracks_board_mutations"
+description = "Create a card with a unique title, move it to Review, then open Export: the board JSON preview contains that title under review; Undo once and the preview no longer places it under review — the export is derived from live store state"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "14.4"
-name = "cross_view_echo_without_reload"
-description = "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list ↔ detail, board ↔ stats) without reload."
+name = "detail_board_export_echo"
+description = "Editing a card title in the detail modal and saving updates the board card title and the same title string in the board JSON export preview without a reload"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "14.5"
-name = "count_delta_is_exact"
-description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+name = "column_count_delta_exact"
+description = "Measure a column header count immediately before and after dragging one card into that column; the destination count increases by exactly one and the source decreases by exactly one with no lag"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "14.6"
-name = "different_inputs_change_outcomes"
-description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+name = "two_creates_differ_in_export"
+description = "Create two cards with different titles in Backlog; the board shows both distinct titles and the board JSON export contains both distinct title strings"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "14.7"
-name = "interleaved_flows_preserve_state"
-description = "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state."
+name = "interleaved_create_and_filter"
+description = "Start Add Card in Backlog, cancel, apply an assignee filter, then create a valid card in In Progress; the new card appears in In Progress when the filter includes its assignee (or after clearing filters), and the prior cancel did not leave a partial card"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "14.8"
-name = "empty_to_repopulated_round_trip"
-description = "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions."
+name = "empty_column_then_repopulate"
+description = "Move every card out of Review so the empty state shows, then Add Card into Review; the count goes from zero to one and the new card appears with the entered title, and the export preview lists it under review"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "14.n1"
-name = "partial_persistence_is_incoherent"
-description = "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence."
+name = "partial_in_memory_reset"
+description = "After reload, some session facets survive while others reset (for example filters clear but a created card remains), producing incoherent partial persistence"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "14.n2"
-name = "derived_surface_ignores_inputs"
-description = "A derived surface renders identically regardless of its inputs."
+name = "export_ignores_board_changes"
+description = "The Export preview renders identically before and after a visible create or move"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "14.n3"
-name = "different_inputs_produce_identical_output"
-description = "Repeating an action with different inputs yields byte-identical output."
+name = "different_titles_same_export"
+description = "Creating two cards with different titles yields export text with identical title fields or one shared title string for both cards"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "State changes appear in one view but not another until reload."
+name = "export_stale_vs_board"
+description = "A title or column change appears on the board card but not in the export preview until reload"
 type = "binary"
 negate = true
 weight = 1.0
-
+[[criterion]]
+id = "14.9"
+name = "import_export_full_pipeline"
+description = "Mutate the board (create or move), Copy the board JSON, reload to seeded baseline, Import that JSON — the board shows the mutated titles/columns/order and the export preview matches the imported state"
+type = "binary"
+weight = 1.0
 [[criterion]]
 id = "behavioral.catchall"
 name = "behavioral_catchall"

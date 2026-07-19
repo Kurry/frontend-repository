@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -208,6 +208,13 @@ name = "microinteractions_deviate_from_reference"
 description = "Microinteractions are missing or deviate from the provided reference."
 type = "binary"
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "new_surfaces_integrate_with_reference_language"
+description = "The financial, import, spreadsheet, and report surfaces integrate with the reference's coastal planner language (palette, type scale, spacing, planner density) rather than reading as a bolted-on foreign UI next to the screenshot-matched workspace."
+type = "binary"
 weight = 1.0
 
 [[criterion]]

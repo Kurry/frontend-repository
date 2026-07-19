@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.5
@@ -107,7 +107,7 @@ weight = 0.5
 [[criterion]]
 id = "15.7"
 name = "numbers_dates_and_units_are_consistent"
-description = "Where the app renders numbers, dates, and units, formatting is consistent (same date format, same decimal precision, units labeled)."
+description = "Where the app renders numbers, dates, and units, formatting is consistent: money values carry a currency symbol or code with two-decimal precision everywhere, converted values are labeled as EUR, and dates use one format across ledger, charts, and reports."
 type = "binary"
 weight = 0.5
 
@@ -146,6 +146,35 @@ weight = 0.5
 id = "15.n4"
 name = "copy_is_truncated_or_overflowing"
 description = "Truncated or overflowing text renders copy unreadable."
+type = "binary"
+negate = true
+weight = 0.5
+
+[[criterion]]
+id = "15.9"
+name = "reports_read_as_structured_documents"
+description = "Where the app renders the settlement report and budget summary, they read as structured documents with labeled sections (balances, transactions, settled state; category totals, burn-rate, projection), not raw data dumps."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.10"
+name = "export_action_labels_are_specific"
+description = "Where the app renders export and import controls, action labels are specific verbs such as Download trip JSON, Copy ICS, and Import trip JSON rather than generic Submit or OK."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.11"
+name = "markdown_export_well_formed"
+description = "Where the markdown export renders, it uses a heading per day and readable time-ordered lines with no raw data dumps such as [object Object] or undefined."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.n5"
+name = "export_or_ics_garbled"
+description = "Raw serialization artifacts such as [object Object], undefined, NaN, or unrendered template tokens appear in the markdown export, the ICS payload, or the trip JSON preview."
 type = "binary"
 negate = true
 weight = 0.5

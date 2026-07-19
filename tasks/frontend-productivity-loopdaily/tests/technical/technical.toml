@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -77,14 +77,14 @@ weight = 1.0
 [[criterion]]
 id = "2.3"
 name = "malformed_sample_guarded_path"
-description = "Clicking Load Malformed Sample exercises the same guarded import/recovery path as a real corrupted file and reports what was skipped or repaired in the role=alert live region"
+description = "Clicking Load Malformed Sample exercises the soft-recovery drill (skip-or-repair, distinct from Import's strict field-contract gate) and reports what was skipped or repaired in the role=alert live region"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.4"
 name = "export_import_no_network"
-description = "Export as JSON downloads the current data via a Blob and anchor download attribute with no network request; Import reads a file via FileReader with no network request"
+description = "Export as JSON downloads the current Workspace JSON document via a Blob and anchor download attribute with no network request; Import reads a file via FileReader with no network request"
 type = "binary"
 weight = 1.0
 
@@ -190,6 +190,28 @@ weight = 1.0
 id = "2.18"
 name = "console_clean_full_exercise"
 description = "The browser console stays free of errors and unhandled promise rejections during a full exercise of the app, including the malformed-data recovery path"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.19"
+name = "habit_form_validation_matches_field_contract"
+description = "New Habit and category creation enforce the field contracts in the UI: blank, over-80-character, or whitespace-only habit names; targetCount outside 1–100 or once-with-count-not-1; reminder over 40 characters; and blank or over-40-character category names are rejected with inline feedback naming the offending field, and no habit or category is added"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.20"
+name = "import_accepts_invalid_workspace_schema"
+description = "Import accepts a parseable JSON document that violates the Workspace JSON field contract (wrong schemaVersion, missing required keys, out-of-enum targetType, or unresolved categoryId) and still mutates habits or categories"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.21"
+name = "target_type_count_cross_field_contract"
+description = "Choosing Once a day forces targetCount to 1 in the created habit record (visible after create on the card or in Export as JSON), and choosing Daily count with a valid 1–100 targetCount persists that count — the cross-field targetType/targetCount contract holds without a reload"
 type = "binary"
 weight = 1.0
 

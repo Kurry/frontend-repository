@@ -1,0 +1,219 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "empty_states_are_designed"
+description = "Empty regions are designed states: a no-match queue names the active filters with a Clear all control, and a timeline filtered to an event type with no entries shows an explanatory message rather than a blank area"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "inline_validation_before_submit"
+description = "The reject form, the harvest-pending justification, and the foil cap field validate inline before submit — the 20-character justification minimum, the required reject class, and the 0 to 40 percent cap bounds each surface a message at the field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "errors_are_actionable"
+description = "Validation and gate messages name the exact field or condition and what satisfies it — for example that the justification needs at least 20 characters, or which gate condition is still unmet — not just a bare 'Invalid'"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "actions_confirm_visibly"
+description = "Triage actions, workbench saves, copy actions, and exports each produce visible confirmation (status change, toast, or icon swap) in the same interaction"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "harvest_shows_activity_state"
+description = "The simulated harvest shows a visible running indicator on the active step, its backoff countdown during retries, and never leaves the golden pane looking idle while work is simulated"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "destructive_actions_are_recoverable"
+description = "Destructive actions offer recovery or warning: triage exposes Undo for the last action, deleting a referenced rubric criterion immediately surfaces the dangling-reference warning on affected foils, and the reject form can be canceled without side effects"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "protected_state_is_explained"
+description = "Non-obvious constraints explain themselves in-app: attempting to delete locked criterion 1.4 shows an explanatory message, and the disabled Mark authored control is accompanied by the gate banner naming what remains"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "controls_use_semantic_tags"
+description = "Buttons, inputs, selects, checkboxes, and labels use semantic elements rather than styled generic containers"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "dialogs_close_predictably"
+description = "The reject form and confirmation dialogs close via their close control, the Escape key, and a background click, and closing without submitting changes nothing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "long_work_shows_progress"
+description = "The 5-step harvest presents its progress step by step with statuses and attempt counts, so the long simulated flow is never a spinner with no detail"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n1"
+name = "empty_region_is_blank"
+description = "An emptied or unmatched region (queue, timeline, or foil list) renders blank with no message or recovery control"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n2"
+name = "errors_only_reach_console"
+description = "A failure or rejection is surfaced only in the browser console with no visible UI feedback"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n3"
+name = "silent_success_or_failure"
+description = "A triage, save, copy, or export action completes or fails with no visible feedback"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n4"
+name = "batch_scale_not_communicated"
+description = "Batch Reject applies to multiple seeds without ever showing how many seeds are selected or affected"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n5"
+name = "interactive_elements_use_nonsemantic_tags"
+description = "Non-semantic div or span tags wrap interactive elements such as triage buttons, chips, or checkboxes"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n6"
+name = "modal_not_keyboard_dismissible"
+description = "The reject form or a confirmation dialog cannot be dismissed via the keyboard"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n7"
+name = "validation_feedback_missing_or_delayed"
+description = "An invalid submission is silently ignored, or validation feedback appears only after an unexplained delay"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n8"
+name = "button_text_ambiguous_or_missing"
+description = "Action controls carry ambiguous or missing text so their triage, authoring, or export effect cannot be predicted"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n9"
+name = "warnings_lack_explanation"
+description = "A foil's dangling-reference warning or a gate condition appears with no in-app explanation of what it refers to or how to resolve it"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n10"
+name = "affordances_hidden_or_inaccessible"
+description = "A required affordance — Undo, the selection toolbar, a copy control, or a chip's remove control — is visually hidden or practically unreachable"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "edge_cases.catchall"
+name = "edge_cases_catchall"
+description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

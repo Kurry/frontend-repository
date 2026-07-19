@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,208 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "hold_to_add_creates_custom_theme"
+description = "Create flow: holding Hold to add theme to completion (~0.7s) increases the My themes count by exactly one, the new row appears and becomes the highlighted active row, the editor shows its name and tokens, and the live preview recolors to its token set — all without a page reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "invalid_theme_name_inline_validation"
+description = "Create/rename flow: submitting an empty or whitespace-only theme name shows an immediate inline validation message naming the name field, and the invalid value is not applied (My themes count stays the same)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "rename_and_token_edit_update_all_surfaces"
+description = "Edit flow: renaming a custom theme in the editor updates that same row's name in My themes immediately; editing its primary color updates that row's four-swatch chip, the live preview surfaces, the Color Palette tab's primary swatch value, the Contrast panel's primary pair, and every Export format preview — without reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "remove_custom_theme_updates_all_surfaces"
+description = "Delete flow: removing the active custom theme deletes its row from My themes, drops the My themes count by exactly one, clears it from active selection (a remaining theme or default becomes active), and the preview recolors accordingly."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "preview_tab_switch_retains_theme"
+description = "View/mode switch: switching Live Preview tabs among Components Demo, Component Variants, and Color Palette swaps the pane in place without reload and keeps the same active theme tokens applied."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "last_custom_remove_shows_empty_state"
+description = "Edge: after removing the last custom theme, My themes shows the empty-state hint while the built-in catalog still lists all 35 presets."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "fork_builtin_adds_exactly_one_custom"
+description = "Fork flow: selecting a built-in preset then changing one of its tokens adds exactly one new entry to My themes (an editable copy) while the built-in catalog still contains all 35 presets unchanged, and the preview tracks the forked copy."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "chrome_dropdowns_preserve_workflow"
+description = "Chrome dropdowns (version, chrome theme-picker light/dark/cupcake/synthwave, language EN/ES/FR/JA) open and close in place without navigating away; after choosing a chrome theme option the workspace editor/preview state remains and the shell recolors with that option marked active."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "export_artifact_formats_copy_and_dismiss"
+description = "Artifact end-state overlay: Export opens with CSS, Theme JSON, and theme-extension tabs regenerated from the active theme; Copy confirms on the active tab; Download is available; Close, backdrop, or Escape dismisses and returns to the workspace."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "share_hash_round_trip_without_dead_end"
+description = "Share round-trip: after editing tokens the #theme= hash payload changes; opening the app fresh at a URL carrying that payload renders the same theme on first paint (editor tokens, list selection, and preview colors match). A plain reload without #theme= returns to the seeded baseline (35 built-ins, no custom themes beyond seed, default active) — no dead end requiring a second reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "theme_crud_unavailable_from_ui"
+description = "Custom theme create (Hold to add or equivalent New), rename, token edit, or Remove cannot be completed from the visible UI controls."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "create_fails_to_appear_or_duplicates"
+description = "Completing Hold to add theme either fails to add a visible My themes row or adds duplicate rows for a single completed hold."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "token_edits_desync_surfaces"
+description = "After editing a custom theme's name or primary color, My themes swatches, editor rows, live preview, Color Palette, and CSS-export block disagree about the same tokens."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "preview_tab_switch_breaks_or_loses_theme"
+description = "Switching among Components Demo, Component Variants, and Color Palette breaks the layout or loses the active theme selection / tokens."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_my_themes_region_broken"
+description = "After removing all custom themes, the My themes region is blank or broken with no empty-state hint, or the 35 built-ins disappear."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "fork_mutates_builtin_catalog"
+description = "Editing a built-in mutates that preset in place or changes the built-in catalog away from exactly 35 unchanged presets instead of forking an editable custom copy."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "chrome_dropdown_cannot_reopen"
+description = "After opening or closing a chrome dropdown (version, chrome theme, or language), that dropdown cannot be reopened or closed again."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "export_modal_blocks_with_no_exit"
+description = "The Export modal blocks the workspace with no working exit (no Close, backdrop dismiss, or Escape)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "failed_name_validation_silent"
+description = "An empty or whitespace-only theme name attempt provides no visible validation feedback naming the name field."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "share_or_export_dead_end_requires_reload"
+description = "Recovering from the CSS-export modal or a share-hash load requires a full page reload — the UI reaches a dead end."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "duplicate_then_undo_redo_flow"
+description = "Duplicate then undo: with a custom theme active, Duplicate increases My themes by exactly one with matching tokens; Undo removes that duplicate and restores the prior selection and preview; Redo restores the duplicate again — all without reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "export_import_theme_json_round_trip_flow"
+description = "Artifact end state: edit primary and Radius Boxes, open Export and confirm CSS, Theme JSON, and theme-extension each contain the edits and Theme JSON still shows required name, color-scheme, color (oklch or #RRGGBB), radius, size, border, depth, and noise keys; Download Theme JSON then Import that document reconstructs the same visible name and tokens in editor, preview, Contrast, and Export."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "create_record_appears_in_theme_json_export"
+description = "Create a custom theme with a valid name, edit primary and box radius, open Theme JSON: the preview object carries that same name and the edited token values under the required contract keys — the form-created record is the would-be request body / export payload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.16"
+name = "schema_validation_create_and_import_flow"
+description = "Schema validation flow: attempt create/rename with an illegal or over-length name (My themes unchanged, name field named); Import JSON missing a --color-* key or with a non-oklch/non-#RRGGBB color (state unchanged, offending field named); then a valid create yields Theme JSON whose payload shape matches the form-produced request body."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "snapshot_before_after_flow"
+description = "Snapshots flow: Save snapshot under a valid name after editing tokens (snapshot theme matches the Theme JSON field contract), change tokens further so the preview differs, then toggle Before / After and confirm the preview flips between the snapshot tokens and the live edits without losing either set."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "vision_mode_deuteranopia_flow"
+description = "Vision mode: with Components Demo visible, choose Deuteranopia and confirm the preview pane's colors change under simulation while editor swatches stay unfiltered; choosing None restores the unfiltered preview."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "export_formats_missing_session_edits"
+description = "After editing primary and box radius, at least one Export format tab (CSS, Theme JSON, or theme-extension) still shows the pre-edit values — the artifact omits the session's work."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n12"
+name = "undo_after_duplicate_leaves_orphan"
+description = "After Duplicate then Undo, the duplicate row remains in My themes or selection/preview stay on the removed duplicate."
 type = "binary"
 negate = true
 weight = 1.0

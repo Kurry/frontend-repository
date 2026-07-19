@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -63,81 +63,81 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+name = "command_palette_bonus"
+description = "Optional: a command palette jumps to tags, Export, or Import beyond the required controls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "richer_markdown_export_styling"
+description = "Optional: Timeline Markdown export offers richer styling controls beyond the required report"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+name = "todo_setup_coachmarks"
+description = "Optional: coachmarks guide the first Make TODO setup while staying on-brand"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+name = "enhanced_history_visualization"
+description = "Optional: History branch visualization is clearer than a plain list while remaining usable"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+name = "keyboard_chord_hints"
+description = "Optional: keyboard chord hints surface undo/redo or export shortcuts"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+name = "tag_analytics_beyond_counts"
+description = "Optional: tag usage insights beyond the required rail counts"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+name = "polished_empty_illustration"
+description = "Optional: polished empty-state illustration work that stays on-brand with the TagNote shell"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+name = "import_diff_preview"
+description = "Optional: Import shows a diff preview of incoming notes before commit"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+name = "print_friendly_timeline"
+description = "Optional: a print-friendly timeline layout beyond the required markdown export"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+name = "competition_level_polish"
+description = "Optional: competition-level interaction polish visibly beyond the specification"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+name = "demo_blocks_required_flows"
+description = "A bonus enhancement blocks or breaks a required Send, Export, or Import flow"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "11.n2"
@@ -214,6 +214,6 @@ weight = 1.0
 [[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
-description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app includes a significant, browser-observable enhancement beyond the required TagNote specification that is NOT covered by any other criterion in this file. Name the enhancement and cite the concrete evidence. If already covered by another criterion, answer no here."
 type = "binary"
 weight = 1.0

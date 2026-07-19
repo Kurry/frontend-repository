@@ -1,0 +1,157 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "14.1"
+name = "multi_facet_reload_reset"
+description = "Add a field, save a version, define a metadata field, paste a playground payload, and switch the right pane to the Example tab — then reload the page. All facets coherently reset to the seeded baseline: the seeded library with the first schema active, no user versions or metadata fields, an empty playground, and empty undo history — never a mix of surviving and reset facets"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.2"
+name = "edit_to_all_derivations_pipeline"
+description = "Full pipeline probe: add a number field with minimum 1 and maximum 5 and mark it required, then confirm without a reload that the tree shows it, the compiled text gains its property with minimum, maximum, and the required entry, the example payload shows it with a value between 1 and 5, and the format instruction names it as a required number — all four surfaces track the one edit"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.3"
+name = "validate_edit_revalidate_tracks"
+description = "Paste a payload violating one constraint, run validation, and confirm exactly that field fails with a message naming the path and bound; edit the schema so the constraint now passes, re-run validation on the same payload, and confirm the annotation flips to pass and the exported validation report reflects the new outcome"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.4"
+name = "different_payloads_different_outcomes"
+description = "Validate two different payloads against the same schema: the per-field annotations, rollup failure counts, and validation reports differ in ways the payloads dictate"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.5"
+name = "version_diff_matches_edits_exactly"
+description = "Save a version, make exactly two structural edits (one added field, one type change), save a second version, and diff the two: the diff shows exactly one added entry and one changed entry with correct labels, and nothing else"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.6"
+name = "import_inference_input_dependent"
+description = "Paste two different example objects into Import from example in sequence: each inferred draft's field names and types match its own pasted object, and applying the second draft produces a tree, compiled text, and example payload matching the second object's shape"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.7"
+name = "interleaved_run_and_edit_integrity"
+description = "Start a validation run, pause it mid-run, switch tabs and edit an unrelated schema field's description, then resume: the run continues from exactly the paused step with earlier outcomes unchanged, and the description edit is still present — neither flow corrupted the other"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.8"
+name = "history_scrub_round_trip"
+description = "Make three labeled edits, scrub the history slider back to before the first edit and confirm the tree, compiled text, and example match the pre-edit state, then scrub forward to the end and confirm all three edits are back — derived panes track through both directions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n1"
+name = "derived_pane_ignores_inputs"
+description = "A derived pane — compiled text, example payload, format instruction, diff, or a validation report — renders identically after its inputs change (an edit, a different version pair, or a different payload)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "14.n2"
+name = "example_or_export_stale_after_edit"
+description = "After an edit, the example payload or an export still reflects the pre-edit schema until a reload or manual refresh"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "14.n3"
+name = "inference_output_constant"
+description = "Two clearly different pasted example objects yield identical inferred schema drafts"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "14.n4"
+name = "partial_reset_incoherent"
+description = "After a reload, some user-made facets survive (for example versions or playground content) while others reset, producing incoherent partial persistence in this in-memory task"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "14.catchall"
+name = "behavioral_catchall"
+description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling that is NOT covered by any other criterion in this file. If present, name the probe and cite the concrete evidence (action sequence and mismatched surfaces) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

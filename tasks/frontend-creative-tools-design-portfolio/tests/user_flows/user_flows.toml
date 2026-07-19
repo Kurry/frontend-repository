@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -60,152 +60,212 @@ allowed_tools = [
 [scoring]
 aggregation = "weighted_mean"
 
+
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "create_project_updates_work_board_shortcut_export"
+description = "Create flow: after boot, create a valid project named Northline Studio; the /work listing grows by exactly one entry, Projects Board shows one more card with that name and a status badge, the new project's slash shortcut immediately prints its detail block, /stats total increases by one, and Portfolio JSON contains the new name — all without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "invalid_create_blocks_and_names_field"
+description = "Create flow: submitting the project create form or command with an empty project name, illegal slug, or year outside 1990–2100 leaves the measured project count unchanged and shows immediate inline validation naming the offending field in the terminal output or form."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "edit_project_echoes_board_work_detail_export"
+description = "Edit flow: editing a seeded project's name or tags updates that same record on the Projects Board card, the /work list line, the project's shortcut detail block, and the export preview without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "delete_project_removes_all_surfaces"
+description = "Delete flow: deleting a project decreases the Projects Board card count by exactly one, removes its line from subsequent /work output, drops it from status/tag filter results and the export preview, and its former shortcut no longer prints a detail block."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "theme_and_mode_preserve_buffer_history"
+description = "Theme and mode flow: running /retro then toggling into Projects Board keeps the retro theme applied; switching back to Terminal CLI preserves the output buffer and up-arrow command history; none of these steps reloads the document."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "last_delete_shows_empty_projects_state"
+description = "Edge: after deleting every active project, Projects Board and /work output both show a clear empty-projects state with a hint for how to create one."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "board_filter_clear_and_status_move"
+description = "Filter flow: applying a status or tag filter or status:shipped syntax query in Projects Board recomputes the visible cards from the shared collection; clearing restores the full set exactly; editing a project's status moves it between the corresponding filter results."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "window_chrome_minimize_maximize_round_trip"
+description = "Yellow minimize swaps the blurred wallpaper for the sharp one and the terminal remains operable afterward; green maximize expands the terminal window and the command prompt stays usable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "exit_overlay_reopen_restores_terminal"
+description = "Red close opens the exit overlay with kill-style lines and a Reopen terminal control; activating Reopen restores the terminal window so the prompt is usable again without a full page reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "consent_and_privacy_status_round_trip"
+description = "Consent flow: before any choice /privacy reads not set; choosing Accept dismisses the banner and a subsequent /privacy reads accepted; on a fresh load choosing Decline makes /privacy read declined; export Portfolio JSON consent matches."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "reload_restores_seeded_baseline"
+description = "Reload baseline: after creating or editing a project, archiving, switching theme/mode, and opening Export, reloading the page replays the boot sequence and /work lists exactly the seeded projects — session mutations are reverted."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "bulk_archive_with_undo_flow"
+description = "Bulk archive with undo: selecting three visible board projects and choosing Archive selected moves all three to /archive, drops /stats by three, and removes them from export; Ctrl+Z restores all three to the board, prior /stats, and Portfolio JSON."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "export_import_round_trip_flow"
+description = "Export then import: create Northline Atlas with a valid project field-contract payload, confirm Portfolio JSON contains it under projects[] with required version/theme/consent/projects keys, copy the JSON, delete Northline Atlas, import that payload, and confirm Northline Atlas returns on the board and in /work with the same status, tags, slug, and stats."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "artifact_field_contract_flow"
+description = "Artifact field-contract flow: after creating or editing a project and switching to /retro with consent accepted, open Export and confirm Portfolio JSON shows version exactly \"1.0\", theme exactly \"retro\", consent exactly \"accepted\", and a projects entry whose name, slug, blurb, status, tags, stats, type, and year match the form values."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "palette_opens_project_and_export"
+description = "Palette navigation: Ctrl+K, type part of a seeded project name, Enter on the Project result opens that detail; reopen palette and choose Export view to open the export preview."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "project_crud_unavailable_from_ui"
+description = "Project create, edit, or delete cannot be completed from the visible shell commands or in-terminal form."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "created_project_missing_or_duplicated"
+description = "After a valid create, the new project fails to appear in /work, Projects Board, or export, or appears duplicated across those surfaces."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "edit_desyncs_board_work_detail"
+description = "After editing a project's name or tags, Projects Board, /work output, shortcut detail, and export show mutually inconsistent values for that same record."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "mode_switch_reloads_or_loses_history"
+description = "Switching between Terminal CLI and Projects Board reloads the document or drops the prior output buffer / command history when returning to CLI."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_projects_ui_broken"
+description = "After deleting every active project, Projects Board or /work shows a blank/broken body with no empty-state guidance."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "filter_clear_disagrees_with_collection"
+description = "Clearing a Projects Board status/tag filter or syntax query leaves a visible set that disagrees with the full shared collection."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "exit_overlay_cannot_reopen"
+description = "After red close opens the exit overlay, the Reopen terminal control is missing or fails to restore the terminal window."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "exit_overlay_traps_without_exit"
+description = "The exit overlay blocks further use with no working Reopen or keyboard path back to the terminal."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "invalid_create_silent_failure"
+description = "Submitting an empty project name adds no project and also shows no visible validation feedback naming the field."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "consent_privacy_dead_end"
+description = "Choosing Accept or Decline on the cookie banner leaves /privacy stuck on not set, or recovering from the banner requires a full page reload."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "bulk_archive_undo_dead_end"
+description = "After Archive selected, Undo is missing or fails to restore the archived projects to the board and export preview."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n12"
+name = "import_does_not_restore_exported_project"
+description = "After exporting JSON that contains a created project and importing that payload, the project is absent from the board or /work."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n13"
+name = "schema_invalid_import_succeeds"
+description = "Importing parseable JSON that fails the Portfolio JSON field contract still replaces the board or /work collection as if the import succeeded."
 type = "binary"
 negate = true
 weight = 1.0

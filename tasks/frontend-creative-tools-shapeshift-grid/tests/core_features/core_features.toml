@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -119,7 +119,7 @@ weight = 1.0
 [[criterion]]
 id = "1.9"
 name = "invalid_save_blocked_with_field_error"
-description = "Submitting the Save board form with an empty or whitespace-only name adds no board: the gallery count stays the same, an inline validation message naming the name field appears before submit, and the save control stays disabled until the name is valid"
+description = "Submitting the Save board form with a Board field-contract violation (empty or whitespace-only name, empty or whitespace-only tag, name over 40 characters, tag over 24 characters, or a duplicate name) adds no board: the gallery count stays the same, an inline validation message naming the offending field appears before submit, and the save control stays disabled until name and tag are valid"
 type = "binary"
 weight = 1.0
 
@@ -227,7 +227,7 @@ optional = true
 [[criterion]]
 id = "1.28"
 name = "1_28"
-description = "QR Brush fills the cell with a flat solid color and stamps no scannable QR mask, so the QR and Color brushes look identical"
+description = "QR Brush fills the cell with a flat uniform color fill and stamps no scannable QR mask, so the QR and Color brushes look identical"
 type = "binary"
 weight = 1.0
 negate = true
@@ -243,7 +243,7 @@ negate = true
 [[criterion]]
 id = "1.30"
 name = "save_flow_multi_surface_probe"
-description = "Starting from a blank canvas: paint several cells, open Save board, and submit the name 'Flow Probe' with a tag. Measured immediately around the submit, the gallery collection count increases by exactly one; the new card appears in Gallery mode with a thumbnail matching the painted cells and its tag; and switching Paint -> Gallery -> Paint shows the same new board both times without a reload"
+description = "Starting from a blank canvas: paint several cells, open Save board, and submit a valid Board payload with name 'Flow Probe' and a trimmed tag of at most 24 characters. Measured immediately around the submit, the gallery collection count increases by exactly one; the new card appears in Gallery mode with a thumbnail matching the painted cells and its tag; the Export session JSON boards array includes that board under the field-contract keys name, tag, favorite, and cells; and switching Paint -> Gallery -> Paint shows the same new board both times without a reload"
 type = "binary"
 weight = 1.0
 
@@ -313,7 +313,7 @@ weight = 0.5
 [[criterion]]
 id = "1.40"
 name = "color_brush_fill_and_eraser_clear"
-description = "Color Brush fills a painted cell solid with the active swatch color, and Eraser clears a painted cell back to blank"
+description = "Color Brush fills a painted cell completely with the active swatch color, and Eraser clears a painted cell back to blank"
 type = "binary"
 weight = 1.0
 
@@ -323,6 +323,36 @@ name = "slider_resize_before_paint_keeps_blank"
 description = "Moving the cell-size slider before any painting rebuilds the grid at the new cell size while the board stays completely blank, with no stray painted cells appearing"
 type = "binary"
 weight = 0.5
+
+[[criterion]]
+id = "1.42"
+name = "session_json_field_contract_keys_visible"
+description = "Opening Export and selecting session JSON shows a monospaced preview matching the Session field contract: schemaVersion exactly shapeshift-session-v1, plus visible keys cellSize (16–64), brushMode (qr|color|erase), paletteColor (white|black|red|yellow|green|blue|pink), gridOverlay, mirrorMode (off|horizontal|vertical), fillStats with painted/qr/colorFilled/blank, cells, and boards"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "import_rejects_nonconforming_session_schema"
+description = "Importing session JSON that fails the field contract (wrong schemaVersion, cellSize outside 16–64, brushMode or paletteColor or mirrorMode outside their closed enums, or a board missing name/tag/cells) shows an inline error naming the offending field or the import problem and leaves gallery count, canvas cells, and fill stats unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "export_omits_session_field_contract"
+description = "With painted cells or saved boards present, the Export session JSON preview is missing schemaVersion shapeshift-session-v1 or omits required Session/Board/Cell field-contract keys (cellSize, brushMode, paletteColor, mirrorMode, fillStats, cells, boards, or a board's name/tag/favorite/cells)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.45"
+name = "import_accepts_invalid_session_schema"
+description = "Import accepts a parseable JSON document that violates the Session/Board/Cell field contract (wrong schemaVersion, invalid enums, or missing required keys) and mutates gallery, canvas, or fill stats without an inline error naming the import problem"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.catchall"

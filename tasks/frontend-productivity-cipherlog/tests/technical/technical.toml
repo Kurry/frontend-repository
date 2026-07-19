@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -145,7 +145,7 @@ optional = true
 [[criterion]]
 id = "2.13"
 name = "errors_conveyed_as_text"
-description = "Inline validation errors (blank title, duplicate channel, wrong passcode) are rendered as text associated with their field rather than conveyed by color alone"
+description = "Inline validation errors (blank title, duplicate channel, wrong passcode, contract-invalid import) are rendered as text associated with their field rather than conveyed by color alone"
 type = "binary"
 weight = 0.5
 optional = true

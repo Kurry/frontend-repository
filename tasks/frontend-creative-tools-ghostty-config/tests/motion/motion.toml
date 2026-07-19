@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -170,6 +170,28 @@ name = "reduced_motion_removes_transitions"
 description = "With prefers-reduced-motion set, transitions are removed or minimized and every state change still applies instantly and completely."
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "palette_and_diff_motion"
+description = "Driven through real UI controls, the command palette enters and dismisses with a brief opacity/scale transition, and Diff mode cross-fades default versus current values rather than snapping."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.17"
+name = "import_profile_toast_motion"
+description = "Import and profile actions produce transient toast feedback that enters with motion, stays readable, and dismisses with a fade."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n16"
+name = "disabled_undo_reads_interactive"
+description = "When Undo or Redo is disabled (empty stack), the control still reads as fully interactive with no disabled visual treatment."
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.catchall"

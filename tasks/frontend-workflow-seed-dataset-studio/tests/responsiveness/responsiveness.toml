@@ -1,0 +1,219 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "7.1"
+name = "layout_adapts_1440_to_375"
+description = "The studio layout adapts gracefully from 1440 pixel desktop to 375 pixel mobile: the top bar, rollup, filter row, table, and workbench remain usable at every width between"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.2"
+name = "mobile_tap_targets_adequate"
+description = "At mobile widths, interactive controls — row checkboxes, chips, triage buttons, pane controls — present tap targets of at least 44 pixels"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.3"
+name = "workbench_panes_stack_at_1024"
+description = "At widths of 1024 pixels and below the workbench panes stack vertically in the order question, rubric, foils, golden, each keeping its full controls, while desktop widths show at least two panes side by side"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.4"
+name = "rollup_strip_and_column_hiding_at_768"
+description = "At widths of 768 pixels and below the stats rollup collapses to a horizontally scrollable strip and the queue hides the deference and commit columns behind the seed detail surface while keeping id, title, status, and difficulty visible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.5"
+name = "no_page_overflow_at_375"
+description = "At 375 pixel width no content clips or overflows the viewport and no page-level horizontal scrolling appears; the seed table and the manifest text scroll within their own containers"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.6"
+name = "stacking_order_logical"
+description = "Narrow-width stacking keeps a logical reading order — rollup, filters, then table in the queue; header and gate banner before panes in the workbench"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.7"
+name = "typography_scales_across_widths"
+description = "Typography remains readable and hierarchically distinct at both desktop and mobile widths, with no unreadably small monospace ids or manifest text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.8"
+name = "hidden_data_stays_reachable"
+description = "Data hidden at narrow widths (deference and commit columns) remains reachable through the seed detail surface, and the horizontally scrollable rollup strip exposes all its figures by scrolling"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.9"
+name = "dialogs_fit_small_viewports"
+description = "The reject form, confirmation dialogs, and the export view fit within small viewports with their actions visible without page-level scrolling"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.10"
+name = "fixed_chrome_stays_accessible"
+description = "Persistent chrome — the top bar, view switcher, and selection toolbar — remains visible and operable at every width without covering the content being acted on"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.n1"
+name = "layout_breaks_at_breakpoints"
+description = "The layout breaks, collapses incorrectly, or overflows at 1024, 768, or 375 pixel widths"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.n2"
+name = "mobile_controls_too_small_or_misaligned"
+description = "Controls are too small to tap or visibly misaligned at mobile widths"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.n3"
+name = "text_unreadable_at_some_width"
+description = "Table cells, badges, or manifest text become too small or truncated to read at some supported width"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.n4"
+name = "unnecessary_scrollbars_or_cropping"
+description = "Content is cropped or page-level scrollbars appear where container scrolling was specified (the seed table or manifest text)"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.n5"
+name = "chrome_missing_at_some_width"
+description = "The rollup, filter row, view switcher, or selection toolbar becomes unresponsive or missing at some width"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.n6"
+name = "fixed_chrome_obscures_content"
+description = "Fixed or sticky chrome obscures queue rows, workbench fields, or dialog actions at some width"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.n7"
+name = "elements_overlap_at_some_size"
+description = "Badges, chips, pane content, or table cells overlap each other at some viewport size"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.n8"
+name = "hidden_columns_unreachable"
+description = "Columns hidden at 768 pixels and below have no reachable alternative surface, losing the deference or commit data entirely on mobile"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.n9"
+name = "workbench_loses_controls_when_stacked"
+description = "Stacked workbench panes drop controls — an add, delete, lock message, or gate item present at desktop is missing at 1024 pixels and below"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.n10"
+name = "controls_disappear_at_sizes"
+description = "Interactive controls disappear entirely at specific sizes with no replacement affordance"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "responsiveness.catchall"
+name = "responsiveness_catchall"
+description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

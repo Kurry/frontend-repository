@@ -1,0 +1,163 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "8.1"
+name = "active_step_fade"
+description = "Driven by the real Run Script control, each step highlights as active with a roughly 200 millisecond background fade-in and fades out when it completes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.2"
+name = "console_line_stagger"
+description = "Console lines appear one at a time with a roughly 50 millisecond stagger while a run streams"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.3"
+name = "drag_reorder_settles"
+description = "Dragging a step animates the other steps smoothly out of the way and the dropped step settles into place rather than snapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.4"
+name = "badge_and_countdown_motion"
+description = "Step badges transition in with a short fade, the retry countdown ticks visibly, and the running pulse animates continuously"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.5"
+name = "modal_transitions"
+description = "The New Script modal and the screenshot modal enter with a short opacity and scale transition of roughly 200 to 300 milliseconds and exit the same way"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.6"
+name = "playground_match_emphasis"
+description = "Playground selector matches highlight with a brief emphasis animation when the match set changes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.7"
+name = "copy_confirmation_transition"
+description = "The Copy export confirmation swaps its icon with a brief transition and reverts after a moment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.8"
+name = "toasts_slide_and_dismiss"
+description = "Feedback toasts after version saves, bulk operations, and schedule changes slide in, remain readable, and auto-dismiss with a fade"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.9"
+name = "hover_system"
+description = "Hover feedback is present throughout: buttons ease background and shadow with a slight press effect, library entries, step rows, run rows, and timeline entries take a full-width hover wash, and form controls show focus rings"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.10"
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion set, steps and console lines appear without animation and all transitions apply instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.n1"
+name = "no_hover_or_press_feedback"
+description = "Buttons, step rows, or library entries show no hover, focus, or press feedback beyond browser defaults"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "8.n2"
+name = "transitions_snap_or_jank"
+description = "Step highlights, modals, or the console stream snap with no transition, or animations cause visible layout jank or flicker during a run"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "8.n3"
+name = "reduced_motion_ignored"
+description = "With prefers-reduced-motion set, the step highlight, console stagger, or modal transitions still animate"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "motion.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion and microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

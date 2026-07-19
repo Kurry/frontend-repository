@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -90,8 +90,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "node_config_forms_type_specific"
-description = "Double-clicking a node opens a type-specific configuration modal: Prompt shows a prompt selector (at least 4 seeded prompts), Agent shows an agent selector (at least 3 seeded names) plus a timeout field bounded 1 to 300 seconds, Eval shows a rubric selector (at least 3 names), Condition shows a required expression field, Output shows a required destination field; an invalid or empty required field shows an inline message naming that field with Save disabled until valid, and saving updates the node's configuration badge on the canvas"
+name = "node_config_forms_field_contract"
+description = "Double-clicking a node opens a type-specific configuration modal enforcing the field contract: every type requires title (1–80 chars); Prompt requires prompt from the seeded library (≥4); Agent requires agent from the seeded list (≥3) and timeout_seconds integer 1–300; Eval requires rubric (≥3); Condition requires expression; Output requires destination. An invalid field shows an inline message naming that exact field key with Save disabled until valid; saving updates the configuration badge and both artifact previews"
 type = "binary"
 weight = 1.0
 
@@ -154,7 +154,7 @@ weight = 1.0
 [[criterion]]
 id = "1.18"
 name = "save_load_confirmation_round_trip"
-description = "Saving via the Save modal with a valid name adds the workflow to the Saved Workflows panel with name and node count; clicking a saved workflow replaces the canvas only after a confirmation dialog is accepted (declining leaves the canvas untouched), and loading resets execution badges and the rollup; saving with an empty name shows an inline validation message naming the name field and nothing is added to the panel"
+description = "Saving via the Save modal with a valid name (1–80 chars) adds the workflow to the Saved Workflows panel with name and node count; clicking a saved workflow replaces the canvas only after a confirmation dialog is accepted (declining leaves the canvas untouched), and loading resets execution badges and the rollup; saving with an empty name shows an inline validation message naming the name field and nothing is added to the panel"
 type = "binary"
 weight = 1.0
 
@@ -173,25 +173,76 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "1.24"
+name = "multi_select_bulk_delete"
+description = "Shift-clicking (or marquee-selecting) a second node creates a multi-selection with distinct chrome and a live selected count in the toolbar; Delete selected removes every selected node and their attached edges in one interaction, dropping both node and edge counts and clearing the selection"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "undo_redo_restores_canvas_and_artifacts"
+description = "Undo reverses the most recent editing action (drop, delete, bulk delete, edge create/delete, reposition, configuration save, or successful import) restoring canvas nodes/edges, configuration badges, and both artifact previews together; Redo reapplies with the same completeness; empty stacks disable their controls; a new edit after undo clears redo"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "artifact_center_json_and_mermaid"
+description = "Opening the Artifact panel shows live-compiled Workflow Definition JSON and Mermaid tabs: JSON includes required keys name, nodes (id, type enum prompt|agent|eval|condition|output, title, position.x/y, type-specific config), and edges (id, source, target); Mermaid lists node and edge lines from the same graph; editing the canvas updates both previews without reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "artifact_copy_download_import"
+description = "Copy writes the exact visible preview text and shows a brief confirmation; Download triggers a real file download with a format-appropriate filename; Import of a valid Workflow Definition JSON replaces the canvas and updates badges and both previews without reload; contract-violating JSON shows an inline message naming the offending field and mutates nothing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "graph_validity_badge"
+description = "A graph-validity badge beside the artifact preview reads valid when the canvas has at least one Prompt, one Output, and a directed Prompt-to-Output path, and otherwise reads incomplete with a short reason naming what is missing — always with a text label, never color alone"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.22"
 name = "canvas_static_no_authoring"
 description = "The canvas is a static picture: nodes cannot actually be created from the palette, repositioned, or connected — authoring interactions leave the graph unchanged"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "1.23"
 name = "execution_fabricated"
-description = "Execution evidence is fabricated: the rollup or timeline shows values that do not match the badges on the canvas, all nodes complete instantly in one jump with no sequential progression, or two runs produce byte-identical timeline entries with identical timestamps"
+description = "Execution evidence is fabricated: the rollup or timeline shows values that mismatch the badges on the canvas, all nodes complete instantly in one jump as a single simultaneous swap, or two runs produce byte-identical timeline entries with identical timestamps"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n4"
+name = "export_omits_session_mutations"
+description = "After adding a node, saving a distinctive configuration, or creating an edge, the Workflow Definition JSON or Mermaid preview still omits that session mutation (stale or seed-only artifact text)"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n5"
+name = "undo_does_not_restore"
+description = "After deleting a node or saving a configuration that changes the artifact preview, Undo leaves the canvas or artifact previews in the post-edit state"
+type = "binary"
+negate = true
+weight = 1.0
 
 [[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0

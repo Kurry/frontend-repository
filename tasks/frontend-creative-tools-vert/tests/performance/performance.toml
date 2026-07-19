@@ -62,78 +62,85 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "9.1"
-name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+name = "cold_start_under_two_seconds"
+description = "Cold start to interactive is under 2 seconds on a local render: the converter workspace (navbar, hero, drop zone, empty queue, seeded presets, catalog) is usable within that window."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
-name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+name = "console_clean_all_routes"
+description = "No console errors, warnings, or hydration mismatch messages appear on Convert, Settings, or About — on first load or after client-side navigation."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
-name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+name = "ui_transitions_respond_quickly"
+description = "Navbar route switches and theme toggles begin responding in under 100ms of the pointer/keyboard action (no multi-second UI stall)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.4"
-name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+name = "converting_shows_status_progress"
+description = "While Convert runs, Converting status on affected rows (and live counts updates) give visible progress feedback for the async work."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.5"
-name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+name = "multi_file_queue_stays_responsive"
+description = "With several queued files visible, scrolling the queue and interacting with Convert-to selectors and selection checkboxes remains without perceived lag."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.6"
-name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+name = "conversion_keeps_page_interactive"
+description = "Converting a file keeps the page responsive: the navbar, theme toggle, and other queue rows stay interactive while a conversion runs."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
-name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+name = "row_and_view_animations_smooth"
+description = "Queue row enter/exit and Convert/Settings/About view transitions maintain smooth motion without visible hitching when exercised through real UI controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.8"
 name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+description = "Rapidly clicking sample add, Convert, batch actions, Undo, or theme toggle does not hang or freeze the app."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+name = "no_layout_jumps_after_paint"
+description = "After first paint no visible layout jumps occur; the queue and catalog regions hold their space as content settles."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+name = "extended_session_stable"
+description = "An extended session of add → convert → batch → undo → preset save → session export → remove → clear → settings changes shows no runaway resource use that freezes the page."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.11"
+name = "session_export_recompiles_without_freeze"
+description = "Session export previews recompile without freezing the queue controls after a retarget, preset save, or conversion."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.n1"
 name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+description = "More than 2 seconds pass before the converter workspace is interactive on local render."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,31 +148,31 @@ weight = 1.0
 [[criterion]]
 id = "9.n2"
 name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+description = "Console errors, warnings, or hydration mismatches appear during Convert/Settings/About navigation or convert flows."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n3"
-name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+name = "route_or_theme_transitions_block"
+description = "Route switches or theme toggles block or lag for a noticeable multi-second stall."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n4"
-name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
+name = "conversion_hangs_ui"
+description = "Running Convert freezes the navbar, theme toggle, or other queue rows until the run finishes."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n5"
-name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+name = "multi_file_queue_janks"
+description = "A queue with several files kills interactivity — scrolling or changing Convert-to selectors becomes unusable."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,39 +180,47 @@ weight = 1.0
 [[criterion]]
 id = "9.n6"
 name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
+description = "Row enter/exit or view-transition animation makes Convert, Download, or navbar input unresponsive."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n7"
-name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
+name = "resource_load_blocks_first_paint"
+description = "The UI blocks rendering of the converter workspace while loading resources, leaving a blank page past first paint."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n8"
-name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
+name = "runaway_resources_over_session"
+description = "Repeated convert/clear/export cycles cause runaway browser resource usage that freezes or crashes the tab."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n9"
-name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
+name = "layout_jumps_after_paint"
+description = "After first paint the queue or catalog visibly jumps or reflows as content settles without reserved space."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n10"
-name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+name = "rapid_use_crashes"
+description = "The app crashes or becomes a blank page under rapid sample-add / Convert / Cancel / Undo use."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n11"
+name = "export_recompile_freezes_queue"
+description = "After a retarget, preset save, or conversion, regenerating the session export preview freezes queue controls for a multi-second stall."
 type = "binary"
 negate = true
 weight = 1.0

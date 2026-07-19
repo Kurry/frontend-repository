@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,106 +62,116 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
-description = "The combat HUD reads as a dense status bar with the fighter Health bar, the Fury meter, the 'Wave X of Y' indicator, the combo counter, and the Peso balance all legible at once"
+name = "festival_night_palette"
+description = "The Stage map and combat scene sit on deep near-black surfaces with warm fiesta accent hues (red, orange, gold, or teal) on controls, meters, and highlights"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
-description = "In the Masks screen the locked, unlocked-but-unequipped, and equipped states each use a visibly different card treatment, and on the Stage map the locked, unlocked, and completed nodes are each visually distinct"
+name = "dense_combat_hud_legible"
+description = "The combat HUD shows the fighter Health bar, Fury meter, Wave X of Y indicator, combo counter, and Peso balance legibly at once without opening another screen"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
-description = "The fighter's and boss's health bars switch to a clear danger color treatment below roughly 25 percent remaining, and the Fury meter takes on an unmistakable ready treatment once full"
+name = "combo_and_fiesta_visual_distinction"
+description = "Combo feedback is a popup that increments per hit, and completing the Fiesta Combo shows a distinct celebratory flash and label clearly beyond the plain combo counter"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.4"
 name = "festival_night_aesthetic_and_end_screens"
-description = "The game uses a dark festival-night arena aesthetic with warm fiesta accent hues, the Victory screen uses a celebratory treatment clearly differentiated from the ordinary in-combat HUD, and the Derrota screen reads as a clear defeat state"
+description = "The Victory screen uses a celebratory treatment distinct from the ordinary in-combat HUD, the Derrota screen reads as a clear defeat state, and the Pause overlay is visually distinct from both end screens"
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "3_5"
-description = "At approximately 375px wide the combat stage and HUD render without horizontal scrolling, HUD text stays legible rather than clipping, and all combat action buttons remain reachable"
+name = "boss_telegraph_visually_distinct"
+description = "Boss wind-up cues are visually distinct from the boss normal attack animation, giving a clear tell before the strike lands"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.6"
-name = "3_6"
-description = "At approximately 375px wide the document overflows horizontally, or combat action buttons or HUD text become clipped, overlapping, or unreachable"
+name = "flat_or_default_browser_chrome"
+description = "The Stage map, combat HUD, or overlays render with flat unstyled browser-default controls that lack the festival accent treatment described for the app"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "3.7"
-name = "3_7"
-description = "The Mask states or the Stage-map nodes render identically, with no visual distinction between locked, unlocked, and equipped or completed states"
+name = "mask_and_stage_states_undifferentiated"
+description = "Locked, unlocked-but-unequipped, and equipped Mask cards look the same, or locked, unlocked, and completed Stage nodes are visually indistinguishable"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "3.8"
 name = "cantina_cost_hierarchy_legible"
-description = "The Cantina shows each upgrade's current level and its escalating cost with a clear visual hierarchy so the current tier and the next-tier cost are easy to tell apart at a glance"
+description = "The Cantina shows each upgrade current level and its escalating cost with a clear hierarchy so the current tier and the next-tier cost are easy to tell apart"
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "3.9"
 name = "overlay_chrome_consistent"
-description = "The Cantina, Masks, History, Fighter Settings, and reset-confirmation surfaces share one consistent overlay chrome — panel surface, title treatment, and close control are styled the same way across all five"
+description = "The Cantina, Masks, History, Fighter Settings, Export Campaign, Import Campaign, Pause, and reset-confirmation surfaces share one consistent overlay chrome — panel surface, title treatment, and close control styled the same way"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.10"
 name = "history_panel_regions_distinct"
-description = "The History panel presents the snapshot list, the labelled History state region, the Undo/Redo controls, the Apply Scenario Change action, and any alternate branch as visually distinguishable regions that do not overlap the primary controls"
+description = "The History panel presents the snapshot list, the labelled History state region, the Undo/Redo controls, the Apply Scenario Change action, and any alternate branch as distinguishable regions without overlapping the primary controls"
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "3.11"
 name = "consistent_icon_style"
-description = "Menu and HUD controls use one consistent vector icon style throughout, and the Cantina, Masks, Settings, History, and Reset controls each carry a recognizable icon alongside their label"
+description = "Menu and HUD controls use one consistent vector icon style — the Cantina, Masks, Settings, History, Export, Import, Pause, and Reset controls each carry a recognizable icon alongside their label"
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "3.12"
 name = "narrow_overlays_and_buttons_fit"
-description = "At approximately 375px wide the Cantina, Masks, History, Fighter Settings, and reset-confirmation overlays fit within the viewport without horizontal scrolling, and the on-screen action buttons (Strike, Smash, Block, Dodge, Fiesta Fury) stay large enough to tap without overlapping the combat scene's visible enemies or meters"
+description = "At about 375px wide, combat action buttons stay large enough to tap and overlays including Export Campaign and Pause fit without horizontal scrolling"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.13"
 name = "fury_button_enabled_vs_disabled"
-description = "The Fiesta Fury button's enabled look once the meter is full is visibly different from its disabled look while the meter is filling (compared via computed styles or a screenshot of both states)"
+description = "The Fury meter takes on an unmistakable ready treatment once full, and the Fiesta Fury button enabled look is visibly different from its disabled look"
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
+
+[[criterion]]
+id = "3.14"
+name = "export_import_regions_distinct"
+description = "Export Campaign presents a scrollable Campaign JSON preview, Copy, and Download as distinguishable regions; Import Campaign presents an input, apply control, and inline field-error space"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.15"
+name = "health_danger_color_below_quarter"
+description = "Fighter and boss health bars switch to a clear danger color treatment below roughly 25 percent remaining"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "3.catchall"
 name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
+

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,113 +62,113 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "controls_keyboard_accessible"
+description = "Top bar controls, tag rail chips, search syntax chips, note actions, selection checkboxes, bulk tray actions, Export/Import controls, and the composer are keyboard accessible with Tab, Shift+Tab, Enter, or Space"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "dialogs_manage_focus"
+description = "Delete confirmation, Export panel, and Import panel trap focus while open, close on Escape, and return focus to the control that opened them"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "icons_have_accessible_names"
+description = "Icon-only controls expose accessible names describing their action"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "validation_uses_live_regions"
+description = "Composer inline validation and Import validation messages are announced through an aria-live polite region as well as shown visually"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
 name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+description = "Composer and Import fields use visible labels or accessible names associated with the controls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
 name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+description = "TagNote title and date-section headings follow a logical order without skips"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "landmark_regions_present"
+description = "The shell exposes landmark regions (banner/main/complementary or equivalent) so the timeline and composer are distinguishable"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
 name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+description = "Primary ink on #F5F5F7 canvas and #007AFF controls on near-white text keep sufficient contrast"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "semantic_html_roles_used"
+description = "Interactive controls use button/input semantics rather than clickable bare divs for Send, Export, and note actions"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion set, shake, bubble, toast, tray, and export animations are removed while features remain usable"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
 name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+description = "Bulk checkboxes, Export tabs, or syntax chips cannot be reached via keyboard"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.n2"
-name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+name = "dialogs_lose_focus"
+description = "Delete, Export, or Import overlays leave keyboard focus unmanaged while open (focus escapes the dialog) or leave focus stranded away from the opener on close"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.n3"
-name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+name = "icon_only_unnamed"
+description = "Icon-only note actions lack accessible names"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+name = "errors_not_announced"
+description = "Composer or Import errors are visual-only with no live region"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "unlabeled_composer"
+description = "The composer text surface has no accessible name or label"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.n6"

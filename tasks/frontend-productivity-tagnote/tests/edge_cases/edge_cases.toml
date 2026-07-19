@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,153 +62,182 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "first_note_empty_state"
+description = "Empty state UI is present when the timeline has no notes, inviting the user to send the first note"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "composer_and_import_inline_validation"
+description = "Inline validation appears on the composer text field and on Import Session JSON before a bad submit mutates state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "errors_name_field_and_fix"
+description = "Error messages name the offending field (text, schemaVersion, marks style) and the fix rather than only saying Invalid"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "actions_show_toast_confirmation"
+description = "Success toasts appear after send, pin, archive, bulk apply, delete, and copy"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "export_import_panels_show_busy_feedback"
+description = "Export Copy/Download and Import processing show brief visible confirmation or progress rather than freezing silently"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "delete_supports_cancel"
+description = "Delete confirmation and Delete selected offer cancel paths that leave notes unchanged"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "todo_and_syntax_affordances_discoverable"
+description = "Make TODO on tag chips and search syntax chips are visible affordances for non-obvious filtering"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
 name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+description = "Buttons, inputs, checkboxes, and dialogs use semantic tags"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "modals_support_close_paths"
+description = "Delete, Export, and Import overlays close via explicit controls and Escape"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "history_panel_shows_state"
+description = "The History panel provides a History state region so long undo/redo flows show current position"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_timeline_no_feedback"
+description = "An empty timeline shows nothing and provides no UI feedback"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "errors_only_in_console"
+description = "Composer or Import errors are surfaced only in the browser console"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n3"
 name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+description = "Send, archive, bulk, or copy actions lack visible feedback"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "delete_lacks_warning"
+description = "Delete or Delete selected has no confirmation warning"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "interactive_nonsemantic_wrappers"
+description = "Non-semantic div or span tags wrap interactive Send, Export, or bulk controls"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n6"
 name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+description = "Delete, Export, or Import overlays cannot be dismissed via Escape"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "validation_missing_or_delayed"
+description = "Validation feedback for blank send or invalid import is missing or delayed with no UI indication"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "button_text_ambiguous"
+description = "Export, Import, or bulk action button text is ambiguous or missing"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "syntax_chips_lack_guidance"
+description = "Search syntax chips are absent so tag: and done: filters have no in-app guidance"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "bulk_checkboxes_inaccessible"
+description = "Note selection checkboxes are visually hidden or inaccessible"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.11"
+name = "overlength_text_rejected"
+description = "Submitting composer text longer than 2000 characters shows validation naming the text field and appends no note"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "invalid_import_preserves_session"
+description = "Importing malformed or field-contract-invalid Session JSON leaves notes, todoTags, and Export unchanged with visible validation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "bulk_zero_selection_noop"
+description = "Archive selected, Pin selected, and Delete selected with zero checkboxes selected start no mutations"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "overlength_silently_accepted"
+description = "Composer text longer than 2000 characters is accepted and appended without naming the text field"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "edge_cases.catchall"

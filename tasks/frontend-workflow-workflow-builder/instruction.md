@@ -137,7 +137,7 @@ Modules:
 - structured-editor-v1
 - command-session-v1
 - entity-collection-v1
-- browse-query-v1
+- artifact-transfer-v1
 
 Module specs:
 <module_spec id="structured-editor-v1">
@@ -202,23 +202,22 @@ Module specs:
 }
 </module_spec>
 
-<module_spec id="browse-query-v1">
+<module_spec id="artifact-transfer-v1">
 {
-  "id": "browse-query-v1",
+  "id": "artifact-transfer-v1",
   "contract_version": "zto-webmcp-v1",
-  "title": "Browse / query",
-  "purpose": "Content sites, catalogs, feeds, dashboards, and navigation.",
-  "permitted_operations": ["open", "search", "apply_filter", "clear_filter", "sort", "set_locale", "set_theme"],
+  "title": "Artifact transfer",
+  "purpose": "Import, export, copy, print, and conversion workflows.",
+  "permitted_operations": ["import", "export", "copy", "print_preview", "convert"],
   "binding_keys": {
-    "required_any_of": [["destinations"]],
-    "optional": ["browsable_entity", "filters", "sorts", "locales", "themes", "visible_postconditions"]
+    "required_any_of": [["artifact_operations"]],
+    "optional": ["import_modes", "export_formats", "conversion_modes", "visible_postconditions"]
   },
   "restrictions": [
-    "No arbitrary URL, selector, or undeclared route.",
-    "Destinations and filters come from bounded PRD declarations.",
-    "Visible navigation state must update via the same handlers as UI controls."
+    "No raw files, filesystem paths, blobs, base64, or artifact contents in WebMCP arguments or results.",
+    "File picker interaction, clipboard contents, and downloaded artifacts remain Playwright responsibilities."
   ],
-  "tool_name_prefix": "browse"
+  "tool_name_prefix": "artifact"
 }
 </module_spec>
 
@@ -230,20 +229,25 @@ Bindings:
 - Session operations: start; pause; resume; restart
 - Demos: seeded-workflow-run; retry-from-failed-node
 - Entity: saved-workflow
-- Entity operations: create; select
+- Entity operations: create; select; delete
 - Entity fields: name; node-count
-- Browsable entity: timeline-events
-- Destinations: canvas; saved-workflows-panel; timeline-panel
-- Filters: timeline-status
+- Artifact operations: export; import; copy; convert
+- Export formats: json; mermaid
+- Import modes: workflow-definition
+- Conversion modes: json-to-mermaid
 - Workflow completion: node-status-badges
 - Workflow completion: run-rollup-n-of-m
 - Workflow completion: configuration-badge
+- Workflow completion: artifact-preview
 
 Mechanics exclusions:
 - Node drag positioning, canvas pan/zoom, and palette drag-to-drop coordinates stay Playwright-driven; editor add creates nodes but drop-position mechanics are gesture-graded
 - Edge-handle drag drawing and incompatible-connection toast visuals stay Playwright; editor add(edge) only proves the state command
 - Retry backoff countdown, pulsing running border, and edge flow-pulse animations are timed visuals observed live via Playwright
 - Keyboard node cycling (Tab/Enter/Delete) is graded via real Playwright keyboard input
+- Raw file path / base64 blobs must not appear in WebMCP args; clipboard contents and downloaded artifact bytes remain Playwright responsibilities
+- Multi-select marquee geometry and Shift-click chord timing stay Playwright when mechanism matters
+- Timeline status filter chips and Saved Workflows / Artifact panel open toggles stay Playwright-driven; no browse-query module is assigned
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,142 +62,142 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "7.1"
-name = "layout_adapts_desktop_to_mobile"
-description = "Layout adapts gracefully from 1440px desktop to 375px mobile."
+name = "layout_adapts_1440_to_375"
+description = "Resizing from 1440px desktop to roughly 375px mobile keeps a usable PaneCraft workspace: header, page tabs, library or its mobile equivalent, and panes remain present and operable at both widths."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
-name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+name = "mobile_tap_targets_adequate"
+description = "At roughly 375px width, Add Page, Create Pane, page tabs, pane Edit/Delete/Share, and date-range controls present tap targets at least 44px in at least one dimension."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
-name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+name = "typography_readable_both_widths"
+description = "PaneCraft title, pane titles, and body/table text remain legible at both 1440px and 375px — type scales or reflows without becoming unreadably small on mobile."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
-name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+name = "no_clip_or_overflow_at_375"
+description = "At roughly 375px width, pane cards, header controls, and library content never clip or overflow the viewport at the page level."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
-name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+name = "page_tabs_scrollable_on_mobile"
+description = "At roughly 375px wide the page tabs stay scrollable and usable rather than disappearing or becoming unreachable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.6"
-name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+name = "pane_grid_collapses_to_one_column"
+description = "At roughly 375px wide the pane grid collapses to a single column with a logical stacking order and no overlapping panes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.7"
-name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+name = "mobile_controls_tappable"
+description = "At roughly 375px width, tap/click activation works on page tabs, Create Pane, date-range options, and pane Edit/Share controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.8"
-name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+name = "no_horizontal_scroll_at_375"
+description = "At roughly 375px width the page does not produce horizontal scrolling at the page level."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.9"
-name = "media_and_canvases_resize"
-description = "Images, grids, and canvases size responsively to fit the layout."
+name = "charts_and_grid_scale"
+description = "Chart panes, data tables, and the pane grid size responsively with the viewport rather than staying a fixed overflowing size."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.10"
-name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
+name = "overlays_operable_at_small_widths"
+description = "At roughly 375px wide the preview modal, pane wizard, Share panel, Export center, and saved-analysis views remain readable and operable without clipped controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.n1"
-name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+name = "layout_breaks_at_375_or_desktop"
+description = "At roughly 375px or at 1024px+ the PaneCraft layout breaks: overlapping panes, overflow, or unusable stacking."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n2"
-name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+name = "mobile_controls_too_small"
+description = "At roughly 375px width, Add Page, Create Pane, page tabs, or pane Edit/Delete/Share are too small or misaligned to operate reliably."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n3"
-name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+name = "text_unreadable_on_mobile"
+description = "At roughly 375px width, pane titles, body/table text, or header labels are too small to read."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n4"
-name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+name = "content_cropped_with_spurious_scrollbars"
+description = "At roughly 375px or desktop widths, workspace content is cropped or unnecessary page-level horizontal scrollbars appear."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n5"
-name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
+name = "tabs_or_library_missing_on_mobile"
+description = "At roughly 375px width, page tabs or access to the Data Source Library is missing or unreachable."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n6"
-name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
+name = "fixed_header_obscures_panes"
+description = "A fixed header or control bar obscures pane content or primary actions at some viewport size."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n7"
-name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
+name = "panes_overlap_at_some_size"
+description = "Pane cards, tabs, or overlays overlap into an unusable pile at some viewport size."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n8"
-name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
+name = "desktop_four_column_missing"
+description = "At desktop widths of 1024px and above, the four-column grid, Data Source Library, or header controls are missing or overlap."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n9"
-name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
+name = "charts_static_size_overflow"
+description = "Chart panes or data tables use a static size and overflow the viewport at roughly 375px."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n10"
 name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
+description = "Create Pane, Share, date-range, or pane Edit controls disappear at specific viewport sizes."
 type = "binary"
 negate = true
 weight = 1.0

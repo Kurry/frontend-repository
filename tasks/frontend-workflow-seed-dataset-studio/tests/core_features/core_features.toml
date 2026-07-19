@@ -1,0 +1,458 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_manifest_scale_and_repos"
+description = "On first load the queue shows a seeded manifest of at least 60 seeds spanning exactly the 6 fictional repositories with their languages — quartz-orm (TypeScript), copperline (Go), lattice-db (Rust), brineworks (Python), fernwheel (Ruby), ashgrid (Java) — and a visible total count states the number of seeds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "queue_row_anatomy"
+description = "Each queue row shows the seed id in the pattern repo-kind-number (for example quartz-orm-issue-142), the repository name, the language, the kind (issue or pr), the seed title, a status badge (draft, authored, rejected, or harvest-pending), and a difficulty badge (hard or unset)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "named_seed_present_with_fields"
+description = "The seed quartz-orm-issue-142 is present on first load with the title 'Connection pool exhausts when nested transactions roll back', status draft, kind issue, difficulty unset, deference profile premise-acceptance, and failure model wrong-answer"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "seeded_status_distribution"
+description = "On first load the seeded status distribution includes at least 24 draft, at least 14 authored, at least 10 rejected, and at least 6 harvest-pending seeds, each group reachable in the queue by applying the matching status filter"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "pinned_commit_display_and_copy"
+description = "A queue row shows the first 10 characters of its seed's commit hash, the seed detail surface shows the full 40-character lowercase hexadecimal hash, and a copy control puts the full hash on the clipboard with a visible confirmation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "profile_and_failure_model_on_detail"
+description = "The seed detail surface shows the seed's deference profile (premise-acceptance, happy-path-bias, or boundary-violation) and failure model (wrong-answer, no-runtime-evidence, missing-incomplete-info, or off-target), and a rejected seed additionally shows its reject class"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "combined_filters_indicated"
+description = "Filter controls narrow the queue by status, language, repository, and difficulty; applying a status filter plus a language filter shows only seeds matching both, and each active filter is visibly indicated"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "search_narrows_and_restores"
+description = "Typing in the search field narrows the visible rows incrementally to seeds whose id or title matches the typed text, and clearing the search restores the previous filtered set exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "column_sort_round_trip"
+description = "Clicking a sortable column header (id, repository, language, status, or title) sorts the queue ascending, and clicking the same header again sorts descending, reversing the visible row order relative to ascending consistently with the cell values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "saved_filter_chips"
+description = "A Save filter control stores the currently applied filter and search combination as a named chip; clicking the saved chip later re-applies exactly that combination, and the chip's remove control deletes it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "matching_count_and_clear_all"
+description = "A visible count of matching seeds updates whenever filters, search, or triage change the matching set, and an active-filters summary offers a single Clear all control that restores the full queue"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "rollup_panel_breakdowns"
+description = "The stats rollup panel shows counts of seeds by status (draft, authored, rejected, harvest-pending), by language, and by repository, plus a breakdown of rejected seeds by reject class"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "rollup_derives_from_every_mutation"
+description = "Any triage action, authoring status transition, or export that changes seed state updates the corresponding rollup figures in the same interaction with no reload — the rollup never lags behind the queue"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "rollup_cell_click_through"
+description = "Clicking a rollup cell (for example the authored count for lattice-db) navigates to the queue with the matching filters applied, and the number of visible rows agrees with the figure on the clicked cell"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "accept_opens_workbench"
+description = "Selecting a draft seed and choosing Accept for authoring opens that seed in the authoring workbench and its status chip changes out of draft"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "reject_form_constrained_and_gated"
+description = "The reject form offers a reject class select constrained to exactly duplicate-report, insufficient-signal, environment-specific, ambiguous-report, and trivial-fix, plus a required justification of at least 20 characters, and its Submit control stays disabled until both are valid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "valid_rejection_updates_everything"
+description = "Submitting a valid rejection sets the seed's status to rejected, shows the chosen class on the seed, decrements the draft rollup count by one, and increments both the rejected rollup count and that class's breakdown figure by one"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "short_justification_rejected_inline"
+description = "Submitting the reject form with a justification shorter than 20 characters shows an inline validation message naming the justification field and changes no seed's status or rollup figure"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "multi_select_toolbar"
+description = "Row checkboxes enable multi-select and a selection toolbar appears showing the selected count with batch Accept and batch Reject actions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "batch_reject_atomic"
+description = "Batch Reject applies one reject class and one justification to every selected seed through the same validated form, and on submit all selected seeds change status in one update while the draft, rejected, and class-breakdown rollup figures change by exactly the selection size in the same interaction"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "undo_reverses_last_triage"
+description = "After a triage action (single or batch), an Undo control reverses exactly that action: the affected seeds return to their prior status and every rollup figure returns to its prior value"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "workbench_panes_and_header"
+description = "Opening a seed in the workbench shows panes for the question, the positive rubric, the negative rubric, the foils, and the golden answer, all scoped to that seed, with the seed id, repository, language, and pinned commit visible in the workbench header"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "underspecification_checklist"
+description = "The question pane holds multiline question text and an under-specification checklist of at least 4 items (such as no file paths named, no code quoted, no fix revealed, observable symptom stated); items check and uncheck, and the checklist state is kept per seed when switching seeds and returning"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "positive_rubric_editable_15"
+description = "The positive rubric pane lists criteria numbered 1.1 through 1.5 on first open, each with an editable id, name, weight, and PASS/FAIL description, and edits persist when switching panes and returning"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "locked_runtime_evidence_gate"
+description = "Criterion 1.4 in the positive rubric is a locked runtime-evidence gate requiring the answer to cite evidence from executing the code at the pinned commit: its row shows a lock indicator, no working delete affordance exists for it, and attempting to remove it leaves it in place with an explanatory message"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "add_delete_unlocked_criteria"
+description = "Positive criteria other than 1.4 can be added and deleted: adding continues the 1.x numbering at the next free number, and deleting an unlocked criterion removes exactly that row"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "negative_rubric_classes"
+description = "The negative rubric pane lists 2.x criteria each tagged with one of false-premise-acceptance, fabricated-symbol, or wrong-subsystem; entries can be added, edited, and deleted, and each entry visibly indicates that matching it counts against the answer"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "foil_anatomy_complete"
+description = "Each foil shows its answer text, a failure mode chosen from wrong-answer, no-runtime-evidence, missing-incomplete-info, and off-target, an expects-fail multi-select whose options are exactly the current rubric criterion ids, and an expected-correctness cap between 0 and 40 percent"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "live_cross_reference_rubric_foils"
+description = "Adding a rubric criterion (such as 1.6) immediately makes its id selectable in every foil's expects-fail options, and deleting a criterion that a foil references immediately flags that foil with a visible warning naming the missing id until the reference is removed or remapped"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "foil_criterion_cross_links"
+description = "Clicking an expects-fail id chip on a foil highlights or scrolls to that criterion in the rubric pane, and a 2.x negative criterion links back to any foils that reference it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "golden_pane_pending_justified"
+description = "The golden answer pane holds either golden answer text or a harvest-pending state, and switching to harvest-pending requires a justification of at least 20 characters that is displayed alongside the pending state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "harvest_five_named_steps"
+description = "Run harvest starts a simulated harvest decomposed into exactly the 5 named steps — clone at pinned commit, install dependencies, reproduce failure, capture runtime evidence, distill golden answer — and each step's status advances visibly through pending, running, and complete or failed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "harvest_retry_and_backoff"
+description = "A simulated harvest failure retries automatically with a visible attempt counter (such as retry 2 of 3) and a backoff countdown; a step that exhausts its retries is marked failed with an inline error summary and a manual Retry control that resumes from that step while earlier steps' outputs remain unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "harvest_pause_resume_checkpoint"
+description = "Pausing a running harvest freezes progression at the current step and resuming continues from exactly that step; steps completed before the pause keep their original timestamps and never re-execute"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "harvest_completion_fills_golden"
+description = "A harvest that completes all 5 steps fills the golden answer pane with a generated answer draft, clears the harvest-pending state, and records the harvest completion on the seed's timeline"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "workbench_save_propagates"
+description = "Saving the workbench shows a visible save confirmation, updates the seed's row in the queue (a title edit appears in the queue row), and records an authoring-save event on the seed's timeline"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "gate_banner_names_conditions"
+description = "The workbench gate banner names each unmet authored-status condition individually — question text present, at least 3 foils, every foil expects-fail id resolves to an existing criterion, and golden answer present or harvest-pending justified — rather than a single generic blocked message"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "gate_banner_updates_live"
+description = "The gate banner updates in the same interaction that changes its inputs: adding the third foil, filling the question, justifying harvest-pending, or fixing a dangling expects-fail reference each removes exactly its named condition from the banner without a save or reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "mark_authored_gated"
+description = "Mark authored is disabled while the gate lists any unmet condition and enabled when all conditions pass; activating it sets the seed's status to authored, updates its queue badge and the rollup counts, and stamps a status transition on the timeline"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "seed_timeline_ordered_filterable"
+description = "Each seed's event timeline lists its status transitions, authoring saves, harvest events, and exports in order with timestamps, a filter narrows the timeline by event type, and an empty filtered timeline shows an explanatory empty state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "export_manifest_mirrors_state"
+description = "Export package on an authored seed shows JSON-shaped manifest text carrying the seed id, repository, pinned 40-character commit, language, kind, title, difficulty, deference profile, failure model, the question text, every positive criterion with id, name, weight, and description, every negative criterion with its class, every foil with failure mode, expects-fail ids, and correctness cap, and the golden answer or justified harvest-pending state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "export_reflects_fresh_edits"
+description = "Workbench edits made before exporting appear verbatim in the manifest: renaming a criterion or changing a foil's correctness cap changes the corresponding manifest fields on the next export with no stale values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "copy_manifest_confirmed"
+description = "The Copy manifest control puts the manifest text on the clipboard and shows a visible confirmation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "dataset_snapshot_matches_rollup"
+description = "The Dataset snapshot control produces JSON-shaped summary text with the total seed count, counts by status, by language, and by repository, and the rejected-by-class breakdown, all matching the rollup panel's current figures, with its own copy-with-confirmation control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "export_stamps_timeline"
+description = "Completing an export stamps a timestamped export event on that seed's timeline, and the export view names the seed id it was generated from"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "empty_filter_state_recoverable"
+description = "Filtering to a combination matching no seeds shows an empty state in the table region naming the active filters, with a Clear all control that restores the full queue"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "double_activation_single_effect"
+description = "Rapidly double-activating Mark authored transitions the seed exactly once (the authored rollup grows by exactly one and the timeline gains exactly one transition entry), and rapidly double-activating Run harvest starts exactly one harvest (one step-list fill and one harvest sequence on the timeline)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "gate_reopens_when_foils_drop"
+description = "Deleting foils until fewer than 3 remain on a seed that previously passed the gate re-disables Mark authored and returns the at-least-3-foils condition to the gate banner"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "long_title_truncation"
+description = "A seed title longer than 80 characters renders truncated with an ellipsis in the queue row and is shown in full in the workbench header"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.50"
+name = "undo_single_depth"
+description = "Undo covers only the most recent triage action: after a newer triage action, Undo reverses the newest one, and a second Undo without an intervening triage action makes no further change"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.51"
+name = "rejecting_open_seed_closes_panes"
+description = "Rejecting the seed currently open in the workbench closes or visibly disables its authoring panes and shows its rejected state with the chosen class"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n1"
+name = "authored_despite_unmet_gate"
+description = "A seed reaches authored status while a gate condition is unmet — an empty question, fewer than 3 foils, a dangling expects-fail id, or a golden answer neither present nor justified as harvest-pending"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n2"
+name = "export_text_is_prewritten"
+description = "The export manifest or dataset snapshot is prewritten rather than derived: two different seeds or two different session states yield identical export text, or the snapshot's counts contradict the rollup panel at the moment of export"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n3"
+name = "fabricated_harvest_success"
+description = "The golden answer pane fills or the harvest reports completion while the 5-step list never visibly ran or its step statuses remain unchanged from before the run"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n4"
+name = "rollup_disagrees_with_queue"
+description = "After a triage or authoring action, a rollup figure disagrees with the count of queue rows matching that figure's filters until a reload"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

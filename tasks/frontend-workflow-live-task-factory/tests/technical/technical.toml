@@ -1,0 +1,179 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "10.1"
+name = "serves_and_runs_clean"
+description = "The app serves from its documented start path on port 3000, renders the console, and a full exercise of the app (connections, candidates, triage, a pipeline run, library, palette) produces no console errors or unhandled promise rejections"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.2"
+name = "demo_mode_makes_zero_outbound_requests"
+description = "With no credential ever entered, a full exercise of demo mode — browsing PRs, triaging, running a full pipeline, downloading a bundle — shows zero outbound network requests to any external host in the network log (same-origin app asset loads excepted)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.3"
+name = "credentials_held_in_memory_only"
+description = "After typing credentials and activating Connect, no browser storage (localStorage, sessionStorage, cookies, IndexedDB) contains the token or key material, and after a page reload both credential rows show Disconnected and the mode indicator reads Demo data"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.4"
+name = "exports_carry_no_credential_material"
+description = "After entering a distinctive fake token and key (for example ghp_SENTINEL123 and sk-SENTINEL456), the downloaded bundle JSON, the run report, and every copied text contain no trace of either value"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.5"
+name = "persistence_split_matches_contract"
+description = "A page reload preserves produced and imported packages, triage placements with reject reasons, the source-file filter settings, the configured AI base URL, and coachmark dismissals, while credentials and connection statuses reset to Disconnected"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.6"
+name = "shared_state_coherence_across_views"
+description = "A change made in one view is immediately reflected in every other view showing that data without a reload: a triage action updates the header stats and the accepted PR set the runner offers, and a completed run's package appears in the Library and in command-palette results"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.7"
+name = "forms_validate_per_field_before_submit"
+description = "The Add repository form shows an inline error naming the repository field for an empty or malformed value (not matching owner/name with exactly one slash) before any submission takes effect, and the connection panel surfaces inline per-field validation for its fields"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.8"
+name = "import_enforces_bundle_schema"
+description = "Importing a bundle whose fields violate the package schema — a base_sha that is not 40-character lowercase hex, a difficulty outside easy, medium, and hard, or a non-positive pr_number — is rejected with errors naming each offending field, and importing a conforming bundle succeeds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.9"
+name = "fixture_data_is_api_shaped"
+description = "Rendered PR data is consistent with the modeled API shape: merged dates render as real dates, the base commit SHA renders as 40-character lowercase hex, additions and deletions are non-negative integers, and PR numbers are positive integers, across the seeded repositories"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.10"
+name = "demo_runs_are_deterministic"
+description = "Running the same fixture PR twice in demo mode streams the same evaluation text and the same instruction text both times, producing packages with identical instruction content"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.n1"
+name = "outbound_request_before_any_credential"
+description = "The network log shows an outbound request to any external host at a time when no credential had yet been entered in the session"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "10.n2"
+name = "request_to_disallowed_host"
+description = "At any point the network log shows a request to a host other than api.github.com or the user-configured AI base URL (same-origin app asset loads excepted)"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "10.n3"
+name = "credential_appears_in_storage_export_or_url"
+description = "A credential value entered this session appears in browser storage, in any downloaded or copied output, or in the page URL"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "10.n4"
+name = "demo_mode_gates_or_hides_functionality"
+description = "In demo mode a screen or control is missing, visibly disabled, or replaced by a keys-required gate compared to the specified console (beyond the specified Add repository live-connection notice), so that demo and live mode do not share the same screens and flows"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "10.n5"
+name = "views_desync_or_stale_data"
+description = "The same datum shows different values in two places — for example the triage stats disagree with the column contents, a package's difficulty differs between the library row and the viewer, or a completed run's package is absent from the library until a reload"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "10.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, console line, network entry) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

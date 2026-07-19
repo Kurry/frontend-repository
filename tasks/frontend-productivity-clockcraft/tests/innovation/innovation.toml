@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -64,70 +64,70 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "11.1"
 name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+description = "Optional: a daily velocity speedometer against a minute target provides a delightful beyond-spec microinteraction."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.2"
 name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+description = "Optional: heat-map cell intensity animates when minutes change beyond the required hover treatment."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.3"
 name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+description = "Optional: first-run coachmarks introduce Export session as the durability path."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.4"
 name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+description = "Optional: a printable day summary or velocity graphic beyond the required Weekly overview and heat-map."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.5"
 name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+description = "Optional: ambient focus-sound toggles or another alternative input beyond the required keyboard palette."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.6"
 name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+description = "Optional: a configurable daily minute target personalizes the velocity readout."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.7"
 name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+description = "Optional: ClockCraft branding narrative beyond the required wordmark."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.8"
 name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+description = "Optional: a chrome color mode beyond the required light productivity palette."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.9"
 name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+description = "Optional: print-optimized day summary styling where it helps without violating the in-memory storage rule."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.10"
 name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+description = "Optional competition-level polish around export/import or heat-map is visible to users."
 type = "binary"
 weight = 1.0
 

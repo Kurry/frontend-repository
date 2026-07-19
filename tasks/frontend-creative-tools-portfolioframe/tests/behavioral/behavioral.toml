@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,88 +62,126 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "14.1"
-name = "multi_facet_round_trip"
-description = "Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline — never a mix."
+name = "multi_facet_persistence_round_trip"
+description = "Starting empty: set Profile Header Name to 'Ada Lovelace', add one project titled 'Portfolio Site', select Forest theme, switch Density to Compact, hide Testimonials, Move Up another section once, and Save As Draft under name 'v1'; then reload. Confirm every facet survives coherently — name, project card, Forest accents, Compact spacing, Testimonials hidden, section order, and draft 'v1' listed — never a mix of surviving and reverted facets."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.2"
-name = "sort_reversal_proves_live_data"
-description = "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders."
+name = "section_reorder_reversal_proves_live_order"
+description = "Reorder-reversal proof (genre stand-in for sort reversal): with at least two visible sections, note order, Move Up the second section once and note the new preview order, then Move Down that same section once. Confirm the original order returns — proving preview order is derived from live shared order state, not two hardcoded layouts."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.3"
-name = "derived_view_responds_to_input"
-description = "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input."
+name = "completeness_and_theme_derived_sensitivity"
+description = "Derived-view sensitivity: fill a previously empty recommended Profile Header Name and confirm Completeness \"x of y complete\" increases; then switch from Sunrise to Forest and confirm preview headings/chips/accents change meaningfully rather than redrawing identically regardless of input."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.4"
-name = "cross_view_echo_without_reload"
-description = "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list ↔ detail, board ↔ stats) without reload."
+name = "editor_edit_echoes_in_preview"
+description = "Cross-view echo: type 'Ada Lovelace' into Profile Header Name and edit a project's Title in the editor; without reload confirm the preview header and that project's card both reflect the same values."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.5"
-name = "count_delta_is_exact"
-description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+name = "add_project_count_delta_exact"
+description = "Count-delta integrity: measure the preview project-card count (and Completeness numerator if projects was empty), submit one valid Add Project, and re-measure immediately — project cards increase by exactly one and Completeness updates the same moment (no off-by-one, no lagging counter)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.6"
-name = "different_inputs_change_outcomes"
-description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+name = "different_inputs_different_preview"
+description = "Input-dependent output: set Profile Header Name to 'Ada Lovelace' and note the preview; then change it to 'Grace Hopper'. Confirm the two outcomes differ in the ways the inputs dictate (not byte-identical preview headers)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.7"
-name = "interleaved_flows_preserve_state"
-description = "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state."
+name = "interleaved_project_and_skill_flows"
+description = "Interleaved-flow integrity: start filling Add Project fields but do not submit, add a skill 'Design' through the Skills input, then submit the project; confirm both the skill chip and the project card appear, Completeness tracks both, and neither flow corrupted the other's state."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.8"
-name = "empty_to_repopulated_round_trip"
-description = "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions."
+name = "empty_then_repopulate_collections"
+description = "Edge-state round-trip: add a project, testimonial, and skill, delete each last item so empty-state hints return, then add one of each again; confirm empty states clear, all three surfaces show the new items, and Completeness tracks through both transitions."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.n1"
-name = "partial_persistence_is_incoherent"
-description = "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence."
+name = "partial_persistence_after_reload"
+description = "After configuring profile content, theme, density, section visibility/order, and a draft then reloading, some user-configured facets survive while others reset — incoherent partial persistence instead of a full coherent restore."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n2"
-name = "derived_surface_ignores_inputs"
-description = "A derived surface renders identically regardless of its inputs."
+name = "completeness_or_theme_ignores_inputs"
+description = "Filling a recommended field or switching themes leaves Completeness count and preview accents visually identical — a derived surface ignoring its inputs."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n3"
-name = "different_inputs_produce_identical_output"
-description = "Repeating an action with different inputs yields byte-identical output."
+name = "different_names_render_identical_preview"
+description = "Setting Profile Header Name to two clearly different strings yields identical preview header text."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "State changes appear in one view but not another until reload."
+name = "cross_surface_state_stale_until_reload"
+description = "After editing Profile Header, a project, theme, or density, the live preview still shows stale values until a full page reload."
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "14.9"
+name = "mutate_then_export_contains_session_work"
+description = "Full-pipeline probe: set Profile Header Name to 'Ada Lovelace', add project titled 'Portfolio Site' with Status WIP, pin it Featured, select Forest, then open Export package Portfolio JSON and Markdown resume. Confirm both export texts contain 'Ada Lovelace' and 'Portfolio Site', and Completeness summary strip matches the Completeness panel count — ending at the produced artifact."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "export_import_round_trip_state"
+description = "Round-trip probe: build distinctive content (unique Name, two projects, Compact density, Blossom theme), Download Portfolio JSON, clear working content, Import the file, and confirm editor, preview, theme, density, section order, statuses, and both export tabs reconstruct the same visible state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.11"
+name = "bulk_delete_undo_restores_export"
+description = "Undo round-trip: select three projects, Delete selected (preview and export lose all three), then Undo; confirm all three cards, statuses, and export titles return exactly, proving undo restores the artifact surface too."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "export_identical_across_different_inputs"
+description = "Building two sessions with clearly different Names and project titles yields byte-identical Export package Portfolio JSON or Markdown resume text."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n6"
+name = "export_stale_after_mutations"
+description = "After mutating profile or projects, the Export package preview remains identical to its pre-mutation text (derived surface ignoring inputs)."
 type = "binary"
 negate = true
 weight = 1.0
@@ -151,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "behavioral.catchall"
 name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

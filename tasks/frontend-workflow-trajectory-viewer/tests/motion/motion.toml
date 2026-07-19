@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -106,9 +106,24 @@ weight = 1.0
 [[criterion]]
 id = "4.8"
 name = "reduced_motion_respected"
-description = "With prefers-reduced-motion set, animations are removed and state changes apply instantly, while every surface and flow (step navigation, streaming completion, forms) remains complete and usable"
+description = "With prefers-reduced-motion set, animations are removed and state changes apply instantly, while every surface and flow (step navigation, streaming completion, forms, palette, export) remains complete and usable"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "palette_and_filter_motion"
+description = "Driven through the real UI: the command palette opens with a short opacity and scale transition, and filtered timeline rows animate out and back when the step-type filter changes rather than snapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n1"
+name = "filter_or_palette_snaps_hard"
+description = "Changing the step-type filter or opening the command palette snaps with no transition while prefers-reduced-motion is unset"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.catchall"

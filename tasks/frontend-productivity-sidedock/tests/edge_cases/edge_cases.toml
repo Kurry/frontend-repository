@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -69,15 +69,15 @@ weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "forms_validate_inline_field_contracts"
+description = "Create workspace, Add bookmark, and folder create each show inline per-field validation against their field contracts before submit: empty or invalid Bookmark URL shows Enter a URL to add a bookmark or Enter a complete web address, such as https://example.com under that field; blank workspace name names the name field."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
 name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+description = "Field-contract validation errors name the offending field and the fix (for example Enter a complete web address, such as https://example.com, or a message naming title, name, or accentColor) rather than only saying Invalid."
 type = "binary"
 weight = 1.0
 
@@ -181,7 +181,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n7"
 name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+description = "Submitting an empty Bookmark URL, an over-120-character title, or a blank workspace name produces no inline field-contract validation feedback."
 type = "binary"
 negate = true
 weight = 1.0
@@ -206,6 +206,29 @@ weight = 1.0
 id = "4.n10"
 name = "affordances_hidden_or_inaccessible"
 description = "Interactive affordances are visually hidden or inaccessible."
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "4.11"
+name = "package_import_malformed_leaves_session"
+description = "Importing malformed or undecodable SideDock package JSON shows a visible error naming the import problem, leaves the current workspaces, pins, and sidebar view unchanged, and produces no console crash"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "package_import_contract_failure_no_partial_apply"
+description = "Importing parseable JSON that fails the SideDock package field contract (wrong schemaVersion sidedock-package-v1, accentColor outside the nine-color enum, non-http/https url, or pinnedBookmarkIds longer than 8) leaves the session unchanged and shows validation naming the offending field or rule"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "invalid_bookmark_payload_still_creates_row"
+description = "Submitting the Add bookmark form with an empty url, a non-http/https url, or a title longer than 120 characters still creates a bookmark row"
 type = "binary"
 negate = true
 weight = 1.0

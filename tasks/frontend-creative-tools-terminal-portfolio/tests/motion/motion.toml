@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -139,6 +139,28 @@ name = "reduced_motion_respected"
 description = "With prefers-reduced-motion enabled on a fresh load, staggered/enter animations are disabled or substantially reduced while the app remains fully usable"
 type = "binary"
 weight = 0.5
+
+[[criterion]]
+id = "4.12"
+name = "export_tab_and_copy_motion"
+description = "Verified through real UI controls: switching Export Center format tabs eases rather than hard-cuts, and Copy confirmation briefly changes state before resetting"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "mode_switch_includes_config_studio"
+description = "Switching among Terminal CLI, Projects Board, and Config Studio updates the terminal body without a full reload and without a hard visual pop of the entire window"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n2"
+name = "export_tabs_hard_cut_only"
+description = "Export Center tab switches and Copy confirmation snap with no transition or feedback motion at all"
+type = "binary"
+weight = 0.5
+negate = true
 
 [[criterion]]
 id = "4.catchall"

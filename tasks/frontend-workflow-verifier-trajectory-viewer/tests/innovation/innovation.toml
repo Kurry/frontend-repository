@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -61,155 +61,84 @@ allowed_tools = [
 [scoring]
 aggregation = "weighted_mean"
 
+
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+name = "coachmarks_tour_optional"
+description = "Optional: a short coachmarks tour highlights the verdict table, Export review package, and the flips-only filter on first visit, is dismissible, and never blocks the primary review workflow"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "review_activity_feed_optional"
+description = "Optional: a compact review activity feed lists the last several adjudication mutations with timestamps, derived from the same store as the summary panel"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+name = "command_palette_polish_beyond_jump"
+description = "Optional: the command palette fuzzy-filters Jump to trial and action entries as the user types, beyond a static unfiltered list"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+name = "export_memo_readable_polish"
+description = "Optional: the Review Memo Markdown preview includes clear section headings and readable bullets that go beyond a bare dump of ids"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+name = "bulk_bar_contextual_polish"
+description = "Optional: the bulk selection bar shows a live selected-count and clears selection with an explicit control after Apply classification to selected"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+name = "comparison_delta_sparklines"
+description = "Optional: the comparison strip adds compact visual cues for per-dimension improvement versus regression beyond signed numbers alone"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+name = "keyboard_cheatsheet_optional"
+description = "Optional: a dismissible keyboard cheatsheet documents arrow scrubbing, Ctrl/Cmd+K, and Undo/Redo without blocking review"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+name = "density_toggle_optional"
+description = "Optional: a density control tightens or loosens verdict table and timeline row spacing beyond the default dense register"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+name = "print_friendly_memo_optional"
+description = "Optional: a print-optimized view of the Review Memo Markdown formats cleanly for paper or PDF without breaking the main workspace"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+name = "competition_level_review_polish"
+description = "Competition-level polish is visible in the review console beyond MVP: cohesive instrument chrome, purposeful motion, and a complete export end state"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+name = "innovation_is_generic_review_shell"
+description = "Beyond the mandated review console surfaces, the UI reads as a generic log viewer shell with no review-operator polish or optional enhancement."
 type = "binary"
+weight = 0.5
 negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
-type = "binary"
-negate = true
-weight = 1.0
 
 [[criterion]]
 id = "innovation.catchall"

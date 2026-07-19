@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -169,6 +169,13 @@ description = "Lorem ipsum or placeholder text (\"TODO\", \"asdf\", \"Lorem\", t
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "2.16"
+name = "export_panel_monospace_preview"
+description = "The Export panel shows a monospaced session JSON preview with Copy and Download actions, and the difficulty control and Save table / Load saved table controls read as part of the same felt chrome rather than a disconnected gadget strip"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "2.catchall"

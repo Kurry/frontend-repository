@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,150 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_library_when_filter_or_delete_all"
+description = "An empty state appears in the library region when the period filter matches nothing or all user-manageable palettes are deleted, with a message explaining that no palettes match and how to get back (clear the filter or create a palette)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "invalid_create_inline_validation"
+description = "An empty palette name or fewer than the required swatches shows visible inline validation naming the offending field before submit, adds no palette, and leaves the collection count unchanged."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "validation_names_field_and_fix"
+description = "Palette create/edit and subscribe email validation copy names the field and the fix rather than only saying 'Invalid'."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "swatch_copy_shows_confirmation"
+description = "Clicking a swatch copies its hex and shows a brief on-swatch 'copied' confirmation (~1s) that then clears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "double_submit_creates_exactly_one"
+description = "Double-activating the editor's submit control with a valid palette creates exactly one palette: the count increases by one and one new card appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "painting_title_never_copies"
+description = "Clicking a painting-title control never triggers the copy confirmation; only swatch clicks copy a hex."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "subscribe_stays_dismissed"
+description = "Dismissing the subscribe popup keeps it dismissed for the rest of the session; it does not reappear on further idle or scrolling."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "library_controls_use_semantic_tags"
+description = "View toggles, period filter, palette editor fields, submit, MENU, CART, and swatch controls use semantic button/input/label elements rather than unlabeled decorative wrappers."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "overlay_close_paths"
+description = "The cart drawer, Detail/Editor overlay, and subscribe popup each close via an explicit close control (and backdrop or Escape where present), returning to the library without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "submit_disabled_while_invalid"
+description = "While any required create/edit field is invalid, the submit control stays disabled and an inline error naming what to fix remains visible next to that field."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_library_shows_nothing"
+description = "When the period filter matches nothing or all user palettes are deleted, the library region shows nothing — no empty-state message or restore guidance."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "validation_errors_only_in_console"
+description = "Invalid create/edit failures surface only in the browser console with no visible inline field feedback."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "swatch_copy_silent"
+description = "Clicking a swatch produces no visible copied confirmation and no clipboard write of the hex (silent failure)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "delete_palette_no_destructive_affordance"
+description = "Deleting a palette proceeds with no visible destructive affordance (no Delete labeling or confirmation cue) distinguishing it from a non-destructive action."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "interactive_controls_are_nonsemantic"
+description = "Primary interactive controls (view toggles, period filter, swatches, editor submit, MENU/CART) are non-semantic div/span click targets without button/role semantics."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "overlay_not_keyboard_dismissible"
+description = "With the cart drawer, subscribe popup, or Detail/Editor overlay open, keyboard users cannot dismiss it (no Escape path and no focusable Close control)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "double_submit_creates_duplicates"
+description = "Rapidly double-activating the editor's submit control with a valid palette creates more than one new palette or more than one new card for a single intended create."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "ambiguous_or_missing_action_labels"
+description = "Primary actions show blank, placeholder, or ambiguous labels such as 'Submit', 'OK', or 'Button' instead of specific labels for create/edit, delete, view toggles, or filter."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "painting_title_triggers_copy"
+description = "Clicking a painting-title control triggers the on-swatch copied confirmation or copies a hex as if the swatch were clicked."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "subscribe_reappears_after_dismiss"
+description = "After dismissing the subscribe popup, further idle or scrolling makes it reappear in the same session."
 type = "binary"
 negate = true
 weight = 1.0

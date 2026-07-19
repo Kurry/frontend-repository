@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.5
@@ -63,89 +63,113 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "15.1"
-name = "headings_use_consistent_capitalization"
-description = "For fidelity tasks, rendered copy must match the reference. Where the app renders headings and section titles, they use consistent capitalization (one convention — title case or sentence case — throughout)."
+name = "nav_menu_uppercase_convention"
+description = "Where the app renders navigation, menu, and button labels (HOME, ON TRACK, OFF TRACK, CALENDAR, STORE, CLIPS, PHOTOS, VIDEO, LIVE), they keep the uppercase convention consistently."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.2"
-name = "actions_use_specific_labels"
-description = "Where the app renders button or action labels, they are specific verbs ('Add expense', 'Start session'), not generic ('Submit', 'OK') when a specific label is possible."
+name = "action_labels_specific"
+description = "Where the app renders primary action labels, they use the mandated specific labels (STORE, Subscribe) rather than generic Submit/OK alone when a specific label is specified."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.3"
-name = "errors_name_problem_and_fix"
-description = "Where the app renders error messages, they name the problem and the fix ('Amount must be a positive number'), not just a rejection ('Invalid')."
+name = "newsletter_errors_name_email_and_fix"
+description = "Where the app renders newsletter error messages, they name the email field and state the fix (valid address format) rather than only saying Invalid."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.4"
-name = "empty_states_explain_next_step"
-description = "Where the app renders empty states, the copy explains what belongs there and how to add it."
+name = "exact_mandated_chrome_strings"
+description = "Where the app renders mandated chrome copy, the exact strings appear: tab title 2025 Apex Grand Prix Driver — Avery Vale; preloader LOAD VALE; menu items HOME, ON TRACK, OFF TRACK, CALENDAR; socials CLIPS, PHOTOS, VIDEO, LIVE; contact hello@averyvale.example; hero widget NEXT RACE, ALPINE GP, and NOVA RACING SINCE 2019; legal links Privacy Policy, Terms, Cookies; press-kit tabs JSON, Markdown, ICS; nav PRESS KIT; race circuits Alpine GP, Bayfront Circuit, Ridgeway GP, Solstice GP, Meridian Night Run, Cascade Finale."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.5"
-name = "body_copy_is_well_written"
-description = "Where the app renders body or marketing copy, rate how free it is of spelling and grammatical errors."
+name = "body_copy_spelling_grammar"
+description = "Where the app renders body or marketing copy on the Avery Vale homepage, rate how free it is of spelling and grammatical errors."
 type = "likert"
 points = 5
 weight = 0.5
 
 [[criterion]]
 id = "15.6"
-name = "terminology_is_consistent"
-description = "Where the app renders labels for the same concept in multiple places, terminology is consistent (not 'task' here and 'todo' there)."
+name = "avery_vale_terminology_consistent"
+description = "Where the app renders the driver and team identity, terminology stays consistent as Avery Vale / AVERY VALE and Nova Racing (not mixed with leftover source-driver naming)."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.7"
-name = "numbers_dates_and_units_are_consistent"
-description = "Where the app renders numbers, dates, and units, formatting is consistent (same date format, same decimal precision, units labeled)."
+name = "supporting_copy_sentence_case"
+description = "Where the app renders supporting body copy (not nav/menu/button labels), it uses one consistent sentence-case convention."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.8"
-name = "success_messages_are_specific"
-description = "Where the app renders confirmation and success messages, they state what happened ('Entry saved'), not vague affirmations."
+name = "newsletter_confirmation_states_success"
+description = "Where the app renders the newsletter confirmation, it states that the signup succeeded rather than a vague affirmation alone."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.n1"
-name = "placeholder_copy_is_visible"
-description = "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI."
+name = "placeholder_copy_visible"
+description = "Lorem ipsum or placeholder text (TODO, Lorem, asdf, or template variables like {{title}}) is visible anywhere in the shipped UI."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n2"
-name = "prominent_copy_has_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as headings, hero text, or primary buttons."
+name = "prominent_copy_has_typos"
+description = "Spelling or grammatical errors appear in prominent copy such as LOAD VALE, AVERY VALE, NEXT RACE, ALPINE GP, or STORE."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n3"
-name = "concept_names_are_inconsistent"
-description = "The same concept is named inconsistently across surfaces."
+name = "source_brand_names_in_copy"
+description = "Rendered copy still names the source driver, real team, sponsors, or reference-site branding instead of the fictional Avery Vale / Nova Racing system."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n4"
-name = "copy_is_truncated_or_overflowing"
-description = "Truncated or overflowing text renders copy unreadable."
+name = "copy_truncated_or_overflowing"
+description = "Truncated or overflowing text renders mandated labels, hero widget copy, or newsletter messages unreadable at 1440 or 390."
+type = "binary"
+negate = true
+weight = 0.5
+
+[[criterion]]
+id = "15.9"
+name = "press_kit_empty_state_plain_language"
+description = "Where the app renders press-kit empty states, the copy says selection lists are empty in plain language rather than a blank or cryptic error code."
+type = "binary"
+weight = 0.5
+
+
+[[criterion]]
+id = "15.10"
+name = "status_and_import_errors_name_fields"
+description = "Race status validation errors name the status field, and press-kit Import errors name the import problem in plain language rather than silent failure or generic Error text."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "15.n5"
+name = "press_kit_labels_wrong_case_or_missing"
+description = "PRESS KIT, JSON, Markdown, or ICS labels are missing or use inconsistent casing versus the mandated strings."
 type = "binary"
 negate = true
 weight = 0.5

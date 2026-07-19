@@ -1,0 +1,458 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "portfolio_lists_twelve_bundles"
+description = "On first load the portfolio lists 12 seeded review bundles, each row showing a fictional task slug (including ember-relay-router, juniper-lint-fixer, and drift-ledger-repair), a verdict hero state, six per-gate status chips, and a review-progress indicator for the 5 reviewer steps"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "hero_state_distribution"
+description = "Every bundle carries exactly one of the three verdict hero states rendered as a labeled banner treatment, and the seeds distribute as 4 READY FOR THE BENCHMARK, 5 NOT READY — BUT FIXABLE, and 3 AT RISK — MAY NEED A RESTART"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "rollup_counts_match_table"
+description = "The rollup strip shows a live count of bundles per hero state plus a count of bundles carrying at least one stop-early flag, and each count equals what the portfolio table currently shows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "portfolio_filters_combine"
+description = "The hero-state filter and the gate-plus-status filter each narrow the visible rows, active filters render as removable chips, applying both together narrows further, and clearing all filters restores all 12 rows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "calibration_strip_per_bundle"
+description = "The portfolio's calibration strip shows one cell per bundle with the Sable-4 valid-trial count out of total Sable-4 trials for that bundle plus an overall Sable-4 validity percentage, and hovering a cell with the real pointer shows the bundle slug with its valid/total figures"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "stop_early_flags_named"
+description = "Bundles seeded with stop-early flags show a warning badge on their portfolio row, and hovering or focusing the badge reveals the flag's name (agent solved without runtime evidence, or oracle contradicts the task description)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "bundle_open_and_return"
+description = "Selecting a bundle row opens that bundle's review workspace without a full page reload, and a persistent control returns to the portfolio"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "gate_board_six_gates"
+description = "A bundle's gate board shows six gates in the fixed order Admission, No-op, Oracle, Difficulty — Sable-4, Difficulty — Quartz-Mini, Analysis, each card showing a status of pass, fail, errored, inconclusive, or missing, a one-line summary, and an expandable reasons list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "thresholds_visible_on_board"
+description = "The gate board displays the certification thresholds as visible reference values — the 0.80 difficulty bar, the 0.90 oracle comprehensiveness bar, and the minimum of 3 valid trials — with each difficulty gate's measured score shown next to the 0.80 bar and the Oracle gate's comprehensiveness value shown next to the 0.90 bar"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "gate_evidence_links_jump"
+description = "Activating a gate card's evidence link jumps to the exact record backing that gate — a difficulty gate's link opens the trial inspector on that gate's trials and the Oracle gate's link opens its oracle transcript record — with the target visibly highlighted on arrival"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "difficulty_status_derivation"
+description = "Difficulty gate statuses are consistent with their displayed evidence: a gate whose score meets the 0.80 bar with at least 3 valid trials shows pass, a gate with fewer than 3 valid trials shows inconclusive, and a gate whose score misses the bar with 3 or more valid trials shows fail; ember-relay-router's Difficulty — Quartz-Mini gate ships inconclusive with exactly 2 valid trials"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "hero_derives_from_gates_and_flags"
+description = "Each bundle's verdict hero state matches the stated mapping: all six gates passing yields READY FOR THE BENCHMARK, a non-passing gate with no stop-early flag and no unresolved REDESIGN fix item yields NOT READY — BUT FIXABLE, and a stop-early flag or an unresolved REDESIGN item yields AT RISK — MAY NEED A RESTART"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "gate_evidence_read_only"
+description = "A control exists that directly edits a gate's score, status, reasons, or evidence text (rather than changing state only through re-runs, fix check-offs, steps, recommendations, and overrides)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.14"
+name = "rerun_four_named_steps"
+description = "Activating Re-run gate starts a simulated re-evaluation showing four named steps in order — provision harness, collect trials, evaluate checks, publish result — whose statuses advance visibly through pending, running, and complete or failed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "retry_backoff_attempt_counter"
+description = "A simulated step failure retries automatically with a visible backoff countdown and an attempt counter (such as retry 2 of 3), and a step that exhausts its retries is marked failed with an inline error summary and a manual Retry control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "manual_retry_resumes_from_step"
+description = "Activating a failed step's Retry control resumes the re-run from that step, and steps already complete keep their original timestamps and outputs without re-executing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "pause_resume_checkpoint"
+description = "Pausing a running re-run freezes progression at the current step, and resuming continues from exactly that step with completed steps unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "rerun_flips_gate_in_place"
+description = "When the publish result step completes, the gate receives a fresh result that can change its status — re-running ember-relay-router's Difficulty — Quartz-Mini gate gathers additional valid trials so it leaves inconclusive — and the gate card's status chip, summary, and score update in place"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "rerun_recomputes_dependents"
+description = "A gate status change from a completed re-run recomputes, without a reload, the bundle's verdict hero banner, the allowed recommendation set and its explanation, the portfolio row's hero state and gate chips, the rollup counts, and the calibration strip when trial validity changed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "event_timeline_records_and_filters"
+description = "The bundle's event timeline lists timestamped entries for re-run step transitions, gate status changes, fix-item check-offs, recommendation changes, reviewer step completions, and bundling; it is filterable by event kind and new entries appear without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "trials_list_with_validity"
+description = "Opening a difficulty gate's evidence shows a selectable trial list with at least 4 trials per judge model for the bundle, each labeled with its judge model (Sable-4 or Quartz-Mini), trial number, and a valid or invalid badge"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "three_pane_inspector_content"
+description = "The trial inspector shows three panes for the selected trial: a criterion list of at least 6 rubric criteria each with id, name, weight, and a negated marker where inverted; the judge's per-criterion reasoning with a pass, fail, or not-applicable outcome chip per criterion; and the agent's answer text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "eight_named_checks_rendered"
+description = "The inspector renders the trial's eight named validity checks each with an outcome chip: answer-determinacy, runtime-evidence-used, grounded-in-trajectory, comprehensiveness-near-miss, difficulty-crux, honest-uncertainty, refusals, and low-timeout"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "trial_validity_derives_from_checks"
+description = "Each trial's valid or invalid badge is consistent with its displayed checks: the badge reads valid exactly when the trial's answer-determinacy, refusals, and low-timeout checks all show pass"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "criterion_selection_links_panes"
+description = "Selecting a criterion in the left pane highlights that criterion's reasoning block in the middle pane and highlights the cited passages in the agent's answer in the right pane, and selecting a different criterion moves both highlights"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "reasoning_selection_reflects_back"
+description = "Selecting a reasoning block in the middle pane selects the corresponding criterion in the left pane so all three panes agree on the selected criterion"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "evidence_highlight_treatments"
+description = "Cited passages in the agent's answer carry a visible highlight treatment distinct from body text, and the passage cited by the currently selected criterion is visually distinct from other cited passages"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "trial_diff_side_by_side"
+description = "The Compare trials control enters a diff mode where two trials of the same gate render their check outcomes side by side — one column per trial, one row per named check — with every differing check flagged by a visible flip marker and a summary stating how many of the eight checks flipped"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "diff_exit_restores_selection"
+description = "Leaving diff mode restores the single-trial three-pane view on the previously selected trial"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "fix_list_item_anatomy"
+description = "Every fix-list item shows its position number, a category tag of RERUN, FIX, REDESIGN, or TALK-TO-LEAD, a title, a detail sentence, a remediation sentence, and an evidence link that jumps to its backing record; every non-READY bundle shows at least 3 items"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "fix_resolve_round_trip"
+description = "Checking a fix item's resolve checkbox marks it resolved with a visible struck or dimmed treatment and unchecking restores it, with position numbers staying sequential and REDESIGN items ordered above FIX and RERUN items"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "fix_resolution_recomputes_constraint"
+description = "Resolving or unresolving a fix item immediately recomputes the allowed recommendation set and the visible constraint explanation, and resolving an unresolved REDESIGN item on a flag-free bundle updates the verdict hero banner and portfolio row per the hero mapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "recommendation_allowed_set_enforced"
+description = "The Verdict step shows APPROVE, APPROVE WITH CAVEATS, MAJOR CHANGES NEEDED, and REJECT-ESCALATE with only the currently allowed set enabled and the rest visibly disabled, and the enabled set matches the ordered rules (all-pass plus all-resolved allows APPROVE and APPROVE WITH CAVEATS; all-pass with only RERUN/FIX unresolved allows APPROVE WITH CAVEATS and MAJOR CHANGES NEEDED; a non-passing gate or unresolved REDESIGN allows MAJOR CHANGES NEEDED and REJECT-ESCALATE; an unresolved TALK-TO-LEAD allows only REJECT-ESCALATE)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "constraint_explanation_names_triggers"
+description = "The constraint explanation panel states in plain language which rule currently applies and names the specific gates or fix items triggering it, and the explanation text changes when the triggering conditions change"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "recommendation_recorded_in_header"
+description = "Selecting an allowed recommendation records it and shows it as the bundle's current recommendation in the workspace header"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "override_requires_justification"
+description = "Choosing a recommendation outside the allowed set requires the Override constraint toggle plus a written justification of at least 20 characters; a shorter or whitespace-only submission shows an inline message naming the justification field and saves nothing, while a valid justification saves, shows an Override badge, and keeps the justification retrievable from the verdict panel"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "override_toggle_off_reverts"
+description = "Turning the override toggle off while an out-of-set recommendation is saved reverts the recommendation to unset and removes the Override badge"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "stepper_locks_until_done"
+description = "The 5 reviewer steps Resolve, Gate, Audit, Verdict, Bundle render as a stepper where each step shows done or not-done at a glance, and a step is locked — its content shows a locked notice naming the prerequisite step and its done control is disabled — until every earlier step is done"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "step_done_unlock_and_relock"
+description = "Marking a step done unlocks the next step and updates the portfolio row's review-progress indicator, and un-marking a done step re-locks all later steps while preserving their notes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "step_notes_survive_navigation"
+description = "Text entered in a step's notes field persists across navigating to the portfolio and back, and to another bundle and back, along with the step's done flag"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "summary_document_complete"
+description = "The Bundle step renders a review summary containing the verdict hero state, the chosen recommendation with the override justification when one exists, a gates table listing all six gates with their current statuses, the ordered fix list with each item's category tag, resolved state, and remediation, and a reviewer notes checklist of the 5 steps with done flags and notes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "summary_reflects_live_state"
+description = "Changing a fix item, the recommendation, or a step note and returning to the Bundle step shows the changed values in the rendered summary document"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "copy_summary_confirmation"
+description = "The Copy summary control places the summary text on the clipboard and shows a visible confirmation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "bundling_gated_and_stamped"
+description = "Complete bundling is enabled only when the Verdict step is done and a recommendation is recorded; activating it marks the Bundle step done, appends a timestamped bundling event to the event timeline, and flips the bundle's portfolio row to show the Bundled badge"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "breadcrumb_tracks_selection"
+description = "The address-style breadcrumb extends as the reviewer descends (Portfolio / bundle slug / gate name / trial number / criterion id), and selecting any gate, trial, or criterion anywhere updates it to that exact path"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "breadcrumb_segments_navigate"
+description = "Activating a breadcrumb segment navigates to that level with the corresponding record selected and highlighted"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "cross_entry_selection_identical"
+description = "Reaching the same record from different entry points — a portfolio gate chip, the gate card, an evidence link, or the breadcrumb — lands on the identical selection state and breadcrumb path"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "double_rerun_single_execution"
+description = "Rapidly double-activating a Re-run gate control starts exactly one re-run (one step sequence, one publish event, one timeline start entry), and activating Re-run while that gate's re-run is running leaves the running re-run untouched"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "empty_states_designed"
+description = "A portfolio filter combination matching nothing shows an empty state naming the active filters with a Clear filters control; a timeline filtered to an empty event kind shows an empty state message; and a READY bundle with no fix items shows a fix-list empty state saying no fixes are required"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "self_diff_prevented"
+description = "In diff mode the second trial picker excludes the already-picked trial or shows an inline message, and no self-diff of a trial against itself renders"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.51"
+name = "long_title_truncation"
+description = "A fix-item title longer than 80 characters renders truncated with an ellipsis in the list and shows in full in the item's expanded detail"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.52"
+name = "unmark_verdict_relocks_bundle"
+description = "Un-marking the Verdict step done after bundling re-locks the Bundle step and removes its done state while the timeline keeps the historical bundling event"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.53"
+name = "fabricated_rerun_success"
+description = "A re-run presents a completed state while the gate card, hero banner, portfolio row, or timeline remain unchanged from before the re-run in a case where the published result should have changed them"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.54"
+name = "constraint_ignores_state"
+description = "The enabled recommendation set stays the same across gate flips or fix-item resolution changes that the stated rules say must change it"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.55"
+name = "summary_shows_stale_state"
+description = "The Bundle summary document shows a hero state, recommendation, gate status, fix item, or note that contradicts what the rest of the workspace currently displays"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

@@ -91,7 +91,7 @@ weight = 1.0
 [[criterion]]
 id = "1.5"
 name = "sample_png_adds_queue_row"
-description = "After clicking \"Add sample png\", a file row appears in the queue showing the filename, a \".png\" source format, a \"Convert to\" selector defaulting to a sensible target, the input size, and a Ready status, and the counts line updates to include 1 queued and 1 ready."
+description = "After clicking \"Add sample png\", a file row appears in the queue showing the filename, a \".png\" source format, a selection checkbox, a \"Convert to\" selector defaulting to the Settings default Convert-to target when set (otherwise a sensible target), the input size, and a Ready status, and the counts line updates to include 1 queued and 1 ready."
 type = "binary"
 weight = 1.0
 
@@ -119,7 +119,7 @@ weight = 1.0
 [[criterion]]
 id = "1.11"
 name = "multi_surface_persistence_chain"
-description = "After selecting a catalog category, switching the theme, and changing the Settings quality value, reloading the page restores the active category, the theme, and the quality value, while the conversion queue returns to a single empty state with \"0 files queued\" and no phantom row, progress, or download success."
+description = "After selecting a catalog category, switching the theme, changing the Settings quality and default Convert-to target, and saving a conversion preset, reloading the page restores the active category, theme, quality, default target, and presets list, while the conversion queue returns to a single empty state with \"0 files queued\" and no phantom row, progress, or download success."
 type = "binary"
 weight = 1.0
 
@@ -154,7 +154,7 @@ weight = 1.0
 [[criterion]]
 id = "1.24"
 name = "row_select_remove_and_clear"
-description = "After clicking a queued row it becomes the selected row with a visible inset ring, and clicking its Remove control drops the row from the queue and decrements the counts line; Clear queue empties the whole queue."
+description = "Each queue row exposes a selection checkbox; checking it marks the row selected (inset ring) and reveals the batch tray; clicking Remove drops the row from the queue and decrements the counts line; Clear queue empties the whole queue."
 type = "binary"
 weight = 1.0
 
@@ -169,7 +169,7 @@ optional = true
 [[criterion]]
 id = "1.26"
 name = "settings_and_about_content"
-description = "Settings exposes an Output quality control (1 to 100) that changes jpeg and webp output bytes, a keep-metadata toggle, and a light/dark theme choice; About and Privacy explain conversion is local and files are never uploaded, and remain reachable with no file selected."
+description = "Settings exposes output quality (1 to 100), keep-metadata toggle, default Convert-to target (png, jpeg, jpg, or webp), and light/dark theme; About and Privacy explain conversion is local and files are never uploaded, and remain reachable with no file selected."
 type = "binary"
 weight = 1.0
 
@@ -254,9 +254,160 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "1.39"
+name = "queue_row_field_contract"
+description = "After adding the sample png, the queue row shows non-empty name, from in png|jpg|jpeg|webp|gif|bmp|svg, to in png|jpeg|jpg|webp, status Ready (then Done after Convert), a selection checkbox, and a non-negative input size; when Done, an output size is shown."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "session_json_export_field_contract"
+description = "After converting a sample file with a non-default quality and at least one named preset visible, the session JSON export preview includes current quality, keep-metadata, theme, active catalog category, every conversion preset (name, target, quality), and per-file queue metadata (name, from, to, status, inputSize, outputSize) matching the visible store — with no raw file bytes, blobs, or base64 payloads."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "conversion_session_import_round_trip"
+description = "After mutating settings and presets with at least one file still queued, exporting session JSON then Importing that same JSON restores Settings quality/keep-metadata/theme/default target, the presets list, and Convert-to targets on currently queued files that match by filename, and the session JSON export preview matches that imported state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "session_export_omits_session_mutations"
+description = "After lowering quality, saving a preset, and converting a sample file, the session JSON or conversion-report export omits the lowered quality, omits the saved preset, or omits a per-file entry reflecting the converted row's name/from/to/status."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.43"
+name = "batch_tray_reveals_on_multi_select"
+description = "Selecting one or more queue rows via their selection checkboxes reveals a batch tray with Batch set format, Batch remove, and Download all done; with zero selected the tray stays hidden."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "batch_set_format_applies_target"
+description = "With two queued files selected, Batch set format to webp sets Convert-to to webp on both selected rows; any previously Done selected row returns to Ready with Download disabled, and the session JSON export preview lists both files' to as webp."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "batch_remove_confirms_and_removes"
+description = "Batch remove asks for confirmation that names the selected count of rows to remove, then removes exactly those selected rows and updates the counts; with zero selected the tray stays hidden and Batch remove does nothing."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "download_all_done_triggers_downloads"
+description = "Download all done triggers a real file download for every selected Done row, or for every Done row in the queue when none are selected."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "seeded_conversion_presets_at_least_three"
+description = "On first load, Settings (or an adjacent presets strip on Convert) lists at least 3 seeded named conversion presets, each with a name, a default target format (png, jpeg, jpg, or webp), and a quality from 1 to 100."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "save_preset_adds_named_preset"
+description = "Saving a preset named \"Web ready\" with target webp and quality 80 increases the visible preset count by exactly one; empty or whitespace-only names are rejected with an inline message naming the name field and add no preset."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "apply_preset_writes_quality_and_targets"
+description = "Applying a preset writes that preset's quality into Settings and its target into every selected queue row, or into every Ready row when none are selected; Done rows that receive a new target return to Ready."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "delete_preset_decrements_count"
+description = "Delete preset removes the named preset after confirmation; seeded and user presets alike can be deleted, and the visible preset count decreases by exactly one."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "undo_restores_queue_or_preset"
+description = "Undo reverses the most recent mutating queue or preset action (add, remove, clear, retarget, batch set format, batch remove, save preset, or delete preset) and restores the prior queue rows, counts, selection, and presets list; Undo/Redo controls show enabled and disabled states that match whether a step is available."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.52"
+name = "redo_reapplies_and_clears_on_new_mutation"
+description = "Redo reapplies the most recently undone action with the same completeness; after Undo removes a queued file, Redo removes it again; performing a new mutating add after an undo clears the redo stack and disables Redo."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.53"
+name = "session_export_two_formats_live"
+description = "The Session export panel compiles LIVE from the current store and offers session JSON and conversion-report markdown tabs; each preview regenerates whenever the queue, settings, or presets change, with a monospaced preview and Copy / Download / Import controls."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.54"
+name = "conversion_report_markdown_summarizes"
+description = "The conversion-report markdown export summarizes settings, preset names, and one line per queued file with name, formats, status, and sizes matching the visible session."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.55"
+name = "session_export_copy_and_download"
+description = "On a session JSON or conversion-report tab, Copy writes the visible preview text to the clipboard and shows a brief copied confirmation; Download starts a file download of that same preview text."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.56"
+name = "default_convert_to_applies_on_add"
+description = "Setting a default Convert-to target in Settings (for example webp) causes newly added files to default their Convert-to selector to that target."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n43"
+name = "batch_tray_visible_with_zero_selected"
+description = "The batch tray (Batch set format, Batch remove, Download all done) is visible while zero queue rows are selected."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n44"
+name = "empty_preset_name_still_adds"
+description = "Saving a preset with an empty or whitespace-only name increases the visible preset count or adds a blank-named preset."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n45"
+name = "undo_fails_to_restore_queue_or_presets"
+description = "After removing a queued file or deleting a preset, Undo leaves the queue counts or presets list unrestored."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in core features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

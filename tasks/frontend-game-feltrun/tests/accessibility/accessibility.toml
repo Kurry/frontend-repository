@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,158 +62,158 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "Canvas play is exempt from per-element semantics; menus, pause screens, and score readouts must be keyboard-reachable and announced. All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "betting_and_export_keyboard_accessible"
+description = "Every betting control, panel toggle, slider, Undo last action, Save table, Load saved table, difficulty control, and Export Copy/Download/Import control is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space, arrows for the slider)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "session_modal_focus_trap"
+description = "The Start new session confirmation traps focus while open and returns focus to the control that opened it on close"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "icons_have_accessible_names"
+description = "Icon-only controls in the chrome expose accessible names (aria-label or equivalent) so their purpose is announced"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "toast_and_copy_live_regions"
+description = "The badge-unlock toast and the export copied confirmation are announced via a polite live region as well as shown visually"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+name = "raise_and_import_have_labels"
+description = "The raise-amount input and the session import field have explicit labels associated with the controls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+name = "headings_logical_order"
+description = "Panel headings such as Session stats, Hand history, Badges, and Export follow a logical heading order without skipping levels in a way that breaks outline navigation"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "landmarks_or_regions_present"
+description = "Primary regions (table, stats/history panels, export) are distinguishable via landmarks or labeled regions for assistive navigation"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "1.8"
-name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+name = "focus_visible_on_dark_felt"
+description = "Keyboard focus is clearly visible on every interactive control and legible against the dark felt"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "validation_errors_announced"
+description = "Raise-amount and import validation errors appear next to the field they describe and are announced to assistive technology when they appear"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "style_badges_not_color_alone"
+description = "AI play-style badges are not distinguished by color alone — each also has a text label (Aggressive, Tight, or Bluffer) or icon-plus-text"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
-name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+name = "controls_not_keyboard_reachable"
+description = "Betting, Undo, Save, difficulty, or Export controls cannot be reached or activated with the keyboard alone"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n2"
-name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+name = "modal_loses_focus_management"
+description = "The Start new session confirmation lets keyboard focus escape while open, or fails to return focus to the opener on close"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n3"
-name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+name = "toasts_not_announced"
+description = "Badge-unlock or export-copied feedback is visual only with no polite live region announcement"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+name = "inputs_missing_labels"
+description = "The raise-amount or import field has no accessible label"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "focus_indicator_missing"
+description = "Focused betting or export controls show no visible focus indicator against the dark felt"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+name = "errors_not_associated"
+description = "Validation errors appear without association to the raise-amount or import field"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+name = "badges_color_only"
+description = "AI play-style badges are distinguished only by color with no text label"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+name = "icon_only_unnamed"
+description = "Icon-only chrome controls lack accessible names"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+name = "keyboard_trap_outside_modal"
+description = "Keyboard focus becomes trapped in a non-modal region with no Escape or Tab escape path"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n10"
-name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+name = "live_region_polite_missing_on_errors"
+description = "Inline raise or import errors appear visually with no accessible live region update and no field error association"
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "accessibility.catchall"
 name = "accessibility_catchall"
-description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

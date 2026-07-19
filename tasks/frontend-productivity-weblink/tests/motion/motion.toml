@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "3.1"
 name = "buttons_hover_feedback"
-description = "Join Room, Leave Room, the theme toggle, and the choose-file control each show a hover feedback change (background, border, or shadow) on pointer hover"
+description = "Join Room, Leave Room, the theme toggle, choose-file, Export Session, Import Session, Copy, and Download each show a hover feedback change (background, border, or shadow) on pointer hover"
 type = "binary"
 weight = 1.0
 
@@ -110,7 +110,7 @@ optional = true
 [[criterion]]
 id = "3.7"
 name = "buttons_scale_down_on_press"
-description = "Join Room, Leave Room, the theme toggle, and the choose-file control each apply a brief scale-down while pressed, verified by pressing the real controls"
+description = "Join Room, Leave Room, the theme toggle, choose-file, Export Session, Import Session, Copy, and Download each apply a brief scale-down while pressed, verified by pressing the real controls"
 type = "binary"
 weight = 0.5
 
@@ -124,14 +124,14 @@ weight = 1.0
 [[criterion]]
 id = "3.9"
 name = "join_error_animates_in"
-description = "The inline join-form error appears with a short fade or slide rather than popping in instantly, verified by activating Join Room with an empty identifier"
+description = "Inline field-contract errors (join, display name, composer, import) appear with a short fade or slide rather than popping in instantly, verified by activating Join Room with an empty identifier"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "3.10"
 name = "reduced_motion_removes_animations"
-description = "On a fresh load with prefers-reduced-motion set, entrance and transition animations are removed and state changes apply instantly, while joining, chatting, queueing files, and theme switching all remain usable"
+description = "On a fresh load with prefers-reduced-motion set, entrance and transition animations are removed and state changes apply instantly, while joining, chatting, queueing files, exporting, importing, and theme switching all remain usable"
 type = "binary"
 weight = 1.0
 

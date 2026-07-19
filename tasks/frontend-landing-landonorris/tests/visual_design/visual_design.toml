@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -141,7 +141,7 @@ optional = true
 [[criterion]]
 id = "3.11"
 name = "store_button_pill_treatment"
-description = "The Store button is a solid lime pill with a small bag icon, a rounded radius near 12px, and a bold sans label near 20px, and the hamburger and menu close control are square outlined buttons about 60px by 60px with rounded corners"
+description = "The Store button is a filled lime pill with a small bag icon, a rounded radius near 12px, and a bold variable-sans label near 20px, and the hamburger and menu close control are square outlined buttons about 60px by 60px with rounded corners"
 type = "binary"
 weight = 0.5
 optional = true
@@ -164,7 +164,7 @@ weight = 1.0
 [[criterion]]
 id = "3.14"
 name = "desktop_nav_single_row"
-description = "At viewport widths at or above 992px the nav is a single row about 100px tall with the wordmark left, the monogram mark centered, and the Store button plus hamburger on the right"
+description = "At viewport widths at or above 992px the nav is a single row about 100px tall with the wordmark left, the monogram mark centered, and STORE, PRESS KIT, and hamburger on the right"
 type = "binary"
 weight = 1.0
 
@@ -286,6 +286,28 @@ name = "newsletter_copy_actionable"
 description = "The newsletter inline error copy names the email field and states how to fix the input, and the post-submit confirmation copy states that the signup succeeded rather than a vague affirmation"
 type = "binary"
 weight = 0.5
+
+[[criterion]]
+id = "3.40"
+name = "race_calendar_list_anatomy"
+description = "Race calendar rows share one dense list anatomy (circuit, date, status chip, selected lime treatment) on the dark-green base rgb(40, 44, 32)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.31"
+name = "press_kit_and_palette_visual_system"
+description = "The press-kit drawer uses the dark-green surface and off-white body type with lime tab/active states for JSON / Markdown / ICS; the command palette is a centered dark overlay with a single search field and compact results list."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.n30"
+name = "shortlist_controls_obscure_masks"
+description = "Shortlist controls on helmet or editorial cards obscure the helmet silhouette mask or the editorial image crop so the artwork is unreadable."
+type = "binary"
+negate = true
+weight = 1.0
 
 [[criterion]]
 id = "3.catchall"

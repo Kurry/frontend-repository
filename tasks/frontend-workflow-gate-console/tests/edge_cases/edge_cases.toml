@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,92 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "timeline_and_registry_empty_states"
+description = "Filtering the timeline to a type with no entries, or the registry to a severity with no gates, shows an empty-state message rather than a blank region; a run with no events yet names what will appear there."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "gatenote_and_import_validate_inline"
+description = "GateNote create and Acceptance Package import surfaces show inline validation naming the offending field (text, category, schemaVersion, stages, or payload) before a successful commit."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "field_contract_errors_name_fields"
+description = "Validation messages for note text length, missing category, wrong schemaVersion, or out-of-enum severity name the field and the fix rather than only saying Invalid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "copy_note_and_import_confirmations"
+description = "Fingerprint copy, export Copy, note attach, and successful import each show visible confirmation feedback."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "rerun_shows_progress_indicator"
+description = "A stage re-run shows the overall progress indicator advancing as gates complete rather than jumping straight to a final state with no intermediate feedback."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "note_cancel_and_whatif_revert"
+description = "Cancel on the Add note form leaves evidence and timeline unchanged; what-if revert restores recorded gate results without needing a destructive confirm."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "status_legend_explains_colors"
+description = "A visible legend explains the four status colors used on stage segments, gates, chain links, and timeline entries."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "note_and_export_controls_semantic"
+description = "Add note, Export acceptance package, Import acceptance package, Copy, and Download use semantic button or link controls with visible labels."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "note_export_import_dismissible"
+description = "The note form and export/import drawers close via an explicit close control and Escape; focus returns to the opener."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "rerun_progress_and_export_tabs"
+description = "Long re-run simulations expose per-gate progress, and the export drawer exposes format tabs so the operator can switch between Acceptance Package JSON and Certificate Chain Markdown without losing context."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "invalid_import_leaves_run_unchanged"
+description = "Importing malformed Acceptance Package JSON or a document that breaks the field contract shows visible validation naming the offending field and leaves the selected run's note count and stage statuses unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "double_rerun_starts_once"
+description = "Double-activating a stage's re-run control starts exactly one simulation; the timeline gains one re-run start entry, not two."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_timeline_or_registry_blank"
+description = "A filtered-empty timeline or registry shows nothing and provides no empty-state message."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +155,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n2"
 name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+description = "GateNote or import validation failures are surfaced only in the browser console with no on-screen field errors."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,15 +163,15 @@ weight = 1.0
 [[criterion]]
 id = "4.n3"
 name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+description = "Copy fingerprint, export Copy, note attach, or import succeed or fail with no visible confirmation or error."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "whatif_leaks_into_rerun"
+description = "Starting a re-run while what-if simulated values differ from recorded values runs against the simulated overlay or leaves simulated markers after the re-run starts."
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +179,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n5"
 name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+description = "Add note, Export, Import, or Copy controls are only non-semantic div or span wrappers with no button or link role."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +187,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n6"
 name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+description = "The note form or export/import drawer cannot be dismissed via Escape."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +195,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n7"
 name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+description = "GateNote field-contract violations show no inline UI indication before or on submit."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +203,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n8"
 name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+description = "Primary actions use generic labels such as Submit or OK instead of Add note, Export acceptance package, Import acceptance package, or Start re-run where those verbs apply."
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +211,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n9"
 name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+description = "What-if mode has no visible banner, or the export drawer has no format labels, leaving the operator without in-app guidance for those flows."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +219,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n10"
 name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+description = "Export, Import, Add note, or what-if controls are visually hidden or not reachable when a run and stage are open."
 type = "binary"
 negate = true
 weight = 1.0

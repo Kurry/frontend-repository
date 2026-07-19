@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,200 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "ayu_theme_propagates_end_to_end"
+description = "Selecting the Ayu base theme in step two replaces all six swatch values at once, retints both live Preview panels immediately, and after advancing to step three with Vector selected the bitmap tiles render in the Ayu colours; the step four summary names Ayu as the selected colour set — all without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "single_swatch_edit_to_summary"
+description = "Editing a single swatch in step two changes that swatch row, retints the live Preview, leaves the other five swatch rows unchanged, and the edited colour appears in the step four swatch strip after advancing to the final stage."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "icon_set_toggle_preserves_colours"
+description = "Switching the icon set in step three between None and Vector updates every preview tile and the replaced-count status line immediately, leaves the step two colour choice intact when returning via Back, and the step four summary reports the currently selected icon set with its replaced count."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "back_retains_earlier_choice"
+description = "Moving backward one step shows the earlier replacement choice still selected exactly as it was left; moving backward and forward through the wizard repeatedly shows each step exactly once with its own choices retained."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "revise_after_generate"
+description = "After generating the patched result, returning to an earlier step, picking a different colour set or icon set, and advancing again replaces the earlier preview at that step and in the final summary."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "reload_restores_wizard_state"
+description = "After advancing to a later step with a chosen base theme, edited swatches, and icon set, reloading the page restores the exact wizard step and all chosen replacements: progress bar highlight, base theme selection, six swatch values, icon set choice, and replaced count."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "upload_continue_to_theme"
+description = "From the seeded Upload step, activating Continue advances to Update theme colours without requiring a file pick, and the progress bar highlights the theme stage."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "generate_shows_confirmation_summary"
+description = "Advancing to Download new executable after choosing replacements shows a Patched result generated confirmation plus a summary of the chosen colour set name, swatch strip, live preview, and icon set with replaced count."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "download_reflects_occurrence"
+description = "Activating Download writes an EuroScope.exe file and the control label reflects that the download occurred."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "invalid_hex_recovery_without_reload"
+description = "After an invalid swatch hex blocks apply with an inline message, correcting the value clears the message and lets the user continue the wizard without a full page reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "primary_wizard_flows_unavailable"
+description = "Theme select, icon-set switch, step advance/return, generate, or download flows are not enabled from the visible UI controls."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "theme_change_fails_to_propagate"
+description = "After selecting Ayu (or another base theme), swatches, Preview panels, Vector bitmap tiles, or the step four summary disagree about the chosen colour set until a reload."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "icon_toggle_resets_colours"
+description = "Switching the icon set between None and Vector resets the step two colour choice or leaves tiles and replaced-count status out of sync."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "back_loses_selection"
+description = "Moving backward one step loses the earlier theme, swatch, or icon-set selection that was previously visible."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "reload_drops_persisted_choices"
+description = "After configuring wizard step and replacements then reloading, the step, theme, swatches, or icon set silently revert (client-storage persistence failed)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "revise_leaves_stale_summary"
+description = "After generating, revising an earlier colour or icon choice, and returning to step four, the summary still shows the pre-revision choices."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "failed_hex_lacks_feedback"
+description = "An invalid swatch hex attempt provides no inline field feedback and silently fails or appears to succeed."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "flow_dead_end_requires_reload"
+description = "A blocked validation or mid-wizard navigation leaves the user in a dead end that requires a full page reload to continue."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
+id = "6.11"
+name = "undo_after_batch_bitmap"
+description = "Selecting three tiles and Keep original selected mutes them and drops the replaced count by three; pressing Ctrl+Z restores the prior keep-original map, tile appearance, and replaced count."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "export_import_reconstructs_state"
+description = "After configuring theme, icon set, and a keep-original override, downloading the Patch recipe JSON and importing it after Reset to base reconstructs the same six swatches, icon set, keep-original map, Preview, and export preview; the Patch recipe JSON still shows schemaVersion euroscope-patch-v1, target.product EuroScope, the six colours keys, iconSet, and bitmaps keepOriginal entries with no undeclared top-level keys, and Theme CSS still shows all six --es-* tokens matching colours.*"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "command_palette_jump_flow"
+description = "Opening the command palette with Ctrl+K, typing part of Update embedded bitmaps, and pressing Enter lands on step three; reopening and choosing Ayu applies the Ayu palette."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "snapshot_before_after_flow"
+description = "Saving a snapshot named Night ops, editing two swatches, toggling Before shows Night ops colours in the Preview while After shows the edited colours; restoring Night ops returns all six swatches to the saved values."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "ayu_reaches_patch_recipe_json"
+description = "Selecting Ayu, advancing with Vector to step four, shows Ayu in the summary and the Patch recipe JSON preview contains baseTheme Ayu, iconSet vector, the six colours #RRGGBB values, and schemaVersion euroscope-patch-v1 without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.16"
+name = "artifact_end_state_field_contract"
+description = "Artifact end state: edit a swatch and toggle one keep-original, open Export center, and confirm Patch recipe JSON shows every required field-contract key with the edited values (no undeclared top-level keys; baseTheme/iconSet match controls) and Theme CSS shows all six --es-* tokens equal to colours.*; Download recipe then Import reconstructs the same visible replacements."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "import_fails_silently_or_corrupts"
+description = "Importing a valid previously exported patch recipe fails silently, leaves Reset-to-base colours in place, or corrupts the keep-original map versus the file."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "palette_jump_does_not_apply_theme"
+description = "Activating a base theme result from the command palette leaves the working swatches and Preview showing a different palette than the activated theme."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "export_omits_field_contract_keys"
+description = "After editing a swatch and keep-original override, the Patch recipe JSON preview omits a required field-contract key (schemaVersion, colours.*, iconSet, or bitmaps keepOriginal), shows an undeclared top-level key, or Theme CSS omits a required --es-* token or disagrees with colours.*"
 type = "binary"
 negate = true
 weight = 1.0

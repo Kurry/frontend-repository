@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -98,14 +98,14 @@ weight = 1.0
 [[criterion]]
 id = "1.6"
 name = "deleted_user_gone_from_list"
-description = "After deleting a user, that user's name is no longer visible anywhere in the All Users list"
+description = "After archiving a user via Delete, that user's name is no longer visible anywhere in the All Users list and the same record appears in Archive"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
 name = "empty_state_after_delete_all_or_zero_match_filter"
-description = "After deleting all users, and separately when applied filters match zero users, the list region shows an empty state message and no user data rows remain visible"
+description = "After archiving all users, and separately when applied filters match zero users, the All Users list region shows an empty state message and no active user data rows remain visible"
 type = "binary"
 weight = 1.0
 
@@ -147,7 +147,7 @@ weight = 1.0
 [[criterion]]
 id = "1.14"
 name = "bulk_action_applies_to_selection"
-description = "After selecting multiple All Users rows and running a bulk action (Change status, Change role, or Delete), the selected users update or disappear together in the list and KPIs reflect the change"
+description = "After selecting multiple All Users rows and running a bulk action (Change status, Change role, or Delete/archive), the selected users update or move to Archive together and KPIs reflect the change"
 type = "binary"
 weight = 1.0
 
@@ -182,14 +182,14 @@ weight = 1.0
 [[criterion]]
 id = "1.21"
 name = "domain_state_beyond_crud"
-description = "Domain state beyond CRUD is implemented: status badges, role assignment, list filters/sort that recompute visible users, and bulk status/role/delete on selected rows"
+description = "Domain state beyond CRUD is implemented: status badges, role assignment, list filters/sort that recompute visible users, bulk status/role/archive on selected rows, live User Logs, Archive vault, and directory export previews"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.23"
 name = "static_html_no_working_crud"
-description = "Users list is static HTML only with no working create/edit/delete against shared state"
+description = "Users list is static HTML only with no working create/edit/archive against shared state"
 type = "binary"
 weight = 1.0
 negate = true
@@ -220,7 +220,7 @@ negate = true
 [[criterion]]
 id = "1.29"
 name = "sidebar_shell_nav_groups"
-description = "The sidebar shows Pineapple Tech branding, at least 14 collapsible nav groups including a Users group containing All Users, Add User, Roles, Permissions, User Logs, User Stats, User Payments, and User Products, a top-level Dashboard item, and a sticky account footer with an online avatar, the name 'Ari Lane', and the role 'Admin'"
+description = "The sidebar shows Pineapple Tech branding, at least 14 collapsible nav groups including a Users group containing All Users, Add User, Roles, Permissions, User Logs, User Stats, User Payments, User Products, and Archive, a top-level Dashboard item, and a sticky account footer with an online avatar, the name 'Ari Lane', and the role 'Admin'"
 type = "binary"
 weight = 1.0
 
@@ -234,7 +234,7 @@ weight = 1.0
 [[criterion]]
 id = "1.31"
 name = "add_user_form_sections_and_inline_validation"
-description = "The Add User form presents Profile (first name, last name, email, phone, notes), Access (temporary password, account segment, send invitation), Account settings (status, role, 2FA / product-access toggles), and Permissions checkboxes; its submit control stays disabled until every required field is valid, and correcting an invalid field clears that field's inline error without a reload"
+description = "The Add User form presents Profile (firstName, lastName, email, phone, notes), Access (temporaryPassword, accountSegment, send invitation), Account settings (status, role, 2FA / product-access toggles), and Permissions checkboxes; validation enforces the API-shaped field contract (firstName/lastName 1-40, email with domain dot, temporaryPassword min 8 on create, role in Admin|Manager|Member|Viewer, status in Active|Invited|Suspended, accountSegment in Internal|Partner|External, phone 7-15 digits when present, notes max 280); submit stays disabled until valid; correcting an invalid field clears that field's inline error without a reload"
 type = "binary"
 weight = 1.0
 
@@ -262,7 +262,7 @@ weight = 1.0
 [[criterion]]
 id = "1.35"
 name = "delete_flow_chain"
-description = "Deleting a user via the row action, and separately running bulk Delete on two checkbox-selected rows, removes exactly those rows, decreases the Total KPI by the number deleted, drops the deleted users from every active filtered view, and clears them from the selection"
+description = "Archiving a user via the row Delete action, and separately running bulk Delete on two checkbox-selected rows, removes exactly those rows from All Users, decreases the Total KPI by the number archived, drops them from every active filtered view, clears them from the selection, and shows them in Archive"
 type = "binary"
 weight = 1.0
 
@@ -321,6 +321,100 @@ name = "all_users_kpi_filter_sort_bulk_pagination_chrome"
 description = "The All Users view shows a KPI strip labeled Total / Active / Paying / Suspended whose cards each render a small inline trend chart, role and status filter controls, a sort control offering Last active, Newest, Highest spend, and Name A-Z, bulk action controls for Export, Change status, Change role, and Delete, and pagination chrome under the table"
 type = "binary"
 weight = 1.0
+
+
+[[criterion]]
+id = "1.44"
+name = "user_field_contract_blocks_invalid"
+description = "Submitting Add User with firstName longer than 40 characters, an email missing a domain dot, a temporaryPassword shorter than 8 characters, or notes longer than 280 characters shows a field-named inline error for the offending field, keeps submit blocked or rejects the add, and does not increase the users count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "closed_role_status_enums_only"
+description = "Role and status controls on Add/Edit and bulk change only offer the closed enums Admin/Manager/Member/Viewer and Active/Invited/Suspended — no free-text role/status entry is available"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "command_palette_opens_and_navigates"
+description = "Pressing Control+K or Meta+K, or activating the Command palette control, opens a command palette overlay; choosing All Users, Archive, or Operations Overview closes the palette and switches the main canvas to that view without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "command_palette_export_and_theme"
+description = "From the command palette, choosing Export directory opens the export drawer, and choosing Toggle theme flips light/dark without a reload; Escape closes the palette"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "archive_vault_restore_round_trip"
+description = "After archiving a user via Delete, Archive lists that user's name and email with a Restore action; choosing Restore returns the user to All Users, increases Total by one, and removes the row from Archive without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "user_logs_append_on_mutations"
+description = "After creating a user, archiving a user, and changing a user's status, User Logs shows new top-of-list entries naming those actions and the target user email or display name — not a static seed-only decorative list that ignores the mutations"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "duplicate_user_creates_invited_copy"
+description = "Choosing Duplicate on a row opens Add User prefilled from that user's payload with email cleared and status Invited; submitting with a new valid email adds exactly one new row and leaves the source row unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "directory_export_drawer_formats"
+description = "Export directory (from header, overview Export, bulk Export, or command palette) opens an export drawer with tabs labeled Directory JSON and Users CSV, each showing a monospaced live preview plus Copy and Download actions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.52"
+name = "directory_json_schema_and_session_mutations"
+description = "Directory JSON preview includes schemaVersion exactly pineapple-directory-v1, users, archive, activityLog, kpis, filters, sort, theme, and activeView; after creating a user with a distinctive email and archiving another user, the new email appears under users, the archived user appears under archive and not under users, and activityLog reflects the mutations before copy or download"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.53"
+name = "users_csv_header_and_rows"
+description = "Users CSV preview starts with the exact header firstName,lastName,email,phone,role,status,payments,products,lastActive and includes one data line per active user; after creating a user with a distinctive firstName, that firstName appears in a CSV data line before copy or download"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.54"
+name = "export_import_directory_round_trip"
+description = "After mutating the collection (create or edit at least one user and archive at least one user), importing the copied Directory JSON restores All Users names/statuses, Archive membership, KPI totals, and both export previews to the pre-export mutated state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.55"
+name = "export_omits_session_mutations"
+description = "After a create, edit, archive, restore, duplicate, or bulk change that is visible in the UI, the Directory JSON or Users CSV export preview still omits that session mutation (stale or seed-only export text)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.56"
+name = "delete_permanently_erases_without_archive"
+description = "Choosing Delete permanently erases the user with no Archive row and no way to Restore the record in the same session"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.catchall"

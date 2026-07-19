@@ -1,0 +1,212 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "9.1"
+name = "cold_start_is_under_two_seconds"
+description = "The app is interactive — portfolio rows and filters respond — within 2 seconds of a local cold load"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.2"
+name = "console_is_clean"
+description = "Browser devtools show no errors or warnings on load or during a full exercise of the app"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.3"
+name = "transitions_respond_under_100ms"
+description = "View switches — portfolio to workspace, step to step, trial to trial — begin responding in under 100ms with no perceptible lag"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.4"
+name = "rerun_shows_progress_indicators"
+description = "Simulated re-run latency is covered by visible progress affordances (step statuses, activity indicator, backoff countdown) rather than a frozen interface"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.5"
+name = "dense_views_render_without_lag"
+description = "Dense views — the 12-row portfolio with chips and strips, trial lists with 8-plus trials, long timelines, and the three-pane inspector — render and scroll without perceived lag"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.6"
+name = "state_changes_remain_interactive"
+description = "The UI remains interactive during state changes: filters, selection, and navigation respond while a re-run advances and while lists animate"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.7"
+name = "animations_maintain_smooth_frame_rate"
+description = "Animations — hero cross-fades, list enters and exits, highlight moves, stepper slides — hold a smooth frame rate with no visible hitching"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.8"
+name = "rapid_input_does_not_freeze"
+description = "Rapid repeated input — quick bundle switches, rapid filter toggles, fast criterion selection changes, repeated diff entry and exit — causes no hangs or dropped interactions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.9"
+name = "extended_sessions_avoid_resource_runaway"
+description = "An extended session with multiple re-runs and timeline growth shows no memory leaks or runaway resource use"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.n1"
+name = "local_load_exceeds_two_seconds"
+description = "More than 2 seconds pass before interaction is possible on local render"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n2"
+name = "console_errors_during_flows"
+description = "Errors or warnings appear in the console during re-runs, inspection, overrides, or bundling"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n3"
+name = "transitions_block_or_lag"
+description = "Transitions block or lag behind their triggering interaction"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n4"
+name = "simulated_work_hangs_ui"
+description = "The simulated re-run causes the UI to hang or freeze while its steps advance"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n5"
+name = "dense_data_kills_frame_rate"
+description = "Dense views (full portfolio, long timelines, three-pane inspector) drop the frame rate noticeably"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n6"
+name = "animation_blocks_input"
+description = "Input becomes unresponsive during animation"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n7"
+name = "resource_load_blocks_rendering"
+description = "The UI blocks rendering while loading its resources"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n8"
+name = "browser_resources_run_away"
+description = "Memory leaks or runaway browser resource usage occur across repeated re-runs and navigation"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n9"
+name = "loading_state_is_blank"
+description = "A region renders blank with no affordance while its content is being prepared"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n10"
+name = "rapid_or_edge_use_crashes"
+description = "The app crashes under rapid or edge-case use"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "performance.catchall"
+name = "performance_catchall"
+description = "The app exhibits a significant, browser-observable performance or stability defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (interaction, timing, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

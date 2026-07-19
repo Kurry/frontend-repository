@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -114,9 +114,31 @@ weight = 1.0
 [[criterion]]
 id = "2.9"
 name = "labels_and_error_association"
-description = "The rescore and attribution form fields have visible labels, and each validation message names the field it belongs to and renders in association with that field"
+description = "The rescore, attribution, and saved-pair form fields have visible labels, and each validation message names the field it belongs to and renders in association with that field"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "api_shaped_schemas_shared_across_forms_and_export"
+description = "Form validation enforces the same lab-results field contracts the export shape declares: attribution cause is one of scorer noise, rubric change effect, harness change effect with note at most 200 characters; rescore labelName is unique case-insensitively with scorerModel in {Sable 4, Quartz Mini, Onyx Pro} and configNote at most 120 characters; saved-pair name is unique, at most 40 characters, with distinct labelA and labelB — invalid values show an inline message naming the field and do not mutate state, while a valid create produces a record whose fields match the corresponding nested objects in the Export JSON"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "import_export_share_one_schema"
+description = "After a valid Import of lab-results JSON, a fresh Export JSON preview re-enumerates schemaVersion rescore-ab-lab-v1 and the restored attributions and savedPairs with the imported values — form, export, and import share one schema"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n4"
+name = "form_export_schema_disagree"
+description = "Form validation accepts values the Export lab results field contract forbids (or rejects values that contract allows), so form records and export payloads disagree on required fields, enums, or bounds"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "2.catchall"

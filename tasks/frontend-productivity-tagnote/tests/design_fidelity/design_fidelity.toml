@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,113 +62,113 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "spacing_and_sizing_follow_scale"
-description = "Spacing and sizing follow the design system's scale, with no arbitrary one-off values visible in computed styles."
+name = "spacing_follows_4px_scale"
+description = "Spacing and gaps follow the 4px-multiple scale described in the visual design, with no arbitrary one-off crowding in the shell"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
 name = "typography_matches_spec"
-description = "Typography matches the spec for all headings and body copy."
+description = "Typography matches the spec: h1 at 34px, section h2 at 17px, body/note text at 17px in the SF Pro / -apple-system stack"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "layout_matches_reference"
-description = "Layout matches reference screenshots to within a small tolerance at all specified breakpoints; fidelity tasks achieve near pixel-parity."
+name = "layout_matches_reference_shell"
+description = "Desktop layout matches the reference screenshots shell (centered column, sticky top bar and composer, tag rail above timeline) within a small tolerance; where screenshots and text conflict, text wins"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.4"
-name = "specified_state_changes_animate"
-description = "Transitions or animations are applied to the state changes the spec calls out, such as add, delete, filter, or view switch."
+name = "list_and_view_transitions_present"
+description = "Add/remove/move bubble transitions and Calendar/Archived/Export view switches animate as specified rather than hard-cutting"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "responsive_behavior_matches_reference"
-description = "Responsive behavior matches reference patterns."
+name = "narrow_behavior_matches_spec"
+description = "At ~375px the tag rail scrolls locally, notes wrap, and the composer stays pinned as specified"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.6"
-name = "control_styling_matches_spec"
-description = "Button and form radii, padding, and shadows conform to the spec."
+name = "pill_controls_match_spec"
+description = "Primary #007AFF pills and secondary #E6EEF7 pills match the specified radius and shadow-free treatment"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.7"
-name = "typography_has_clear_hierarchy"
-description = "Typography has a clear hierarchy that distinguishes section and body text."
+name = "hierarchy_title_vs_body"
+description = "The TagNote title is visually larger than section headers, which are distinct from 17px note body text"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.8"
-name = "component_states_match_spec"
-description = "Component states (default, hover, active, disabled) match the spec where specified."
+name = "hover_active_states_match"
+description = "Hover and active press states on Send, chips, and bubbles match the specified treatments"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.9"
-name = "surface_treatments_match_spec"
-description = "Color, depth, and border treatments are precise per the design."
+name = "surfaces_match_palette"
+description = "Canvas #F5F5F7, white note cards, #FFCC00 pin badge, and #007AFF links match the specified palette"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.10"
-name = "microinteractions_match_spec"
-description = "Microinteraction feedback for hover and press follows the spec in duration and motion."
+name = "export_bulk_chrome_matches"
+description = "Export panel tabs/preview and the bulk tray match the specified chrome language rather than an unstyled default"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.n1"
-name = "sizing_or_spacing_contradicts_scale"
-description = "Visible sizing or spacing values contradict the specified scale."
+name = "spacing_contradicts_scale"
+description = "Visible sizing or spacing values contradict the 4px scale with cramped or uneven shell regions"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "3.n2"
-name = "colors_fall_outside_palette"
-description = "Colors appear outside the specified palette."
+name = "typography_mismatches_spec"
+description = "Heading or body sizes clearly contradict the 34/17/17px spec"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "3.n3"
-name = "sizing_mismatches_spec"
-description = "Sizing mismatches the spec."
+name = "shell_diverges_from_reference"
+description = "The desktop shell layout diverges grossly from the reference screenshots without instruction text justifying the change"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "3.n4"
-name = "required_animations_missing_or_wrong"
-description = "Animations are missing or incorrect where the spec requires them."
+name = "pill_controls_wrong_treatment"
+description = "Primary/secondary pills use wrong colors, add unexpected shadows, or lose the full pill radius"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "3.n5"
-name = "specified_controls_use_browser_defaults"
-description = "Form or button controls use browser default styles when the spec styles them."
+name = "palette_wrong"
+description = "Canvas, card, pin badge, or link colors clearly contradict the specified palette"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "3.n6"

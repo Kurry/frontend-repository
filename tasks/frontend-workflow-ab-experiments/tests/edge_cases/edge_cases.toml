@@ -1,0 +1,219 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "empty_states_designed"
+description = "Empty state UI renders when filters match nothing, when the flagged-only inspector filter has no entries, when the timeline filter has no entries, and when the open experiment is deleted or archived."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "all_forms_validate_inline"
+description = "The designer, criterion form, and decision dialog all validate inline before submit, including the allocations-sum-to-100 rule shown live as sliders move."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "errors_name_field_and_fix"
+description = "Validation messages name the offending field or rule and the fix — for example that allocations must sum to 100 or that a rationale is required — rather than only saying 'Invalid'."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "actions_show_confirmation"
+description = "Creating, deciding, promoting, archiving, and exporting each produce visible success feedback such as a toast naming what happened."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "run_shows_progress_affordances"
+description = "Simulated runs show loading affordances: inline loading on the running row, filling per-variant progress bars, and numeric sample fractions."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "destructive_actions_guarded"
+description = "Delete and bulk delete require confirmation dialogs, cancel leaves data intact, and undo reverts archives and deletions."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "nonobvious_controls_have_help"
+description = "Non-obvious controls — the Underpowered state, token efficiency row, and outlier flag — carry a tooltip or inline explanation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "controls_use_semantic_tags"
+description = "Buttons, inputs, sliders, and labels use semantic elements rather than bare divs or spans."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "modal_close_paths"
+description = "The designer, decision, and confirmation modals close from their close control, Escape, and a background click where offered."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "long_run_shows_progress"
+description = "A full run to the sample target continuously shows progress — fractions, bars, and timeline entries — never a frozen or blank interval."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n1"
+name = "empty_collection_has_no_feedback"
+description = "An empty filtered table, timeline, or inspector list shows nothing and provides no feedback."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n2"
+name = "errors_only_reach_console"
+description = "Errors are surfaced only in the browser console."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n3"
+name = "actions_lack_visible_feedback"
+description = "Flagging, deciding, archiving, or exporting silently succeeds or fails with no visible feedback."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n4"
+name = "destructive_actions_lack_warning"
+description = "Delete or bulk delete executes with no warning or confirmation."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n5"
+name = "interactive_elements_use_nonsemantic_tags"
+description = "Non-semantic div or span tags wrap the table rows, tabs, sliders, or flag controls."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n6"
+name = "modal_not_keyboard_dismissible"
+description = "A modal cannot be dismissed via the keyboard."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n7"
+name = "validation_feedback_missing_or_delayed"
+description = "Allocation-sum or required-field validation is missing or appears only after the form is submitted with no live indication."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n8"
+name = "button_text_ambiguous_or_missing"
+description = "Button text is ambiguous or missing — for example unlabeled icon-only actions with no accessible name or tooltip."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n9"
+name = "non_obvious_flows_lack_guidance"
+description = "The decision or merge-consequence of an action (locked editing after deciding) is never explained anywhere in the UI."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n10"
+name = "affordances_hidden_or_inaccessible"
+description = "Interactive affordances such as row actions or flag controls are visually hidden with no way to discover them."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "edge_cases.catchall"
+name = "edge_cases_catchall"
+description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

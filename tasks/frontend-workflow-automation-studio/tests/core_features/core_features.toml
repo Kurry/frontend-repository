@@ -1,0 +1,436 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_library_entries"
+description = "On load, the left sidebar lists at least 3 seeded automation scripts, each entry showing the script name, its step count, a last-run status badge, and a last-run timestamp"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "new_script_modal_gating"
+description = "New Script opens a modal with script name (required), target URL (required), and description (optional); Create stays disabled until name and URL are valid, and submitting creates a blank script with exactly one empty step and selects it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "invalid_url_validation"
+description = "Submitting New Script with an invalid target URL shows an inline validation message naming the URL field and creates nothing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "library_bulk_operations"
+description = "Checking library entries raises a bulk actions bar with a live selected count; Duplicate selected adds one Copy-suffixed script per selection and Delete selected removes them all after a single confirmation naming the count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "script_delete_cascades"
+description = "Deleting a script removes it from the library, its run history, and the schedule queue together, without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "palette_opens_and_filters"
+description = "Pressing Ctrl+K (or Cmd+K) opens a command palette with its search input focused, and typing fuzzy-matches across script names, step labels in the selected script, and view names, narrowing the results as the query grows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "palette_keyboard_activation"
+description = "Arrow keys move a visible highlight through palette results and Enter activates the highlighted one — a script result selects the script, a step result scrolls to and highlights that step, a view result switches views — while Escape closes the palette; each row shows a kind label and an unmatched query shows an empty-state line"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "numbered_step_list_inline_fields"
+description = "The selected script renders as an ordered, numbered step list where each step has a type selector (Navigate, Click, Type, Extract, Wait, Screenshot, Assert Text) and its parameter fields inline in the row"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "type_specific_fields_only"
+description = "Each step type shows only its relevant fields: Navigate a URL input; Click a CSS selector; Type selector and text; Extract selector and variable name; Wait milliseconds; Screenshot no extra field; Assert Text selector and expected text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "step_param_validation_markers"
+description = "An empty required selector, a non-numeric or non-positive wait duration, or an empty extract variable name shows an inline message naming the field, and the invalid step carries a visible warning marker in the list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "add_reorder_delete_steps"
+description = "Add Step appends a Click-type step at the bottom, dragging a step reorders the list with the numbering updating, and Delete removes a step after an inline confirmation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "bulk_step_operations"
+description = "Step checkboxes enable a bulk bar with a selected count offering Disable selected (dimmed with a Disabled tag), Enable selected, Duplicate selected, and Delete selected behind a single inline confirmation, each applying to every selected step at once"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "unsaved_marker_and_save_version"
+description = "Editing a step or the script name shows an unsaved-changes marker, and Save version commits the changes as a new numbered version and clears the marker"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "versions_panel_lists_history"
+description = "The Versions panel lists every saved version with number, timestamp, and step count, newest first, with the current version marked"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "version_preview_and_restore"
+description = "Selecting an older version shows a read-only preview of its steps, and Restore copies them into a new version — the version list grows by one and the editor shows the restored steps, with no version edited in place"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "run_highlights_and_badges"
+description = "Run Script highlights each step in sequence with a running-state border, pauses for a realistic delay per step, then shows a pass or fail badge, and disabled steps are skipped with a visible Skipped badge"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "terminal_console_lines"
+description = "The run console is a terminal-style dark monospace pane streaming one line per step with timestamp, step type, and result — pass lines in the success color, failed lines showing the error reason in the error color"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "console_theme_selector"
+description = "The console theme selector offers at least 3 named themes; switching visibly changes the console background and text colors while preserving the log content and the pass/fail distinction"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "console_follow_and_smooth_scroll"
+description = "A console holding at least 200 lines scrolls smoothly; it auto-follows the newest line, stops following when the user scrolls up, and shows a jump-to-latest control that resumes following"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "retry_backoff_and_resume"
+description = "A failing step retries automatically with a visible backoff countdown and attempt counter (such as waiting before retry 2 of 3); exhausting retries marks it failed with an inline error reason and a manual Retry control that resumes the run from that step with earlier results and timestamps unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "pause_resume_checkpoint"
+description = "Pausing a running script freezes progression at the current step and resuming continues from exactly that step, with completed steps never re-executing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "run_rollup_live"
+description = "A run-level rollup — passed count out of total (n of m), elapsed duration, retry count, and failure count — derives from step states and updates as steps advance"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "event_timeline_filter_highlight"
+description = "Each run has an event timeline listing step transitions with timestamps, filterable by status, and selecting a timeline entry highlights the corresponding step"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "extracted_values_table_fills"
+description = "Extract steps write rows (variable name, value, source step number) into an extracted-values table that fills as the run progresses, with values that vary between runs"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "screenshot_placeholder_modal"
+description = "Screenshot steps produce a simulated placeholder image in the console, and clicking it opens a modal showing the full-size image with the step label"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "playground_matching_and_count"
+description = "The Playground shows a prefilled mock HTML textarea, a selector input, and a rendered preview; typing a CSS selector highlights every matched element in the preview and shows a live match count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "playground_error_states"
+description = "A selector matching nothing shows a zero-match message, and an invalid selector shows an inline error naming the problem without breaking the preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "send_selector_to_step"
+description = "Send to step copies the current playground selector into the selector field of a chosen step, where it is visible when the editor is reopened"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "runs_view_seeded_and_detail"
+description = "The Runs view lists the selected script past runs (at least 3 seeded per seeded script) with run number, start time, duration, pass/fail totals, and a status badge, and selecting one shows its per-step results and extracted values read-only"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "diff_view_three_treatments"
+description = "Choosing two runs and activating Compare pairs them step by step and marks a changed extracted value, a step passing in one run but failing in the other, and steps present in only one run with distinct added, removed, and changed treatments"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "self_compare_no_differences"
+description = "Comparing a run against itself shows an explicit no-differences state rather than an empty screen"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "schedule_toggle_and_badge"
+description = "The Schedule toggle reveals a time picker and repeat interval select (hourly, daily, weekly) when on, and the sidebar entry shows a clock icon badge while scheduled that disappears when toggled off"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "scheduled_queue_and_trigger"
+description = "The Scheduled queue lists all scheduled scripts with next simulated run time and a live countdown, and Trigger now starts that script immediately, writing a run record into its history marked as schedule-triggered"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "schedule_form_validation"
+description = "Saving the schedule form with a missing time or no interval shows inline validation naming the field and does not enable the schedule"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "undo_redo_controls"
+description = "Undo and Redo appear in the toolbar, respond to Ctrl+Z and Ctrl+Shift+Z (Cmd variants on macOS), and are disabled when their stacks are empty"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "undo_restores_complete_state"
+description = "Undo after a step add, delete, reorder, parameter edit, bulk operation, script create or delete, or schedule change restores the exact prior state, including step numbering, badges, and the export preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "history_timeline_rollback"
+description = "The history timeline panel lists recent editing actions with human-readable labels; clicking an older entry rolls the workspace back to the state just after that action with later entries shown as undone, and a new action after an undo clears the redo stack"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "export_api_shaped_tabs"
+description = "The Export view shows a live monospaced preview with two tabs whose content is API-shaped: Definition JSON as a script object with id, name, target_url, version, a schedule object (enabled, time, interval of exactly hourly, daily, or weekly), and a steps array whose entries carry id, order, a type of exactly navigate, click, type, extract, wait, screenshot, or assert_text, a params object holding only that type typed fields, and a disabled flag; and Run report as a run object with run id, trigger (manual or schedule), start time, duration, totals (passed, failed, skipped, retries), and per-step outcomes with order, type, status of exactly pass, fail, or skipped, attempts, error reason on failures, and extracted name and value where present — these field names and enums are visible in the preview text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "export_recompiles_live"
+description = "Editing a step, completing a run, or changing the schedule changes the corresponding values in the export preview without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "copy_export_confirmation"
+description = "Copy export puts the exact visible preview text on the clipboard and shows a visible confirmation (icon swap or toast) that reverts after a moment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "report_totals_match_everywhere"
+description = "The Run report totals match the run console rollup and the Runs view figures for the same run"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n1"
+name = "library_badge_stale"
+description = "A library entry last-run badge or timestamp disagrees with that script actual latest run after a run completes"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n2"
+name = "stale_fields_after_type_change"
+description = "Changing a step type leaves parameter fields from the previous type visible or saved on the step"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n3"
+name = "reorder_corrupts_steps"
+description = "Dragging a step to reorder corrupts the list — numbering fails to update, a step keeps another step parameters, or the drop position disagrees with the gesture"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n4"
+name = "console_theme_breaks_log"
+description = "Switching console themes loses log content or renders pass and fail lines indistinguishable"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n5"
+name = "runs_identical_across_executions"
+description = "Two separate runs of the same script produce identical extracted values and results, or the diff view shows no differences for runs whose visible records differ"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n6"
+name = "version_mutated_in_place"
+description = "Restoring or editing mutates an existing version in place instead of adding a new one — the version list count stays flat after a restore"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n7"
+name = "undo_leaves_stale_surface"
+description = "After an undo or timeline rollback, at least one dependent surface (step numbering, a status badge, the export preview) still shows the pre-undo value"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n8"
+name = "schedule_surfaces_dead"
+description = "The scheduled queue countdown never advances, or a Trigger now run is missing from the run history or the Run report"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n9"
+name = "export_contradicts_views"
+description = "A value in the Definition JSON or Run report contradicts what the editor, console, or Runs view shows at the same moment, or the exported record shape drops the declared field names and enums"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n10"
+name = "copy_confirms_but_clipboard_wrong"
+description = "Copy export shows its confirmation but the clipboard content is empty or differs from the visible preview text"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "core_features.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

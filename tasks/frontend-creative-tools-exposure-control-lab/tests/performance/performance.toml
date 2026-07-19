@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,158 +62,174 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "9.1"
-name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+name = "cold_start_under_two_seconds"
+description = "On a local cold load the Camera Exposure Simulator becomes interactive (dials respond) within 2 seconds."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
-name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+name = "console_clean_during_full_exercise"
+description = "No console errors or warnings appear during a full exercise of dials, help, modes, presets, snapshots, undo/redo, before/after, export, and import."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
-name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+name = "dial_press_feedback_under_100ms"
+description = "Pressing a dial stepper updates that dial's readout with UI response in under 100ms (perceived immediate), even when preview easing continues."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.4"
-name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+name = "preview_assets_do_not_blank_ui"
+description = "While local preview assets (depth plate, motion frames, noise) load, the lab chrome remains visible rather than a blank white screen with no controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.5"
-name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+name = "seeded_presets_list_scrolls_smoothly"
+description = "With the seeded preset list (≥6 rows) visible in Presets/Compare, scrolling and filtering the list shows no perceived lag."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.6"
-name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+name = "ui_interactive_during_preview_easing"
+description = "During preview-stack and meter easing after a stop change, steppers and mode switch remain interactive — the UI does not freeze until transitions finish."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
-name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+name = "preview_easing_holds_stable_frame_rate"
+description = "Driven through real steppers, brightness/blur/frame/noise transitions maintain a smooth frame rate without visible hitching during continuous stop changes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.8"
-name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+name = "rapid_stepper_presses_never_hang"
+description = "Rapid repeated stepper presses stay responsive: every press lands, dial values never skip out of the stop lists, and the preview keeps updating without hangs."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+name = "extended_dial_session_stable"
+description = "After an extended session of many dial steps, mode switches, and preset edits, the tab remains responsive without runaway memory growth that freezes the UI."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+name = "local_assets_load_without_blocking_shell"
+description = "The lab shell (dials, meter, mode switch) appears and is usable before or as preview imagery finishes loading — interactions are not blocked waiting on a single remote fetch."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.n1"
-name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+name = "cold_load_exceeds_two_seconds"
+description = "More than 2 seconds pass after local cold load before a dial press can be registered."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n2"
-name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+name = "console_errors_during_lab_flows"
+description = "Console errors, warnings, or unhandled rejections appear during dial, help, mode, or preset flows."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n3"
-name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+name = "meter_or_mode_transition_blocks_ui"
+description = "Meter travel or mode-region swap blocks the main thread so subsequent clicks queue with visible lag."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n4"
-name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
+name = "preview_update_hangs_ui"
+description = "Updating the preview stack after a stop change hangs or freezes the UI until the transition completes."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n5"
-name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+name = "preset_list_janks_on_filter"
+description = "Filtering or scrolling the seeded presets list produces sustained frame-rate collapse or multi-second jank."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n6"
-name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
+name = "animation_blocks_stepper_input"
+description = "While meter or preview animations run, stepper and mode controls ignore input."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n7"
-name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
+name = "asset_load_blocks_first_paint_of_controls"
+description = "The UI blocks rendering of dials and meter until all preview imagery finishes loading, leaving a blank interactive void."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n8"
-name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
+name = "runaway_resources_after_rapid_steps"
+description = "Rapid stepper use causes visible memory/CPU runaway that degrades or crashes the tab."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n9"
-name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
+name = "blank_while_loading_preview"
+description = "Nothing is displayed (blank page) while preview assets load — no dial chrome or skeleton."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n10"
-name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+name = "crash_under_rapid_or_edge_use"
+description = "The app crashes or becomes permanently unresponsive under rapid stepper presses or after deleting all presets and recreating."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
+
+
+[[criterion]]
+id = "9.11"
+name = "histogram_ev_recompute_without_freeze"
+description = "Histogram and EV recompute immediately on each stop change with no multi-second freeze under rapid stepper presses"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.n11"
+name = "histogram_recompute_hangs_ui"
+description = "Updating the histogram or EV after a stop change hangs or freezes the UI for multiple seconds"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "performance.catchall"
 name = "performance_catchall"
 description = "The app exhibits a significant, browser-observable defect in performance or stability that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true

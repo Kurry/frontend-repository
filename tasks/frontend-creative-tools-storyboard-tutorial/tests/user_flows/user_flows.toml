@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,150 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "create_scene_updates_all_modes"
+description = "Create flow: after submitting Add Scene with a valid title and description, the board scene count increases by exactly one, the new scene appears numbered at the end of the grid in Tile mode, and switching to List then Slide shows that same new scene with the Slide N / total counter total increased by one — all without a page reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
 name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+description = "Create flow: leaving the title or description empty keeps the submit control disabled, shows an immediate inline validation message naming the empty field under that field, and adds no scene to the board."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "edit_description_echoes_across_modes"
+description = "Edit flow: changing a scene description in Tile mode, then switching to List and Slide, shows the updated text on that same numbered scene in every mode without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "delete_renumbers_and_updates_slide_total"
+description = "Delete flow: deleting a scene removes its card, renumbers the remaining scenes sequentially with no gaps, and reduces the Slide N / total counter total by one so previous/next disable at the new first and last scene."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "view_mode_switch_keeps_scene_set"
+description = "View/mode switch: activating Tile, List, and Slide toggles re-lays out the same scene set without reloading the document; the active toggle stays visibly pressed and scene content remains intact across switches."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "last_delete_reveals_empty_board"
+description = "Edge: after deleting every scene, a visible empty-board state explains the board is empty and offers a way to add a scene."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "slide_arrows_walk_full_sequence"
+description = "Slide walk: entering Slide mode and pressing Right repeatedly advances through every scene in order while the N / total counter increments each step; pressing Left walks back the same sequence."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "back_to_top_returns_after_scroll"
+description = "Board navigation: after scrolling the board down, a back-to-top control appears and returns the board to the top while the scene set and active view mode remain."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "create_form_closes_after_valid_submit"
+description = "Create overlay: submitting a valid Add Scene form closes the create form and shows the new scene on the board without trapping navigation."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "reload_restores_seeded_baseline"
+description = "Recovery: a page reload returns the app to its seeded state — seeded scenes visible, Tile mode active, and the first slide position — with no dead end requiring a second reload to recover."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "scene_crud_unavailable_from_ui"
+description = "Add Scene create, description edit, or scene delete cannot be completed from the visible UI controls."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "new_scene_missing_or_duplicated"
+description = "Submitting one valid Add Scene either fails to show a new card or creates duplicate cards for a single submit."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "description_edit_desyncs_modes"
+description = "After editing a scene description in Tile mode, List or Slide still shows the pre-edit text for that numbered scene until a reload."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "view_switch_breaks_or_loses_scenes"
+description = "Switching among Tile, List, and Slide breaks the layout or loses scenes from the shared set."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_board_state_broken"
+description = "After deleting every scene, the board region is blank or broken with no empty-state explanation and no way to add a scene."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "slide_walk_skips_or_wraps"
+description = "In Slide mode, Right/Left arrow walks skip scenes, wrap past the ends, or leave the N / total counter out of sync with the centered scene."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "back_to_top_missing_or_stuck"
+description = "After scrolling the board down, the back-to-top control is missing, or activating it leaves the board stuck away from the top."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "create_form_blocks_with_no_exit"
+description = "The Add Scene create form blocks the workspace with no working exit after open (no cancel/close path that returns to the board)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "failed_create_lacks_feedback"
+description = "An empty required title or description on Add Scene provides no visible inline validation naming the empty field."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "reload_leaves_mixed_user_state"
+description = "After creating or editing scenes and switching modes, a reload leaves a mix of user mutations with seeded baseline (for example a created scene survives while Tile mode resets, or vice versa)."
 type = "binary"
 negate = true
 weight = 1.0

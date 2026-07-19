@@ -1,0 +1,157 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "14.1"
+name = "multi_facet_reload_resets_seeded"
+description = "Multi-facet round-trip: apply a status filter, flag one outlier in a completed experiment's inspector, sort the sample table by score delta, and create a new experiment, then reload the page. All four facets coherently reset to the seeded baseline (seeded experiments and criteria, no unseeded flags, default sort and filters) — never a mix of surviving and reset facets."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.2"
+name = "sample_table_sort_reversal"
+description = "Sort-reversal proof: sort the sample-level table by score delta ascending, note the row order, then sort descending; the order reverses correctly relative to ascending, proving sort derives from live sample data rather than two hardcoded orders."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.3"
+name = "flag_recomputes_derived_surfaces"
+description = "Derived-view sensitivity: flag one outlier response in the inspector and confirm the p-value, per-variant means, matrix cells, and radial pass-rate percentages all visibly change; unflag it and confirm they return to their prior values."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.4"
+name = "decision_echoes_across_views"
+description = "Cross-view echo: record a decision in the decision dialog and confirm the library row's status badge changes to Decided and the results panel header shows the decision and rationale, without a reload; likewise an experiment rename from the designer updates both the library row and the open panel header."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.5"
+name = "experiment_count_delta_exact"
+description = "Count-delta integrity: note the visible experiment count, create one experiment, and confirm the count increased by exactly one; then bulk-delete two selected experiments and confirm the count decreased by exactly two immediately."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.6"
+name = "full_pipeline_probe"
+description = "Full-pipeline probe: design a new experiment whose variants use different prompts or models, run it to completion, and confirm the distributions differ per variant; flag one outlier and confirm the summary statistics change; declare a winner with a rationale; then export the report and confirm it contains the flag-adjusted statistics, the design as entered, and the decision rationale — each stage's output feeding the next."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.7"
+name = "interleaved_designer_and_run"
+description = "Interleaved-flow integrity: open the designer and partially fill it, leave to start a run on another pending experiment, return to the designer and complete the creation; confirm the run progressed independently and the created experiment matches what was entered, with neither flow corrupting the other."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.8"
+name = "flag_all_then_restore_round_trip"
+description = "Edge-state round-trip: flag every response of one variant so the summary shows the insufficient-data state, then unflag them; the summary strip, charts, matrix, and radial wheels track through both transitions back to their original values."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n1"
+name = "partial_persistence_is_incoherent"
+description = "A facet of user-configured state silently reverts while others survive — for example the status filter resets while the sample-table sort persists — producing incoherent partial state handling."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n2"
+name = "derived_surface_ignores_inputs"
+description = "A derived surface renders identically regardless of its inputs — the distribution strip, difference chart, matrix, or radial wheels stay unchanged after outlier flags or additional samples alter the underlying data."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n3"
+name = "different_inputs_produce_identical_output"
+description = "Repeating a run or preview with different variant configurations yields byte-identical scores, responses, or statistics."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n4"
+name = "cross_view_state_is_stale"
+description = "A change appears in one view but not another until reload — for example a decision shows in the results header while the library row still reads Completed."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "behavioral.catchall"
+name = "behavioral_catchall"
+description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

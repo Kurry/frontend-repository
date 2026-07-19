@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,149 +63,93 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "3.1"
 name = "spacing_and_sizing_follow_scale"
-description = "Spacing and sizing follow the design system's scale, with no arbitrary one-off values visible in computed styles."
+description = "Queue toolbar, table, detail panels, and Export preview spacing follow a consistent scale with no arbitrary one-off gaps that break the ops-console rhythm described in the instruction"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
 name = "typography_matches_spec"
-description = "Typography matches the spec for all headings and body copy."
+description = "Typography matches the instruction hierarchy: submission titles larger than section headings, which are larger than metadata and body text; export preview is monospaced"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "layout_matches_reference"
-description = "Layout matches reference screenshots to within a small tolerance at all specified breakpoints; fidelity tasks achieve near pixel-parity."
+name = "layout_matches_ops_console"
+description = "Layout matches the instruction's ops-console composition: filter toolbar above full-width queue table; detail with gate banner spanning the top and findings beside failure-profile; Export as a distinct view"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.4"
 name = "specified_state_changes_animate"
-description = "Transitions or animations are applied to the state changes the spec calls out, such as add, delete, filter, or view switch."
+description = "Transitions are applied to the state changes the instruction calls out (drawer, finding add/override, gate swap, profile bars, re-check steps, toasts, palette, bulk bar)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "responsive_behavior_matches_reference"
-description = "Responsive behavior matches reference patterns."
+name = "responsive_behavior_matches_spec"
+description = "Responsive behavior matches the instruction: table condenses at 768px, findings stack above profile, 375px has no page-level horizontal scroll, drawer goes full-width"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.6"
 name = "control_styling_matches_spec"
-description = "Button and form radii, padding, and shadows conform to the spec."
+description = "Buttons, selects, inputs, and toggles show the instructed default, hover, focus, disabled, and error treatments; disabled Approve is visibly muted beside its explanation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.7"
 name = "typography_has_clear_hierarchy"
-description = "Typography has a clear hierarchy that distinguishes section and body text."
+description = "Typography has a clear hierarchy that distinguishes submission titles, section headings, and body/metadata text across queue, detail, drawer, and Export"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.8"
 name = "component_states_match_spec"
-description = "Component states (default, hover, active, disabled) match the spec where specified."
+description = "Component states (default, hover, active/selected, disabled, error) match the instruction where specified, including selected queue rows distinct from hover"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.9"
 name = "surface_treatments_match_spec"
-description = "Color, depth, and border treatments are precise per the design."
+description = "Stage tags, payout tags, tier chips, and gate banner treatments follow the instructed severity language and remain consistent across surfaces"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.10"
 name = "microinteractions_match_spec"
-description = "Microinteraction feedback for hover and press follows the spec in duration and motion."
+description = "Hover and press microinteractions follow the instruction (button press, row wash, chip lift, focus rings) with durations that feel intentional rather than instant snaps"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.n1"
 name = "sizing_or_spacing_contradicts_scale"
-description = "Visible sizing or spacing values contradict the specified scale."
+description = "Visible sizing or spacing values contradict the consistent ops-console scale (crowded or orphaned regions in queue/detail/export)"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n2"
-name = "colors_fall_outside_palette"
-description = "Colors appear outside the specified palette."
+name = "layout_contradicts_instruction_composition"
+description = "The first working views contradict the instructed composition (missing gate banner region, missing export view, or findings/profile arrangement that ignores the adjoining/stacked rules)"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n3"
-name = "sizing_mismatches_spec"
-description = "Sizing mismatches the spec."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n4"
-name = "required_animations_missing_or_wrong"
-description = "Animations are missing or incorrect where the spec requires them."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n5"
-name = "specified_controls_use_browser_defaults"
-description = "Form or button controls use browser default styles when the spec styles them."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n6"
-name = "layout_misaligned_at_breakpoints"
-description = "The grid or layout is misaligned at reference breakpoints."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n7"
-name = "elements_are_clipped_or_offscreen"
-description = "Elements render off-screen or clipped."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n8"
-name = "structure_deviates_from_reference"
-description = "Section order, content, or structure deviates from the reference on fidelity tasks."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n9"
-name = "heading_and_body_text_undifferentiated"
-description = "Heading and body text have no distinction."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n10"
-name = "microinteractions_deviate_from_reference"
-description = "Microinteractions are missing or deviate from the provided reference."
+name = "stage_tier_treatments_inconsistent"
+description = "The same stage or tier renders with inconsistent treatments across queue, detail, drawer, or timeline"
 type = "binary"
 negate = true
 weight = 1.0
@@ -213,7 +157,7 @@ weight = 1.0
 [[criterion]]
 id = "design_fidelity.catchall"
 name = "design_fidelity_catchall"
-description = "The app exhibits a significant, browser-observable defect in fidelity to the spec or reference that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in design fidelity to the instruction that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

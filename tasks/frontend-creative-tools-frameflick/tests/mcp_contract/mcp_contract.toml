@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,78 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "12.1"
-name = "mandated_modules_are_bound"
-description = "All contract-mandated modules are initialized and bound."
+name = "editor_entity_artifact_modules_bound"
+description = "Contract modules structured-editor-v1, entity-collection-v1, and artifact-transfer-v1 are initialized and bound (webmcp_session_info / webmcp_list_tools show tools for editor, entity, and artifact prefixes)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.2"
-name = "handlers_match_visible_ui_logic"
-description = "Exposed tool handlers match visible UI command logic."
+name = "handlers_match_visible_ui"
+description = "Exposed editor, entity, and artifact tool handlers drive the same visible UI logic as on-page controls (style property updates, mode switches, preset create/select/delete, and style-json export/import/copy)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.3"
-name = "only_documented_operations_exist"
-description = "Only documented operations and routes are available."
+name = "only_documented_ops_including_artifact"
+description = "Only documented editor operations (update_property, switch_mode, set_content, preview), entity operations (create, select, delete), and artifact operations (export, import, copy) are available — no undeclared routes or modules."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.4"
-name = "contract_is_automation_exercisable"
-description = "The contract can be fully exercised via automation."
+name = "contract_exercisable_via_automation"
+description = "The contract can be fully exercised via webmcp_invoke_tool for editor update_property / switch_mode / set_content / preview, entity create / select / delete, and artifact export / import / copy against the bound values."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.5"
-name = "declared_entity_operations_work"
-description = "Entity operations declared in the contract, including create, update, delete, and reorder, all work."
+name = "entity_preset_create_select_delete"
+description = "Entity operations create, select, and delete work for the preset entity (delete requires explicit confirm=true) and update the Saved presets list the same way as the visible controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.6"
-name = "form_flow_operations_are_bound"
-description = "Form submission validation, error, and cancel operations are clearly bound."
+name = "editor_property_updates_bound"
+description = "Editor update_property is bound for declared properties: background, custom-background, padding, corner-radius, shadow, frame-style, caption-text, caption-position, caption-size, caption-color, watermark, watermark-text, watermark-color, watermark-opacity, watermark-corner, zoom, and export-scale."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.7"
-name = "queries_match_allowed_spec"
-description = "Query destinations and filters match the allowed specification."
+name = "editor_modes_and_value_bounds"
+description = "Editor switch_mode accepts square, widescreen, story, and original; numeric properties respect declared bounds (padding 0-25, corner-radius 0-48, shadow 0-10, caption-size 12-64, watermark-opacity 5-100, zoom 20-200)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.8"
-name = "capabilities_stay_declared"
-description = "No extra or undeclared module routes or capabilities are exposed."
+name = "no_extra_undeclared_modules"
+description = "No extra modules, destinations, or operations beyond structured-editor-v1 / entity-collection-v1 / artifact-transfer-v1 and the declared Bindings are exposed."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.9"
 name = "session_tool_and_invoke_apis_work"
-description = "Session info, tool list, and invocation are correctly surfaced."
+description = "webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool correctly surface session info, the tool list, and successful invocations for the bound editor and entity tools."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.10"
 name = "mcp_initializes_without_harness_edits"
-description = "MCP initialization works without manual editing or test harness changes."
+description = "MCP initialization works from the app's own registration without manual editing or test harness changes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.n1"
 name = "mcp_tools_missing_or_noop"
-description = "MCP tooling is unbound, missing, or a no-op."
+description = "MCP tooling for structured-editor-v1, entity-collection-v1, or artifact-transfer-v1 is unbound, missing, or a no-op."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n2"
 name = "handlers_diverge_from_ui_logic"
-description = "Handlers do not match UI logic because actions mismatch or state does not sync."
+description = "An editor or entity tool handler updates a different property, applies a mismatched preset, or leaves the canvas/Saved presets UI out of sync with the invoked action."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n3"
 name = "undeclared_capabilities_exposed"
-description = "Undeclared destinations or entity operations are exposed."
+description = "Undeclared modules, destinations, or entity operations beyond the Bindings block are exposed."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,15 +157,15 @@ weight = 1.0
 [[criterion]]
 id = "12.n4"
 name = "automation_cannot_exercise_contract"
-description = "The contract cannot be exercised from automation."
+description = "webmcp_invoke_tool cannot exercise bound editor update_property/switch_mode or entity create/select/delete operations."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n5"
-name = "validation_bypass_desyncs_state"
-description = "Validation bypasses lead to inconsistent MCP and UI state."
+name = "validation_bypass_desyncs_preset_state"
+description = "Entity create bypasses preset name validation and leaves MCP state inconsistent with the visible Saved presets list (for example a nameless or duplicate row)."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n6"
 name = "session_or_tool_api_errors"
-description = "The session or tool API returns errors or incomplete data."
+description = "webmcp_session_info or webmcp_list_tools returns errors or an incomplete tool list for the mandated modules."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +181,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n7"
 name = "mcp_relies_on_undocumented_hacks"
-description = "MCP relies on manual or undocumented test hacks."
+description = "MCP only works through manual or undocumented test hacks rather than the app's registered tool handlers."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n8"
 name = "required_contract_module_missing"
-description = "No module contract is implemented where one is declared required."
+description = "structured-editor-v1, entity-collection-v1, or artifact-transfer-v1 is not implemented despite being declared required."
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,15 +197,30 @@ weight = 1.0
 [[criterion]]
 id = "12.n9"
 name = "mcp_is_stubbed_or_commented_out"
-description = "The MCP interface is commented out or only stubbed."
+description = "The MCP interface is commented out or only stubbed: listed tools leave the live FrameFlick UI unchanged when invoked."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n10"
-name = "automated_contract_validation_fails"
-description = "The project fails automated MCP contract validation."
+name = "mechanics_exclusions_faked_via_webmcp"
+description = "WebMCP is used to fake success for mechanics-excluded paths (drag-to-reposition, drag-and-drop upload, Download PNG rasterization / Copy image clipboard, Collaboration merge convergence, or raw file path/blob args) instead of leaving those Playwright-only."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "12.11"
+name = "artifact_style_json_export_import_copy"
+description = "Artifact operations export, import, and copy work for style-json (and export for png is declared): invoking artifact export/copy updates the same Export preview / confirmation path as the visible Download style JSON and Copy style JSON controls with the documented RenderSettings keys including watermarkColor; import applies style settings like Import style JSON and rejects field-contract-invalid payloads the same way."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.n11"
+name = "artifact_export_omits_live_style"
+description = "Artifact export/copy for style-json succeeds while the returned/visible recipe omits live canvas settings the UI just changed."
 type = "binary"
 negate = true
 weight = 1.0

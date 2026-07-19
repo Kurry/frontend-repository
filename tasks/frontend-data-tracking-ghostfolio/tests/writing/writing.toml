@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.5
@@ -63,65 +63,65 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "15.1"
-name = "headings_use_consistent_capitalization"
-description = "Where the app renders headings and section titles, they use consistent capitalization (one convention — title case or sentence case — throughout)."
+name = "consistent_capitalization"
+description = "Where the app renders headings, buttons, and labels on the portfolio overview, they use one consistent capitalization convention throughout."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.2"
-name = "actions_use_specific_labels"
-description = "Where the app renders button or action labels, they are specific verbs ('Add expense', 'Start session'), not generic ('Submit', 'OK') when a specific label is possible."
+name = "specific_action_verbs"
+description = "Where the app renders primary action labels, they use specific verbs such as Add holding, Save, Delete, Export portfolio, Import portfolio, Download JSON, Download CSV, or Copy rather than generic Submit or OK when a specific label is possible."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.3"
-name = "errors_name_problem_and_fix"
-description = "Where the app renders error messages, they name the problem and the fix ('Amount must be a positive number'), not just a rejection ('Invalid')."
+name = "validation_names_field_and_fix"
+description = "Where the app renders validation or error messages on the holding form, they name the field and the fix (for example that quantity must be positive), not only a bare Invalid rejection."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.4"
 name = "empty_states_explain_next_step"
-description = "Where the app renders empty states, the copy explains what belongs there and how to add it."
+description = "Where the app renders empty states in the holdings table or allocation region, the copy explains what belongs there and how to add a holding."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.5"
-name = "body_copy_is_well_written"
-description = "Where the app renders body or marketing copy, rate how free it is of spelling and grammatical errors."
+name = "body_copy_quality"
+description = "Where the app renders body copy, brand subtitle, section eyebrows, or toast text, rate how free it is of spelling and grammatical errors."
 type = "likert"
 points = 5
 weight = 0.5
 
 [[criterion]]
 id = "15.6"
-name = "terminology_is_consistent"
-description = "Where the app renders labels for the same concept in multiple places, terminology is consistent (not 'task' here and 'todo' there)."
+name = "holding_terminology_consistent"
+description = "Where the app renders labels for holdings, asset class, market value, and net worth across the table, detail panel, meta line, and allocation, terminology stays consistent rather than mixing synonyms for the same concept."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.7"
-name = "numbers_dates_and_units_are_consistent"
-description = "Where the app renders numbers, dates, and units, formatting is consistent (same date format, same decimal precision, units labeled)."
+name = "numeric_formatting_consistent"
+description = "Where the app renders quantities, unit prices, market values, net worth, and allocation percentages, formatting is consistent (same decimal precision conventions and percentage presentation)."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.8"
-name = "success_messages_are_specific"
-description = "Where the app renders confirmation and success messages, they state what happened ('Entry saved'), not vague affirmations."
+name = "toast_states_what_happened"
+description = "Where the app renders confirmation toasts after save or delete, they state what happened (for example that a holding was saved or removed), not a vague affirmation only."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.n1"
-name = "placeholder_copy_is_visible"
-description = "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI."
+name = "placeholder_copy_visible"
+description = "Lorem ipsum or placeholder text (TODO, Lorem, asdf, or template variable names such as {{title}}) is visible anywhere in the shipped UI."
 type = "binary"
 negate = true
 weight = 0.5
@@ -129,26 +129,44 @@ weight = 0.5
 [[criterion]]
 id = "15.n2"
 name = "prominent_copy_has_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as headings, hero text, or primary buttons."
+description = "Spelling or grammatical errors appear in prominent copy such as the brand bar, net-worth section title, primary buttons, or empty-state message."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n3"
-name = "concept_names_are_inconsistent"
-description = "The same concept is named inconsistently across surfaces."
+name = "inconsistent_concept_names"
+description = "The same concept is named inconsistently across surfaces (for example Asset class in one place and Category in another for the same field)."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n4"
-name = "copy_is_truncated_or_overflowing"
-description = "Truncated or overflowing text renders copy unreadable."
+name = "copy_truncated_unreadably"
+description = "Truncated or overflowing text renders primary labels, validation messages, or empty-state copy unreadable outside the intentional >40-character table ellipsis case."
 type = "binary"
 negate = true
 weight = 0.5
+
+
+[[criterion]]
+id = "15.9"
+name = "export_import_labels_specific"
+description = "Where the app renders export and import chrome, labels are specific (Export portfolio, Import portfolio, Download JSON, Download CSV, Copy), and import errors name the failing field from the holding payload contract."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.n5"
+name = "generic_export_import_copy"
+description = "Export or import controls use only generic labels such as Submit or OK, or import errors omit the failing field name."
+type = "binary"
+negate = true
+weight = 0.5
+
+
 
 [[criterion]]
 id = "writing.catchall"

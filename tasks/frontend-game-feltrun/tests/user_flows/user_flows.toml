@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,171 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "For games, evaluate the start → play → pause → end → restart flow. Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "raise_to_history_to_export_chain"
+description = "Raising a specific chip amount moves exactly that amount from the human stack into the pot; when the hand completes, Session stats hands-played increases by exactly one, the hand appears at the top of Hand history with pot, winner, and hand type, and the Export preview lists that same hand in handHistory with matching pot, winnerName, and handType — all without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "raise_invalid_inline_validation"
+description = "Entering a raise amount below the legal minimum or above the human's stack shows an inline validation message naming the violated limit and keeps raise confirm disabled until the amount is legal"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "blind_level_advance_export_tracks"
+description = "Completing the 8th hand of a blind level advances the blind-level indicator by exactly one level and increases both blinds; Session stats and Hand history carry over unchanged, and the export preview's session.blindLevel, smallBlind, and bigBlind match the advanced values"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "rebuy_then_reload_restores"
+description = "When the human's stack reaches 0, Rebuy restores the stack to 1000 and increments rebuys by exactly 1; after a full page reload both the restored stack and incremented rebuys count remain"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "panel_toggles_retain_table_state"
+description = "Toggling Hand history, Session stats, Badges, and Export panels does not reset chip stacks, the active hand, or the pot"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "empty_history_before_first_hand"
+description = "Before any hand is played, Hand history shows \"No hands played yet\" and the table shows the \"Deal first hand\" prompt"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "difficulty_switch_preserves_progress"
+description = "Switching difficulty mid-session does not reset chip stacks, Session stats, or Hand history"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "history_drawer_preserves_workflow"
+description = "On a narrow viewport, collapsing and reopening the stats/history/badges drawer leaves the table hand, stacks, and pot intact"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "new_session_confirm_overlay"
+description = "\"Start new session\" opens a confirmation overlay; cancelling leaves every panel unchanged, and confirming resets table, stacks, stats, history, badges, and clears export handHistory to empty with inProgressHand null"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "undo_then_continue_hand"
+description = "On the human's turn, raise, Undo last action to restore stack and pot, then take a different legal action — the hand advances normally without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "mid_hand_save_resume_flow"
+description = "Mid-hand after the flop: Save table, note board/pot/stacks/side to act, reload — the table resumes with the same board, pot, stacks, street, and side to act"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "export_import_round_trip_flow"
+description = "After completing at least one hand, Copy or Download the session JSON then Import that same text — visible stacks, Session stats, Hand history, badges, and difficulty match the pre-export state and the export preview matches again"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "collab_offline_merge_flow"
+description = "In Collaboration scenario, queue two non-conflicting offline edits, reconnect, and apply either delivery order — Shared content converges identically without dropping either change"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "primary_game_flows_unavailable"
+description = "Deal first hand, betting controls, Export Copy/Download, Save table, or Undo last action are not reachable from the UI"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "completed_hand_missing_from_history"
+description = "A completed hand fails to appear in Hand history or appears duplicated"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "export_desyncs_from_panels"
+description = "After a completed hand, Export preview handHistory or session stats disagree with the visible Hand history and Session stats panels"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "panel_toggle_resets_hand"
+description = "Opening or closing Hand history, stats, badges, or Export resets the active hand, stacks, or pot"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_history_broken_ui"
+description = "Before any hands, Hand history shows a broken blank region with no \"No hands played yet\" empty state"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "save_resume_wrong_position"
+description = "After Save table mid-hand and reload, the table resumes at a different board, street, pot, or side to act than was saved"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "drawer_cannot_reopen"
+description = "On a narrow viewport the collapsed stats/history drawer cannot be reopened"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "session_confirm_blocks_exit"
+description = "The Start new session confirmation has no cancel or dismiss path and blocks further play"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "import_fails_without_feedback"
+description = "Importing invalid session JSON fails with no visible inline error naming the import field"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "flow_dead_end_requires_reload"
+description = "A betting, export, save/resume, or new-session flow dead-ends and requires a full page reload to recover"
 type = "binary"
 negate = true
 weight = 1.0

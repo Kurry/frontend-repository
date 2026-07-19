@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,148 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "stop_edge_button_invisible"
+description = "At each stop-list edge the corresponding stepper button fades to invisible and stops responding so the value cannot step past the first or last stop"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "meter_clamped_at_track_ends"
+description = "A further step in the same direction at a meter track end cannot push the indicator past that end"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "empty_preset_name_rejected"
+description = "Submitting create with an empty preset name adds no row and shows validation feedback naming the name field"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "double_submit_one_preset"
+description = "Double-activating the preset submit control creates exactly one preset: row count increases by one"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "empty_presets_list_message"
+description = "After deleting every preset the list region shows an empty state explaining that no presets exist and how to create one"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "empty_snapshot_name_rejected"
+description = "Saving a snapshot with an empty name adds no snapshot and shows inline validation naming the name field"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "light_sliders_clamp_bounds"
+description = "Light sliders clamp at -100 and 100; dragging past either end leaves the value at the clamp and the readout shows that bound"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "malformed_import_keeps_state"
+description = "Importing a malformed edit-stack JSON (missing schemaVersion, wrong schemaVersion, out-of-bounds contrast, or non-enum lookPack) shows a visible error naming that the file is invalid and leaves the current edit state unchanged"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "undo_redo_disabled_when_empty"
+description = "Before any edit, Undo and Redo are disabled; after Undo empties the undo stack, Undo disables again"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "iso_max_grain_still_shows_photo"
+description = "At ISO 3200 the grain overlay is clearly stronger than at ISO 100 but the underlying photo remains discernible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "help_open_close_no_navigation"
+description = "Opening and closing help never navigates away or reloads the page"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "reset_clears_look_and_snapshots_selection"
+description = "Reset clears the active look pack selection and snapshot selection while restoring default dials and zeroed sliders"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "edge_stepper_still_advances"
+description = "At a stop-list edge the faded stepper still advances or wraps the value past the first or last stop"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "meter_escapes_track"
+description = "The exposure meter indicator renders outside the visible track at extreme stop combinations"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "empty_name_still_adds_preset"
+description = "Submitting an empty preset name still adds a preset row"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "double_submit_duplicates_preset"
+description = "Double-activating preset submit creates two or more rows for one intended create"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "empty_list_shows_blank_region"
+description = "After deleting all presets the list region is blank with no empty-state message or create affordance"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "malformed_import_corrupts_state"
+description = "Importing malformed edit-stack JSON corrupts dials, clears the preview, or crashes the app"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "slider_past_bounds_unbounded"
+description = "Light slider values display or apply outside the -100 to 100 range"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "undo_enabled_with_empty_stack"
+description = "Undo remains enabled and clickable when there are no mutations to reverse"
 type = "binary"
 negate = true
 weight = 1.0
@@ -213,7 +211,7 @@ weight = 1.0
 [[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant edge-case failure not covered by any other criterion in this file. Name the defect and cite concrete evidence. If already covered, answer no."
 type = "binary"
 negate = true
 weight = 1.0

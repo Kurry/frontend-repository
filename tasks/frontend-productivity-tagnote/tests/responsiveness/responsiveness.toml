@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,43 +62,43 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "7.1"
-name = "layout_adapts_desktop_to_mobile"
-description = "Layout adapts gracefully from 1440px desktop to 375px mobile."
+name = "no_horizontal_scroll_375"
+description = "At approximately 375px wide there is no page-level horizontal scrolling"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
-name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+name = "tag_rail_and_chips_scroll_locally"
+description = "At ~375px the tag rail and search syntax chips scroll horizontally inside their own containers rather than breaking the layout"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
-name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+name = "composer_pinned_narrow"
+description = "At ~375px the composer stays pinned and legible at the bottom"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
-name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+name = "export_bulk_usable_narrow"
+description = "At ~375px Export tabs, Copy, Download, and the bulk tray stay fully visible and operable"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
-name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+name = "desktop_centered_column"
+description = "At desktop widths the single centered column keeps its maximum width while the canvas fills remaining space"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.6"
-name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+name = "long_url_wraps"
+description = "A long unbroken URL wraps inside its bubble rather than overflowing the column at narrow and desktop widths"
 type = "binary"
 weight = 1.0
 
@@ -132,35 +132,35 @@ weight = 1.0
 
 [[criterion]]
 id = "7.n1"
-name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+name = "page_scrolls_horizontally_375"
+description = "At ~375px the page scrolls horizontally"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n2"
-name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+name = "composer_unreachable_narrow"
+description = "At ~375px the composer is pushed off-screen or unreachable"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n3"
-name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+name = "export_clipped_narrow"
+description = "At ~375px Export or bulk tray controls are clipped or inoperable"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n4"
-name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+name = "desktop_column_stretches_full"
+description = "At desktop width the content column stretches edge-to-edge with no centered max-width treatment"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n5"

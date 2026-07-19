@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,177 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "continue_without_file_uses_seed"
+description = "Continuing from step one without picking a file advances to Update theme colours using the seeded EuroScope.exe sample, and no error message appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "back_forward_retains_choices"
+description = "Moving backward and forward through the wizard repeatedly shows each step exactly once and each step retains its own choices; no step is duplicated and no selection is lost."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "invalid_hex_blocks_apply"
+description = "Typing an invalid value into a swatch hex field (for example not-a-colour) shows an inline validation message naming that swatch before any submit or step change; advancing while invalid leaves the Preview on its last valid colour and keeps the message until corrected."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "double_generate_one_result"
+description = "Double-activating the Generate control produces exactly one patched result: one confirmation block and one summary appear, not two."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "none_icon_set_zero_replaced"
+description = "With the icon set on None, the step four summary reports zero replaced bitmaps while the colour set summary still reflects the chosen theme."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "correcting_hex_clears_message"
+description = "After an invalid swatch hex shows an inline message, correcting the value to a valid hex clears the message and applies the colour to the Preview."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "alert_guidance_present"
+description = "Information, Caution, or Warning alert blocks with actionable guidance copy are visible in the wizard chrome for the patching workflow."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "semantic_wizard_controls"
+description = "Base theme, Base icon set, swatch hex fields, and primary action buttons use semantic form/button controls with persistent visible labels rather than unlabeled placeholder-only fields."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "continue_without_file_errors"
+description = "Continuing from step one without picking a file shows an error or refuses to advance even though a seeded EuroScope.exe sample is present."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "back_forward_loses_or_duplicates"
+description = "Moving backward and forward through the wizard duplicates a step, skips a stage, or loses a previously selected theme, swatch, or icon set."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "invalid_hex_applies_or_silent"
+description = "An invalid swatch hex is applied to the Preview, or advancing proceeds with no inline message naming the swatch."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "double_generate_duplicates_result"
+description = "Double-activating Generate produces two confirmation blocks or two summaries for a single intended patched result."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "none_reports_nonzero_replaced"
+description = "With the icon set on None, the step four summary reports a non-zero replaced bitmap count."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "validation_console_only"
+description = "Invalid swatch hex input is surfaced only in the browser console, with no inline UI message naming the swatch."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
+id = "4.9"
+name = "empty_undo_redo_disabled"
+description = "Undo with an empty history and Redo with an empty redo stack are disabled controls; activating them does nothing and produces no console errors."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "whitespace_snapshot_name_rejected"
+description = "Saving a snapshot with a whitespace-only name adds no row and shows validation naming the snapshot name field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "malformed_import_unchanged"
+description = "Importing a malformed patch-recipe file leaves swatches, icon set, and keep-original overrides unchanged and shows an inline import error."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "all_keep_original_zero_count"
+description = "Selecting every bitmap and choosing Keep original selected while Vector is active drops the replaced count to zero; Use Vector selected restores the full replaced count."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "protanopia_hex_unchanged"
+description = "With Protanopia selected, the six swatch hex field values stay identical to their unfiltered values while only the Preview panels' rendered colours shift."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "schema_invalid_import_rejected"
+description = "Importing parseable JSON that fails the Patch recipe field contract — missing schemaVersion or target, an undeclared top-level key, baseTheme or iconSet outside their closed enums, a colours key missing/extra or not #RRGGBB, a bitmaps entry missing a seeded id or boolean keepOriginal, or a cross-field mismatch — leaves swatches, icon set, and keep-original overrides unchanged and shows validation naming the offending field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "non_rrggbb_swatch_rejected"
+description = "A swatch hex that is not #RRGGBB (missing hash, wrong length, or non-hex characters) is rejected with validation naming that swatch and is not applied to Preview or the Patch recipe JSON / Theme CSS exports."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "empty_undo_still_mutates"
+description = "Activating Undo while the undo stack is empty still mutates swatches, Preview, or export preview."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "malformed_import_applies_partial"
+description = "A malformed patch-recipe import partially applies fields or clears valid swatches without an inline import error."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "schema_invalid_import_mutates_state"
+description = "Importing parseable JSON that violates the Patch recipe field contract still mutates swatches, icon set, keep-original overrides, or export preview."
 type = "binary"
 negate = true
 weight = 1.0

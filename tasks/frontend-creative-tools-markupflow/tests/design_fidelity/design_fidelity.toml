@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,142 +62,142 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "spacing_and_sizing_follow_scale"
-description = "Spacing and sizing follow the design system's scale, with no arbitrary one-off values visible in computed styles."
+name = "spacing_matches_three_region_scale"
+description = "At 1440px, spacing among the header, left tool rail (~88px), central canvas, and right Layers panel (~256–288px) follows a 4px base scale matching the reference screenshots — no arbitrary one-off gaps that break the annotation-studio composition."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "typography_matches_spec"
-description = "Typography matches the spec for all headings and body copy."
+name = "typography_matches_studio_spec"
+description = "UI text uses the Segoe UI / -apple-system / BlinkMacSystemFont / Helvetica / Arial / sans-serif stack; tool-rail section labels render ~11–13px semi-bold uppercase muted, and the Layers heading renders larger and bolder (~16–18px, weight 700) consistent with the reference."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "layout_matches_reference"
-description = "Layout matches reference screenshots to within a small tolerance at all specified breakpoints; fidelity tasks achieve near pixel-parity."
+name = "desktop_composition_matches_reference"
+description = "At 1440px the layout matches the reference composition within a small tolerance: header with MarkupFlow title and actions above a three-region workspace (tool rail | canvas | Layers/Saved projects/Collaboration) — a dark annotation studio, not a marketing landing."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.4"
-name = "specified_state_changes_animate"
-description = "Transitions or animations are applied to the state changes the spec calls out, such as add, delete, filter, or view switch."
+name = "specified_state_changes_have_motion"
+description = "State changes the spec calls out — new Layers row enter, layer delete exit, Saved projects row enter, drag-row opacity/shadow, and theme toggle recolor — show the specified transitions rather than hard cuts when driven through real UI controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "responsive_behavior_matches_reference"
-description = "Responsive behavior matches reference patterns."
+name = "responsive_behavior_matches_reference_patterns"
+description = "At ~375px vs 1280px+, responsive behavior matches the reference patterns: at 375px the layout stacks vertically with a horizontally scrollable tool rail; at desktop widths all three regions are visible simultaneously without overlap."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.6"
-name = "control_styling_matches_spec"
-description = "Button and form radii, padding, and shadows conform to the spec."
+name = "controls_styled_not_browser_default"
+description = "Toolbar buttons (8px radius, transparent at rest / surface on hover / accent+check when active), Export PNG (primary #0000EE with white text), and panels (12px radius, surface #2A303B, 1px border #3A414D) use the studio treatments from the spec rather than unstyled browser defaults."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.7"
-name = "typography_has_clear_hierarchy"
-description = "Typography has a clear hierarchy that distinguishes section and body text."
+name = "clear_hierarchy_rail_vs_layers"
+description = "Typography hierarchy clearly distinguishes muted uppercase tool-rail section labels (Shapes, Effects, Style) from the larger bolder Layers heading and body/secondary text (#F3F4F6 / #9CA3AF)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.8"
 name = "component_states_match_spec"
-description = "Component states (default, hover, active, disabled) match the spec where specified."
+description = "Toolbar tools, swatches, stroke buttons, Undo/Redo, and Layers rows show distinct default, hover, focus, active-selection (accent #0079FD with white/check), and disabled (dimmed Undo/Redo) treatments as specified."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.9"
-name = "surface_treatments_match_spec"
-description = "Color, depth, and border treatments are precise per the design."
+name = "palette_and_surfaces_match_tokens"
+description = "Dark workspace surfaces use background #1F242E, panels #2A303B, borders #3A414D, primary text #F3F4F6, secondary #9CA3AF, primary action #0000EE, and active-tool accent #0079FD; light theme via the header toggle keeps pairings legible."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.10"
-name = "microinteractions_match_spec"
-description = "Microinteraction feedback for hover and press follows the spec in duration and motion."
+name = "microinteraction_timing_matches_spec"
+description = "Hover states on toolbar buttons, swatches, stroke buttons, and Layers rows, plus live dashed draw-preview while dragging a shape, follow the specified microinteraction feel when driven through real pointer controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.n1"
-name = "sizing_or_spacing_contradicts_scale"
-description = "Visible sizing or spacing values contradict the specified scale."
+name = "spacing_contradicts_reference_studio"
+description = "Visible spacing between header, tool rail, canvas, and Layers panel contradicts the reference studio composition (large empty voids or cramped collisions)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n2"
-name = "colors_fall_outside_palette"
-description = "Colors appear outside the specified palette."
+name = "colors_ignore_specified_palette"
+description = "Workspace chrome uses a fixed unrelated palette that ignores the specified dark tokens (or light-theme pairings) after theme toggle."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n3"
-name = "sizing_mismatches_spec"
-description = "Sizing mismatches the spec."
+name = "region_sizing_mismatches_reference"
+description = "At 1440px the tool rail or Layers panel is sized or proportioned in clear mismatch with the reference (~88px rail / ~256–288px Layers / flexible canvas)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n4"
-name = "required_animations_missing_or_wrong"
-description = "Animations are missing or incorrect where the spec requires them."
+name = "required_studio_animations_missing"
+description = "Required animations are missing where the spec requires them (Layers rows snap in/out with no enter/exit, Saved projects row snaps in, drag-row shows no opacity/shadow change)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n5"
-name = "specified_controls_use_browser_defaults"
-description = "Form or button controls use browser default styles when the spec styles them."
+name = "controls_use_browser_default_styles"
+description = "Toolbar tools, Export PNG, project name field, or panel chrome use unstyled browser default appearance when the spec styles them."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n6"
-name = "layout_misaligned_at_breakpoints"
-description = "The grid or layout is misaligned at reference breakpoints."
+name = "desktop_layout_misaligned_vs_reference"
+description = "At 1440px the three-region workspace is misaligned versus the reference (missing tool rail or Layers panel, regions overlapping, or canvas not centered)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n7"
-name = "elements_are_clipped_or_offscreen"
-description = "Elements render off-screen or clipped."
+name = "elements_clipped_or_offscreen_vs_reference"
+description = "At 1440px, tool-rail sections, canvas drop zone, or Layers/Saved projects/Collaboration panels render clipped or off-screen compared to the reference composition."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n8"
-name = "structure_deviates_from_reference"
-description = "Section order, content, or structure deviates from the reference on fidelity tasks."
+name = "structure_deviates_from_reference_studio"
+description = "Structure deviates from the reference: a marketing landing or multi-page shell replaces the dark three-region MarkupFlow annotation studio."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n9"
-name = "heading_and_body_text_undifferentiated"
-description = "Heading and body text have no distinction."
+name = "no_hierarchy_between_rail_and_layers"
+description = "Tool-rail section labels and the Layers heading are visually undifferentiated — no clear hierarchy between muted uppercase groups and the larger Layers title."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,31 @@ weight = 1.0
 [[criterion]]
 id = "3.n10"
 name = "microinteractions_deviate_from_reference"
-description = "Microinteractions are missing or deviate from the provided reference."
+description = "Hover/press microinteractions on toolbar tools, swatches, stroke buttons, or Layers rows are missing or clearly deviate from the reference feel."
+type = "binary"
+negate = true
+weight = 1.0
+
+# HARDEN_MARKUPFLOW_V1
+
+[[criterion]]
+id = "3.11"
+name = "right_column_includes_history_versions"
+description = "At 1440px the right column includes Layers plus History and Versions panels in the annotation-studio composition matching the hardened spec (not only a bare Layers list)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.12"
+name = "presets_group_in_tool_rail"
+description = "At 1440px the left tool rail shows a Presets group with the four named recipes in addition to Shapes, Effects, and Style"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.n11"
+name = "hardened_panels_missing_from_composition"
+description = "History, Versions, or Presets are missing from the desktop composition despite being required by the instruction"
 type = "binary"
 negate = true
 weight = 1.0

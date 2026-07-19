@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,158 +62,158 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "For games, evaluate onboarding and controls guidance plus pause and restart affordances. Empty state UI is present and renders when a collection is empty."
+name = "stats_empty_before_first_match"
+description = "Before any match has been played, the Stats view shows the friendly No matches played yet message rather than blank or zero rows."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "setup_form_inline_validation"
+description = "On setup, invalid playerName or missing difficulty shows inline per-field validation naming the field before submit, and Start match stays disabled until valid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "illegal_actions_name_why"
+description = "Acting out of turn, revealing an already-revealed or flagged tile, using a hint past the limit, or revealing while paused is rejected with specific visible feedback naming why."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "save_and_copy_confirmations"
+description = "Save Progress shows a Saved confirmation and Copy on an export shows a Copied confirmation; both are visible and transient."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "rival_thinking_indicator"
+description = "During the Rival turn a visible Rival is thinking indicator is shown for the thinking delay rather than an instant silent jump."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "undo_available_for_moves"
+description = "After a reveal, flag, or hint, Undo is available to restore the prior board and scores; Undo at the history root is disabled."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "hint_limit_and_floor"
+description = "The Hint control is disabled after 2 uses in the round; using a hint at a score below 3 floors the score at 0 rather than going negative."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "semantic_controls"
+description = "Primary game controls (Start match, Flag Mode, Hint, Pause/Resume, Export Match, Save Progress) use semantic button/input elements rather than clickable bare divs."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "overlays_have_close_paths"
+description = "Round Result and Match Complete overlays support continuing play (next round, Rematch, or New match) without trapping the player."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "match_progress_visible"
+description = "During a best-of-3 match the current round number and round-win progress toward 2 wins are visible so the player can read match progress."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_stats_or_log_blank"
+description = "Before any match, Stats or Match log shows nothing with no empty-state guidance."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "errors_only_in_console"
+description = "Illegal-action or import failures surface only in the browser console with no on-screen feedback."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n3"
 name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+description = "Reveal, mine hit, Save Progress, or Copy succeeds or fails silently with no visible HUD/toast/confirmation change."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "import_corrupt_without_warning"
+description = "Importing malformed JSON or a payload missing required match-result fields changes the Match log without a visible rejection naming that the file is invalid."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "interactive_nonsemantic_wrappers"
+description = "Interactive controls are only non-semantic div or span wrappers with no button/input semantics."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "overlays_not_dismissible"
+description = "Round Result or Match Complete cannot be progressed via keyboard-operable controls."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "validation_missing_or_delayed"
+description = "Setup validation feedback is missing or delayed with no UI indication when playerName or difficulty is invalid."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "ambiguous_control_labels"
+description = "Export, Save Progress, or Resume Saved Match controls use ambiguous or missing labels."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "save_resume_unavailable_without_guidance"
+description = "Save Progress is clickable with no match in progress, or Resume Saved Match is offered with no checkpoint, without disabled state or guidance."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "flagged_tile_still_reveals"
+description = "A flagged tile can still be revealed by a normal reveal click without unflagging first."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"
 description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true

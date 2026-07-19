@@ -62,142 +62,170 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "sample_png_convert_download_chain"
+description = "Create/convert flow: clicking \"Add sample png\" appends exactly one queue row, the counts line changes from \"0 files queued\" to reflect one queued file, and the empty-state message disappears; running Convert moves that row through Converting to Done, updates the counts line to show one done, and enables that row's Download — all without a page reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "settings_quality_invalid_blocked"
+description = "Settings flow: entering a quality outside 1 to 100 shows immediate inline validation naming the quality field, and the invalid value is not applied."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "retarget_done_row_returns_to_ready"
+description = "Edit flow: changing a Done row's \"Convert to\" target returns that row to Ready, disables its Download control, and updates the counts line; running Convert again completes it to Done with an output size shown for the new target."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "remove_file_updates_queue_and_counts"
+description = "Delete flow: removing a queued file drops its row from the queue and the counts; removing the only queued file restores the empty state and \"0 files queued\"."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "route_switch_retains_theme_and_navbar"
+description = "View/mode switch: navigating to Convert, Settings, or About by navbar or URL renders the matching view with the shared navbar and theme intact, without losing the theme choice."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "last_remove_reveals_empty_state"
+description = "Edge: after removing the only queued file, the empty state \"Your conversion queue is empty\" and \"0 files queued\" are clear and visible, and adding a file again works immediately."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "webp_vs_jpeg_different_outputs"
+description = "Convert flow: converting the same source file twice, once to webp and once to jpeg, produces two completed rows whose output sizes differ, and each Download saves a file whose extension matches its selected target."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "quality_setting_flows_into_jpeg_size"
+description = "Settings→convert flow: lowering output quality in Settings and reconverting the same file to jpeg yields a smaller output size on the completed row than the same conversion at quality 100."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "catalog_theme_quality_preset_persist_queue_resets"
+description = "Persistence flow: selecting a catalog category, switching the theme, changing the quality setting, and saving a preset, then reloading, restores the active category, theme, quality, and presets list, while the conversion queue returns to a single empty state with \"0 files queued\" and no phantom row, progress, or download success."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "about_privacy_reachable_without_file"
+description = "Recovery/navigation: About and Privacy views remain reachable from the navbar without selecting a file, and returning to Convert restores the workspace without a dead-end reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "session_export_import_chain"
+description = "Artifact end state: after converting at least one file and changing quality, open Session export — the session JSON preview's quality and per-file status/to/outputSize match the visible store; Copy shows a brief copied confirmation; Download starts a file of that same text; change settings away; Import the same JSON and confirm Settings, presets, and matching queue Convert-to targets restore without reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "batch_set_format_updates_export"
+description = "Batch flow: selecting two queued files, running Batch set format to webp, and confirming both rows show webp as Convert-to (Done rows returned to Ready) updates the session JSON export preview so both files list to as webp — all without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "save_and_apply_preset_flow"
+description = "Preset flow: saving a preset named Web ready with target webp and quality 80 increases the visible preset count by exactly one; applying it writes quality 80 into Settings and webp into the selected (or all Ready) rows; the session JSON export preview includes that preset."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "undo_redo_remove_round_trip"
+description = "Undo/redo flow: Undo after removing a queued file restores that row and the prior counts; Redo removes it again; after a new add following an undo, Redo is disabled."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "primary_convert_flow_unavailable"
+description = "Adding a sample file, running Convert, or downloading a completed result cannot be completed from the visible UI controls."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "sample_add_missing_or_duplicated"
+description = "Clicking \"Add sample png\" either fails to add a visible queue row or adds duplicate rows for a single click."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "convert_desyncs_row_and_counts"
+description = "After Convert completes, the row status, enabled Download, and counts line disagree about whether the file is Done."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "route_switch_breaks_or_loses_theme"
+description = "Switching among Convert, Settings, and About breaks the layout or loses the active theme / navbar."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_queue_region_broken"
+description = "After removing the last queued file, the queue region is blank or broken with no empty-state copy, or \"0 files queued\" is missing."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "same_targets_identical_output_sizes"
+description = "Converting the same source once to webp and once to jpeg yields identical output sizes (or identical download extensions), showing hardcoded rather than real conversion."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "retarget_leaves_download_enabled"
+description = "Changing a Done row's Convert-to target leaves Download enabled or leaves the row Done instead of returning it to Ready."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "reload_leaves_phantom_queue_success"
+description = "After reload, the queue shows a phantom file row, progress, checkmark, or download-ready control instead of a single empty \"0 files queued\" state."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "failed_or_unsupported_silent"
+description = "An Unsupported or Failed conversion provides no visible status feedback naming the problem."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +233,31 @@ weight = 1.0
 [[criterion]]
 id = "6.n10"
 name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+description = "Leaving Settings or About requires a full page reload to recover the converter workspace — a navigation dead end."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "session_import_does_not_restore_settings"
+description = "Importing a previously exported valid session JSON after changing quality/theme/presets/default target leaves those surfaces unchanged — no round-trip restore."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n12"
+name = "batch_set_format_skips_selected_rows"
+description = "After Batch set format to webp on two selected rows, one or both still show a different Convert-to target, or a selected Done row stays Done with Download enabled."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n13"
+name = "undo_redo_broken_after_remove"
+description = "After removing a queued file, Undo fails to restore the row/counts, or after Undo then a new add, Redo remains enabled and resurrects the cleared redo stack."
 type = "binary"
 negate = true
 weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,94 +62,94 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "join_enables_composer_and_adds_message"
+description = "Join-and-chat flow: enter a valid roomId and Join Room; the badge leaves idle, the composer enables, and submitting one valid ChatMessage increases the transcript line count by exactly one with the new line right-aligned."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "invalid_join_or_message_shows_field_contract_errors"
+description = "Invalid JoinSession or ChatMessage payloads (empty/illegal roomId, whitespace-only or over-long text) show immediate inline validation naming roomId or text and do not start a join or append a transcript line."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "display_name_edit_echoes_to_session_pack"
+description = "Edit a valid displayName, then open Export Session: the Session Pack peer.displayName matches the visible session-panel name without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "leave_room_disables_composer_keeps_transcript"
+description = "Leave Room while waiting flips the badge to disconnected, disables the composer with its explanatory note, and keeps every previously sent transcript line."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "theme_toggle_retained_across_export"
+description = "Toggle theme, then open Export Session: the Session Pack theme enum matches the active surface (light or dark) and the three panels stay in place."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "empty_file_queue_shows_empty_state"
+description = "With zero queued files, the file-transfer panel shows its empty-state message in place of table rows."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "file_queue_two_files_flow"
+description = "Choosing two different local files replaces the empty state with exactly two queue rows, each with its own name, size, and Not Started status, regardless of connection state."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "export_import_session_pack_flow"
+description = "Artifact end-state flow: after distinctive name/room/chat/file mutations, Export Session preview shows weblink-session-v1 field-contract keys with those values; Download then Import Session reconstructs the same visible state with the badge at rest."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "export_import_overlays_close_cleanly"
+description = "Export Session and Import Session surfaces open from their controls, support Escape or an explicit close, and return focus so Join Room and the composer remain usable afterward."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "invalid_import_recovers_without_reload"
+description = "After a rejected invalid Session Pack Import (field-contract error visible), the workspace remains usable: Join Room, composer (after a valid join), and Export Session still operate without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "join_chat_export_flows_unavailable"
+description = "Join Room, chat send while connected/waiting, Export Session, or Import Session is missing or non-functional from the UI."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "sent_message_or_queue_row_missing_or_duplicated"
+description = "A valid sent chat line or chosen file fails to appear, or appears duplicated without a matching user action."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "session_pack_desyncs_from_panels"
+description = "After a visible mutation (name, roomId, chat, file queue, or theme), the Session Pack preview disagrees with the session, chat, or file panels until reload."
 type = "binary"
 negate = true
 weight = 1.0
@@ -196,8 +196,8 @@ weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "field_contract_failure_lacks_feedback"
+description = "An invalid join, chat, displayName, or Import Session attempt fails silently with no inline field-naming feedback."
 type = "binary"
 negate = true
 weight = 1.0

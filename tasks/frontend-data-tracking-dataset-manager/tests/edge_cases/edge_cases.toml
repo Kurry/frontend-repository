@@ -1,0 +1,219 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "empty_states_are_designed"
+description = "An emptied dataset, an all-verified unverified-only filter, and a no-duplicates scan each render a designed empty state with a message and a next-step control, never a blank region"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "forms_validate_inline"
+description = "New Dataset, Add Row, threshold rule, splits, and snapshot name forms all validate inline before submit with messages naming the offending field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "errors_are_actionable"
+description = "The formula bar and import wizard errors name the actual problem (unknown column, non-numeric column, no parseable rows, percentages must sum to 100), not just 'Invalid'"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "actions_show_confirmation"
+description = "Import commit, merge, bulk apply, attach, and copy each produce visible success feedback (toast or confirmation) stating what happened"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "scan_shows_progress"
+description = "The duplicate scan shows its staged progress while running rather than freezing or completing invisibly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "destructive_actions_guarded_and_undoable"
+description = "Row delete, bulk delete, and merge require confirmation, and undo restores their effect exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "non_obvious_controls_have_help"
+description = "Non-obvious controls — the formula bar syntax, pivot buckets, split stratification — carry placeholder text, hints, or tooltips explaining their use"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.8"
+name = "controls_use_semantic_tags"
+description = "Buttons, inputs, selects, and labels across the toolbar, wizard, and panels use semantic elements rather than bare divs or spans"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "modal_supports_close_paths"
+description = "Modals and the export drawer close via their close control, Escape, and (for modals) a background click"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "long_import_shows_step_feedback"
+description = "The multi-step import wizard shows which step is active and how many rows are ready versus flagged throughout the flow"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n1"
+name = "empty_collection_has_no_feedback"
+description = "An empty dataset or empty scan result shows nothing at all — no message, no next-step control"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n2"
+name = "errors_only_reach_console"
+description = "A failed formula, bad CSV paste, or invalid form surfaces its error only in the browser console"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n3"
+name = "actions_lack_visible_feedback"
+description = "Import commit, merge, or bulk apply silently succeeds or fails with no visible feedback"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n4"
+name = "destructive_actions_lack_warning"
+description = "Row delete, bulk delete, or merge executes immediately with no confirmation step"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n5"
+name = "interactive_elements_use_nonsemantic_tags"
+description = "Interactive affordances (row actions, wizard controls, tray buttons) are bare divs or spans with no role or keyboard operability"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n6"
+name = "modal_not_keyboard_dismissible"
+description = "A modal, wizard, or drawer cannot be dismissed via the keyboard"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n7"
+name = "validation_feedback_missing_or_delayed"
+description = "An invalid form submits, mutates data, or gives no indication of what is wrong"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n8"
+name = "button_text_ambiguous_or_missing"
+description = "Primary controls carry ambiguous or missing labels (icon-only destructive actions with no accessible name, or generic 'OK' on data-changing steps)"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n9"
+name = "double_activation_double_applies"
+description = "Double-activating Add Row Submit or the wizard Commit appends the rows twice"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n10"
+name = "truncation_loses_data"
+description = "A cell value longer than 80 characters is clipped with no way to see the full value in the inline editor or Edit modal"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "edge_cases.catchall"
+name = "edge_cases_catchall"
+description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

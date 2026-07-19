@@ -1,0 +1,148 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "rail_header_diff_layout"
+description = "The app composes as a left rail with the prompt picker and history list, a header row with the version pickers, the Diff, Compare Branches, Blame, and Graph mode tabs, and the change summary strip, with the diff surface filling the remaining area"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "split_pane_divider_gutter"
+description = "Split panes are equal-width columns separated by a 1 pixel subtle border divider, with line numbers in a fixed-width muted gutter visually distinct from the text area"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "diff_color_treatments"
+description = "Added lines use a light green background with a strong-green gutter plus symbol, removed lines a light red background with a strong-red gutter minus symbol, and word-level highlights use a visibly stronger shade of the same hue than their line background"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "summary_tags_and_conflict_accent"
+description = "The change summary strip uses green, red, and blue tag treatments for added, removed, and net token delta, and three-way conflict regions carry a distinct third treatment never confused with plain adds or removes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "picker_and_history_anatomy"
+description = "Version picker options show version number and relative timestamp, and history rows show number, author, timestamp, and change note with the head version visibly marked"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "graph_node_kind_distinction"
+description = "Graph nodes are visually distinct by kind — chain, branch, and merge nodes differ in shape or accent — and selected and compared nodes carry a visible highlight ring"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "monospace_prompt_type_hierarchy"
+description = "All prompt text in diff, blame, merge, and export surfaces renders in monospaced type, while UI chrome shows a clear sans-serif hierarchy with the app title larger than panel headings, which are larger than body and label text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "control_states_and_icon_set"
+description = "Buttons, inputs, selects, tabs, and toggles show distinct default, hover, focus (visible ring), disabled, and error treatments, and one consistent icon set is used across tabs, gutter symbols, thread markers, and toolbar actions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "responsive_stack_and_rail"
+description = "At widths of 768 pixels and below the split view stacks into a single column with a base/compare segment switch and the left rail collapses behind a toggle, while at 375 pixel width no content clips or overflows the viewport, no page-level horizontal scrolling appears, and long lines wrap or scroll within the diff surface's container"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.n1"
+name = "desktop_overlap_or_clipping"
+description = "At 1440 pixel width, any pane text, gutter number, tag, picker label, graph node, or thread marker overlaps another element or is clipped by its container"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.n2"
+name = "diff_hues_confusable"
+description = "Added and removed treatments use hues or shades that are confusable with each other or with the conflict treatment, or the same change kind renders in different hues in split versus unified mode"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

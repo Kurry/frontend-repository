@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -165,7 +165,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n5"
 name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+description = "Keyboard focus escapes an open modal into the page behind it while the modal is open."
 type = "binary"
 negate = true
 weight = 1.0
@@ -210,6 +210,49 @@ type = "binary"
 negate = true
 weight = 1.0
 
+[[criterion]]
+id = "1.11"
+name = "keyboard_alternative_for_drag"
+description = "Every drag interaction has a keyboard path: each stop card offers keyboard-operable Move to day and reorder controls that achieve the same reassignment and reordering as a pointer drag"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "conflict_dialog_semantics"
+description = "The conflict-resolution modal has role dialog with aria-modal, traps focus while open, makes Keep mine / Take theirs / Merge operable from the keyboard, and returns focus to the edited block on close"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "poll_names_and_promotion_announced"
+description = "Poll controls expose accessible names that include the item name and current vote count, and a promotion is announced through an aria-live region"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "role_state_programmatic"
+description = "The role switcher exposes the current role programmatically, and controls disabled by the Viewer role are disabled in the accessibility tree rather than merely styled as inactive"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n11"
+name = "drag_only_mutation_path"
+description = "Reassigning a stop to another day or reordering within a day is achievable only by pointer drag, with no keyboard-operable alternative anywhere in the UI"
+type = "binary"
+weight = 1.0
+negate = true
+
+
+[[criterion]]
+id = "1.15"
+name = "export_import_keyboard_operable"
+description = "Export Download/Copy controls and the trip JSON import control are reachable and operable with the keyboard alone, with a visible focus indicator"
+type = "binary"
+weight = 1.0
 [[criterion]]
 id = "accessibility.catchall"
 name = "accessibility_catchall"

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -169,6 +169,36 @@ description = "Scroll smoothing traps the user, prevents reaching content, fight
 type = "binary"
 weight = 1.0
 negate = true
+
+
+[[criterion]]
+id = "4.20"
+name = "palette_and_export_overlay_transition"
+description = "Command palette and Export catalog overlays enter and exit with a brief opacity/scale transition rather than snapping; verified via the real UI open/close path"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.21"
+name = "bulk_bar_enters_on_selection"
+description = "When Events Manager selection becomes non-empty, the bulk action bar slides or fades in rather than appearing with no transition"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.22"
+name = "export_copy_confirmation_animates"
+description = "Activating Copy on Export or Copy leads JSON shows a brief copied confirmation that appears then resets rather than a permanent static label"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.n6"
+name = "palette_export_snap_open_close"
+description = "Command palette or Export catalog open/close by snapping with no transition on the real UI path"
+type = "binary"
+negate = true
+weight = 1.0
 
 [[criterion]]
 id = "4.catchall"

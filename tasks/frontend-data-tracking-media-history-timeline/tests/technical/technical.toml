@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,20 +63,20 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.1"
 name = "shared_state_coherence_across_surfaces"
-description = "A change made in one surface — creating, editing, or deleting an event, toggling a category, moving the year window, or switching modes — is immediately reflected in every other surface that shows the same data (Library list, stage pins, counts, detail panel) without a reload; no surface ever shows stale data another surface already updated"
+description = "A change made in one surface — creating, editing, deleting, bulk mutating, undoing, redoing, or importing — is immediately reflected in every other surface that shows the same data (Library list, stage pins, counts, category tally, detail panel, export preview) without a reload; no surface ever shows stale data another surface already updated"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
 name = "seeded_reset_multi_facet_round_trip"
-description = "Scripted probe: create an event, toggle a category off, type a search, narrow the year window, and switch mode; confirm localStorage and sessionStorage remain empty throughout; then reload — every facet coherently returns to the seeded baseline (seeded corpus, default categories, empty search, default year window), never a mix of surviving and reset facets"
+description = "Scripted probe: create an event, toggle a category off, type a search, narrow the year window, open Export once, and switch mode; confirm localStorage and sessionStorage remain empty throughout; then reload — every facet coherently returns to the seeded baseline (seeded corpus, default categories, empty search, default year window, empty undo stacks), never a mix of surviving and reset facets"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
-name = "2_3"
+name = "uses_browser_storage_apis"
 description = "Uses localStorage or sessionStorage to persist events or filters"
 type = "binary"
 weight = 1.0
@@ -85,21 +85,21 @@ negate = true
 [[criterion]]
 id = "2.4"
 name = "keyboard_operable_chrome_controls"
-description = "Every chrome control (mode switch, Filters, About, Reset filters, form fields, scrubber thumbs) is reachable and operable with the keyboard alone, showing a visible focus indicator on each"
+description = "Every chrome control (mode switch, Filters, About, Reset filters, Undo, Redo, Export timeline, Import timeline, form fields, scrubber thumbs, bulk actions) is reachable and operable with the keyboard alone, showing a visible focus indicator on each"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.5"
 name = "dialogs_trap_and_return_focus"
-description = "The About modal and Filters drawer expose dialog semantics, trap keyboard focus while open, and return focus to the control that opened them on close"
+description = "The About modal, Filters drawer, and Export drawer expose dialog semantics, trap keyboard focus while open, and return focus to the control that opened them on close"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.6"
 name = "validation_exposed_to_assistive_tech"
-description = "Form validation messages are exposed to assistive technology (e.g. an aria-live region, role=alert, or aria-describedby wiring on the field) in addition to being shown visually"
+description = "Form validation messages and import errors are exposed to assistive technology (e.g. an aria-live region, role=alert, or aria-describedby wiring on the field) in addition to being shown visually"
 type = "binary"
 weight = 0.5
 
@@ -113,7 +113,7 @@ weight = 1.0
 [[criterion]]
 id = "2.8"
 name = "console_clean_during_full_exercise"
-description = "No console errors or warnings appear during a full exercise of the app — panning, zooming, filtering, creating, editing, deleting, and stepping through details"
+description = "No console errors or warnings appear during a full exercise of the app — panning, zooming, filtering, creating, editing, deleting, bulk actions, undo/redo, exporting, importing, and stepping through details"
 type = "binary"
 weight = 1.0
 
@@ -133,7 +133,21 @@ weight = 1.0
 negate = true
 
 [[criterion]]
-id = "2.catchall"
+id = "2.11"
+name = "export_compiled_from_live_store"
+description = "Export JSON and CSV previews are compiled from the live session store: after a create or edit, reopening or refreshing the export drawer shows the mutated fields without reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.12"
+name = "import_replaces_shared_store"
+description = "A successful Timeline JSON import replaces the shared events collection and filter/window fields so Library, stage, scrubber, tally, and a subsequent export all agree"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "technical.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"

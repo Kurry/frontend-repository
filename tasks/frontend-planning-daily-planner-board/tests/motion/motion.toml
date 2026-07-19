@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -116,6 +116,14 @@ name = "reduced_motion_removes_animations"
 description = "With prefers-reduced-motion enabled, animations are removed and state changes apply instantly while every flow remains fully functional"
 type = "binary"
 weight = 1.0
+
+
+[[criterion]]
+id = "4.9"
+name = "export_and_bulk_tray_animate_open"
+description = "Driven through the real Export and multi-select bulk-tray controls (not any state shortcut): opening either surface animates in with a short ease and closing reverses it"
+type = "binary"
+weight = 0.5
 
 [[criterion]]
 id = "4.catchall"

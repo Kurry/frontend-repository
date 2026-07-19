@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -98,7 +98,7 @@ weight = 1.0
 [[criterion]]
 id = "1.6"
 name = "attempt_settles_to_waiting_no_peer_claim"
-description = "After the connection attempt settles (a few seconds after Join Room), the connection badge shows a waiting-for-peer label, and no visible text anywhere claims a peer connected"
+description = "After the connection attempt settles (within 5 seconds after Join Room), the connection badge shows a waiting-for-peer label, and no visible text anywhere claims a peer connected"
 type = "binary"
 weight = 1.0
 
@@ -184,14 +184,14 @@ weight = 1.0
 [[criterion]]
 id = "1.28"
 name = "name_edit_updates_identity_live"
-description = "Editing the display name in the session panel updates the visible peer identity immediately, with no save control and no page reload"
+description = "Editing the display name to a value that satisfies the PeerIdentity field contract (trimmed 1–40 characters) updates the visible peer identity immediately, with no save control and no page reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.29"
 name = "empty_identifier_join_blocked_inline_error"
-description = "With the room or peer identifier empty, activating Join Room starts no connection attempt: an inline error message naming the identifier field appears next to it, the connection badge stays on its idle label, no other panel changes, and the error clears as soon as a non-empty identifier is typed"
+description = "With roomId empty, longer than 64 characters, or containing spaces/illegal characters, activating Join Room starts no connection attempt: an inline error naming the roomId field appears next to it, the connection badge stays idle, no other panel changes, and the error clears once a valid roomId (1–64 chars of A–Z a–z 0–9 hyphen underscore) is typed"
 type = "binary"
 weight = 1.0
 
@@ -212,7 +212,7 @@ weight = 0.5
 [[criterion]]
 id = "1.32"
 name = "join_and_chat_flow_chain"
-description = "Full join-and-chat chain: count the transcript lines, enter a room identifier, and click Join Room; the badge moves from idle to connecting and then to waiting for peer, the chat composer becomes enabled at the same moment the badge leaves idle, and submitting one message immediately increases the transcript line count by exactly one with the new line right-aligned; reloading the page afterward restores the peer identity, the last-entered room identifier, and the seeded plus the newly sent line in the same order, with the badge resuming at idle or disconnected, never connecting or waiting"
+description = "Full join-and-chat chain: count the transcript lines, enter a valid roomId, and click Join Room; the badge moves from idle to connecting and then to waiting for peer within 5 seconds, the chat composer becomes enabled at the same moment the badge leaves idle, and submitting one message immediately increases the transcript line count by exactly one with the new line right-aligned; reloading the page afterward restores the peer identity, the last-entered room identifier, and the seeded plus the newly sent line in the same order, with the badge resuming at idle or disconnected, never connecting or waiting"
 type = "binary"
 weight = 1.0
 
@@ -236,6 +236,57 @@ name = "multi_facet_reload_round_trip"
 description = "Multi-facet round-trip: edit the display name, enter a room identifier, send one chat line while connecting/waiting, queue one file, and toggle the theme, then reload; every facet (name, client ID, room identifier, seeded plus sent transcript, file queue, theme choice) is restored coherently from local storage — never a mix of restored and reset facets — and the connection badge resumes at idle or disconnected"
 type = "binary"
 weight = 1.0
+
+
+[[criterion]]
+id = "1.36"
+name = "peer_identity_field_contract_rejects_invalid_name"
+description = "Editing displayName to whitespace-only or longer than 40 characters shows an inline validation message naming the displayName field and leaves the last valid peer name unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "chat_message_field_contract_bounds"
+description = "While the composer is enabled, submitting whitespace-only text adds no transcript line; submitting text longer than 2000 characters shows an inline message naming the text field and adds no line"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "session_pack_export_shows_field_contract_keys"
+description = "After editing displayName to a distinctive valid value, joining a distinctive valid roomId, sending a distinctive chat line, and queueing one file, opening Export Session shows a Session Pack JSON preview with schemaVersion exactly weblink-session-v1 and required keys peer, roomId, theme, messages, and fileQueue, containing those live displayName, roomId, chat text, and file name values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "session_pack_copy_and_download_match_preview"
+description = "In Export Session, Copy places the visible Session Pack JSON on the clipboard with a visible confirmation, and Download triggers a real client-side .json download whose contents match the preview text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "session_pack_import_round_trip"
+description = "Download a Session Pack after distinctive displayName, roomId, chat, and file-queue mutations, then Import Session that same JSON: peer displayName, roomId, transcript lines, file queue, and theme reconstruct to match the pack, a fresh Export still shows schemaVersion weblink-session-v1 with those values, and the connection badge is at rest (idle or disconnected)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "invalid_session_pack_import_rejected"
+description = "Importing malformed Session Pack JSON, or parseable JSON that fails the field contract (wrong schemaVersion, theme outside light|dark, message role outside local|demo, fileQueue status other than not-started, displayName outside 1–40 characters, illegal roomId characters when non-empty, or missing required keys), shows validation naming the offending field and leaves peer, transcript, queue, and theme unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "session_pack_omits_session_mutations"
+description = "After editing displayName, joining a distinctive roomId, sending a distinctive chat line, and queueing a file, the Session Pack JSON preview is missing that displayName, roomId, chat text, or file name, or is missing schemaVersion weblink-session-v1"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.catchall"

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -98,7 +98,7 @@ weight = 1.0
 [[criterion]]
 id = "1.6"
 name = "decision_form_schema_validation"
-description = "The decision form offers exactly Confirm clean and Confirm leak verdicts plus a rationale field; submitting with no verdict or a rationale under 20 characters shows inline messages naming the invalid field, records no decision and no timeline entry, and the submit control stays disabled until both are valid"
+description = "The decision form's submitted record matches the API-shaped field contract: verdict exactly Confirm clean or Confirm leak (stored as confirm-clean or confirm-leak) and rationale a trimmed string of 20 to 2000 characters; submitting with no verdict, a rationale under 20 characters, or a rationale over 2000 characters shows inline messages naming the invalid field, records no decision and no timeline entry, and the submit control stays disabled until both are valid"
 type = "binary"
 weight = 1.0
 
@@ -147,7 +147,7 @@ weight = 1.0
 [[criterion]]
 id = "1.13"
 name = "export_block_copies_exact_text"
-description = "The Export summary control opens a monospaced code block containing the rollup values, and activating its copy control places the exact block text on the clipboard and shows a visible confirmation"
+description = "The Export control opens a live-compiled monospaced preview with a format choice between Review report JSON and Summary text; activating Copy places the exact visible preview text on the clipboard and shows a visible confirmation"
 type = "binary"
 weight = 1.0
 
@@ -170,6 +170,50 @@ negate = true
 id = "1.16"
 name = "queue_static_no_live_derivation"
 description = "The queue, rollup strip, or mutation flip count is static markup: moving the threshold, submitting a decision, or toggling an included test leaves the dependent chips or numbers unchanged"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.17"
+name = "review_report_json_field_contract_keys"
+description = "With any session state, the Export Review report JSON preview visibly includes the required top-level keys schemaVersion, threshold, exportedAt, rollup, submissions, decisions, and mutationSuites, and schemaVersion equals leak-review.report.v1"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "review_report_export_contains_session_work"
+description = "Scripted probe: submit one Confirm leak decision with a distinct rationale token of at least 20 characters, move the threshold away from 0.75, toggle one mutation test include flag, open Export Review report JSON, and confirm the preview contains schemaVersion leak-review.report.v1, the new threshold, a decisions entry with that rationale and verdict confirm-leak, rollup counts matching the strip, and the toggled included boolean; Download offers a .json file for that format"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "review_report_import_round_trip"
+description = "Scripted probe: after exporting Review report JSON that conforms to the field contract, reload to clear in-memory state, Import that same JSON, and confirm the queue chips, rollup strip, audit timeline rationale, threshold, mutation include toggles, and a subsequent export preview match the imported document"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "invalid_review_report_import_rejects_schema"
+description = "With at least one confirmed decision present, importing Review report JSON with wrong schemaVersion, threshold outside 0.50 to 0.95, or a submissionId that matches no row shows visible validation naming the offending field or payload and leaves queue chips, threshold, audit timeline, and mutation toggles unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "review_report_omits_session_mutations"
+description = "After submitting a Confirm leak decision with a distinct rationale token and changing the threshold, the Export Review report JSON preview omits that decision token or the new threshold, or omits schemaVersion leak-review.report.v1 / required keys, while presenting an export preview as if complete"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.22"
+name = "invalid_import_mutates_state"
+description = "Importing Review report JSON that violates the field contract (wrong schemaVersion, threshold outside bounds, or unknown submissionId) still mutates queue chips, threshold, audit timeline, or mutation include toggles"
 type = "binary"
 weight = 1.0
 negate = true

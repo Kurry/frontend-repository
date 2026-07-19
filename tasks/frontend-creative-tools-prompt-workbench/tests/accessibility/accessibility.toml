@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,86 +62,86 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "keyboard_operable_workbench_controls"
+description = "Every interactive control — toolbar buttons (Insert Variable, Run/Stop, Save, model selector), suggestion chips, binding-panel inputs, history rows, variant prev/next, library rows, and attachment add/remove — is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space), each showing a visible focus indicator when focused."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "save_modal_focus_trap_and_return"
+description = "The Save modal traps focus while open, closes on Escape, and returns focus to the Save control; the Insert Variable popover also closes on Escape and returns focus to its trigger."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "toolbar_and_badge_icons_named"
+description = "Meaningful toolbar, badge, chip, and history icons expose descriptive accessible names or alt text so assistive technology can identify them."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "run_status_announced_via_live_region"
+description = "Run status changes (streaming started, completed, stopped) are announced through a polite live region, and validation messages on Insert Variable and Save forms are programmatically associated with their fields."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
 name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+description = "The Insert Variable name field and the Save modal title and technique fields use explicit label elements associated with their controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+name = "reasoning_disclosure_exposes_expanded_state"
+description = "The reasoning disclosure is keyboard-operable and exposes its expanded or collapsed state to assistive technology (for example aria-expanded on the header control)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "workbench_landmarks_present"
+description = "The app exposes semantic landmarks (for example main for the editor/response stack and complementary or aside for the variable binding panel, plus nav where chrome switches workbench/library) so assistive technology can navigate the tool."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+name = "workbench_contrast_sufficient"
+description = "Toolbar labels, panel titles, binding-row text, Unbound indicators, and primary controls meet sufficient contrast against their surfaces."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "semantic_roles_on_interactive_chrome"
+description = "Toolbar actions, suggestion chips, history rows, variant controls, and library rows use button/role semantics (or native interactive elements) rather than unlabeled clickable divs."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion set, response-panel open, streaming cursor blink, reasoning height/chevron motion, variant cross-fade, attachment badge enter/exit, library row enter/exit, and toast transitions apply instantly (or are removed), and the streaming cursor does not blink, while every flow remains completable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
-name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+name = "workbench_controls_unreachable_by_keyboard"
+description = "A toolbar button, suggestion chip, binding input, history row, variant control, library row, or attachment control cannot be reached or activated via keyboard alone."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n2"
-name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+name = "focus_indicators_missing_on_workbench"
+description = "Focused toolbar buttons, chips, binding inputs, history rows, variant controls, or library rows show no visible focus indicator or the indicator is obscured."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,55 +149,55 @@ weight = 1.0
 [[criterion]]
 id = "1.n3"
 name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+description = "Suggestion chips, history rows, variant controls, or library rows use non-semantic tags without ARIA roles or accessible names."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+name = "run_status_or_unbound_color_only"
+description = "Run status (waiting/streaming/complete/stopped) or Unbound variable state is conveyed by color alone with no text, label, or other non-color cue."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "save_modal_no_focus_trap"
+description = "With the Save modal open, Tab moves focus to controls behind the overlay without trapping focus in the dialog."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+name = "unreadable_contrast_on_workbench"
+description = "Toolbar labels, panel titles, Unbound indicators, or primary button labels are unreadable due to poor contrast against their background."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+name = "validation_or_status_visual_only"
+description = "Insert Variable / Save validation feedback or run-status changes are visual only with no programmatic association or live-region announcement for assistive technology."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+name = "meaningful_icons_missing_names"
+description = "Meaningful toolbar, badge, or history icons that convey actions are missing alt text or an accessible name."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+name = "heading_order_skipped"
+description = "Workbench or library panel headings skip levels (for example jumping H1 to H3) or have no coherent order."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n10"
 name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+description = "With prefers-reduced-motion set, the streaming cursor still blinks or response-panel / reasoning / variant / toast / badge transitions still animate fully."
 type = "binary"
 negate = true
 weight = 1.0

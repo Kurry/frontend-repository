@@ -1,0 +1,141 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "console_layout_anatomy"
+description = "The console renders a fixed top bar carrying the app name, the mode indicator, the credential status chips, and the Connections control, a left navigation rail with entries for Candidates, Triage, Runs, and Library, and a main area showing the active view"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "mode_indicator_visually_unmistakable"
+description = "The mode indicator is a filled chip that is always visible in the top bar, rendered in a neutral treatment reading Demo data and switching to a distinct accent treatment reading Live when a credential connects"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "stage_status_treatments_distinct"
+description = "Pending, running, retrying, failed, and complete stage statuses each carry a visually distinct color or icon treatment, and the treatment for each status is consistent between the stage list and the event timeline"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.4"
+name = "reject_reason_badges_consistent"
+description = "Reject-reason badges (too-few-files, too-many-files, docs-only, no-linked-issue) share one badge treatment with a distinct hue per reason, identical wherever they appear: triage cards, the rejected-column filter, and the stats breakdown"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "monospace_package_parts_labeled"
+description = "The instruction document and the TOML-shaped task config render in monospaced blocks, each with a visible part label and its copy and download controls adjacent to the block"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "verdict_treatments_semantic"
+description = "The substantial verdict renders with a success treatment and the trivial verdict with a warning treatment, consistently in the Evaluate stage output and in the batch run report buckets"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "typography_and_spacing_rhythm"
+description = "Typography shows a clear hierarchy — app title larger than view headings, which are larger than card, table, and label text — and spacing between the rail, board columns, stage list, and package viewer panels is visually regular with no crowded or orphaned regions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "control_states_and_icon_set"
+description = "Buttons, inputs, selects, toggles, and cards show distinct default, hover, focus (visible ring), disabled, and error treatments, and one consistent icon set is used across the navigation rail, credential rows, stage statuses, triage actions, and package controls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n1"
+name = "desktop_layout_overlaps_or_clips"
+description = "At 1440 pixel width, any text or control in the top bar, triage columns, stage list, or package viewer overlaps another element or is clipped by its container"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n2"
+name = "status_or_badge_colors_disagree"
+description = "The color or icon treatment for the same stage status or reject reason differs between two surfaces — for example the failed status looks different in the stage list versus the timeline, or a reject reason's badge hue changes between the card and the stats breakdown"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

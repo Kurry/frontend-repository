@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -141,6 +141,35 @@ name = "reduced_motion_instant_but_usable"
 description = "With prefers-reduced-motion set, list and feedback animations are removed and state changes apply instantly, while every feature (upload, sliders, presets, tabs, Collaboration scenario) remains usable."
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "copied_style_json_label_swap"
+description = "Clicking Copy style JSON through the real control briefly swaps its label to Copied style! then reverts, matching the Copy image confirmation pattern."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.13"
+name = "before_after_eased_swap"
+description = "Activating the Before/After toggle through the real control crossfades or swaps the canvas composition over a short eased transition rather than a hard cut; with prefers-reduced-motion set the swap is instant."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "snapshot_list_enter_exit_animation"
+description = "Saving a snapshot through the real Save snapshot control animates the new entry into the Snapshots list, and confirming a delete animates the removed entry out rather than snapping."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.n12"
+name = "before_after_hard_cuts_always"
+description = "The Before/After toggle always hard-cuts with no eased transition even when prefers-reduced-motion is unset."
+type = "binary"
+negate = true
+weight = 0.5
 
 [[criterion]]
 id = "4.catchall"

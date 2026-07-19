@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.1"
 name = "console_clean_during_flows"
-description = "No console errors or unhandled promise rejections appear while the homepage and its interaction workflows (preloader dismiss, menu open and close, hovers, scroll-linked sections, hover-to-play video, marquees, newsletter submit) are exercised"
+description = "No console errors or unhandled promise rejections appear while the homepage and its interaction workflows (preloader dismiss, menu open/close, race select, shortlist, press kit, command palette, undo/redo, hovers, scroll-linked sections, hover-to-play video, marquees, newsletter submit) are exercised"
 type = "binary"
 weight = 1.0
 
@@ -150,7 +150,7 @@ weight = 1.0
 [[criterion]]
 id = "2.13"
 name = "keyboard_operable_with_focus_ring"
-description = "Every interactive control (Store button, hamburger, menu items, socials, legal links, the email field, Subscribe) is reachable and operable with the keyboard alone and shows a visible focus indicator"
+description = "Every interactive control (Store button, PRESS KIT, hamburger, menu items, socials, legal links, shortlist controls, race rows, Undo, Redo, the email field, Subscribe) is reachable and operable with the keyboard alone and shows a visible focus indicator"
 type = "binary"
 weight = 1.0
 
@@ -201,7 +201,7 @@ weight = 0.5
 [[criterion]]
 id = "2.20"
 name = "hydration_clean_console"
-description = "The console is hydration-clean: no hydration mismatch errors or warnings appear on first load or after exercising the interactive islands (menu, Store button, video card, newsletter form), and statically rendered content is not visibly replaced by different client content after hydration"
+description = "The console is hydration-clean: no hydration mismatch errors or warnings appear on first load or after exercising the interactive islands (menu, Store, PRESS KIT, race calendar, press kit, palette, video card, newsletter form), and statically rendered content is not visibly replaced by different client content after hydration"
 type = "binary"
 weight = 1.0
 
@@ -233,6 +233,37 @@ id = "2.24"
 name = "required_authored_asset_files_load"
 description = "Browser network evidence shows successful same-origin loads with no 404s or decode errors for the required authored asset families: editorial raster images and SVG marks, a VP9 WebM with changing frames, an original GLB with material textures and HDR environment, and an original Rive file with its runtime WASM"
 type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.25"
+name = "shared_state_coherence_press_kit"
+description = "Shared-state coherence: selecting a race or shortlisting an asset updates the Selected races / shortlist count and the press-kit preview content immediately without reload; Undo restores both chrome counts and kit preview together."
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "2.26"
+name = "api_shaped_schemas_drive_forms"
+description = "Newsletter Subscribe, race status edit, and press-kit Import validate through client-side schemas: invalid email/status/import JSON shows named field/import errors before commit; a valid Subscribe or status edit commits a record matching the declared field contract into the same store the press-kit JSON/ICS previews read."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n26"
+name = "export_import_schema_divergence"
+description = "A press-kit JSON export that the UI just produced fails the same Import validation path, or Import accepts payloads whose race dates/status enums the calendar UI itself rejects."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n25"
+name = "press_kit_desyncs_from_selections"
+description = "Race selections or shortlist membership shown in the chrome disagree with the press-kit preview until a full page reload."
+type = "binary"
+negate = true
 weight = 1.0
 
 [[criterion]]

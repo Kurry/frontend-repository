@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.1"
 name = "console_composition_regions"
-description = "At 1440px width the queue view composes as a filter toolbar above a full-width data table, and the detail view places the gate banner across the top with the findings list and the failure-profile panel as adjoining regions separated by hairline borders or elevation, with spacing reading as a consistent rhythm and no crowded or orphaned areas"
+description = "At 1440px width the queue view composes as a filter toolbar above a full-width data table with bulk selection chrome when rows are selected, the detail view places the gate banner across the top with the findings list and the failure-profile panel as adjoining regions, and Export is a distinct view with a monospaced preview; regions separate with hairline borders or elevation, with spacing reading as a consistent rhythm and no crowded or orphaned areas"
 type = "binary"
 weight = 1.0
 
@@ -98,14 +98,14 @@ weight = 1.0
 [[criterion]]
 id = "2.6"
 name = "typography_and_component_states"
-description = "Submission titles are visibly larger than section headings, which are larger than metadata and body text; numeric columns and percentages align consistently; and buttons, selects, inputs, and toggles show distinct default, hover, focus (visible ring), disabled, and error treatments, with the disabled Approve control visibly muted beside its explanation"
+description = "Submission titles are visibly larger than section headings, which are larger than metadata and body text; numeric columns and percentages align consistently; the export preview uses a monospaced face; buttons, selects, inputs, and toggles show distinct default, hover, focus (visible ring), disabled, and error treatments, with the disabled Approve control visibly muted beside its explanation; selected queue rows have a clear selected treatment distinct from hover"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.7"
 name = "responsive_reflow_clean"
-description = "At 768px width the queue table condenses (stacked or scrolling within its own container) and the detail view stacks the findings list above the failure-profile panel; at 375px width no content clips or overflows the viewport, no page-level horizontal scrolling appears, and the contributor drawer becomes full-width"
+description = "At 768px width the queue table condenses (stacked or scrolling within its own container) and the detail view stacks the findings list above the failure-profile panel; at 375px width no content clips or overflows the viewport, no page-level horizontal scrolling appears, the contributor drawer becomes full-width, and the bulk bar and export preview remain usable"
 type = "binary"
 weight = 1.0
 

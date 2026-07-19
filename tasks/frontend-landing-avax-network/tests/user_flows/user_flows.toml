@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,152 +62,155 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "For fidelity tasks, evaluate the reference's flows. Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "newsletter_next_back_advances_step_surfaces"
+description = "Starting on newsletter step 1 of 5: clicking Next advances exactly one step and both the step counter and progress bar reflect the new step; clicking Back retreats one step with the same two surfaces updating."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "newsletter_submit_shows_thank_you"
+description = "On newsletter step 5, submitting a valid subscribe request body shows Thank you for subscribing after a brief delay (~500ms) and appends one newsletter lead (Session leads total +1); an invalid step-5 submit shows named field errors, no thank-you, and appends no lead."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "newsletter_step_survives_scroll"
+description = "Starting on newsletter step 1: click Next twice to reach step 3, then scroll to the top of the page and back down; the form remains on step 3 with matching step counter and progress bar (step state does not reset from mere scrolling)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "contact_valid_submit_success_and_clear"
+description = "Filling a valid contact lead request body (including otherDetail when project_type is Other) and submitting shows Success! We'll be in touch. after a brief delay (~600ms), clears every field, and appends one contact lead (Session leads total +1)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "contact_otherDetail_conditional_round_trip"
+description = "Choosing project_type Other reveals the conditional otherDetail field; typing a value then switching away from Other hides the field and discards its value (re-selecting Other shows it empty)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "theme_toggle_recolors_and_persists_while_scrolling"
+description = "Toggling the theme adds or removes the dark state on the document root, recolors every surface/text/accent across sections in the same pass, swaps sun/moon icons, and the choice persists while scrolling and interacting; toggling back restores the exact prior palette."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "news_carousel_paging_and_bounds"
+description = "Paging the news carousel forward updates the visible cards and the arrows' enabled state at the track ends; at the first slide previous is disabled and at the last slide next is disabled."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "news_carousel_resets_on_scroll_above"
+description = "After paging the news carousel away from the first slide, scrolling above the carousel and back resets it to the first slide with the previous arrow disabled again."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "mobile_drawer_open_locks_scroll"
+description = "Below 1025px: tapping the hamburger opens the overlay drawer with four accordions, locks background scrolling, and sets the control's aria-expanded to true."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "mobile_drawer_close_restores_position"
+description = "Below 1025px: closing the open drawer restores background scrolling and the collapsed aria-expanded state, and the page scroll position is unchanged."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "newsletter_or_contact_primary_flow_unavailable"
+description = "The newsletter cannot advance through its five steps to Thank you for subscribing, or the contact form cannot reach Success! We'll be in touch. from the visible UI controls."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "theme_or_carousel_state_desyncs"
+description = "After a theme toggle or carousel page, some sections keep the prior palette or the carousel arrows disagree with the visible slide (state not synced across surfaces)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "drawer_blocks_with_no_exit"
+description = "Below 1025px the mobile drawer overlay opens but cannot be closed, leaving navigation blocked with no exit path."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "failed_form_flow_lacks_feedback"
+description = "Submitting the contact form with required fields empty produces no inline field-naming errors and no visible failure feedback."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "flow_dead_end_requires_reload"
+description = "After opening the drawer, advancing newsletter steps, or submitting a form, recovering normal homepage interaction requires a full page reload."
 type = "binary"
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "land_scroll_submit_confirm"
+description = "On a fresh load: land on the hero, scroll through mid-page sections to Newsletter or Contact, complete a valid submit, and see the matching confirmation (Thank you for subscribing or Success! We'll be in touch.) without leaving /."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "session_lead_export_download_and_copy"
+description = "After at least one successful submit, the Session leads panel shows the new row; Download JSON downloads astra-session-leads.json including that payload; Copy JSON copies the same JSON and shows Copied confirmation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "second_submit_export_contains_both"
+description = "After two successful submits with different emails (or names), a subsequent export's leads array contains both distinct payloads and counts.total equals 2."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "undo_last_lead_then_export_omits_it"
+description = "With two leads present, Undo last lead removes the newest row and decrements the total by one; a subsequent export's leads array omits the undone entry."
+type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "export_flow_unavailable_after_submit"
+description = "After a successful newsletter or contact submit, Download JSON / Copy JSON controls are absent from the Session leads panel, or activating them yields an empty download/clipboard payload that omits the just-submitted lead."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
-id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+id = "6.15"
+name = "contact_otherDetail_invalid_then_valid"
+description = "With project_type Other and empty otherDetail, submit shows a named otherDetail error and no success; then filling otherDetail (at least 2 characters) and the remaining valid lead fields and submitting shows Success! We'll be in touch., clears the form, and appends exactly one contact lead."
 type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]

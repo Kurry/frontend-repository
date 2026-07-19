@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "1.2"
 name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+description = "Quick Switcher, Shortcuts, delete confirm, Export as .txt, Export Workspace, and Import Workspace trap focus and return it to the originating control on close."
 type = "binary"
 weight = 1.0
 
@@ -84,7 +84,7 @@ weight = 1.0
 [[criterion]]
 id = "1.4"
 name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+description = "Export as .txt filename errors, Import Workspace validation, and toasts are conveyed both visually and via polite ARIA live regions."
 type = "binary"
 weight = 1.0
 

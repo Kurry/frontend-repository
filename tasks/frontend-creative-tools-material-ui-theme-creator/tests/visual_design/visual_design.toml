@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,58 +62,58 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
-description = "Dark studio shell with Preview/Editor and Saved Themes density remains tool-like"
+name = "coherent_dark_studio_palette"
+description = "The UI uses a coherent dark studio palette — near-black surfaces, light shell text, and indigo/Material primary accent — consistently across header, tabs, tools, and Saved Themes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
-description = "Empty Saved Themes state is visually present when the collection is empty"
+name = "roboto_hierarchy_and_material_icons"
+description = "Typography uses Roboto (or the bundled equivalent) with clear hierarchical size differences for the Material-UI Theme Creator brand, tab labels, tool headings, and body; Material iconography is used consistently."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
-description = "Presents only a static marketing page without Monaco or saved themes management"
+name = "marketing_landing_instead_of_studio"
+description = "The first viewport reads as a marketing landing or sparse card stack rather than a dense Material theme studio with header brand above Preview/Components/Saved Themes."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "3.4"
 name = "dark_shell_brand_and_typography"
-description = "The shell renders near-black surfaces with light text and an indigo/Material primary accent, Roboto as the UI typeface, Material iconography, and a header brand lockup ('Material-UI Theme Creator' with version affordance) sitting above the main tabs"
+description = "Header brand lockup Material-UI Theme Creator sits above the main tabs with version affordance @material-ui/core@^4.11.0 visible in the dark shell."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
 name = "preview_workspace_split_layout"
-description = "At desktop width, the Preview tab shows device toggles plus the framed sample site on one side and the code editor with stacked tool panels on the other, in a full-viewport tool-dense layout rather than a marketing-page composition"
+description = "On desktop, Preview shows device toggles plus framed sample site on one side and the code editor plus stacked tool panels on the other — a full-viewport tool density layout."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.6"
 name = "distinct_component_state_treatments"
-description = "Buttons, inputs, and accordion rows show visibly distinct default, hover, focus (visible ring), and disabled treatments, each verified via computed styles while the state is active"
+description = "Buttons, inputs, and accordion rows show distinct default, hover, focus (visible ring), and disabled treatments."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.7"
 name = "preview_workspace_stacks_at_1024"
-description = "At viewport widths of 1024px and below, the Preview workspace stacks vertically with the device preview above the editor and tool panels, and every control remains reachable"
+description = "At widths of 1024 pixels and below, the Preview workspace stacks vertically with device preview above editor and tool panels."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.8"
 name = "mobile_375_clipping_or_overflow"
-description = "At 375px viewport width, content clips, overlaps, or overflows the viewport, or horizontal scrolling appears"
+description = "At 375 pixel width, content clips or overflows the viewport, or page-level horizontal scrolling appears."
 type = "binary"
 negate = true
 weight = 1.0
@@ -121,28 +121,43 @@ weight = 1.0
 [[criterion]]
 id = "3.9"
 name = "consistent_label_capitalization"
-description = "Headings, buttons, and tab labels use one consistent capitalization convention throughout the app"
+description = "Headings, buttons, and tab labels (Preview, Components, Saved Themes, Palette rows, New Theme, Theme Files) use one consistent capitalization convention."
 type = "binary"
-weight = 0.5
+weight = 1.0
 
 [[criterion]]
 id = "3.10"
 name = "status_and_validation_copy_quality"
-description = "The save status text reads 'All changes saved' when the source matches the active theme, and validation messages name the field and the fix rather than a bare rejection"
+description = "Save status reads All changes saved when appropriate; validation messages name the field and the fix; Theme Files panes are labeled JSON and CSS."
 type = "binary"
-weight = 0.5
+weight = 1.0
 
 [[criterion]]
 id = "3.11"
 name = "empty_state_copy_explains_next_step"
-description = "Empty states (Saved Themes emptied, no-match search) explain what belongs in the region and how to add or restore it"
+description = "The Saved Themes empty state explains what belongs in the region and how to add a theme."
 type = "binary"
-weight = 0.5
+weight = 1.0
 
 [[criterion]]
 id = "3.12"
 name = "placeholder_text_visible_in_ui"
-description = "Lorem-ipsum, 'TODO', template-variable, or other placeholder text is visible somewhere in the shipped UI"
+description = "Placeholder or lorem-ipsum text is visible anywhere in the shipped UI."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.13"
+name = "contrast_matrix_and_export_visual_anatomy"
+description = "Contrast matrix rows show ratio numerals plus AA / AAA / Fail badges with distinct treatments; Theme Files shows two labeled monospace artifact panes with Copy and Download; Before/After and Color blindness sit as compact preview-stage chrome."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.n1"
+name = "contrast_status_color_only"
+description = "Contrast matrix AA / AAA / Fail status is conveyed by color alone with no readable text badge or label."
 type = "binary"
 negate = true
 weight = 1.0
@@ -150,7 +165,7 @@ weight = 1.0
 [[criterion]]
 id = "3.catchall"
 name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered - even partially - by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

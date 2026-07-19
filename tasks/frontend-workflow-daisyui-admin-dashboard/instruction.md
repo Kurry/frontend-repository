@@ -132,6 +132,7 @@ Modules:
 - browse-query-v1
 - entity-collection-v1
 - form-workflow-v1
+- artifact-transfer-v1
 
 Module specs:
 <module_spec id="browse-query-v1">
@@ -198,21 +199,47 @@ Module specs:
 }
 </module_spec>
 
+<module_spec id="artifact-transfer-v1">
+{
+  "id": "artifact-transfer-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Artifact transfer",
+  "purpose": "Import, export, copy, print, and conversion workflows.",
+  "permitted_operations": ["import", "export", "copy", "print_preview", "convert"],
+  "binding_keys": {
+    "required_any_of": [["artifact_operations"]],
+    "optional": ["import_modes", "export_formats", "conversion_modes", "visible_postconditions"]
+  },
+  "restrictions": [
+    "No raw files, filesystem paths, blobs, base64, or artifact contents in WebMCP arguments or results.",
+    "File picker interaction, clipboard contents, and downloaded artifacts remain Playwright responsibilities."
+  ],
+  "tool_name_prefix": "artifact"
+}
+</module_spec>
+
 Bindings:
 - Browsable entity: users
-- Destinations: operations-overview; all-users; add-user; roles; permissions; user-logs; user-stats; user-payments; user-products
+- Destinations: operations-overview; all-users; add-user; roles; permissions; user-logs; user-stats; user-payments; user-products; archive-vault; export-drawer
 - Filters: role; status
 - Sorts: last-active; newest; highest-spend; name-az
 - Themes: light; dark
 - Entity: user
-- Entity operations: create; select; update; delete
+- Entity operations: create; select; update; delete; toggle
 - Entity fields: name; email; role; status; payments; products; last-active
-- Form fields: first-name; last-name; email; phone; role; status
+- Form fields: first-name; last-name; email; phone; role; status; temporary-password; account-segment; notes
 - Form operations: validate; submit; cancel
+- Value bounds: first-name 1-40; last-name 1-40; temporary-password min-8; phone 7-15-digits; notes max-280; role Admin|Manager|Member|Viewer; status Active|Invited|Suspended; account-segment Internal|Partner|External
+- Artifact operations: export; import; copy
+- Export formats: json; csv
+- Import modes: directory-json; users-csv
 
 Mechanics exclusions:
 - Chart hover/tooltip mechanics stay Playwright-only
 - Drawer overlay slide on small viewports stays Playwright-observed
+- Command palette open/close scale animation stays Playwright-observed
+- Raw file paths/blobs forbidden in WebMCP args
+- Clipboard and downloaded artifact contents remain Playwright responsibilities
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

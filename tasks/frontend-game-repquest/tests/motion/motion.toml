@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -61,97 +61,90 @@ allowed_tools = [
 aggregation = "weighted_mean"
 
 [[criterion]]
-id = "4.1"
+id = "8.1"
 name = "buttons_hover_state"
-description = "All interactive buttons (Log Reps, Gear Shop Equip/Unlock, Reset Quest, History Delete, Settings Save/toggle, Game Mode, Start/Pause/Resume/End run, Undo/Redo/Apply scenario change) show a visible hover state, verified with a real pointer hover while inspecting computed styles"
+description = "Log Reps, Gear Equip/Unlock, Reset Quest, History Delete, Settings Save/toggles, Game Mode, Start/Pause/Resume/End run, Undo/Redo/Apply scenario change, Export/Import, Save Progress, Resume Saved Run, and Difficulty controls show a visible hover state on the real UI controls"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
-id = "4.2"
+id = "8.2"
 name = "keyboard_focus_ring_visible"
-description = "Reaching interactive controls with keyboard Tab shows a visible focus ring on every control across all four tabs"
+description = "Those same controls show a visible focus ring when reached by keyboard Tab"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
-id = "4.3"
+id = "8.3"
 name = "character_glides_on_log"
-description = "The character sprite advances smoothly (glides, not teleports) along the quest map canvas path when a new set is logged through the real Log Reps form"
+description = "When a new set is logged via the real Log Reps control, the character sprite advances smoothly (glides, not teleports) along the quest map canvas path"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
-id = "4.4"
+id = "8.4"
 name = "transient_notification_slide_and_dismiss"
-description = "A transient notification banner slides or fades in when a zone unlocks, a boss is defeated, gear is bought, or the quest is reset, and dismisses itself shortly after without user action"
+description = "Transient notification banners for zone unlock, boss defeat, gear bought, quest reset, export/import feedback, Victory, or Defeat slide or fade in and dismiss themselves shortly after"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
-id = "4.5"
+id = "8.5"
 name = "history_delete_reveals_on_hover"
-description = "History Delete controls reveal on row hover or keyboard focus at desktop widths"
-type = "binary"
-weight = 0.5
-optional = true
-
-[[criterion]]
-id = "4.6"
-name = "control_missing_hover_and_focus"
-description = "One or more of the required interactive controls (Log Reps, Gear Shop, Reset Quest, History Delete, Undo/Redo) has no visible hover state and no visible focus ring when reached by keyboard"
+description = "History Delete controls reveal on row hover or focus on wider viewports"
 type = "binary"
 weight = 1.0
-negate = true
-
 [[criterion]]
-id = "4.7"
-name = "character_snaps_instantly"
-description = "The character position snaps instantly along the quest map with no glide or transition when reps are logged through the real Log Reps form, despite the motion requirement"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.8"
+id = "8.6"
 name = "boss_defeat_confetti_celebration"
-description = "Defeating a boss by submitting the qualifying set through the real Log Reps form triggers a brief one-time confetti-style particle celebration over the quest map"
+description = "Defeating a boss or achieving Challenge Victory via the real qualifying action triggers a brief one-time confetti-style particle celebration that does not loop ambiently"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
-id = "4.9"
+id = "8.7"
 name = "history_entries_animate_in_out"
-description = "Adding a set animates the new entry into the top of the History list, and deleting an entry through its real Delete control animates it out rather than snapping"
+description = "Adding a set animates the new entry into the top of the History list, and deleting an entry animates it out rather than snapping"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
-id = "4.10"
+id = "8.8"
 name = "reminder_banner_attention_treatment"
-description = "While visible, the Daily Reminder banner uses a noticeable attention treatment such as a pulse"
-type = "binary"
-weight = 0.5
-
-[[criterion]]
-id = "4.11"
-name = "confetti_loops_or_fires_for_ordinary_sets"
-description = "The boss-defeat particle celebration loops ambiently, replays on later visits without a new boss defeat, or fires for ordinary non-qualifying sets"
+description = "The Daily Reminder banner uses a noticeable attention treatment such as a pulse while visible"
 type = "binary"
 weight = 1.0
-negate = true
-
 [[criterion]]
-id = "4.12"
+id = "8.9"
 name = "zone_palette_swaps_on_reach"
-description = "Logging the set that carries lifetime reps across a zone boundary through the real Log Reps form swaps the quest map canvas background palette to the new zone's colors as soon as the zone is reached, without requiring a reload or tab switch to see the change"
+description = "Zone transitions on the quest map canvas swap the background palette as soon as a new zone is reached via real logging"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
-id = "4.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable motion or microinteraction defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction, observed frames) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+id = "8.10"
+name = "victory_defeat_panel_animates_in"
+description = "Victory and Defeat result panels animate in (fade or slide) when the run resolves rather than appearing with no transition"
 type = "binary"
 weight = 1.0
+[[criterion]]
+id = "8.n1"
+name = "control_missing_hover_and_focus"
+description = "A primary control lacks both a visible hover state and a visible keyboard focus ring"
+type = "binary"
 negate = true
+weight = 1.0
+[[criterion]]
+id = "8.n2"
+name = "character_snaps_instantly"
+description = "On Log Reps via the real control, the character teleports to the new path position with no glide"
+type = "binary"
+negate = true
+weight = 1.0
+[[criterion]]
+id = "8.n3"
+name = "confetti_loops_or_fires_for_ordinary_sets"
+description = "Confetti loops ambiently or fires for ordinary non-boss sets and non-Victory actions"
+type = "binary"
+negate = true
+weight = 1.0
+[[criterion]]
+id = "motion.catchall"
+name = "motion_catchall"
+description = "A significant motion defect is present that is NOT covered by any other criterion in this file. If present, name it and cite concrete evidence. If already covered, answer no here."
+type = "binary"
+negate = true
+weight = 1.0

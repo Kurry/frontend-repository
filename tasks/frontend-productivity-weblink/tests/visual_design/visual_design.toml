@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -163,6 +163,14 @@ description = "The app fails this criterion if lorem ipsum or placeholder text (
 type = "binary"
 weight = 1.0
 negate = true
+
+
+[[criterion]]
+id = "2.15"
+name = "export_import_controls_in_chrome"
+description = "Export Session and Import Session controls are visible in the communication workspace chrome alongside the session, chat, and file-transfer panels rather than buried behind an unrelated route"
+type = "binary"
+weight = 0.5
 
 [[criterion]]
 id = "2.catchall"

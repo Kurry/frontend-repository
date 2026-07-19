@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -63,157 +63,71 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+name = "delightful_table_microinteractions"
+description = "Beyond the mandated equity transition and confetti, the table offers an extra delightful microinteraction during play (for example chip-fly into the pot or seat pulse on action) that feels intentional"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "richer_hand_review_motion"
+description = "Beyond the required history entrance, the app offers an advanced hand-review affordance such as expanding a history row to replay streets or highlight the winning cards"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+name = "guided_first_hand_coachmark"
+description = "A brief optional coachmark or tip helps a first-time player start the first hand without blocking play after dismiss"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+name = "equity_or_odds_graphic_extra"
+description = "Beyond the percentage readout, an optional equity graphic (bar, meter segments, or street markers) adds usability without replacing the numeric equity"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+name = "keyboard_betting_shortcuts"
+description = "Optional keyboard shortcuts for Fold/Check/Call/Raise speed up play beyond Tab-focus activation alone"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+name = "session_timeline_or_sparkline"
+description = "An optional session sparkline or win/loss timeline summarizes results beyond the numeric Session stats counters"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+name = "export_share_packaging_extra"
+description = "Beyond the mandated session JSON, an optional second portable view (for example a human-readable hand-history text tab) adds shareability"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+name = "difficulty_explainer"
+description = "An optional short explanation of what Easy/Standard/Hard changes about AI behavior appears near the difficulty control"
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
-type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+name = "fake_innovation_static_only"
+description = "The app presents static decorative flourishes that claim advanced play affordances (coachmarks, equity graphics, or shortcuts) while remaining non-interactive during real play"
 type = "binary"
+weight = 0.5
 negate = true
-weight = 1.0
 
 [[criterion]]
-id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "innovation.catchall"
+id = "11.catchall"
 name = "innovation_catchall"
-description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable innovation or polish enhancement beyond the specification that is NOT covered by any other criterion in this file. If present, name the enhancement and cite the concrete evidence. If nothing beyond the specification is present, answer no."
 type = "binary"
 weight = 1.0

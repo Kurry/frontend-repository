@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,21 +62,21 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
+name = "exploration_first_composition"
 description = "Timeline stage plus scrubber/library composition stays exploration-first, not a marketing card stack"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
+name = "empty_state_visually_present"
 description = "Empty list/filter state is visually present when no events match"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
+name = "brochure_layout_replaces_stage"
 description = "Replaces the timeline with a static brochure layout and no scrub/explore stage"
 type = "binary"
 weight = 1.0
@@ -84,7 +84,7 @@ negate = true
 
 [[criterion]]
 id = "3.4"
-name = "3_4"
+name = "era_bands_and_category_pins"
 description = "The canvas axis draws about seven labelled era bands and adaptive year ticks, and pins carry their category color"
 type = "binary"
 weight = 1.0
@@ -99,7 +99,7 @@ weight = 1.0
 [[criterion]]
 id = "3.6"
 name = "brand_header_and_document_title"
-description = "The brand header shows the product name MediaHistoryTimeline with 'History of Media and Communication' as the brand signal, the first viewport is the timeline tool itself, and the document title reflects MediaHistoryTimeline"
+description = "The brand header shows the product name MediaHistoryTimeline with History of Media and Communication as the brand signal, the first viewport is the timeline tool itself, and the document title reflects MediaHistoryTimeline"
 type = "binary"
 weight = 1.0
 
@@ -113,14 +113,14 @@ weight = 1.0
 [[criterion]]
 id = "3.8"
 name = "consistent_icon_set_across_chrome"
-description = "Icons across the chrome (mode switch, filters, about, form controls) come from one consistent icon set with a uniform stroke style — no mixed icon styles"
+description = "Icons across the chrome (mode switch, filters, about, undo/redo, export/import, form controls) come from one consistent icon set with a uniform stroke style — no mixed icon styles"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.9"
 name = "distinct_component_state_treatments"
-description = "Buttons, inputs, and scrubber thumbs show distinct default, hover, focus, and disabled treatments (verified via computed styles while in each state), and form fields show a distinct error treatment"
+description = "Buttons, inputs, and scrubber thumbs show distinct default, hover, focus, and disabled treatments (verified via computed styles while in each state), form fields show a distinct error treatment, and Undo/Redo show disabled treatment when stacks are empty"
 type = "binary"
 weight = 1.0
 
@@ -134,7 +134,7 @@ weight = 1.0
 [[criterion]]
 id = "3.11"
 name = "narrow_width_chrome_reflow_usable"
-description = "At widths of 768px and below, the chrome reflows — the header controls stack or collapse and the Library/Filter surface uses the full width — while the stage, scrubber, filtering, and detail panel all remain usable"
+description = "At widths of 768px and below, the chrome reflows — the header controls stack or collapse and the Library/Filter surface uses the full width — while the stage, scrubber, filtering, detail panel, and export drawer all remain usable"
 type = "binary"
 weight = 1.0
 
@@ -156,27 +156,41 @@ weight = 0.5
 [[criterion]]
 id = "3.14"
 name = "specific_verb_action_labels"
-description = "Action labels are specific verbs such as 'Add event' and 'Reset filters' rather than generic labels like 'Submit' or 'OK' where a specific one is possible"
+description = "Action labels are specific verbs such as Add event, Reset filters, Export timeline, Import timeline, Undo, and Redo rather than generic labels like Submit or OK where a specific one is possible"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "3.15"
 name = "helpful_validation_and_empty_state_copy"
-description = "Validation messages name the field and the fix, and the empty state copy explains what matched nothing and how to recover"
+description = "Validation messages name the field and the fix, import errors name the import field, and the empty state copy explains what matched nothing and how to recover"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "3.16"
 name = "placeholder_or_lorem_text_shipped"
-description = "Lorem-ipsum, 'TODO', template-variable, or other placeholder text is visible somewhere in the shipped UI"
+description = "Lorem-ipsum, TODO, template-variable, or other placeholder text is visible somewhere in the shipped UI"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
-id = "3.catchall"
+id = "3.17"
+name = "export_drawer_tabs_and_preview"
+description = "The export drawer shows Timeline JSON and Events CSV tabs with a scrollable preview plus Download and Copy affordances"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.18"
+name = "category_tally_visually_distinct"
+description = "The category tally strip is visually distinct from Library rows and updates without a layout jump that obscures the list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "visual_design.catchall"
 name = "visual_design_catchall"
 description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"

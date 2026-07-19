@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -79,8 +79,8 @@ id = "3.3"
 name = "static_brochure_replaces_library"
 description = "Replaces the library with a static brochure and no interactive palette collection"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "3.4"
@@ -113,7 +113,7 @@ weight = 1.0
 [[criterion]]
 id = "3.8"
 name = "library_controls_row_layout"
-description = "The library controls row shows the view toggles with circular fill indicators and places the period filter on the right"
+description = "The library controls row shows the view toggles with circular fill indicators and places period filter, name sort, vision-simulation, and undo/redo as a coherent controls strip"
 type = "binary"
 weight = 0.5
 
@@ -133,66 +133,77 @@ weight = 0.5
 
 [[criterion]]
 id = "3.11"
-name = "mobile_viewport_overflow"
-description = "At 375 pixel width, content clips, overflows the viewport, or a horizontal scrollbar appears"
+name = "export_drawer_visual_anatomy"
+description = "Export drawer shows format tabs, a monospaced preview block, and Copy / Download actions as a focused drawer — not a bare unstyled textarea dumped on the page"
 type = "binary"
 weight = 1.0
-negate = true
 
 [[criterion]]
 id = "3.12"
-name = "nomenclature_responsive_reflow"
-description = "Below 768 pixels the nomenclature index reflows so each entry keeps its swatch chip, hex, historical name with note, and source legible without truncating mid-word, while at desktop widths the four-column index layout holds"
+name = "selection_tray_and_contrast_matrix_surfaces"
+description = "When multi-select is active, a compact selection tray appears for Batch favorite / Batch delete; Detail/Editor shows the contrast matrix beneath the swatch editor as a readable table/list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.13"
-name = "responsive_grids_and_controls"
-description = "Palette cards and swatch tiles reduce their column count at narrower widths so tiles stay legible, and the sticky header and library controls remain usable at every width"
+name = "hover_focus_states_editorial"
+description = "Visual focus and hover states on view toggles, swatches, cards, and export controls align to the cream editorial visual language rather than generic browser defaults"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.14"
-name = "editor_panel_fits_mobile"
-description = "The Detail/Editor panel fits within a 375 pixel wide viewport with all fields and controls reachable without horizontal scrolling"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "3.15"
-name = "editorial_prose_quality"
-description = "The editorial intro (eyebrow, headline, two-column note) reads as finished prose explaining the historical-name pairing, and historical color names with their short notes read as plausible art-historical references, each note a complete phrase"
-type = "binary"
-weight = 0.5
-
-[[criterion]]
-id = "3.16"
-name = "placeholder_text_shipped"
-description = "Placeholder or filler text (lorem ipsum, 'TODO', template variable names, fragment notes) is visible somewhere in the shipped UI"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.17"
-name = "consistent_copy_conventions"
-description = "Headings, buttons, and labels follow one consistent capitalization convention, and validation messages name the field and the fix"
-type = "binary"
-weight = 0.5
-
-[[criterion]]
-id = "3.18"
 name = "document_title_and_brand_lockup"
 description = "The document title includes 'Palette Library' and the on-page brand reads as Object and Archive / o+a"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
+id = "3.n1"
+name = "random_inconsistent_palette"
+description = "Random or inconsistent color choices unrelated to the cream / near-black editorial palette appear across chrome and library surfaces"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n2"
+name = "visual_clutter_no_spacing"
+description = "Visual clutter with no spacing/padding discipline — controls, trays, and rows collide or crowd without a consistent scale"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n3"
+name = "mixed_inconsistent_fonts"
+description = "Mixed, inconsistent fonts or weights break the specified expressive / mono / italic pairing"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n4"
+name = "overlapping_or_cut_off_text"
+description = "Overlapping or cut-off text/images appear in nomenclature rows, palette cards, export preview, or the contrast matrix"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n5"
+name = "buttons_look_like_plain_text"
+description = "Primary actions (create, export, batch, undo) look like plain text or passive labels with no interactive affordance"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
 id = "3.catchall"
 name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design, layout, responsiveness, or rendered copy that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, viewport, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, viewport, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
+

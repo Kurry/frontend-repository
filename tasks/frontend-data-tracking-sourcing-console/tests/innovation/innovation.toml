@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -63,150 +63,79 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+name = "quota_pressure_sparklines"
+description = "Beyond the required fill bars, quota cells or a summary strip show a compact trend or pressure cue that helps operators spot underfilled bands at a glance"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "cluster_map_or_graph"
+description = "Beyond the inline cluster-guard message, the app offers a cluster map or grouping visualization that shows which repositories share a cluster id"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+name = "guided_sourcing_coachmarks"
+description = "A short guided coachmark or checklist walkthrough highlights Score → Select → Pin → Queue → Export for first-time operators without blocking power use"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+name = "queue_diff_preview"
+description = "Before import apply or after a bulk action, a diff preview names which statuses and queue positions will change"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+name = "keyboard_chord_cheatsheet"
+description = "A discoverable keyboard cheatsheet documents Control-K/Command-K, Undo/Redo chords, and queue move shortcuts"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+name = "export_checksum_or_fingerprint"
+description = "Exported Queue JSON includes a visible integrity fingerprint or content hash of the pack that changes when session mutations change the export"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+name = "saved_filter_presets"
+description = "Operators can save and reapply named filter-plus-search presets beyond the one-off clear control"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+name = "org_diversity_dashboard"
+description = "A compact org diversity readout shows how close each org is to the cap of 3 before a Select is attempted"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+name = "timeline_filter_chips"
+description = "The timeline view offers filter chips by transition type (score, select, reject, pin, queue, import) beyond the plain newest-first list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+name = "compare_two_exports"
+description = "A lightweight compare mode highlights differences between two exported Queue JSON snapshots from the same session"
 type = "binary"
 weight = 1.0
+
 
 [[criterion]]
 id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
+name = "gimmick_breaks_sourcing_flows"
+description = "An optional flourish (coachmark, overlay, or extra viz) intercepts Score, Select, Pin, Queue, Export, or Import so the primary sourcing flow cannot complete without dismissing a blocking layer that has no skip path."
 type = "binary"
 negate = true
 weight = 1.0
@@ -214,6 +143,6 @@ weight = 1.0
 [[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
-description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app includes an additional browser-observable delight, power-user, or operator-efficiency enhancement in the sourcing console that is NOT covered by any other criterion in this file and goes beyond the written specification. If present, name the enhancement and cite the concrete evidence. If nothing beyond the spec is present, answer no."
 type = "binary"
 weight = 1.0

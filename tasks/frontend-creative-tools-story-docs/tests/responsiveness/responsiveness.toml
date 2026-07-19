@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,94 +62,94 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "7.1"
-name = "layout_adapts_desktop_to_mobile"
-description = "Layout adapts gracefully from 1440px desktop to 375px mobile."
+name = "layout_adapts_1440_to_375"
+description = "Resizing from 1440px desktop to 375px mobile keeps a usable storyboard workspace: header, scene board, and view-mode toggles remain present and operable at both widths."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
-name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+name = "mobile_tap_targets_adequate"
+description = "At 375px width, Add Scene, Tile/List/Slide toggles, sidebar toggle, kebab triggers, and header tools present tap targets at least 44px in at least one dimension."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
-name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+name = "typography_readable_both_widths"
+description = "Header titles (Demo Projects, 1. Getting Started), Welcome to Docs!, and scene titles/descriptions remain legible at both 1440px and 375px — type scales or reflows without becoming unreadably small on mobile."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
-name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+name = "no_clip_or_overflow_at_375"
+description = "At 375px width, header, sidebar overlay, scene cards, and create form content never clips or overflows the viewport."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
-name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+name = "sidebar_collapses_at_1024"
+description = "At widths of 1024px and below the left storyboard sidebar collapses behind a toggle that opens it as an overlay drawer; at desktop widths the sidebar is open beside the scene grid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.6"
-name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+name = "scene_grid_steps_down_to_one_column"
+description = "The scene grid steps down from multiple columns at desktop widths to fewer columns at tablet widths and a single column at 375px width, with a logical stacking order."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.7"
-name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+name = "mobile_tap_operates_primary_controls"
+description = "At 375px, tap/click on Add Scene, view-mode toggles, and the sidebar toggle operates those controls (no pointer-only dead zones that ignore tap)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.8"
-name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+name = "no_horizontal_scroll_at_375"
+description = "At 375px width the page has no horizontal scrolling."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.9"
-name = "media_and_canvases_resize"
-description = "Images, grids, and canvases size responsively to fit the layout."
+name = "scene_images_and_grid_resize"
+description = "Scene card images and the scene grid size responsively to fit the layout at 1440px and 375px without overflowing the viewport."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.10"
-name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
+name = "header_and_mode_toggles_remain_reachable"
+description = "Header tools and Tile/List/Slide toggles remain reachable and usable at every width from 1440px to 375px."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.n1"
 name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+description = "Layout breaks or overflows at 1440px, 1024px, or 375px — header, sidebar, or scene grid collide or spill."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n2"
-name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+name = "mobile_controls_too_small"
+description = "At 375px, Add Scene, view-mode toggles, or sidebar toggle are too small or misaligned for reliable tapping."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n3"
-name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+name = "text_too_small_on_mobile"
+description = "At 375px, scene titles, Welcome to Docs!, or header labels are too small to read."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,55 +157,55 @@ weight = 1.0
 [[criterion]]
 id = "7.n4"
 name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+description = "At 375px, scene cards or header content is cropped, or unnecessary horizontal scrollbars appear."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n5"
-name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
+name = "sidebar_missing_or_unresponsive_narrow"
+description = "At ≤1024px the sidebar toggle is missing or the collapsed sidebar cannot be opened as an overlay."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n6"
-name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
+name = "fixed_chrome_obscures_board"
+description = "Fixed header or overlay chrome obscures scene cards or Add Scene so the board cannot be used."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n7"
-name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
+name = "overlap_at_narrow_width"
+description = "At 375px or 1024px, header tools, view-mode toggles, or scene cards overlap each other unusably."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n8"
-name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
+name = "primary_controls_ignore_tap_on_mobile"
+description = "At 375px, Add Scene or Tile/List/Slide toggles ignore tap/click input (press registers no mode change or create-form open)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n9"
-name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
+name = "scene_images_overflow_viewport"
+description = "Scene images use a static size that overflows the viewport at 375px."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n10"
-name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
+name = "header_or_mode_toggles_disappear"
+description = "Header tools or Tile/List/Slide toggles disappear at 375px or 1024px."
 type = "binary"
 negate = true
 weight = 1.0

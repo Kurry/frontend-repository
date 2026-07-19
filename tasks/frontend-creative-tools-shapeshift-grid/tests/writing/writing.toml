@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.5
@@ -63,64 +63,64 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "15.1"
-name = "headings_use_consistent_capitalization"
-description = "Where the app renders headings and section titles, they use consistent capitalization (one convention — title case or sentence case — throughout)."
+name = "toolbar_gallery_capitalization_consistent"
+description = "Where the app renders toolbar labels, gallery actions, and form labels, they use one consistent capitalization convention throughout."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.2"
 name = "actions_use_specific_labels"
-description = "Where the app renders button or action labels, they are specific verbs ('Add expense', 'Start session'), not generic ('Submit', 'OK') when a specific label is possible."
+description = "Where the app renders button or action labels, they use specific verbs appropriate to the studio (for example Save board, Clear, Grid On/Off) rather than generic Submit/OK alone when a specific label is possible."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.3"
-name = "errors_name_problem_and_fix"
-description = "Where the app renders error messages, they name the problem and the fix ('Amount must be a positive number'), not just a rejection ('Invalid')."
+name = "validation_names_field_and_fix"
+description = "Where the app renders validation messages for Save board, rename, or Import, they name the offending field-contract key and the fix (for example name, tag, or schemaVersion), not only a bare rejection like 'Invalid'."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.4"
-name = "empty_states_explain_next_step"
-description = "Where the app renders empty states, the copy explains what belongs there and how to add it."
+name = "empty_gallery_copy_explains_next_step"
+description = "Where the app renders an empty gallery state (after delete-all or a zero-match tag filter), the copy explains what belongs there and how to save a board or clear the filter."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.5"
-name = "body_copy_is_well_written"
-description = "Where the app renders body or marketing copy, rate how free it is of spelling and grammatical errors."
+name = "stage_and_toolbar_copy_polished"
+description = "Where the app renders the <SHAPESHIFT GRID TOOL> title, typewriter-style intro line, and toolbar chrome copy, rate how free it is of spelling and grammatical errors."
 type = "likert"
 points = 5
 weight = 0.5
 
 [[criterion]]
 id = "15.6"
-name = "terminology_is_consistent"
-description = "Where the app renders labels for the same concept in multiple places, terminology is consistent (not 'task' here and 'todo' there)."
+name = "board_terminology_consistent"
+description = "Where the app renders labels for the same concept in multiple places, terminology stays consistent (board / gallery / cell / brush) rather than mixing conflicting synonyms across Paint and Gallery."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.7"
-name = "numbers_dates_and_units_are_consistent"
-description = "Where the app renders numbers, dates, and units, formatting is consistent (same date format, same decimal precision, units labeled)."
+name = "export_footer_copy_consistent"
+description = "Where the app renders export footer captions (/MADE WITH SHAPESHIFT GRID TOOL and <SHAPESHIFTFESTIVAL.COM>), formatting and product naming stay consistent with the on-stage branding."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.8"
-name = "success_messages_are_specific"
-description = "Where the app renders confirmation and success messages, they state what happened ('Entry saved'), not vague affirmations."
+name = "save_feedback_is_specific"
+description = "Where the app renders confirmation or success messages after saving a board, they state what happened rather than a vague affirmation alone."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.n1"
-name = "placeholder_copy_is_visible"
+name = "placeholder_copy_visible"
 description = "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI."
 type = "binary"
 negate = true
@@ -129,23 +129,23 @@ weight = 0.5
 [[criterion]]
 id = "15.n2"
 name = "prominent_copy_has_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as headings, hero text, or primary buttons."
+description = "Spelling or grammatical errors appear in prominent copy such as <SHAPESHIFT GRID TOOL>, toolbar labels, or primary gallery actions."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n3"
-name = "concept_names_are_inconsistent"
-description = "The same concept is named inconsistently across surfaces."
+name = "inconsistent_board_terminology"
+description = "The same concept is named inconsistently across Paint and Gallery (for example mixing unrelated terms for board vs gallery card vs cell)."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n4"
-name = "copy_is_truncated_or_overflowing"
-description = "Truncated or overflowing text renders copy unreadable."
+name = "copy_truncated_or_overflowing"
+description = "Truncated or overflowing text renders toolbar labels, gallery names/tags, or validation messages unreadable."
 type = "binary"
 negate = true
 weight = 0.5

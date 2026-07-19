@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,186 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "For fidelity tasks, evaluate whether the app matches the reference's UX affordances. Empty state UI is present and renders when a collection is empty."
+name = "mara_voss_solo_sibling_non_navigating"
+description = "On the Mara Voss case, the sibling tag region shows only Mara Voss's own tag, and activating that tag does not navigate away from the Mara Voss case."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "popup_locks_background_scroll"
+description = "While a media popup is open, the page behind it cannot scroll."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "every_close_path_stops_media"
+description = "Every close path of a media popup — the red circular close button and the dimmed backdrop alike — stops any audio or video that is still playing and restores background scroll."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "scrapbook_drag_clamps_to_region"
+description = "A scrapbook item dragged and released at the boundary of the scrapbook region stays within the region and remains draggable afterward."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "overscroll_advances_exactly_one"
+description = "Triggering the overscroll affordance once advances exactly one case in the architect sequence, never two."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "interactive_controls_use_semantic_tags"
+description = "Architect tags, sibling tags, the overscroll affordance, About/home links, and red circular close buttons use semantic buttons or links rather than unlabeled non-interactive shells."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "media_popup_close_button_and_backdrop"
+description = "Media popups support both close paths specified by the reference: the red circular close button and clicking the dimmed backdrop both dismiss the overlay."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "overscroll_affordance_labelled"
+description = "Each case route shows a bottom overscroll affordance labelled to open the next case so the advance action is discoverable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "mara_voss_sibling_navigates_away"
+description = "On Mara Voss, activating the solo sibling tag navigates away from the Mara Voss case."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "popup_allows_background_scroll"
+description = "While a media popup is open, the page behind it still scrolls."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "close_leaves_media_playing"
+description = "Closing a media popup via the red circular close button or dimmed backdrop leaves audio or video still playing."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "scrapbook_item_escapes_region"
+description = "A scrapbook item released at the scrapbook boundary escapes outside the region or becomes undraggable afterward."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "interactive_elements_nonsemantic"
+description = "Primary interactive archive controls (tags, close buttons, overscroll affordance) are non-semantic div/span shells without button/link roles."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "popup_not_dismissible"
+description = "A media popup cannot be dismissed via the red circular close button or the dimmed backdrop."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "overscroll_label_missing_or_ambiguous"
+description = "The case bottom overscroll control shows a blank or generic label (e.g. OK/Submit) instead of indicating opening the next case."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "overscroll_skips_or_jumps_two"
+description = "A single overscroll trigger advances two or more cases, or skips the next architect in sequence."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "empty_note_pin_still_lists"
+description = "Pinning a case with an empty field note still adds the architect to the reading list with an empty-note hint, and the dossier JSON still lists that architect among pins (empty note string allowed under the field contract)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "malformed_import_keeps_state"
+description = "Importing malformed or empty dossier JSON, or JSON that violates the Dossier JSON field contract (wrong schemaVersion, missing pins/notes/scrapbookOffsets, unknown architect slug, duplicate pin, note over 500 characters, or x/y outside 0 through 100), leaves existing pins and notes unchanged, shows a visible validation message naming the offending field or payload, and does not crash the archive."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "undo_noop_when_empty_stack"
+description = "Pressing Undo when no scrapbook drag has occurred leaves every scrapbook item in place and does not change the reading list or pins."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "filter_and_search_intersect"
+description = "With both a category filter and a search query active, only tags that match both constraints stay operable; clearing either control re-expands the set according to the remaining constraint."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "escape_palette_keeps_media_popup"
+description = "Closing the command palette with Escape while a media popup is open leaves the popup open and the media state unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "overlong_field_note_rejected"
+description = "Committing a field note longer than 500 characters shows inline validation naming the note field and leaves the previously saved note, reading-list preview, and dossier preview unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "malformed_import_wipes_pins"
+description = "Importing malformed or schema-invalid dossier JSON clears existing pins or notes or crashes the archive UI."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n12"
+name = "empty_undo_mutates_state"
+description = "Pressing Undo with an empty undo stack moves scrapbook items or clears pins/notes."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n13"
+name = "overlong_note_silently_accepted"
+description = "A field note longer than 500 characters is saved without naming the note field and appears in the reading list or dossier preview."
 type = "binary"
 negate = true
 weight = 1.0

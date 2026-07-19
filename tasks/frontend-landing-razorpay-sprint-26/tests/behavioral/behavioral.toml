@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,88 +62,133 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "14.1"
-name = "multi_facet_round_trip"
-description = "For fidelity tasks, evaluate the reference's stateful behaviors. Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline — never a mix."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "14.2"
-name = "sort_reversal_proves_live_data"
-description = "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders."
+name = "reload_resets_scroll_nav_modal"
+description = "Starting on /sprint/26: scroll into Payment Gateway so its nav cell is active, open then close a video modal if desired; then reload. All facets coherently reset — page at top, preloader-then-hero restarts, no prior scroll position or modal/nav active state survives — never a mixed partial survival."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.3"
-name = "derived_view_responds_to_input"
-description = "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input."
+name = "scroll_spy_derived_from_scroll_position"
+description = "Derived-view sensitivity: from the hero, manually scroll until International Payments is in view and confirm the scroll-spy highlight moves to 02.INTERNATIONAL PAYMENTS; continue into Payment Gateway and confirm it moves to 03.PAYMENT GATEWAY — the active cell changes with scroll input rather than staying fixed."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.4"
-name = "cross_view_echo_without_reload"
-description = "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list ↔ detail, board ↔ stats) without reload."
+name = "nav_click_echoes_section_and_spy"
+description = "Cross-view echo: click 05.MARKETING in the segment nav; without reload, the Marketing section is in view and the scroll-spy/active nav treatment reflects Marketing (section surface and nav chrome agree)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.5"
-name = "count_delta_is_exact"
-description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+name = "exactly_one_active_nav_cell"
+description = "Count-delta integrity: note how many segment-nav cells are marked active (should be one), click a different label, and confirm exactly one cell remains active — the previous cell loses active state with no off-by-one double-active lag."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.6"
-name = "different_inputs_change_outcomes"
-description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+name = "different_nav_targets_different_sections"
+description = "Input-dependent output: click 01.AGENTIC STACK and note the visible section content; then click 06.BUSINESS BANKING; the two outcomes differ (Agentic Stack vs Business Banking section content and matching nav highlights)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.7"
-name = "interleaved_flows_preserve_state"
-description = "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state."
+name = "interleaved_modal_and_nav"
+description = "Interleaved-flow integrity: click 03.PAYMENT GATEWAY, open that section's video modal, close it, then click 04.D2C; the modal is closed with scroll unlocked, D2C is in view, and nav active state matches D2C — neither flow corrupted the other."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.8"
-name = "empty_to_repopulated_round_trip"
-description = "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions."
+name = "modal_open_close_edge_round_trip"
+description = "Edge-state round-trip: open an executive video modal (body scroll locked, video playing), close it (scroll unlocked, playback stopped), then open it again; playback starts clean and scroll lock tracks both transitions."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.n1"
-name = "partial_persistence_is_incoherent"
-description = "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence."
+name = "partial_state_survives_reload"
+description = "After scrolling to a mid-page section with an active nav cell, a reload leaves an incoherent mix (e.g. mid-page scroll position survives while preloader is skipped, or an active nav cell survives at the top)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n2"
-name = "derived_surface_ignores_inputs"
-description = "A derived surface renders identically regardless of its inputs."
+name = "scroll_spy_ignores_scroll_input"
+description = "Manually scrolling through multiple stacked sections leaves the scroll-spy active cell identical regardless of which section is in view."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n3"
-name = "different_inputs_produce_identical_output"
-description = "Repeating an action with different inputs yields byte-identical output."
+name = "nav_targets_yield_identical_view"
+description = "Clicking two different segment-nav labels (e.g. Agentic Stack vs Business Banking) yields an identical visible section and identical active-nav treatment."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "State changes appear in one view but not another until reload."
+name = "nav_section_state_stale_until_reload"
+description = "After a nav click or scroll into a new section, the section in view and the marked-active nav cell disagree until a full page reload."
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "14.20"
+name = "reload_resets_shortlist_and_brief"
+description = "Pin two features, set Theme filter to D2C, type a search query, open then close a video modal; reload. All facets coherently reset — empty shortlist, empty compare, Theme filter All, empty search, empty Watch log, closed brief/palette, empty undo/redo — never a mixed partial survival."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.21"
+name = "brief_export_pipeline_to_artifact"
+description = "Full pipeline: pin Voice Payments and Quick Buy 2.0, add Biometric Card Authentication to compare, set Theme filter Payment Gateway, type Card, open Nikhil Rao video; open Export sprint brief — JSON matches the API-shaped field contract (required string brand/event/searchQuery/generatedAt, required arrays shortlistedFeatures/compareFeatures/watchedExecutives, required closed-enum themeFilter) with those session values, brand Novapay, event Sprint 26, and ISO-8601 UTC generatedAt ending in Z; Copy shows Copied on the JSON tab."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.22"
+name = "brief_import_export_round_trip"
+description = "Export a sprint brief with a non-empty shortlist, compare set, and Watch log entry, clear both trays and the Watch log, then Import the exported JSON; Shortlist tray, Compare tray, Watch log, pinned marks, and preview tabs restore to the exported values; Import of a contract-invalid payload afterward leaves restored state unchanged and names the field error."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.23"
+name = "undo_round_trip_shortlist"
+description = "Pin Voice Payments (count 1), Undo (count 0 and mark cleared), Redo (count 1 and mark active); sprint brief shortlistedFeatures tracks each step when reopened."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.24"
+name = "theme_search_derived_sensitivity"
+description = "Derived-view sensitivity: with All showing many cards, switch Theme filter to Marketing then type Wallet; the visible card set changes meaningfully (not an identical redraw); clearing search and setting All restores the full set."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n20"
+name = "hardcoded_identical_brief_export"
+description = "Two sessions with different shortlists and watched executives produce byte-identical Export sprint brief JSON (hardcoded artifact)."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n21"
+name = "filter_ignore_inputs"
+description = "Changing Theme filter or Launch search leaves the visible feature-card set identical regardless of input."
 type = "binary"
 negate = true
 weight = 1.0

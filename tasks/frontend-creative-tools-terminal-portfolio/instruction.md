@@ -128,6 +128,7 @@ Contract version: zto-webmcp-v1
 Modules:
 - browse-query-v1
 - entity-collection-v1
+- artifact-transfer-v1
 
 Module specs:
 <module_spec id="browse-query-v1">
@@ -173,15 +174,42 @@ Module specs:
 }
 </module_spec>
 
+<module_spec id="artifact-transfer-v1">
+{
+  "id": "artifact-transfer-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Artifact transfer",
+  "purpose": "Import, export, copy, print, and conversion workflows.",
+  "permitted_operations": ["import", "export", "copy", "print_preview", "convert"],
+  "binding_keys": {
+    "required_any_of": [["artifact_operations"]],
+    "optional": ["import_modes", "export_formats", "conversion_modes", "visible_postconditions"]
+  },
+  "restrictions": [
+    "No raw files, filesystem paths, blobs, base64, or artifact contents in WebMCP arguments or results.",
+    "File picker interaction, clipboard contents, and downloaded artifacts remain Playwright responsibilities."
+  ],
+  "tool_name_prefix": "artifact"
+}
+</module_spec>
+
 Bindings:
 - Browsable entity: projects
-- Destinations: terminal-home; project-detail; about
+- Destinations: terminal-home; project-detail; about; config-studio; export-center; profiles
+- Filters: status; tag; featured
+- Sorts: name-asc; name-desc
+- Themes: dark; light; retro; glass
 - Entity: project
-- Entity operations: create; select; update; delete
-- Entity fields: title; summary
+- Entity operations: create; select; update; delete; toggle
+- Entity fields: title; summary; slug; status; tags; year; featured
+- Artifact operations: export; import; copy
+- Export formats: json; config; css
+- Import modes: declared-portfolio
 
 Mechanics exclusions:
 - Terminal typing animation timing stays Playwright-observed
+- Raw file paths/blobs forbidden in WebMCP args
+- Export download bytes and clipboard contents stay Playwright-only per artifact-transfer restrictions
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

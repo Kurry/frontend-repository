@@ -1,0 +1,219 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "keyboard_reaches_everything"
+description = "Every interactive control — library entries and checkboxes, step type selectors and fields, drag handles, run controls, console theme selector, diff run pickers, schedule fields, undo and redo, and the palette — is reachable and operable with the keyboard alone"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "dialogs_trap_and_return_focus"
+description = "The New Script modal, screenshot modal, and confirmations trap focus while open, close on Escape, and return focus to the control that opened them"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "icons_and_images_labeled"
+description = "Icon-only controls (undo/redo, clock badges, bulk actions, jump-to-latest) carry accessible names, and placeholder screenshots carry descriptive alt text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "live_announcements"
+description = "Run completion, a step entering the failed state, and pause and resume are announced through an aria-live region as well as shown visually"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "labeled_form_fields"
+description = "Every form field has a visible label, and validation messages are associated with their fields so each names the field it belongs to"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "heading_order_logical"
+description = "Headings follow a logical order with no skipped levels across the views"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "landmarks_present"
+description = "The page exposes landmark structure (navigation for the sidebar, main for the content area) for assistive navigation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "contrast_sufficient"
+description = "Text and controls meet sufficient color contrast, including console text on every offered theme and badges on dimmed disabled steps"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "semantic_controls"
+description = "Buttons, checkboxes, selects, and tabs use semantic elements or correct ARIA roles rather than bare styled divs"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "state_not_color_only"
+description = "Pass, fail, skipped, and diff states are conveyed by text or icon plus color, never color alone"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n1"
+name = "keyboard_unreachable_controls"
+description = "Some interactive control cannot be reached or activated via keyboard"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n2"
+name = "focus_indicators_missing"
+description = "Focus indicators are missing or visually obscured on some controls"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n3"
+name = "custom_widgets_lack_roles"
+description = "Custom widgets (palette, drag handles, console, diff view) use non-semantic tags without ARIA roles or labels"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n4"
+name = "color_only_state"
+description = "A state or error is indicated by color alone"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n5"
+name = "dialog_focus_escapes"
+description = "An open dialog lets focus escape into the background content"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n6"
+name = "poor_contrast_text"
+description = "Some text is unreadable due to poor contrast, including on the terminal themes"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n7"
+name = "errors_visual_only"
+description = "Validation or failure feedback is visual only, with no screen-reader path"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n8"
+name = "icon_content_unlabeled"
+description = "Icon or image content lacks accessible text"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n9"
+name = "heading_levels_skipped"
+description = "Headings skip levels or are ordered illogically"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n10"
+name = "reduced_motion_ignored_a11y"
+description = "Animations ignore the reduced-motion preference"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "accessibility.catchall"
+name = "accessibility_catchall"
+description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

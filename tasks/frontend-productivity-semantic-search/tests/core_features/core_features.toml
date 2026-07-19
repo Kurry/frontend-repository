@@ -1,0 +1,275 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_corpus_and_index_stats"
+description = "On first load the index panel reports at least 120 seeded documents spanning at least 6 topics and at least 4 document types, its document list shows entries with realistic multi-sentence content, and the index statistics (total indexed, stale count, last build time, distinct term count) render with values consistent with the library"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "ranked_result_card_anatomy"
+description = "Running a query via Enter or the Search control renders a ranked list of document cards, each showing the document title, a type tag, its topic tags, a similarity score badge with a monospace numeric value between 0.00 and 1.00, and a two-line excerpt whose most relevant passage carries a distinct highlight background"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "descending_order_and_determinism"
+description = "The result list is sorted by similarity score descending, a visible count above the results states how many match, and re-running the same query with unchanged corpus, threshold, and feedback returns the same ranked order both times"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "syntax_chips_parse_and_combine"
+description = "Typing structured tokens (tag:, type:, before: followed by a value) in the query turns each token into a removable chip above the results when the query runs, a query combining tag, type, and before tokens applies all filters together, and the result count reflects the combination while the free-text remainder still drives the semantic ranking"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "chip_removal_and_unknown_token_notice"
+description = "Removing a filter chip re-runs the query without that filter and the visible count updates; removing all chips restores unfiltered results; a token with an unknown tag or type value shows an inline notice naming the unmatched value while the remaining valid tokens still apply"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "threshold_slider_filters_live"
+description = "A similarity threshold slider from 0.0 to 1.0 in 0.05 increments hides result cards whose score is below the selected value, and the visible result count updates immediately as the slider moves, without re-running the query"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "feedback_reranks_persists_and_resets"
+description = "Thumbs-up on a result visibly boosts its position and score in the current query's ranking and thumbs-down demotes it, the affected card shows a feedback marker, re-running the same query reproduces the adjusted ranking, and a Reset Feedback control restores the unadjusted order"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "score_explanation_disclosure"
+description = "Each result card has a collapsed-by-default explanation disclosure that expands on activation with a rotating chevron to reveal matched terms with per-term contribution bars and values (plus any feedback adjustment line), remembers its open state per result while the app is open, and shows different terms and contributions for two different results consistent with their excerpts"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "keyword_fallback_labeled"
+description = "A query that returns zero semantic results with similarity at or above 0.2 falls back to keyword matching, the results section is labeled Keyword results (no semantic matches above threshold), and fallback cards still show the matched words via the highlighted excerpt"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "topic_clustering_round_trip"
+description = "The Group by topic toggle regroups the ranked list into expandable topic groups whose header counts sum to the total result count, expanding or collapsing a group shows or hides only that group's cards, and toggling grouping off restores the flat ranked order"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "detail_panel_related_and_breadcrumbs"
+description = "Clicking a result card opens a side panel with the document's full body, type, tags, and a Related section of exactly three next-most-similar documents with similarity values that differ between two different documents; clicking a related row shows that document in the same panel and pushes a breadcrumb, clicking an earlier breadcrumb navigates back, and the panel closes via its close control or Escape"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "command_palette_fuzzy_and_keyboard"
+description = "Pressing Cmd+K or Ctrl+K opens a command palette whose input fuzzy-matches across document titles, saved searches, and app commands with matches updating on every keystroke; arrow keys move the highlight, Enter activates the highlighted entry (opening a document, running a saved search, or invoking a command), and Escape closes the palette"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "arrow_key_result_selection"
+description = "With results on screen, ArrowDown and ArrowUp move a visible selection highlight through the result cards and Enter opens the selected card's detail panel"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "history_timeline_appends"
+description = "Every executed query appends a history entry showing the query text, its chips, a timestamp, and the result count at execution, with entries ordered newest first"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "save_search_validation_and_rerun"
+description = "The Save search form keeps its Save control disabled until the required name is non-empty, saving with an empty name shows an inline message naming the name field and adds nothing, a successfully saved search appears in the Saved list, clicking a saved search or history entry re-runs that query restoring its chips and threshold, and a saved search's Delete action requires confirmation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "history_bulk_delete_exact"
+description = "History entries support checkbox multi-selection that reveals a contextual action bar with Delete selected (its confirmation naming the selected count) and Clear selection; confirming removes exactly the selected entries and leaves the rest"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "compare_queries_overlap_and_diff"
+description = "The Compare view shows two chosen queries' result sets side by side with documents in both sets marked as overlap in both columns and side-unique documents carrying a distinct marker, a summary line states the overlap count and each side's unique count consistently with the columns, and changing either selected query updates the columns and summary without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "add_document_validates_and_marks_stale"
+description = "The Add document form keeps its Add control disabled until title, body, and type are valid and shows an inline message naming an empty required field without adding; a valid submission adds the document to the index panel's list immediately, increases the stale count by exactly one, and the new document does not appear in search results before a rebuild"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "index_bulk_actions"
+description = "The index panel's document list supports checkbox multi-selection with a contextual action bar offering Delete selected (confirmation naming the count) and Mark stale; bulk deleting removes exactly the selected documents and the index statistics update to match"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "reindex_run_steps_and_status_bar"
+description = "Index Now starts a simulated re-index decomposed into one visible ingest step per document, each showing the document title and a status advancing through pending, running, and complete or failed; while active the status bar shows Indexing with running progress M/N and on completion it shows Indexed N documents"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "retry_backoff_and_resume_from_step"
+description = "A simulated ingest failure retries automatically with a visible backoff countdown and attempt counter (such as retry 2 of 3); a step that exhausts retries is marked failed with an inline error summary and a manual Retry control, and activating it resumes the run from that step while earlier completed steps keep their original timestamps and never re-execute"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "pause_resume_rollup_timeline"
+description = "Pausing a running re-index freezes progression at the current document and resuming continues from exactly that step; a rollup showing documents ingested out of total, elapsed time, and failure count derives live from the step states, and an ordered event timeline of step transitions with timestamps can be filtered by status"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "rebuild_makes_stale_searchable"
+description = "After the re-index run completes, a query matching a previously stale document's content returns it with a similarity score, and the stale count returns to zero"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "undo_redo_with_labels"
+description = "Undo and Redo controls revert and reapply document additions, deletions, bulk deletions, feedback marks, and saved-search changes, each showing the label of the action it will affect and disabling when its stack is empty; undoing a document deletion restores the document to the library and index statistics, and redo removes it again"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "export_report_live_and_copyable"
+description = "The Export report modal shows structured JSON shaped like an API exchange — a request object with query, filters (objects with kind and value per chip), and threshold, plus a results array of hits each with id, title, type, score, snippet, highlights, and feedback — the JSON parses without error, changing the threshold or feedback and reopening the export updates the matching fields, and the Copy control places the exact text on the clipboard with a visible confirmation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "empty_state_recovery"
+description = "A query matching nothing even by keyword, or a threshold set above the top score, shows an empty state explaining that no documents matched and offering a control that clears chips and resets the threshold; using it restores results"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n1"
+name = "scores_constant_across_queries"
+description = "Two clearly different queries produce identical similarity scores or an identical ranking across the corpus, indicating scores are hardcoded per document rather than computed from the query"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n2"
+name = "fabricated_index_completion"
+description = "The status bar or run rollup reports the re-index complete while previously stale documents still fail to appear in matching search results or the stale count remains above zero"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n3"
+name = "double_activation_duplicates"
+description = "Rapidly double-activating the Search control records two history entries for one intended query, or rapidly double-activating Index Now starts two overlapping re-index runs"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core search, indexing, or library features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "12.1"
 name = "mandated_modules_are_bound"
-description = "All contract-mandated modules are initialized and bound."
+description = "All four contract-mandated modules — browse-query-v1, entity-collection-v1, form-workflow-v1, and artifact-transfer-v1 — are initialized and bound to the product's activities, destinations (overview, day-detail, activity-form, budget-ledger, export-canvas), form fields (title, day, location, notes, startTime, endTime, category), and artifact operations (export, import, copy) with export formats ics, json, and markdown."
 type = "binary"
 weight = 1.0
 
@@ -91,21 +91,21 @@ weight = 1.0
 [[criterion]]
 id = "12.5"
 name = "declared_entity_operations_work"
-description = "Entity operations declared in the contract, including create, update, delete, and reorder, all work."
+description = "Entity operations declared for the activity entity — create, select, update, delete (with confirm=true), and reorder — all work against the same shared state as the visible UI, including entity fields title, day, location, notes, startTime, endTime, and category."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.6"
 name = "form_flow_operations_are_bound"
-description = "Form submission validation, error, and cancel operations are clearly bound."
+description = "Form submission validation, error, and cancel operations are clearly bound to the declared form fields (title, day, location, notes, startTime, endTime, category)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.7"
 name = "queries_match_allowed_spec"
-description = "Query destinations and filters match the allowed specification."
+description = "Browse destinations (overview, day-detail, activity-form, budget-ledger, export-canvas), filters (day, type, category), and themes (light, dark) match the declared bindings, and applying them updates the visible navigation state through the same handlers as the UI controls."
 type = "binary"
 weight = 1.0
 
@@ -206,6 +206,21 @@ weight = 1.0
 id = "12.n10"
 name = "automated_contract_validation_fails"
 description = "The project fails automated MCP contract validation."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "12.11"
+name = "artifact_export_import_tools_bound"
+description = "Artifact-transfer tools for export, import, and copy are bound for formats ics, json, and markdown and import mode trip-json, and invoking export/import uses the same handlers as the visible export canvas controls so MCP-driven export state matches the on-screen previews."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.n11"
+name = "artifact_module_missing_or_noop"
+description = "artifact-transfer-v1 is missing, unbound, or its export/import/copy tools are no-ops that leave the export canvas and session state unchanged."
 type = "binary"
 negate = true
 weight = 1.0

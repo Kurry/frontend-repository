@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,150 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "filter_empty_state_present"
+description = "When model, harness, or task-category filters match nothing, each affected region shows a designed empty state rather than a blank area"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "classification_form_validates_inline"
+description = "The Classify and bulk Apply classification forms show inline per-field errors for Classification field-contract violations before submit"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "field_contract_errors_name_fix"
+description = "Classification and Import errors name the offending field and the fix (for example rationale must be at least 15 characters, schemaVersion must be 1) rather than only saying Invalid"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "copy_and_toasts_confirm"
+description = "Copy in the export drawer shows a brief copied confirmation, and completed re-run or saved classification shows a toast"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "rerun_shows_in_progress"
+description = "While a cell re-run is running, that cell shows an in-progress indicator and a loading affordance wherever its data is displayed"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "undo_and_cancel_on_triage"
+description = "Cancel on the Classify form leaves totals unchanged, and Undo restores a saved classification or threshold move"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "cell_tooltip_lists_rewards"
+description = "Heatmap cell hover tooltips list per-trial rewards so score composition is understandable without leaving the grid"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "triage_controls_use_semantic_tags"
+description = "Classify, Re-run, Export, Import, and threshold slider controls use semantic button or input elements rather than clickable bare divs alone"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "drawer_supports_close_paths"
+description = "The cell drawer closes from its close control and by clicking outside it; the command palette closes on Escape and backdrop click"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "rerun_progress_list_ticks"
+description = "A re-run shows queued then running with a per-trial progress list that ticks each trial complete before the run reaches complete"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_filter_has_no_feedback"
+description = "A no-match filter state leaves the heatmap or variance region blank with no empty-state message or clear-filters control"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "import_errors_only_in_console"
+description = "Import or Classification field-contract failures surface only in the browser console with no inline UI error"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "classify_lacks_visible_feedback"
+description = "Saving a valid Classification or completing a re-run produces no visible badge, summary, timeline, or toast feedback"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "bulk_apply_without_valid_form"
+description = "Bulk Apply classification badges selected rows even when the Classification form still fails the field contract"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "heatmap_controls_nonsemantic_only"
+description = "Primary heatmap cell, Classify, and Export controls are only nonsemantic div or span click targets with no button or input semantics"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "drawer_not_escape_dismissible"
+description = "The open cell drawer or command palette cannot be dismissed with Escape"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "classification_validation_missing"
+description = "Classification field-contract validation feedback is missing until after a failed submit has already mutated triage totals"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "primary_actions_ambiguous_labels"
+description = "Primary actions that should read Classify, Re-run, Export, or Import use blank or ambiguous labels such as OK or Submit only"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "empty_chart_lacks_guidance"
+description = "Toggling every chart series off leaves a blank panel with no designed empty-chart message"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "export_import_affordances_hidden"
+description = "Export or Import controls are visually hidden or unreachable after a normal load of the calibration console"
 type = "binary"
 negate = true
 weight = 1.0

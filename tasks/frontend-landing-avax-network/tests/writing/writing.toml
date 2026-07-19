@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.5
@@ -63,91 +63,119 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "15.1"
-name = "headings_use_consistent_capitalization"
-description = "For fidelity tasks, rendered copy must match the reference. Where the app renders headings and section titles, they use consistent capitalization (one convention — title case or sentence case — throughout)."
+name = "headings_uppercase_display_treatment"
+description = "Where the app renders section headings, they keep the reference's uppercase display treatment consistently across Why Astra, Network, News, Solutions, Community, and Contact."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.2"
-name = "actions_use_specific_labels"
-description = "Where the app renders button or action labels, they are specific verbs ('Add expense', 'Start session'), not generic ('Submit', 'OK') when a specific label is possible."
+name = "cta_labels_specific"
+description = "Where the app renders primary action labels, they use specific verbs matching the PRD (Start Building, View More, View All Events, Next/Back, Follow @astra) rather than generic Submit/OK alone when a specific label is specified."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.3"
-name = "errors_name_problem_and_fix"
-description = "Where the app renders error messages, they name the problem and the fix ('Amount must be a positive number'), not just a rejection ('Invalid')."
+name = "contact_errors_name_fields"
+description = "Where the app renders contact or newsletter final-submit validation errors, they name the missing/invalid field (including otherDetail when project_type is Other) rather than only saying Invalid."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.4"
-name = "empty_states_explain_next_step"
-description = "Where the app renders empty states, the copy explains what belongs there and how to add it."
+name = "community_empty_feed_reads_intentional"
+description = "Where the app renders the empty community feed track, the surrounding Community copy (Join The Best Community in web3 and channel buttons) still reads as intentional product copy rather than a broken missing-content stub."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.5"
-name = "body_copy_is_well_written"
-description = "Where the app renders body or marketing copy, rate how free it is of spelling and grammatical errors."
+name = "marketing_copy_spelling_grammar"
+description = "Where the app renders body or marketing copy (hero statement, Developer Hub, Solutions, Events), rate how free it is of spelling and grammatical errors."
 type = "likert"
 points = 5
 weight = 0.5
 
 [[criterion]]
 id = "15.6"
-name = "terminology_is_consistent"
-description = "Where the app renders labels for the same concept in multiple places, terminology is consistent (not 'task' here and 'todo' there)."
+name = "astra_terminology_consistent"
+description = "Where the app renders the product name and network labels, terminology stays consistent as Astra / Astra Network (not mixed with leftover source-network naming)."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.7"
-name = "numbers_dates_and_units_are_consistent"
-description = "Where the app renders numbers, dates, and units, formatting is consistent (same date format, same decimal precision, units labeled)."
+name = "numbers_dates_formatted_consistently"
+description = "Where the app renders numbers and dates, formatting is consistent: the Network total uses US thousands separators as 60,932,291 and the Events card shows Sep 16-17, 2026."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.8"
-name = "success_messages_are_specific"
-description = "Where the app renders confirmation and success messages, they state what happened ('Entry saved'), not vague affirmations."
+name = "success_messages_exact_copy"
+description = "Where the app renders confirmation messages, they state the mandated outcomes exactly: Thank you for subscribing after newsletter submit and Success! We'll be in touch. after contact submit."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.9"
+name = "mandated_news_titles_exact"
+description = "Where the app renders News card titles, they match exactly in order: Astra Payments Collective: How a Payments Ecosystem Took Shape; Northstar Systems Explores Biometric-Verified On-Chain Services; LedgerWorks is Now on Astra; Forge9000 Round 4: New Mechanics, Rewards and Opportunities for Builders; Launch Team Applications Are Now Open; The Astra Foundation Introduces Its Research Selection Committee; and The Astra Foundation Opens $50,000 In Research Grants for Network Economics."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.10"
+name = "partner_and_studio_credit_plausible_fiction"
+description = "Where the app renders placeholder partner logos and the footer studio credit, invented names read as plausible copy and do not reference real third-party brands or agencies."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.n1"
-name = "placeholder_copy_is_visible"
-description = "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI."
+name = "placeholder_copy_visible"
+description = "Lorem ipsum or placeholder text (TODO, Lorem, asdf, or template variables like {{title}}) is visible anywhere in the shipped UI."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n2"
-name = "prominent_copy_has_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as headings, hero text, or primary buttons."
+name = "prominent_copy_has_typos"
+description = "Spelling or grammatical errors appear in prominent copy such as News & Stories from the Astra Network, Join The Best Community in web3, or primary CTA labels."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n3"
-name = "concept_names_are_inconsistent"
-description = "The same concept is named inconsistently across surfaces."
+name = "source_brand_names_in_copy"
+description = "Rendered copy still names the source network, real partners, or the reference site's real agency instead of the fictional Astra system."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n4"
-name = "copy_is_truncated_or_overflowing"
-description = "Truncated or overflowing text renders copy unreadable."
+name = "copy_truncated_or_overflowing"
+description = "Truncated or overflowing text renders mandated headings, news titles, or form messages unreadable at 1440 or 390."
 type = "binary"
 negate = true
+weight = 0.5
+
+[[criterion]]
+id = "15.11"
+name = "session_leads_export_labels_specific"
+description = "Where the app renders Session leads export controls, labels are specific (Download JSON, Copy JSON, Undo last lead, Copied confirmation) rather than generic OK/Submit alone."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.12"
+name = "empty_session_leads_copy_explains"
+description = "Where the app renders the empty Session leads state, the copy explains that newsletter and contact submissions will appear there (not a blank or TODO placeholder)."
+type = "binary"
 weight = 0.5
 
 [[criterion]]

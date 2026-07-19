@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,118 +62,118 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_gallery_state_after_delete_all"
+description = "After deleting all boards, Gallery mode shows an empty state with a message explaining the gallery is empty and how to save a board."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "save_form_inline_validation"
+description = "The Save board form validates against the Board field contract before submit: empty/whitespace name, empty/whitespace tag, name over 40 characters, tag over 24 characters, or a duplicate name each show a per-field message naming the offending field, and the save control stays disabled until name and tag are valid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "empty_name_blocks_save_count"
+description = "Submitting the Save board form with an empty name must not add a board — the gallery count stays the same and the inline validation message names the name field."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "zero_match_tag_filter_empty_state"
+description = "A tag filter that matches no boards shows the empty state rather than a blank region, and clearing the filter restores the list."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "undo_empty_history_noop"
+description = "Pressing Undo with no history is a safe no-op: the canvas does not change and no error appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "same_cell_stroke_records_once"
+description = "Dragging a paint stroke back and forth over the same cell with the same brush and color records the cell to undo history only once, so one Undo reverts it."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "cell_slider_locks_until_clear"
+description = "After the first paint, image upload, or camera capture, the cell-size slider locks and fades to a muted disabled look; Clear empties the board and re-enables it."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "toolbar_and_gallery_controls_semantic"
+description = "Toolbar tools, swatches, gallery save/rename/delete/favorite controls, and form fields use semantic button/input/label elements rather than unlabeled decorative wrappers."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "camera_cancel_leaves_board_and_slider"
+description = "Cancel in the camera overlay closes it without altering the canvas or locking the slider."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "resize_before_and_after_paint"
+description = "Resizing the cell slider before any paint keeps the board blank; resizing after painting resamples the art into the new grid rather than clearing it."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_gallery_has_no_feedback"
+description = "After deleting all boards or filtering to zero tag matches, the gallery shows nothing and provides no empty-state feedback."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "validation_errors_only_in_console"
+description = "Save board validation failures are surfaced only in the browser console with no visible inline message naming the name field."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "camera_cancel_paints_or_locks"
+description = "Cancelling the camera overlay paints onto the canvas or locks the cell-size slider."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "clear_or_delete_lacks_destructive_affordance"
+description = "Clear or gallery delete proceeds with no clear destructive affordance when those actions are exposed."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "interactive_controls_nonsemantic_only"
+description = "Primary interactive controls (tools, swatches, gallery actions, forms) are non-semantic div/span wrappers with no button/input/label role."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "camera_overlay_not_keyboard_dismissible"
+description = "The camera overlay cannot be dismissed via keyboard (Escape or equivalent Cancel path)."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,31 +181,46 @@ weight = 1.0
 [[criterion]]
 id = "4.n7"
 name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+description = "Save board validation feedback is missing or delayed with no UI indication while the save control remains enabled for an empty name."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "primary_actions_ambiguous_labels"
+description = "Primary tool, Save board, Clear, or gallery action labels are missing or so generic that the action is ambiguous."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "cell_slider_movable_while_art_exists"
+description = "After painting, image upload, or camera capture, the cell-size slider remains movable and changes grid resolution mid-artwork."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "resize_after_paint_clears_art"
+description = "Resizing the cell slider after painting clears the board instead of resampling the art into the new grid."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "import_schema_invalid_session_rejected"
+description = "Importing malformed session JSON, or parseable JSON that fails the Session/Board/Cell field contract (wrong schemaVersion, cellSize outside 16–64, brushMode/paletteColor/mirrorMode outside closed enums, Cell kind/color mismatch, Board missing required keys, or fillStats that do not sum to the cell count), shows an inline error naming the offending field or the import problem, leaves gallery count, canvas cells, and fill stats unchanged, and produces no console crash."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "import_schema_invalid_still_mutates_studio"
+description = "Importing JSON that fails the Session field contract (wrong enums or missing required keys) still mutates gallery boards, canvas cells, or fill stats."
 type = "binary"
 negate = true
 weight = 1.0

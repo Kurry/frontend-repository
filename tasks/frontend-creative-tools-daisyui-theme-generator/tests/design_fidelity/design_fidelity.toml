@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,153 +62,169 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "spacing_and_sizing_follow_scale"
-description = "Spacing and sizing follow the design system's scale, with no arbitrary one-off values visible in computed styles."
+name = "three_panel_spacing_matches_spec_scale"
+description = "At 1440px, spacing among the left Themes panel (~14rem), center editor (~17rem), and right live preview follows a consistent dense tool-studio scale matching the reference — no arbitrary one-off gaps that break the three-panel composition."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "typography_matches_spec"
-description = "Typography matches the spec for all headings and body copy."
+name = "outfit_chrome_typography_matches_spec"
+description = "Site chrome wordmark and navbar controls use Outfit (or equivalent) display typography consistent with the reference; preview body text follows the active theme rather than a mismatched default UI stack in chrome."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "layout_matches_reference"
-description = "Layout matches reference screenshots to within a small tolerance at all specified breakpoints; fidelity tasks achieve near pixel-parity."
+name = "desktop_three_panel_matches_reference"
+description = "At 1440px the layout matches the reference composition within a small tolerance: sticky top navbar chrome above Themes | editor | live preview — not a marketing landing or equal-width card stack."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.4"
-name = "specified_state_changes_animate"
-description = "Transitions or animations are applied to the state changes the spec calls out, such as add, delete, filter, or view switch."
+name = "specified_theme_state_changes_animate"
+description = "State changes the spec calls out — Hold-to-add progress, My themes row enter/exit, Random icon rotate, swatch/radius/size selected-state, Depth/Noise toggle slide, preview re-theme easing — show the specified transitions rather than hard cuts (verified via real UI controls)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "responsive_behavior_matches_reference"
-description = "Responsive behavior matches reference patterns."
+name = "narrow_stack_matches_reference_patterns"
+description = "Below desktop width the three-panel workspace stacks toward a single column with Themes, editor, and live preview still reachable, matching the reference responsive pattern rather than hiding a panel entirely."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.6"
-name = "control_styling_matches_spec"
-description = "Button and form radii, padding, and shadows conform to the spec."
+name = "token_controls_styled_not_browser_default"
+description = "Name field, color swatches, radius icon buttons, xs–xl size selectors, Font family, Depth/Noise toggles, contrast matrix, Random/Export/Undo/Redo, Artifact center, and preview segmented tabs use the dense tool-studio treatments from the spec rather than unstyled browser defaults."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.7"
-name = "typography_has_clear_hierarchy"
-description = "Typography has a clear hierarchy that distinguishes section and body text."
+name = "clear_hierarchy_chrome_vs_editor_vs_preview"
+description = "Typography hierarchy clearly distinguishes chrome brand/wordmark, editor section headings (Change Colors, Radius, Sizes, Options), and denser preview component copy."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.8"
-name = "component_states_match_spec"
-description = "Component states (default, hover, active, disabled) match the spec where specified."
+name = "active_selected_hover_states_match_spec"
+description = "Theme rows, radius/size selectors, Depth/Noise toggles, and preview tabs show distinct default, hover, active/selected, and focus treatments as specified."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.9"
-name = "surface_treatments_match_spec"
-description = "Color, depth, and border treatments are precise per the design."
+name = "theme_token_surfaces_match_spec"
+description = "Surfaces are driven by active data-theme / theme tokens: Components Demo packs cards, stats, form, calendar, chat, product card, range, radial progress, orders, terminal, and pricing; Color Palette renders a token swatch grid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.10"
-name = "microinteractions_match_spec"
-description = "Microinteraction feedback for hover and press follows the spec in duration and motion."
+name = "hover_and_hold_microinteractions_match_spec"
+description = "Hover/press feedback on announce strip, chrome controls, theme rows, swatch chips, and radius/size selectors, plus Hold-to-add inset progress fill, follow the spec in duration and motion (~0.15–0.2s ease where specified) via the real UI path."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.n1"
-name = "sizing_or_spacing_contradicts_scale"
-description = "Visible sizing or spacing values contradict the specified scale."
+name = "panel_widths_contradict_spec_scale"
+description = "At 1440px the Themes or editor panels use visibly arbitrary widths that contradict the ~14rem / ~17rem / remaining-preview scale from the spec."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n2"
-name = "colors_fall_outside_palette"
-description = "Colors appear outside the specified palette."
+name = "preview_ignores_active_theme_tokens"
+description = "The live preview colors, radii, or sizes stay fixed and ignore the active theme's tokens after a built-in or custom theme is selected."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n3"
-name = "sizing_mismatches_spec"
-description = "Sizing mismatches the spec."
+name = "editor_density_mismatches_spec"
+description = "The center editor is a sparse single-column form missing the dense stack of Name field, base-plus-eight-pair swatch grid, radius rows, xs–xl size selectors, and Depth/Noise toggles the spec requires."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n4"
-name = "required_animations_missing_or_wrong"
-description = "Animations are missing or incorrect where the spec requires them."
+name = "required_hold_or_row_motion_missing"
+description = "Hold-to-add progress fill, My themes row enter/exit, or Random icon rotate are missing or are hard cuts where the spec requires motion (checked via real UI controls)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n5"
-name = "specified_controls_use_browser_defaults"
-description = "Form or button controls use browser default styles when the spec styles them."
+name = "token_controls_use_browser_defaults"
+description = "Color swatches, radius/size selectors, or primary Random/CSS buttons render as unstyled browser-default controls when the spec styles them as dense tool chrome."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n6"
-name = "layout_misaligned_at_breakpoints"
-description = "The grid or layout is misaligned at reference breakpoints."
+name = "three_panel_misaligned_at_desktop"
+description = "At 1440px the Themes | editor | preview grid is misaligned, overlapping, or collapsed into a single marketing-style column."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n7"
-name = "elements_are_clipped_or_offscreen"
-description = "Elements render off-screen or clipped."
+name = "theme_rows_or_preview_clipped"
+description = "Theme-list rows, editor controls, or live preview components render off-screen or clipped at the reference desktop width."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n8"
-name = "structure_deviates_from_reference"
-description = "Section order, content, or structure deviates from the reference on fidelity tasks."
+name = "structure_deviates_from_reference_studio"
+description = "Section order or structure deviates from the reference: sticky navbar chrome and three-panel Themes/editor/preview workspace are missing or replaced by an unrelated layout."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n9"
-name = "heading_and_body_text_undifferentiated"
-description = "Heading and body text have no distinction."
+name = "chrome_and_editor_type_undifferentiated"
+description = "Chrome brand text, editor section headings, and preview body copy share one undifferentiated size/weight with no hierarchy."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n10"
-name = "microinteractions_deviate_from_reference"
-description = "Microinteractions are missing or deviate from the provided reference."
+name = "hover_or_hold_microinteractions_missing"
+description = "Announce-strip/chrome hover transitions, theme-row hover wash, or Hold-to-add inset progress are missing or deviate from the reference behavior."
 type = "binary"
 negate = true
 weight = 1.0
+
+
+[[criterion]]
+id = "3.11"
+name = "artifact_and_contrast_match_spec"
+description = "Artifact center format tabs plus Copy/Download, and the contrast matrix AA/AAA badge rows, match the instructed dense tool-studio anatomy rather than being omitted or replaced by a single CSS dump only."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.n20"
+name = "missing_artifact_center_formats"
+description = "The Artifact center is missing one of the required CSS, JSON, or Config format tabs, or lacks both Copy and Download, contradicting the instructed end-state contract."
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "design_fidelity.catchall"

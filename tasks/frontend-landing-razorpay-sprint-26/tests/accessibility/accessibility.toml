@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,85 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "interactive_controls_keyboard_operable"
+description = "Every interactive control (segment-nav anchors, wordmark, GET ACCESS rail, hamburger, executive play controls, video-modal close, card EXPLORE/READ MORE links) is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "video_modal_focus_manageable"
+description = "When the video modal is open, its close control is keyboard-focusable and operable; dismissing it returns operable focus to the page chrome."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "portraits_and_media_accessible_names"
+description = "Executive portraits, brand lockups, and other informative images carry descriptive alt text or accessible labels; purely decorative fragments are hidden from the accessibility tree."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "hero_canvas_has_accessible_equivalent"
+description = "The 3D hero canvas is treated as decorative while the section's real heading text (SPRINT 26 / 100+ LAUNCHES & UPDATES billboard copy) remains present in the DOM as an accessible equivalent."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+name = "nav_and_cta_accessible_names"
+description = "Every nav anchor and CTA (segment labels, GET ACCESS, SCROLL TO SEE 100+ UPDATES, EXPLORE/READ MORE) has an accessible link/button name; outbound links keep rel noopener noreferrer."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+name = "headings_logical_order"
+description = "Section titles use real heading elements in a logical order through the long-scroll page with no skipped levels that break the outline."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "landmarks_nav_and_structure"
+description = "HTML-first landmarks are present: nav regions for the segment and/or mobile menus, and semantic heading structure for section titles rather than clickable divs standing in for links."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+name = "contrast_across_band_backgrounds"
+description = "Text and control labels meet WCAG AA contrast against their immediate band backgrounds — white text on dark and blue bands, dark text on white and light-grey bands — including the #305eff focus outline visibility."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "semantic_interactive_chrome"
+description = "Interactive chrome uses real controls (links/buttons) with semantic roles rather than canvas-only hit targets for nav, play, and CTAs."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "reduced_motion_keeps_page_operable"
+description = "With prefers-reduced-motion emulated on a fresh load: the preloader exits immediately, smooth scrolling and parallax/pinning are disabled, WebGL settles to a static first composition, and split/reveal/vector timelines jump to readable end states while every control and section remains operable."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.a1"
+name = "word_reveal_keeps_phrase_accessible"
+description = "Word-reveal headings such as THE AGENTIC ERA keep the full original phrase exposed to assistive technology on the heading container (aria-label or equivalent) while per-word fragments are aria-hidden from the accessibility tree."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
 name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+description = "A primary interactive control (segment-nav link, hamburger, play control, GET ACCESS, or modal close) cannot be reached or activated via keyboard."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +148,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n2"
 name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+description = "Focused interactive controls show no visible focus indicator (including the mandated #305eff outline color) or the indicator is fully obscured."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,55 +156,55 @@ weight = 1.0
 [[criterion]]
 id = "1.n3"
 name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+description = "Custom interactive chrome (hamburger, play control, modal close) uses non-semantic tags without ARIA roles/labels."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+name = "nav_active_state_color_only"
+description = "The active segment-nav cell is conveyed only by color with no other accessible name/state cue for the current section."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "modal_focus_not_managed"
+description = "The open video modal's close control is not keyboard-focusable, or keyboard users cannot dismiss the modal."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+name = "poor_contrast_unreadable_text"
+description = "Text on dark, blue, white, or light-grey bands is unreadable due to contrast below WCAG AA against its immediate background."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
-id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+id = "1.a4"
+name = "word_reveal_character_soup"
+description = "A word-reveal heading is exposed to the accessibility tree as word/character soup — no aria-label (or equivalent) on the container and the split spans are not aria-hidden."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+name = "media_missing_alt_or_labels"
+description = "Executive portraits, brand lockups, or other informative images lack descriptive alt text or accessible labels."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+name = "heading_order_skipped"
+description = "Headings skip levels in a way that breaks the page outline (e.g. jumping from H1 to H3 with no H2)."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,9 +212,24 @@ weight = 1.0
 [[criterion]]
 id = "1.n10"
 name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+description = "With prefers-reduced-motion set, the preloader still runs its full timed sequence, parallax/pinning continues, or word-reveal/vector timelines keep animating instead of jumping to readable end states."
 type = "binary"
 negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "1.20"
+name = "palette_brief_trays_focus_trap"
+description = "Command palette, Sprint launch brief panel, Shortlist tray, and Compare tray trap focus while open, close on Escape, and return focus to the control that opened them; Pin, Unpin, Add to compare, Theme filter, Launch search, Export, Download, Copy, Import, Undo, and Redo expose accessible names."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "copied_and_import_errors_live"
+description = "Copied confirmations and import errors are announced through a polite live region as well as shown visually."
+type = "binary"
 weight = 1.0
 
 [[criterion]]

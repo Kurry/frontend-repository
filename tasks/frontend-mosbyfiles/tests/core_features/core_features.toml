@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -266,6 +266,122 @@ name = "boundary_drag_stays_in_region"
 description = "A scrapbook item released at the boundary of the scrapbook region stays within the region and can still be dragged again afterward"
 type = "binary"
 weight = 0.5
+
+[[criterion]]
+id = "1.40"
+name = "category_filter_narrows_home_stack"
+description = "On home: choosing Monumental Modernism in the category filter leaves only that group's three architect tags operable while the other three category groups are dimmed or hidden; choosing All restores all four groups and eight tags."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "home_search_filters_architect_tags"
+description = "On home: typing a substring of Ada Mercer into the search field leaves the Ada Mercer tag operable and hides or disables non-matching tags; clearing the search restores all eight tags."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "pin_adds_to_reading_list"
+description = "On a case: activating Pin adds that architect to the reading-list drawer and marks the control as pinned; activating again removes the architect from the reading list and clears the pinned mark."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "field_note_saves_to_list_and_dossier"
+description = "On a case: committing a Field note whose body includes a distinct token (at most 500 characters) updates that architect's reading-list preview (when pinned) and appears under notes in the Export dossier JSON preview without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "scrapbook_undo_redo_restores_offsets"
+description = "After dragging a scrapbook item to a new position via the real pointer path, Undo or Ctrl+Z restores the prior position inside the scrapbook region; Redo or Ctrl+Shift+Z reapplies the dragged position."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "command_palette_opens_and_navigates"
+description = "Pressing Ctrl+K opens a command palette with a focused search input; typing enough of Imani Vale to highlight that case and pressing Enter swaps to the Imani Vale case without a full page reload and closes the palette."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "dossier_export_contains_session_work"
+description = "After pinning Julian Kade and committing a field note containing kade-note-alpha, the Export dossier Dossier JSON preview contains schemaVersion exactly field-notes-archive.dossier.v1, julian-kade inside pins, and kade-note-alpha under notes; Copy writes the visible preview text and Download offers a .json file for that format."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "dossier_markdown_report_lists_pins"
+description = "With at least one pinned architect and a saved note, switching Export dossier to Reading report markdown shows that architect as a heading with the note beneath and a summary line stating pin and non-empty note counts."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "dossier_import_restores_pins_notes"
+description = "After exporting Dossier JSON that conforms to the field contract (schemaVersion field-notes-archive.dossier.v1 with pins, notes, scrapbookOffsets), reloading to clear in-memory state, and importing that JSON, the reading list shows the same pins with the same note bodies."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "dossier_json_exposes_field_contract_keys"
+description = "With any session state, the Export dossier Dossier JSON preview visibly includes the required top-level keys schemaVersion, pins, notes, and scrapbookOffsets, and schemaVersion equals field-notes-archive.dossier.v1."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "field_note_rejects_overlong_body"
+description = "On a case: attempting to commit a Field note longer than 500 characters shows inline validation naming the note field and does not update the stored note, reading-list preview, or dossier JSON notes entry."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "invalid_dossier_import_rejects_schema"
+description = "With at least one pin present, importing Dossier JSON with wrong schemaVersion or an unknown architect slug shows visible validation naming the offending field or payload and leaves the existing pin set and notes unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n40"
+name = "dossier_omits_session_mutations"
+description = "After pinning an architect and saving a distinct field-note token, the Export dossier JSON preview omits that pin or that note token, or omits schemaVersion field-notes-archive.dossier.v1 / required keys, while presenting an export preview as if complete."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n41"
+name = "undo_does_not_restore_scrapbook"
+description = "After a real scrapbook drag, Undo or Ctrl+Z leaves the item at the dragged position instead of restoring the prior offset."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n42"
+name = "pin_control_is_noop"
+description = "Activating Pin on a case leaves the reading list without that architect and leaves the Pin control in the unpinned rest state."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n43"
+name = "invalid_import_applies_partial_state"
+description = "Importing Dossier JSON that violates the field contract (wrong schemaVersion, unknown architect slug, or out-of-bounds scrapbook offset) still mutates pins, notes, or scrapbook positions."
+type = "binary"
+negate = true
+weight = 1.0
 
 [[criterion]]
 id = "1.catchall"

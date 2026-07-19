@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,153 +62,211 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_projects_state_after_delete_all"
+description = "After deleting every project, Projects Board and /work output both show an empty state with a message and a way to create a project."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "empty_name_inline_validation"
+description = "On project create, an empty project name or uppercase slug shows visible validation feedback naming the field and the contract rule, and the projects collection count does not increase."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "validation_names_field_and_fix"
+description = "Project create/edit validation copy names the invalid field and the accepted contract rule (bounds, enum, or format) rather than only saying Invalid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "unknown_command_prints_hint"
+description = "Typing an unknown command prints a visible command-not-found line with a hint rather than failing silently or throwing."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "double_submit_adds_exactly_one"
+description = "Double-activating the create submit adds exactly one project: the collection count increases by one and exactly one new board card appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "reopen_restores_history_and_theme"
+description = "Closing the terminal with the red traffic light then pressing Reopen restores the terminal with its output history and theme intact."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "up_arrow_before_history_is_noop"
+description = "Pressing the up arrow before any command has been typed leaves the prompt unchanged with no errors."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "shell_controls_use_semantic_tags"
+description = "Command prompt, create/edit form fields, consent Accept/Decline, traffic lights, and mode toggle use semantic button/input/label elements rather than unlabeled decorative wrappers."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "exit_overlay_reopen_path"
+description = "The exit overlay shown after the red-dot close provides a working Reopen control that returns to the terminal without a full page reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "create_submit_disabled_until_valid"
+description = "On the project create form, the submit control stays disabled or inert until all API-shaped required fields are valid, and per-field inline messages name each invalid field before submit."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_projects_shows_nothing"
+description = "After the projects collection is empty, Projects Board or /work shows nothing — no empty-state message or create guidance."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "validation_errors_only_in_console"
+description = "Invalid empty-name create failures surface only in the browser console with no visible terminal or form feedback naming the field."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "unknown_command_silent"
+description = "An unknown command produces no visible command-not-found line or hint (silent failure)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "delete_project_no_destructive_affordance"
+description = "Deleting a project proceeds with no visible destructive affordance or confirmation distinguishing it from a non-destructive command."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "interactive_controls_are_nonsemantic"
+description = "Primary interactive controls (traffic lights, mode toggle, consent buttons, board filters) are non-semantic div/span click targets without button/role semantics."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "exit_overlay_not_keyboard_dismissible"
+description = "With the exit overlay open after red-dot close, keyboard users cannot activate Reopen or otherwise restore the terminal."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "double_submit_adds_duplicates"
+description = "Double-activating create submit adds more than one project or leaves the collection count increased by more than one."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "ambiguous_or_missing_action_labels"
+description = "Primary actions show blank, placeholder, or ambiguous labels such as 'Submit', 'OK', or 'Button' instead of specific labels like Accept, Decline, Reopen, or create/edit project actions."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "up_arrow_before_history_errors"
+description = "Pressing the up arrow before any command has been typed throws a console error or corrupts the prompt value."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "reopen_loses_history_or_theme"
+description = "After red-dot close and Reopen, prior output history is wiped or the active theme resets unexpectedly while other session state remains."
 type = "binary"
 negate = true
 weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "featured_fourth_limit_message"
+description = "Featuring a fourth project while three are already featured shows a featured-limit message and does not set the fourth flag."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "malformed_import_rejected"
+description = "Importing malformed Portfolio JSON shows a visible validation message naming the problem, changes no projects, and leaves /work and the board unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "empty_profile_name_rejected"
+description = "Saving a profile with an empty name creates no profile and shows validation naming the name field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "undo_redo_disabled_when_empty"
+description = "Undo with an empty history and Redo with an empty redo stack are disabled; activating them does nothing and produces no console errors."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "config_diff_no_differences_state"
+description = "Config Diff with no session mutations shows a no-differences state rather than a blank or broken panel."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "year_out_of_bounds_rejected"
+description = "Submitting project create with year 1999 or 2101 does not increase the projects count and shows validation naming the year field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "malformed_import_mutates_collection"
+description = "Importing malformed Portfolio JSON still changes the projects collection or export preview."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.n12"
+name = "featured_limit_silent_fail"
+description = "Attempting to feature a fourth project fails silently with no featured-limit message while leaving an inconsistent featured state."
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "edge_cases.catchall"

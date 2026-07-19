@@ -1,0 +1,219 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "double_submit_single_save"
+description = "Double-activating Submit & Next saves exactly one annotation: the queue count decrements by one and history gains one entry"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "skip_all_then_proceed"
+description = "Skipping every item in a suite leaves the queue showing the same items in skip order with the skipped badge equal to the number of skips, and submitting then proceeds from the front of the reordered queue"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "empty_stacks_disable_undo_redo"
+description = "Undo with an empty history and Redo with an empty redo stack are disabled; activating them does nothing and produces no console errors"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "sliver_box_discarded"
+description = "Drawing a box smaller than a few pixels in either dimension is discarded rather than creating an unusable sliver region"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "last_region_delete_empty_state"
+description = "Deleting the last region on an item leaves the image visible with an empty region list and a short empty-state line explaining how to draw a region"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "comment_cap_round_trip"
+description = "At exactly 500 characters the comments counter shows 0 remaining and further input is prevented, and the saved annotation shows the full 500-character comment in history"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "select_attribute_needs_options"
+description = "Submitting the class form with a select-kind attribute and an empty option list shows an inline message naming the attribute options field and saves nothing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "assist_on_complete_suite"
+description = "Running Assist on a fully annotated suite shows a message that there is nothing to pre-label instead of starting an empty run"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "timeline_filter_empty_state"
+description = "Filtering the assist event timeline to a status with no entries shows an empty-state message in the timeline region rather than a blank area"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "copy_matches_visible_preview"
+description = "Copying the export mid-update copies exactly the text currently visible in the preview block"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n1"
+name = "empty_regions_render_blank"
+description = "An emptied collection (suite queue, region list, timeline filter, palette results) renders a blank area with no explanatory feedback"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n2"
+name = "errors_only_in_console"
+description = "A rejected input or failed action is surfaced only in the browser console, with no visible UI feedback"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n3"
+name = "destructive_without_warning"
+description = "Deleting a class in use or a metadata field with saved values proceeds without its count-bearing confirmation dialog"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n4"
+name = "double_activation_duplicates"
+description = "Double-activating Submit & Next, a bulk action, or Run Assist duplicates its effect"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n5"
+name = "nonsemantic_interactive_wrappers"
+description = "Interactive elements are bare div or span wrappers without button or input semantics"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n6"
+name = "dialog_not_keyboard_dismissable"
+description = "A dialog cannot be dismissed via keyboard"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n7"
+name = "validation_feedback_missing"
+description = "A form accepts invalid input silently or shows validation feedback only after a delay with no indication"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n8"
+name = "ambiguous_control_labels"
+description = "Primary controls carry ambiguous or missing labels that leave their action unclear"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n9"
+name = "boundary_input_corrupts_state"
+description = "A boundary input (501st comment character, shortcut digit 0, empty dispute reason) corrupts state or throws instead of being rejected with feedback"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n10"
+name = "affordances_hidden"
+description = "Interactive affordances (bulk bar, resolve control, palette) are visually hidden or unreachable when their preconditions are met"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "edge_cases.catchall"
+name = "edge_cases_catchall"
+description = "The app exhibits a significant, browser-observable defect in edge-case and recovery behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -70,28 +70,35 @@ weight = 1.0
 [[criterion]]
 id = "5.2"
 name = "console_clean_full_exercise"
-description = "No console errors, warnings, or unhandled promise rejections appear on load or during a full exercise of the app, including a complete re-run simulation, what-if flips, and a note submission"
+description = "No console errors, warnings, or unhandled promise rejections appear on load or during a full exercise of the app, including a complete re-run simulation, what-if flips, a note submission, and opening Export acceptance package"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "5.3"
 name = "reload_returns_seeded_state"
-description = "After creating notes, running a re-run, and toggling what-if and theme, a page reload returns the app to its seeded baseline: the seeded runs and recorded gate results, the default view, and the default theme, with none of those changes surviving"
+description = "After creating notes, running a re-run, importing a package, and toggling what-if and theme, a page reload returns the app to its seeded baseline: the seeded runs and recorded gate results, the default view, and the default theme, with none of those changes surviving"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "5.4"
 name = "cross_view_state_coherence"
-description = "A change made in one surface is immediately reflected in every other surface that shows the same data without a reload: a re-run's results appear in the stage strip, chain, suite outcome, and timeline together, and a note appears in both the gate evidence area and the timeline"
+description = "A change made in one surface is immediately reflected in every other surface that shows the same data without a reload: a re-run's results appear in the stage strip, chain, suite outcome, timeline, and export preview together, and a note appears in the gate evidence area, the timeline, and the Acceptance Package JSON notes array"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "5.5"
 name = "stable_under_rapid_input"
-description = "Rapidly clicking through runs, stages, what-if toggles, and filters causes no hangs, dropped interactions, or desynced surfaces, and double-activating the re-run control starts exactly one simulation"
+description = "Rapidly clicking through runs, stages, what-if toggles, filters, and export tabs causes no hangs, dropped interactions, or desynced surfaces, and double-activating the re-run control starts exactly one simulation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.6"
+name = "whatif_excluded_from_export"
+description = "While what-if simulated gate values differ from recorded results, the Acceptance Package JSON preview still reflects recorded states only; after revert, export and on-screen recorded surfaces continue to agree"
 type = "binary"
 weight = 1.0
 

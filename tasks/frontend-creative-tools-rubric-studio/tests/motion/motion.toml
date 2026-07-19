@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "3.2"
 name = "accordion_animates_with_chevron"
-description = "Clicking a criterion accordion header animates the row open with a height transition while its chevron rotates, and clicking again animates it closed; the Grading notes disclosure animates the same way at its own level — driven through the real click path, not a state shortcut"
+description = "Clicking a criterion accordion header animates the row open with a height transition while its chevron rotates, and clicking again animates it closed; the Rationale notes disclosure animates the same way at its own level — driven through the real click path, not a state shortcut"
 type = "binary"
 weight = 1.0
 

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -60,17 +60,18 @@ allowed_tools = [
 [scoring]
 aggregation = "weighted_mean"
 
+
 [[criterion]]
 id = "2.1"
 name = "shared_state_coherence"
-description = "All surfaces derive from one shared state: selecting a criterion drives the judge highlight, the agent highlight, and the detail panels from the same record; switching the active label recomputes the verdict table, rollup bar, and flip flags together; and recording an adjudication updates the criterion row, summary counts, and the trial's badge in the task table in the same interaction without a reload"
+description = "All surfaces derive from one shared state: selecting a criterion drives the scorer highlight, the agent highlight, and the detail panels from the same record; switching the active label recomputes the verdict table, rollup bar, flip flags, and export dimensionRollup together; and recording, bulk-applying, undoing, or importing an adjudication updates the criterion row marks, summary counts, the trial badge, and the next Export preview in the same interaction without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
 name = "no_storage_reload_seeded"
-description = "No browser storage is used: localStorage and sessionStorage remain empty after reviewing trials, switching labels, filtering flips, and adjudicating, and a page reload returns the app to its seeded state — the 3-task list, default labels active, and no adjudications recorded"
+description = "No browser storage is used: localStorage and sessionStorage remain empty after reviewing trials, switching labels, filtering flips, adjudicating, exporting, importing, and undoing, and a page reload returns the app to its seeded state — the 3-task list, default labels active, no adjudications recorded, and empty undo and redo stacks"
 type = "binary"
 weight = 1.0
 
@@ -93,35 +94,42 @@ negate = true
 [[criterion]]
 id = "2.5"
 name = "console_clean_full_exercise"
-description = "The console is free of errors and warnings on load and stays clean after opening tasks and trials, walking both trajectories, streaming terminal output, switching labels, comparing, filtering flips, and adjudicating"
+description = "The console is free of errors and warnings on load and stays clean after opening tasks and trials, walking both trajectories, streaming terminal output, switching labels, comparing, filtering flips, adjudicating, exporting, importing, and undoing"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.7"
 name = "load_and_interaction_stability"
-description = "The app is interactive (task rows respond to activation) within 2 seconds of a local cold load, rapidly switching labels, toggling the flips filter, and arrowing through both trajectories stays smooth with no hangs and no surface showing data from a previously active label or step, and the verdict table and timelines remain responsive while terminal output streams"
+description = "The app is interactive (task rows respond to activation) within 2 seconds of a local cold load; rapidly switching labels, toggling the flips filter, arrowing through both trajectories, and reopening Export stays smooth with no hangs and no surface showing data from a previously active label or step; the verdict table and timelines remain responsive while terminal output streams"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.8"
 name = "keyboard_operability_focus"
-description = "Every interactive control — task and trial rows, the pane switcher, timeline entries, tree rows, disclosure toggles, verdict rows, evidence links, the label switcher, comparison pickers, the flips filter, and adjudication form fields — is reachable and operable with the keyboard alone with a visible focus indicator, Home and End jump each timeline to its first and last steps, the active timeline entry is programmatically marked as current, opening the adjudication form moves focus to its first field with focus returning to the opening control on close, and overlays close on the Escape key"
+description = "Every interactive control — task and trial rows, the pane switcher, timeline entries, tree rows, disclosure toggles, verdict rows, evidence links, the label switcher, comparison pickers, the flips filter, flip-row checkboxes, bulk apply, Undo, Redo, Export, Import, adjudication form fields, and the command palette — is reachable and operable with the keyboard alone with a visible focus indicator; Home and End jump each timeline to its first and last steps; the active timeline entry is programmatically marked as current; opening the adjudication form, export drawer, import surface, or command palette moves focus into that surface with focus returning to the opening control on close; overlays close on Escape"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.10"
 name = "labels_errors_alt_text"
-description = "Form fields have visible labels, each validation message names the field it belongs to and renders in association with that field, and placeholder screenshot frames carry descriptive alternative text"
+description = "Form fields have visible labels, each validation message names the field it belongs to and renders in association with that field, placeholder screenshot frames carry descriptive alternative text, and export copy confirmation and successful import are announced through an aria-live polite region as well as shown visually"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "export_and_import_share_store"
+description = "Export preview text and a successful import both derive from the same live adjudication set as the verdict table and summary panel: a mutation visible on the rows appears in the next export, and an import updates the rows, summary counts, badge, and export together without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in technical behavior, state integrity, accessibility plumbing, or delivery constraints that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

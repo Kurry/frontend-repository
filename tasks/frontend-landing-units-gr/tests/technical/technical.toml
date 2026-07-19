@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "te-noerror"
 name = "console_clean_during_exercise"
-description = "The homepage loads and runs (including the carousel, hamburger menu, consent banner, hover, and full-page scroll) with no uncaught console errors or warnings and no failed asset requests"
+description = "The homepage loads and runs (including the carousel, hamburger menu, consent banner, shortlist, booking inquiry/export, FAQ, command palette, hover, and full-page scroll) with no uncaught console errors or warnings and no failed asset requests"
 type = "binary"
 weight = 1.0
 
@@ -77,7 +77,7 @@ weight = 1.0
 [[criterion]]
 id = "te-nostorage"
 name = "browser_storage_stays_empty"
-description = "After exercising the carousel, the hamburger menu, and the cookie banner, localStorage and sessionStorage remain empty"
+description = "After exercising the carousel, the hamburger menu, the cookie banner, shortlist toggles, booking inquiry, export/import, FAQ, and command palette, localStorage and sessionStorage remain empty"
 type = "binary"
 weight = 1.0
 
@@ -99,7 +99,7 @@ optional = true
 [[criterion]]
 id = "te-neg-storage"
 name = "storage_populated_after_interaction"
-description = "localStorage or sessionStorage is populated after interacting with the page (menu, carousel, or consent state persisted to browser storage)"
+description = "localStorage or sessionStorage is populated after interacting with the page (menu, carousel, consent, shortlist, inquiry, or FAQ state persisted to browser storage)"
 type = "binary"
 weight = 1.0
 negate = true
@@ -174,6 +174,36 @@ id = "te-authored-assets-load"
 name = "required_authored_asset_files_load"
 description = "Browser network/render evidence shows every required Noma image, map, SVG/icon, animation JSON plus fallback, and cursor asset loading from same-origin paths with no 404, transparent/broken response, image decode, or vector-animation parse failure"
 type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "te-shared-store-coherence"
+name = "shortlist_inquiry_export_store_coherence"
+description = "Shared-state coherence: toggling a studio onto the shortlist is immediately reflected in the shortlist drawer and Monthly estimate, and a subsequent inquiry Export JSON includes that same shortlist under shortlist[].tier / monthly_rent_eur with monthly_estimate_eur matching the sum, without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "te-neg-hardcoded-export"
+name = "export_payload_ignores_live_store"
+description = "Export JSON/Markdown content stays fixed across different shortlist and inquiry inputs, proving a hardcoded payload rather than live store compilation"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "te-export-schema-keys-present"
+name = "export_json_has_inquiry_schema_keys"
+description = "After a valid inquiry submit, inspecting the Export JSON (download or Copy packet text) shows top-level keys inquiry, shortlist, and monthly_estimate_eur, and inquiry includes full_name, email, phone, studio_tier, move_in_month, message, privacy_consent, and submitted"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "te-neg-export-missing-schema-keys"
+name = "export_json_missing_contract_keys"
+description = "After a valid inquiry submit, the Export JSON omits inquiry, shortlist, or monthly_estimate_eur, or the inquiry object lacks required keys such as email, studio_tier, or privacy_consent"
+type = "binary"
+negate = true
 weight = 1.0
 
 [[criterion]]

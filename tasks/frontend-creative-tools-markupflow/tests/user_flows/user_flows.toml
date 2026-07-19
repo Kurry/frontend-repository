@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,204 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "draw_rectangle_updates_layers_and_undo"
+description = "Create flow: after loading an image (Try sample image or Choose image) and drawing one rectangle with an active color selected, the Layers panel gains exactly one new row labeled as a rectangle with a color chip matching the active color, and Undo switches from disabled to enabled — without a page reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "invalid_project_name_inline_validation"
+description = "Create/save flow: submitting Saved projects with an empty or invalid name shows an immediate inline validation message naming the name field, and the Saved projects list count stays the same."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "layer_select_and_style_update_surfaces"
+description = "Edit flow: clicking a Layers row (not Delete) selects it and draws a dashed selection outline on the matching canvas annotation; changing the selected annotation's color, stroke, text style, or font size updates that annotation in place on the canvas without reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "delete_layer_clears_row_canvas_selection"
+description = "Delete flow: clicking Delete on a Layers row removes that row, removes the matching mark from the canvas, clears any selection outline that referenced it, and enables Undo so the deletion can be stepped back."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "edit_preview_mode_switch_retains_annotations"
+description = "View/mode switch: clicking preview hides the tool rail to show the annotated result; clicking edit restores the tool rail; the active view button is visibly marked, and annotations remain on the canvas without reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "last_delete_reveals_layers_empty_state"
+description = "Edge: after deleting the last remaining annotation, the Layers panel shows its empty-state message while the loaded image stays intact on the canvas."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "save_reset_open_restores_project"
+description = "Save/open flow: saving under a new project name adds exactly one Saved projects row; Reset workspace clears the canvas and Layers panel; Open on that saved row restores the saved image and every annotation onto both the canvas and the Layers list."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "undo_redo_keyboard_syncs_surfaces"
+description = "History flow: after drawing two shapes, pressing Ctrl+Z removes the most recent shape from both the canvas and the Layers list and enables Redo; activating Redo restores it to both surfaces; drawing a new shape after an undo returns Redo to disabled."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "layer_move_buttons_restack_canvas"
+description = "Reorder flow: with at least three overlapping annotations, clicking a Layers row's up or down move button changes the row order in the panel and immediately changes which annotation renders frontmost on the canvas."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "collab_conflict_resolves_without_dead_end"
+description = "Collaboration recovery: after a conflict surfaces Keep local / Keep remote / Merge both, picking any choice updates Shared content and returns the panel to a usable editing state without requiring a full page reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "primary_annotation_flows_unavailable"
+description = "Drawing a shape, deleting a Layers row, saving a project, or switching edit/preview cannot be completed from the visible UI controls."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "create_fails_to_appear_or_duplicates"
+description = "Drawing one rectangle either fails to add a visible Layers row or adds duplicate rows for a single completed drag."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "canvas_and_layers_desync"
+description = "After drawing, deleting, or undoing, the canvas and Layers panel disagree about which annotations exist."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "preview_switch_breaks_or_loses_annotations"
+description = "Switching between edit and preview breaks the layout or loses annotations / selection state."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_layers_region_broken"
+description = "After deleting all annotations, the Layers region is blank or broken with no empty-state message, or the loaded image disappears."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "open_project_mismatches_saved_state"
+description = "Opening a saved project restores a different image or annotation set than was saved, or leaves Layers and canvas disagreeing."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "tool_rail_cannot_return_from_preview"
+description = "After entering preview mode, the tool rail cannot be restored via the edit view control."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "conflict_blocks_with_no_exit"
+description = "A Collaboration conflict blocks the workspace with no working Keep local / Keep remote / Merge both exit."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "failed_save_validation_silent"
+description = "An empty or invalid project-name save attempt provides no visible validation feedback naming the name field."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "history_or_reorder_dead_end_requires_reload"
+description = "Recovering from undo/redo desync or a failed layer reorder requires a full page reload — the UI reaches a dead end."
+type = "binary"
+negate = true
+weight = 1.0
+
+# HARDEN_MARKUPFLOW_V1
+
+[[criterion]]
+id = "6.11"
+name = "flow_preset_to_export_json"
+description = "End-to-end: load sample image, activate Callout arrow, confirm Layers gains exactly two rows (arrow and text), Export project JSON, and confirm the preview text includes schemaVersion markupflow-project-v1, imageDataUrl beginning with data:image/, imageWidth, imageHeight, the annotations array, both annotation types with type/color/strokeWidth, the arrow's x2 and y2, and the text annotation's textStyle and fontSize fields"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "flow_style_copy_paste"
+description = "End-to-end: draw Thick color-A rectangle, Copy style, draw Thin color-B oval, select oval, Paste style — oval updates to Thick and color A; rectangle unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "flow_snapshot_compare_restore"
+description = "End-to-end: with annotations present, Save snapshot, draw one more shape, Restore snapshot (extra shape gone), Compare (base image only), end Compare (annotated view restored)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "flow_project_json_round_trip"
+description = "End-to-end: draw at least two shapes, reorder Layers, Download project JSON, Reset workspace, Import project — same annotations and stacking order return on canvas and Layers; then Import a non-conforming payload (wrong schemaVersion, imageDataUrl without data:image/ prefix, missing required fields, or geometry missing width/height or x2/y2 for the type) and confirm an inline error names the import problem while canvas and Layers stay unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "export_import_round_trip_dead_end"
+description = "After Download project JSON and Reset, Import project cannot restore the saved annotations, or restore leaves canvas and Layers disagreeing"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n12"
+name = "history_jump_desyncs_surfaces"
+description = "Jumping to a History entry leaves canvas and Layers showing different annotation sets"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n13"
+name = "export_lacks_schema_version_fields"
+description = "After drawing annotations, Export project JSON preview lacks schemaVersion markupflow-project-v1, omits imageDataUrl/imageWidth/imageHeight, or omits annotation type/color/strokeWidth or required type-specific geometry fields the MarkupFlowProject and Annotation field contracts require"
 type = "binary"
 negate = true
 weight = 1.0

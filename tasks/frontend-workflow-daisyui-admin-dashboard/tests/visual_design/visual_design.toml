@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -122,7 +122,7 @@ negate = true
 [[criterion]]
 id = "3.9"
 name = "copy_capitalization_and_verb_labels"
-description = "Headings, buttons, and menu items follow one consistent capitalization convention throughout the app, and action labels are specific verbs such as 'Add user' and 'Export' rather than generic labels where a specific one is possible"
+description = "Headings, buttons, and menu items follow one consistent capitalization convention throughout the app, and action labels are specific verbs such as 'Add user', 'Export directory', and 'Restore' rather than generic labels where a specific one is possible"
 type = "binary"
 weight = 0.5
 
@@ -137,6 +137,22 @@ weight = 0.5
 id = "3.11"
 name = "placeholder_text_in_shipped_ui"
 description = "Placeholder text (lorem ipsum, 'TODO', 'asdf', or template variable names like '{{title}}') is visible anywhere in the shipped UI"
+type = "binary"
+weight = 1.0
+negate = true
+
+
+[[criterion]]
+id = "3.12"
+name = "export_drawer_and_command_palette_chrome"
+description = "The export drawer shows Directory JSON and Users CSV tabs with a monospaced preview and Copy/Download actions; the command palette is a centered elevated overlay with a search field and scrollable command list; Archive rows use a quieter muted treatment distinct from active rows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.13"
+name = "export_drawer_missing_or_undifferentiated"
+description = "The export drawer lacks format tabs, monospaced preview, or Copy/Download, or the command palette is indistinguishable from a plain text field with no command list"
 type = "binary"
 weight = 1.0
 negate = true

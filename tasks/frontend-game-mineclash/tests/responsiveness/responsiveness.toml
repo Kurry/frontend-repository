@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,158 +62,75 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "7.1"
-name = "layout_adapts_desktop_to_mobile"
-description = "For games, evaluate canvas scaling and touch/control fallbacks. Layout adapts gracefully from 1440px desktop to 375px mobile."
+name = "narrow_grid_scales_tappable"
+description = "At a narrow viewport around 375px wide the grid scales down (roughly 28px minimum tiles) and stays tappable without horizontal scrolling, with score and strike panels stacking above the grid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
-name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+name = "narrow_no_horizontal_scroll"
+description = "At 375px width the setup screen, HUD, history panel, overlays, Match log, export controls, and Stats view reflow to a single column without horizontal scrolling."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
-name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+name = "desktop_layout_usable"
+description = "At desktop widths around 1440px the board, score panels, history panel, and Match log remain fully usable without clipping primary controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
-name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+name = "overlays_reflow_narrow"
+description = "Round Result and Match Complete overlays remain readable and operable at 375px without clipped buttons."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
-name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "7.6"
-name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "7.7"
-name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "7.8"
-name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "7.9"
-name = "media_and_canvases_resize"
-description = "Images, grids, and canvases size responsively to fit the layout."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "7.10"
-name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
+name = "export_controls_reachable_narrow"
+description = "Export Match, Export Archive, Import, Save Progress, and Resume Saved Match remain reachable at 375px without being pushed off-screen."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.n1"
-name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+name = "narrow_horizontal_overflow"
+description = "At 375px width primary game chrome requires horizontal scrolling or clips essential controls."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n2"
-name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+name = "tiles_untappable_narrow"
+description = "At 375px width grid tiles are too small or overlapped to tap reliably."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n3"
-name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+name = "desktop_clips_hud"
+description = "At 1440px the score panels, history panel, or turn banner clip or overlap unreadably."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n4"
-name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+name = "overlay_buttons_unreachable_narrow"
+description = "At 375px Rematch, New match, or Export Match on Match Complete cannot be reached."
 type = "binary"
-negate = true
 weight = 1.0
-
-[[criterion]]
-id = "7.n5"
-name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
-type = "binary"
 negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n6"
-name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n7"
-name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n8"
-name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n9"
-name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n10"
-name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
-type = "binary"
-negate = true
-weight = 1.0
 
 [[criterion]]
 id = "responsiveness.catchall"
 name = "responsiveness_catchall"
-description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable responsiveness defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true

@@ -1,0 +1,157 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "14.1"
+name = "multi_facet_reload_reset"
+description = "Run a query, give one result a thumbs-up, save a search, add a document, and set the threshold to 0.4 — then reload the page. All facets coherently reset to the seeded baseline: seeded corpus without the added document, empty query, no history, no saved searches, no feedback, threshold at its default, and a fully built index — never a mix of surviving and reset facets"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.2"
+name = "search_to_export_pipeline_tracks"
+description = "Full pipeline probe: run a query, note the top three results and their scores, thumbs-up the third result, and raise the threshold; then open the export report. The report's ranked list shows the boosted result's new position, the raised threshold value, the feedback marker on that result, and only results at or above the threshold — every stage tracked the same live state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.3"
+name = "add_index_search_pipeline"
+description = "Add a document whose body contains a distinctive invented word, confirm a search for that word returns nothing before rebuild while the stale count reads one, run Index Now to completion, then search again: the new document appears with a similarity score, the stale count reads zero, and the index statistics count the new document"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.4"
+name = "different_queries_different_rankings"
+description = "Run two clearly different queries (different topics) and compare their result lists: the rankings, similarity scores, and explanation disclosures differ in ways consistent with each query's terms; then select both in the Compare view and confirm the overlap and unique counts are consistent with the two visible result sets"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.5"
+name = "threshold_count_delta_exact"
+description = "With results visible, note the result count, then raise the threshold until at least one card disappears: the count decreases by exactly the number of hidden cards, and the cluster group counts (when grouped) still sum to the new total"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.6"
+name = "feedback_rerank_and_reset_round_trip"
+description = "Note a query's ranked order, thumbs-up a mid-ranked result and confirm it moves up with its score adjusted, re-run the same query and confirm the adjusted order reproduces, then use Reset Feedback and confirm the original order returns exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.7"
+name = "interleaved_run_and_search_integrity"
+description = "Start a re-index run, pause it mid-run, run a search and open a result's detail panel, then resume the run: the run continues from exactly the paused step with earlier timestamps unchanged, and the search results and panel remain intact — neither flow corrupted the other"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.8"
+name = "undo_redo_round_trip_tracks_derived"
+description = "Delete a document that appears in the current results, confirm the card disappears and the index statistics drop by one, undo and confirm both the card and statistics return, then redo and confirm they drop again — derived surfaces track through every transition"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n1"
+name = "derived_surface_ignores_inputs"
+description = "A derived surface — the result count, cluster counts, index statistics, compare summary, or export report — renders identically after its inputs change (threshold, feedback, document changes, or a different query)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "14.n2"
+name = "identical_scores_for_different_queries"
+description = "Two different queries yield identical similarity scores for the same documents, or the export report shows scores that do not match the on-screen badges for the same query"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "14.n3"
+name = "cross_view_state_stale"
+description = "A change made in one surface (feedback, deletion, threshold) appears there but not in another surface showing the same data (compare view, clusters, export report, index statistics) until a reload"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "14.n4"
+name = "partial_reset_incoherent"
+description = "After a reload, some user-made facets survive (for example history or feedback) while others reset, producing incoherent partial persistence in this in-memory task"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "14.catchall"
+name = "behavioral_catchall"
+description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling that is NOT covered by any other criterion in this file. If present, name the probe and cite the concrete evidence (action sequence and mismatched surfaces) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,86 +62,86 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "zero_pane_page_empty_state"
+description = "A page with zero panes shows the empty-state message Create your first pane to build this page."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "wizard_inline_validation_before_advance"
+description = "In the Create Pane wizard and other forms, advance/submit stay disabled until the current step's fields are valid, and an invalid field shows an inline error naming that field before submit."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "errors_name_field_and_fix"
+description = "Validation and rejection messages name the field and the fix (for example a duplicate saved-analysis name) rather than only saying Invalid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "copy_link_shows_copied_confirmation"
+description = "Copy Link copies the mock share link and shows a transient Copied! confirmation that clears on its own."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "no_data_range_empty_inside_pane"
+description = "A pane whose metric/dimension/date-range combination yields no matching rows shows No data for this range centered inside the pane instead of a blank chart, and widening the range restores the chart without recreating the pane."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "destructive_delete_requires_confirmation"
+description = "Pane delete and page delete ask for confirmation first; cancelling keeps the item, confirming removes it (pages never allow deleting the last remaining page)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "last_page_delete_blocked_with_explanation"
+description = "Deleting the last remaining page is blocked: the delete control is disabled or a visible explanation appears, and the page survives."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "forms_use_semantic_controls"
+description = "Wizard fields, page rename, saved-analysis forms, preview filter, and Collaboration Scenario editors use semantic button/input/label elements rather than unlabeled decorative wrappers."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "overlays_dismissible_close_paths"
+description = "Preview modal, pane wizard, Share panel, and confirmation dialogs close via an explicit close control and Escape (and backdrop where present), returning to the workspace without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "double_submit_creates_exactly_one"
+description = "Double-activating a create or submit control for a pane or saved analysis creates exactly one record: the relevant count increases by one and exactly one new item appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_page_shows_nothing"
+description = "A page with zero panes shows nothing — no Create your first pane to build this page empty-state message."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "validation_errors_only_in_console"
+description = "Invalid wizard, page-name, or saved-analysis input failures surface only in the browser console with no visible inline field feedback."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,63 +149,85 @@ weight = 1.0
 [[criterion]]
 id = "4.n3"
 name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+description = "Completing Create Pane, Copy Link, or saved-analysis create produces no visible feedback (count unchanged with no confirmation or error)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "destructive_delete_no_confirmation"
+description = "Pane or page delete proceeds immediately with no confirmation dialog or cancel path."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "interactive_controls_are_nonsemantic"
+description = "Primary interactive controls (Create Pane, page tabs, pane Edit/Delete, Share) are non-semantic div/span click targets without button/role semantics."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "overlays_not_keyboard_dismissible"
+description = "With the preview modal, pane wizard, Share panel, or confirmation open, keyboard users cannot dismiss it (no Escape path and no focusable close control)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "duplicate_saved_analysis_accepted"
+description = "A saved analysis with a duplicate name is accepted, creating a duplicate record or leaving bundled source data changed, without inline feedback naming the problem."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "ambiguous_or_missing_action_labels"
+description = "Primary actions show blank, placeholder, or ambiguous labels such as Submit, OK, or Button instead of specific labels like Add Page, Create Pane, or Copy Link."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "storage_unavailable_crashes_or_blanks"
+description = "When persistent storage is unavailable, the root crashes, goes blank, or omits bundled sources instead of rendering a usable seeded workspace with a visible warning that changes will not persist."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "invalid_input_damages_last_valid_state"
+description = "Invalid or extreme form input is accepted or clears the last valid rendered pane/page/saved-analysis state instead of rejecting with specific visible feedback."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "schema_invalid_paneconfig_rejected"
+description = "Submitting Create Pane or Edit with a PaneConfig that breaks the field contract (out-of-enum type/size/refreshInterval/source, metric or required dimension not on the source, missing dimension on a chart type, or non-null dimension on table/counter) leaves pane count unchanged and shows an inline error naming the offending field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "malformed_or_schema_invalid_workspace_import_rejected"
+description = "Importing malformed Workspace JSON, or JSON that fails the WorkspaceDocument field contract, leaves pages, panes, date range, and saved analyses unchanged and shows a visible error naming the offending field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "schema_invalid_import_applies_partial_state"
+description = "A Workspace JSON import that fails the field contract partially applies some pages, panes, or saved analyses while rejecting others."
 type = "binary"
 negate = true
 weight = 1.0

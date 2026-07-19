@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -85,7 +85,7 @@ weight = 1.0
 [[criterion]]
 id = "11.4"
 name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+description = "Data visualizations or interactive graphics (the debt network, burn-rate chart, pie, or beyond) provide extra usability beyond the spec, such as tooltips, drill-downs, or series toggling."
 type = "binary"
 weight = 1.0
 

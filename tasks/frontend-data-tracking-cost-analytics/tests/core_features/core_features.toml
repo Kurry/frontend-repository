@@ -1,0 +1,339 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "kpi_strip_complete"
+description = "The top row shows four KPI tiles — total spend this month, spend today, projected month-end spend, and remaining budget against the cap — each with a trend arrow comparing against the previous period"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "budget_cap_over_state"
+description = "Setting the header budget cap below the projection switches the remaining-budget tile to an error treatment with a 2 pixel error-colored border and an over-budget label, and raising the cap above the projection returns it to normal"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "spend_chart_tooltip"
+description = "The cumulative daily spend line chart renders for the selected range, and hovering a point with the real pointer shows a tooltip with the date and exact dollar amount"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "date_range_filtering"
+description = "The date-range picker re-renders the spend chart to only the selected range, and an invalid range (end before start) shows an inline validation message and does not apply"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "period_compare_overlay"
+description = "The period-compare toggle overlays the previous period of equal length as a visually distinct second series, and delta chips with signed percentage changes appear on the KPI tiles while it is on"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "breakdown_dimension_switching"
+description = "The breakdown chart plots per-day spend split by the selected dimension — model, feature, or team — with one color series per member and a legend mapping series to names, and switching dimensions redraws the series"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "stacked_grouped_toggle"
+description = "The stacked/grouped toggle switches the same breakdown data between stacked bars and grouped side-by-side bars without changing the plotted totals"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "legend_series_toggling"
+description = "Clicking a legend entry removes that series from the bars and mutes the entry; clicking again restores it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "segment_drilldown_chip"
+description = "Clicking a bar segment filters the event table to exactly that day and dimension member and shows a removable applied-filter chip above the table describing the drill-down"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "team_budget_panel"
+description = "The team budget panel lists each seeded team with its monthly ceiling, spend to date, a burn-rate projection bar against the ceiling, and an error-treatment overage highlight when the projection exceeds the ceiling"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "radial_attainment_wheel"
+description = "The radial budget-attainment wheel renders one ring per team showing percent of ceiling consumed, with a legend mapping rings to teams"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "ceiling_edit_ripples"
+description = "Editing a team's ceiling immediately re-renders that team's projection bar, overage state, and wheel ring without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "anomaly_detection_markers"
+description = "Days whose spend exceeds twice the trailing 7-day average carry a distinct anomaly marker on the spend chart, and the anomaly list names each flagged day with its spend and percentage above trend — at least the 2 seeded anomaly days appear"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "anomaly_explanation_disclosure"
+description = "Each anomaly entry's disclosure is collapsed by default and expands to list the top contributing events with model, team, and cost; its View events control applies that day as a table filter and moves to the filtered event table"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "event_table_columns_virtualized"
+description = "The event table lists seeded usage events with columns timestamp, model, feature, team, prompt tokens, completion tokens, cost, and tag, and with at least 1,000 seeded events it scrolls smoothly, rendering rows as they enter the viewport"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "column_sort_round_trip"
+description = "Clicking any event-table column header sorts ascending and clicking again sorts descending, reversing the visible order relative to ascending consistently with the cell values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "bulk_selection_bar"
+description = "Row checkboxes and select-all select events, a bulk action bar appears with the live selection count and team and feature Recategorize controls, and the bar disappears when the selection empties"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "recategorize_reaggregates"
+description = "Applying a bulk recategorization updates every selected event and immediately re-aggregates the KPI tiles, both charts, the team budget panel, and the anomaly list to reflect the change"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "filter_chips_removable"
+description = "Applied filters — drill-down, anomaly day, saved view — render as removable chips above the table, and removing a chip restores the wider dataset in the table, charts, and formula result"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "undo_redo_scope"
+description = "Toolbar Undo and Redo apply to bulk recategorizations, ceiling edits, saved-view changes, and schedule changes, are disabled when there is nothing to undo or redo, and undoing a recategorization returns every affected event and every derived surface to its exact prior value"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "saved_views_round_trip"
+description = "Save view captures the current filters, breakdown dimension, and date range under a required name; applying a saved view restores exactly that combination and deleting one requires confirmation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "unit_cost_panel"
+description = "The unit-cost panel lists the 5 seeded models — aurora-70b, quasar-mini, helix-2, cobalt-8b, meridian-pro — each with its cost per 1,000 tokens"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "what_if_repricing_live"
+description = "Dragging a model's what-if rate slider reprices history live — the KPI tiles, both charts, the budget panel, and event-table costs recompute as the slider moves — and a what-if active indicator appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "what_if_revert_exact"
+description = "The Revert control restores all rates to their originals and every derived number returns exactly to its pre-what-if value"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "estimator_per_keystroke"
+description = "Typing sample text into the cost estimator updates a live estimated token count and an estimated cost for each of the 5 models at current rates as the user types"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "formula_box_evaluates"
+description = "The formula input evaluates =SUM(cost), =AVG(cost), =COUNT(), =SUM(prompt_tokens), and =SUM(completion_tokens) over the currently filtered events and renders the labeled result, re-evaluating when the active filters change"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "formula_error_handling"
+description = "An unrecognized formula shows an inline error naming the accepted forms and renders no result"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "capacity_gauge_moves"
+description = "The records gauge shows stored records (events plus saved views plus report snapshots) against the simulated capacity of 2,000 with a proportional fill, and generating a report or saving a view visibly moves it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "report_schedule_and_run_now"
+description = "The report schedule form saves a frequency and included sections (rejecting zero sections with an inline message), and Run schedule now generates exactly one report snapshot in the report history whose opened totals match the live dashboard at generation time"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "export_report_complete"
+description = "Download JSON and Download CSV export a cost report with overall totals, per-model, per-team, and per-feature tables, the flagged anomalies, and a description of the applied filters"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "empty_filter_states"
+description = "A filter combination matching zero events shows an empty state in the table with a clear-filters control and a zero-events formula result, and toggling off every chart series shows an empty-chart message"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.32"
+name = "cap_field_validation"
+description = "A zero or negative budget cap is rejected with an inline validation message naming the cap field, and the previous cap remains in effect"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "ceiling_allocation_cross_field"
+description = "A ceiling edit that would make the sum of all team ceilings exceed the monthly cap shows an inline message naming the excess amount and is not saved; an edit within the cap saves normally"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "usage_event_shape_conformance"
+description = "The Recategorize selects offer only the seeded teams and features, and the downloaded JSON export serializes each event with exactly the fields timestamp, model, feature, team, prompt tokens, completion tokens, cost, and tag, its per-dimension tables carrying the same seeded model, team, and feature names the dashboard renders"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n1"
+name = "charts_ignore_recategorization"
+description = "After a bulk recategorization, the breakdown chart, budget panel, or KPI tiles render identically to before the change while the table shows the new tags"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n2"
+name = "what_if_revert_partial"
+description = "After Revert, any derived surface — a tile, chart, table cost, or the budget panel — still shows repriced values instead of the exact originals"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n3"
+name = "export_omits_session_mutations"
+description = "An exported report or generated snapshot reflects stale pre-mutation numbers — recategorizations, ceiling edits, or an active what-if rate applied in this session are missing from the exported figures"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n4"
+name = "anomaly_list_static"
+description = "The anomaly list or its explanations stay unchanged when the underlying events that produced them are recategorized away"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "core_features.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

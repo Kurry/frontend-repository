@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,48 +62,38 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
+name = "selection_feedback_via_real_row"
 description = "Selecting a holding through the real table row (click or keyboard) gives a visible selection and detail update that makes the chosen holding unambiguous."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "4_2"
-description = "Completing the Add holding flow with keyboard input keeps a visible focus indicator on the form controls."
+name = "keyboard_form_keeps_focus_ring"
+description = "Completing the Add holding flow with keyboard input keeps a visible focus ring on the form controls that differs from hover treatment."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
-description = "Filtering by asset class visibly identifies which holdings currently match."
+name = "filter_identifies_visible_set"
+description = "Filtering by asset class through the real filter control visibly identifies which holdings currently match."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "4_4"
-description = "Interactive controls show distinct hover and focus treatments and immediate pressed feedback when actuated through the real control."
+name = "button_hover_press_focus_distinct"
+description = "Buttons show immediate pressed feedback on pointer-down and a hover change in background; every interactive control shows a clearly visible focus ring that differs from its hover treatment — verified through the real controls."
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "4.5"
 name = "row_hover_wash_and_selected_left_border"
 description = "Table rows take a visible hover wash under the pointer, and the row selected via the real row control is marked by more than color alone: a teal left border in addition to the tint."
 type = "binary"
-weight = 0.5
-optional = true
-
-[[criterion]]
-id = "4.6"
-name = "4_6"
-description = "One core flow can be completed with the keyboard alone and with the pointer alone, reaching the same outcome by either input."
-type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "4.7"
@@ -118,9 +108,8 @@ id = "4.8"
 name = "focus_hover_collapsed_or_invisible"
 description = "Focus and hover are collapsed into one identical highlight, or some interactive control shows no visible focus indicator when focused from the keyboard."
 type = "binary"
-weight = 0.5
+weight = 1.0
 negate = true
-optional = true
 
 [[criterion]]
 id = "4.9"
@@ -139,7 +128,7 @@ weight = 1.0
 [[criterion]]
 id = "4.11"
 name = "toast_animates_in_and_fades_out"
-description = "Saving or deleting a holding raises a brief confirmation toast that animates in, remains readable, and dismisses with a fade."
+description = "Saving or deleting a holding through the real controls raises a brief confirmation toast that animates in, remains readable, and dismisses with a fade."
 type = "binary"
 weight = 1.0
 
@@ -153,7 +142,7 @@ weight = 1.0
 [[criterion]]
 id = "4.13"
 name = "reduced_motion_removes_animation"
-description = "With prefers-reduced-motion enabled on a fresh load, animations are removed and every state change (add, delete, filter, select) applies instantly with no loss of functionality."
+description = "With prefers-reduced-motion enabled on a fresh load, animations are removed and every state change (add, delete, filter, select, export open/close, import feedback) applies instantly with no loss of functionality."
 type = "binary"
 weight = 1.0
 
@@ -164,6 +153,47 @@ description = "Selecting, adding, editing, deleting, or filtering holdings trigg
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "4.n1"
+name = "jarring_or_layout_jank_motion"
+description = "Specified transitions introduce layout jank, flicker, or jarring motion that distracts from reading the net-worth figure or holdings table."
+type = "binary"
+negate = true
+weight = 0.5
+
+
+[[criterion]]
+id = "4.15"
+name = "export_drawer_enter_and_copy_confirm"
+description = "Opening Export portfolio through the real control enters the drawer with a brief opacity or scale transition, and Copy on a format tab shows a short Copied confirmation before resetting."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n2"
+name = "export_motion_snaps_or_blocks"
+description = "Opening the export drawer snaps with no transition while prefers-reduced-motion is unset, or activating Copy leaves no visible Copied confirmation on screen, or export open/close blocks interaction until a reload."
+type = "binary"
+negate = true
+weight = 1.0
+
+
+
+[[criterion]]
+id = "4.20"
+name = "export_drawer_slides_in"
+description = "Opening Export portfolio through the real control slides the export drawer in from the side rather than snapping open; Copy confirmation feedback appears without a full page reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n10"
+name = "export_drawer_snaps_open"
+description = "The export drawer appears by snapping fully open with no enter transition when opened through the real Export portfolio control (with prefers-reduced-motion off)."
+type = "binary"
+negate = true
+weight = 1.0
 
 [[criterion]]
 id = "4.catchall"

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.5
@@ -63,89 +63,89 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "15.1"
-name = "headings_use_consistent_capitalization"
-description = "Where the app renders headings and section titles, they use consistent capitalization (one convention — title case or sentence case — throughout)."
+name = "uppercase_convention_on_dial_meter_mode"
+description = "Where the app renders dial titles, meter captions (UNDER EXPOSED / OVER EXPOSED), and mode labels, they keep one consistent uppercase convention throughout."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.2"
-name = "actions_use_specific_labels"
-description = "Where the app renders button or action labels, they are specific verbs ('Add expense', 'Start session'), not generic ('Submit', 'OK') when a specific label is possible."
+name = "specific_verbs_on_actions"
+description = "Where the app renders button or action labels, they use specific verbs such as Apply preset, Reset, Download PNG, Download JPEG, Download edit stack, Copy edit stack, and Import edit stack rather than generic Submit/OK when a specific label is possible."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.3"
-name = "errors_name_problem_and_fix"
-description = "Where the app renders error messages, they name the problem and the fix ('Amount must be a positive number'), not just a rejection ('Invalid')."
+name = "validation_names_problem_and_fix"
+description = "Where the app renders validation messages (empty preset name, empty snapshot name, invalid edit-stack import), they name the problem and the fix."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.4"
-name = "empty_states_explain_next_step"
-description = "Where the app renders empty states, the copy explains what belongs there and how to add it."
+name = "empty_presets_copy_explains_next_step"
+description = "Where the app renders the empty presets state, the copy explains that no presets exist and how to create one."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.5"
-name = "body_copy_is_well_written"
-description = "Where the app renders body or marketing copy, rate how free it is of spelling and grammatical errors."
+name = "help_explainers_polished"
+description = "Where the app renders the three help explainer paragraphs (Aperture, Shutter Speed, ISO), rate how free they are of spelling and grammatical errors and filler."
 type = "likert"
 points = 5
 weight = 0.5
 
 [[criterion]]
 id = "15.6"
-name = "terminology_is_consistent"
-description = "Where the app renders labels for the same concept in multiple places, terminology is consistent (not 'task' here and 'todo' there)."
+name = "terminology_consistent_across_surfaces"
+description = "Where the app renders labels for the same concept in multiple places (APERTURE vs Aperture in help, SPEED vs Shutter Speed, ISO, presets, look packs), terminology stays consistent."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.7"
-name = "numbers_dates_and_units_are_consistent"
-description = "Where the app renders numbers, dates, and units, formatting is consistent (same date format, same decimal precision, units labeled)."
+name = "stop_readout_formatting_consistent"
+description = "Where the app renders stop values, formatting is consistent: aperture as f/N, shutter as 1/N, ISO as a bare integer — the same conventions in dials and preset stop readouts."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.8"
-name = "success_messages_are_specific"
-description = "Where the app renders confirmation and success messages, they state what happened ('Entry saved'), not vague affirmations."
+name = "import_error_names_invalid_file"
+description = "Where the app renders edit-stack import errors, the copy names the invalid file or field rather than a bare rejection."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.n1"
-name = "placeholder_copy_is_visible"
-description = "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI."
+name = "placeholder_copy_visible"
+description = "Lorem ipsum or placeholder text (TODO, Lorem, asdf, or template variable names) is visible anywhere in the shipped UI, including help explainers."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n2"
-name = "prominent_copy_has_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as headings, hero text, or primary buttons."
+name = "prominent_copy_has_spelling_errors"
+description = "Spelling or grammatical errors appear in prominent copy such as dial titles, meter captions, mode labels, or primary action buttons."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n3"
-name = "concept_names_are_inconsistent"
-description = "The same concept is named inconsistently across surfaces."
+name = "inconsistent_concept_naming"
+description = "The same dial, look pack, or export concept is named inconsistently across surfaces in a way that would confuse a user."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n4"
-name = "copy_is_truncated_or_overflowing"
-description = "Truncated or overflowing text renders copy unreadable."
+name = "truncated_or_overflowing_labels"
+description = "Dial titles, meter captions, preset names, export labels, or validation messages are truncated or overflowing so the copy is unreadable."
 type = "binary"
 negate = true
 weight = 0.5
@@ -153,7 +153,7 @@ weight = 0.5
 [[criterion]]
 id = "writing.catchall"
 name = "writing_catchall"
-description = "The app exhibits a significant, browser-observable defect in rendered copy quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app's rendered text exhibits a significant copy-quality defect not covered by any other criterion in this file. If present, name the defect and cite evidence. If already covered, answer no."
 type = "binary"
 negate = true
 weight = 1.0

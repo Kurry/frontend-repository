@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,158 +62,209 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "font_family_end_to_end_updates_all_surfaces"
+description = "Editing the font family end to end: entering a new font-family value updates the generated font-family line to the entered value, increases the override count by exactly one (measured immediately before and after), and re-renders the live terminal preview."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "invalid_setting_blocks_generated_line"
+description = "Typing an invalid value into a validated setting shows an immediate inline message naming that setting, and no malformed line is emitted into the generated configuration."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "category_round_trip_keeps_font_family"
+description = "After editing font-family, switching to another category and back shows the same value in the control, the live preview, and the generated line without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "single_override_reset_flow"
+description = "Resetting the edited font-family setting removes its generated line (or shows it empty), decreases the override count by exactly one, and returns the preview text to the default face, while every unrelated override stays unchanged."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "theme_selection_end_to_end"
+description = "Selecting a theme end to end: choosing a theme on the Colors page recolors the live terminal preview, adds a theme = the chosen theme line to the generated configuration, updates the override count, and enables the export actions if they were disabled."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "reset_all_restores_empty_state"
+description = 'After editing at least two settings in different categories, Reset all removes every generated override line, returns the override count to zero, restores "# No changes to the default config yet", restores the live preview to defaults, and disables the export actions.'
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "reload_restores_edited_settings"
+description = "Reloading the page restores the same view and the previously edited settings from client storage: the edited controls, the live preview, the generated lines, and the override count all match their pre-reload state."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "sidebar_category_nav_keeps_workflow"
+description = "Navigating between setting categories via the sidebar keeps the current category visibly identified, does not reload the document, and preserves in-progress override state across categories."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "copy_flow_feedback_without_mutation"
+description = "With at least one override present: activating Copy shows visible feedback, and afterward the generated configuration text and override count are identical to their pre-copy values."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "download_flow_saves_ghostty_config"
+description = "With at least one override present: activating Download initiates a save for a file named ghostty-config without altering the generated configuration text."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "primary_edit_or_export_flows_unavailable"
+description = "Font-family editing, theme selection, Copy, Download, or Reset all cannot be completed from the visible UI controls."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "font_family_edit_missing_or_duplicated"
+description = "Entering a font-family value either fails to add a generated line or creates duplicate font-family lines for a single edit."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "surfaces_desync_after_edit"
+description = "After a setting edit, the control value, live preview, and generated line disagree about the same setting without a reload."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "category_switch_loses_selection_or_breaks"
+description = "Switching sidebar categories breaks the layout or loses the active category identification / override values."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "reset_all_leaves_broken_empty_ui"
+description = "After Reset all, the generated-config panel is blank or broken with no empty-state comment and no disabled export state."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "preview_and_config_disagree_on_theme"
+description = "After selecting a theme, the live preview colors and the generated theme = line disagree about which theme is active."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "sidebar_categories_cannot_reselect"
+description = "After visiting another category, a previously visited sidebar category cannot be re-selected to show its settings form."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "export_toast_blocks_with_no_exit"
+description = "Copy/Download/Reset feedback blocks navigation with no dismiss path back to the editor."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "failed_invalid_edit_silent"
+description = "An invalid setting edit provides no visible validation feedback and leaves the user without an explanation."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "category_or_export_dead_end_requires_reload"
+description = "Recovering from a category switch or export action requires a full page reload — the UI reaches a dead end."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
+
+[[criterion]]
+id = "6.11"
+name = "export_import_round_trip_flow"
+description = "After editing at least two settings: Copy or Download the generated config, Reset all to empty, then Import that same text — controls, live preview, generated lines, and override count all match the pre-reset state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "undo_redo_round_trip_flow"
+description = "Edit font-family, confirm the override appears, Undo once (override and count revert), then Redo once — the override returns on the control, preview, and generated line."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "command_palette_jump_flow"
+description = "Open the palette with Cmd+K or Ctrl+K, type enough of a setting name to match, choose the result, and land on that setting's category with the control focused."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "profile_save_apply_flow"
+description = "With at least two overrides: Save profile under a name, Reset all, then select that profile — the same overrides reappear in the generated panel, controls, and preview."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "import_round_trip_desyncs"
+description = "After export → Reset all → Import of the exported text, controls, preview, and generated lines disagree about the restored overrides."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "6.15"
+name = "field_contract_validation_blocks_bad_commit"
+description = "Attempting to commit an out-of-contract value (for example font-size outside 4–60, cursor-style outside the closed enum, a non-#RRGGBB color, or an empty profile-name) shows inline validation naming the field, leaves the generated configuration without that malformed line, does not change the override count for the rejected value, and keeps the rest of the workflow operable without a reload; a subsequent valid in-contract commit emits the matching key = value line."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n12"
+name = "validation_bypass_emits_bad_config"
+description = "An out-of-contract value reaches the generated config or export artifact without the inline field validation the Ghostty contracts require."
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "user_flows.catchall"
 name = "user_flows_catchall"
 description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true

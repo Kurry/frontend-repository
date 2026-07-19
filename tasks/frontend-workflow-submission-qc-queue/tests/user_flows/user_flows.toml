@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,78 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "triage_end_to_end_flow"
+description = "Triage end to end: open a submitted submission, move it to in-review, add a blocker finding and observe the gate banner read gate failed and the queue row gain a blocker chip, then override that finding with justification and observe the finding struck-through, the gate flip to passed, and the queue chips update — all without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "revision_loop_flow"
+description = "Revision loop: on an in-review submission add a major finding, request a revision with a valid 20-plus-character summary, observe the stage move to needs-revision in the detail view, the queue row, and the contributor timeline (new timestamped event), then mark it revised and observe the stage return to in-review"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "approval_gate_flow"
+description = "Approval gate: attempt to approve an in-review submission that has an open blocker and observe the disabled control with its explanation; resolve the blocker by override, approve, and observe stage approved and payout released in both detail and queue"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "profile_sensitivity_flow"
+description = "Profile sensitivity: record two criteria's failure rates in the failure-profile panel, narrow the date range and observe the bars and percentages change, then restore the full range and observe the original values return exactly"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "bulk_hold_and_export_flow"
+description = "Bulk hold and export: select at least two queue rows, activate Hold payout, confirm both rows show held (unless already released), open Export, confirm the QC package JSON lists those submissions with payout_state held, copy the export and see the confirmation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "undo_after_mutation_flow"
+description = "Undo after mutation: add a finding, confirm it appears in the detail list and the export preview, activate Undo, and confirm the finding is gone from the list, the gate and queue chips restore, and the export preview no longer contains that finding"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
 name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+description = "Filtering the queue by stage or contributor updates the visible row set immediately; clearing filters restores all rows; zero-match filters show the designed empty state with a clear-filters control"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "drawer_and_palette_support_flows"
+description = "Contributor drawer and command palette support expected flows: drawer opens from a contributor name and closes via close control, outside click, and Escape with focus return; palette opens via Ctrl/Cmd+K, navigates to a submission or Export view, and closes on Escape"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
 name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+description = "Add finding, Request revision, Override, and Approve overlays behave as expected for details, edits, and confirmations, with cancel/close paths that leave the submission unchanged when dismissed without submit"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
 name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+description = "Recovery: after a failed validation (short revision summary or invalid finding), correcting the field and resubmitting completes the flow without a reload; no dead ends require refreshing the page"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
 name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+description = "Primary triage flows (add finding, request revision, approve, override, export, undo) are not enabled from the UI"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n2"
 name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+description = "A newly added finding fails to show up or duplicates on a single submit"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n3"
 name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+description = "Stage, finding, payout, or gate state changes are not synced across queue, detail, drawer, and export"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +157,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n4"
 name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+description = "Switching between queue, detail, and Export breaks layout or loses the active submission selection incorrectly"
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +165,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n5"
 name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+description = "A zero-findings submission or zero-match filter produces broken or missing UI instead of a designed empty state"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n6"
 name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+description = "Filtered queue views disagree with each other about what is visible for the same active filters"
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +181,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n7"
 name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+description = "The contributor drawer or command palette cannot be re-opened after closing"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n8"
 name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+description = "Review action overlays or the command palette block navigation with no exit option"
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +197,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n9"
 name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+description = "A failed validation or blocked approve provides no user feedback"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n10"
 name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+description = "Navigation dead ends or requires reload for recovery after a triage action"
 type = "binary"
 negate = true
 weight = 1.0

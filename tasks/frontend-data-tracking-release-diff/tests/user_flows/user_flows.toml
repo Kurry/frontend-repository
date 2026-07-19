@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,35 +63,35 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "6.1"
 name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+description = "Cut-release flow: submit a valid unique semver with notes under the field contract, complete seal (retrying rank-stability if needed); the sidebar gains exactly one version, it is selected sealed, the timeline gains a cut event, and Export Release pack JSON lists that name and notes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
 name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+description = "Invalid cut submission (empty/non-semver name, duplicate name, or notes over 500 characters) shows immediate inline validation naming the field and starts no cut."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
 name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+description = "Diff flow: pick 1.0.0 as base and 2.0.0 as compare, read summary counts, expand unchanged, then change compare to 1.1.0 and observe every kind count and row classification recompute immediately."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
 name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+description = "Advance rotation changes active subsets, increments cycle by one, prepends history without repeating a subset in the prior 3 cycles, appends a timeline event, and Export Release pack JSON shows the new rotation.cycle."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
 name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+description = "Switching among Manifest, Diff, Splits, and Rotation retains the selected version, diff picker pair, and sealed cuts without a reload."
 type = "binary"
 weight = 1.0
 
@@ -119,14 +119,14 @@ weight = 1.0
 [[criterion]]
 id = "6.9"
 name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+description = "Cut dialog, Export release pack, and Import release pack open, accept their flows (cut steps / format tabs / paste-or-file import), and close without trapping the app in a dead end."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
 name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+description = "After a failed rank-stability check, Retry check can pass and finish the seal without a page reload; after a rejected import, the prior session remains operable."
 type = "binary"
 weight = 1.0
 
@@ -206,6 +206,22 @@ weight = 1.0
 id = "6.n10"
 name = "navigation_dead_end_requires_reload"
 description = "Navigation dead ends or requires reload for recovery."
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "6.11"
+name = "export_import_round_trip_flow"
+description = "Export then import: after sealing a cut, export Release pack JSON that satisfies the field contract, advance rotation so the cycle differs, import the earlier JSON, and confirm version names, task counts, and rotation cycle return to the pack contents"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "export_omits_cut_in_flow"
+description = "After a sealed cut with distinct notes, Export Release pack JSON omits that version or notes while the sidebar shows the sealed cut"
 type = "binary"
 negate = true
 weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -116,7 +116,7 @@ optional = true
 [[criterion]]
 id = "3.8"
 name = "export_modal_and_dropdown_layout"
-description = "The CSS export opens as a centered modal with a scrollable code block, copy affordance, and hint line, while version, theme, and language menus align to their chrome triggers without clipping or leaving the viewport"
+description = "Export opens as a centered modal/drawer with CSS / Theme JSON / theme-extension format tabs, a scrollable code block, Copy and Download affordances, and a hint line, while version, theme, and language menus align to their chrome triggers without clipping or leaving the viewport"
 type = "binary"
 weight = 1.0
 
@@ -131,7 +131,7 @@ weight = 1.0
 [[criterion]]
 id = "3.10"
 name = "distinct_control_state_treatments"
-description = "Buttons, inputs, and segmented choices show visibly distinct default, hover, focus (visible ring), active-selection, and error treatments rather than a single unchanging style"
+description = "Buttons, inputs, and segmented choices show visibly distinct default, hover, focus (visible ring), active-selection, disabled (empty Undo/Redo), and error treatments rather than a single unchanging style"
 type = "binary"
 weight = 1.0
 
@@ -145,7 +145,7 @@ weight = 1.0
 [[criterion]]
 id = "3.12"
 name = "consistent_specific_labels"
-description = "Chrome labels, editor section titles, and buttons follow one consistent capitalization convention, and action labels are specific—Hold to add theme, Reset theme, Remove theme, Copy—rather than generic where a specific label is possible"
+description = "Chrome labels, editor section titles, and buttons follow one consistent capitalization convention, and action labels are specific—Hold to add theme, Reset theme, Remove theme, Duplicate, Export, Copy, Download, Save snapshot—rather than generic where a specific label is possible"
 type = "binary"
 weight = 0.5
 
@@ -162,6 +162,20 @@ name = "placeholder_copy_shipped"
 description = "Lorem ipsum, 'TODO', template-variable, or other placeholder text is visible somewhere in the shipped UI"
 type = "binary"
 negate = true
+weight = 0.5
+
+[[criterion]]
+id = "3.15"
+name = "contrast_matrix_visual_anatomy"
+description = "The Contrast panel reads as a compact matrix of pair name, numeric ratio, and AA/AAA badges with a distinct warning treatment on failing pairs, sitting in the editor without breaking the three-panel studio"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.16"
+name = "snapshots_and_vision_controls_placed"
+description = "Snapshots list and Before / After sit near the editor, and the vision-mode control sits on the preview chrome, without collapsing the themes | editor | preview composition"
+type = "binary"
 weight = 0.5
 
 [[criterion]]

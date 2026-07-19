@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -63,157 +63,80 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "For fidelity tasks, score execution quality rather than invention beyond the reference. The app has unique, delightful microinteractions."
+name = "execution_quality_of_signature_interactions"
+description = "Score execution quality of the reference experience (not invention beyond it): flick-deck elastic reshuffle, client-carousel scale(1)/scale(0.94), primary-button hover wipe, and cookie banner ease feel polished and coherent rather than unfinished stubs."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "scroll_storytelling_services_throw_execution"
+description = "On a fresh load, scrolling through the pinned services region throws Organic content / Ads for social / Training with rotation driven by real scroll progress, and scrolling back reverses the sequence — executed smoothly as reference recreation rather than a missing or janky stub."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+name = "lime_veil_lettermark_intro_execution"
+description = "On a fresh load, the lime page-load veil lifts with the brand lettermark rising letter by letter and the nav settling in one orchestrated timeline matching the reference ambition."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
-type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+name = "cinder_bloom_brand_narrative_arc"
+description = "The long-form page reads as one Cinder & Bloom narrative arc from hero through statement, client deck, services, testimonials, about/self-esteem, CTA, and full-height footer rather than disconnected template blocks."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
-id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+id = "11.a1"
+name = "designed_experience_narrative_arc"
+description = "The page reads as a designed experience with a narrative arc — sections build on each other visually and the signature pinned-services throw is memorable as faithful reference execution, not a template with effects sprinkled on."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
-id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+id = "11.a2"
+name = "showcase_rechoreographed_at_narrow_widths"
+description = "Impeccable execution across breakpoints: at about 479px the showcase composition is re-choreographed (tighter hero, hamburger lime menu, fluid type) rather than a broken shrink of the desktop layout."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
-type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+name = "signature_motion_absent_or_stubbed"
+description = "Signature reference motions are absent or stubbed: no pinned services throw, no lime veil/lettermark intro, and no flick-deck elastic settle on the real UI path."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
+name = "recreation_feels_generic_template"
+description = "The recreation reads as a generic agency template with default type/spacing and none of the reference's broken-grid hero, dense flick deck, or pinned three-card services execution quality."
 type = "binary"
 negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
-type = "binary"
-negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
+name = "page_flat_static_no_immersion"
+description = "The page is flat and static with no scroll storytelling, no lettermark intro, and no flick/carousel motion language despite the reference requiring them."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
-id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
+id = "11.b1"
+name = "operator_tools_polished_execution"
+description = "Bonus execution quality: shortlist → live discovery brief (schemaVersion 1 field contract) → Download/Copy/Import with schema-invalid import rejection and the Ctrl+K palette feel polished and coherent with the Cinder & Bloom recreation rather than unfinished stubs bolted onto a static page."
 type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
-type = "binary"
-negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
-description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app demonstrates a noteworthy, browser-observable execution-quality enhancement of the reference experience that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick, and must not invent design beyond the reference. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0

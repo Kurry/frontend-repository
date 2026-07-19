@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "2.3"
 name = "forbidden_browser_storage"
-description = "After exercising create, rename, token editing, tab selection, and chrome-theme controls, localStorage, sessionStorage, IndexedDB, or another browser persistence store contains app theme or editor state"
+description = "After exercising create, rename, token editing, undo, snapshot save, tab selection, vision mode, and chrome-theme controls, localStorage, sessionStorage, IndexedDB, or another browser persistence store contains app theme or editor state"
 type = "binary"
 weight = 1.0
 negate = true
@@ -93,7 +93,7 @@ weight = 1.0
 [[criterion]]
 id = "2.6"
 name = "console_clean_full_flow"
-description = "No console errors or unhandled promise rejections appear from first load through create, rename, token edit, preview-tab switch, Random, export/copy, hash-load, and remove flows"
+description = "No console errors or unhandled promise rejections appear from first load through create, rename, duplicate, token edit, undo/redo, snapshot, vision mode, preview-tab switch, Random, export all three formats, import, hash-load, and remove flows"
 type = "binary"
 weight = 1.0
 
@@ -144,7 +144,7 @@ weight = 1.0
 [[criterion]]
 id = "2.13"
 name = "export_dialog_focus_management"
-description = "The open CSS-export modal exposes role dialog with aria-modal true, keeps Tab focus trapped inside it, closes on Escape, and returns focus to the control that opened it"
+description = "The open Export modal exposes role dialog with aria-modal true, keeps Tab focus trapped inside it, closes on Escape, and returns focus to the control that opened it"
 type = "binary"
 weight = 1.0
 
@@ -180,6 +180,35 @@ weight = 1.0
 id = "2.18"
 name = "post_load_layout_jumps"
 description = "After first paint, panels or the preview grid visibly jump, reflow, or shift position as the app settles"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.19"
+name = "export_texts_derived_from_shared_state"
+description = "After editing primary and radius on a custom theme, Export CSS, Theme JSON, and theme-extension previews all reflect those same shared-token values without a reload — derived live, not a disconnected static snippet"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.20"
+name = "theme_form_validation_matches_field_contract"
+description = "Theme create/rename and Import enforce the Theme JSON field contract in the UI: empty, over-length (>64), or illegal-character names are rejected with inline feedback naming the name field; Import of JSON that fails required keys, oklch/#RRGGBB color formats, closed enums (color-scheme, radius, size, border, depth/noise), or the color-scheme cross-field rule is rejected with feedback naming the offending field and does not mutate themes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.21"
+name = "color_scheme_cross_field_matches_export"
+description = "Toggling the Dark color scheme option updates the Theme JSON color-scheme field to dark when checked and light when unchecked, matching the editor option without a reload — a cross-field contract between the option and the export payload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n20"
+name = "import_accepts_schema_invalid_payload"
+description = "Import accepts a parseable JSON document that violates the Theme JSON field contract (missing required keys, invalid oklch/#RRGGBB color, out-of-enum radius/size/border/depth/noise/color-scheme, or cross-field disagreement) and still mutates My themes or editor tokens"
 type = "binary"
 negate = true
 weight = 1.0

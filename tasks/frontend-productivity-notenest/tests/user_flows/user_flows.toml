@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,77 +63,91 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "6.1"
 name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+description = "Create flow: submitting a valid New Note inside a selected folder increases that folder's list and badge by one, shows the note in All Notes, and includes its title in Nest JSON and Markdown vault export previews — without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
 name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+description = "Invalid create: a blank, whitespace-only, or over-200-character title shows an inline error naming the title field and adds no note to any list, badge, or export preview."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
 name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+description = "Edit flow: renaming a note, changing its color, or toggling pin updates the same record in All Notes, its folder list, Pinned section when applicable, search results, and Nest JSON without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
 name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+description = "Delete flow: deleting a note removes it from its folder list, decreases that folder's badge by one, adds exactly one Trash entry, and moves it from Nest JSON notes into trash."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
 name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+description = "View switch: moving between All Notes, a folder, Trash, and Export Nest retains pin/color/selection state without a full page reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
 name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+description = "After moving the last active note to Trash (or emptying a folder), that region shows its styled empty-state message rather than a blank pane."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "search_filters_update_lists"
+description = "Search filters notes by title or body across folders; each result shows a folder-path breadcrumb; clearing the box restores the full list everywhere it was narrowed."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
 name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+description = "At narrow width the Folders button hides and reopens the folder panel with workflow continuity; note selection and editor content remain."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
 name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+description = "Folder-delete, Empty Trash, Batch Trash, Export Nest, Import Nest, and command-palette overlays support confirm/cancel or Escape close and return focus without trapping the user."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "export_import_flow_without_reload"
+description = "Artifact flow: after mutating the workspace, Export Nest Nest JSON preview reflects mutations; Import Nest of that JSON reconstructs the same visible tree, notes, pins, and colors without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "batch_trash_undo_flow"
+description = "Batch Trash of two selected notes then Session Undo restores both notes, prior badges, and Nest JSON membership without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "command_palette_selects_note"
+description = "Command palette flow: Ctrl+K / Cmd+K opens the palette, choosing a matched note title selects that note in the editor, and Escape closes the palette."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
 name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+description = "New Note, New Folder, delete-to-Trash, Export Nest, or Import Nest are not enabled from the UI."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +155,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n2"
 name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+description = "New notes fail to show up in lists/export or duplicate on a single create."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +163,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n3"
 name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+description = "Pin, color, move, or title changes are not synced across All Notes, folder list, and Nest JSON export."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +171,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n4"
 name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+description = "Switching All Notes / folder / Trash / Export Nest breaks layout or loses the selected note unexpectedly."
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,15 +179,15 @@ weight = 1.0
 [[criterion]]
 id = "6.n5"
 name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+description = "Emptying a folder or Trash produces broken or missing UI instead of the styled empty state."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "search_and_lists_disagree"
+description = "Search results disagree with All Notes about which notes match a query."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +195,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n7"
 name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+description = "Collapsed folder panel at narrow width cannot be re-opened via the Folders button."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +203,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n8"
 name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+description = "Export Nest, Import Nest, command palette, or confirm dialogs block navigation with no Escape or cancel exit."
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +211,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n9"
 name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+description = "A failed create/import/batch flow provides no visible user feedback naming the problem."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +219,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n10"
 name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+description = "Navigation dead ends or requires reload for recovery after Export Nest, Import Nest, or command palette."
 type = "binary"
 negate = true
 weight = 1.0

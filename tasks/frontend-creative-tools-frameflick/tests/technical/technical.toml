@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "2.2"
 name = "refresh_restores_persisted_state"
-description = "A full page refresh after uploading an image, adjusting settings, and saving a preset restores the active canvas settings exactly, keeps the saved preset in the Saved presets list, and shows the uploaded image as a Recent thumbnail."
+description = "A full page refresh after uploading an image, adjusting settings, saving a preset, and saving a named snapshot restores the active canvas settings exactly, keeps the preset and snapshot in their lists, and shows the uploaded image as a Recent thumbnail; undo/redo stacks are empty after refresh."
 type = "binary"
 weight = 1.0
 
@@ -100,7 +100,7 @@ optional = true
 [[criterion]]
 id = "2.6"
 name = "console_errors_or_warnings_logged"
-description = "Console errors, warnings, or unhandled promise rejections are logged during load or during a full exercise of upload, styling controls, export, preset save/apply/delete, and the Collaboration scenario."
+description = "Console errors, warnings, or unhandled promise rejections are logged during load or during a full exercise of upload, styling, export, style JSON import/export, undo/redo, presets, snapshots, and the Collaboration scenario."
 type = "binary"
 weight = 1.0
 negate = true
@@ -201,6 +201,43 @@ name = "slider_drag_rerenders_without_lag"
 description = "Dragging any slider re-renders the canvas live with no visible lag or dropped updates, and the UI stays responsive throughout the drag."
 type = "binary"
 weight = 0.5
+
+[[criterion]]
+id = "2.20"
+name = "shared_state_coherence_export_and_undo"
+description = "Shared-state coherence: a style change made via a slider or swatch is immediately reflected in the canvas and the Export preview JSON without reload; Undo restores both surfaces together."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n20"
+name = "export_preview_desyncs_from_canvas"
+description = "After a style mutation, the Export preview JSON disagrees with the visible canvas controls (for example preview still lists Night while Ocean is selected)."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.21"
+name = "export_preview_uses_documented_settings_keys"
+description = "The live Export preview JSON text exposes every documented RenderSettings key (backgroundPreset or customBackground, padding, cornerRadius, shadow, frame, canvasSize, caption fields, watermark fields including watermarkColor, zoom, positionX/positionY, exportScale) and updates those keys when the matching controls change."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n21"
+name = "preset_settings_partial_or_opaque"
+description = "A saved preset's Apply restores only a subset of the documented settings fields, or the Export preview after Apply still disagrees with the restored canvas controls on those fields."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.22"
+name = "forms_enforce_render_settings_bounds"
+description = "Form validation for preset save, snapshot save, hex inputs, and style JSON import enforces the same RenderSettings / PresetCreate / SnapshotCreate bounds and enums as the export preview: out-of-contract values surface named field errors and do not enter the live export payload as valid."
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "2.catchall"

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,150 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "7.1"
-name = "layout_adapts_desktop_to_mobile"
-description = "Layout adapts gracefully from 1440px desktop to 375px mobile."
+name = "mobile_single_column_stack"
+description = "At mobile width the metric tiles, chart, and breakdown panels reflow into a single stacked column preserving metrics-then-chart-then-panels hierarchy"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
-name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+name = "top_controls_reachable_mobile"
+description = "At mobile width the site, date-range, clear-filter, undo, redo, compare, ceiling, and export controls stay reachable without horizontal scrolling"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
-name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+name = "no_clip_at_375"
+description = "At 375 pixel width no content clips or overflows the viewport and no page-level horizontal scrollbar appears"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
-name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+name = "export_drawer_usable_375"
+description = "The export drawer stays fully visible and operable at 375 pixel width rather than rendering off-screen"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
-name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+name = "ceiling_and_compare_usable_375"
+description = "The bounce-rate ceiling control and Compare previous control stay fully visible and operable at 375 pixel width"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.6"
-name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+name = "desktop_three_column_panels"
+description = "At desktop width the three breakdown panels appear in a three-column row under the trend chart"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.7"
-name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+name = "centered_max_width"
+description = "On a wide viewport dashboard content stays within a centered max width near 1120px rather than stretching edge to edge"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.8"
-name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+name = "sticky_top_bar_usable"
+description = "The sticky top bar remains usable across viewport widths without overlapping metric numbers unreadably"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.9"
-name = "media_and_canvases_resize"
-description = "Images, grids, and canvases size responsively to fit the layout."
+name = "panels_readable_tablet"
+description = "At tablet width breakdown panel names and counts remain readable without overlapping"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.10"
-name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
+name = "theme_toggle_reachable_mobile"
+description = "The theme toggle remains reachable and operable at 375 pixel width"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.n1"
-name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+name = "horizontal_scroll_at_375"
+description = "A page-level horizontal scrollbar appears at 375 pixel width"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n2"
-name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+name = "export_offscreen_mobile"
+description = "Export report or the export drawer is off-screen or unreachable at 375 pixel width"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n3"
-name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+name = "controls_overlap_illegible"
+description = "Top-bar controls overlap each other into illegible clusters at mobile width"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n4"
-name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+name = "panels_overflow_desktop"
+description = "Breakdown panels overflow or clip at desktop width in the three-column layout"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n5"
-name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
+name = "chart_forces_horizontal_scroll"
+description = "The visitors chart forces horizontal page scroll at 375 pixel width"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n6"
-name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
+name = "ceiling_clipped"
+description = "The bounce-rate ceiling control is clipped or unusable at mobile width"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n7"
-name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
+name = "compare_unreachable"
+description = "Compare previous is unreachable at 375 pixel width"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n8"
-name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
+name = "stacked_order_wrong"
+description = "At mobile width the stacked order is not metrics then chart then panels"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n9"
-name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
+name = "drawer_wider_than_viewport"
+description = "The export drawer is wider than the viewport and cannot be dismissed or scrolled into view at 375px"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n10"
-name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
+name = "undo_redo_unreachable_mobile"
+description = "Undo or Redo is unreachable at mobile width"
 type = "binary"
 negate = true
 weight = 1.0
@@ -213,7 +213,8 @@ weight = 1.0
 [[criterion]]
 id = "responsiveness.catchall"
 name = "responsiveness_catchall"
-description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable responsiveness or layout defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0
+

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,109 +63,94 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "seeded_board_walkthrough"
-description = "On load, the board shows exactly four columns named Backlog, In Progress, Review, and Done, each header showing a live card count, with at least 12 seeded cards total distributed so no column is empty (at least 4 Backlog, 3 In Progress, 3 Review, 2 Done)"
+description = "On load, the board shows exactly four columns named Backlog, In Progress, Review, and Done, each header showing a live card count, with at least 12 seeded cards total distributed so no column is empty (at least 4 Backlog, exactly 3 In Progress, exactly 3 Review, at least 2 Done), and In Progress and Review each show a WIP limit of 3"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.2"
 name = "card_anatomy_complete"
 description = "Every seeded card shows a title, a status chip naming its execution state, and an n of m progress indicator for its task items; cards with an assignee show an avatar or initials, and at least 3 seeded cards show a prompt chip with icon and prompt title"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.3"
 name = "drag_between_columns_updates_counts"
 description = "Using a real pointer drag, moving a card from one column to another places it in the destination column and both column header counts update immediately (source down by one, destination up by one) without a page reload"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.4"
 name = "drop_position_exact"
 description = "Scripted probe: drag a card and drop it between the first and second cards of another column; the card lands at exactly that index (position 2), not at the top or bottom. Then drag a card within its own column to a new position and confirm it lands at exactly the drop position"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.5"
 name = "keyboard_move_control_parity"
 description = "Each card exposes a move control (overflow menu or equivalent) offering moves to each of the four columns plus Move up and Move down, operable with the keyboard alone; using it moves the card and updates both column counts exactly as a drag would"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.6"
 name = "create_card_valid_submit"
-description = "Clicking Add Card in a column opens a modal with title (required), description, attached prompt select, and assignee select; submitting with a valid title closes the modal, inserts the new card at the top of that column, and increments that column's count by exactly one"
+description = "Clicking Add Card in a column opens a modal with title (required, 1 to 120 characters after trim), description (optional, up to 2000), attached prompt select, and assignee select; submitting with a valid title closes the modal, inserts the new card at the top of that column, increments that column count by exactly one, and the board JSON export preview includes the new card under the same field names"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.7"
 name = "create_card_invalid_blocked"
-description = "In the Add Card modal, the Submit control stays disabled while the title is empty; submitting with an empty or whitespace-only title shows an inline validation message naming the title field and no card is added (column count unchanged); rapidly double-activating Submit with a valid title creates exactly one card"
+description = "In the Add Card modal, Submit stays disabled while the title is empty after trim; submitting with an empty, whitespace-only, or over-120-character title shows an inline validation message naming the title field and adds no card; rapidly double-activating Submit with a valid title creates exactly one card"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.9"
 name = "prompt_panel_readonly"
 description = "Clicking a card's prompt chip opens a side panel showing the prompt title and full prompt text in read-only form; the panel closes via its close control and via the Escape key"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.10"
 name = "card_detail_edit_saves_in_place"
 description = "Clicking a card opens a detail modal showing title, description, attached prompt, assignee, a comment thread area, the task item checklist, and a status badge matching the card's current column; editing the title and clicking Save updates the card on the board in place without a reload, while Cancel leaves it unchanged; submitting a comment appends it to the thread with a visible timestamp"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.12"
 name = "filter_search_narrow_all_columns"
 description = "Selecting an assignee in the toolbar filter narrows all four columns simultaneously to that assignee's cards while the four-column structure remains, and column counts change to reflect visible cards; typing in the search input narrows cards incrementally by title, a visible Clear filters control restores the full board, and clearing the search restores the full board exactly"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.14"
 name = "run_progresses_subitems_sequentially"
 description = "Pressing Run on a card starts a watchable simulated execution: sub-items advance one at a time in order through pending, running, and complete states, the card's status chip reads running with an active indicator during the run, the n of m progress indicator increments live, and on completion the chip reads complete with m of m shown"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.15"
 name = "retry_backoff_visible"
 description = "Running the seeded failing card shows a sub-item entering a retrying state with a visible attempt counter and a live backoff countdown of the form 'waiting Ns before retry 2 of 3' before the next attempt starts"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.16"
 name = "manual_retry_resumes_from_failed_step"
 description = "After a run reaches a failed state, a Retry control appears; activating it resumes execution from exactly the failed sub-item — sub-items already complete keep their checked state and visibly do not re-run from the start"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.17"
 name = "empty_column_state_with_add"
 description = "Moving or filtering the last card out of a column leaves that column showing an empty state message with an Add Card control that opens the create flow targeting that column"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.19"
 name = "board_static_no_working_flows"
-description = "The board is static markup only: dragging, keyboard moves, or card creation fail to change the shared board state (counts or card positions never actually change)"
+description = "The board is static markup only: after drag, keyboard move, or create attempts, column counts and card positions remain unchanged"
 type = "binary"
 weight = 1.0
 negate = true
-
 [[criterion]]
 id = "1.20"
 name = "execution_fabricated"
@@ -173,7 +158,62 @@ description = "Card execution is fabricated: pressing Run completes all sub-item
 type = "binary"
 weight = 1.0
 negate = true
-
+[[criterion]]
+id = "1.21"
+name = "wip_limit_breach_visible"
+description = "Moving or creating a card into In Progress or Review so the visible count exceeds the WIP limit of 3 shifts that column to a deep amber warning background with a visible breach label beside the count; moving cards out until the count is 3 or fewer clears the amber state and breach label"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "1.22"
+name = "bulk_move_updates_counts_and_export"
+description = "Selecting two or more cards reveals a bulk action bar; confirming Move to Done relocates every selected card to Done in selection order, updates all four column counts immediately, clears the selection, dismisses the bar, and the board JSON export lists those cards under done"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "1.23"
+name = "undo_redo_restores_board_and_export"
+description = "After a create, move, or bulk move, Undo restores the prior column membership, counts, WIP breach state, and export preview; Redo reapplies the same change; Undo and Redo are disabled when their stacks are empty and respond to Ctrl+Z / Ctrl+Shift+Z (Cmd on macOS)"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "1.24"
+name = "board_json_export_api_shaped"
+description = "Opening Export shows a live monospaced preview with board JSON and markdown digest tabs; the JSON is API-shaped with a board object, columns (id one of backlog/in-progress/review/done, name, wip_limit, ordered card_ids), cards (id, title, description, column, position, assignee, attached_prompt, status one of pending/running/retrying/failed/complete, tasks with id/title/status/attempts, comments with id/body/created_at ISO-8601), plus prompts and assignees arrays — these field names and enums are visible in the preview text"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "1.25"
+name = "export_recompiles_from_session_mutations"
+description = "After creating a card, moving a card, completing a run, or undoing, the Export preview updates without a reload so the compiled board JSON and markdown digest reflect the session mutations currently visible on the board"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "1.26"
+name = "copy_and_download_export"
+description = "Copy writes the exact visible export preview text to the clipboard and shows a brief confirmation; Download starts a file download of that same preview text"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "1.27"
+name = "import_round_trip_board_json"
+description = "After mutating the board, importing a previously exported board JSON restores the imported cards titles, columns, order, and task progress to match the pre-export mutated state, and the export preview matches again"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "1.28"
+name = "export_omits_session_mutations"
+description = "The Export preview still shows the pre-mutation board after a visible create, move, bulk move, or completed run, so the compiled artifact contradicts the live board"
+type = "binary"
+weight = 1.0
+negate = true
+[[criterion]]
+id = "1.29"
+name = "import_accepts_invalid_payload"
+description = "Importing malformed board JSON or a payload that violates the card field contract still changes column counts or titles, or shows a success state with no field-named import error visible"
+type = "binary"
+weight = 1.0
+negate = true
 [[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"

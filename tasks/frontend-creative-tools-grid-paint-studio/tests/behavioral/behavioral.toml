@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,88 +62,124 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "14.1"
-name = "multi_facet_round_trip"
-description = "Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline — never a mix."
+name = "in_memory_multi_facet_reload_reset"
+description = "Starting on Paint: switch to Color Brush, pick a non-black swatch, paint at least 3 cells, enable Mirror Horizontal, switch to Gallery and save a uniquely named board, snap a version, then reload. All facets coherently reset to the seeded baseline together — 4 seeded boards, blank canvas at cell size 40, QR Brush active, black swatch, Mirror Off, Vision Off, empty undo/redo — never a mix of persisted user art with reset tools."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.2"
-name = "sort_reversal_proves_live_data"
-description = "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders."
+name = "tag_filter_then_clear_restores_list"
+description = "Filter-reversal proof: note the full gallery list, filter by a seeded board's tag so the list narrows, then clear the filter; the full list restores exactly (same boards, same count), proving the visible list is derived from the shared collection rather than two hardcoded snapshots."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.3"
-name = "derived_view_responds_to_input"
-description = "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input."
+name = "gallery_list_responds_to_tag_filter"
+description = "Derived-view sensitivity: apply a tag filter that matches a subset of boards; the visible gallery list changes meaningfully (fewer cards, only matching tags). Clearing the filter restores the full list rather than redrawing identically regardless of filter input."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.4"
-name = "cross_view_echo_without_reload"
-description = "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list ↔ detail, board ↔ stats) without reload."
+name = "paint_save_echo_across_modes"
+description = "Cross-view echo: paint a recognizable pattern in Paint mode, save it from Gallery with a valid name, open Export center — Project JSON includes that board name and cell pattern — return to Paint without reload and the painted board remains untouched."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.5"
-name = "count_delta_is_exact"
-description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+name = "gallery_count_delta_exact"
+description = "Count-delta integrity: note the gallery count, save one new uniquely named board, and confirm the count increases by exactly one; after deleting that board, confirm the count decreases by exactly one with no off-by-one lag."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.6"
-name = "different_inputs_change_outcomes"
-description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+name = "different_paints_save_different_thumbnails"
+description = "Input-dependent output: paint two clearly different patterns (for example red block vs blue block), save each with a distinct name; the two gallery thumbnails differ in the ways those painted cells dictate, and Export center Project JSON differs between the two sessions."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.7"
-name = "interleaved_flows_preserve_state"
-description = "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state."
+name = "interleaved_paint_and_gallery"
+description = "Interleaved-flow integrity: start painting in Paint mode, switch to Gallery and favorite/filter a seeded board, return to Paint and continue the stroke/tool state; neither flow corrupts the other — painted cells and gallery facets remain coherent without reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.8"
-name = "empty_to_repopulated_round_trip"
-description = "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions."
+name = "empty_gallery_then_repopulate"
+description = "Edge-state round-trip: delete every board (empty-gallery state visible), then paint and save a new named board; the gallery count tracks through both transitions (zero then one) and the new card appears with a matching thumbnail."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "export_import_round_trip_probe"
+description = "Export then Import Project JSON after Clear: board cells, gallery boards (including SavedBoard name/tag/favorite), versions, histogram bars, tool/swatch/mirror/vision, and cell lock reconstruct from the ProjectDocument payload rather than remaining blank or seeded-only."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "undo_redo_histogram_round_trip"
+description = "Paint, undo, redo: canvas cells and histogram bars return to the post-paint state on redo and to the prior state on undo, proving both surfaces share one board history."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.11"
+name = "mirror_fill_export_consistency"
+description = "With Mirror Both, paint one cell then open Export center: Project JSON cell data includes both the painted cell and its mirrors, matching what the canvas shows."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.12"
+name = "project_document_schema_round_trip_probe"
+description = "Schema round-trip: paint cells, save a board with a closed-enum tag, confirm Export Project JSON shows ProjectDocument keys and that SavedBoard boards entry (name, tag, favorite, cellSize, cells); Clear; Import the same JSON; gallery card name/tag/favorite, canvas cells, and Project JSON text all match the pre-Clear export."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.n1"
-name = "partial_persistence_is_incoherent"
-description = "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence."
+name = "partial_persistence_after_reload"
+description = "After painting, changing tools/swatch/mirror, and saving a board, a reload leaves an incoherent mix (for example user art or the saved board survives while tools reset, or seeded boards are missing while canvas art remains)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n2"
-name = "derived_surface_ignores_inputs"
-description = "A derived surface renders identically regardless of its inputs."
+name = "tag_filter_ignores_input"
+description = "Applying or clearing a tag filter leaves the visible gallery list identical regardless of filter input."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n3"
-name = "different_inputs_produce_identical_output"
-description = "Repeating an action with different inputs yields byte-identical output."
+name = "different_paints_identical_thumbnails"
+description = "Saving two boards painted with clearly different cell patterns yields visually identical thumbnails."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "State changes appear in one view but not another until reload."
+name = "load_board_stale_until_reload"
+description = "After loading a saved board from Gallery, the paint canvas stays blank or stale until a full page reload."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "export_stale_after_mutations"
+description = "After painting and saving, Export center Project JSON still shows the pre-mutation payload as if the session work were absent."
 type = "binary"
 negate = true
 weight = 1.0
@@ -155,3 +191,4 @@ description = "The app exhibits a significant, browser-observable defect in beha
 type = "binary"
 negate = true
 weight = 1.0
+

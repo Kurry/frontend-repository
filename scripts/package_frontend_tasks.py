@@ -151,14 +151,31 @@ TASK_SPECS: dict[str, dict] = {
     "frontend-planning-trip-itinerary": {
         "source": "TripItinerary",
         "description": "French Riviera trip itinerary planner good-app eval.",
-        "modules": ["browse-query-v1", "entity-collection-v1", "form-workflow-v1"],
+        "modules": [
+            "browse-query-v1",
+            "entity-collection-v1",
+            "form-workflow-v1",
+            "artifact-transfer-v1",
+        ],
         "bindings": {
-            "Browsable entity": "Itinerary days and activities",
-            "Destinations": "Map/itinerary overview; Day detail; Activity form",
-            "Entity operations": "create/update/delete activities; move between days; filter",
-            "Workflow completion": "Activity form validate/submit/cancel",
+            "Browsable entity": "activities",
+            "Destinations": "overview; day-detail; activity-form; budget-ledger; export-canvas",
+            "Filters": "day; type; category",
+            "Themes": "light; dark",
+            "Entity": "activity",
+            "Entity operations": "create; select; update; delete; reorder",
+            "Entity fields": "title; day; location; notes; startTime; endTime; category",
+            "Form fields": "title; day; location; notes; startTime; endTime; category",
+            "Form operations": "validate; submit; cancel",
+            "Artifact operations": "export; import; copy",
+            "Export formats": "ics; json; markdown",
+            "Import modes": "trip-json",
         },
-        "mechanics_exclusions": ["Map pan/zoom / marker drag stays Playwright"],
+        "mechanics_exclusions": [
+            "Map pan/zoom / marker drag stays Playwright",
+            "Raw file paths/blobs forbidden in WebMCP args",
+            "Chart hover tooling stays Playwright-observed",
+        ],
     },
     "frontend-data-tracking-admin-analytics-dashboard": {
         "source": "variants/AdminAnalyticsDashboard",
@@ -2491,7 +2508,7 @@ def rubric_to_tomls(
             'judge = "codex"',
             'model = "gpt-5.6-sol"',
             'prompt_template = "../system_prompt.md"',
-            'cwd = "/app"',
+            'cwd = "/logs/verifier"',
             'mode = "batched"',
             "timeout = 3000",
             "",
@@ -3528,5 +3545,95 @@ TASK_SPECS.update({
         "modules": ["structured-editor-v1", "command-session-v1", "entity-collection-v1", "browse-query-v1"],
         "bindings": "see schemas/webmcp-assignments.json",
         "mechanics_exclusions": ["Node drag positioning, canvas pan/zoom, and palette drag-to-drop coordinates stay Playwright-driven; editor add creates nodes but drop-position mechanics are gesture-graded", "Edge-handle drag drawing and incompatible-connection toast visuals stay Playwright; editor add(edge) only proves the state command"],
+    },
+})
+
+
+# Batch 4: authored 2026-07-19 — advanced platform suite, atlas pipeline, live console.
+# Bindings SoT: schemas/webmcp-assignments.json.
+TASK_SPECS.update({
+    "frontend-creative-tools-annotation-studio": {
+        "source": "feature-labeling-annotation-studio PRD",
+        "description": "Annotation studio with taxonomy builder, regions, agreement review.",
+        "modules": ["entity-collection-v1", "structured-editor-v1", "command-session-v1", "artifact-transfer-v1"],
+        "bindings": "see schemas/webmcp-assignments.json",
+    },
+    "frontend-creative-tools-prompt-diff": {
+        "source": "feature-version-control-prompt-diff PRD",
+        "description": "Prompt version control with diffs, three-way merge, blame, and graph.",
+        "modules": ["structured-editor-v1", "browse-query-v1", "entity-collection-v1", "artifact-transfer-v1"],
+        "bindings": "see schemas/webmcp-assignments.json",
+    },
+    "frontend-creative-tools-schema-builder": {
+        "source": "feature-schema-builder-output-schema PRD",
+        "description": "Output schema builder with tree editor, playground, and versions.",
+        "modules": ["structured-editor-v1", "command-session-v1", "artifact-transfer-v1"],
+        "bindings": "see schemas/webmcp-assignments.json",
+    },
+    "frontend-data-tracking-cost-analytics": {
+        "source": "feature-analytics-cost-analytics PRD",
+        "description": "Cost analytics with budgets, anomalies, what-if repricing, reports.",
+        "modules": ["browse-query-v1", "entity-collection-v1", "command-session-v1", "artifact-transfer-v1"],
+        "bindings": "see schemas/webmcp-assignments.json",
+    },
+    "frontend-data-tracking-dataset-manager": {
+        "source": "feature-data-manager-dataset-manager PRD",
+        "description": "Dataset manager with import wizard, pivot, splits, and snapshots.",
+        "modules": ["entity-collection-v1", "form-workflow-v1", "command-session-v1", "artifact-transfer-v1"],
+        "bindings": "see schemas/webmcp-assignments.json",
+    },
+    "frontend-productivity-persona-library": {
+        "source": "feature-content-manager-persona-library PRD",
+        "description": "Persona library with trait matrix, blending, test bench, and packs.",
+        "modules": ["browse-query-v1", "entity-collection-v1", "command-session-v1", "artifact-transfer-v1"],
+        "bindings": "see schemas/webmcp-assignments.json",
+    },
+    "frontend-productivity-semantic-search": {
+        "source": "feature-search-semantic-search PRD",
+        "description": "Semantic search with feedback re-ranking, clusters, and re-indexing.",
+        "modules": ["browse-query-v1", "entity-collection-v1", "command-session-v1", "artifact-transfer-v1"],
+        "bindings": "see schemas/webmcp-assignments.json",
+    },
+    "frontend-workflow-ab-experiments": {
+        "source": "feature-experimentation-ab-testing PRD",
+        "description": "A/B experiment studio with variants, stats gating, and decisions.",
+        "modules": ["form-workflow-v1", "command-session-v1", "entity-collection-v1", "artifact-transfer-v1"],
+        "bindings": "see schemas/webmcp-assignments.json",
+    },
+    "frontend-workflow-automation-studio": {
+        "source": "feature-automation-browser-studio PRD",
+        "description": "Browser automation studio with step builder, runs, and versioning.",
+        "modules": ["browse-query-v1", "structured-editor-v1", "command-session-v1", "artifact-transfer-v1"],
+        "bindings": "see schemas/webmcp-assignments.json",
+    },
+    "frontend-workflow-batch-runner": {
+        "source": "feature-batch-processor-batch-runner PRD",
+        "description": "Durable batch runner with retries, checkpoints, scheduling, reports.",
+        "modules": ["browse-query-v1", "form-workflow-v1", "command-session-v1", "artifact-transfer-v1"],
+        "bindings": "see schemas/webmcp-assignments.json",
+    },
+    "frontend-workflow-live-task-factory": {
+        "source": "SWE-gen pipeline, live dual-mode (debranded)",
+        "description": "Live PR-to-task factory console with real GitHub/AI integration.",
+        "modules": ["entity-collection-v1", "form-workflow-v1", "command-session-v1", "artifact-transfer-v1"],
+        "bindings": "see schemas/webmcp-assignments.json",
+    },
+    "frontend-workflow-quality-audit-desk": {
+        "source": "codebase-atlas quality audit (debranded)",
+        "description": "Quality audit desk with checks, rubric verdicts, and audit reports.",
+        "modules": ["browse-query-v1", "form-workflow-v1", "command-session-v1", "artifact-transfer-v1"],
+        "bindings": "see schemas/webmcp-assignments.json",
+    },
+    "frontend-workflow-review-workbench": {
+        "source": "codebase-atlas review app (debranded)",
+        "description": "Gated bundle review with verdicts, trial audit, and summary export.",
+        "modules": ["browse-query-v1", "form-workflow-v1", "command-session-v1", "artifact-transfer-v1"],
+        "bindings": "see schemas/webmcp-assignments.json",
+    },
+    "frontend-workflow-seed-dataset-studio": {
+        "source": "codebase-atlas seed pipeline (debranded)",
+        "description": "Dataset factory studio: triage, authoring workbench, gates, exports.",
+        "modules": ["structured-editor-v1", "form-workflow-v1", "command-session-v1", "artifact-transfer-v1"],
+        "bindings": "see schemas/webmcp-assignments.json",
     },
 })

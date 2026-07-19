@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -278,6 +278,80 @@ negate = true
 id = "1.31"
 name = "1_31"
 description = "A success signal such as a saved-draft confirmation, an added chip, or an updated completeness count appears while the underlying item is absent, or a value stays constant regardless of the input given"
+type = "binary"
+weight = 1.0
+negate = true
+
+
+[[criterion]]
+id = "1.32"
+name = "export_package_live_preview_tabs"
+description = "The Export package panel shows a live-compiled monospaced preview with Portfolio JSON and Markdown resume tabs; after setting Profile Header Name to a unique string and adding a uniquely titled project, both tabs' visible text contain those exact strings without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "export_copy_and_download_controls"
+description = "Copy export puts the exact visible Export package preview text on the clipboard with a visible confirmation that reverts after a moment, and Download export produces a file whose contents match the currently visible tab (portfolio.json or resume.md)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "import_package_round_trip"
+description = "After building content and exporting Portfolio JSON, importing that package reconstructs the same visible Name, project titles, section order, theme, and density in the editor and preview without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "bulk_project_select_and_delete"
+description = "Selecting at least two projects via checkboxes shows a bulk actions bar with the live selected count; Delete selected removes all selected projects from the preview grid and clears the selection, and both Export package tabs no longer contain those project titles"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "layout_presets_apply_pack"
+description = "Applying a named layout preset (Classic, Compact stack, or Spotlight) instantly changes section order, visibility, theme, and density together in the preview and updates the Export package preview; Undo restores the prior layout state exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "command_palette_ctrl_k"
+description = "Pressing Ctrl+K (Cmd+K on macOS) opens a command palette with a focused search input; typing narrows results across sections, presets, drafts, themes, and actions with kind labels; Enter activates the highlighted result and Escape closes the palette"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "project_status_and_featured_pin"
+description = "Submitting a project with Status WIP shows a WIP chip on its preview card; pinning Featured on a project renders it first with a Featured treatment, and pinning a different project moves the Featured treatment so exactly one featured project is visible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n32"
+name = "export_omits_session_mutations"
+description = "After adding a uniquely titled project or editing the profile Name, the visible Portfolio JSON or Markdown resume export text omits that session mutation"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n33"
+name = "import_malformed_mutates_state"
+description = "Importing a malformed Portfolio JSON changes Name, projects, theme, or density instead of showing a visible error and leaving state unchanged"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n34"
+name = "bulk_delete_leaves_stale_export"
+description = "After Delete selected removes projects from the preview, the Export package tabs still list the deleted project titles as if they remained"
 type = "binary"
 weight = 1.0
 negate = true

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.5
@@ -63,64 +63,71 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "15.1"
-name = "headings_use_consistent_capitalization"
-description = "Where the app renders headings and section titles, they use consistent capitalization (one convention — title case or sentence case — throughout)."
+name = "headings_consistent_capitalization"
+description = "Where the app renders headings and section titles (editorial intro, library controls, Detail/Editor, Export drawer), they use one consistent capitalization convention throughout."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.2"
 name = "actions_use_specific_labels"
-description = "Where the app renders button or action labels, they are specific verbs ('Add expense', 'Start session'), not generic ('Submit', 'OK') when a specific label is possible."
+description = "Where the app renders button or action labels, they use specific verbs appropriate to the archive (for example Batch delete, Copy export, Undo, Duplicate) rather than generic Submit/OK alone when a specific label is possible."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.3"
-name = "errors_name_problem_and_fix"
-description = "Where the app renders error messages, they name the problem and the fix ('Amount must be a positive number'), not just a rejection ('Invalid')."
+name = "validation_names_field_and_fix"
+description = "Where the app renders validation messages for palette create/edit (name, artist, period, swatches), subscribe email, or archive import field-contract failures, they name the field and the fix, not only a bare rejection like 'Invalid'."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.4"
-name = "empty_states_explain_next_step"
-description = "Where the app renders empty states, the copy explains what belongs there and how to add it."
+name = "empty_library_copy_explains_next_step"
+description = "Where the app renders an empty library state (after delete-all or a zero-match period filter), the copy explains what belongs there and how to start a new palette or clear the filter."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.5"
-name = "body_copy_is_well_written"
-description = "Where the app renders body or marketing copy, rate how free it is of spelling and grammatical errors."
+name = "editorial_and_historical_notes_polished"
+description = "Where the app renders the editorial intro and historical color-name notes, rate how free the prose is of spelling and grammatical errors and how complete each note phrase reads."
 type = "likert"
 points = 5
 weight = 0.5
 
 [[criterion]]
 id = "15.6"
-name = "terminology_is_consistent"
-description = "Where the app renders labels for the same concept in multiple places, terminology is consistent (not 'task' here and 'todo' there)."
+name = "palette_terminology_consistent"
+description = "Where the app renders labels for the same concept in multiple places, terminology stays consistent (palette / swatch / period / historical name / export) rather than mixing conflicting synonyms across Browse, Detail, and Export."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.7"
-name = "numbers_dates_and_units_are_consistent"
-description = "Where the app renders numbers, dates, and units, formatting is consistent (same date format, same decimal precision, units labeled)."
+name = "hex_formatting_consistent"
+description = "Where the app renders hex values across Nomenclature, Palette, Swatch, contrast matrix, and export previews, formatting is consistent (same case and # prefix convention)."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.8"
-name = "success_messages_are_specific"
-description = "Where the app renders confirmation and success messages, they state what happened ('Entry saved'), not vague affirmations."
+name = "copy_and_dismiss_messages_specific"
+description = "Where the app renders confirmation microcopy (on-swatch copied feedback, export copied confirmation, batch-delete confirmation, subscribe dismiss/success), it states what happened rather than a vague affirmation alone."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.9"
+name = "contrast_and_export_headers_specific"
+description = "Where the app renders contrast-matrix headers and export format tab labels, they use specific wording (for example Contrast, CSS vars, utility-theme snippet, SCSS map, JSON) rather than generic placeholders."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.n1"
-name = "placeholder_copy_is_visible"
+name = "placeholder_copy_visible"
 description = "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI."
 type = "binary"
 negate = true
@@ -129,23 +136,23 @@ weight = 0.5
 [[criterion]]
 id = "15.n2"
 name = "prominent_copy_has_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as headings, hero text, or primary buttons."
+description = "Spelling or grammatical errors appear in prominent copy such as the editorial headline, library headings, export labels, or primary action labels."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n3"
-name = "concept_names_are_inconsistent"
-description = "The same concept is named inconsistently across surfaces."
+name = "inconsistent_palette_terminology"
+description = "The same concept is named inconsistently across Browse layouts, Detail/Editor, and Export (for example mixing unrelated terms for palette vs swatch vs period)."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n4"
-name = "copy_is_truncated_or_overflowing"
-description = "Truncated or overflowing text renders copy unreadable."
+name = "copy_truncated_or_overflowing"
+description = "Truncated or overflowing text renders historical names, hex labels, contrast-matrix rows, export preview, or editorial intro copy unreadable."
 type = "binary"
 negate = true
 weight = 0.5
@@ -157,3 +164,4 @@ description = "The app exhibits a significant, browser-observable defect in rend
 type = "binary"
 negate = true
 weight = 1.0
+

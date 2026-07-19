@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,118 +62,174 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_library_after_delete_all"
+description = "After deleting every user palette, the library region shows a clear empty state with a way to start a new palette."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "palette_form_inline_validation_before_submit"
+description = "On the palette create/edit form, an empty name, empty artist, out-of-list period, fewer than 3 or more than 12 swatches, or a non-six-digit hex shows an inline message naming the offending field before submit, and the save control stays disabled until every field is valid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "invalid_create_names_field_and_blocks_add"
+description = "Invalid create (empty palette name, empty artist, out-of-list period, fewer than 3 swatches, or invalid hex) leaves the palette count unchanged and shows visible validation feedback naming the problem."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "swatch_copy_confirmation_visible"
+description = "Clicking a swatch copies its hex and shows a brief on-swatch copied confirmation that clears after about 1 second."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "zero_match_period_filter_empty_state"
+description = "A period filter that matches nothing shows an empty state in the library region; choosing all periods again restores the full collection."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "rapid_swatch_copies_clear_individually"
+description = "Clicking three or more swatches in quick succession shows each copied confirmation on the swatch that was clicked, and every confirmation clears on its own after about 1 second with no stuck labels."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "editorial_intro_guides_historical_pairing"
+description = "The editorial intro (eyebrow, headline, and two-column note) explains that each color is paired with its nearest historical name, guiding first-time browsing of the archive."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "palette_and_filter_controls_semantic"
+description = "View toggles, period filter, name sort, vision simulation, undo/redo, editor fields, favorite flags, export controls, and popup controls use semantic button/input/label elements rather than unlabeled decorative wrappers."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "subscribe_popup_dismiss_paths"
+description = "The subscribe popup can be dismissed by closing or by a valid submit; dismissing keeps it dismissed for the rest of the session so further idle time or scrolling does not bring it back."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "invalid_subscribe_email_feedback"
+description = "Submitting the subscribe popup with an invalid email shows an inline message naming the email field and keeps the popup open instead of dismissing it."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "batch_delete_zero_selection_noop"
+description = "With zero palettes selected, Batch delete does nothing and shows no confirmation; the selection tray stays hidden until at least one card is selected."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "malformed_import_leaves_collection"
+description = "Importing malformed archive JSON shows an inline error naming the import field, leaves the palette count and names unchanged, and does not apply a successful-import state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "undo_redo_stack_edge"
+description = "After Undo restores a deleted palette, Redo deletes it again; after a new create following an undo, Redo is disabled and cannot resurrect the cleared redo stack."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "contrast_matrix_sparse_palette"
+description = "A palette with fewer than 2 distinct swatch hexes shows an empty or explanatory contrast-matrix state instead of fabricated contrast ratios."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "empty_collection_export_compiles"
+description = "After deleting all user palettes, the Export drawer previews still compile for an empty collection without errors or a broken drawer — archive JSON shows version palette-archive.v1 and an empty palettes array."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "invalid_hex_or_period_rejected_on_create"
+description = "Creating with a swatch that is not a six-digit hex with a leading number-sign, or with a period outside the closed period list, leaves the palette count unchanged and shows an inline message naming the offending field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.17"
+name = "schema_violating_import_rejected"
+description = "Importing archive JSON that is missing required palette fields, uses an invalid period, includes an invalid hex, or has a swatch count outside 3–12 shows an inline error naming the import field and leaves palette count and names unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.18"
+name = "invalid_subscribe_email_stays_open"
+description = "Submitting the subscribe popup with a value that is not a valid email address (missing at-sign or domain) shows an inline message naming the email field and does not dismiss the popup."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_library_has_no_feedback"
+description = "After deleting all palettes or filtering to zero matches, the library region shows nothing and provides no empty-state feedback."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "validation_errors_only_in_console"
+description = "Palette, subscribe, or import validation failures are surfaced only in the browser console with no visible inline message."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "swatch_copy_lacks_visible_feedback"
+description = "Clicking a swatch copies silently with no on-swatch copied confirmation label."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "delete_palette_lacks_warning_path"
+description = "Deleting a palette or confirming Batch delete proceeds with no confirmation, cancel, or equally clear destructive affordance when the UI exposes a delete action."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "interactive_controls_nonsemantic_only"
+description = "Primary interactive controls (view toggles, period filter, swatches, favorite flags, editor fields, export controls) are non-semantic div/span wrappers with no button/input/label role."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "overlays_not_keyboard_dismissible"
+description = "Detail/Editor, Export drawer, batch-delete confirmation, or the subscribe popup cannot be dismissed via keyboard (Escape or equivalent)."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,31 +237,55 @@ weight = 1.0
 [[criterion]]
 id = "4.n7"
 name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+description = "Palette create/edit validation feedback is missing or delayed with no UI indication while the save control remains enabled for invalid fields."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "primary_actions_ambiguous_labels"
+description = "Primary create/save/delete, batch, export, or view-toggle labels are missing or so generic that the action is ambiguous."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "subscribe_returns_after_dismiss"
+description = "After dismissing the subscribe popup, further idle time or scrolling brings the same popup back in the same session."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "stuck_copied_labels_on_swatches"
+description = "After rapid swatch clicks, one or more 'copied' confirmations remain stuck on swatches past about 1 second."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "malformed_import_mutates_library"
+description = "Importing malformed archive JSON still changes palette count or names as if the import succeeded."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n12"
+name = "redo_works_after_cleared_stack"
+description = "After a new mutating action following an undo, Redo still reapplies a cleared redo-stack action."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n13"
+name = "schema_bad_import_mutates_anyway"
+description = "Importing archive JSON that violates the field contract (invalid period, invalid hex, or missing required palette fields) still changes palette count or names."
 type = "binary"
 negate = true
 weight = 1.0
@@ -217,3 +297,4 @@ description = "The app exhibits a significant, browser-observable defect in edge
 type = "binary"
 negate = true
 weight = 1.0
+

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.5
@@ -150,6 +150,35 @@ type = "binary"
 negate = true
 weight = 0.5
 
+[[criterion]]
+id = "15.9"
+name = "activity_log_entries_specific"
+description = "Where the activity log renders entries, each is a specific human-readable sentence naming actor, action, and target (for example 'John moved Flight 102 to Day 1'), not a generic 'item updated'"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.10"
+name = "export_markdown_well_formed"
+description = "Where the markdown export renders, it uses a heading per day and readable time-ordered lines with no raw data dumps, and the coachmark and conflict-modal copy explains what to do in plain language"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.n5"
+name = "export_or_log_garbled"
+description = "Raw serialization artifacts such as [object Object], undefined, NaN, or unrendered template tokens appear in the activity log, the markdown export, the ICS payload, or the trip JSON"
+type = "binary"
+weight = 0.5
+negate = true
+
+
+[[criterion]]
+id = "15.11"
+name = "field_contract_errors_name_fields"
+description = "Where stop validation or trip JSON import errors render, the copy names the problem field (title, endTime, category, or import) and a fix — not a generic rejection"
+type = "binary"
+weight = 0.5
 [[criterion]]
 id = "writing.catchall"
 name = "writing_catchall"

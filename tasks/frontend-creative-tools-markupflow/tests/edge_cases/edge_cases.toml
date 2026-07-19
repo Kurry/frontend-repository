@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,218 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_layers_message_when_no_annotations"
+description = "When the Layers panel has no annotations it shows a friendly message explaining that annotations will appear there, rather than a blank region."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "project_name_inline_validation_before_save"
+description = "On Saved projects submit, an empty or invalid name shows an inline validation message naming the name field before anything is saved, and the Saved projects list count stays unchanged."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "validation_names_field_and_fix"
+description = "Saved-projects name validation copy names the name field and the way forward rather than only saying 'Invalid'."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "tiny_drag_creates_no_annotation"
+description = "A click-drag on the canvas shorter than a small threshold creates no annotation: the Layers row count is unchanged and Undo availability does not change."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "empty_history_undo_redo_disabled"
+description = "With nothing drawn, Undo and Redo are both visibly disabled and pressing Ctrl+Z or Ctrl+Y changes nothing on the canvas or in the Layers panel."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "last_delete_keeps_image_and_empty_layers"
+description = "Deleting the last remaining annotation returns the Layers panel to its empty-state message and leaves the loaded image intact on the canvas."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "corrupt_storage_falls_back_clean"
+description = "On first-ever load, and when a stored value is missing or corrupt, the app falls back to a clean empty workspace (empty canvas drop zone and empty Layers message) without crashing and without console errors."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "studio_controls_use_semantic_tags"
+description = "Toolbar tools, header actions, project name field, Layers Delete/up/down, and Collaboration Go offline / Go online use semantic button/input/label elements rather than unlabeled decorative wrappers."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "conflict_keeps_prior_until_choice"
+description = "Creating conflicting Collaboration edits never silently drops either side: the Shared content region keeps its prior converged text until the user picks Keep local, Keep remote, or Merge both."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "save_disabled_while_name_empty"
+description = "The Saved projects Save control stays visibly disabled while the project name field is empty."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_layers_shows_nothing"
+description = "When the annotation collection is empty, the Layers panel shows nothing — no empty-state message or add guidance."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "validation_errors_only_in_console"
+description = "Invalid project-name save failures surface only in the browser console with no visible inline field feedback."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "draw_or_delete_silent"
+description = "Drawing a shape, deleting a Layers row, or undoing produces no visible change to the canvas or Layers list (silent failure)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "delete_annotation_no_destructive_affordance"
+description = "Layers Delete proceeds with no visible destructive affordance (no Delete labeling) distinguishing it from a non-destructive row click."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "interactive_controls_are_nonsemantic"
+description = "Primary interactive controls (toolbar tools, header actions, Layers rows, Save/Open) are non-semantic div/span click targets without button/role semantics."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "conflict_choice_not_keyboard_dismissible"
+description = "With Keep local / Keep remote / Merge both visible, keyboard users cannot complete conflict resolution (choices unreachable or non-activatable)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "tiny_drag_still_creates_annotation"
+description = "A click-drag shorter than the small threshold still creates a Layers row or enables Undo."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "ambiguous_or_missing_action_labels"
+description = "Primary actions show blank, placeholder, or ambiguous labels such as 'Submit', 'OK', or 'Button' instead of specific labels like Export PNG, Try sample image, Go offline, or Save."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "corrupt_storage_crashes_workspace"
+description = "A missing or corrupt stored workspace value crashes the UI or throws a console error instead of falling back to a clean empty workspace."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "conflict_silently_overwrites"
+description = "Conflicting Collaboration edits silently overwrite Shared content without showing Keep local / Keep remote / Merge both."
+type = "binary"
+negate = true
+weight = 1.0
+
+# HARDEN_MARKUPFLOW_V1
+
+[[criterion]]
+id = "4.11"
+name = "paste_style_disabled_before_copy"
+description = "Paste style stays visibly disabled and changes nothing when no style has been copied yet"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "empty_snapshot_name_disabled"
+description = "Save snapshot stays disabled while the snapshot name is empty and adds no Versions row"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "malformed_import_keeps_workspace"
+description = "Importing a malformed project JSON, or one that fails the MarkupFlowProject or Annotation field contract (wrong schemaVersion, missing imageDataUrl/annotations, imageDataUrl not beginning with data:image/, invalid type/strokeWidth/textStyle enum, fontSize outside 10–72, color not #RRGGBB, or geometry missing width/height, x2/y2, or cx/cy for the type), shows an inline error naming the import problem, leaves canvas and Layers unchanged, and produces no console crash"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "geometry_violation_import_rejected"
+description = "Importing a parseable project JSON whose annotations array contains a rectangle without positive width and height, or an arrow without x2 and y2, shows an inline error naming the geometry field and leaves canvas and Layers unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "export_disabled_without_image"
+description = "With no image loaded, Export project JSON and Copy project JSON stay disabled or show an empty-state hint and do not invent annotations"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "name_over_80_chars_rejected"
+description = "Submitting Saved projects or Save snapshot with a name longer than 80 characters shows an inline validation message naming the name field and adds no row"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "malformed_import_crashes_or_mutates"
+description = "A malformed or field-contract-invalid project JSON import crashes the UI, throws a console error, or mutates the live canvas/Layers without a clear inline error"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n12"
+name = "paste_style_applies_without_copy"
+description = "Paste style applies a style change when Copy style has not been used in the session"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n13"
+name = "oversized_name_silently_accepted"
+description = "A Saved projects or Save snapshot name longer than 80 characters is accepted and adds a row with no inline validation naming the name field"
 type = "binary"
 negate = true
 weight = 1.0

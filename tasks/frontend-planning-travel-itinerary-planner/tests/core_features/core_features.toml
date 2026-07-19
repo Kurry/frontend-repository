@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -302,6 +302,270 @@ description = "The left nav sidebar shows an Overview entry, an Itinerary day li
 type = "binary"
 weight = 1.0
 
+[[criterion]]
+id = "1.41"
+name = "hover_highlights_paired_marker"
+description = "Hovering a stop row in the plan column visibly highlights that stop's map marker (enlargement or halo) and emphasizes the route segment through it, and moving the pointer away clears the highlight — verified by real pointer hover"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "day_focus_fits_map"
+description = "Activating a day header's Focus control fits the map viewport to exactly that day's stops, and leaving focus mode restores the full-plan map extent"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "day_polylines_with_recomputed_distances"
+description = "The map draws one directional polyline per day connecting that day's stops in start-time order in the day's color, with each leg labeled with a distance in kilometers to one decimal; after reordering or reassigning a stop the affected polylines and distance labels update immediately"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "marker_clustering_by_zoom"
+description = "Zooming the map out groups nearby pins into cluster badges showing the count of contained stops, and zooming in or clicking a cluster expands it back into individual pins"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "map_layer_toggle_three_styles"
+description = "A map layer toggle offers at least three layer styles and switching between them restyles the map in place without a page reload or blank map"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "lodging_isochrone_toggle"
+description = "Selecting the seeded Hotel Le Negresco stop offers an isochrone toggle that draws a translucent circle of roughly 1.25 km radius around the hotel, and toggling it off removes the overlay"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "drag_reassign_and_reorder"
+description = "Dragging a stop card to another day reassigns it and dragging within a day reorders it, with the day sections, map pins, polylines, and distance labels all reflecting the new arrangement immediately after the drop"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "day_accordion_collapse_expand"
+description = "Activating a day section header collapses that day's stop rows and activating it again expands them, while the other days keep their own expanded or collapsed state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "time_collision_amber_warning"
+description = "When two time blocks in the same day overlap in time, both blocks show an amber overlap treatment with a warning icon, and adjusting either block's times so they no longer overlap clears the treatment from both"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "travel_buffer_mode_recompute"
+description = "Travel-time buffer cards between consecutive stops show a Driving / Walking / Transit mode selector and a computed duration, and changing the mode immediately changes the displayed duration consistent with a faster mode yielding a shorter buffer"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "impossible_transit_warning"
+description = "When the gap between two consecutive blocks is shorter than the selected mode's computed buffer, the buffer card shows an impossible-transit warning, and widening the gap or choosing a faster mode clears it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.52"
+name = "timezone_axis_relabels_times"
+description = "The timezone switcher toggles displayed block times between destination local (CET), home (ET), and UTC: every visible time label relabels to the selected zone and the switcher indicates the active zone"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.53"
+name = "recurring_generator_creates_seven_blocks"
+description = "Creating a stop such as 'Breakfast at hotel' 8:00-8:45 with the repeat-daily option enabled creates exactly one block per day across Sun 7/5 through Sat 7/11 (7 blocks) in a single action"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.54"
+name = "bucket_drawer_with_polls"
+description = "The unassigned-concepts bucket drawer opens from a persistent control and lists the unscheduled ideas, each carrying a poll widget with per-member vote indicators for Sarah, John, and Marco plus a user vote control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.55"
+name = "vote_winner_promotes_to_timeline"
+description = "After starting a vote on a bucket item, the simulated members cast votes with visible count updates, and when the item reaches 3 of 4 votes it leaves the bucket and appears as a scheduled stop on a day timeline with a map pin in that day's color"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.56"
+name = "conflict_modal_choice_applies"
+description = "Triggering a simulated peer edit on a block the user has an unsaved edit open on opens a conflict-resolution modal showing current and incoming versions side by side with Keep mine / Take theirs / Merge choices, and the chosen resolution is actually applied to the block"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.57"
+name = "role_switcher_gates_controls"
+description = "Switching the role to Viewer visibly disables all mutating controls (create, edit, delete, drag, vote, bulk), Editor keeps delete disabled while create/edit/move work, and Owner enables everything"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.58"
+name = "activity_log_records_mutations"
+description = "The activity log drawer lists session mutations newest first, each entry naming the actor and the change, and performing a create, a drag move, and a delete appends three matching entries"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.59"
+name = "filter_ribbon_combines_and_clears"
+description = "The filter ribbon combines cost-tier, category, and tag filters to recompute the visible stops from the shared collection, and Clear filters restores the full plan"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.60"
+name = "fuzzy_search_typo_tolerant"
+description = "Typing a slightly misspelled query such as 'anitbes' in the search field still surfaces the Antibes stop, and clearing the query restores the unfiltered view"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.61"
+name = "bulk_selection_bar_actions"
+description = "Selecting multiple stops summons a bulk action bar showing the selected count, and its Mass tag, Move to day, and Delete actions apply to every selected stop in one operation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.62"
+name = "kanban_pivot_status_columns"
+description = "Kanban pivot mode shows the stops as To Visit / Reserved / Completed columns, and dragging a card between columns updates that stop's status wherever it appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.63"
+name = "markdown_export_live_compile"
+description = "The export canvas shows a markdown itinerary with a heading per day in date order and time-ordered stop lines, and reopening it after a change shows the updated document with a Copy control that confirms via toast"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.64"
+name = "ics_payload_valid_structure"
+description = "The ICS view renders a payload that begins with BEGIN:VCALENDAR, contains exactly one VEVENT block per scheduled stop with a DTSTART and a SUMMARY naming the stop, and ends with END:VCALENDAR"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.65"
+name = "undo_redo_structural_changes"
+description = "Undo and redo controls step through structural changes: after a delete, Undo restores the stop across list, map, and kanban together and Redo removes it again"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.66"
+name = "coachmarks_sequence_first_load"
+description = "On a fresh load an onboarding coachmark sequence of at least 3 steps points at the plan column, the map pane, and the ideas bucket with Next and Skip controls, and once dismissed it does not reappear during the session"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.67"
+name = "theme_toggle_swaps_all_panes"
+description = "The light/dark toggle swaps the palette across the sidebar, plan column, and map chrome without a reload, with text readable in both themes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.68"
+name = "vote_promotion_silently_fails"
+description = "A poll reaches its winning vote threshold yet the winning item stays in the bucket and the timeline gains no new stop — the promotion silently fails or the winner is left behind"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.69"
+name = "buffer_cards_ignore_mode_change"
+description = "Switching a travel buffer card's transport mode leaves the displayed duration unchanged for legs where the mode speeds dictate different durations — the buffer is a static label rather than a computed value"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.70"
+name = "viewer_role_mutations_still_apply"
+description = "While the Viewer role is active, a mutating control still changes the plan (a stop is created, edited, deleted, or dragged successfully) despite the read-only role"
+type = "binary"
+weight = 1.0
+negate = true
+
+
+[[criterion]]
+id = "1.71"
+name = "stop_field_contract_enforced"
+description = "The stop create/edit form enforces the Stop field contract: empty title, endTime not after startTime, and out-of-enum category/costTier/status/day each show an inline error naming that field and leave the stops count unchanged; a valid submit creates a record whose visible title, day, location, times, category, costTier, and status match the submitted values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.72"
+name = "trip_json_live_compile"
+description = "The export canvas trip JSON preview is a live-compiled document with schemaVersion \"1\", a trip object carrying title and dateStart/dateEnd, and a stops array; after creating or renaming a stop the JSON updates to include that stop's title and fields without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.73"
+name = "trip_json_download_and_copy"
+description = "Download trip JSON offers a real download of the visible trip JSON text, and Copy trip JSON places that exact text on the clipboard with a visible confirmation toast"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.74"
+name = "import_trip_json_reconstructs"
+description = "Importing a previously exported trip JSON reconstructs the stops so list rows, map pins, and the trip JSON preview match the imported document; importing malformed JSON shows a visible error and leaves the session unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.75"
+name = "ics_download_control"
+description = "Download ICS offers a real download of the visible ICS payload that begins with BEGIN:VCALENDAR and contains one VEVENT per scheduled stop"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n8"
+name = "trip_json_omits_session_mutations"
+description = "After a create, rename, delete, status change, or vote promotion, the trip JSON preview omits the mutation — the document is static or incomplete relative to the visible plan"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n9"
+name = "import_accepts_invalid_stop_payload"
+description = "Importing trip JSON whose stops violate the Stop field contract (missing title, illegal enum, or endTime not after startTime) still mutates the plan instead of rejecting with a named import error"
+type = "binary"
+weight = 1.0
+negate = true
 [[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"

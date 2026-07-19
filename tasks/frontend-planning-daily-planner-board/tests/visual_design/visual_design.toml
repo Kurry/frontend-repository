@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -154,6 +154,21 @@ description = "Lorem ipsum, placeholder text (TODO, asdf, template variable name
 type = "binary"
 weight = 1.0
 negate = true
+
+
+[[criterion]]
+id = "3.14"
+name = "export_canvas_monospace_previews"
+description = "The export canvas presents ICS and Planner JSON as monospaced previews with Download and Copy controls, visually distinct from surrounding UI text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.15"
+name = "bulk_tray_and_conflict_drawer_match_chrome"
+description = "The bulk tray and conflict drawer adopt the same spacing scale, radii, and accent as the board chrome rather than a mismatched overlay style"
+type = "binary"
+weight = 0.5
 
 [[criterion]]
 id = "3.catchall"

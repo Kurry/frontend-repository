@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,189 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_gallery_state_after_delete_all"
+description = "Deleting every board shows an empty-gallery state in the list region that explains the gallery is empty and how to save a board."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "save_rename_inline_validation"
+description = "The Save board and rename forms validate name and tag inline before submit: an invalid or empty name, duplicate name, name over 40 characters, or tag outside pattern|portrait|abstract|logo|study|signal shows a per-field message naming that field, and the submit control stays disabled until every required field is valid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "empty_name_blocks_save_count"
+description = "Saving a board with an empty name adds nothing to the gallery, surfaces visible validation feedback naming the name field, and leaves the gallery count unchanged."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "zero_match_tag_filter_empty_state"
+description = "When the tag filter matches no boards, the list region shows an empty state; clearing the filter restores the full list."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "camera_denied_shows_message"
+description = "Denying camera access shows a visible message instead of a broken overlay, and the paint stage remains usable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "undo_redo_empty_and_capacity"
+description = "Undo with no strokes and Redo with an empty redo stack are disabled; activating them changes nothing and causes no errors; after roughly 100 strokes the oldest undo steps drop off while Undo keeps reverting the most recent ones."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "cell_locked_until_clear"
+description = "Moving the Cell control after art exists is impossible: the control stays visibly muted/disabled until Clear empties the board and re-enables it."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "toolbar_and_gallery_controls_semantic"
+description = "Toolbar tools, swatches, Upload/Camera/Undo/Redo/Clear/Export/Share, gallery save/rename/delete/favorite/bulk controls, and command palette results use semantic button/input/label elements rather than unlabeled decorative wrappers."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "camera_cancel_leaves_board_unchanged"
+description = "Cancelling the camera overlay leaves the board exactly as it was — Cancel closes the overlay without painting."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "double_save_creates_one_entry"
+description = "Double-activating Save board creates exactly one gallery entry: the count increases by one and one new card appears."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "flood_fill_noop_on_matching_target"
+description = "Flood Fill on a board where every cell in the contiguous region already matches the active swatch fill target changes nothing and does not push an undo step."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "malformed_import_rejected"
+description = "Importing malformed Project JSON, or JSON that omits a required ProjectDocument key, uses tool/swatch/mirror/vision outside their closed enums, carries cells whose dimensions disagree with cellSize, or carries boards/versions that violate SavedBoard / VersionSnapshot rules, shows a visible error naming the offending field (or the payload), leaves the board and gallery unchanged, and does not lock Cell."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "compare_requires_two_sides"
+description = "Compare with fewer than two sides selected shows a short message explaining that two versions (or a version and the live board) must be chosen, and does not enter the split view."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "bulk_delete_disabled_when_none_selected"
+description = "With zero gallery checkboxes checked, the bulk action bar stays hidden or its Delete selected action stays disabled so nothing is deleted."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "vision_never_rewrites_cells"
+description = "Vision preview filters never rewrite stored cell colors: toggling Vision Off restores the original swatch appearance of every painted cell."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "empty_version_name_blocked"
+description = "Snap version with an empty name or a name over 40 characters shows inline validation naming the name field and adds nothing to the Versions list."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.17"
+name = "duplicate_board_name_rejected"
+description = "Submitting Save board or rename with a name that already exists on another board (after trim) leaves the gallery count unchanged and shows an inline error naming the name field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.18"
+name = "invalid_tag_rejected"
+description = "Save board with a missing tag or a tag outside pattern, portrait, abstract, logo, study, signal shows an inline error naming the tag field and does not increase the gallery count."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.19"
+name = "overlong_board_name_rejected"
+description = "A board name longer than 40 characters is rejected with an error naming the name field so no card is saved with a name over 40 characters."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_gallery_has_no_feedback"
+description = "After deleting all boards or filtering to zero tag matches, the gallery list region shows nothing and provides no empty-state feedback."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "invalid_save_mutates_gallery"
+description = "An empty name, duplicate name, overlong name, or invalid tag on Save board or rename mutates the gallery count or card list without visible validation naming the offending field."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "cell_adjustable_with_art_present"
+description = "With painted art on the board, the Cell control remains adjustable so resolution can change mid-artwork."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "undo_empty_throws_or_corrupts"
+description = "Activating Undo or Redo with an empty stack throws a visible error, corrupts the canvas, or enables a control that should be disabled."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "camera_denied_breaks_overlay"
+description = "When camera access is denied, the overlay is broken or empty with no explanatory message."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "malformed_import_corrupts_state"
+description = "Malformed Project JSON import partially mutates the board or gallery or locks Cell without a visible error."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "vision_mutates_stored_colors"
+description = "Enabling a Vision preview mode permanently rewrites stored cell colors so toggling Off cannot restore the original swatches."
 type = "binary"
 negate = true
 weight = 1.0
@@ -213,7 +252,8 @@ weight = 1.0
 [[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in edge-case handling that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0
+

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -105,7 +105,7 @@ weight = 1.0
 [[criterion]]
 id = "1.7"
 name = "cursor_style_swaps_preview_shape"
-description = "When the cursor-style control is changed among block, bar, underline, and hollow block, the live cursor preview swaps its shape to match the selected style and the generated cursor-style line follows."
+description = "When the cursor-style control is changed among block, bar, underline, and hollow block, the live cursor preview swaps its shape to match the selected style and the generated cursor-style line follows using block, bar, underline, or block_hollow (hollow block maps to block_hollow)."
 type = "binary"
 weight = 1.0
 
@@ -258,6 +258,100 @@ name = "reload_restores_all_facets_coherently"
 description = "After editing settings in at least two different categories and switching to a non-default category: reload the page and confirm every facet is restored coherently from client storage - the edited controls, the live preview, the generated lines, the override count, and the active view all match their pre-reload state, with none silently reverted while others survive."
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "import_applies_config_text"
+description = "An Import control accepts pasted Ghostty config text (key = value lines); applying a valid paste sets matching overrides so the generated panel, controls, live preview, and override count all reflect the imported values."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "export_contains_session_mutations"
+description = "After editing settings, Download and Copy contain those exact key = value override lines — never a stale or empty artifact while overrides exist."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "settings_search_filters_rows"
+description = "A settings search field filters visible setting rows by label or key as the user types; clearing the query restores the full unfiltered form for the active category."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "command_palette_jumps_to_setting"
+description = "Opening the command palette with Cmd+K or Ctrl+K, typing a fuzzy match, and choosing a result navigates to that setting's category, focuses the matching control, and closes the palette without a document reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "undo_redo_setting_mutations"
+description = "Undo and Redo reverse and reapply setting mutations; after editing font-family then undoing, the generated line, override count, and live preview revert; Redo restores the edit on all three surfaces. Each control disables when its stack is empty."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "diff_mode_compares_overrides_to_defaults"
+description = "A Diff mode toggle shows each overridden key's default and current values side by side with a distinct changed treatment; with zero overrides it shows an explicit no-differences state; toggling Diff does not clear overrides."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "named_profiles_save_and_apply"
+description = "Save profile with a required name stores the current override set; selecting that profile after Reset all re-applies the same overrides to the editor, preview, and generated config; Delete removes the profile after confirmation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "keybind_conflict_notice"
+description = "On the Keybinds page, assigning the same shortcut trigger to two different actions shows a conflict notice naming both actions; the notice clears when the duplicate trigger is resolved."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "api_shaped_ghostty_field_contracts"
+description = "The generated config is API-shaped like a real Ghostty create/update request body: overrides are key = value lines whose visible field contracts match the instruction — non-empty font-family; font-size 4–60; cursor-style in {block, bar, underline, block_hollow}; background/foreground/cursor-color as #RRGGBB; opacities 0–1; theme in {Dracula, Nord, Gruvbox Dark, Catppuccin Mocha, Solarized Dark - Patched, Builtin Dark}; clipboard-read/write in {ask, allow, deny}; copy-on-select in {true, false, clipboard}; window-decoration in {auto, none, client, server}; non-negative window-padding-x/y and scrollback-limit; palette N=#RRGGBB with N 0–255; keybind trigger=action with duplicate-trigger conflict; boolean true/false; non-empty profile-name. A valid setting edit, profile save, or Import creates that same would-be request body, and Export emits conforming lines containing the session's actual overrides."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "form_validation_matches_export_contracts"
+description = "Form validation enforces the same Ghostty field contracts the export shape declares: an out-of-bound or out-of-enum value shows an inline message naming the offending field and does not emit a malformed override line into the generated configuration; Import of contract-invalid text is rejected the same way without mutating overrides."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n40"
+name = "export_omits_session_overrides"
+description = "With overrides present, Copy or Download produces empty, default-only, or otherwise incomplete config text that omits the session's actual key = value mutations."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n41"
+name = "undo_does_not_restore"
+description = "After a setting edit, Undo leaves the generated line, override count, or live preview unchanged from the post-edit state."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n42"
+name = "export_violates_ghostty_field_contracts"
+description = "With overrides present, the generated or exported config emits values that violate the contracted Ghostty shapes — for example font-size outside 4–60, cursor-style outside block/bar/underline/block_hollow, a non-#RRGGBB color, opacity outside 0–1, theme outside the declared set, or clipboard values outside ask/allow/deny — or omits required contracted keys for overrides the session actually made."
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.catchall"

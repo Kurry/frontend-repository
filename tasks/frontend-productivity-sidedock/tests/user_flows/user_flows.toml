@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,14 +63,14 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "6.1"
 name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+description = "Create flow: submitting Add bookmark with a field-contract-valid url and title inserts exactly one row visible in the tree and in the SideDock package preview under the active workspace items."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
 name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+description = "Create flow: submitting Add bookmark with an empty or non-http/https url, or Create workspace with a blank name, triggers immediate inline validation naming the offending field and creates nothing."
 type = "binary"
 weight = 1.0
 
@@ -208,6 +208,14 @@ name = "navigation_dead_end_requires_reload"
 description = "Navigation dead ends or requires reload for recovery."
 type = "binary"
 negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "6.11"
+name = "sidedock_package_round_trip_flow"
+description = "SideDock package round trip: create a workspace, add a bookmark with a distinctive url and title that satisfy the field contract, pin it, confirm the Export SideDock package preview shows schemaVersion sidedock-package-v1 plus those values, Download or Copy that JSON, mutate the session away, Import the same JSON, and confirm workspace tabs, tree, Pinned row, sidebar view, and package preview match the pre-export session"
+type = "binary"
 weight = 1.0
 
 [[criterion]]

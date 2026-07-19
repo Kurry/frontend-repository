@@ -1,0 +1,180 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "9.1"
+name = "serves_clean_on_start_path"
+description = "The app serves via its documented start path on port 3000 and renders the Queue view with the seeded records, with no errors"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.2"
+name = "shared_state_coherence"
+description = "Shared-state coherence: a change made in one surface (a completed run, a verdict, a feedback entry) is immediately reflected in every other surface showing that data — queue row, detail panels, rollup strip, charts, and report — without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.3"
+name = "storage_stays_empty"
+description = "After a full exercise of the app (runs, verdicts, feedback, escalation, fixes, report copy), localStorage, sessionStorage, and other browser storage remain empty"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.4"
+name = "reload_returns_seeded_baseline"
+description = "A page reload returns the app to its seeded state: the seeded records with their original stages, check results, and feedback, the default Queue view, and an empty export history"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.5"
+name = "console_clean_through_flows"
+description = "No console errors or unhandled promise rejections appear on load or while exercising runs, batch runs, pause/resume, verdicts, feedback, escalation, re-audit, and report copy"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.6"
+name = "no_outbound_network_requests"
+description = "Only same-origin requests appear in the network log while loading and exercising the app; no CDN, font, icon, analytics, or API requests leave the origin"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.7"
+name = "views_reachable_via_client_state"
+description = "The Queue, Reviewers, Report, and task detail views are all reachable from the in-app navigation, and switching between them never triggers a full page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.8"
+name = "rapid_input_keeps_state_synced"
+description = "Rapid interaction — fast filter toggling, quick sort clicks, switching views while a run advances — leaves all surfaces consistent, with no view showing stale data another view already updated"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.9"
+name = "deterministic_state_renders_consistently"
+description = "Two loads of the same seeded state render the same records, stages, check outcomes, and rollup values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.n1"
+name = "browser_storage_used"
+description = "localStorage, sessionStorage, or another browser storage API is non-empty after exercising the app"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n2"
+name = "outbound_request_observed"
+description = "An outbound network request to another origin (CDN script, font host, analytics, API) appears in the network log"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n3"
+name = "console_error_during_flows"
+description = "A console error or unhandled rejection is thrown by a specific interaction during normal flows, even if the UI limps on"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n4"
+name = "views_desync_same_datum"
+description = "The same datum shows different values in two places at once — for example the rollup strip and the report disagree on a check's pass count, or a queue row lags its detail view"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n5"
+name = "debug_artifacts_visible"
+description = "Visible debug output, console.log spam, placeholder scaffolding, or leftover template chrome appears in the running app"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n6"
+name = "external_link_navigates_away"
+description = "An app-chrome link or control navigates away from the app's origin"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, console line) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -138,7 +138,7 @@ optional = true
 [[criterion]]
 id = "3.12"
 name = "layout_regions_match_spec"
-description = "The app opens into a header with the app name and a one-line description, a toolbar holding search, tag filter chips, a Tag manager toggle, and a Theme control, a main area with the task tree on the left and the Archive panel on the right, and a footer holding the New root task input"
+description = "The app opens into a header with the app name and a one-line description, a toolbar holding search, tag filter chips, a Tag manager toggle, Export grove, Import grove, and a Theme control, a main area with the task tree on the left and the Archive panel on the right, and a footer holding the New root task input"
 type = "binary"
 weight = 1.0
 
@@ -152,7 +152,7 @@ weight = 1.0
 [[criterion]]
 id = "3.14"
 name = "single_consistent_icon_set"
-description = "Chevron, zoom, move, archive, export, and theme controls all draw from one visually consistent icon set, with no two controls of the same kind using mismatched glyph styles"
+description = "Chevron, zoom, move, archive, export, import, and theme controls all draw from one visually consistent icon set, with no two controls of the same kind using mismatched glyph styles"
 type = "binary"
 weight = 0.5
 
@@ -166,21 +166,21 @@ weight = 0.5
 [[criterion]]
 id = "3.16"
 name = "narrow_viewport_stacking_and_wrapping"
-description = "At approximately 375px wide, the Archive panel stacks below the task tree (while on desktop widths they sit side by side), toolbar controls wrap onto additional rows rather than clipping, and the app-name heading scales down rather than overflowing the viewport"
+description = "At approximately 375px wide, the Archive panel stacks below the task tree (while on desktop widths they sit side by side), toolbar controls including Export grove and Import grove wrap onto additional rows rather than clipping, and the app-name heading scales down rather than overflowing the viewport"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.17"
 name = "consistent_capitalization_and_verb_labels"
-description = "Headings, buttons, and control labels use one consistent capitalization convention throughout, and action labels are specific verbs (Add Child, Move To, Export as Text) rather than generic labels where a specific one is possible"
+description = "Headings, buttons, and control labels use one consistent capitalization convention throughout, and action labels are specific verbs (Add Child, Move To, Export as Text, Export grove, Import grove) rather than generic labels where a specific one is possible"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "3.18"
 name = "actionable_error_and_empty_copy"
-description = "Validation and error messages name the problem and the fix, and each empty state (empty tree, empty Archive panel, no filter or search matches) explains what belongs there and how to fill it"
+description = "Validation and error messages name the problem and the fix including which field failed the field contract, and each empty state (empty tree, empty Archive panel, no filter or search matches) explains what belongs there and how to fill it"
 type = "binary"
 weight = 0.5
 
@@ -198,6 +198,13 @@ name = "muted_secondary_subtitle_color"
 description = "In the Light theme, the header's one-line app description renders in the muted #62748E secondary tone, visibly distinct from the #0F172B primary ink used for body text"
 type = "binary"
 weight = 0.5
+
+[[criterion]]
+id = "3.21"
+name = "grove_package_panel_monospace_preview"
+description = "The Grove package panel shows a scrollable monospaced JSON preview with Download grove package and Copy grove package controls"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "3.catchall"

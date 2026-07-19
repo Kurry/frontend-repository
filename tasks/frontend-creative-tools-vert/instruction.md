@@ -1,5 +1,5 @@
 <summary>
-Build VERT, a private, frontend-only local file converter, using Svelte 5 with SvelteKit static delivery, Svelte stores and runes, Tailwind CSS 4.3.2, and Bits UI. The app opens directly into a converter workspace where a user adds local image files, picks a target format per file, runs a real in-browser conversion, and downloads the result, with a visible queue and per-file status. All conversion runs on the device; there is no backend, no authentication, and no upload.
+Build VERT, a private, frontend-only local file converter, using Svelte 5 with SvelteKit static delivery, Svelte stores and runes, Tailwind CSS 4.3.2, and Bits UI. The app opens directly into a converter workspace where a user adds local image files, picks a target format per file, runs a real in-browser conversion, and downloads the result, with a visible queue and per-file status. The app produces the user's conversion session files — a session JSON and a conversion-report markdown compiled live from the store — so session work survives without a backend. All conversion runs on the device; there is no backend, no authentication, and no upload.
 </summary>
 
 <reference_screenshots>
@@ -19,17 +19,39 @@ Feature: Converter workspace and navigation —
 Feature: Adding files —
 - The drop zone is a keyboard-and-pointer file affordance: clicking it opens the local file picker; dragging a file over it shows a highlighted drop target; dropping files adds them to the queue. Its helper text names the supported local inputs before any file is chosen
 - Two sample-image affordances ("Add sample png", "Add sample svg") let a user add a real local file to the queue without their own file, so the primary workflow is reachable immediately
-- Adding one or more image files appends a row per file to the conversion queue showing the filename, the detected source format, a "Convert to" format selector defaulting to a sensible target, the input size, and a per-file status. Supported inputs are png, jpg, jpeg, webp, gif, bmp, and svg
+- Adding one or more image files appends a row per file to the conversion queue showing the filename, the detected source format, a "Convert to" format selector defaulting to the Settings default target when set (otherwise a sensible target), the input size, a selection checkbox, and a per-file status. Supported inputs are png, jpg, jpeg, webp, gif, bmp, and svg
 Feature: Conversion queue —
 - Each queued file exposes a "Convert to" selector bound to the real output formats png, jpeg, jpg, and webp. Changing a file's target updates that row and, if it was already converted, returns it to a ready state so it can be reconverted
 - Running Convert performs a real, in-browser transcode of every ready file to its selected target using the browser's native image codecs, moving each row through Converting and then Done, and updates the counts line ("N queued, R ready, D done"). Different inputs and different targets produce genuinely different output bytes; the output size is shown on each completed row
 - Each completed row offers a Download control that saves the real converted file to disk with the correct extension; the Download control is disabled until that row is Done
 - Per-file status is a first-class, distinguishable set of states: Ready, Converting, Done, Failed, and Unsupported. Each status carries a text label and a glyph, not color alone
 - Removing a file drops its row from the queue and the counts; Clear queue empties the whole queue; Cancel stops an in-progress run
+Feature: Multi-select and batch tray —
+- Each queue row exposes a selection checkbox; selecting one or more rows reveals a batch tray with Batch set format, Batch remove, and Download all done
+- Batch set format applies one Convert-to target to every selected row at once; any previously Done selected row returns to Ready with Download disabled
+- Batch remove asks for confirmation that names the selected count of rows to remove, then removes exactly those rows and updates the counts; with zero selected the tray stays hidden and Batch remove does nothing
+- Download all done triggers a real file download for every selected Done row, or for every Done row in the queue when none are selected
+Feature: Conversion presets —
+- Settings (or an adjacent presets strip on Convert) lists at least 3 seeded named conversion presets on first load, each with a name, a default target format (png, jpeg, jpg, or webp), and a quality from 1 to 100
+- Save preset stores the current Settings quality and default target under a name the user enters; empty or whitespace-only names are rejected with an inline message naming the name field and add no preset
+- Apply preset writes that preset's quality into Settings and its target into every selected queue row, or into every Ready row when none are selected; Done rows that receive a new target return to Ready
+- Delete preset removes the named preset after confirmation; seeded and user presets alike can be deleted, and the visible preset count decreases by exactly one
+- Conversion presets persist across reloads in client storage
+Feature: Undo and redo —
+- Undo reverses the most recent mutating queue or preset action — add, remove, clear, retarget, batch set format, batch remove, save preset, or delete preset — and restores the prior queue rows, counts, selection, and presets list
+- Redo reapplies the most recently undone action with the same completeness; performing a new mutating action after an undo clears the redo stack and disables Redo
+- Undo and Redo controls show enabled and disabled states that match whether a step is available
+Feature: Session export and import (useful end state) —
+- The app produces the user's conversion session files: a Session export panel compiles LIVE from the current store and offers two formats — session JSON and conversion-report markdown — each regenerating whenever the queue, settings, or presets change
+- The session JSON includes the current quality, keep-metadata flag, theme, active catalog category, every conversion preset (name, target, quality), and per-file queue metadata (name, from, to, status, inputSize, outputSize) exactly as currently stored — never raw file bytes, blobs, or base64 payloads
+- The conversion-report markdown summarizes the same session: settings, preset names, and one line per queued file with name, formats, status, and sizes
+- Export content must reflect every mutation the session made — a retarget, quality change, preset save, batch action, or conversion that is visible in the queue must appear in the compiled export text before download or copy
+- Each format tab shows a monospaced preview; Copy writes the visible preview text to the clipboard and shows a brief copied confirmation; Download starts a file download of that same preview text
+- Import accepts a previously exported session JSON (conversion-session mode): after a successful import, Settings quality/keep-metadata/theme/default target, the presets list, and Convert-to targets on currently queued files that match by filename all match the imported document, and the session JSON export preview matches that imported state; malformed JSON shows an inline error naming the import field and leaves the store unchanged
 Feature: Format catalog —
 - The "VERT supports..." catalog shows four category cards (Images, Audio, Documents, Video) each listing its real supported-format set, a local-or-server support label, and a ready status. Selecting a category marks it active; the active category is remembered across reloads
 Feature: Settings and about —
-- Settings exposes an output-quality control (1 to 100) that affects the bytes of jpeg and webp output, a keep-metadata toggle, and a light or dark theme choice, presented as a form whose fields validate inline: entering a quality outside 1 to 100 shows an inline message naming the quality field before submit, and the invalid value is never applied
+- Settings exposes an output-quality control (1 to 100) that affects the bytes of jpeg and webp output, a keep-metadata toggle, a default Convert-to target (png, jpeg, jpg, or webp) used when new files are added, and a light or dark theme choice, presented as a form whose fields validate inline: entering a quality outside 1 to 100 shows an inline message naming the quality field before submit, and the invalid value is never applied
 - About and Privacy views explain that conversion is local and that files are never uploaded, and remain reachable without selecting a file
 </core_features>
 
@@ -38,7 +60,12 @@ Feature: Settings and about —
 - Converting the same source file twice, once to webp and once to jpeg, produces two completed rows whose output sizes differ, and each Download saves a file whose extension matches its selected target
 - Changing a Done row's "Convert to" target returns that row to Ready, disables its Download control, and updates the counts line; running Convert again completes it to Done with an output size shown for the new target
 - Lowering the output quality in Settings and reconverting the same file to jpeg yields a smaller output size on the completed row than the same conversion at quality 100, showing the setting flows into the conversion result
-- Selecting a catalog category, switching the theme, and changing the quality setting, then reloading the page, restores the active category, the theme, and the quality value, while the conversion queue returns to a single empty state with "0 files queued" and no phantom row, progress, or download success
+- Selecting two queued files, running Batch set format to webp, and confirming both rows show webp as Convert-to (Done rows returned to Ready) updates the session JSON export preview so both files list to as webp — all without a reload
+- Saving a preset named Web ready with target webp and quality 80 increases the visible preset count by exactly one; applying it writes quality 80 into Settings and webp into the selected (or all Ready) rows; the session JSON export preview includes that preset
+- After converting at least one file and changing quality, opening Session export shows a session JSON preview whose quality and per-file status/to/outputSize match the visible store; Copy shows a brief copied confirmation; Download starts a file of that same text
+- Export then import round-trip: after mutating settings and presets (and with at least one file still queued), Download or Copy the session JSON, then Import that same JSON text — Settings, presets, and matching queued files' Convert-to targets match the pre-export mutated state, and the export preview matches again
+- Undo after removing a queued file restores that row and the prior counts; Redo removes it again; after a new add following an undo, Redo is disabled
+- Selecting a catalog category, switching the theme, changing the quality setting, and saving a preset, then reloading the page, restores the active category, the theme, the quality value, and the presets list, while the conversion queue returns to a single empty state with "0 files queued" and no phantom row, progress, or download success
 - Removing the only queued file restores the explicit empty state and the "0 files queued" counts line; adding a file again works immediately from that state
 </user_flows>
 
@@ -48,14 +75,21 @@ Feature: Settings and about —
 - Cancel during an in-progress run stops the run: no row left mid-run shows Done, and the counts line matches the rows actually completed
 - Double-activating Convert runs each ready file exactly once: the done count increases only by the number of ready rows, with no duplicate rows created
 - A long filename is truncated with an ellipsis in its queue row without breaking the row layout, and the download still uses the full name with the correct extension
+- Saving a preset with an empty name does not increase the preset count and shows an inline message naming the name field
+- Batch remove with zero selected rows does nothing and shows no confirmation; the tray stays hidden until at least one row is selected
+- Importing malformed session JSON shows an inline error naming the import field, leaves quality, presets, and queue targets unchanged, and does not clear undo history as if the import succeeded
+- After Undo restores a deleted preset, Redo deletes it again; after a new Save preset following an undo, Redo is disabled and cannot resurrect the cleared redo stack
+- Session export with an empty queue still compiles valid session JSON and conversion-report text (settings and presets present, files array empty) without errors
 </edge_cases>
 
 <visual_design>
 - A focused single-product converter surface, not a generic dashboard: a magenta-to-blush vertical gradient page background, a floating rounded white navbar pill, a bold oversized hero headline paired with a large white drop-zone card given the most visual weight in the first viewport
 - The drop zone is the visual focal point of the workspace: a rounded card with a circular magenta upload glyph, a large title, and supporting helper text, clearly more prominent than secondary metadata or the footer
-- The conversion queue reads as a dense worklist: one row per file with the filename emphasized, a muted sub-line for formats and sizes, a compact format selector, a pill-shaped status indicator color-and-glyph coded (muted Ready, amber Converting, green Done, red Failed and Unsupported), and right-aligned Download and Remove actions
+- The conversion queue reads as a dense worklist: one row per file with a selection checkbox, the filename emphasized, a muted sub-line for formats and sizes, a compact format selector, a pill-shaped status indicator color-and-glyph coded (muted Ready, amber Converting, green Done, red Failed and Unsupported), and right-aligned Download and Remove actions
+- The batch tray is a compact bar above or below the queue when multi-select is active; Undo/Redo sit near the queue chrome; Session export is a panel or drawer with format tabs, a monospaced preview, and Copy / Download / Import controls
 - The "VERT supports..." section is a four-up card grid; each card shows a category icon, a bold category name, a support label (Video reads "Server supported" in the accent color, the rest "Local supported"), a status line, and a scrollable list of real format extensions
-- Icons come from one consistent glyph family across the navbar, drop zone, status pills, and category cards — no mixed icon styles
+- Conversion presets read as a compact named list with Apply and Delete actions, not a second dashboard
+- Icons come from one consistent glyph family across the navbar, drop zone, status pills, batch tray, and category cards — no mixed icon styles
 - Type hierarchy across at least three roles (oversized hero, section and card headings, body and muted captions); spacing on a consistent 4 and 8 pixel scale; one magenta accent family on a light neutral base, with green reserved for success and red for error consistently
 - A light and a dark theme; every text-on-surface pairing stays legible in both
 </visual_design>
@@ -68,18 +102,23 @@ Feature: Settings and about —
 - Selecting a queue row marks it with an inset ring; selecting the active category card marks it with an accent ring, and both selections reverse through the same control
 - Status transitions are visible as each file moves Ready to Converting to Done (or Failed): the status pill changes with a brief transition rather than an instant swap, and the counts line updates live
 - Switching between Convert, Settings, and About transitions the view content with a short fade or slide rather than a hard cut
+- The Session export panel enters and exits with a brief opacity or scale transition; Copy shows a short copied confirmation before resetting
+- Batch tray appearance and preset list add/remove use short enter/exit feedback rather than hard snaps
 - With prefers-reduced-motion set, row and view animations are removed and state changes apply instantly while every flow remains completable
 </motion>
 
 <responsiveness>
 - At narrow widths the hero stacks, the catalog collapses to one column, file rows stack, and the primary controls stay operable with no horizontal page scrolling down to 320 pixels
+- The batch tray, Undo/Redo, Session export panel, and preset controls remain reachable at 375 pixel width without permanently covering Convert or Download
 </responsiveness>
 
 <accessibility>
-- Every interactive control is reachable and operable with the keyboard alone, with a visible focus ring on every interactive control
+- Every interactive control is reachable and operable with the keyboard alone, with a visible focus ring on every interactive control — including selection checkboxes, batch actions, Undo/Redo, Session export Copy/Download/Import, and preset Save/Apply/Delete
 - Focusing the drop zone and pressing Enter or Space opens the local file picker exactly as a pointer click does
 - The active category card exposes its pressed state through aria-pressed as well as its accent ring
 - Status changes are announced: the counts line and each status pill update via an aria-live region so a conversion's progress is announced without moving focus
+- Session export Copy confirmation and import validation errors are announced through an aria-live region as well as shown visually
+- Batch-remove confirmation and Session export use dialog semantics: focus moves in on open, stays trapped while open, and returns to the invoking control on close
 - The full convert-and-download flow is completable with keyboard alone and with pointer alone, reaching the same result either way
 - Each status carries a text label and a glyph, never color alone
 </accessibility>
@@ -88,28 +127,31 @@ Feature: Settings and about —
 - The app is interactive within 2 seconds of a local cold load
 - No console errors, warnings, or hydration mismatch messages appear on any route, on first load or after client navigation
 - Converting a file keeps the page responsive: the navbar, theme toggle, and other queue rows stay interactive while a conversion runs
+- Session export previews recompile without freezing the queue controls after a retarget, preset save, or conversion
 - After first paint no visible layout jumps occur; the queue and catalog regions hold their space as content settles
 </performance>
 
 <writing>
-- Microcopy is concise UI writing in sentence case: verb-first buttons (Convert, Download, Remove, Clear queue), numeral counters ("1 queued, 0 ready, 1 done"), and second-person help text; error and unsupported messages state the problem plainly without codes or blame
+- Microcopy is concise UI writing in sentence case: verb-first buttons (Convert, Download, Remove, Clear queue, Batch set format, Batch remove, Download all done, Undo, Redo, Save preset, Apply preset, Copy, Download session), numeral counters ("1 queued, 0 ready, 1 done"), and second-person help text; error and unsupported messages state the problem plainly without codes or blame
+- Session export labels, batch confirmation copy, and preset validation name the field or count involved rather than generic Submit or OK
 </writing>
 
 <requirements>
 - Use Svelte 5 with SvelteKit static delivery (adapter-static), Svelte stores and runes for all shared state, and Tailwind CSS 4.3.2 (pinned) with design tokens in the theme layer.
-- Bits UI is the component library: use it for the queue chrome — format selects, dialogs or confirmations, toggles, and menu surfaces. No other UI component libraries.
+- Bits UI is the component library: use it for the queue chrome — format selects, dialogs or confirmations, toggles, Session export panel, and menu surfaces. No other UI component libraries.
 - AutoAnimate and Svelte transitions are allowed for animation; no other animation libraries.
 - Phosphor icons via the phosphor-svelte package only; no other icon sets, no raw pasted SVG icon copies, no icon CDNs.
-- All forms, including the Settings panel, are driven by sveltekit-superforms with Formsnap in client-side validation mode and a Zod schema: the schema defines the rules and invalid fields show inline per-field errors before submit.
+- All forms, including the Settings panel, preset save, and session import, are driven by sveltekit-superforms with Formsnap in client-side validation mode and a Zod schema: the schema defines the rules and invalid fields show inline per-field errors before submit.
 - All libraries are installed via npm and bundled locally; no CDN imports of any script, style, font, or icon.
 - Static delivery only: no server loaders, server actions, or API routes; all interactivity lives in client state after load, and deep-linking any route serves the same client app.
 - No authentication wall: open directly into the primary converter workspace.
 - Keep the implementation frontend-only and self-contained; do not depend on a live backend, and do not upload files. All image conversion must run in the browser using native browser codecs (canvas re-encoding) so the app works fully offline.
 - Image conversion must be real: converting the same file to two different targets, or at two different quality settings, must produce genuinely different output bytes, and the produced download must be a valid file of the selected format. Never show a Done, checkmark, or download-ready state for a conversion that did not actually run.
 - Supported decodable inputs: png, jpg, jpeg, webp, gif, bmp, svg. Real output targets: png, jpeg, jpg, webp. A file whose format cannot be decoded must be marked Unsupported with a plain reason, not silently succeeded.
-- Persist relevant state in localStorage (or equivalent client storage) so a reload restores it: at minimum the theme, the active conversion category, and the conversion settings (quality, keep-metadata). The in-progress file queue may remain in memory, so that a reload before any file is added restores a single empty queue with no phantom file row and no false progress or download success.
-- Seed enough local sample data for the primary workflow to be non-empty and usable on first load: the drop zone, the supported-input list, the four category cards with their real format lists, and the sample-file affordances all render before any file is chosen, while the conversion queue itself starts legitimately empty.
-- The queue, per-file target selection, per-file status, counts, theme, active category, and settings must all derive from one shared client store, not disconnected copies: adding, converting, removing, or clearing files updates the rows and the counts together, and no view keeps a second copy of the queue.
+- Persist relevant state in localStorage (or equivalent client storage) so a reload restores it: at minimum the theme, the active conversion category, the conversion settings (quality, keep-metadata, default Convert-to target), and the conversion presets list. The in-progress file queue may remain in memory, so that a reload before any file is added restores a single empty queue with no phantom file row and no false progress or download success.
+- Seed enough local sample data for the primary workflow to be non-empty and usable on first load: the drop zone, the supported-input list, the four category cards with their real format lists, the sample-file affordances, and at least 3 conversion presets all render before any file is chosen, while the conversion queue itself starts legitimately empty.
+- The queue, per-file target selection, per-file status, counts, multi-select set, theme, active category, settings, presets, undo/redo stacks, and compiled session export previews must all derive from one shared client store, not disconnected copies: adding, converting, removing, clearing, batching, or undoing updates the rows, counts, presets, and export previews together, and no view keeps a second copy of the queue.
+- Export previews must be compiled live from the store; an export that omits session mutations is invalid. WebMCP artifact export/import/copy of session-json must invoke the same store commands as the visible Session export controls.
 </requirements>
 
 <integrity>
@@ -193,18 +235,22 @@ Module specs:
 </module_spec>
 
 Bindings:
-- Artifact operations: import; convert; export
+- Artifact operations: import; convert; export; copy
 - Conversion modes: png-to-jpeg; png-to-webp; jpeg-to-png; jpeg-to-webp; webp-to-png; webp-to-jpeg; gif-to-png; bmp-to-png; svg-to-png
-- Export formats: png; jpeg; jpg; webp
+- Export formats: png; jpeg; jpg; webp; session-json; conversion-report
+- Import modes: conversion-session
 - Entity: file
-- Entity operations: create; select; update; delete
-- Entity fields: name; from; to; status
+- Entity operations: create; select; update; delete; toggle
+- Entity fields: name; from; to; status; selected
 - Session operations: start; stop
+- Workflow completion: session-json and conversion-report export previews reflect queue, settings, and preset mutations
+- Workflow completion: batch set format updates selected rows' to field and resets Done to Ready
 
 Mechanics exclusions:
 - Drag-drop drop-zone and native file-picker stay Playwright-observed
 - Theme recolor stays Playwright-observed
 - Queue reorder is not offered
+- Raw file paths, blobs, and base64 file contents are forbidden in WebMCP args and results
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,176 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "For fidelity tasks, evaluate the reference's flows. Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "solutions_menu_open_shows_six_labels"
+description = "Solutions menu flow: activating the Solutions trigger opens its panel with all six labels (Portfolios, Presentations, Editorials, Companies, Freelancers, Students) visible and the trigger's expanded state flipped on."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "solutions_escape_closes_and_returns_focus"
+description = "With the Solutions menu open: pressing Escape closes the panel, restores the collapsed expanded state, and returns focus to the Solutions trigger."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "solutions_outside_click_closes_cleanly"
+description = "With the Solutions menu open: clicking outside the panel closes it without activating anything beneath; repeating open→outside-close any number of times leaves no orphaned panels."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "mobile_menu_opens_at_768"
+description = "Mobile menu flow: at 768px width the desktop navigation and Log in link are hidden and a compact Menu button appears; activating it opens a mobile menu panel listing the navigation and account links."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "mobile_menu_dismiss_preserves_scroll"
+description = "At 768px with the mobile menu open: dismissing the panel (or widening back to desktop width) removes it and restores the appropriate header layout, with the page's scroll position unchanged throughout."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "slideshow_auto_advances_every_2200ms"
+description = "Slideshow flow: leaving the page idle advances the six-frame slideshow on its own timer every 2200ms — the newly active frame becomes fully opaque while neighbors drop to 0.35 opacity — without any manual control being touched."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "slideshow_wraps_after_sixth_frame"
+description = "After the sixth slideshow frame advances, the strip wraps back to the first frame and continues advancing on the same 2200ms cadence with the same active/neighbor opacity treatment."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "scroll_reveal_cards_on_fresh_load"
+description = "Scroll-reveal flow on a fresh page load: the four workflow feature cards start unrevealed; scrolling the workflow section into view via the real scrollbar fades and raises them into place with an 80ms stagger; they remain in their revealed resting state while scrolling onward."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "reload_restores_unrevealed_cards"
+description = "After the workflow cards have been revealed by scroll, reloading the page restores the unrevealed starting state until the workflow section is scrolled into view again on a fresh load."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "zoom_to_fit_1440_to_390"
+description = "Zoom-to-fit flow: resizing the viewport from 1440px down to 390px continuously rescales the whole 1024px design artboard to fit the viewport width; at every intermediate width the full design width stays visible with no horizontal scrollbar and no cropped right edge, and the scroll wrapper's height tracks the scaled document height."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "primary_homepage_flows_unavailable"
+description = "The Solutions menu, mobile Menu panel, auto-advancing slideshow, or scroll-reveal of the four workflow cards cannot be completed from the visible UI controls."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "menu_or_slideshow_state_desyncs"
+description = "After opening Solutions or advancing the slideshow, the trigger expanded state, panel visibility, or active-frame opacity disagree with each other (state not synced across surfaces)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "overlay_menu_blocks_with_no_exit"
+description = "The Solutions menu panel or mobile Menu panel opens but cannot be closed, leaving navigation blocked with no exit path."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "chrome_links_land_on_missing_pages"
+description = "Activating a header, footer, CTA, tile, or Solutions-menu chrome link lands on a blank, error, or Not found page instead of keeping the user on the homepage."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "flow_dead_end_requires_reload"
+description = "After opening Solutions or the mobile Menu, recovering normal homepage interaction requires a full page reload."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
+id = "6.11"
+name = "trial_brief_export_flow_with_session_values"
+description = "Trial brief export flow: fill Name Jordan Lee, Email jordan@atelier.example, plan Pro, team size 11-50, and interest chips Portfolios and Freelancers — the live preview JSON shows those exact values and satisfies the trial-signup field contract; Download JSON / Copy brief yield text matching the preview."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "trial_brief_import_round_trip"
+description = "After exporting a brief, activate Reset so the form and preview return to the empty baseline, then Import the saved JSON — name, email, plan, team_size, interests chips, and the live preview all restore to the exported values with no reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "undo_brief_interest_toggle"
+description = "Toggle an interest chip on (it appears in the preview interests array), then Undo — the chip deselects and the preview interests array loses that label; Redo restores both."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "command_palette_jump_to_trial_brief"
+description = "Press Ctrl/Cmd+K, type trial so Jump to trial brief remains visible, press Enter — the trial brief panel scrolls into view and the palette closes."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "trial_brief_schema_validation_flow"
+description = "Trial brief schema validation flow: choose plan Free trial with team_size 11-50 (or Team with team_size 1, or Pro with zero interests) — Submit stays disabled with a named conflicting-field message; correct to a valid combination (Free trial + team_size 1 with empty interests, or Team + 2-10 with at least one interest) — Submit enables and shows Trial brief ready — download or copy your JSON above with a conforming preview."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.16"
+name = "trial_brief_reset_flow"
+description = "Trial brief Reset flow: fill a contract-valid brief (for example Load sample brief), confirm Submit enables, activate Reset — Name and Email clear, Plan and Team size show no selection, interest chips deselect, preview shows product Canvasly with empty name/email/plan/team_size strings, interests [], and a fresh generated_at, Submit stays disabled, Trial brief ready is gone; Undo restores the pre-Reset brief."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "different_brief_inputs_identical_export"
+description = "Running the trial brief export flow twice with different names and interest sets yields byte-identical preview/export text."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "cross_field_invalid_still_submits_success"
+description = "Choosing Free trial with team_size 11-50 (or Team with team_size 1, or Pro with zero interests) still enables Submit and shows Trial brief ready without fixing the cross-field conflict."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "reset_does_not_clear_brief"
+description = "Activating Reset after a filled brief leaves the form or preview with the prior name, email, plan, team_size, or interests still present."
 type = "binary"
 negate = true
 weight = 1.0

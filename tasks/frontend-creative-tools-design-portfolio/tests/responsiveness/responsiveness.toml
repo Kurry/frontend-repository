@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -60,152 +60,175 @@ allowed_tools = [
 [scoring]
 aggregation = "weighted_mean"
 
+
 [[criterion]]
 id = "7.1"
-name = "layout_adapts_desktop_to_mobile"
-description = "Layout adapts gracefully from 1440px desktop to 375px mobile."
+name = "terminal_adapts_1440_to_375"
+description = "At 1440px the terminal window is centered over the wallpaper with visible margins; resizing to 375px keeps the terminal usable with the command input visible and no broken overflow."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
-name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+name = "mobile_tap_targets_banner_and_chrome"
+description = "At 375px width, cookie-banner Accept/Decline, titlebar dots, and primary board/filter controls present tap targets at least 44px in at least one dimension."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
-name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+name = "monospace_type_readable_across_widths"
+description = "JetBrains Mono terminal copy remains legible at both 1440px and 375px without collapsing into unreadably tiny glyphs."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
-name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+name = "no_clip_or_overflow_at_375"
+description = "At 375px width, no terminal content, welcome box, or board card clips or overflows the viewport."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
-name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+name = "narrow_width_expands_terminal_window"
+description = "At widths of 768px and below, the terminal window expands toward full width rather than remaining a narrow centered desktop card that leaves unusable side gutters."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.6"
-name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+name = "welcome_box_stacks_at_768"
+description = "At widths of 768px and below, the two-column post-boot welcome box stacks into a single column with Capabilities and Navigation still readable in order."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.7"
-name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+name = "boot_dismissible_by_touch"
+description = "On a fresh load, boot can be dismissed via touch-capable activation as well as Enter/click, revealing the post-boot terminal."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.8"
-name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+name = "no_horizontal_scroll_at_375"
+description = "At 375px width the page shows no horizontal scrolling."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.9"
-name = "media_and_canvases_resize"
-description = "Images, grids, and canvases size responsively to fit the layout."
+name = "board_grid_and_canvases_reflow"
+description = "Projects Board cards reflow from a multi-column grid at desktop widths to a single column at narrow widths without clipping card content; matrix-rain and confetti canvases size to the viewport when active."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.10"
-name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
+name = "command_input_usable_at_narrow_widths"
+description = "At 375px and 768px the command input remains visible and usable for typing a command after boot."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.n1"
-name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+name = "layout_breaks_at_common_widths"
+description = "At 1440px, 768px, or 375px the terminal chrome, welcome box, or Projects Board breaks or overflows the viewport."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n2"
-name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+name = "mobile_controls_too_small"
+description = "At 375px, banner buttons, titlebar dots, or board filter controls are too small or misaligned to tap reliably."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n3"
-name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+name = "terminal_text_unreadable_on_mobile"
+description = "At 375px, terminal output or welcome-box text is too small to read."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n4"
-name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+name = "card_content_cropped_at_narrow"
+description = "At narrow widths, Projects Board card content is cropped or forces unnecessary scrollbars inside the terminal body."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n5"
-name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
+name = "desktop_margins_missing_or_window_stuck_narrow"
+description = "At 1440px the terminal lacks visible side margins over the wallpaper, or at ≤768px the window stays stuck in a narrow desktop size."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n6"
-name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
+name = "fixed_chrome_obscures_prompt"
+description = "Fixed overlays, banners, or titlebar chrome obscure the command input or board filters at 375px."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n7"
-name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
+name = "welcome_columns_overlap_at_narrow"
+description = "At ≤768px the welcome-box columns overlap, stack out of order, or collide with the ASCII name art."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n8"
-name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
+name = "boot_not_touch_dismissible"
+description = "On a touch-capable activation path, the boot sequence cannot be dismissed and remains stuck on Press Enter to continue."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n9"
-name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
+name = "canvas_or_board_overflows_viewport"
+description = "An active matrix-rain/confetti canvas or the Projects Board grid uses a static size that overflows the viewport at 375px."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n10"
-name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
+name = "command_input_disappears_at_size"
+description = "At 375px or 768px the command input disappears or becomes unreachable after boot."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.11"
+name = "export_palette_usable_at_375"
+description = "At 375px width the command palette, export preview, and archive vault remain fully visible and operable; previews scroll within their own containers rather than forcing page-level horizontal scroll."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.12"
+name = "bulk_bar_usable_at_narrow"
+description = "At 768px and below the bulk actions bar and board stats strip remain usable without clipping action labels."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.n11"
+name = "export_or_palette_overflows_mobile"
+description = "At 375px the command palette, export preview, or archive vault overflows the viewport or forces page-level horizontal scrolling."
 type = "binary"
 negate = true
 weight = 1.0

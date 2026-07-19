@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,77 +63,84 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "12.1"
 name = "mandated_modules_are_bound"
-description = "All contract-mandated modules are initialized and bound."
+description = "All contract-mandated modules are initialized and bound: browse-query-v1, entity-collection-v1, form-workflow-v1, and artifact-transfer-v1"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.2"
 name = "handlers_match_visible_ui_logic"
-description = "Exposed tool handlers match visible UI command logic."
+description = "Exposed tool handlers for submission select/update, form submit (add-finding, request-revision, override-finding, approve, mark-revised, bulk-update), and artifact export/copy call the same store commands as the visible UI"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.3"
 name = "only_documented_operations_exist"
-description = "Only documented operations and routes are available."
+description = "Only documented operations and destinations are available: queue, submission-detail, contributor-drawer, export-center; filters stage/tier/contributor/date-range; sorts open-finding-count-asc/desc; artifact formats qc-package-json and qc-report-markdown"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.4"
 name = "contract_is_automation_exercisable"
-description = "The contract can be fully exercised via automation."
+description = "The contract can be fully exercised via automation: browse open/filter/sort, entity select/update, form validate/submit/cancel, and artifact export/copy"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.5"
 name = "declared_entity_operations_work"
-description = "Entity operations declared in the contract, including create, update, delete, and reorder, all work."
+description = "Declared entity operations select and update work on submission entities for stage and payout-state within the declared value bounds, including approve only from in-review with zero open blockers"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.6"
 name = "form_flow_operations_are_bound"
-description = "Form submission validation, error, and cancel operations are clearly bound."
+description = "Form validation, submit, and cancel are bound for declared fields tier, category, description, evidence, revision-summary, override-justification, bulk-stage, and bulk-payout-state across workflow steps add-finding, request-revision, override-finding, approve, mark-revised, bulk-update, undo, redo, and export-package"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.7"
 name = "queries_match_allowed_spec"
-description = "Query destinations and filters match the allowed specification."
+description = "Browse destinations and filters match the allowed specification; applying stage/tier/contributor filters and open-finding-count sorts updates the same visible queue as the UI controls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.8"
 name = "capabilities_stay_declared"
-description = "No extra or undeclared module routes or capabilities are exposed."
+description = "No extra or undeclared module routes or capabilities are exposed beyond the four mandated modules and their bindings"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.9"
 name = "session_tool_and_invoke_apis_work"
-description = "Session info, tool list, and invocation are correctly surfaced."
+description = "webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool correctly surface and invoke the registered tools"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.10"
 name = "mcp_initializes_without_harness_edits"
-description = "MCP initialization works without manual editing or test harness changes."
+description = "MCP initialization works without manual editing or test harness changes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.11"
+name = "artifact_export_surface_bound"
+description = "Artifact-transfer export and copy operations are bound so a caller can trigger the QC package export surface; export formats include qc-package-json and qc-report-markdown, and visible postconditions include export preview reflecting live stages/findings/gate/history and copy confirmation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.n1"
 name = "mcp_tools_missing_or_noop"
-description = "MCP tooling is unbound, missing, or a no-op."
+description = "MCP tooling is unbound, missing, or a no-op for mandated modules including artifact-transfer-v1"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,15 +148,16 @@ weight = 1.0
 [[criterion]]
 id = "12.n2"
 name = "handlers_diverge_from_ui_logic"
-description = "Handlers do not match UI logic because actions mismatch or state does not sync."
+description = "Invoking a mandated tool updates MCP-visible state while the queue, detail, or export UI still shows a different stage, finding set, or payout for the same submission"
 type = "binary"
 negate = true
 weight = 1.0
 
+
 [[criterion]]
 id = "12.n3"
 name = "undeclared_capabilities_exposed"
-description = "Undeclared destinations or entity operations are exposed."
+description = "Undeclared destinations or entity operations are exposed"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +165,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n4"
 name = "automation_cannot_exercise_contract"
-description = "The contract cannot be exercised from automation."
+description = "The contract cannot be exercised from automation"
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n5"
 name = "validation_bypass_desyncs_state"
-description = "Validation bypasses lead to inconsistent MCP and UI state."
+description = "Validation bypasses lead to inconsistent MCP and UI state (for example a tool submit creates a finding the UI rejects)"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +181,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n6"
 name = "session_or_tool_api_errors"
-description = "The session or tool API returns errors or incomplete data."
+description = "The session or tool API returns errors or incomplete data"
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n7"
 name = "mcp_relies_on_undocumented_hacks"
-description = "MCP relies on manual or undocumented test hacks."
+description = "MCP relies on manual or undocumented test hacks"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +197,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n8"
 name = "required_contract_module_missing"
-description = "No module contract is implemented where one is declared required."
+description = "No module contract is implemented where one is declared required, including missing artifact-transfer-v1"
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n9"
 name = "mcp_is_stubbed_or_commented_out"
-description = "The MCP interface is commented out or only stubbed."
+description = "The MCP interface is commented out or only stubbed"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +213,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n10"
 name = "automated_contract_validation_fails"
-description = "The project fails automated MCP contract validation."
+description = "The project fails automated MCP contract validation"
 type = "binary"
 negate = true
 weight = 1.0

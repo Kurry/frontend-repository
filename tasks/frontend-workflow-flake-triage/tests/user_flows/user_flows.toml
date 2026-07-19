@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,86 +62,93 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "flaky_triage_end_to_end"
+description = "Triage flow: filter to flaky, select a test, change its reason through the closed vocabulary select, and confirm the row updates, a reason-change timeline entry appears, and Triage report JSON shows the new reason — all without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "invalid_rerun_shows_inline_validation"
+description = "Re-run flow: submitting without choosing a runCount triggers immediate inline validation naming runCount and starts no re-run."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "reason_change_updates_related_displays"
+description = "Reason edit flow: changing a reason updates the queue row, the detail panel's reason display if open, the audit timeline, and the next Triage report JSON preview together."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "rerun_updates_all_surfaces"
+description = "Re-run flow: completing a valid 5-run re-run updates the matrix cells, verdict chip, quarantine lists, detail panel, and Triage report JSON together in the same session."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "suite_switch_retains_chrome"
+description = "Suite switch: changing suites via the suite switcher shows that suite's queue without a full page reload and keeps theme and chrome usable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "empty_quarantine_is_clear"
+description = "Edge: when every visible test is keep, both quarantine lists show designed empty states and export quarantine membership is empty."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "filters_update_queue_everywhere"
+description = "Filter flow: applying verdict, reason, or suite filters narrows the queue; clearing restores the full queue; quarantine map continues to reflect full-suite verdicts."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "detail_panel_preserves_workflow"
+description = "Detail panel: selecting a test opens the detail panel; closing or selecting another test continues the triage workflow without losing suite selection."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "export_import_overlays_support_flows"
+description = "Export and import surfaces open from visible controls, support Copy/Download or paste/apply as specified, and close without trapping the operator."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "stop_mid_run_recovers_without_reload"
+description = "Stop flow: start a 10-run re-run, stop after some runs complete, confirm completed results stay frozen, remaining runs never fill in, and the timeline records the stop — recoverable without reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "export_import_round_trip_flow"
+description = "Round-trip flow: after a reason change and completed re-run, Copy Triage report JSON, diverge with another reason change, Import the JSON, and confirm queue, quarantine counts, and next Export match the imported document."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
 name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+description = "Reason change, re-run, Export triage report, or Import triage report are not reachable from the visible UI."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "reason_change_missing_or_duplicated"
+description = "A reason change fails to appear on the row or produces duplicate timeline entries for one change."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,23 +156,23 @@ weight = 1.0
 [[criterion]]
 id = "6.n3"
 name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+description = "After a re-run or reason change, queue, detail, quarantine, and export disagree until reload."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "suite_switch_breaks_or_loses_selection"
+description = "Switching suites breaks the layout or leaves the prior suite's tests visible as if still selected."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_quarantine_breaks_ui"
+description = "Empty quarantine lists or empty filter results produce broken or missing UI instead of empty states."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,31 +180,31 @@ weight = 1.0
 [[criterion]]
 id = "6.n6"
 name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+description = "Verdict/reason/suite filters disagree with each other about which tests are visible."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "detail_panel_cannot_reopen"
+description = "After closing the detail panel, selecting a test cannot reopen it."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "export_import_blocks_navigation"
+description = "Export or import surfaces block the app with no exit option."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "failed_import_lacks_feedback"
+description = "A failed Import triage report provides no user-visible feedback."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +212,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n10"
 name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+description = "After stop, failed import, or closing export, recovery requires a full page reload."
 type = "binary"
 negate = true
 weight = 1.0

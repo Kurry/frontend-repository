@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -209,6 +209,35 @@ description = "The app crashes under rapid or edge-case use."
 type = "binary"
 negate = true
 weight = 1.0
+
+[[criterion]]
+id = "9.11"
+name = "drag_smooth_full_grid"
+description = "Dragging a stop card across the fully seeded multi-day grid tracks the pointer smoothly with no visible stutter or dropped frames"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.12"
+name = "ambient_simulation_stable"
+description = "After 60 seconds of the presence and caret simulation running, the console shows no new errors and interactions remain as responsive as at load"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.13"
+name = "cluster_zoom_smooth"
+description = "Rapidly zooming the map through cluster and uncluster levels repeatedly shows no hitching, missing pins, or console errors"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.n11"
+name = "undo_history_growth_lags"
+description = "After roughly 30 recorded mutations, typing, dragging, or undoing becomes visibly laggy compared to a fresh session — the history engine degrades interaction"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "performance.catchall"

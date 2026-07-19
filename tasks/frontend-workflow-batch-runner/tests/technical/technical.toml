@@ -1,0 +1,137 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "shared_state_coherence"
+description = "All surfaces derive from one shared state: an item advancing updates the grid, progress bar, rollup strip, and event timeline together; a retry, pause, resume, or macro is reflected in the grid, rollups, history, and any open inspector; and a job edit, delete, or undo is reflected everywhere the job appears, all without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "no_storage_seeded_reload"
+description = "localStorage and sessionStorage remain empty after composing, launching, retrying, pausing, reordering, scheduling, exporting, and undoing, and a page reload returns the app to its seeded state (seeded jobs and history, default view, no schedules)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "storage_apis_exercised"
+description = "localStorage, sessionStorage, or another browser storage API holds jobs, runs, schedules, or UI state after exercising the app"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.4"
+name = "console_errors_during_flows"
+description = "Console errors or unhandled promise rejections appear on load or during composing, launching, retrying, pausing, reordering, comparing, scheduling, exporting, or undoing"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "outbound_network_requests"
+description = "The app issues outbound network requests beyond its own origin while loading or during any flow"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "rapid_input_keeps_sync"
+description = "Rapid job switches, macro clicks, and timeline filtering while the 200-item job runs leave every surface consistent — no view shows a status or count another surface already updated differently"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "same_datum_diverges"
+description = "The same datum shows different values in two places — for example an item's cost or status differs between the grid, the inspector, the comparison view, or the export"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "all_views_reachable"
+description = "Every documented surface — composer, grid, queue, inspector, timeline, comparison, schedule form, exports — is reachable through in-app controls and renders without errors"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "external_navigation_leak"
+description = "Any app-chrome link or control navigates away from the app's origin"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "technical.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable defect in technical quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

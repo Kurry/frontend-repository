@@ -139,6 +139,7 @@ Contract version: zto-webmcp-v1
 Modules:
 - browse-query-v1
 - form-workflow-v1
+- artifact-transfer-v1
 
 Module specs:
 <module_spec id="browse-query-v1">
@@ -182,12 +183,33 @@ Module specs:
 }
 </module_spec>
 
+<module_spec id="artifact-transfer-v1">
+{
+  "id": "artifact-transfer-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Artifact transfer",
+  "purpose": "Import, export, copy, print, and conversion workflows.",
+  "permitted_operations": ["import", "export", "copy", "print_preview", "convert"],
+  "binding_keys": {
+    "required_any_of": [["artifact_operations"]],
+    "optional": ["import_modes", "export_formats", "conversion_modes", "visible_postconditions"]
+  },
+  "restrictions": [
+    "No raw files, filesystem paths, blobs, base64, or artifact contents in WebMCP arguments or results.",
+    "File picker interaction, clipboard contents, and downloaded artifacts remain Playwright responsibilities."
+  ],
+  "tool_name_prefix": "artifact"
+}
+</module_spec>
+
 Bindings:
-- Destinations: hero; solutions-insights; links; companies; developers-hub; numbers; blog; solutions; community; event; questions; newsletter; contact-us; footer
+- Destinations: hero; solutions-insights; links; companies; developers-hub; numbers; blog; solutions; community; event; questions; newsletter; contact-us; session-leads; footer
 - Themes: light; dark
-- Form fields: firstname; lastname; email; socialhandle; country; vertical; project_type; astra_contact_message; gdpr; marketing_consent; newsletter
+- Form fields: firstname; lastname; email; socialhandle; country; vertical; isDeveloper; hasWeb3Experience; isStudent; source; project_type; otherDetail; astra_contact_message; gdpr; marketing_consent; newsletter
 - Form operations: validate; submit; cancel; reset; advance; return
 - Workflow steps: step-1; step-2; step-3; step-4; step-5
+- Artifact operations: export; copy
+- Export formats: json
 
 Mechanics exclusions:
 - Hero clipped-panel entrance + layered alpha video sequence + HUD reveal stay Playwright-observed
@@ -196,6 +218,7 @@ Mechanics exclusions:
 - Logo marquee (31.5s) and footer wordmark marquee (5s) pause-on-hover stay Playwright-observed
 - Theme cross-fade timing (~0.3s) stays Playwright-observed
 - Desktop links card scrub / companies rise stays Playwright-observed
+- Clipboard contents and downloaded astra-session-leads.json artifacts remain Playwright responsibilities
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

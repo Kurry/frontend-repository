@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,223 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_canvas_placeholder_before_upload"
+description = "Before any image is loaded, the canvas region shows a placeholder reading Upload an image to get started and export actions do not produce a broken or empty file state."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "empty_preset_name_inline_validation"
+description = "Attempting to save a preset with an empty name shows an inline validation message naming the name field before submit, keeps Save preset disabled or rejected, and adds no entry to the Saved presets list."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "unsupported_file_type_message"
+description = "Choosing or dropping an unsupported non-image file shows the visible message Unsupported file type. Choose a PNG or JPG image and preserves the last valid canvas state."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "copy_image_shows_copied_confirmation"
+description = "After a successful Copy image action, the button briefly shows Copied! confirmation for about two seconds then reverts, without altering the on-screen composition."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "invalid_hex_keeps_last_valid_color"
+description = "Entering an invalid caption or watermark hex value shows Invalid color. Enter six hexadecimal digits after # and the canvas keeps rendering the last valid color."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "preset_delete_confirm_cancel_path"
+description = "Clicking Del on a Saved preset opens a confirm dialog; dismissing or canceling it leaves the preset in the list and the Saved presets count unchanged."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "duplicate_preset_name_rejected"
+description = "Saving a preset with a name that already exists shows Preset \"name\" already exists (with that name) and leaves the Saved presets list count unchanged rather than creating a duplicate."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "form_controls_use_semantic_labels"
+description = "Preset name, Caption, Watermark, and Collaboration inputs use semantic form controls with visible labels (or accessible name equivalents)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "delete_dialog_dismissible"
+description = "The preset delete confirm dialog can be dismissed via Escape or an explicit cancel/close path without deleting the preset."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "double_activate_save_creates_one_preset"
+description = "Double-activating the preset save control with a valid new name creates exactly one preset: the Saved presets count increases by one and one new entry appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_canvas_shows_no_guidance"
+description = "Before any image is loaded, the canvas region shows nothing — no Upload an image to get started placeholder or other empty-state guidance."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "rejection_errors_only_in_console"
+description = "Unsupported-file, invalid-hex, or empty-preset-name failures surface only in the browser console with no visible UI message."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "copy_or_save_silently_fails"
+description = "Copy image or Save preset produces no visible success or error feedback after the action."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "preset_delete_lacks_confirm"
+description = "Activating Del on a Saved preset removes it immediately with no confirm dialog."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "interactive_elements_nonsemantic"
+description = "Primary interactive controls (Save preset, Apply, Del, tabs, or Collaboration connection controls) are non-semantic div/span shells without button/role semantics."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "delete_dialog_not_keyboard_dismissible"
+description = "The open preset delete confirm dialog cannot be dismissed via keyboard (Escape or a focusable cancel control)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "empty_name_validation_missing"
+description = "Submitting Save preset with an empty name shows no inline validation naming the name field and may still add a list entry."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "action_labels_ambiguous_or_missing"
+description = "Primary actions lack readable labels or use only ambiguous blank/icon-only text where Save preset, Download PNG, Copy image, or Apply to canvas should appear."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "invalid_input_damages_canvas_state"
+description = "After an unsupported upload or invalid hex entry, the last valid canvas image or color is damaged, blanked, or replaced instead of preserved."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "duplicate_or_double_save_creates_extras"
+description = "A duplicate-name save or a double-activated save with one valid name creates more than one new Saved presets entry or increases the count by more than one."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "malformed_style_json_rejected"
+description = "Importing malformed (unparseable) style JSON shows Invalid style JSON and leaves the current canvas settings unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "empty_undo_redo_disabled"
+description = "Undo with an empty history and Redo with an empty redo stack are disabled controls; activating them does nothing and produces no console errors."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "empty_snapshot_name_rejected"
+description = "Saving a snapshot with an empty, whitespace-only, or over-length (over 40 characters) name adds no Snapshots entry and shows an inline message naming the name field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "paste_all_unchecked_noops"
+description = "Pasting settings with every group unchecked applies nothing and leaves the canvas unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "malformed_style_json_mutates_canvas"
+description = "Importing malformed style JSON changes canvas settings or fails without showing Invalid style JSON."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "custom_background_hex_named_field_error"
+description = "Entering an invalid custom background hex (not exactly # followed by six hexadecimal digits) shows Invalid color. Enter six hexadecimal digits after # next to the custom background hex field and preserves the last valid canvas background."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n12"
+name = "invalid_hex_accepted_into_payload"
+description = "An invalid caption, watermark, or custom-background hex is accepted into the live canvas or appears as a valid #RRGGBB value under captionColor, watermarkColor, or customBackground in the Export preview RenderSettings JSON."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "schema_invalid_style_json_rejected"
+description = "Importing parseable JSON that fails the RenderSettings field contract (missing required key, out-of-enum frame or canvasSize, out-of-bounds padding, invalid hex, or backgroundPreset/customBackground both non-null) leaves the canvas unchanged and shows validation naming the offending field or Invalid style JSON."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.17"
+name = "overlong_preset_name_rejected"
+description = "Saving a preset with a name over 40 characters shows an inline message naming the name field and leaves the Saved presets count unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n13"
+name = "schema_invalid_import_mutates_canvas"
+description = "Importing parseable but field-contract-invalid style JSON changes canvas settings without naming the offending field or showing Invalid style JSON."
 type = "binary"
 negate = true
 weight = 1.0

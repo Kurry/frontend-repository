@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "2.2"
 name = "2_2"
-description = "After creating entries and performing a full page refresh, the exact entries, their categories, their assigned tags, and the streak are restored from persistence"
+description = "After creating entries and performing a full page reload, the app returns to the empty in-memory baseline with no entries or tags restored from browser storage"
 type = "binary"
 weight = 1.0
 
@@ -84,7 +84,7 @@ weight = 1.0
 [[criterion]]
 id = "2.4"
 name = "2_4"
-description = "Committed state is lost after a full page refresh, or an entry deleted before the refresh is revived after reload"
+description = "Browser localStorage or sessionStorage becomes non-empty after exercising create, edit, export, or import flows (good-app in-memory storage violation)"
 type = "binary"
 weight = 1.0
 negate = true
@@ -116,7 +116,7 @@ negate = true
 [[criterion]]
 id = "2.9"
 name = "overlay_focus_trap_and_return"
-description = "The edit dialog, delete confirmation, tag manager, and history panel are keyboard-dismissable with Escape, trap Tab focus while open, and return focus to the control that opened them on close"
+description = "The edit dialog, delete confirmation, tag manager, history panel, export drawer, import confirmation, interruption reason step, and command palette are keyboard-dismissable with Escape, trap Tab focus while open, and return focus to the control that opened them on close"
 type = "binary"
 weight = 1.0
 
@@ -163,6 +163,21 @@ description = "A control or link in the app chrome navigates away from / or to a
 type = "binary"
 weight = 1.0
 negate = true
+
+
+[[criterion]]
+id = "2.16"
+name = "export_import_use_shared_collection"
+description = "Session JSON and Timesheet CSV export texts derive from the same shared entries collection the timeline and list show, and a valid Import replaces that same collection so all surfaces update together without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.17"
+name = "storage_apis_unused"
+description = "After a full create/edit/export exercise, localStorage and sessionStorage remain empty"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "2.catchall"

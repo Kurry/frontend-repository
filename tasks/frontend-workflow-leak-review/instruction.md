@@ -1,5 +1,5 @@
 <summary>
-Build a contamination and leak review console for benchmark submissions using Svelte 5, runes-based Svelte stores, Tailwind CSS 4.3.2, and Flowbite Svelte.
+Build a contamination and leak review console for benchmark submissions using Svelte 5, runes-based Svelte stores, Tailwind CSS 4.3.2, and Flowbite Svelte. The app produces the reviewer's session artifact: a structured Review report JSON compiled live from the queue, decisions, threshold, rollup, and mutation include toggles — downloadable and copyable, importable for round-trip, and readable through the MCP export surface.
 </summary>
 
 <core_features>
@@ -23,11 +23,12 @@ Feature: Evidence view —
 - Within each matched pair, the overlapping tokens are visually highlighted in both panes with the same highlight treatment, so the shared text is identifiable at a glance
 - Previous and Next controls step through the matched pairs; each step scrolls both panes so the focused pair's highlighted regions are in view in both panes at once, and a position label updates in the form current of total; Previous disables on the first pair and Next disables on the last
 
-Feature: Reviewer decision —
-- The evidence view carries a decision form with a verdict choice offering exactly Confirm clean and Confirm leak, and a rationale text field; the form validates before submit with inline per-field messages, and the rationale must be at least 20 characters
-- Submitting with a rationale shorter than 20 characters shows an inline message naming the rationale field and the minimum length, and records no decision
-- The submit control stays disabled until a verdict is chosen and the rationale is valid
-- Submitting a valid decision updates that row's state chip to the chosen confirmed state in the queue, removes the row from the Review triggered filter results, and appends exactly one new entry to the audit timeline — all without a reload
+Feature: Reviewer decision (API-shaped create payload) —
+- The evidence view carries a decision form whose submitted record IS the would-be request body for a leak-review decisions API and must match this field contract (all keys required; example values illustrative only):
+  - verdict: required closed enum exactly confirm-clean or confirm-leak (UI labels Confirm clean and Confirm leak)
+  - rationale: required trimmed string, 20 to 2000 characters inclusive
+- Cross-field rules: submit stays disabled until both fields are valid; a missing verdict or a rationale outside 20 to 2000 characters shows inline per-field messages naming the offending field (and the min or max length for rationale) and records no decision and no audit entry
+- Submitting a valid decision creates that payload as the decision record, updates that row's state chip to Confirmed clean or Confirmed leak matching the verdict, removes the row from the Review triggered filter results, and appends exactly one new audit timeline entry carrying the same verdict and rationale — all without a reload
 - Cancelling the decision form leaves the submission's state and the audit timeline unchanged
 
 Feature: Audit timeline —
@@ -47,23 +48,41 @@ Feature: Mutation track —
 
 Feature: Rollup strip and export —
 - A rollup strip visible on the queue view shows the count of Review triggered rows, the count of Confirmed clean rows, the count of Confirmed leak rows, and the mean similarity score across all submissions to two decimals; all four values re-derive live when the threshold moves or a decision is submitted
-- An Export summary control opens a monospaced code block containing a plain-text summary of the rollup values and per-task decision counts, with a copy control; activating copy places the exact block text on the clipboard and shows a visible confirmation
+- An Export control opens a panel with a live-compiled monospaced preview and a format choice between Review report JSON and Summary text
+- Review report JSON is API-shaped like a real leak-review / contamination-report API payload. The live JSON preview, Download .json, Copy, and Import all conform to this SAME field contract. All keys and nesting are REQUIRED unless marked optional. Example values are illustrative only. Field names and enum values are visible in the preview text:
+  - schemaVersion: required string, exactly leak-review.report.v1
+  - threshold: required number from 0.50 to 0.95 inclusive matching the slider
+  - exportedAt: required ISO-8601 timestamp string
+  - rollup: required object with reviewTriggered, confirmedClean, and confirmedLeak as non-negative integers matching the on-screen strip, and meanSimilarity as a number matching the strip's two-decimal mean
+  - submissions: required array of every queue row; each item has id (non-empty string), task (non-empty string), submitter (non-empty string), similarity (number from 0.00 to 1.00), and reviewState exactly one of unreviewed, review-triggered, confirmed-clean, or confirmed-leak
+  - decisions: required array of every confirmed decision; each item has submissionId (must match a submissions[].id), verdict exactly confirm-clean or confirm-leak, rationale (trimmed string 20 to 2000 characters), decidedAt (ISO-8601), task, and submitter
+  - mutationSuites: required array; each item has task (non-empty string) and tests (array of objects with id, name, and included boolean reflecting the current include toggles)
+- Cross-field rules: every decisions[].submissionId must exist in submissions; every submissions[].reviewState of confirmed-clean or confirmed-leak must have exactly one matching decisions entry with the matching verdict; rollup counts must equal the counts derived from submissions
+- The decision record a valid form submit creates IS that would-be request body (verdict + rationale); Review report JSON decisions entries compile from those same records plus decidedAt, task, and submitter
+- Export content must reflect every threshold move, decision, and mutation-include toggle made in the session; an export that omits session work or violates the field contract is incomplete
+- Summary text is a plain-text rollup of the same live counts and per-task decision counts; Copy places the exact visible preview text on the clipboard and shows a visible confirmation; Download of Review report JSON starts a .json file download of that same preview text
+- An Import control accepts previously exported Review report JSON that conforms to the field contract above; a valid import restores threshold, submission review states, the audit timeline from decisions, and mutation include toggles so the queue chips, rollup strip, audit view, mutation flip counts, and a subsequent export preview match the imported document without a reload
+- Malformed JSON, or JSON that fails the field contract (wrong or missing schemaVersion, threshold outside 0.50 to 0.95, missing required keys, reviewState or verdict outside the closed enums, rationale outside 20 to 2000 characters, submissionId that matches no submissions[].id, rollup counts that disagree with submissions, or included that is not a boolean), shows visible validation naming the offending field or the payload, leaves existing state unchanged, and does not crash the console
 </core_features>
 
 <user_flows>
 - Triage flow: on the queue, note the Review triggered count in the rollup strip, drag the threshold slider from 0.75 down to 0.60, and confirm additional Unreviewed rows at or above 0.60 flip to Review triggered, the rollup count rises to match, and the Review triggered filter shows exactly those rows — with no confirmed row changing state and no reload
-- Review flow end to end: open a Review triggered submission, step through its matched pairs with Next until the last pair (both panes scrolling in sync), choose Confirm leak, enter a rationale of at least 20 characters, and submit; the queue row's chip reads Confirmed leak, the row leaves the Review triggered filter, the Confirmed leak rollup count increases by exactly one, and the audit timeline gains exactly one entry carrying that rationale
+- Review flow end to end: open a Review triggered submission, step through its matched pairs with Next until the last pair (both panes scrolling in sync), choose Confirm leak, enter a rationale of at least 20 characters that satisfies the decision field contract, and submit; the queue row's chip reads Confirmed leak, the row leaves the Review triggered filter, the Confirmed leak rollup count increases by exactly one, and the audit timeline gains exactly one entry carrying that rationale
 - Canary flow: open the canary view, expand the task carrying the failing post-strip check, and confirm the alert banner names the file where the token survived while the placement checklist for the same task still shows its per-token N of M counts
 - Mutation flow: on a comparison card, note the flip count, toggle off one included test that flipped, and confirm the flip count decreases by exactly one; toggle it back on and the original count is restored
-- A page reload returns the app to its seeded state: at least 12 submissions with their seeded states, the threshold at 0.75, and an audit timeline empty of user-made decisions
+- Artifact end state: submit one Confirm leak decision with a distinct rationale token of at least 20 characters, move the threshold away from 0.75, toggle one mutation test include flag, open Export, and confirm Review report JSON shows schemaVersion exactly leak-review.report.v1, the new threshold, a decisions entry with that rationale and verdict confirm-leak, rollup counts matching the strip, and the toggled included boolean; Copy confirms on the active tab; Download offers a .json file for Review report JSON
+- Export then import round-trip: after those mutations, Download or Copy the Review report JSON, reload to clear in-memory state, Import that same JSON, and confirm the queue chips, rollup strip, audit timeline rationale, threshold, mutation include toggles, and a subsequent export preview match the imported document
+- A page reload without Import returns the app to its seeded state: at least 12 submissions with their seeded states, the threshold at 0.75, and an audit timeline empty of user-made decisions
 </user_flows>
 
 <edge_cases>
-- Submitting the decision form with no verdict chosen or a rationale under 20 characters shows inline messages naming the invalid fields and changes no state; the audit timeline gains no entry
+- Submitting the decision form with no verdict chosen, a rationale under 20 characters, or a rationale over 2000 characters shows inline messages naming the invalid fields and changes no state; the audit timeline gains no entry
 - Double-activating the decision submit control records exactly one decision: the timeline gains exactly one entry and the rollup counts shift once
 - When every triggered submission has been decided, the Review triggered filter shows an empty state explaining that nothing currently needs review
 - Dragging the threshold to its extremes works: at 0.95 only scores at or above 0.95 are triggered, and at 0.50 every undecided score at or above 0.50 is triggered; the rollup strip tracks both extremes correctly
 - Stepping past the ends of the matched pairs is impossible: Previous stays disabled on the first pair and Next on the last, and the position label never leaves the valid range
+- Opening Export with no decisions yet still produces schema-valid Review report JSON with schemaVersion leak-review.report.v1, the current threshold, empty decisions array, submissions covering the seeded queue, and rollup counts matching the strip
+- Importing malformed JSON or a payload that breaks the Review report field contract — wrong schemaVersion, threshold outside 0.50 to 0.95, missing required keys, verdict or reviewState outside the closed enums, rationale outside 20 to 2000 characters, submissionId matching no row, or rollup counts that disagree with submissions — leaves queue chips, threshold, audit timeline, and mutation toggles unchanged and shows validation naming the offending field or the payload
 </edge_cases>
 
 <visual_design>
@@ -108,6 +127,16 @@ Feature: Rollup strip and export —
 - The UI stays responsive under rapid repeated input — fast view switches, quick filter changes, rapid disclosure toggling — with no dropped interactions
 </performance>
 
+<writing>
+- Headings and view titles use one consistent capitalization convention throughout the app
+- Action labels are specific verbs such as Confirm leak, Export, and Import rather than generic labels where a specific one is possible
+- Decision and import validation messages name the offending field and the rule (for example the rationale minimum length); empty states explain what belongs there
+</writing>
+
+<innovation>
+- Optional, non-blocking: enhancements beyond this specification are welcome — for example keyboard triage shortcuts, richer match-diff visualizations, or a themed density toggle — provided nothing here replaces or degrades a specified behavior
+</innovation>
+
 <requirements>
 Shared application state must live in runes-based Svelte stores (in-memory only): the submissions collection with scores and review states, the threshold value, the active view, filters, the evidence focus index, canary and mutation seed data with their include toggles, the audit timeline, and UI chrome. Do not use localStorage, sessionStorage, or other browser storage APIs.
 State contracts (behavioral, not storage keys):
@@ -117,11 +146,12 @@ State contracts (behavioral, not storage keys):
 - The canary checklists and their alert banner derive from the same seeded canary data the task rows render
 - Filters recompute the visible lists from the shared collection; they do not create a second disconnected copy
 - The active view is shared client state; switching views does not reload the document
-Build tooling: Vite with the Svelte 5 plugin or an equivalent SPA setup. Styling is Tailwind CSS 4.3.2 (pinned) with design tokens in the theme layer. Flowbite Svelte is the component library for navigation, tables, chips/badges, alerts, accordions/disclosures, sliders, modals, form controls, and toasts; no other component library. svelte-motion and AutoAnimate allowed for animation; no other animation libraries. Phosphor icons via the phosphor-svelte package only — no raw copy-pasted SVG icon sets. All forms — the reviewer decision form and any filter forms — are driven by Felte validating through a Zod schema: the schema defines the rules (verdict required, rationale at least 20 characters) and inline per-field errors render before submit. All libraries installed via npm and bundled locally; no CDN imports. No backend or authentication.
+Build tooling: Vite with the Svelte 5 plugin or an equivalent SPA setup. Styling is Tailwind CSS 4.3.2 (pinned) with design tokens in the theme layer. Flowbite Svelte is the component library for navigation, tables, chips/badges, alerts, accordions/disclosures, sliders, modals, form controls, and toasts; no other component library. svelte-motion and AutoAnimate allowed for animation; no other animation libraries. Phosphor icons via the phosphor-svelte package only — no raw copy-pasted SVG icon sets. All forms — the reviewer decision form, Import, and any filter forms — are driven by Felte validating through a Zod schema: the schema defines the rules and inline per-field errors render before submit. Schemas are API-shaped: they model the payload a real leak-review API would accept (the decision create body with verdict enum confirm-clean|confirm-leak and rationale bounds 20 to 2000 characters — the record a successful submit creates IS that request body; the Review report JSON document with required schemaVersion leak-review.report.v1, threshold bounds, rollup object, submissions and decisions arrays with closed reviewState and verdict enums, mutationSuites with included booleans, and the cross-field submissionId and rollup consistency rules), and Review report JSON export/import compile and validate against that same schema. All libraries installed via npm and bundled locally; no CDN imports. No backend or authentication.
 - All data is fictional: benchmark task names, submitter names, code excerpts, canary tokens, file names, and test names must not reference real products, companies, or people
 - Seed at least 12 submissions across at least 4 fictional benchmark tasks, with at least 3 submissions at or above the seeded 0.75 threshold and at least 3 matched snippet pairs on every triggered submission; seed at least one failing post-strip canary check and at least 2 mutation comparison suites of at least 8 tests each
 - Zero navigational outbound links for app chrome — in-app controls only; view changes via shared client state
 - Icon set bundled locally
+- The useful end state is the Review report: Export must produce Review report JSON and Summary text that contain the session's actual decisions, threshold, rollup, and mutation include toggles, with Copy and Download, and Review report JSON must round-trip through Import while conforming to the declared field contract
 </requirements>
 
 <integrity>
@@ -232,20 +262,25 @@ Bindings:
 - Filters: review-state; audit-verdict
 - Form fields: verdict; rationale
 - Form operations: validate; submit; cancel
-- Value bounds: {"verdict":["confirm-clean","confirm-leak"],"rationale":"min 20 characters","review-state":["unreviewed","review-triggered","confirmed-clean","confirmed-leak"]}
+- Value bounds: {"verdict":["confirm-clean","confirm-leak"],"rationale":"min 20 characters, max 2000 characters","review-state":["unreviewed","review-triggered","confirmed-clean","confirmed-leak"],"schemaVersion":["leak-review.report.v1"],"threshold":"0.50 to 0.95"}
 - Entity: mutation-test
 - Entity operations: toggle
 - Entity fields: included
-- Artifact operations: export; copy
-- Export formats: summary-text
+- Artifact operations: export; copy; import
+- Export formats: summary-text; review-report-json
 - Workflow completion: a submitted decision updates the queue chip, Review triggered filter membership, rollup counts, and appends exactly one audit entry
 - Workflow completion: toggling a mutation test re-derives the flip count live
+- Workflow completion: exporting Review report JSON reflects the session threshold, decisions, rollup, and mutation include toggles under schemaVersion leak-review.report.v1
+- Workflow completion: importing valid Review report JSON restores threshold, decisions, audit timeline, and mutation include toggles
+- Import modes: review-report-json
 
 Mechanics exclusions:
 - Threshold slider stays Playwright-driven: the graded behavior is live re-banding and rollup updates during the drag (and arrow-key adjustment); a WebMCP setter would snap state past the graded derivation
 - Matched-pair Previous/Next stepping with synced two-pane scrolling is scroll-mechanics, graded via the real controls
 - Canary disclosure open/close height transition and chevron rotation stay Playwright-observed
-- Clipboard contents of the export-summary copy are verified via Playwright
+- Clipboard contents of the export copy are verified via Playwright
+- Downloaded Review report JSON file bytes are verified via Playwright
+- File-picker Import stays Playwright-only per artifact-transfer no-raw-file-contents restriction
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

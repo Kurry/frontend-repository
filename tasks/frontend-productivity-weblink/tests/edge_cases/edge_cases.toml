@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,50 +62,50 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_queue_state_present"
+description = "When the file queue is empty, an empty-state message explains that chosen files will appear there."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "field_contracts_validate_inline"
+description = "PeerIdentity, JoinSession, ChatMessage, and Import Session validate inline before commit, naming the offending field."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "field_contract_errors_name_field"
+description = "Field-contract errors name the field (displayName, roomId, text, or the import offender) rather than only saying Invalid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "copy_session_pack_shows_confirmation"
+description = "Copy in Export Session shows a visible confirmation after placing Session Pack JSON on the clipboard."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "connecting_badge_shows_in_progress"
+description = "Immediately after a valid Join Room, the connection badge shows a connecting label before settling to waiting for peer within 5 seconds."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "leave_room_cancels_pending_attempt"
+description = "Leave Room cancels a connecting or waiting attempt immediately, returning the badge to disconnected without requiring a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "disabled_composer_note_explains_why"
+description = "While idle or disconnected, the disabled composer has a nearby note explaining that sending is unavailable because no session is active."
 type = "binary"
 weight = 1.0
 
@@ -118,8 +118,8 @@ weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "export_import_surfaces_support_close"
+description = "Export Session and Import Session surfaces can be dismissed via an explicit close control and/or Escape."
 type = "binary"
 weight = 1.0
 
@@ -132,8 +132,8 @@ weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_queue_has_no_feedback"
+description = "An empty file queue shows nothing and provides no empty-state feedback."
 type = "binary"
 negate = true
 weight = 1.0
@@ -180,8 +180,8 @@ weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "field_contract_feedback_missing_or_delayed"
+description = "Field-contract validation feedback for roomId, displayName, text, or Import is missing or delayed with no UI indication."
 type = "binary"
 negate = true
 weight = 1.0

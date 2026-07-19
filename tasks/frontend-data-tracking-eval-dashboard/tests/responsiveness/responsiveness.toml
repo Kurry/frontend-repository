@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,77 +63,77 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "7.1"
 name = "layout_adapts_desktop_to_mobile"
-description = "Layout adapts gracefully from 1440px desktop to 375px mobile."
+description = "At desktop widths the suite sidebar is open by default beside the chart strip and results table; at 768px and below the sidebar collapses behind a toggle that opens it as an overlay"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
 name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+description = "At 375px width, toolbar controls including Export results, Import results, Undo, Redo, and suite row actions remain usable tap targets"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
 name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+description = "App title, panel headings, and table body text remain readable from desktop down to 375px without overlapping"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
 name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+description = "At 375px width no content clips or overflows the viewport and no page-level horizontal scrolling appears"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
-name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+name = "sidebar_collapses_below_768"
+description = "At widths of 768 pixels and below, the suite sidebar collapses behind a toggle control that opens it as an overlay"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.6"
-name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+name = "tables_scroll_in_containers"
+description = "At 375px the results and comparison tables scroll within their own containers rather than forcing page-level horizontal scroll"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.7"
-name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+name = "export_drawer_usable_on_narrow"
+description = "The export drawer, import control, and Undo/Redo stay fully visible and operable at 375px rather than rendering off-screen"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.8"
 name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+description = "At 375px there is no page-level horizontal scrolling while browsing suites, results, comparison, and export"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.9"
-name = "media_and_canvases_resize"
-description = "Images, grids, and canvases size responsively to fit the layout."
+name = "charts_resize_to_width"
+description = "Bar and line charts resize to fit the main column at desktop and 375px without overflowing"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.10"
-name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
+name = "toolbar_remains_accessible"
+description = "Fixed or sticky toolbar controls remain accessible at desktop and 375px widths"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.n1"
 name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+description = "Layout breaks or overflows at 768px or 375px breakpoints"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n2"
 name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+description = "Export, Import, Undo, or suite controls are too small or misaligned at 375px"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n3"
 name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+description = "Results table or suite list text is too small to read at 375px"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +157,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n4"
 name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+description = "Charts, tables, or the export drawer are cropped or force unnecessary page-level scrollbars at 375px"
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +165,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n5"
 name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
+description = "The suite sidebar cannot be opened as an overlay at or below 768px, or stays stuck open and covers the main content with no dismiss path"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n6"
 name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
+description = "Fixed toolbar or overlay chrome obscures the results table or suite list at narrow widths"
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +181,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n7"
 name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
+description = "Chart strip, results table, or export drawer overlap illegibly at some viewport size"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n8"
 name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
+description = "At 375px the sidebar toggle, suite selection, or export drawer cannot be activated by tap"
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +197,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n9"
 name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
+description = "Charts use a static width that overflows the viewport at 375px"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n10"
 name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
+description = "Export results, Import results, Undo, or Redo disappear at 375px"
 type = "binary"
 negate = true
 weight = 1.0

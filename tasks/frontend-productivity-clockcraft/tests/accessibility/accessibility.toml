@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,14 +63,14 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+description = "All interactive controls — filter buttons, form fields, entry rows, checkboxes, Export/Import, and command palette entries — are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
 name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+description = "Edit dialog, delete confirmation, tag manager, history panel, export drawer, import confirmation, interruption reason step, and command palette trap focus and return it to the originating control on close."
 type = "binary"
 weight = 1.0
 
@@ -84,14 +84,14 @@ weight = 1.0
 [[criterion]]
 id = "1.4"
 name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+description = "Toasts, inline validation, and import field-contract errors are conveyed both visually and via ARIA live regions."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
 name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+description = "Manual entry, timer, tag manager, edit dialog, and interruption reason fields use explicit label elements."
 type = "binary"
 weight = 1.0
 
@@ -208,6 +208,20 @@ name = "animations_ignore_reduced_motion"
 description = "Animations ignore reduced-motion settings."
 type = "binary"
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "category_filter_pressed_state"
+description = "Category filter buttons expose their active state to assistive technology (pressed or current), not only through color"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "validation_associated_with_fields"
+description = "Inline validation messages are programmatically associated with their fields so the failing field is identified"
+type = "binary"
 weight = 1.0
 
 [[criterion]]

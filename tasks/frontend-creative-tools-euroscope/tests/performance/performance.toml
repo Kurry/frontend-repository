@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,111 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "9.1"
-name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+name = "cold_start_under_two_seconds"
+description = "On a local cold load of the root URL, the patching wizard is interactive within 2 seconds."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
-name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+name = "console_clean_full_exercise"
+description = "No console errors or warnings appear during a full exercise of the wizard, including selecting themes, editing swatches, toggling the icon set, generating, and downloading the patched result."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
-name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+name = "responsive_under_rapid_swatch_edits"
+description = "Under rapid repeated swatch hex edits or colour-picker changes, the live Preview stays responsive with no hangs, freezes, or dropped updates."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.4"
-name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+name = "icon_toggle_stays_snappy"
+description = "Rapidly toggling the icon set between None and Vector updates every preview tile and the replaced-count status without perceptible multi-second lag."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.5"
-name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+name = "step_transitions_stay_interactive"
+description = "While advancing or returning between wizard steps, the UI remains interactive: Back/Continue stay operable and the page does not freeze waiting on the step-body swap."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.6"
-name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+name = "generate_download_no_hang"
+description = "Generating the patched result and activating Download complete without a multi-second UI hang or freeze."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
-name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+name = "preview_recolours_without_jank"
+description = "When base theme or swatch changes retint the Preview panels, the recolour happens without multi-second UI blocking or visible frame collapse."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "9.8"
-name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
-type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "9.n1"
-name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+name = "cold_load_exceeds_two_seconds"
+description = "More than 2 seconds pass after a local cold load before the patching wizard becomes interactive."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n2"
-name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+name = "console_errors_during_exercise"
+description = "Console errors or warnings appear while exercising theme selection, swatch edits, icon-set toggles, generate, or download."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n3"
-name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+name = "rapid_input_hangs_or_crashes"
+description = "Rapid repeated swatch edits or icon-set toggles hang the UI, drop Preview/tile updates, or crash the page."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n4"
-name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
+name = "step_or_generate_blocks_rendering"
+description = "Advancing steps or generating the patched result blocks rendering for a multi-second freeze before the UI updates."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n5"
-name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+name = "preview_updates_drop"
+description = "Rapid theme or swatch changes leave the Preview panels or bitmap tiles showing stale colours while the swatch values already changed."
 type = "binary"
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.8"
+name = "rapid_keep_original_and_filter"
+description = "Rapidly toggling keep-original flags or switching colour-blindness modes keeps the Preview, tile grid, contrast matrix, and export preview responsive with no hangs or dropped updates."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.9"
+name = "console_clean_export_undo_palette"
+description = "No console errors or warnings appear while copying exports, importing a recipe, undoing, or opening the command palette during a full exercise."
+type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.n6"
-name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n7"
-name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n8"
-name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n9"
-name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n10"
-name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+name = "undo_or_import_hangs"
+description = "Undo, redo, recipe import, or command-palette open hangs the UI for multiple seconds or crashes the page."
 type = "binary"
 negate = true
 weight = 1.0

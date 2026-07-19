@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,153 +63,78 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "3.1"
 name = "spacing_and_sizing_follow_scale"
-description = "Spacing and sizing follow the design system's scale, with no arbitrary one-off values visible in computed styles."
+description = "Spacing follows the 4px-multiple scale across capture bar, cards, and panels similarly to the reference overview/segments."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.2"
 name = "typography_matches_spec"
-description = "Typography matches the spec for all headings and body copy."
+description = "Heading/body/mono stacks and sizes follow the instruction (Poppins-class headings, Inter-class body, JetBrains Mono-class timestamps) in the spirit of the reference screenshots."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.3"
-name = "layout_matches_reference"
-description = "Layout matches reference screenshots to within a small tolerance at all specified breakpoints; fidelity tasks achieve near pixel-parity."
+name = "layout_matches_reference_home"
+description = "Home layout matches the reference composition: capture bar, Unthreaded inbox, and threads column as shown in overview/segments (text wins on conflicts)."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.4"
 name = "specified_state_changes_animate"
-description = "Transitions or animations are applied to the state changes the spec calls out, such as add, delete, filter, or view switch."
+description = "Spark enter/exit and pin reorder animate as specified rather than hard-cutting, consistent with the motion-capable reference feel."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.5"
 name = "responsive_behavior_matches_reference"
-description = "Responsive behavior matches reference patterns."
+description = "Desktop vs narrow layouts keep the same information hierarchy as the reference without inventing a conflicting dashboard chrome."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.6"
 name = "control_styling_matches_spec"
-description = "Button and form radii, padding, and shadows conform to the spec."
+description = "Primary/secondary buttons, pills, and rounded-xl cards match the specified shape system and reference control styling."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.7"
 name = "typography_has_clear_hierarchy"
-description = "Typography has a clear hierarchy that distinguishes section and body text."
+description = "Thread titles, inbox headers, body, and timestamp meta show a clear size/weight hierarchy as in the reference."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.8"
 name = "component_states_match_spec"
-description = "Component states (default, hover, active, disabled) match the spec where specified."
+description = "Hover/focus/active treatments on nav tabs and cards are present and consistent with the polished reference chrome."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "3.9"
-name = "surface_treatments_match_spec"
-description = "Color, depth, and border treatments are precise per the design."
+name = "export_drawer_fits_visual_system"
+description = "Export drawer uses the same surface #ffffff, primary indigo accents, and rounded-md controls as the rest of the app rather than a visually alien panel."
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "3.10"
-name = "microinteractions_match_spec"
-description = "Microinteraction feedback for hover and press follows the spec in duration and motion."
-type = "binary"
-weight = 1.0
-
 [[criterion]]
 id = "3.n1"
-name = "sizing_or_spacing_contradicts_scale"
-description = "Visible sizing or spacing values contradict the specified scale."
+name = "layout_diverges_grossly_from_reference"
+description = "Home layout grossly diverges from the reference overview (missing capture/inbox/threads regions) without instruction justification."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "3.n2"
-name = "colors_fall_outside_palette"
-description = "Colors appear outside the specified palette."
+name = "palette_ignores_specified_tokens"
+description = "App colors ignore the specified indigo/rose/off-white/status tokens in favor of an unrelated theme."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "3.n3"
-name = "sizing_mismatches_spec"
-description = "Sizing mismatches the spec."
+name = "reference_screenshots_shipped_as_assets"
+description = "Reference screenshots from /reference-screenshots are copied into the shipped app as UI assets."
 type = "binary"
 negate = true
 weight = 1.0
-
-[[criterion]]
-id = "3.n4"
-name = "required_animations_missing_or_wrong"
-description = "Animations are missing or incorrect where the spec requires them."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n5"
-name = "specified_controls_use_browser_defaults"
-description = "Form or button controls use browser default styles when the spec styles them."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n6"
-name = "layout_misaligned_at_breakpoints"
-description = "The grid or layout is misaligned at reference breakpoints."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n7"
-name = "elements_are_clipped_or_offscreen"
-description = "Elements render off-screen or clipped."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n8"
-name = "structure_deviates_from_reference"
-description = "Section order, content, or structure deviates from the reference on fidelity tasks."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n9"
-name = "heading_and_body_text_undifferentiated"
-description = "Heading and body text have no distinction."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n10"
-name = "microinteractions_deviate_from_reference"
-description = "Microinteractions are missing or deviate from the provided reference."
-type = "binary"
-negate = true
-weight = 1.0
-
 [[criterion]]
 id = "design_fidelity.catchall"
 name = "design_fidelity_catchall"

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,88 +62,103 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "14.1"
-name = "multi_facet_round_trip"
-description = "Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline — never a mix."
+name = "multi_facet_reload_persists_all"
+description = "Starting from seed: edit the source to a distinct valid diagram, switch to Config and change the theme value to another valid theme, leave Config as the active tab, and toggle the app theme to dark; then reload. Confirm every facet survives together — restored source, active Config tab, edited configuration, dark theme, and a preview consistent with those documents — never a mix of surviving and reverted facets."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.2"
-name = "sort_reversal_proves_live_data"
-description = "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders."
+name = "sample_type_reversal_proves_live_state"
+description = "Selection-reversal proof (genre stand-in for sort reversal): click Sequence and note source/preview/badge, click Flowchart and note the different type, then click Sequence again. Confirm sequence source, sequence preview marks, and sequence badge return — proving editor/preview/badge are derived from live sample state, not two hardcoded snapshots."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.3"
-name = "derived_view_responds_to_input"
-description = "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input."
+name = "source_edit_derived_preview_sensitivity"
+description = "Derived-view sensitivity: replace the source with two clearly different valid diagrams in sequence. Confirm the preview changes meaningfully for each input rather than redrawing an identical diagram regardless of source."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.4"
-name = "cross_view_echo_without_reload"
-description = "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list ↔ detail, board ↔ stats) without reload."
+name = "source_edit_echoes_preview_and_badge"
+description = "Cross-view echo: after selecting Mindmap, confirm without reload that the editor source, the preview render, and the header diagram-type badge all reflect the mindmap type together."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.5"
-name = "count_delta_is_exact"
-description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+name = "export_availability_delta_on_error"
+description = "Count-delta integrity (export availability): with valid source note that SVG/PNG/Copy image/MMD are enabled; introduce invalid syntax and re-check immediately — those controls become unavailable; correct the source and re-check — they become available again (exact enablement delta, no lagging controls)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.6"
-name = "different_inputs_change_outcomes"
-description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+name = "different_sources_different_outcomes"
+description = "Input-dependent output: load Sequence then Class via samples (or two distinct valid sources). Confirm the two outcomes differ in the ways the inputs dictate (not byte-identical preview marks or identical badge labels)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.7"
-name = "interleaved_flows_preserve_state"
-description = "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state."
+name = "interleaved_config_and_code_flows"
+description = "Interleaved-flow integrity: start editing Code with a valid change, switch to Config and enter invalid JSON or an illegal theme enum (validation visible naming the theme field or config document, last valid config kept), switch back to Code and finish a second distinct valid edit; confirm Code shows the finished edit, Config still shows the validation error, and the preview reflects the latest valid Code without corrupting either document."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.8"
-name = "empty_to_repopulated_round_trip"
-description = "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions."
+name = "empty_then_repopulate_source"
+description = "Edge-state round-trip: clear the source to empty (error/empty treatment, exports unavailable), then paste or type a valid flowchart (or click Flowchart sample); confirm the empty/error treatment clears, the preview renders the new diagram, exports re-enable, and the badge matches."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "session_json_export_import_roundtrip"
+description = "Full-pipeline artifact probe: mutate source to a distinctive valid diagram, set config.theme to another valid Mermaid Config enum, select Sequence, toggle appTheme to dark; confirm Session JSON preview contains those values under schemaVersion mermaid-session-v1 with every required MermaidSession key; Download then Import reconstructs the same source, config theme, sequence badge, and dark theme; MMD export then Import restores matching Code text; a second Session JSON import with wrong schemaVersion or illegal theme leaves state unchanged with field-named validation."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.n1"
-name = "partial_persistence_is_incoherent"
-description = "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence."
+name = "partial_persistence_after_reload"
+description = "After configuring source, Config tab, config theme value, and dark app theme then reloading, some user-configured facets survive while others reset — incoherent partial persistence instead of all four facets restoring together."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n2"
-name = "derived_surface_ignores_inputs"
-description = "A derived surface renders identically regardless of its inputs."
+name = "preview_identical_across_different_sources"
+description = "Changing to two clearly different valid sources or samples leaves the preview visually identical — a derived surface ignoring its inputs."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n3"
-name = "different_inputs_produce_identical_output"
-description = "Repeating an action with different inputs yields byte-identical output."
+name = "different_samples_apply_identical_diagrams"
+description = "Selecting Sequence and Class yields identical preview marks and the same header badge label."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "State changes appear in one view but not another until reload."
+name = "cross_surface_state_stale_until_reload"
+description = "After a source edit, sample click, or config theme change, editor, preview, or badge still shows stale values until a full page reload."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "session_export_ignores_mutations_or_import_noop"
+description = "Session JSON export omits the session's actual code/config.theme/appTheme/diagramType mutations, or Import of a valid Session JSON leaves the workspace unchanged / Import of an illegal payload still mutates state."
 type = "binary"
 negate = true
 weight = 1.0
@@ -151,7 +166,7 @@ weight = 1.0
 [[criterion]]
 id = "behavioral.catchall"
 name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

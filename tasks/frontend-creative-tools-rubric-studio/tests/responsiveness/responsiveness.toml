@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,158 +62,158 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "7.1"
-name = "layout_adapts_desktop_to_mobile"
-description = "Layout adapts gracefully from 1440px desktop to 375px mobile."
+name = "layout_adapts_1440_to_375"
+description = "Resizing from 1440px desktop to 375px mobile keeps a usable rubric studio: rail (or its toggle), header card, and criteria/Tune/preview canvas remain present and operable at both widths."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
-name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+name = "mobile_tap_targets_adequate"
+description = "At 375px width, rail toggle, accordion headers, Add criterion, verdict toggles, case include toggles, history entries, and Export/copy present tap targets at least 44px in at least one dimension."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
-name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+name = "typography_readable_both_widths"
+description = "Rubric name, section headings, criterion names, and metadata remain legible at both 1440px and 375px — type scales or reflows without becoming unreadably small on mobile."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
-name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+name = "no_clip_or_overflow_at_375"
+description = "At 375px width, no content clips or overflows the viewport; the Tune bars and diff view reflow to stacked layouts and the export code block scrolls within its own container."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
-name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+name = "rail_collapses_at_1024"
+description = "At widths of 1024px and below the left rail collapses behind a toggle control that opens it as an overlay; at desktop widths the rail is open by default."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.6"
-name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+name = "narrow_stack_order_stays_usable"
+description = "At 375px width, header card, criteria/Tune/preview content, and history reflow into a logical stacking order without covering each other into an unusable pile."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.7"
-name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+name = "mobile_controls_tappable"
+description = "At 375px width, tap/click activation works on the rail toggle, rail entries (when overlay open), accordion headers, case toggles, verdict toggles, and Export."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.8"
-name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+name = "no_horizontal_scroll_at_375"
+description = "At 375px width the page does not produce page-level horizontal scrolling."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.9"
-name = "media_and_canvases_resize"
-description = "Images, grids, and canvases size responsively to fit the layout."
+name = "tune_bars_and_code_block_reflow"
+description = "At 375px width, Tune precision/recall/F1 bars and the export monospaced code block size responsively — bars stack or shrink to fit, and the code block scrolls inside its container rather than forcing page overflow."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.10"
-name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
+name = "fixed_chrome_remains_accessible"
+description = "Fixed or sticky studio chrome (rail toggle, header actions, Export) remains reachable at 375px and does not permanently obscure the criteria list or form dialogs."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.n1"
 name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+description = "At 1024px or 375px the studio layout breaks or overflows so rail, header, or canvas become unusable."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n2"
 name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+description = "At 375px width, primary controls are too small to tap reliably or misaligned into overlapping hit targets."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n3"
-name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+name = "text_too_small_on_mobile"
+description = "At 375px width, rubric name, criterion names, or validation copy become too small to read."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n4"
 name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+description = "At 375px width, criteria rows, Tune bars, or the diff view are cropped, or unnecessary page-level scrollbars appear while content is clipped."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n5"
-name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
+name = "rail_missing_or_stuck_closed"
+description = "At 1024px or below the left rail has no working toggle, or the rail overlay is missing so seeded rubrics cannot be opened."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n6"
-name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
+name = "fixed_chrome_obscures_content"
+description = "Fixed positions for the rail toggle, header, or Export permanently obscure accordion rows or the criterion form at 375px."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n7"
-name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
+name = "elements_overlap_at_narrow_width"
+description = "At 375px width, stacking causes header, history, or Tune bars to overlap into an unreadable pile."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n8"
-name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
+name = "rail_toggle_untappable_on_mobile"
+description = "At 375px width the rail toggle or overlay entries cannot be activated by tap/click."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n9"
-name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
+name = "tune_or_export_overflows_viewport"
+description = "At 375px width, Tune bars or the export code block use a static width that overflows the viewport instead of reflowing or scrolling in-container."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n10"
 name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
+description = "Add criterion, Export, aggregation selects, or rail toggle disappear at 1024px or 375px widths."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "responsiveness.catchall"
 name = "responsiveness_catchall"
 description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true

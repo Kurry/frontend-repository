@@ -1,0 +1,233 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "keyboard_reaches_everything"
+description = "Sidebar entries, toolbar and macro controls, grid rows, queue move controls, retry and pause/resume controls, and all form fields are reachable and operable with Tab, Shift+Tab, Enter, and Space"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "modals_manage_focus"
+description = "The composer, schedule form, and confirmation dialogs trap focus while open, close on Escape, and return focus to the control that opened them"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "icons_have_labels"
+description = "Status icons, macro icons, and row-action icons carry accessible names or labels"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "run_events_announced"
+description = "Run completion, an item entering the failed state, and pause/resume transitions are announced through an aria-live region as well as shown visually"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "forms_have_explicit_labels"
+description = "Composer and schedule fields have visible labels, and validation messages are programmatically associated so each names its field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "headings_follow_order"
+description = "Panel and section headings follow a logical order with no skips"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "landmarks_present"
+description = "Landmark structure (nav, main) or a skip link is present"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "contrast_sufficient"
+description = "Status colors, badge text, and rollup values meet sufficient contrast against their backgrounds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "semantic_roles_used"
+description = "Interactive elements use semantic roles — real buttons for macros and retries, a table or grid role for the execution grid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "reduced_motion_respected"
+description = "Animations respect prefers-reduced-motion: rows, statuses, and the bar apply instantly with flows intact"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "keyboard_queue_reorder"
+description = "The pending queue is fully reorderable with the keyboard move controls alone, with focus staying on the moved entry"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "diff_not_color_only"
+description = "The inspector's expected-versus-actual comparison and item statuses are distinguishable by more than color alone (icons, markers, or text labels)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n1"
+name = "keyboard_unreachable_controls"
+description = "Any retry, macro, queue move, or row action cannot be reached or activated via keyboard"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n2"
+name = "focus_indicators_missing"
+description = "Focus indicators are missing or obscured on grid rows, queue entries, or toolbar controls"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n3"
+name = "custom_controls_lack_semantics"
+description = "Custom grid or queue controls use non-semantic tags without ARIA roles or labels"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n4"
+name = "state_uses_color_only"
+description = "Failed, retrying, or match/mismatch state is conveyed by color alone"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n5"
+name = "modals_leak_focus"
+description = "The composer or a dialog lets focus escape behind the overlay while open"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n6"
+name = "unreadable_contrast"
+description = "Status badges, countdowns, or rollup text are unreadable due to poor contrast"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n7"
+name = "errors_visual_only"
+description = "Validation or run-failure feedback is visual only with no screen-reader path"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n8"
+name = "icons_missing_alt"
+description = "Status or action icons lack any accessible name"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n9"
+name = "heading_order_skipped"
+description = "Headings jump levels (for example H1 to H3) in the panel structure"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n10"
+name = "reduced_motion_ignored"
+description = "Grid, countdown, or macro animations ignore the reduced-motion setting"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "accessibility.catchall"
+name = "accessibility_catchall"
+description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

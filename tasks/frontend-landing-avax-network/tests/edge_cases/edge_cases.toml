@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,223 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "For fidelity tasks, evaluate whether the app matches the reference's UX affordances. Empty state UI is present and renders when a collection is empty."
+name = "contact_empty_submit_names_missing_fields"
+description = "Submitting the contact form with required fields empty shows inline messages naming each missing field, shows no success message, clears nothing, and does not append a session lead or change the Session leads total."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "newsletter_confirmation_only_on_step_5"
+description = "The newsletter submit/confirmation action exists only on step 5; steps 1 through 4 offer Next (and Back from step 2 onward) and never show Thank you for subscribing."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "community_feed_arrows_permanently_disabled"
+description = "The community feed track is empty by design: its previous and next arrows are disabled on load and remain disabled after clicking, hovering, and scrolling."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "news_carousel_end_arrows_disabled_no_wrap"
+description = "At the news carousel's first slide the previous arrow is disabled; at the last slide the next arrow is disabled; neither click wraps around."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "contact_errors_are_field_specific"
+description = "Contact and newsletter final-submit validation errors name the specific missing/invalid field (including otherDetail when project_type is Other) with actionable text rather than a generic Invalid rejection alone."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "form_success_messages_appear_after_delay"
+description = "Valid contact and newsletter submits show their success copy (Success! We'll be in touch. / Thank you for subscribing) after the brief simulated delay rather than instantly with no feedback."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "newsletter_progress_surfaces_reflect_step"
+description = "The five-step newsletter long flow keeps a visible step counter and progress bar that update with Next/Back."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "form_controls_use_semantic_labels"
+description = "Newsletter and contact form fields use semantic inputs with visible labels (or accessible name equivalents) rather than unlabeled div shells."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "mobile_drawer_dismissible"
+description = "Below 1025px the open mobile drawer can be dismissed via its close control (and keyboard where focusable), restoring the page."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "newsletter_next_never_blocks_on_validity"
+description = "On newsletter steps 1–4, Next advances even when the current step's fields are incomplete (navigation never blocks on per-step validity)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_community_feed_looks_broken"
+description = "The empty community feed presents as a broken UI (missing track, enabled arrows that imply content, or error chrome) rather than the intentional empty disabled-arrow state."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "contact_errors_only_in_console"
+description = "Submitting an empty contact form surfaces errors only in the browser console with no inline field messages in the UI."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "form_actions_silently_succeed_or_fail"
+description = "Newsletter or contact submit produces no visible success or error feedback after the action."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "carousel_wraps_at_ends"
+description = "Clicking the disabled previous arrow on the first news slide or the disabled next arrow on the last slide wraps the carousel to the opposite end."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "newsletter_shows_thank_you_before_step_5"
+description = "Thank you for subscribing appears while the newsletter is still on steps 1–4, before a step-5 submit."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "drawer_not_keyboard_dismissible"
+description = "Below 1025px the open mobile drawer overlay cannot be dismissed via keyboard (Escape or focusable close control)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "contact_validation_feedback_missing"
+description = "An empty contact submit shows no inline validation indication naming missing fields."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "primary_cta_labels_ambiguous_or_missing"
+description = "Primary newsletter/contact action controls lack readable labels or use ambiguous blank text."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "community_arrows_become_enabled"
+description = "After clicking, hovering, or scrolling, the community feed previous/next arrows become enabled despite the empty feed."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "contact_empty_submit_clears_or_shows_success"
+description = "Submitting the contact form with required fields empty clears entered values or shows Success! We'll be in touch."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "empty_log_export_valid_schema"
+description = "With zero leads, Download JSON still produces astra-session-leads.json with version 1, the current theme, counts all zero, and an empty leads array; Copy JSON copies that same empty-log JSON and still shows Copied confirmation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "undo_on_empty_log_noop"
+description = "With zero leads, Undo last lead leaves the empty state unchanged (total stays 0, no phantom row)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "invalid_then_valid_contact_one_lead"
+description = "A failed empty contact submit followed immediately by a valid contact submit appends exactly one lead — the invalid attempt never appears in the Session leads list or export."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "invalid_contact_appends_phantom_lead"
+description = "Submitting the contact form with required fields empty increments the Session leads total or appends a lead row despite showing validation errors."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "newsletter_invalid_final_submit_named_errors"
+description = "On newsletter step 5, submitting with firstname shorter than 2 characters, a malformed email, empty or out-of-enum country, missing or out-of-enum vertical, isDeveloper unset, or gdpr unchecked shows inline errors naming each offending field, never shows Thank you for subscribing, and appends no lead."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "contact_otherDetail_required_when_other"
+description = "Submitting the contact form with project_type Other and otherDetail empty or shorter than 2 characters shows a named otherDetail error, shows no Success! We'll be in touch. message, clears nothing, and appends no lead."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "contact_message_min_length_and_email_format"
+description = "Submitting the contact form with astra_contact_message shorter than 10 characters or a malformed email shows a named error on that field, shows no success message, clears nothing, and appends no lead."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n12"
+name = "newsletter_invalid_final_shows_thank_you"
+description = "On newsletter step 5, an invalid subscribe payload still shows Thank you for subscribing or appends a newsletter lead."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.17"
+name = "contact_gdpr_unchecked_blocks_lead"
+description = "Submitting the contact form with otherwise-valid fields but gdpr unchecked shows a named gdpr error, shows no Success! We'll be in touch. message, clears nothing, and appends no lead."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n13"
+name = "out_of_enum_project_type_accepted"
+description = "A contact submit accepts a project_type value outside DeFi, Enterprise & Institutions, Gaming, Art & Culture, Development, Other and still shows Success! We'll be in touch. or appends a lead."
 type = "binary"
 negate = true
 weight = 1.0

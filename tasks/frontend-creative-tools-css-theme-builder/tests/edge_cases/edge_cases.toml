@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,231 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_my_themes_hint_after_remove_all"
+description = "After removing all custom themes, My themes shows an empty-state hint while the 35 built-ins remain listed and selectable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "theme_name_inline_validation_before_apply"
+description = "On theme create/rename, an empty, whitespace-only, over-length, or illegal-character name shows a validation message naming the name field before the value is applied, and the invalid value is not applied."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "validation_names_field_and_fix"
+description = "Theme-name validation copy names the name field and the fix rather than only saying 'Invalid'."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "random_shows_confirmation_toast"
+description = "Clicking Random replaces color tokens, re-themes the preview, and shows a brief confirmation toast that slides in and auto-dismisses."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "early_hold_release_cancels_add"
+description = "Releasing Hold to add theme before the ~0.7s progress completes cancels the add: the progress fill resets and the My themes count does not change."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "builtin_remove_blocked_with_notice"
+description = "Attempting to remove a built-in preset removes nothing and surfaces a notice explaining that built-ins cannot be removed."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "hold_progress_guides_nonobvious_control"
+description = "Hold to add theme shows a visible inset progress fill sweeping across the button during the ~0.7s hold so the press-and-hold affordance is guided in-app."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "theme_controls_use_semantic_tags"
+description = "Theme name field, Hold to add, Remove theme, Random, CSS export, segmented radius/size choices, and toggles use semantic button/input/label elements rather than unlabeled decorative wrappers."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "export_modal_close_paths"
+description = "The Export modal closes via Close, backdrop click, and Escape, returning to the workspace without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "rapid_random_leaves_one_coherent_set"
+description = "Rapidly clicking Random at least three times in a row leaves exactly one coherent token set applied — the editor rows, preview, and Color Palette tab agree with each other."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_my_themes_shows_nothing"
+description = "After the custom themes collection is empty, My themes shows nothing — no empty-state hint or add guidance."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "validation_errors_only_in_console"
+description = "Invalid theme-name create/rename failures surface only in the browser console with no visible inline field feedback."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "random_or_token_edit_silent"
+description = "Clicking Random or editing a color/radius/size token produces no visible change to editor, preview, or palette (silent failure)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "remove_theme_no_destructive_affordance"
+description = "Remove theme proceeds with no visible destructive affordance (no Remove labeling or notice) distinguishing it from a non-destructive action."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "interactive_controls_are_nonsemantic"
+description = "Primary interactive controls (theme rows, Hold to add, Random, CSS export, tabs, dropdowns) are non-semantic div/span click targets without button/role semantics."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "export_not_keyboard_dismissible"
+description = "With the Export modal open, keyboard users cannot dismiss it (no Escape path and no focusable Close control)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "early_hold_still_adds_theme"
+description = "Releasing Hold to add theme before ~0.7s still adds a custom theme or leaves the progress fill stuck without resetting."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "ambiguous_or_missing_action_labels"
+description = "Primary actions show blank, placeholder, or ambiguous labels such as 'Submit', 'OK', or 'Button' instead of specific labels like Hold to add theme, Reset theme, Remove theme, or Copy."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "malformed_hash_breaks_ui"
+description = "Loading a URL whose #theme= payload is malformed or undecodable breaks the UI or throws a console error instead of falling back to the default seeded theme."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "long_name_overflows_sidebar_row"
+description = "A very long theme name overflows or breaks the sidebar row layout instead of truncating with an ellipsis while the editor name field still shows the full value."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "undo_redo_disabled_at_empty_boundary"
+description = "Undo and Redo are visibly disabled when their stacks are empty and activating them at that boundary never throws or corrupts themes."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "empty_snapshot_name_rejected"
+description = "Saving a snapshot with an empty, whitespace-only, or over-length (>64) name adds nothing to the Snapshots list and shows validation naming the name field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "malformed_theme_json_import_rejected"
+description = "Importing malformed Theme JSON leaves My themes, editor, preview, and Export unchanged and shows visible validation feedback."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "new_edit_after_undo_clears_redo"
+description = "After Undo, performing a new token edit clears the redo stack and disables Redo."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "schema_invalid_theme_json_import_rejected"
+description = "Importing parseable JSON that fails the Theme JSON field contract — missing a required color or radius key, a --color-* value that is empty or neither oklch(...) nor #RRGGBB, color-scheme outside light|dark, a radius/size/border/depth/noise value outside its closed enum, an empty/illegal name, or a color-scheme/Dark-option cross-field disagreement — leaves My themes, editor, preview, and Export unchanged and shows validation naming the offending field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "illegal_or_overlong_theme_name_rejected"
+description = "A theme name longer than 64 characters, or containing characters outside lowercase letters, digits, hyphens, and underscores, is rejected with validation naming the name field and is not applied (My themes count and active name stay unchanged)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.17"
+name = "invalid_color_format_import_rejected"
+description = "Importing Theme JSON where --color-primary is an empty string or a non-color token (neither oklch(...) nor #RRGGBB) leaves My themes, editor, preview, and Export unchanged and shows validation naming --color-primary."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "undo_at_boundary_throws_or_corrupts"
+description = "Activating Undo or Redo when that stack is empty throws a console error or corrupts the theme list/editor state."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n12"
+name = "malformed_import_mutates_themes"
+description = "Importing malformed Theme JSON still mutates My themes, editor tokens, or Export previews."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n13"
+name = "schema_invalid_import_mutates_themes"
+description = "Importing JSON that fails the Theme JSON field contract (wrong enums, invalid color format, missing required keys, or cross-field color-scheme disagreement) still mutates My themes, editor tokens, or Export previews."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n14"
+name = "invalid_color_format_accepted_on_import"
+description = "Import accepts a --color-* value that is empty or neither oklch(...) nor #RRGGBB and still mutates editor tokens or Export previews."
 type = "binary"
 negate = true
 weight = 1.0

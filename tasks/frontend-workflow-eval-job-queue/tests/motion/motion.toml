@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "4.2"
 name = "dialogs_enter_exit_transition"
-description = "Opening the submit form or a confirmation dialog with the real pointer brings it in with a short opacity and scale transition of roughly 200 to 300 milliseconds, and closing exits the same way rather than disappearing instantly"
+description = "Opening the submit form, export drawer, import surface, or a confirmation dialog with the real pointer brings it in with a short opacity and scale transition of roughly 200 to 300 milliseconds, and closing exits the same way rather than disappearing instantly"
 type = "binary"
 weight = 1.0
 
@@ -91,14 +91,14 @@ weight = 1.0
 [[criterion]]
 id = "4.5"
 name = "toasts_slide_autodismiss"
-description = "After submitting a job, cancelling a job, and copying the configuration preview, a feedback toast slides in, remains readable long enough to scan, and auto-dismisses with a fade"
+description = "After submitting a job, cancelling a job, copying the configuration or export preview, and importing a queue snapshot, a feedback toast slides in, remains readable long enough to scan, and auto-dismisses with a fade"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
 name = "reduced_motion_respected"
-description = "With prefers-reduced-motion enabled, animations are removed or reduced to instant state changes while every flow — submit, cancel, retries, pause and resume — remains fully usable"
+description = "With prefers-reduced-motion enabled, animations are removed or reduced to instant state changes while every flow — submit, cancel, retries, pause and resume, export, and import — remains fully usable"
 type = "binary"
 weight = 1.0
 

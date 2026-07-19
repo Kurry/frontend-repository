@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,14 +63,14 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.1"
 name = "coherent_shared_theme_state"
-description = "A theme change made in one visible surface is reflected immediately and consistently in the theme row, editor controls, every preview tab, URL hash, and CSS export without reload or stale duplicate values"
+description = "A theme change made in one visible surface is reflected immediately and consistently in the theme row, editor controls, every preview tab, contrast matrix, URL hash, and all three Artifact center formats without reload or stale duplicate values"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
 name = "in_memory_reload_rule"
-description = "After changing custom collection state, active theme, editor tokens, preview tab, and chrome preference without relying on a #theme= payload, a fresh baseline load resets all those in-memory facets coherently rather than retaining a partial mixture"
+description = "After changing custom themes, tokens, preview tab, snapshots, undo history, color-blindness filter, and chrome preference without a #theme= payload, a fresh baseline load resets all those in-memory facets coherently rather than retaining a partial mixture"
 type = "binary"
 weight = 1.0
 
@@ -100,7 +100,7 @@ weight = 1.0
 [[criterion]]
 id = "2.6"
 name = "console_clean_full_flow"
-description = "No console errors or unhandled promise rejections appear from first load through create, rename, token edit, preview-tab switch, Random, CSS/copy, hash-load, and remove flows"
+description = "No console errors or unhandled promise rejections appear from first load through create, rename, token edit, preview-tab switch, Random, undo/redo, snapshot, import, Artifact center copy/download, hash-load, and remove flows"
 type = "binary"
 weight = 1.0
 
@@ -178,6 +178,66 @@ description = "Rapid repeated token edits, such as clicking through several radi
 type = "binary"
 weight = 0.5
 optional = true
+
+
+[[criterion]]
+id = "2.18"
+name = "import_export_shared_state_contract"
+description = "Importing a valid declared-theme JSON reconstructs the same visible theme state the JSON export produced across My themes, editor, preview, and Artifact center from shared in-memory state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.17"
+name = "undo_shared_state_contract"
+description = "Undo and redo operate on the same shared state the views render from, so editor, preview, contrast badges, and artifact text revert or reapply together"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.19"
+name = "form_validation_matches_declared_theme_schema"
+description = "Theme create/rename and Import enforce the declared-theme field contract in the UI: empty, over-length (>30), or illegal-character names are rejected with inline feedback naming the name field; Import of JSON that fails required keys or closed enums (radius, size, border, depth/noise, fontFamily) or the defaultDarkTheme→darkColorScheme cross-field rule is rejected with feedback naming the offending field and does not mutate themes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.20"
+name = "export_import_share_one_schema"
+description = "JSON export text and a successful Import of that same text share one declared-theme would-be request body: after Import, editor controls and all three Artifact formats show the same name, #RRGGBB colors, radius/size/border enums, depth/noise, fontFamily, and options the export contained"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.21"
+name = "name_and_dark_scheme_cross_field_contracts"
+description = "After renaming a custom theme and toggling Dark color scheme, the JSON name equals the CSS data-theme attribute value and the Config theme identifier, and options.darkColorScheme in JSON matches the Options toggle — cross-field contracts visible without reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n5"
+name = "download_not_live_compiled"
+description = "Artifact Download produces a static canned file that disagrees with the currently visible Artifact center text for the active theme's session tokens"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.n6"
+name = "schema_desync_across_formats"
+description = "After a valid token edit, CSS custom properties, JSON declared-theme fields, and Config snippet disagree about the same token (different hex, radius enum, border enum, or fontFamily) or the CSS data-theme value disagrees with the JSON name — formats not compiled from one schema"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.n7"
+name = "import_accepts_schema_invalid_payload"
+description = "Import accepts a parseable JSON document that violates the declared-theme field contract (missing required keys, out-of-enum radius/size/border/depth/noise/fontFamily, or defaultDarkTheme true with darkColorScheme false) and still mutates My themes or editor tokens"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "2.catchall"

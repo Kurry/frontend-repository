@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -63,78 +63,78 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+name = "export_summary_strip_bonus"
+description = "Beyond the required export drawer, a structured export summary strip names agent count and the active-agents KPI above the preview so operators can trust the artifact at a glance"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "undo_redo_keyboard_shortcuts_bonus"
+description = "Beyond required Undo/Redo buttons, keyboard shortcuts reverse and reapply mutating actions with the same completeness as the header controls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+name = "last_mutation_chip_bonus"
+description = "A compact chip or status line shows the last mutating action (for example Connected agent or Exported session) and updates after connect, disconnect, export copy, or import"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+name = "kpi_sparkline_extra_affordance"
+description = "KPI sparklines or detail charts offer an extra usability affordance beyond the required tooltip — for example a brush, range highlight, or comparison marker that remains browser-observable"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+name = "palette_recent_commands_bonus"
+description = "The command palette shows recent commands or a keyboard-hint row beyond the required command list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+name = "operator_density_preferences_bonus"
+description = "A density or feed-verbosity preference changes the visible compactness of agent rows or feed items beyond the required layout"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+name = "ops_console_brand_polish_bonus"
+description = "The command center presents a polished ops-console identity (distinct title treatment or header composition) beyond bare generic dashboard chrome"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+name = "theme_accent_customization_bonus"
+description = "Beyond required light/night themes, an accent or contrast preference recolors chips or chart accents without breaking night mode"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+name = "print_or_share_session_bonus"
+description = "A print-friendly or share-oriented session summary view is available beyond the required JSON/CSV export"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+name = "competition_level_ops_polish"
+description = "Competition-level polish is visible: the session artifact path (mutate → export preview → copy/download) feels operator-ready rather than demo-thin"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.n1"
 name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+description = "The demo is purely spec-compliant, barebones, and unenhanced beyond the minimum required surfaces"
 type = "binary"
 negate = true
 weight = 1.0
@@ -142,7 +142,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n2"
 name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
+description = "Interactions and visuals are generic, templated, or copied with no command-center identity"
 type = "binary"
 negate = true
 weight = 1.0
@@ -150,63 +150,63 @@ weight = 1.0
 [[criterion]]
 id = "11.n3"
 name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
+description = "The app has no polish around the export artifact path — no summary, shortcuts, or last-action feedback beyond the bare minimum"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
+name = "no_bonus_operator_affordance"
+description = "No optional operator affordance from the innovation list is present"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
+name = "innovation_breaks_required_flows"
+description = "An attempted enhancement breaks Connect, Export, or Undo required flows"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
+name = "bonus_ui_obscures_required_controls"
+description = "Bonus chrome obscures required Export session, Undo/Redo, or Connect agent controls"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
+name = "fake_innovation_non_observable"
+description = "Claimed enhancements are not browser-observable in the running UI"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
+name = "innovation_only_in_marketing_copy"
+description = "Innovation appears only as marketing copy with no interactive enhancement"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
+name = "bonus_feature_is_nonfunctional"
+description = "A visible bonus control (summary strip, shortcut hint, last-action chip) is nonfunctional"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
+name = "enhancement_regresses_accessibility"
+description = "An enhancement removes keyboard reachability or focus indicators from required controls"
 type = "binary"
 negate = true
 weight = 1.0

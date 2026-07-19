@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -154,6 +154,42 @@ name = "document_title_references_riviera"
 description = "The document title (browser tab) references the French Riviera trip, and the first viewport presents the Trip / Travel Planner product name with 'French Riviera — Cote d'Azur' as the trip signal"
 type = "binary"
 weight = 0.5
+
+[[criterion]]
+id = "3.14"
+name = "financial_surfaces_keep_coastal_language"
+description = "The ledger grid, spreadsheet matrix, and charts keep the planner's coastal visual language: dense but aligned rows, labeled chart axes and legends, prominent EUR totals, and a burn-rate ceiling line clearly distinguishable from the spend line"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.15"
+name = "state_treatments_pair_color_with_icon_or_text"
+description = "Threshold-flagged rows, projected-overage regions, and settled transactions each have a distinct visual treatment that pairs color with an icon or text label"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.16"
+name = "dark_theme_coherent_everywhere"
+description = "In dark theme every pane, chart, overlay, and form keeps readable contrast and the same layout as light theme"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.n17"
+name = "dark_theme_leaves_unstyled_regions"
+description = "In dark theme at least one region (a chart, overlay, wizard step, or report surface) stays light-styled, renders unreadable text, or loses its layout"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.17"
+name = "export_canvas_monospaced_previews"
+description = "The export canvas presents markdown, ICS, and trip JSON as monospaced previews with Download and Copy controls that read as part of the coastal planner chrome rather than a screenshot dead end"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "3.catchall"

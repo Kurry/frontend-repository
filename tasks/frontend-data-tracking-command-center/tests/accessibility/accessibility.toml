@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,150 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "keyboard_reaches_primary_controls"
+description = "Every interactive control — KPI tiles, agent rows and actions, checkboxes, feed items, filter chips, Undo/Redo, Export session, command palette, and form fields — is reachable and operable with the keyboard alone"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "visible_focus_indicators"
+description = "Keyboard focus shows a visible focus indicator on KPI tiles, agent rows, filter chips, header controls, and form fields"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "dialogs_trap_focus_and_escape"
+description = "Connect agent dialog, export drawer, and command palette trap focus while open, close on Escape, and return focus to the control that opened them"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "night_popover_escape_returns_focus"
+description = "The night-mode popover closes on Escape and returns focus to its badge"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+name = "validation_associated_with_fields"
+description = "Form validation messages for Connect agent and night schedule are associated with their fields so each message names the field it belongs to"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+name = "status_not_color_only"
+description = "Agent state chips and feed status chips carry visible text labels so status is never conveyed by color alone"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "aria_live_announces_mutations"
+description = "Connect, disconnect, bulk disconnect, export copy, and import completion are announced through an aria-live region as well as shown visually"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+name = "labels_on_form_controls"
+description = "Connect agent and night-schedule form controls have visible labels"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "checkbox_and_bulk_actions_labeled"
+description = "Agent selection checkboxes and Disconnect selected are labeled or named for assistive technology"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "export_tabs_are_keyboard_operable"
+description = "Session JSON and Agents CSV tabs and Copy/Download controls in the export drawer are keyboard operable"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
-name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+name = "keyboard_traps_without_escape"
+description = "A dialog, drawer, or palette traps keyboard focus with no Escape or close path"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n2"
-name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+name = "focus_not_visible"
+description = "Interactive controls show no visible focus indicator when reached by keyboard"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n3"
-name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+name = "status_color_only"
+description = "Agent or feed status is conveyed only by color with no text label"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+name = "dialogs_missing_modal_semantics"
+description = "Connect dialog, export drawer, or command palette lacks role dialog / aria-modal semantics while behaving as a modal"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "validation_not_associated"
+description = "Validation messages render as orphaned copy unassociated with Connect agent or night-schedule fields"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+name = "live_region_missing_for_mutations"
+description = "Connect, disconnect, export copy, or import completion has no aria-live announcement"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+name = "icon_only_controls_unlabeled"
+description = "Icon-only header controls (palette, export, undo) lack accessible names"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+name = "focus_lost_after_overlay_close"
+description = "Closing Connect, export, or palette leaves focus lost or on body with no return to the opener"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+name = "checkboxes_unreachable_by_keyboard"
+description = "Agent selection checkboxes cannot be toggled with the keyboard"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n10"
-name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+name = "export_drawer_not_keyboard_usable"
+description = "Export drawer format tabs or Copy/Download cannot be operated by keyboard alone"
 type = "binary"
 negate = true
 weight = 1.0

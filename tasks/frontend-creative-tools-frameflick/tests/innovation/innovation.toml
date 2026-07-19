@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -63,157 +63,123 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+name = "live_canvas_microinteraction_polish"
+description = "Beyond bare slider wiring, the live canvas composition feedback feels polished — for example coordinated hover lift on swatches/frames, a Moving image status badge with blue outline while dragging, and eased Copied! / validation transitions that read as intentional craft."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "device_frame_composition_craft"
+description = "Browser and Phone frame styles read as carefully composed mock chrome (traffic-light dots and screenshot.png address bar; phone bezel) rather than crude boxes around the screenshot."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+name = "empty_state_and_replace_guidance"
+description = "Upload empty-state and Replace image guidance feel finished and product-like, steering a first-time user from placeholder through first composition without dead ends."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+name = "preset_and_recent_workflow_polish"
+description = "Saved presets plus the Recent strip together form a delightful reuse workflow — named looks and per-image settings recall — beyond a minimal single-save list."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+name = "pointerless_reposition_affordances"
+description = "Arrow-key nudges, on-screen move buttons, and Reset position give a thoughtful alternative to drag for precise screenshot placement."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+name = "collaboration_merge_experience_polish"
+description = "The Collaboration scenario's offline queue, convergent Shared content, and explicit conflict choices (Use mine, Use theirs, Merge) feel like a polished concurrent-edit demo rather than a stub panel."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+name = "warm_brand_composition"
+description = "The amber-and-brown FrameFlick branding, cream workspace, and yellow pill CTAs read as a cohesive branded tool identity rather than a default admin template."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+name = "export_confidence_feedback"
+description = "Download PNG and Copy image give clear, confidence-building feedback (named download / Copied!) that elevates the export moment beyond a silent button."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+name = "custom_background_and_caption_craft"
+description = "Custom background picker/hex sync and caption position/size/color controls feel like intentional composition tools, not afterthought inputs."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+name = "competition_level_tool_feel"
+description = "Taken together, live canvas dressing, presets, Recent recall, and Collaboration merge present competition-level tool craft visible to a real user."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n1"
 name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+description = "The demo is purely barebones: canvas updates may work but hover lifts, list entry animations, Moving image drag feedback, and Copied! polish are all absent."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
+name = "experience_is_generic_template"
+description = "The UI reads as a generic unbranded form/template with none of FrameFlick's warm amber-brown identity or composition-tool character."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
+name = "no_polish_beyond_controls"
+description = "Controls exist but the product shows no polish in empty states, export feedback, or preset/Recent reuse moments."
 type = "binary"
 negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
-type = "binary"
-negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
+name = "interface_flat_static_no_craft"
+description = "The editor is flat and static — no hover lift on swatches/frames, no live composition feedback while dragging sliders or the screenshot, and no list/feedback transitions."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
-id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
+id = "11.11"
+name = "style_recipe_end_state_polish"
+description = "Beyond bare PNG download, the live Export preview plus Download/Copy/Import style JSON round-trip reads as a polished portable recipe workflow a real operator would trust."
 type = "binary"
-negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
-id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
+id = "11.12"
+name = "undo_before_after_craft"
+description = "Undo/Redo together with Before/After compare and Reset style feel like intentional non-destructive editing craft beyond minimum slider controls."
 type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
-type = "binary"
-negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
-description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the FrameFlick spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0

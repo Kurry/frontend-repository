@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,158 +62,158 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "For games, evaluate the start → play → pause → end → restart flow. Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "safe_reveal_flow_across_surfaces"
+description = "On the Player's turn with score and history panels visible: revealing a safe tile increases the You score by exactly the ore value shown, hands the turn banner to the Rival without a reload, and appends a history state whose History state snapshot shows the updated score with the Rival to move."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "mine_hit_flow_across_surfaces"
+description = "Revealing a mine drops the revealing side's score by 5 (never below 0), fills exactly one more Strike icon, passes the turn banner, and the newest history snapshot shows the increased strike count — all without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "match_completion_updates_log_and_stats"
+description = "Winning 2 rounds opens Match Complete with round-by-round scores and overall winner; without reload, Match log gains a top entry with matching playerName/difficulty/winner/round wins, and Stats for that difficulty increases matches played by exactly one."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "persistence_round_trip_flow"
+description = "After completing a match, toggling Sound, and setting playerName plus difficulty, a full page refresh restores Stats, Match log, Sound, playerName, and difficulty exactly as committed."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "undo_branch_apply_flow"
+description = "Reveal a tile, Undo, reveal a different tile to create a branch; select the earlier node and Apply Scenario Change restores the exact prior board, scores, strikes, and turn without reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "export_after_play_flow"
+description = "Finish a match, Export Match from Match Complete or Match log, and confirm the JSON contains that match's playerName, difficulty, winner, round wins, totals, rounds, and endedAt; Export Archive lists the same match in matches."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "save_resume_across_reload_flow"
+description = "Start a match, reveal at least one tile, Save Progress, fully reload, Resume Saved Match restores scores, strikes, turn, hints remaining, round wins, and visible board."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "import_round_trip_flow"
+description = "Export a finished match as single-match JSON, Import it, and confirm Match log shows an entry with the same playerName, difficulty, winner, round wins, totals, and endedAt."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "pause_resume_flow"
+description = "During a round, Pause freezes the board with a paused indicator and blocks reveals; Resume unfreezes and returns play exactly where it left off without reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "rematch_and_new_match_flow"
+description = "From Match Complete, Rematch restarts Round 1 at the same difficulty with scores and strikes at 0; New match returns to the setup screen where playerName and difficulty can be set again."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "primary_match_flows_unavailable"
+description = "Start match, Pause/Resume, Rematch, Export Match, or Save Progress/Resume Saved Match is missing or non-functional from the visible UI."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "match_log_entry_missing_or_duplicated"
+description = "Finishing a match fails to add a Match log entry, or produces a duplicate top entry for a single finished match."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "match_outcome_desyncs_across_surfaces"
+description = "After Match Complete, the overall winner or round scores disagree with the new Match log entry or Stats update without a reload intervening."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "view_switch_corrupts_round"
+description = "Opening Stats or Match log mid-round ends the round, resets scores, or corrupts the board state."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_match_log_ui_broken"
+description = "Before any match has finished, the Match log is a blank region with no friendly empty-state message."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "pause_leaks_rival_or_reveals"
+description = "While Paused, the Rival takes a turn or the board still accepts reveals, flags, or hints."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "export_flow_dead_ends"
+description = "Export Match or Export Archive leaves the player without a downloadable or copyable artifact after activation."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n8"
 name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+description = "Round Result or Match Complete overlays block continuing play with no Rematch, next-round, or New match exit."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "failed_import_lacks_feedback"
+description = "Importing malformed match JSON provides no visible rejection and may silently corrupt or clear the Match log."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "resume_requires_manual_reload_hack"
+description = "Restoring a saved match requires a manual workaround beyond Resume Saved Match, or resume is a dead end needing a hard reload."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "user_flows.catchall"
 name = "user_flows_catchall"
 description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true

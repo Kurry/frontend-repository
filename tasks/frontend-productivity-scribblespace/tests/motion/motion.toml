@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,90 +63,92 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "4.1"
 name = "hover_states_visible"
-description = "Hovering (without clicking) a toolbar button, a board tab, and a placed canvas object each produces a visible hover change distinct from the resting state."
+description = "Primary and secondary buttons, tool toggles, board tabs, and canvas objects each change appearance on pointer hover, distinct from resting and focus states — verified via computed style while hovering."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
 name = "pressed_scale_feedback"
-description = "Pressing and holding a primary button shows an immediate pressed response (a slight scale-down) before its action completes."
+description = "Buttons give an immediate pressed response (slight scale-down) on pointer-down before the triggered action completes — verified on the real UI control path."
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "4.3"
 name = "drag_lift_ghost_escape"
-description = "Dragging a placed object with the pointer shows a lift affordance and a dashed ghost outline at its origin while dragging, and pressing Escape mid-drag returns it to its starting position."
+description = "Dragging an object shows a lift affordance and a dashed ghost outline at its origin, and pressing Escape mid-drag returns the object to its starting position — verified through the real drag gesture."
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "4.4"
 name = "connect_preview_line_follows"
-description = "In connect mode, after clicking the first object a dashed preview line follows the cursor toward the second object before the connector is completed."
+description = "In connect mode a dashed preview line follows the cursor from the first picked object until the second object is clicked — verified through the real connect click sequence."
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "4.5"
 name = "focus_ring_distinct_from_hover"
-description = "Pressing Tab moves keyboard focus through the non-canvas controls with a clearly visible focus ring on each, distinct from the hover state."
+description = "Keyboard focus shows an accent outline on interactive chrome distinct from the hover treatment."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
 name = "hover_focus_inert"
-description = "Hovering or focusing interactive controls (buttons, tool toggles, board tabs, canvas objects) leaves them visually identical to their resting state, so the interface feels inert to pointer and keyboard."
+description = "Interactive chrome shows no visible hover or focus appearance change during normal pointer and keyboard use."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "4.8"
 name = "object_entrance_exit_animates"
-description = "A new object created through its real toolbar control animates in with a brief scale-and-fade entrance, and a deleted object animates out before disappearing rather than vanishing instantly."
+description = "A newly placed object animates in with a brief scale-and-fade entrance, and a deleted or archived object animates out before disappearing — verified through the real New Note / Delete or Archive controls, not a state shortcut."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
 name = "outline_rows_animate_moves"
-description = "In the Outline view, rows animate smoothly to their new positions when objects are added, removed, or restacked through the visible controls, rather than snapping."
+description = "Outline view rows animate smoothly to new positions when objects are added, removed, or restacked rather than snapping — verified through real create/delete on Outline."
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "4.10"
 name = "flip_transition_and_search_glow"
-description = "Activating a flashcard's Flip control plays a visible flip transition between Front and Back rather than an instant swap, and matching objects during a search show an animated-feeling outer glow."
+description = "Flipping a flashcard plays a visible flip transition rather than an instant swap, and search matches show an animated-feeling outer glow — verified through real Flip and search controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.11"
 name = "dialog_popover_fade_scale"
-description = "Modal dialogs (delete confirmation, export) and popovers (rename, shape menu) enter with a short fade-and-scale transition over a dimmed backdrop and exit the same way."
+description = "Delete confirmation, Export workspace, Import, Command palette, rename, and shape-menu overlays enter with a short fade-and-scale over a dimmed backdrop and exit the same way."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.12"
 name = "reduced_motion_instant_usable"
-description = "With prefers-reduced-motion set, entrance, flip, and list animations are removed and state changes apply instantly, while every feature stays fully usable."
+description = "With prefers-reduced-motion set, entrance, flip, and list animations are removed and state changes apply instantly while every feature stays fully usable — verified on a fresh load with the preference set."
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "copy_confirmation_autodismiss"
+description = "Copy in the Export workspace modal shows a brief copied confirmation that auto-dismisses."
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "4.catchall"
 name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or interaction feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, gesture, observed transition) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in motion or interaction feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

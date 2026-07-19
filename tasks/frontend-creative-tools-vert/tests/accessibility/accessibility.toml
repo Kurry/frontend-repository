@@ -62,86 +62,100 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "keyboard_operable_converter_controls"
+description = "Every interactive control — the drop zone, Add sample png/svg, Convert, Download, Remove, Clear queue, Cancel, Convert-to selectors, selection checkboxes, batch actions (Batch set format, Batch remove, Download all done), Undo/Redo, navbar links (Upload, Convert, Settings, About), theme toggle, catalog category cards, Settings fields including default Convert-to, preset Save/Apply/Delete, and Session export Copy/Download/Import — is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space), each showing a visible focus ring when focused."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "dropzone_enter_space_opens_picker"
+description = "Focusing the drop zone and pressing Enter or Space opens the local file picker exactly as a pointer click does."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "status_and_counts_aria_live"
+description = "Status changes are announced: the counts line and each status pill update via an aria-live region so conversion progress is announced without moving focus."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "category_aria_pressed"
+description = "The active catalog category card exposes its pressed state through aria-pressed as well as its accent ring."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+name = "settings_fields_explicitly_labeled"
+description = "Settings form controls (output quality, keep-metadata toggle, default Convert-to target, theme choice), preset save name field, and Session export import validation messages use explicit labels or associations naming the offending field."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+name = "headings_logical_order"
+description = "Headings follow a logical order with no skips across the workspace hero, queue, catalog, Settings, Session export, and About views."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "landmarks_present"
+description = "The app exposes semantic landmarks (for example nav for the pill navbar and main for the converter workspace) so assistive technology can navigate the tool."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+name = "contrast_light_and_dark"
+description = "Text and controls meet sufficient contrast against their surfaces in both the light and dark themes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "status_not_color_alone"
+description = "Each per-file status (Ready, Converting, Done, Failed, Unsupported) carries a text label and a glyph, never color alone."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion set, queue row enter/exit animations, batch-tray/preset transitions, Session export panel motion, and Convert/Settings/About view transitions are removed and state changes apply instantly while every convert-and-download flow remains completable."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "copy_and_import_announced_live"
+description = "Session export Copy confirmation and import validation errors are announced through an aria-live region as well as shown visually."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "dialog_focus_trap_batch_and_export"
+description = "Batch-remove confirmation and Session export use dialog semantics: focus moves in on open, stays trapped while open, and returns to the invoking control on close."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
-name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+name = "converter_controls_unreachable_by_keyboard"
+description = "A primary converter control (drop zone, Convert, Download, Remove, Clear queue, Convert-to selector, selection checkbox, batch action, Undo/Redo, navbar link, theme toggle, preset control, Session export control, or category card) cannot be reached or activated via keyboard alone."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n2"
-name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+name = "focus_indicators_missing"
+description = "Focused interactive controls (drop zone, buttons, selectors, checkboxes, batch actions, Undo/Redo, navbar items, Settings fields, or Session export controls) show no visible focus ring or the indicator is obscured."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,55 +163,55 @@ weight = 1.0
 [[criterion]]
 id = "1.n3"
 name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+description = "Primary interactive controls use non-semantic tags without button/role semantics or accessible names."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+name = "status_conveyed_by_color_only"
+description = "Per-file Ready/Converting/Done/Failed/Unsupported state is conveyed by color alone with no text label or glyph."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "full_flow_keyboard_incomplete"
+description = "The convert-and-download flow cannot be completed with keyboard alone to the same result as pointer (sample add → Convert → Download)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+name = "unreadable_contrast"
+description = "Hero, queue row, catalog card, batch tray, or Settings label text is unreadable due to poor contrast in light or dark theme."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+name = "status_changes_not_announced"
+description = "Conversion progress updates the counts line or status pills visually only, with no aria-live (or equivalent) announcement for assistive technology."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+name = "icons_missing_accessible_names"
+description = "Meaningful navbar, drop-zone, status, batch, or catalog icons that convey actions or status are missing alt text or an accessible name."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+name = "heading_order_skipped"
+description = "Workspace or Settings headings skip levels (for example jumping H1 to H3) or have no coherent order."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +219,15 @@ weight = 1.0
 [[criterion]]
 id = "1.n10"
 name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+description = "With prefers-reduced-motion set, queue row enter/exit, batch-tray reveal, Session export panel, or Convert/Settings/About view transitions still animate fully."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n11"
+name = "dialog_focus_not_trapped"
+description = "Batch-remove confirmation or Session export opens without moving focus in, trapping focus, or returning focus to the invoking control on close."
 type = "binary"
 negate = true
 weight = 1.0

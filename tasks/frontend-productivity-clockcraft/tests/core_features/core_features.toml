@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -133,7 +133,7 @@ weight = 1.0
 [[criterion]]
 id = "1.11"
 name = "1_11"
-description = "After creating an entry and performing a full page refresh, the saved entry, its category, its assigned tag, and the streak are restored exactly, and an entry deleted before the refresh does not reappear"
+description = "After creating an entry and performing a full page reload, the app returns to the empty seeded baseline — no entries, no tags, empty timeline and list states, and zero Today's minutes — rather than restoring the pre-reload session"
 type = "binary"
 weight = 1.0
 
@@ -312,10 +312,90 @@ weight = 1.0
 
 [[criterion]]
 id = "1.40"
-name = "persistence_multi_facet_round_trip"
-description = "Persistence round trip: after creating several entries with different categories, one custom tag assignment, and one deletion, a full page reload restores every facet coherently — the same entries, tags, stats, and streak reappear together, the deleted entry stays gone, and no facet reverts while others survive"
+name = "reload_resets_to_empty_baseline"
+description = "In-memory reload: after creating several entries with different categories, one custom tag assignment, and one deletion, a full page reload coherently resets every facet to the empty seeded baseline — no surviving mix of persisted and cleared facets"
 type = "binary"
 weight = 1.0
+
+
+[[criterion]]
+id = "1.41"
+name = "export_session_json_field_contract"
+description = "Opening Export session shows a Session JSON preview that is a single object with required keys schemaVersion (clockcraft.session.v1), exportedAt, tags, entries, and rollup (todayMinutes, meaningfulRatio, streakDays), and after adding a named entry the preview contains that entry's name, category, and durationMinutes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "export_timesheet_csv_contains_session_rows"
+description = "The Timesheet CSV export tab shows a header row exactly name,category,tag,durationMinutes,startTime,interruptionReason and one data row per current entry whose name and category match the session"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "export_copy_and_download_controls"
+description = "Each Export session format tab offers Copy (visible copied confirmation) and Download (triggers a real file download whose contents match the previewed text)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "import_session_json_round_trip"
+description = "After exporting Session JSON for a non-empty session, changing the collection, then Importing that Session JSON with confirmation, the list, timeline, tags, ratio, chart, and heat-map reconstruct the exported visible state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "interruption_reason_required_under_25m"
+description = "Stopping a live timer that has run for less than 25 minutes opens an interruption reason step requiring Internal or External; confirming writes that reason as a chip on the entry; cancelling leaves the timer running and adds no entry"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "bulk_set_category_updates_surfaces"
+description = "Selecting two entries via checkboxes and choosing Set category Meaningful updates both entries' chips in the list and timeline, recomputes the Meaningful ratio and today's Weekly overview segment, and clears the selection"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "streak_heatmap_updates_with_entries"
+description = "The streak heat-map shows at least the last 12 weeks of day cells; after logging an entry for today, today's cell fill intensity changes and hovering it surfaces a tooltip with the day and total minutes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "command_palette_opens_and_filters"
+description = "Pressing Cmd+K or Ctrl+K opens a command palette; activating a filter command such as Meaningful applies that category filter and highlights the Meaningful filter button"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "manual_form_enforces_field_contract_bounds"
+description = "Submitting the manual form with a name longer than 120 characters, durationMinutes above 1440, or a startTime that is not YYYY-MM-DDTHH:mm is rejected with an inline message naming the offending field and adds no entry"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n40"
+name = "export_omits_session_mutations"
+description = "After adding or editing entries, Export Session JSON or Timesheet CSV text omits those entries' names, categories, or durations, or Session JSON is missing a required field-contract key"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n41"
+name = "import_accepts_invalid_session_json"
+description = "Importing malformed Session JSON or JSON that fails the field contract still mutates the visible entries, tags, or stats"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.catchall"

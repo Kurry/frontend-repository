@@ -1,0 +1,170 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "layout_matches_anatomy"
+description = "The layout shows a left sidebar with the script library and bulk bar, a main area swapping between step editor with console below, Playground, Runs, Scheduled queue, and Export views via a toolbar switcher, and a Versions panel alongside the editor"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "active_step_border_and_pulse"
+description = "The active running step carries a 2 pixel solid brand-blue left border and a pulsing background while it runs"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "inline_step_controls_consistent"
+description = "Step type selectors and parameter fields render inline within each numbered step row using consistent compact controls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.4"
+name = "console_terminal_treatment"
+description = "The run console uses a near-black background with monospace text, pass lines in success green and fail lines in error red, and every offered theme keeps the pass/fail distinction legible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "clock_badge_small"
+description = "Scheduled scripts show a small clock icon badge of roughly 12 pixels on their sidebar entry"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "status_badges_distinct_everywhere"
+description = "Disabled steps render dimmed with a Disabled tag, and skipped, passed, and failed badges are visually distinct and consistent between the step list, console, timeline, and Runs view"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "diff_treatments_not_color_only"
+description = "Diff highlights use three distinct treatments for added, removed, and changed rows, each carrying an icon or label in addition to color"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "typography_hierarchy"
+description = "Typography shows a clear hierarchy: the app title larger than panel headings, which are larger than step rows and console text, consistent across views"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "spacing_rhythm"
+description = "Gaps between the sidebar, editor, console, and panels are visually regular with no crowded or orphaned regions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "control_state_treatments"
+description = "Buttons, inputs, selects, and toggles show distinct default, hover, focus (visible ring), disabled, and error treatments"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "single_icon_set"
+description = "One consistent icon set is used throughout the toolbar, library entries, step rows, and status badges"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n1"
+name = "status_colors_incoherent"
+description = "Status colors are inconsistent with the specified mappings — for example fail rendered green in one surface, or a console theme that erases the error color"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n2"
+name = "text_overlap_or_clipping"
+description = "At 1440px width, any heading, step row, console line, badge, or preview text overlaps another element or is clipped by its container"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n3"
+name = "default_unstyled_controls"
+description = "Form or button controls render with browser default styling where the spec styles them, or the editor reads as an unstyled wireframe rather than a designed surface"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "visual_design.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

@@ -155,6 +155,8 @@ Contract version: zto-webmcp-v1
 Modules:
 - browse-query-v1
 - command-session-v1
+- entity-collection-v1
+- artifact-transfer-v1
 
 Module specs:
 <module_spec id="browse-query-v1">
@@ -197,15 +199,65 @@ Module specs:
 }
 </module_spec>
 
+<module_spec id="entity-collection-v1">
+{
+  "id": "entity-collection-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Entity collection",
+  "purpose": "Carts, records, favorites, calendar events, list items, and local entities.",
+  "permitted_operations": ["create", "select", "update", "delete", "toggle", "quantity", "reorder"],
+  "binding_keys": {
+    "required_any_of": [["entity"], ["entity_operations"]],
+    "optional": ["entity_fields", "value_bounds", "visible_postconditions"]
+  },
+  "restrictions": [
+    "Closed entity and field enums only.",
+    "Bounded string and numeric values.",
+    "No generic state setter or arbitrary patch object.",
+    "Invokes the same domain command used by the visible control.",
+    "Delete requires explicit confirm=true.",
+    "Reorder only when gesture mechanics are not being evaluated."
+  ],
+  "tool_name_prefix": "entity"
+}
+</module_spec>
+
+<module_spec id="artifact-transfer-v1">
+{
+  "id": "artifact-transfer-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Artifact transfer",
+  "purpose": "Import, export, copy, print, and conversion workflows.",
+  "permitted_operations": ["import", "export", "copy", "print_preview", "convert"],
+  "binding_keys": {
+    "required_any_of": [["artifact_operations"]],
+    "optional": ["import_modes", "export_formats", "conversion_modes", "visible_postconditions"]
+  },
+  "restrictions": [
+    "No raw files, filesystem paths, blobs, base64, or artifact contents in WebMCP arguments or results.",
+    "File picker interaction, clipboard contents, and downloaded artifacts remain Playwright responsibilities."
+  ],
+  "tool_name_prefix": "artifact"
+}
+</module_spec>
+
 Bindings:
-- Destinations: hero; horizontal-media; helmet-grid; collabs; social-stream; footer; menu
+- Destinations: hero; horizontal-media; helmet-grid; race-calendar; collabs; social-stream; footer; menu; press-kit
 - Session operations: start; pause; restart
+- Entity: race
+- Entity operations: select; toggle; update
+- Entity fields: selected; status; circuit; date
+- Artifact operations: import; export; copy
+- Import modes: paste; file
+- Export formats: json; markdown; ics
 
 Mechanics exclusions:
 - Menu overlay open/close slide stays Playwright-observed
 - Horizontal-track and helmet-grid scroll-linked motion stays Playwright-observed
 - Social hover-to-play and placeholder fade stays Playwright-observed
 - WebGL / Rive rendering stays Playwright-observed
+- Clipboard contents and downloaded press-kit artifacts remain Playwright responsibilities
+- File-picker Import stays Playwright-only per artifact-transfer no-raw-file-contents restriction; webmcp may drive paste-mode Import confirm only
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

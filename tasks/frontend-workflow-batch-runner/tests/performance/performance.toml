@@ -1,0 +1,219 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "9.1"
+name = "cold_start_under_2s"
+description = "Cold start to interactive is under 2 seconds on local render, with the seeded sidebar and grid visible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.2"
+name = "console_clean"
+description = "Browser devtools show no errors or warnings on load or across launch, retry, pause, macro, reorder, compare, schedule, export, and undo flows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.3"
+name = "interactions_respond_fast"
+description = "Selecting jobs, opening the inspector, and toggling the comparison view respond in under 100 milliseconds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.4"
+name = "simulated_work_indicated"
+description = "Simulated inference shows activity indicators — spinners, countdowns, the progress bar — throughout the run"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.5"
+name = "large_grid_renders_smoothly"
+description = "The 200-plus-item grid scrolls and updates without perceived lag while the run is active"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.6"
+name = "ui_interactive_during_run"
+description = "The UI stays interactive during an active run — the inspector opens, the queue reorders, and jobs switch while items advance"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.7"
+name = "animations_hold_frame_rate"
+description = "Row settles, the progress bar, and macro flips hold a smooth frame rate with the large job running"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.8"
+name = "rapid_input_never_freezes"
+description = "Rapid macro clicks, quick job switches, and fast timeline filtering never hang or freeze the app"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.9"
+name = "extended_session_stable"
+description = "Running, retrying, and comparing across an extended session shows no runaway slowdown or memory growth symptoms"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.10"
+name = "long_work_degrades_gracefully"
+description = "Pausing or stopping mid-run leaves a responsive, coherent UI rather than a stuck busy state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.n1"
+name = "slow_local_load"
+description = "More than 2 seconds pass before the app is interactive on local render"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n2"
+name = "console_errors_present"
+description = "Errors or warnings appear in the console during the run and management flows"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n3"
+name = "transitions_block_or_lag"
+description = "View or inspector transitions block or visibly lag"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n4"
+name = "run_hangs_ui"
+description = "The simulated run hangs or freezes the UI"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n5"
+name = "large_job_kills_frame_rate"
+description = "The 200-item job drops the frame rate to visible jank during scrolling or updates"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n6"
+name = "input_unresponsive_during_animation"
+description = "Input becomes unresponsive while rows or macros animate"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n7"
+name = "rendering_blocked_by_loading"
+description = "The UI blocks rendering while seeded data initializes"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n8"
+name = "resource_runaway"
+description = "Memory or CPU visibly runs away across repeated launches"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n9"
+name = "blank_while_loading"
+description = "A blank screen shows while the app or a run initializes, with no loading affordance"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n10"
+name = "rapid_use_crashes"
+description = "Rapid or edge-case use crashes the app"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "performance.catchall"
+name = "performance_catchall"
+description = "The app exhibits a significant, browser-observable defect in performance or stability that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

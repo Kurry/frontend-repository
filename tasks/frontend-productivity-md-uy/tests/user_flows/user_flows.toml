@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,126 +62,126 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "edit_echo_reload_flow"
+description = "In Edit mode, type a distinctive new line into the source, switch to Preview and see that line rendered as HTML while the breadcrumb room id stays unchanged; reload restores the same room with source and preview showing the edited text."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "invalid_profile_or_join_inline_validation"
+description = "Submitting the profile dialog with empty/over-long displayName or non-#RRGGBB color, or submitting an invalid roomId in the join field, shows immediate inline validation naming the offending field and commits nothing."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "source_edit_updates_preview_and_package"
+description = "Editing the source updates Preview HTML and the Document package preview markdown field without a reload, while roomId and schemaVersion stay present."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "clear_source_shows_empty_placeholders"
+description = "Selecting all source text and deleting it leaves muted placeholders in source and preview and an empty markdown string in the Document package preview."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "mode_switch_retains_source_and_profile"
+description = "Switching through Edit, Preview, and Present keeps the same source text, room id, and profile chip without a full page reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "slide_count_delta_flow"
+description = "Appending a three-dash delimiter plus a new heading in Edit, then switching to Present, increases M in Slide N of M by exactly one; Next to the last slide shows the new heading and disables Next."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "artifact_export_import_round_trip"
+description = "After a distinctive source edit and a valid profile save, Download Markdown and the Document package preview contain those values with schemaVersion mduy-document-v1; Download package then Import package reconstructs the same source, theme, and profile chip."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "theme_toggle_echoes_package"
+description = "Toggling light/dark recolors the workspace and updates the Document package preview theme field to match without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "share_and_profile_overlays_flow"
+description = "Share and profile dialogs open, accept interaction (sync toggle or valid profile save), and close without trapping the workspace; profile save updates the chip."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "deep_link_parity_without_dead_end"
+description = "Opening the room URL path in a fresh tab renders the same workspace as in-app navigation; invalid join attempts stay on the current room with named validation rather than a dead end requiring reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "primary_edit_export_flows_unavailable"
+description = "Source editing, Download Markdown, Document package export/import, or mode switching are not reachable from the UI."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "export_missing_session_edits"
+description = "After a distinctive source edit and profile save, Download Markdown or Document package omits those session values."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "preview_or_package_desync_from_source"
+description = "Source edits leave Preview HTML or the Document package markdown field stale until a full page reload."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "mode_switch_loses_source_or_profile"
+description = "Switching Edit/Preview/Present loses source text, room id, or the profile chip selection."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_document_breaks_ui"
+description = "Clearing the document produces a broken layout, missing placeholders, or a crashed package preview."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "import_round_trip_diverges"
+description = "Exporting then importing a contract-valid Document package leaves source, theme, or profile different from the exported values."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "theme_package_mismatch"
+description = "The theme toggle state and the Document package theme field disagree after a toggle."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,15 +189,15 @@ weight = 1.0
 [[criterion]]
 id = "6.n8"
 name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+description = "Share or profile overlays block the workspace with no Escape or close path."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "failed_validation_lacks_feedback"
+description = "A failed profile save, join, or Import package provides no named field feedback."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n10"
 name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+description = "An invalid join or failed import leaves the UI in a dead end that requires a full reload to recover."
 type = "binary"
 negate = true
 weight = 1.0

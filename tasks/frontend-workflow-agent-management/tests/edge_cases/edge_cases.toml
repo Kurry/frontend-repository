@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,86 +62,100 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_registry_or_filter_empty_state"
+description = "Removing the last agent or applying a status filter with zero matches shows a designed empty state in the table region rather than a bare table; zero-match filter empty state names the filter and offers clear-filter"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "field_contract_inline_validation"
+description = "Name length 1 or 41, duplicate name ignoring case, access key length 15 or 65, or access key with a space shows an inline error naming the field before submit and adds no row"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "errors_name_field_and_rule"
+description = "Validation and import errors name the field and the rule broken (for example access key must be 16 to 64 characters) rather than only saying Invalid"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "toasts_after_mutations_and_export"
+description = "Register, remove, bulk actions, export copy, and import show visible confirmation feedback that auto-dismisses"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "run_steps_show_progress_feedback"
+description = "While a simulated run is active, step statuses and the n of m progress indicator provide continuous visible progress feedback"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "remove_confirm_and_undo"
+description = "Remove requires an explicit confirm step, and Undo is available afterward to restore the removed agent"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "cancel_and_double_submit_safe"
+description = "Cancel on register/edit leaves the registry unchanged; double-activating submit creates exactly one agent"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "import_rejects_malformed_contract"
+description = "Importing malformed fleet JSON or a document that violates the field contract shows an inline import error, leaves row count and names unchanged, and does not clear undo history as a successful import"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "empty_undo_redo_disabled"
+description = "Undo with an empty history leaves the registry unchanged and stays disabled; Redo with an empty forward stack stays disabled"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "palette_escape_no_mutation"
+description = "Opening the command palette and pressing Escape closes it without adding or removing an agent"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "4.11"
+name = "pause_all_idle_selection_noop"
+description = "Pause All with only idle or offline agents selected leaves statuses unchanged and introduces no inconsistent badges"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.12"
+name = "export_empty_agents_compiles"
+description = "With an empty registry, Export fleet still compiles JSON with an empty agents array and zeroed rollup counts without errors"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_collection_no_feedback"
+description = "An empty registry or zero-match filter shows nothing and provides no empty-state UI feedback"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "errors_only_in_console"
+description = "Field-contract or import failures surface only in the browser console with no inline UI message"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,63 +163,47 @@ weight = 1.0
 [[criterion]]
 id = "4.n3"
 name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+description = "Register, remove, export copy, or import succeed or fail silently with no visible confirmation or error"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "remove_lacks_confirm"
+description = "Remove deletes an agent immediately with no confirmation step"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "invalid_payload_creates_agent"
+description = "A payload that breaks the name, enum, or access-key field contract still creates a registry row"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "modal_not_escape_dismissible"
+description = "The register modal, export drawer, import surface, or command palette cannot be dismissed via Escape"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "import_mutates_on_invalid"
+description = "An invalid import changes the registry row count or agent names"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "selection_stale_after_remove"
+description = "Removing a checkbox-selected agent leaves it in the selection or leaves bulk controls enabled with an empty selection"
 type = "binary"
 negate = true
 weight = 1.0

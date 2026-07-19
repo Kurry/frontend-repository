@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -140,7 +140,7 @@ weight = 1.0
 [[criterion]]
 id = "1.12"
 name = "book_cta_reachable_no_navigation"
-description = "On load, a \"Book your Studio\" CTA is present in the header/sidebar and reachable within two clicks, and activating chrome (nav items, Book CTAs, footer links, social icons, or the \"English\" control) either scrolls within this homepage or performs a no-op — never navigating to another route, opening an external origin, or reaching a 404"
+description = "On load, a \"Book your Studio\" CTA is present in the header/sidebar and reachable within two clicks; activating it opens the booking inquiry overlay on this homepage, and other chrome (nav items, footer links, social icons, or the \"English\" control) either scrolls within this homepage or performs a no-op — never navigating to another route, opening an external origin, or reaching a 404"
 type = "binary"
 weight = 1.0
 
@@ -186,7 +186,7 @@ optional = true
 [[criterion]]
 id = "1.24"
 name = "pricing_tiers_wrong_or_missing"
-description = "The pricing tiers are missing or do not read 640€, 690€, and 740€ per month for the Kick, Boost, and Flex Studios"
+description = "The pricing list is absent, or the visible tiers read values other than Kick Studio 640€/μήνα, Boost Studio 690€/μήνα, and Flex Studio 740€/μήνα"
 type = "binary"
 weight = 1.0
 negate = true
@@ -194,7 +194,7 @@ negate = true
 [[criterion]]
 id = "1.25"
 name = "chrome_link_navigates_away"
-description = "Clicking a homepage chrome link (nav item, the \"English\" control, Book CTA, footer link, or social icon) navigates off the homepage, opens an external origin, or reaches an application-error or Not-found page"
+description = "Clicking a homepage chrome link (nav item, the \"English\" control, Book CTA, footer link, or social icon) navigates off the homepage, opens an external origin, or reaches an application-error or Not-found page (Book CTA must open the in-page inquiry overlay, not leave the document)"
 type = "binary"
 weight = 1.0
 negate = true
@@ -251,7 +251,7 @@ weight = 0.5
 [[criterion]]
 id = "1.33"
 name = "single_page_chrome_stays_on_homepage"
-description = "After clicking numbered nav items, a Book CTA, a footer link, a social icon, and the \"English\" control in sequence, the document remains on the homepage root with no route change, no external-origin navigation, and no application-error or Not-found page"
+description = "After clicking numbered nav items, opening Book your Studio (inquiry overlay), a footer link, a social icon, and the \"English\" control in sequence, the document remains on the homepage root with no route change, no external-origin navigation, and no application-error or Not-found page"
 type = "binary"
 weight = 1.0
 
@@ -268,6 +268,93 @@ name = "arrows_header_bands_headings_present"
 description = "The blue arrows-header band displays the heading \"Αυτό που μας καθορίζει\" between yellow arrow groups, and the orange arrows-header band (background rgb(255, 92, 56)) presents a \"Book your Studio\" band CTA between blue arrow groups"
 type = "binary"
 weight = 0.5
+
+[[criterion]]
+id = "1.36"
+name = "studio_shortlist_toggle_and_estimate"
+description = "On the typical-studio section, toggling Kick then Boost onto the shortlist raises the shortlist badge count to 2, lists Kick Studio 640€/μήνα and Boost Studio 690€/μήνα in the shortlist drawer, and shows Monthly estimate 1330€"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "shortlist_undo_redo_round_trip"
+description = "After adding Kick then Boost to the shortlist, Undo once removes Boost (count and Monthly estimate drop by 690 while Kick remains); Redo restores Boost and 1330€ — verified via the real Undo/Redo controls without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "booking_inquiry_opens_from_book_cta"
+description = "Activating a Book your Studio control opens the booking inquiry overlay titled Book your Studio with fields for full name, email, phone, studio tier, move-in month, message, and the privacy consent checkbox Συμφωνώ με την Πολιτική Απορρήτου"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "valid_inquiry_reveals_export_controls"
+description = "Submitting a create-inquiry body that satisfies the field contract (full_name ≥2 trimmed chars, valid email, phone with ≥10 digits, studio_tier Kick/Boost/Flex, move_in_month YYYY-MM current-or-future, message ≤500 when present, privacy_consent true) shows Inquiry ready — export your packet and reveals Export JSON, Export Markdown, and Copy packet controls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "export_packet_reflects_session_mutations"
+description = "After shortlisting Flex and submitting an inquiry with a distinctive full name, Export JSON produces a packet with inquiry.full_name matching that name, inquiry.studio_tier Flex, inquiry.privacy_consent true, a shortlist entry for Flex with monthly_rent_eur 740, and monthly_estimate_eur equal to the shortlist rent sum — not a static payload that ignores the session"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "faq_three_seeded_accordions"
+description = "The FAQ block lists exactly three seeded questions Τι περιλαμβάνει το ενοίκιο;, Πότε μπορώ να κλείσω studio;, and Πώς επικοινωνώ με τη Noma;, and opening one expands its answer while collapsing any other open item"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "command_palette_opens_and_navigates"
+description = "Pressing Cmd+K or Ctrl+K opens the command palette; choosing typical-unit scrolls to the typical-studio section and closes the palette"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "inquiry_field_contract_rejects_invalid"
+description = "Submitting the booking inquiry with a malformed email (for example not-an-email), a phone with fewer than ten digits, or move_in_month not in YYYY-MM keeps the overlay open, shows an inline error naming the offending field, and never reveals Inquiry ready — export your packet or export controls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "export_json_conforms_to_inquiry_schema"
+description = "After a valid submit, the Export JSON text is a top-level object with inquiry (full_name, email, phone, studio_tier, move_in_month, message, privacy_consent, submitted), shortlist (tier + monthly_rent_eur pairs), and monthly_estimate_eur; studio_tier and each shortlist.tier are exactly Kick, Boost, or Flex"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n36"
+name = "export_omits_session_shortlist_or_inquiry"
+description = "After mutating the shortlist or inquiry fields, an Export JSON/Markdown packet omits those session values, invents keys outside the create-inquiry contract, or stays identical across two different sessions"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n37"
+name = "shortlist_estimate_static_or_desynced"
+description = "After toggling studios on or off, the shortlist badge count, drawer rows, and Monthly estimate disagree with each other or the Monthly estimate stays fixed regardless of selection"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n38"
+name = "invalid_formats_accepted_as_valid_inquiry"
+description = "A booking inquiry submit succeeds (shows Inquiry ready — export your packet or reveals export controls) when email is malformed, phone has fewer than ten digits, move_in_month is not YYYY-MM, or privacy_consent is unchecked"
+type = "binary"
+negate = true
+weight = 1.0
 
 [[criterion]]
 id = "core_features.catchall"

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,78 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_triggered_and_audit_states"
+description = "Before any decision, when the audit verdict filter matches nothing, and when every triggered submission has been decided, the respective region shows an explanatory empty state rather than a blank area"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "decision_form_validates_inline"
+description = "Submitting the decision form with no verdict, a rationale under 20 characters, or a rationale over 2000 characters shows inline messages naming the invalid fields before any state change"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "validation_errors_name_field_and_rule"
+description = "Decision and import validation messages name the offending field and the rule (for example rationale minimum length or schemaVersion) rather than only saying Invalid"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "decision_and_copy_show_confirmation"
+description = "Submitting a valid decision and copying an export each show visible confirmation feedback such as a toast"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "double_submit_records_one_decision"
+description = "Rapidly double-activating the decision submit control records exactly one decision: the timeline gains exactly one entry and rollup counts shift once"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "cancel_leaves_decision_unchanged"
+description = "Cancelling the decision form leaves the submission state and audit timeline unchanged"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "threshold_extremes_track_rollup"
+description = "Dragging the threshold to 0.95 triggers only scores at or above 0.95, and to 0.50 triggers every undecided score at or above 0.50; the rollup strip tracks both extremes"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "pair_stepping_end_guards"
+description = "Previous stays disabled on the first matched pair and Next on the last, and the position label never leaves the valid range"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "export_empty_decisions_still_schema_valid"
+description = "Opening Export with no decisions yet still produces schema-valid Review report JSON with schemaVersion leak-review.report.v1, the current threshold, an empty decisions array, submissions covering the seeded queue, and rollup counts matching the strip"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "invalid_import_rejects_field_contract"
+description = "Importing malformed JSON or a payload that breaks the Review report field contract leaves queue chips, threshold, audit timeline, and mutation toggles unchanged and shows validation naming the offending field or payload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
 name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+description = "An empty triggered filter or empty audit timeline shows nothing and provides no UI feedback"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n2"
 name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+description = "Decision or import validation errors are surfaced only in the browser console"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,15 +149,15 @@ weight = 1.0
 [[criterion]]
 id = "4.n3"
 name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+description = "Valid decision submit or export copy lacks visible confirmation feedback"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "invalid_import_applies_partial_state"
+description = "An invalid Review report import still partially applies threshold, decisions, or mutation toggles"
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,15 +165,15 @@ weight = 1.0
 [[criterion]]
 id = "4.n5"
 name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+description = "Queue rows, filters, decision controls, or Export/Import controls are only non-semantic div or span shells with no operable role"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "export_panel_not_dismissible"
+description = "The Export panel cannot be dismissed via an obvious close path or keyboard"
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +181,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n7"
 name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+description = "Decision form validation feedback is missing or delayed with no UI indication"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,23 +189,23 @@ weight = 1.0
 [[criterion]]
 id = "4.n8"
 name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+description = "Primary decision, Export, or Import controls have ambiguous or missing labels"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "pair_stepping_allows_out_of_range"
+description = "Matched-pair Previous/Next allows stepping past the first or last pair so the position label leaves the valid range"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "threshold_extremes_break_rollup"
+description = "At threshold 0.50 or 0.95 the rollup strip disagrees with the visible triggered rows"
 type = "binary"
 negate = true
 weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "1.2"
 name = "create_once_daily_habit"
-description = "After creating a habit with a name, an emoji icon from the fixed palette, and the Once a day target, it appears in the list with its chosen icon and a one-tap complete control"
+description = "After creating a habit with a valid field-contract payload — trimmed name at most 80 characters, an emoji icon from the fixed palette, targetType once with targetCount exactly 1 — it appears in the list with its chosen icon and a one-tap complete control"
 type = "binary"
 weight = 1.0
 
@@ -282,16 +282,52 @@ weight = 1.0
 [[criterion]]
 id = "1.41"
 name = "invalid_target_count_inline_error"
-description = "Submitting the New Habit form with an invalid numeric daily count (e.g. empty or non-numeric with the numeric target selected) shows an inline error message naming that target field before submit completes, and no phantom habit is added to the list"
+description = "Submitting the New Habit form with an invalid targetCount under the field contract (empty, non-integer, outside 1–100, or once with targetCount not equal to 1) shows an inline error message naming the targetCount field before submit completes, and no phantom habit is added to the list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.42"
 name = "flame_treatment_matches_streak_tier"
-description = "With habits whose current streaks fall below 7 days, between 7 and 29 days, and at 30 or more days (set up via the import path or real history), each habit's flame renders the treatment matching its tier — plain, bright, and gold respectively — not the same treatment for all three"
+description = "With habits whose current streaks fall below 7 days, between 7 and 29 days, and at 30 or more days (set up via a field-contract-valid import path or real history), each habit's flame renders the treatment matching its tier — plain, bright, and gold respectively — not the same treatment for all three"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "workspace_json_api_shaped_field_contract"
+description = "Export as JSON produces a single Workspace JSON object whose downloaded contents include the required field-contract keys schemaVersion exactly loopdaily.workspace.v1, exportedAt, habits, categories, and activeCategoryFilter, with each habit showing name, icon, targetType (once|count), targetCount, categoryId, reminder, paused, completions, order, and createdAt"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "export_contains_session_habit_mutations"
+description = "After creating a habit with a distinctive name, assigning a category, and recording a check-in, Export as JSON's Workspace JSON contains that habit's name, categoryId, and today's completion entry — export content that omits the session's actual mutations is a failure"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "import_rejects_field_contract_failures"
+description = "Importing parseable JSON that fails the Workspace JSON field contract — wrong schemaVersion, missing habits or categories, targetType outside once|count, targetCount outside 1–100 or mismatched with once, icon outside the fixed palette, completion keys not YYYY-MM-DD, unresolved categoryId, or over-length name — leaves habits, categories, Stats, and history unchanged and shows validation naming the offending field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "artifact_export_import_round_trip"
+description = "Artifact end state: create a habit with a distinctive name, category, and numeric target, record at least one check-in, Export as JSON, then Import that same Workspace JSON after confirmation — the list, category chips, check-in state, and Stats numbers reconstruct the exported session"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "import_mutates_on_invalid_contract"
+description = "Import accepts a parseable JSON document that violates the Workspace JSON field contract (wrong schemaVersion, missing required keys, illegal enums, or unresolved categoryId) and still replaces the current habits or categories"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.catchall"

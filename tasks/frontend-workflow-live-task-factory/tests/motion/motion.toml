@@ -1,0 +1,141 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "8.1"
+name = "hover_system_present"
+description = "Verified through real pointer hovering with computed styles inspected while hovering: buttons ease background and shadow with a slight press effect, repo entries, PR rows, triage cards, and library rows take a full-width hover wash, and form controls show focus rings"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.2"
+name = "streaming_affordance_active_then_stops"
+description = "While the Evaluate or Generate stage streams (driven by the real Run pipeline control), an active streaming affordance such as a pulsing cursor or indicator is visible alongside the incrementally appearing text, and it stops when the stage completes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.3"
+name = "stage_transitions_and_countdown_tick"
+description = "Stage status changes animate through the real run path: the running indicator shows continuous activity, a completing stage's status transitions with a short fade rather than snapping, and the rate-limit reset countdown on driftline PR 58 visibly ticks down second by second"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.4"
+name = "triage_cards_animate_between_columns"
+description = "Accepting or rejecting through the real triage controls moves the card between columns with a short transition rather than teleporting, and activating Undo animates the card back to its previous column"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.5"
+name = "list_changes_animate"
+description = "List mutations use a brief enter or exit transition through the real controls: PR rows appearing when the next page loads, a new library entry appearing after a run completes, and filter chips appearing and clearing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.6"
+name = "palette_and_slideover_transitions"
+description = "The command palette (opened with the real Cmd+K or Ctrl+K keystroke) and the Connections slide-over open with a short opacity and translate transition of roughly 150 to 250 milliseconds and close the same way rather than snapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.7"
+name = "toasts_slide_and_auto_dismiss"
+description = "Toasts for copied confirmations, undo, and run completion slide in, remain readable, and auto-dismiss with a fade"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.8"
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion set, streamed text still appears but transitions apply instantly and nothing pulses or slides, while all functionality remains available"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.n1"
+name = "animation_causes_jank_or_flicker"
+description = "Streaming text, card moves, or list transitions visibly shift surrounding layout, flicker, or leave elements misplaced after settling"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "8.n2"
+name = "transitions_block_interaction"
+description = "While a transition plays — a card move, the palette opening, or a stage status change — clicks or key presses are dropped or the UI freezes until the animation ends"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "8.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant motion or microinteraction defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

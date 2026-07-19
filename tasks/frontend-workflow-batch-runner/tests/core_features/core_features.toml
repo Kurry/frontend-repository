@@ -1,0 +1,318 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_jobs_and_sidebar"
+description = "On load, the left sidebar lists at least 3 seeded jobs — at least 2 completed jobs with at least 30 rows each and 1 Ready job with at least 200 rows — and each entry shows the job name, created date, row count, and current status"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "composer_fields_complete"
+description = "Clicking New Job opens a modal with a job name field, a prompt template selector offering at least 5 seeded templates, a model selector offering exactly the 4 seeded models (atlas-40b, lyra-8b, quasar-mini, helix-2) each shown with its per-1,000-token rate, and a concurrency limit control accepting 1 through 5 with a default of 3"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "dataset_preview_and_count"
+description = "In the composer, both picking a seeded dataset slice and pasting JSON-array or CSV text render a preview table with columns mapped from the detected fields and a row count badge matching the number of detected rows; a dataset with an expected-output field is noted as including expected outputs"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "composer_validation_gating"
+description = "The composer's Submit control stays disabled until name, prompt template, and model are valid and at least one dataset row is detected; submitting with zero rows shows an inline message naming the dataset field and creates no job, and pasting malformed JSON or CSV shows an inline parse error and commits no rows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "valid_submit_creates_job"
+description = "Submitting a valid composer form closes the modal, adds exactly one job to the sidebar in a Ready state, and increases the visible job count by exactly one"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "execution_grid_columns"
+description = "Launching a Ready job renders a per-item execution grid with one row per dataset row showing row index, input summary (first 60 characters), status, attempt count, latency in milliseconds, and accumulated item cost"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "status_progression_visible"
+description = "Item statuses advance visibly through pending, running, and complete or failed during a real launch, and a retrying item shows a retrying status with its attempt counter"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "concurrency_guard_enforced"
+description = "At no moment do more items than the job's configured concurrency limit show the running state, and the concurrency guard strip shows the live running count against the limit and takes an amber treatment while saturated"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "deterministic_failures_backoff"
+description = "A subset of items fails on first attempt with a visible backoff countdown and attempt counter (such as waiting before retry 2 of 3), and relaunching the same job configuration fails the same items"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "exhausted_retry_failed_state"
+description = "An item that exhausts its retries is marked failed with an inline error summary, while items that succeed record a simulated output, latency, and cost visible in the grid and inspector"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "virtualized_grid_scale"
+description = "The seeded 200-plus-item job's grid scrolls smoothly during an active run, with rows rendering as they enter the viewport and no perceptible lag or blank stalls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "progress_bar_live_fraction"
+description = "A full-width progress bar above the grid fills proportionally as items complete and its fraction label (for example 42 of 200) updates live and matches the grid's completed count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "pause_resume_checkpoint"
+description = "Pausing a running job stops new items from starting and freezes progression at a checkpoint; resuming continues from exactly that checkpoint, and items completed before the pause keep their outputs, timestamps, and costs unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "retry_failed_only"
+description = "The Retry failed items control re-queues only the failed items of the selected run — completed items keep their original outputs and timestamps and never re-execute — and the control is disabled or explains itself when no failures exist"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "optimistic_macros_reconcile"
+description = "Start All, Pause All, and Stop All flip item statuses immediately across the grid, show a brief reconciling indicator on affected rows that settles into confirmed states, and Stop All marks pending and running items stopped without discarding completed outputs"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "queue_reorder_drag_and_keyboard"
+description = "The pending-queue panel lists not-yet-started items in launch order, entries reorder by real drag and by keyboard-operable move up and move down controls, and after moving an item ahead it enters the running state before the items it passed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "rollups_derive_live"
+description = "The rollup strip shows completed count out of total, failure rate percentage, estimated time remaining, and accumulated simulated cost, all updating as items advance; pausing freezes the estimated-remaining value until resume"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "inspector_full_content"
+description = "Clicking an item row opens an inspector with the full input text, the full simulated output, and an attempts log listing each attempt with timestamp and outcome"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "inspector_expected_diff"
+description = "For an item whose dataset row includes an expected output, the inspector shows a comparison marking matching and differing segments between expected and actual output with distinct treatments not carried by color alone, plus a match or mismatch badge"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "run_history_and_timeline"
+description = "Each job's run history lists runs with start timestamp and outcome counts, selecting a history entry loads that run's grid, rollups, and timeline, and the event timeline lists ordered status transitions with timestamps, filters by status, and highlights the corresponding grid row when an entry is selected"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "run_comparison_flips"
+description = "The Compare runs view shows two selected runs of the same job side by side with one row per item, flags exactly the items whose outcomes differ with a distinct flip marker, and shows a summary count of flips that matches the flagged rows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "schedule_form_and_badge"
+description = "The Schedule form requires a window start and end time, rejects a missing time or an end not after the start with inline messages naming the field, and saving shows a schedule badge with the window on the job's sidebar entry that disappears when the schedule is removed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "simulate_window_start"
+description = "Activating Simulate window start launches each scheduled Ready job as if its window began — the job's grid begins advancing without any further manual launch"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "ics_calendar_text"
+description = "Copy schedule as calendar text opens a monospaced block containing an ICS-format calendar (BEGIN:VCALENDAR with one VEVENT per scheduled job carrying its name and window times) and its copy control gives visible confirmation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "export_report_complete"
+description = "Download JSON and Download CSV export the selected run with the job configuration (name, prompt template, model, concurrency), per-item outcomes (status, attempts, latency, cost, output), the rollup values, and the event timeline"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "undo_redo_scope"
+description = "Toolbar Undo and Redo apply to job creation, edits, deletion, queue reorders, and schedule changes, are disabled when there is nothing to undo or redo, and undoing a job deletion restores the job with its run history while redo removes it again"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "delete_confirm_and_empty_state"
+description = "A job's Delete action opens a confirmation dialog; confirming removes the job and its runs and canceling leaves it intact, and deleting the selected job clears the main panel to an empty state with a message and a control to select or create a job"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "double_activation_guards"
+description = "Rapidly double-activating Launch starts exactly one run (one grid fill, one new history entry), and rapidly double-activating the composer's Submit creates exactly one job"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "input_truncation"
+description = "An input longer than 60 characters is truncated with an ellipsis in the grid row and shown in full in the inspector"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.30"
+name = "api_shaped_field_validation"
+description = "The composer enforces the job payload shape per field: a name longer than 80 characters is rejected with a message naming the 80 character limit, a concurrency value outside 1 through 5 is rejected inline, and a pasted dataset row missing the required input field is listed by row number in the dataset error"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "export_schema_conformance"
+description = "The downloaded JSON report conforms to the job payload shape: its configuration object carries exactly the name, prompt template, model, concurrency, and schedule fields, and every item entry carries index, input, output, status, attempts, latency, and cost with status drawn from the closed set pending, running, complete, failed, retrying, stopped"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n1"
+name = "rollup_desyncs_from_grid"
+description = "The rollup strip disagrees with the visible grid — its completed count, failure rate, or cost total does not match the statuses and costs the grid rows show at the same moment"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n2"
+name = "retry_restarts_completed_items"
+description = "Activating Retry failed items, resume, or a relaunch guard re-executes items that had already completed — their outputs, timestamps, or costs change"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n3"
+name = "export_omits_session_mutations"
+description = "An exported report reflects stale pre-mutation outcomes — items retried, stopped, paused, or reordered in this session appear in the export with statuses or values different from what the grid and rollups currently show"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n4"
+name = "fabricated_run_completion"
+description = "A launch presents a completed state while the grid statuses, run history, or rollups remain unchanged from before the run"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "core_features.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

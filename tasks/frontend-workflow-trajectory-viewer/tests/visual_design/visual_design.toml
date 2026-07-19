@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "3.2"
 name = "type_roles_and_hierarchy"
-description = "A monospaced face is used for code, terminal output, file paths, and step indices while a UI sans is used elsewhere, and page titles are visibly larger than section headings, which are larger than body and label text, consistently across views"
+description = "A monospaced face is used for code, terminal output, file paths, step indices, and the export preview while a UI sans is used elsewhere, and page titles are visibly larger than section headings, which are larger than body and label text, consistently across views"
 type = "binary"
 weight = 1.0
 
@@ -91,7 +91,7 @@ weight = 1.0
 [[criterion]]
 id = "3.6"
 name = "dense_register_icons_states"
-description = "The trial table, timeline, and file tree use compact dense rows with cards and panels carrying subtle shadows and hairline borders rather than heavy outlines, one consistent icon set is used across the chrome, and the ingest checklist, the empty terminal state, and the empty annotations state are each deliberately designed surfaces with explanatory copy rather than blank regions"
+description = "The trial table, timeline, and file tree use compact dense rows with cards and panels carrying subtle shadows and hairline borders rather than heavy outlines, one consistent icon set is used across the chrome, and the ingest checklist, empty terminal, empty annotations, and empty filtered timeline states are each deliberately designed surfaces with explanatory copy rather than blank regions"
 type = "binary"
 weight = 1.0
 
@@ -113,7 +113,7 @@ negate = true
 [[criterion]]
 id = "3.9"
 name = "copy_conventions_specific_labels"
-description = "Headings, buttons, and labels follow one consistent capitalization convention throughout, and action labels are specific verbs (Add note, Classify failure) rather than generic labels where a specific one is possible"
+description = "Headings, buttons, and labels follow one consistent capitalization convention throughout, and action labels are specific verbs (Add note, Classify failure, Copy export, Import review package) rather than generic labels where a specific one is possible"
 type = "binary"
 weight = 0.5
 
@@ -124,6 +124,13 @@ description = "Lorem ipsum, 'TODO', template variable names, real product or mod
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "3.11"
+name = "export_and_palette_first_class"
+description = "The Export panel shows a monospaced preview with clear format tabs, and the command palette is a centered overlay with a distinct search field and ranked results, reading as first-class surfaces rather than afterthought dialogs"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "3.catchall"

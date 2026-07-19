@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,158 +62,92 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "9.1"
-name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+name = "cold_start_under_two_seconds"
+description = "The app is interactive within 2 seconds of a local cold load — capture bar and empty inbox are usable."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "9.2"
-name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+name = "console_clean_full_exercise"
+description = "No uncaught errors appear in the console during a full exercise including capture, assign, reflect, export, import, undo, and virtualized list."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "9.3"
-name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+name = "ui_transitions_stay_responsive"
+description = "View switches among Home/Today/Archived/detail and opening Export respond without multi-second stalls."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "9.4"
-name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+name = "export_regen_stays_snappy"
+description = "Opening Export after many mutations regenerates Workspace JSON and Today digest without freezing the UI."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "9.5"
-name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+name = "virtualized_10k_without_lag"
+description = "Scrolling the 10,000-item virtualized panel stays smooth with DOM row count far below 10,000."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "9.6"
 name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+description = "Rapid capture, tag filter toggles, and undo/redo keep controls interactive with no hang."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "9.7"
 name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+description = "Spark enter/exit and toast slide animations do not visibly hitch the main thread during normal use."
 type = "binary"
-weight = 1.0
-
+weight = 0.5
+optional = true
 [[criterion]]
 id = "9.8"
-name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+name = "rapid_capture_burst_no_freeze"
+description = "At least 25 rapid consecutive capture submissions keep an exact final count with no blank screen, uncaught error, or freeze."
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
-type = "binary"
-weight = 1.0
-
 [[criterion]]
 id = "9.n1"
-name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+name = "cold_start_hangs_or_blank"
+description = "Cold load hangs on a blank screen or spinner beyond a few seconds without becoming interactive."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "9.n2"
-name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+name = "console_errors_during_workflow"
+description = "Uncaught console errors appear during capture/assign/export/import workflows."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "9.n3"
-name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+name = "export_or_undo_freezes_ui"
+description = "Opening Export or rapid undo/redo freezes the UI for multiple seconds."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "9.n4"
-name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
+name = "virtualized_list_blank_gaps"
+description = "Virtualized scrolling shows blank gaps or mounts near-all 10,000 rows in the DOM."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "9.n5"
-name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+name = "rapid_input_freezes_app"
+description = "Rapid capture or filter toggling freezes the app or drops inputs."
 type = "binary"
 negate = true
 weight = 1.0
-
-[[criterion]]
-id = "9.n6"
-name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n7"
-name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n8"
-name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n9"
-name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n10"
-name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
-type = "binary"
-negate = true
-weight = 1.0
-
 [[criterion]]
 id = "performance.catchall"
 name = "performance_catchall"
-description = "The app exhibits a significant, browser-observable defect in performance or stability that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in performance that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

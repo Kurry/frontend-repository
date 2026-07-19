@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -186,6 +186,67 @@ id = "4.17"
 name = "required_authored_asset_files_load"
 description = "Browser network/render evidence shows the Northstar mark, eleven portfolio marks, VP9 WebM hero and still, particle images, annual-report cover and valid local PDF, eight news images, careers art, share image, and icon sprite loading from same-origin paths with no 404, decode, playback, or PDF failure"
 type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "4.18"
+name = "reload_resets_pins_consent_undo"
+description = "After pinning stories, saving or accepting consent, and using undo/redo, a reload returns the seeded baseline: cookie banner visible, shortlist empty, briefing without pins, empty undo/redo stacks — coherent in-memory reset, never mixed persistence."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.19"
+name = "briefing_compiled_from_live_client_state"
+description = "Pinning a story then reading the JSON briefing preview shows that title without reload, proving the export compiles from live client state rather than a static hardcoded document."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n18"
+name = "storage_used_for_pins_or_consent"
+description = "After pinning news stories or saving cookie preferences, localStorage or sessionStorage is non-empty (in-memory genre violation)."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n19"
+name = "briefing_hardcoded_ignores_pins"
+description = "The JSON briefing preview text is identical before and after pinning a news story (static export ignoring session mutations)."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.20"
+name = "consent_form_validates_four_boolean_keys"
+description = "The cookie preferences form enforces the Consent preferences request-body field contract (required booleans necessary, analytics, marketing, functional with necessary constrained to true): invalid drafts show named field errors before commit, and a valid Save writes that exact payload into session/briefing state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n20"
+name = "consent_commits_without_field_contract"
+description = "Cookie preferences can be saved with necessary false, missing category keys, or without named field errors on invalid drafts, yet still dismiss the banner or mutate briefing consent."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.21"
+name = "briefing_export_import_share_schema"
+description = "Investor briefing JSON export and Import validate through the same client-side field contract (schemaVersion 1, company, quote, brands, pinnedTitles, consent, generatedAt): invalid Import shows a named import error before commit, and a valid Import restores pins and consent into the same store the JSON preview reads."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n21"
+name = "export_import_schema_divergence"
+description = "A briefing JSON export that the UI just produced fails the same Import validation path, or Import accepts payloads whose consent keys or pinnedTitles the briefing UI itself rejects."
+type = "binary"
+negate = true
 weight = 1.0
 
 [[criterion]]

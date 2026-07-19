@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,85 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "interactive_controls_keyboard_operable"
+description = "Every interactive control (nav links, Responsibility toggler, Menu toggle, carousel Prev./Next, cookie banner actions, Pin to briefing, Undo/Redo, Briefing and command-palette triggers, Download/Copy/Import briefing, footer links) is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space), with a visible focus indicator."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "overlay_focus_trap_and_return"
+description = "While the mobile menu overlay, cookie preferences modal, or command palette is open, keyboard focus is contained inside it; closing it returns focus to the control that opened it."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "imagery_and_brand_marks_labeled"
+description = "The hero video carries an accessible label; all imagery and the eleven fictional brand marks carry descriptive alt text or accessible labels."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "responsibility_aria_expanded_and_escape"
+description = "The Responsibility toggler exposes aria-expanded reflecting the dropdown open state (true while open, false when closed), and Escape closes the open dropdown."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+name = "consent_controls_have_accessible_names"
+description = "Cookie preferences per-category consent controls and banner actions use explicit labels or equivalent accessible names."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+name = "headings_logical_order"
+description = "Section headings follow a logical heading order through the homepage with no skipped levels that break the outline (e.g. H1 jumping straight to H3 without an H2)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "landmarks_nav_main_footer"
+description = "The document exposes HTML-first landmarks: a primary navigation region, a main content landmark wrapping the homepage sections, and a contentinfo/footer landmark."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+name = "contrast_hero_footer_and_controls"
+description = "Text over imagery and all control labels meet WCAG AA contrast, including white hero type over the video/still and white footer text on the dark rgb(1,1,1) slab."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "investors_marked_external"
+description = "The Investors link is marked as external both visually (external-link icon) and accessibly (accessible name or equivalent indicating external)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "reduced_motion_short_circuits_timelines"
+description = "With prefers-reduced-motion emulated on a fresh load, tokenized transition durations collapse to 0s and scripted timelines short-circuit to their final state (no transform-in animations, no stagger, no particle parallax) while the page remains fully scrollable and operable."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.a1"
+name = "split_headlines_keep_accessible_phrase"
+description = "Split hero and section headlines (Make. Every Day. Better. and A portfolio built for every step.) keep the original phrase accessible on the heading container while per-line or per-character spans are hidden from the accessibility tree."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
 name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+description = "A primary interactive control (Responsibility toggler, Menu toggle, carousel control, cookie action, or nav link) cannot be reached or activated via keyboard."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +148,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n2"
 name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+description = "Focused interactive controls show no visible focus indicator or the indicator is fully obscured."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,55 +156,55 @@ weight = 1.0
 [[criterion]]
 id = "1.n3"
 name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+description = "Custom interactive chrome (Responsibility dropdown, Menu overlay, carousel arrows, cookie actions) uses non-semantic tags without ARIA roles/labels."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+name = "consent_state_color_only"
+description = "Cookie preference category states or errors are indicated only by color with no text or accessible name change."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "overlay_focus_not_trapped"
+description = "While the mobile menu or preferences modal is open, keyboard focus escapes into the page behind or fails to return to the opener on close."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+name = "poor_contrast_unreadable_text"
+description = "Hero white type, footer text on the dark slab, or control labels fail WCAG AA contrast and are unreadable."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+name = "responsibility_aria_expanded_wrong"
+description = "The Responsibility toggler omits aria-expanded, or the attribute stays false while the Purpose/Planet/Product panel is open (or stays true while closed)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+name = "media_missing_alt_or_labels"
+description = "Hero video, portfolio imagery, news cards, or fictional brand marks lack descriptive alt text or accessible labels."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
-id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+id = "1.a4"
+name = "split_heading_character_soup"
+description = "A split/kinetic headline is exposed to the accessibility tree as character soup — no accessible name on the container and the split spans are not hidden from the tree."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +212,30 @@ weight = 1.0
 [[criterion]]
 id = "1.n10"
 name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+description = "With prefers-reduced-motion set, hero intro transforms, scroll staggers, or particle parallax continue to run instead of short-circuiting to settled state."
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "1.11"
+name = "palette_and_briefing_keyboard_reachable"
+description = "The command palette trigger, Investor briefing controls (including Import), Pin to briefing controls, and Undo/Redo are reachable and operable with the keyboard alone with a visible focus indicator."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "shortlist_and_copy_live_region"
+description = "Shortlist count changes and the Copy briefing confirmation are announced through a polite live region as well as shown visually."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n11"
+name = "palette_focus_escapes_overlay"
+description = "While the command palette is open, Tab moves focus to controls behind the overlay instead of staying contained inside the palette."
 type = "binary"
 negate = true
 weight = 1.0

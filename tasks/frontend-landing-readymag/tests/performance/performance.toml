@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,85 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "9.1"
-name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+name = "cold_start_interactive_under_2s"
+description = "The page is interactive within 2 seconds of a local cold load."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
-name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+name = "console_clean_on_load_and_exercise"
+description = "No console errors, hydration mismatch warnings, or unhandled rejections appear on load or during a full scroll-through, Solutions/mobile menu exercise, and slideshow observation; loading the homepage directly shows no post-hydration content flash."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
-name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "9.4"
-name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+name = "chrome_interactions_remain_responsive"
+description = "Solutions menu open/close, Menu panel, and primary CTA chrome respond without multi-second lag after first paint."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.5"
-name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+name = "full_page_scroll_without_lag"
+description = "Scrolling the full homepage (hero through footer) remains usable without perceived multi-second freezes between sections."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.6"
-name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+name = "interactive_during_menus_and_slideshow"
+description = "The UI remains interactive while menus open/close and the slideshow advances (controls stay clickable)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
-name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+name = "marquees_tilts_orb_hold_frame_rate"
+description = "Continuous scrolling from top to bottom holds a smooth frame rate through the marquee rows, tilt accents, orb travel, and feature-card reveals."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.8"
-name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+name = "rapid_menu_toggle_never_freezes"
+description = "Rapidly opening and closing the Solutions menu several times never freezes the page."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+name = "extended_scroll_session_stable"
+description = "After an extended scroll-through with menu exercises and slideshow observation, the page remains responsive without runaway resource use that freezes interaction."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "9.a1"
+name = "scroll_linked_animation_frame_rate"
+description = "Scroll-linked feature-card reveals and continuous marquee/orb motion hold a smooth frame rate through the full page length on a 1440-wide viewport with no visible hitching during continuous scroll."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+id = "9.a4"
+name = "layout_stable_media_reserve_space"
+description = "Layout is stable after load: media regions hold their space from first paint so no visible layout shift occurs as fonts, images, or the floating media card finish loading."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.a6"
+name = "interactive_before_heavy_media_finishes"
+description = "The page becomes interactive before heavy media (hero marquee artwork, floating-card video, slideshow frames) finish loading; reserved media regions do not block first interaction."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.n1"
-name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+name = "cold_load_exceeds_two_seconds"
+description = "More than 2 seconds pass before the page is interactive on a local cold load."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,31 +148,15 @@ weight = 1.0
 [[criterion]]
 id = "9.n2"
 name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+description = "Console errors, hydration mismatch warnings, or unhandled rejections appear during load, scroll-through, menu exercise, or slideshow observation."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
-id = "9.n3"
-name = "transitions_block_or_lag"
-description = "Transitions block or lag."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n4"
-name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n5"
-name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+id = "9.a3"
+name = "heavy_assets_collapse_frame_rate"
+description = "Heavy visual assets (hero marquees, floating-card video, orb path, or reveal scripts) cause frame-rate collapse, delayed first render, or input latency during signature scroll/hover interactions."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +164,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n6"
 name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
+description = "During hero intro, marquee travel, or feature-card reveals, primary controls (Solutions, Sign up, Try Canvasly) become unresponsive."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,31 +172,30 @@ weight = 1.0
 [[criterion]]
 id = "9.n7"
 name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n8"
-name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n9"
-name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
+description = "The UI blocks rendering with a blank page while fonts, images, or the media card load instead of showing reserved-space layout."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n10"
-name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+name = "rapid_use_crashes_page"
+description = "Rapid menu toggling or fast continuous scrolling crashes the page or leaves it permanently unresponsive."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.11"
+name = "brief_and_palette_remain_responsive"
+description = "Rapid trial-brief field edits, undo/redo, and command-palette open/filter/close never freeze the page or drop pointer/keyboard input."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.n11"
+name = "brief_edits_freeze_page"
+description = "Editing trial brief fields, toggling interests, or opening the command palette freezes the page or leaves controls unresponsive for multiple seconds."
 type = "binary"
 negate = true
 weight = 1.0

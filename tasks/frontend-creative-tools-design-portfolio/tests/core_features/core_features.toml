@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -77,35 +77,35 @@ weight = 1.0
 [[criterion]]
 id = "1.3"
 name = "project_create_cross_view_flow"
-description = "Starting from the seeded project count, creating Harbor Atlas with valid name, blurb, status, tags, and stats increases the count by exactly one; it then appears in /work, Projects Board, its detail surface, and matching filters without reload"
+description = "Starting from the seeded project count, creating Northline Atlas with valid name, blurb, status, tags, and stats increases the count by exactly one; it then appears in /work, Projects Board, its detail surface, matching filters, /stats, and the Portfolio JSON export preview without reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
 name = "project_edit_cross_view_flow"
-description = "Editing one project to Evening Terminal updates that same record in Projects Board, /work output, its shortcut detail, tags/status filters, and derived count without recreating or duplicating it"
+description = "Editing one project to Evening Terminal updates that same record in Projects Board, /work output, its shortcut detail, tags/status filters, /stats when tags change, the export preview, and derived count without recreating or duplicating it"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
 name = "project_delete_cross_view_flow"
-description = "Deleting a selected project decreases the measured count by exactly one and removes it from Projects Board, /work output, shortcut lookup, and every matching filter on the first try"
+description = "Deleting a selected project decreases the measured count by exactly one and removes it from Projects Board, /work output, shortcut lookup, every matching filter, /stats, and the export preview on the first try"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
 name = "projects_empty_state"
-description = "After deleting every project through visible controls, Projects Board and /work show a meaningful empty-project state rather than a blank body"
+description = "After deleting every active project through visible controls, Projects Board and /work show a meaningful empty-project state rather than a blank body, and /stats shows zero active projects"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
 name = "project_inline_validation"
-description = "Submitting project create or edit with an empty required name shows an inline field-specific error before submission and leaves the measured project count and last valid record unchanged"
+description = "Submitting project create or edit with an empty required name, illegal slug, status outside shipped|wip|archived, tags outside 1–8 unique entries, or year outside 1990–2100 shows an inline field-specific error naming the offending field before submission and leaves the measured project count and last valid record unchanged"
 type = "binary"
 weight = 1.0
 
@@ -133,7 +133,7 @@ weight = 1.0
 [[criterion]]
 id = "1.14"
 name = "command_catalog_and_clear"
-description = "Slash commands echo their input and produce matching staggered output for /help, /about, /work, /clients, /skills, /philosophy, /social, /articles, /testimonials, /awards, /contact, and /privacy, while /clear wipes prior output"
+description = "Slash commands echo their input and produce matching staggered output for /help, /about, /work, /clients, /skills, /philosophy, /social, /articles, /testimonials, /awards, /contact, /privacy, /stats, /export, /import, /archive, /undo, and /redo, while /clear wipes prior output"
 type = "binary"
 weight = 1.0
 
@@ -161,7 +161,7 @@ weight = 1.0
 [[criterion]]
 id = "1.26"
 name = "cookie_consent_privacy_flow"
-description = "After boot, choosing Accept or Decline dismisses the consent banner without an exception and /privacy reports the selected in-memory status; a fresh reload coherently returns consent to not-set"
+description = "After boot, choosing Accept or Decline dismisses the consent banner without an exception and /privacy reports the selected in-memory status; a fresh reload coherently returns consent to not-set; Portfolio JSON export consent matches /privacy"
 type = "binary"
 weight = 1.0
 
@@ -215,28 +215,194 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.27"
-name = "stubbed_terminal_commands"
-description = "One or more required section, project, clear, or easter-egg commands behaves as a decorative stub, prints unrelated output, or leaves the promised visible state unchanged"
+id = "1.37"
+name = "search_syntax_status_and_tag"
+description = "In Projects Board or via /work, a search field accepts status:shipped / status:wip / status:archived and tag:Name syntax; applying a query recomputes visible projects, and clearing restores the full set exactly"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "syntax_matches_filter_controls"
+description = "A status or tag filter control and a syntax query that express the same constraint show the same visible project set"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "stats_rollup_live_derived"
+description = "/stats prints total count, per-status counts, and top tag frequencies derived from the current collection; creating, editing status/tags, deleting, bulk-updating, restoring, or undoing changes the figures on the next /stats run without reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "board_stats_strip_matches_stats"
+description = "The Projects Board stats strip status counts always match the /stats numbers for the current active collection"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "bulk_select_and_actions_bar"
+description = "In Projects Board each card/row has a checkbox; Select all checks every visible card; a bulk actions bar appears with the live selected count whenever at least one project is selected"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "bulk_archive_updates_surfaces"
+description = "Selecting multiple projects and choosing Archive selected removes them from the board and /work, places them in /archive, drops /stats total by the selected count, clears selection, and removes them from the Portfolio JSON preview without reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "archive_restore_returns_project"
+description = "/archive lists archived projects; Restore on a row returns that project to the active collection with prior fields, increases board card count by exactly one, and removes it from the vault"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "command_palette_fuzzy_activate"
+description = "Ctrl+K (Cmd+K) opens a focused command palette; typing fuzzy-matches commands, projects, themes, and views; arrow keys move the highlight and Enter activates; Escape closes and returns focus to the command input"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "palette_kind_labels_and_empty"
+description = "Each palette result row shows a kind label (Command, Project, Theme, or View); a query matching nothing shows an empty-state line rather than a blank list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "undo_redo_project_mutations"
+description = "Undo and Redo (toolbar, /undo /redo, and Ctrl+Z / Ctrl+Shift+Z) reverse and reapply create/edit/delete/bulk/archive/restore; empty stacks disable the controls; a new mutation after undo clears the redo stack"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "undo_restores_export_and_stats"
+description = "After a project mutation, Undo restores the exact prior state across Projects Board, /work, shortcuts, filters, /stats, Archive vault, and the export preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "export_two_tabs_live_compile"
+description = "/export or Export view shows Portfolio JSON and Resume Markdown tabs compiled live from session state; creating, editing, deleting, archiving, restoring, or undoing a project updates both tabs without reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "export_copy_and_download"
+description = "Copy export puts the exact visible preview text on the clipboard with visible confirmation; Download offers the active tab as portfolio.json or resume.md"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "export_counts_match_stats"
+description = "Portfolio JSON project count and status tallies match /stats and the board stats strip for the current session"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "import_valid_portfolio_json"
+description = "/import or Export Import accepts a valid Portfolio JSON payload and replaces the active projects collection so board, /work, /stats, and export preview match the imported projects"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.52"
+name = "import_export_round_trip_parity"
+description = "Exporting current portfolio JSON and immediately re-importing that same JSON reconstructs the same visible project names, statuses, tags, slugs, and stats on the board and in /work"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.53"
+name = "portfolio_json_api_shaped_field_contract"
+description = "The Portfolio JSON export preview is a single object whose visible text includes the required field contract: version exactly \"1.0\"; theme exactly one of dark, light, retro, or glass; consent exactly one of accepted, declined, or not-set; and a projects array whose entries show name, slug, blurb, status (shipped|wip|archived), tags, stats, type, and year"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.54"
+name = "created_project_record_matches_portfolio_json"
+description = "After creating a project through the form with valid name, slug, blurb, status, tags, stats, type, and year, the Portfolio JSON projects[] entry for that project shows the same field names and values the form produced — the created record is the export payload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "stubbed_terminal_commands"
+description = "One or more required section, project, clear, export, import, archive, undo, stats, palette, or easter-egg commands behaves as a decorative stub, prints unrelated output, or leaves the promised visible state unchanged"
+type = "binary"
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "1.28"
 name = "static_or_desynchronized_projects"
-description = "Project create, edit, delete, shortcut, board, list, or filter surfaces show static or mutually inconsistent records after a visible project mutation"
+description = "Project create, edit, delete, shortcut, board, list, filter, stats, archive, or export surfaces show static or mutually inconsistent records after a visible project mutation"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "1.29"
 name = "outbound_navigation_present"
 description = "A social, contact, award, close-overlay, or command control navigates to another URL, opens a new tab, or invokes mailto or tel"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n11"
+name = "export_omits_session_mutations"
+description = "After creating or deleting a project in the session, the Portfolio JSON or Resume Markdown export preview still omits the created project or still lists the deleted project"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n12"
+name = "undo_does_not_restore_surfaces"
+description = "After a project mutation, Undo leaves Projects Board, /stats, or the export preview in the post-mutation state instead of restoring the prior values"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n13"
+name = "bulk_archive_leaves_board_stale"
+description = "After Archive selected on multiple projects, those projects remain visible on the board or still appear in /work or the export preview"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n14"
+name = "stats_ignore_collection_changes"
+description = "/stats or the board stats strip shows identical totals after creating or deleting a project"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n15"
+name = "portfolio_json_missing_required_contract_keys"
+description = "An open Portfolio JSON export preview omits required contract keys (version, theme, consent, or projects) or shows version not exactly \"1.0\", theme outside dark|light|retro|glass, consent outside accepted|declined|not-set, or a projects entry missing name/slug/blurb/status/tags/stats/type/year"
+type = "binary"
+negate = true
+weight = 1.0
 
 [[criterion]]
 id = "1.catchall"

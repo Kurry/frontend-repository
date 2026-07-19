@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -63,150 +63,97 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+name = "swatch_copy_delight_beyond_minimum"
+description = "Beyond the required on-swatch copied confirmation, copy feedback includes an extra polished microinteraction (for example a brief ink flash, checkmark morph, or coordinated live-region phrasing) that feels crafted rather than bare (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "scroll_storytelling_beyond_minimum"
+description = "Scroll-triggered editorial pacing or reveals go beyond a flat dump of the library — sections stage with intentional rhythm while remaining fully usable (bonus; verify on a fresh load via real scrolling)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+name = "guided_first_browse_hint"
+description = "A brief guided first-run hint or coachmark introduces the three Browse layouts, export drawer, or historical-name pairing without blocking the archive (bonus beyond the required editorial intro)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+name = "hue_index_or_relationship_aid"
+description = "An interactive graphic beyond the required Nomenclature rows and contrast matrix (for example a compact hue spectrum strip) adds usability while staying local and browser-observable (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+name = "keyboard_shortcut_for_power_users"
+description = "Beyond basic Tab/Enter operability, the archive supports an alternate power-user input such as arrow-key layout switching, a shortcut to open Export, or Ctrl/Cmd+Z for undo when focus is not in a text field (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+name = "session_personalization_beyond_spec"
+description = "Within the in-memory session, the app offers a small personalization beyond requirements (for example remembering last Browse layout until reload) without using browser storage APIs (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+name = "object_and_archive_brand_narrative"
+description = "The Object and Archive / o+a brand treatment, script lockup, and editorial field read as a cohesive fine-art archive narrative rather than generic unstyled controls (bonus execution quality)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+name = "cream_editorial_craft_beyond_minimum"
+description = "Cream-field / near-black editorial craft goes beyond bare compliance — cohesive hairline rules, mono hex meta, and italic historical names feel intentional across Browse layouts and Export (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+name = "contrast_matrix_usability_polish"
+description = "Beyond listing ratios, the contrast matrix offers an extra usability polish (for example sorting pairs by worst contrast first, or highlighting failing pairs) that remains browser-observable (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+name = "competition_level_archive_feel"
+description = "The overall archive feels competition-grade: nomenclature index, palette cards, contrast matrix, vision simulation, and export drawer read as a polished fine-art tool rather than a wired demo (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
+
 
 [[criterion]]
 id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+name = "barebones_unstyled_list_only"
+description = "The shipped UI is a bare unstyled list or plain form with no editorial intro, view layouts, export drawer, or archive immersion."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
+name = "generic_dashboard_template_look"
+description = "The experience is a generic dashboard/card-grid template that ignores the specified cream editorial field and nomenclature index composition."
 type = "binary"
 negate = true
 weight = 1.0
@@ -217,3 +164,4 @@ name = "innovation_catchall"
 description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
+

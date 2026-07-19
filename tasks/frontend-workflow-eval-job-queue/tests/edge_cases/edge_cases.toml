@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,85 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_filter_state_present"
+description = "When status/model/dataset filters match no jobs, the table region shows an empty state message with a control that clears the filters"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "submit_validates_inline"
+description = "The submit-job form shows inline validation naming missing dataset/agent/model and trialCount bounds before submit, with submit disabled while invalid"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "errors_name_field_and_rule"
+description = "Validation and import errors name the field and the rule broken (for example trialCount 1 to 10, sweepModel must differ from model, schemaVersion eval-queue-v1) rather than only saying Invalid"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
 name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+description = "Submitting, cancelling, copying the config or export preview, and importing show visible success or confirmation feedback"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "simulation_shows_progress_affordance"
+description = "While running jobs advance and while export/import surfaces open, async-feeling regions show a deliberate loading or progress affordance rather than a blank region"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "cancel_and_pause_confirm_first"
+description = "Cancel on a queued/running job and pause on a lane each ask for confirmation before mutating; declining leaves state unchanged"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "sweep_cross_field_guard"
+description = "Choosing a sweepModel equal to model shows an inline error naming sweepModel and creates no job"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
 name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+description = "Submit, filter, lane, export, and import controls use semantic button/input/label elements rather than clickable bare divs"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
 name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+description = "Submit form, export drawer, import surface, and confirmation dialogs close via an explicit control and Escape"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "mid_trial_cancel_keeps_results"
+description = "Cancelling a job mid-trial keeps every completed trial's reward and duration visible in the detail; only unfinished trials stop"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "import_malformed_leaves_queue"
+description = "Importing malformed Queue Snapshot JSON or a document that breaks the field contract shows an inline import error and leaves job count and lane depths unchanged"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
 name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+description = "A zero-match filter shows nothing and provides no empty-state UI feedback"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +148,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n2"
 name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+description = "Submit or import validation failures surface only in the browser console"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +156,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n3"
 name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+description = "Submit, cancel, copy, or import succeed or fail with no visible feedback"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +164,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n4"
 name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+description = "Cancel job or pause lane mutate state with no confirmation warning"
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +172,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n5"
 name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+description = "Primary interactive controls for submit, filters, lanes, export, or import are only non-semantic div or span wrappers"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +180,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n6"
 name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+description = "Submit, export, import, or confirmation overlays cannot be dismissed via Escape"
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +188,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n7"
 name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+description = "An invalid submit that breaks the field contract still creates a job row before any inline field error is shown"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,15 +196,15 @@ weight = 1.0
 [[criterion]]
 id = "4.n8"
 name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+description = "Primary actions use blank or only generic labels such as OK/Submit where Submit job, Export queue, or Import queue is expected"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "import_silently_corrupts_queue"
+description = "A malformed import changes job count or lane depths without an inline error"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +212,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n10"
 name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+description = "Export queue, Import queue, or Submit job controls are visually hidden or inaccessible when the jobs view is active"
 type = "binary"
 negate = true
 weight = 1.0

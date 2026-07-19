@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.1"
 name = "shared_state_coherence"
-description = "All surfaces derive from one shared state: typing in the editor updates the variable panel, token count, and preview together; a run's status advances identically in the response panel and the history row; saving, opening, and deleting library entries update the list, count, and workbench together — all without a reload"
+description = "All surfaces derive from one shared state: typing in the editor updates the variable panel, token count, pricing estimate, and preview together; a run's status advances identically in the response panel and the history row; saving, opening, and deleting library entries update the list, count, and workbench together; Export JSON regenerates from that same state — all without a reload"
 type = "binary"
 weight = 1.0
 
@@ -129,6 +129,13 @@ weight = 1.0
 id = "2.10"
 name = "live_region_and_error_association"
 description = "Run status changes (streaming started, completed, stopped) are announced through a polite live region, the reasoning disclosure exposes its expanded state to assistive technology, and validation messages are programmatically associated with their fields and name the field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "forms_validate_api_shaped_payloads"
+description = "Insert Variable, Save to Library, and Import forms reject invalid payloads with inline per-field errors before mutating state: VariableInsert name pattern/length, LibraryPrompt title bounds/uniqueness and technique closed enum, and PromptPackage schemaVersion/messages/bindings rules are enforced in the UI"
 type = "binary"
 weight = 1.0
 

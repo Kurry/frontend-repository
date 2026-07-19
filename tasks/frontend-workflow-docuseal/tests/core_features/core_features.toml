@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "opens_into_document_editor_workspace"
-description = "On load, the app opens directly into a document template editor with no authentication wall, showing a top bar (Docuseal wordmark, an editable template-name field, a Build/Preview mode switch, a signing-status pill, and a Send for signing action), a left rail with a templates list, submitters list and field-type palette, a center document canvas with page sheets, and a right properties panel — recognisably PDF form building, not a generic dashboard"
+description = "On load, the app opens directly into a document template editor with no authentication wall, showing a top bar (Docuseal wordmark, an editable template-name field, a Build/Preview mode switch, a signing-status pill, Undo and Redo, Export and Import, and a Send for signing action), a left rail with templates, submitters and field-type palette, a center document canvas with page sheets, and a right properties panel — recognisably PDF form building, not a generic dashboard"
 type = "binary"
 weight = 1.0
 
@@ -77,7 +77,7 @@ weight = 1.0
 [[criterion]]
 id = "1.3"
 name = "full_palette_and_seeded_submitters"
-description = "The field-type palette offers at least these distinct field types: Text, Signature, Initials, Date, Number, Checkbox, Radio, Select, Image, File, Phone, Cells, Stamp; and the submitters list shows at least 'First Party' and 'Second Party', each with a distinct colour swatch"
+description = "The field-type palette offers at least these distinct field types: Text, Signature, Initials, Date, Number, Checkbox, Radio, Select, Image, File, Phone, Cells, Stamp; and the submitters list shows at least First Party and Second Party, each with a distinct colour swatch"
 type = "binary"
 weight = 1.0
 
@@ -98,14 +98,14 @@ weight = 1.0
 [[criterion]]
 id = "1.6"
 name = "placed_field_adopts_active_submitter_colour"
-description = "After placing a field while 'First Party' is the active submitter, the new field box renders in First Party's colour and the properties panel shows it assigned to First Party"
+description = "After placing a field while First Party is the active submitter, the new field box renders in First Party colour and the properties panel shows it assigned to First Party"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
 name = "reassign_recolours_field_in_same_step"
-description = "After selecting a placed field and choosing 'Second Party' in the properties panel's assigned-submitter control, the field box on the canvas recolours to Second Party's colour and the panel reflects the new assignment in the same step"
+description = "After selecting a placed field and choosing Second Party in the properties panel assigned-submitter control, the field box on the canvas recolours to Second Party colour and the panel reflects the new assignment in the same step"
 type = "binary"
 weight = 1.0
 
@@ -119,28 +119,28 @@ weight = 1.0
 [[criterion]]
 id = "1.9"
 name = "rename_updates_canvas_label_immediately"
-description = "After renaming the selected field in the properties panel, the field's label on the canvas updates immediately to the new name, and toggling the required checkbox updates the field's required state in the same step"
+description = "After renaming the selected field in the properties panel, the field label on the canvas updates immediately to the new name, and toggling the required checkbox updates the field required state in the same step"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
 name = "empty_name_shows_inline_validation"
-description = "After clearing the selected field's name input to empty, a visible validation message naming the name field appears next to the control before any submit-style action, the field is not removed and keeps rendering on the canvas, and the message clears when a non-empty name is restored"
+description = "After clearing the selected field name input to empty or whitespace-only, a visible validation message naming the name field appears next to the control before any submit-style action, the field is not removed and keeps rendering on the canvas, and the message clears when a valid non-empty name is restored"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
 name = "delete_removes_only_selected_field"
-description = "After deleting one selected field via the panel's Delete field control, that field is gone from the canvas while the other placed fields remain visible and both submitter definitions remain in the rail"
+description = "After deleting one selected field via the panel Delete field control, that field is gone from the canvas while the other placed fields remain visible and both submitter definitions remain in the rail"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.13"
 name = "send_for_signing_reveals_advance"
-description = "After clicking Send for signing on a template that has fields assigned, the status pill changes from its draft state to an awaiting-first-submitter state (e.g. 'Awaiting First Party') and an Advance control appears"
+description = "After clicking Send for signing on a template that has fields assigned, the status pill changes from its draft state to an awaiting-first-submitter state and an Advance control appears"
 type = "binary"
 weight = 1.0
 
@@ -213,28 +213,28 @@ weight = 1.0
 [[criterion]]
 id = "1.34"
 name = "added_submitter_colours_stay_distinct"
-description = "After adding several submitters via the Add submitter control, every party's colour swatch in the list is visibly distinct from the others already present"
+description = "After adding three or more submitters via the Add submitter control, every party colour swatch in the list is visibly distinct from the others already present"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "1.35"
 name = "place_field_flow_counts_and_reload"
-description = "Note the open template's field count in its left-rail row, the panel summary count, and the active submitter's breakdown count; click a palette type: a new field box appears on the canvas in the active submitter's colour, the rail row and the panel summary each increase by exactly one, the per-submitter breakdown adds exactly one to the active submitter (deltas measured immediately around the click), and after a full page reload the placed field is still on the canvas with the same type, name, and submitter assignment"
+description = "Note the open template field count in its left-rail row, the panel summary count, and the active submitter breakdown count; click a palette type: a new field box appears on the canvas in the active submitter colour, the rail row and the panel summary each increase by exactly one, the per-submitter breakdown adds exactly one to the active submitter (deltas measured immediately around the click), and after a full page reload the placed field is still on the canvas with the same type, name, and submitter assignment"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.36"
 name = "reassign_field_flow_breakdown_and_reload"
-description = "With a field selected, choose a different submitter in the properties panel: the field box on the canvas recolours to the new submitter's colour in the same step the panel control updates, exactly one count moves between the two parties in the per-submitter breakdown, and after a full page reload the field still renders in the new submitter's colour"
+description = "With a field selected, choose a different submitter in the properties panel: the field box on the canvas recolours to the new submitter colour in the same step the panel control updates, exactly one count moves between the two parties in the per-submitter breakdown, and after a full page reload the field still renders in the new submitter colour"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.37"
 name = "delete_field_flow_counts_and_reload"
-description = "Removing the selected field takes exactly one field box off the canvas, decreases the open template's field count by one in both the rail row and the panel summary, updates the per-submitter breakdown accordingly, leaves every other placed field and both submitter definitions unchanged, and the removal survives a full page reload"
+description = "Removing the selected field takes exactly one field box off the canvas, decreases the open template field count by one in both the rail row and the panel summary, updates the per-submitter breakdown accordingly, leaves every other placed field and both submitter definitions unchanged, and the removal survives a full page reload"
 type = "binary"
 weight = 1.0
 
@@ -260,9 +260,74 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
+id = "1.41"
+name = "undo_redo_controls_present"
+description = "Undo and Redo controls are visible in the top bar and are visibly disabled when their stacks are empty on a fresh load"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "duplicate_field_adds_matching_copy"
+description = "With a field selected, activating Duplicate field adds exactly one new field of the same type and submitter colour, selects the duplicate, leaves the source field intact, and increases the open template field count by exactly one"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "batch_reassign_updates_selected_fields"
+description = "With two fields selected via multi-select, Batch reassign to Second Party recolours both boxes to Second Party colour in the same step and moves both counts into Second Party in the per-submitter breakdown"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "export_opens_template_json_and_signing_summary"
+description = "Activating Export opens a centered artifact drawer or dialog with Template JSON and Signing summary format tabs, each showing a regenerated preview, plus Copy and Download controls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "template_json_api_shaped_field_contract"
+description = "The Template JSON export preview is a single object whose visible text includes the required field contract keys name, status (draft, pending, or completed), submitters (each with name and colour), and fields (each with name, type from the closed field-type enum, required, submitter, page, x, y, w, h)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "export_contains_session_field_mutations"
+description = "After placing a field, renaming it to a unique name, and reassigning it to Second Party, both open Export format previews contain that field type, unique name, and Second Party assignment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "import_template_json_round_trip"
+description = "After editing fields and downloading Template JSON from Export, Import of that same document reconstructs the same visible fields, submitters, and status on the canvas and in both Export previews"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n41"
+name = "export_omits_session_mutations"
+description = "After placing a field, renaming it, and reassigning its submitter, an open Export format preview (Template JSON or Signing summary) omits that field type, name, or submitter"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n42"
+name = "undo_does_not_restore_duplicate"
+description = "After Duplicate field adds a field, Undo leaves the duplicate on the canvas or fails to restore the prior field count and selection"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

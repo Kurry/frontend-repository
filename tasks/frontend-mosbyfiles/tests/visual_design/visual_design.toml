@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -243,6 +243,35 @@ description = "A required archive surface is omitted, empty, broken, repeated as
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "2.40"
+name = "reading_list_palette_dossier_match_tokens"
+description = "The reading-list drawer, command palette, and dossier export panel use the near-black surface rgb(25,25,25) / hex 191919 and cream text rgb(253,250,247) / hex fdfaf7 with hairline borders rather than bright unrelated card chrome."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.41"
+name = "pin_control_filled_vs_rest"
+description = "Pinned Pin controls show a filled state visually distinct from the unpinned rest state on case routes."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.42"
+name = "filter_and_search_preserve_stack_composition"
+description = "Category filter chips and the home search field sit in the home stack region without covering the Field Notes Archive wordmark or breaking the filing-cabinet stack composition."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n40"
+name = "dossier_chrome_breaks_palette"
+description = "Reading-list, command palette, or dossier panels use bright default card chrome or colors outside the archive surface/text/accent system."
+type = "binary"
+negate = true
+weight = 1.0
 
 [[criterion]]
 id = "3.catchall"

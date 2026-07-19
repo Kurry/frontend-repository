@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,78 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "timer_round_trip_updates_all_surfaces"
+description = "Timer round trip: start the Live timer with a Meaningful category, stop it (confirming interruption if under 25 minutes), and confirm exactly one new All entries row and timeline block appear, Today's minutes and Meaningful ratio update, today's Weekly overview Meaningful segment grows, and today's heat-map cell updates — without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "manual_add_inline_validation"
+description = "Create flow: submitting the Add entry manually form with an empty name or invalid durationMinutes shows immediate inline validation naming the field and adds no entry."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "edit_category_propagates_everywhere"
+description = "Edit flow: changing an entry's category from Draining to Meaningful in the edit dialog updates chip color in list and timeline, moves minutes on today's chart bar, and shifts the Meaningful ratio without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "delete_confirm_removes_from_all_surfaces"
+description = "Delete flow: confirming delete decreases the All entries count by exactly one, removes the timeline block, and recomputes ratio, streak, chart, and heat-map."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "export_import_artifact_end_state"
+description = "Artifact end state: after creating entries and a custom tag, Export session Session JSON and Timesheet CSV contain those names/categories/durations with Session JSON field-contract keys present; Download Session JSON then Import reconstructs the same visible session."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
 name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+description = "Edge: after deleting the last entry, timeline and All entries show friendly empty states and Today's minutes is zero."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "filters_and_search_update_list"
+description = "Filter/search flow: Meaningful filter shows only Meaningful entries with the button highlighted; typing a name into search narrows the list; clearing search or choosing All restores the full list."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "history_panel_preserves_workflow"
+description = "History panel: View history opens the panel; Undo/Redo via the real controls restore adjacent visible states; the panel can be dismissed and the dashboard workflow continues."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
 name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+description = "Overlays behave as expected for edit, delete confirmation, tag manager, export drawer, import confirmation, interruption reason, and command palette."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "bulk_categorize_flow"
+description = "Bulk categorize: select two entries, Set category Meaningful, confirm both chips update, ratio/chart update, and selection clears — recoverable without reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
 name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+description = "Create/edit/delete, Export session, or Live timer primary flows are not enabled from the UI."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n2"
 name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+description = "New entries fail to show up or duplicate on timer stop or manual add."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,15 +149,15 @@ weight = 1.0
 [[criterion]]
 id = "6.n3"
 name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+description = "State changes are not synced across timeline, list, ratio, chart, heat-map, or Export previews."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "export_import_breaks_or_loses_session"
+description = "Export/Import round-trip breaks layout or loses session entries/tags."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,15 +173,15 @@ weight = 1.0
 [[criterion]]
 id = "6.n6"
 name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+description = "Filtered timeline and list disagree about which entries are visible."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "history_panel_cannot_reopen"
+description = "History panel can't be re-opened after dismiss."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n8"
 name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+description = "Overlays block interaction with no exit option."
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +197,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n9"
 name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+description = "A failed import or invalid form submit provides no user feedback."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n10"
 name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+description = "A flow dead-ends or requires reload for recovery."
 type = "binary"
 negate = true
 weight = 1.0

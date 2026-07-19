@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,88 +62,88 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "14.1"
-name = "multi_facet_round_trip"
-description = "Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline — never a mix."
+name = "multi_facet_reload_resets_to_seed"
+description = "Starting from seed: create one valid scene, switch to List mode, then switch to Slide and advance at least one scene; then reload. Confirm every facet coherently resets to the seeded baseline — at least eight seeded scenes (the created scene gone), Tile mode, and slide index at the first scene — never a mix of surviving and reverted facets."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.2"
-name = "sort_reversal_proves_live_data"
-description = "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders."
+name = "view_mode_reversal_proves_live_set"
+description = "Mode-reversal proof (genre stand-in for sort reversal): note the scene count and titles in Tile, switch to List and confirm the same set/count, switch to Slide and confirm the same set is reachable via prev/next, then return to Tile. Confirm the identical scene set and count — proving modes derive from live data, not three hardcoded snapshots."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.3"
-name = "derived_view_responds_to_input"
-description = "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input."
+name = "slide_range_derived_from_collection"
+description = "Derived-view sensitivity: create one valid scene and confirm Slide prev/next range extends to include it; then delete a different scene and confirm the Slide range shrinks so prev/next never lands on the deleted scene — the slide bounds change meaningfully with collection inputs."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.4"
-name = "cross_view_echo_without_reload"
-description = "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list ↔ detail, board ↔ stats) without reload."
+name = "edit_echoes_tile_list_slide"
+description = "Cross-view echo: edit a scene's description in Tile mode; without reload confirm List shows the same edited text on that record and Slide shows the edited text when that scene is the active slide."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.5"
-name = "count_delta_is_exact"
-description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+name = "create_count_delta_exact"
+description = "Count-delta integrity: measure the visible scene count, submit one valid new scene from Add Scene, and re-measure immediately — the count increases by exactly one (no off-by-one, no lagging counter)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.6"
-name = "different_inputs_change_outcomes"
-description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+name = "different_scene_bodies_different_outcomes"
+description = "Input-dependent output: create a scene with description text A and note the board; create another with clearly different description text B. Confirm the two new cards differ in the ways the inputs dictate (not byte-identical descriptions)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.7"
-name = "interleaved_flows_preserve_state"
-description = "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state."
+name = "interleaved_create_and_mode_switch"
+description = "Interleaved-flow integrity: open Add Scene and fill title/description but do not submit; switch to List mode; then return and submit the create. Confirm exactly one new scene appears, List still shows the full set including it, and neither flow corrupted the other's state."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.8"
-name = "empty_to_repopulated_round_trip"
-description = "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions."
+name = "empty_then_repopulate_board"
+description = "Edge-state round-trip: delete every scene until the empty state is visible, then create two valid scenes via Add Scene; confirm the empty state clears, both new cards appear with contiguous numbering, and Tile/List/Slide all show count 2."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.n1"
-name = "partial_persistence_is_incoherent"
-description = "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence."
+name = "partial_persistence_after_reload"
+description = "After creating a scene and switching view mode then reloading, some user-configured facets survive while others reset — incoherent partial persistence instead of a full return to the seeded baseline."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n2"
-name = "derived_surface_ignores_inputs"
-description = "A derived surface renders identically regardless of its inputs."
+name = "slide_range_identical_after_mutations"
+description = "Creating or deleting scenes leaves the Slide prev/next range visually identical — a derived surface ignoring its collection inputs."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n3"
-name = "different_inputs_produce_identical_output"
-description = "Repeating an action with different inputs yields byte-identical output."
+name = "different_bodies_produce_identical_cards"
+description = "Creating two scenes with different description inputs yields identical card text on the board."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "State changes appear in one view but not another until reload."
+name = "cross_mode_state_stale_until_reload"
+description = "After editing a description or creating a scene in Tile, List or Slide still shows stale values until a full page reload."
 type = "binary"
 negate = true
 weight = 1.0
@@ -151,7 +151,7 @@ weight = 1.0
 [[criterion]]
 id = "behavioral.catchall"
 name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

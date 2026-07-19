@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -214,6 +214,21 @@ name = "underline_gradient_treatments"
 description = "By computed style, muted link underlines use the repeat-x background pattern linear-gradient(to right, rgba(0, 0, 0, 0.31) 0%, rgba(0, 0, 0, 0.31) 100%) sized 1px 2px positioned at 0 90%, and the active black underline uses the same pattern at 0 100% sized 1px 1px"
 type = "binary"
 weight = 0.5
+
+[[criterion]]
+id = "2.22"
+name = "trial_brief_panel_matches_visual_language"
+description = "The trial brief panel and command palette use the same Canvasly visual language as the closing CTA (dark #282828 pills, white/neutral surfaces, Inter utility type, scarce orange accents on primary actions) rather than a disconnected default form theme."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n8"
+name = "brief_panel_generic_browser_defaults"
+description = "The trial brief form or command palette renders with unstyled browser-default controls that clash with the #282828 / orange Canvasly system."
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "2.catchall"

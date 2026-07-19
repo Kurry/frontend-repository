@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -99,7 +99,7 @@ optional = true
 [[criterion]]
 id = "3.6"
 name = "sentence_case_numeral_labels"
-description = "UI labels, headings, buttons, and counts use sentence case and numerals, action labels are specific (Clear filter, Add site) rather than generic, short labels carry no terminal period, and empty states explain what belongs there rather than showing bare nothing-text"
+description = "UI labels, headings, buttons, and counts use sentence case and numerals, action labels are specific (Clear filter, Add site, Export report, Compare previous) rather than generic, short labels carry no terminal period, and empty states explain what belongs there rather than showing bare nothing-text"
 type = "binary"
 weight = 0.5
 optional = true
@@ -170,6 +170,27 @@ description = "Placeholder or lorem text ('Lorem ipsum', 'TODO', unrendered temp
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "3.16"
+name = "export_drawer_format_tabs"
+description = "The export drawer shows format tabs labeled Stats JSON and Breakdown CSV, a monospaced preview block, and Copy / Download / Import actions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.17"
+name = "high_bounce_not_color_only"
+description = "The High bounce alert uses the exact text label High bounce in addition to any accent color so the alert is not color-only"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.18"
+name = "compare_chips_beside_metrics"
+description = "When Compare previous is on, percent-change chips sit beside the metric values without replacing or crowding out the primary metric numbers"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "3.catchall"

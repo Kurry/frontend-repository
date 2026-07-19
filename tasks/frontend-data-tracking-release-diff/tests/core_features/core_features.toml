@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -119,7 +119,7 @@ weight = 1.0
 [[criterion]]
 id = "1.9"
 name = "cut_form_semver_unique_validation"
-description = "The cut form shows an inline message naming the name field when the name is empty or not valid semver, shows a message stating the version already exists when a duplicate name is entered, keeps submit disabled until the name is valid, and starts no cut in any invalid case"
+description = "The cut form enforces the cut-release field contract: name must be MAJOR.MINOR.PATCH semver unique among versions ignoring case; notes at most 500 characters (empty allowed); empty or non-semver name and overlong notes each show an inline message naming that field; duplicate name states the version already exists; submit stays disabled until every required field is valid; no cut starts in any invalid case"
 type = "binary"
 weight = 1.0
 
@@ -161,7 +161,7 @@ weight = 1.0
 [[criterion]]
 id = "1.15"
 name = "manifest_summary_copy_works"
-description = "The selected release shows a monospaced manifest summary code block (version, task count, per-split counts, digest prefix) whose copy control places the exact summary text on the clipboard and shows visible confirmation"
+description = "Export release pack Manifest summary tab shows a monospaced summary for the selected version (version name, task count, per-split counts, digest prefix) whose Copy control places the exact summary text on the clipboard and shows visible confirmation"
 type = "binary"
 weight = 1.0
 
@@ -205,6 +205,50 @@ negate = true
 id = "1.21"
 name = "correlation_never_varies"
 description = "Across multiple rank-stability runs and retries, the correlation value is byte-identical every time, indicating a hardcoded gate rather than a re-randomized draw"
+type = "binary"
+weight = 1.0
+negate = true
+
+
+[[criterion]]
+id = "1.22"
+name = "task_manifest_rows_expose_contract_fields"
+description = "Each manifest table row for a seeded version shows slug, truncated content digest, title, and split tags consistent with the task-manifest entry field contract (kebab-case slug, digest from a 64-character lowercase hex contentDigest, non-empty title, and split tags drawn from auric-holdout, basalt-train, and cinder-public)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "release_pack_json_exposes_field_contract_keys"
+description = "Export release pack Release pack JSON preview visibly includes required top-level keys schemaVersion, generatedAt, versions, rotation, and timeline, and schemaVersion equals exactly larkspur-release-pack/v1"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "release_pack_export_contains_session_cut"
+description = "After sealing a cut named 2.1.0 with notes containing cut-notes-alpha, Export release pack Release pack JSON lists a versions entry with name 2.1.0 and notes containing cut-notes-alpha, still shows task entries with slug, contentDigest, title, and splitTags, and Copy/Download offer that same JSON text (release-pack.json for Download)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "release_pack_import_round_trip"
+description = "After exporting conforming Release pack JSON, advancing rotation so the cycle differs, and importing that earlier JSON (or the seeded sample), version names, task counts, and the rotation cycle match the pack; a second export-then-import keeps the same visible state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "invalid_release_pack_import_rejects_schema"
+description = "Importing JSON with schemaVersion other than larkspur-release-pack/v1, a non-semver version name, a contentDigest that is not 64 lowercase hex characters, or a splitTags value outside auric-holdout|basalt-train|cinder-public shows an inline message naming the violated field and leaves versions, rotation, and timeline unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n22"
+name = "release_pack_omits_session_mutations"
+description = "After sealing a cut with a distinct notes token, the Export release pack JSON preview omits that version name or notes token, or omits schemaVersion larkspur-release-pack/v1 / required top-level keys, while presenting an export preview as if complete"
 type = "binary"
 weight = 1.0
 negate = true

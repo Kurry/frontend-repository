@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -175,7 +175,35 @@ weight = 1.0
 [[criterion]]
 id = "1.33"
 name = "form_inline_validation"
-description = "Invalid pane, page-name, saved-analysis, or conflict-resolution input shows a specific inline per-field error before submit and preserves the last valid visible state"
+description = "Invalid pane, page-name, saved-analysis, or conflict-resolution input that breaks the PaneConfig, Page, or SavedAnalysis field contract shows a specific inline per-field error naming the offending field before submit and preserves the last valid visible state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "workspace_json_api_shaped_field_contract"
+description = "The Workspace JSON export preview is a single object whose visible text includes the WorkspaceDocument field contract: schemaVersion exactly panecraft-workspace-v1; activePageId; dateRange exactly one of today, last-7-days, last-30-days, last-90-days; pages with id/name/panes; savedAnalyses; and pane entries carrying source, type, metric, size, and refreshInterval from their closed enums"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "created_pane_record_matches_paneconfig"
+description = "After completing Create Pane or Edit with a valid configuration, the new or updated pane's visible type/source/metric/dimension/size/refresh match the submitted PaneConfig, and the Workspace JSON preview for that pane shows the same field names and enum values — the created record is the export payload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "export_contains_session_mutations"
+description = "After creating or renaming a page, adding or editing a pane with a distinctive metric, changing the shared date range, and creating a saved analysis, both Workspace JSON and Markdown report previews contain those session values under the field-contract keys"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "workspace_import_round_trip"
+description = "After downloading Workspace JSON from a mutated session, Import of that same document reconstructs the same pages, panes, date range, and saved analyses in the UI and in both export previews without a reload"
 type = "binary"
 weight = 1.0
 
@@ -209,6 +237,22 @@ name = "chart_hover_tooltip_follows_point"
 description = "Hovering a data point or bar in a chart pane shows a tooltip with that point's label and value, and moving to another point moves the tooltip to the newly hovered point"
 type = "binary"
 weight = 0.5
+
+[[criterion]]
+id = "1.n35"
+name = "export_omits_session_mutations"
+description = "After editing a pane metric, changing the date range, or creating a saved analysis, an open Workspace JSON or Markdown report preview omits those edited session values"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n36"
+name = "workspace_json_missing_required_contract_keys"
+description = "An open Workspace JSON export preview omits required contract keys (schemaVersion panecraft-workspace-v1, activePageId, dateRange, pages, or savedAnalyses) or shows dateRange / pane type / size / refreshInterval / source values outside their closed enums"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.catchall"

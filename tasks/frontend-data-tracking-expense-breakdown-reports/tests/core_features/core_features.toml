@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -70,28 +70,28 @@ weight = 1.0
 [[criterion]]
 id = "1.2"
 name = "created_transaction_appears_in_list"
-description = "After creating a transaction with payee 'Ada Books' and a valid amount, the text 'Ada Books' is visible in the transactions list"
+description = "After creating a transaction with payee Ada Books and a valid amount matching the field contract, the text Ada Books is visible in the transactions list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
 name = "three_creates_add_exactly_three_rows"
-description = "After adding 3 new transactions on top of the seed set, the list shows exactly 3 more rows than the initial seeded count"
+description = "After adding 3 new valid transactions on top of the seed set, the list shows exactly 3 more rows than the initial seeded count"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
 name = "expense_create_updates_kpi"
-description = "After creating an expense transaction, Total Expenses (or Net) KPI updates to reflect the new amount"
+description = "After creating an expense transaction, Total Expenses or Net KPI updates to reflect the new amount"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
 name = "edited_payee_replaces_old_value"
-description = "After editing a payee from the seeded value to 'Evening Market', the text 'Evening Market' is visible and the previous payee is not"
+description = "After editing a payee from the seeded value to Evening Market, the text Evening Market is visible and the previous payee is not"
 type = "binary"
 weight = 1.0
 
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "1.26"
 name = "kpi_cards_static_or_hardcoded"
-description = "Summary metric cards show static or hardcoded totals that do not change when transactions are added or deleted"
+description = "Summary metric cards remain fixed at their initial totals after a transaction is added or deleted (static or hardcoded KPIs)"
 type = "binary"
 weight = 1.0
 negate = true
@@ -248,14 +248,14 @@ weight = 1.0
 [[criterion]]
 id = "1.32"
 name = "ledger_sidebar_shell_with_inert_nav"
-description = "The sidebar shows a branded Ledger nav of roughly a dozen items (Dashboard, Accounts, Transactions, Cash Flow, Reports, Budget, Recurring, Goals, Investments, Forecasting, Advice) with Reports as the active item, a 'Shared demo report' eyebrow, 'Demo mode'/'Sample data' chips, notification and settings icons, and an Alex Rivera profile; clicking any other nav item is an inert demo control that does not navigate away from the reports page"
+description = "The sidebar shows a branded Ledger nav of roughly a dozen items (Dashboard, Accounts, Transactions, Cash Flow, Reports, Budget, Recurring, Goals, Investments, Forecasting, Advice) with Reports as the active item, a Shared demo report eyebrow, Demo mode/Sample data chips, notification and settings icons, and an Alex Rivera profile; clicking any other nav item is an inert demo control that does not navigate away from the reports page"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.33"
 name = "inert_chrome_and_tab_switch_fire_toasts"
-description = "Clicking inert chrome actions (Filters, Date, Save, Sort, Columns, Export CSV) and switching chart tabs each fire a demo toast confirming the action, while real create, edit, and delete perform actual state changes rather than being replaced by a toast"
+description = "Clicking inert chrome actions (Filters, Date, Save, Sort, Columns) and switching chart tabs each fire a demo toast confirming the action, while real create, edit, delete, export, and import perform actual state changes rather than being replaced by a toast"
 type = "binary"
 weight = 1.0
 
@@ -277,7 +277,7 @@ negate = true
 [[criterion]]
 id = "1.36"
 name = "form_submit_disabled_until_valid"
-description = "The transaction create/edit form presents date, payee, category, account, and amount fields; the submit control stays disabled until every required field is valid, and each invalid field shows an inline message naming that field before submit"
+description = "The transaction create/edit form presents date, payee, category, account, amount, and optional status fields; the submit control stays disabled until every required field is valid against the field contract, and each invalid field shows an inline message naming that field before submit"
 type = "binary"
 weight = 1.0
 
@@ -287,6 +287,56 @@ name = "income_rows_styled_positive"
 description = "In the transactions list, income amounts render with a leading + and a distinct positive (green) color while expense amounts render neutral"
 type = "binary"
 weight = 0.5
+
+[[criterion]]
+id = "1.38"
+name = "field_contract_rejects_zero_and_cross_field"
+description = "Submitting create with amount 0, or with category Salary and a negative amount, adds no row; inline validation messages name the offending fields and the transactions count is unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "date_range_and_payee_search_narrow_list"
+description = "Applying a date-range filter narrows visible rows to dates inside the inclusive range, and typing a payee search query narrows rows to case-insensitive substring matches; clearing each control restores the prior wider list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "burn_rate_panel_tracks_ceiling_and_overage"
+description = "The Burn rate panel shows daily expense totals for the current calendar month against an editable monthly ceiling and a projected month-end spend; lowering the ceiling below the projection shows a visible over-burn treatment that names the overage, and raising it above clears the treatment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "command_palette_runs_declared_commands"
+description = "Pressing Cmd+K or Ctrl+K opens a command palette listing at least New transaction, Switch to Breakdown, Switch to Trends, Export report, Import CSV, Focus payee search, and Clear filters; choosing Switch to Trends activates the Trends panel and choosing Export report opens the export drawer"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "export_report_json_and_markdown_reflect_session"
+description = "After creating transactions with payees Ada Books and Evening Market, Export report shows a JSON tab whose transactions array contains both payees and whose totals.count equals the live summary strip count, and a Markdown tab titled Expense Breakdown Report with Totals and Category breakdown sections; Download JSON and Download Markdown offer expense-breakdown-report.json and expense-breakdown-report.md; Copy shows a Copied confirmation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "import_csv_diagnostic_commits_valid_rows"
+description = "Import CSV accepts a header date,payee,category,account,amount,status; invalid rows appear in a mismatch list naming the row number and offending field; committing valid rows with Replace all updates the table, KPIs, charts, and burn rate, and a subsequent export reflects the committed rows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "export_omits_session_mutations"
+description = "After creating a distinct payee transaction, the Export report JSON transactions array or Markdown report omits that payee and totals.count disagrees with the live summary strip count"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.catchall"

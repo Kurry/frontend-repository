@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,63 +63,70 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "4.1"
 name = "repository_row_animate_in_out"
-description = "Driven through the real UI controls (never a state-shortcut tool call): a newly added repository row animates in from opacity 0 over roughly 200 milliseconds, and a removed row animates out rather than vanishing instantly"
+description = "Via the real Add repository / Remove UI controls (not a WebMCP shortcut): new repository rows animate in from opacity 0 over roughly 200 milliseconds on add, and a removed row animates out rather than vanishing instantly"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
 name = "progress_bar_smooth_fill"
-description = "During a real scan the progress bar fills with a smooth transition tied to the progress percentage, advancing continuously and never jumping backward"
+description = "Via the real Scan Now UI path: the progress bar fills with a smooth linear transition tied to scan progress percentage, never jumping backward"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
 name = "step_status_chip_transitions"
-description = "Watching a real scan, step status chips transition visibly between pending, running, and complete rather than swapping instantly, and new timeline entries slide in at the top of the log"
+description = "Via the real scan UI path: step status chips transition visibly between pending, running, and complete rather than swapping instantly, and newly appearing timeline entries slide in at the top of the log"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
 name = "disclosure_and_accordion_transitions"
-description = "The findings disclosures and document type accordion groups open and close with a short height-and-opacity transition and a rotating chevron cue when activated with the real pointer or keyboard"
+description = "Via the real UI controls: findings disclosures and accordion groups open and close with a short height-and-opacity transition and a rotating chevron cue"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "modal_enter_exit"
-description = "The Add repository modal enters and exits with a short opacity-and-scale transition of roughly 200 milliseconds when opened and closed via its real triggers"
+name = "modal_export_palette_enter_exit"
+description = "Via the real UI controls on a fresh interaction: the Add repository modal, Export panel, and command palette enter and exit with a short opacity-and-scale (or fade) transition of roughly 200 milliseconds"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
 name = "hover_wash_system"
-description = "Verified with computed styles while hovering: buttons ease background and shadow with a slight press effect, repository rows, document rows, and timeline entries take a visible hover wash, the document hover preview fades in, and form controls show focus rings"
+description = "Buttons ease background and shadow with a slight press effect; repository rows, document rows, and timeline entries take a visible hover wash; the document hover preview fades in; form controls show focus rings — verified via computed style while hovering"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
 name = "countdown_ticks_visibly"
-description = "During the retry backoff, the countdown text updates each second as a visible ticking change rather than staying frozen until the retry fires"
-type = "binary"
-weight = 0.5
-
-[[criterion]]
-id = "4.8"
-name = "reduced_motion_fallback"
-description = "With prefers-reduced-motion set, the progress bar jumps to its current value instantly and row, disclosure, and modal animations apply instantly while every feature remains fully usable"
+description = "Via the real failure-path scan UI: the backoff countdown text updates each second while waiting (Playwright-observed ticking)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "4.8"
+name = "reduced_motion_fallback"
+description = "With prefers-reduced-motion set, the progress bar jumps to its current value instantly and row, disclosure, modal, palette, and export animations apply instantly while flows remain completable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "export_copy_download_confirmation_motion"
+description = "Via the real Export Copy and Download controls: a short confirmation appears before resetting"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "4.n1"
 name = "animation_jank_or_flicker"
-description = "Row add/remove, disclosure toggling, or scan progress causes visible layout jank, flicker, or animations that stutter or leave elements misaligned after settling"
+description = "Row, progress, step-chip, or modal animations visibly jank, flicker, or stutter during normal use"
 type = "binary"
 weight = 1.0
 negate = true
@@ -127,7 +134,7 @@ negate = true
 [[criterion]]
 id = "4.n2"
 name = "static_interactive_chrome"
-description = "Buttons, rows, checkboxes, or accordion headers give no hover, focus, or press feedback at all, leaving the interactive chrome static under the pointer"
+description = "Buttons, repository rows, document rows, and timeline entries show no hover wash or press feedback — interactive chrome looks entirely static"
 type = "binary"
 weight = 1.0
 negate = true
@@ -135,7 +142,7 @@ negate = true
 [[criterion]]
 id = "4.catchall"
 name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction performed, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable motion defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action performed, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

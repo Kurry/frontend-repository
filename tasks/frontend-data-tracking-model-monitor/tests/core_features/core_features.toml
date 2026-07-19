@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "seeded_catalog_complete"
-description = "On load, the model catalog table contains at least 20 seeded models from at least 5 distinct providers, and each row shows model name, provider, context window, cost per 1k input tokens, cost per 1k output tokens, and a free or paid badge; rows reachable by scrolling within the table container count as present"
+description = "On load, the model catalog table contains at least 20 seeded models from at least 5 distinct providers, and each row shows model name, provider, context window, cost per 1k input tokens, cost per 1k output tokens, a free or paid badge, and a pin control; rows reachable by scrolling within the table container count as present"
 type = "binary"
 weight = 1.0
 
@@ -98,7 +98,7 @@ weight = 1.0
 [[criterion]]
 id = "1.6"
 name = "shown_of_total_count_tracks"
-description = "A visible count near the table states how many models are shown out of the total (for example 12 of 24 models) and updates correctly after a search, after a provider filter, and after a refresh"
+description = "A visible count near the table states the number of models shown out of the total (for example 12 of 24 models) and updates correctly after a search, after a provider filter, after the pinned-only chip, and after a refresh"
 type = "binary"
 weight = 1.0
 
@@ -119,14 +119,14 @@ weight = 1.0
 [[criterion]]
 id = "1.9"
 name = "free_transition_toast_respects_toggle"
-description = "With alerts toggled on, a model transitioning to free during a refresh or simulation produces an in-app toast naming that model which auto-dismisses; with alerts toggled off, an equivalent transition produces no toast"
+description = "With alerts toggled on and a valid minimum context window saved, a qualifying model transitioning to free during a refresh or simulation produces an in-app toast naming that model which auto-dismisses; with alerts toggled off, an equivalent transition produces no toast"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
 name = "cost_sidebar_seeded_rollups"
-description = "The right sidebar opens non-empty with at least 3 per-model cost rows each showing model name, requests made, and cost subtotal, and a header showing the session total and total request count derived from at least 6 seeded usage events"
+description = "The right sidebar opens non-empty with at least 3 per-model cost rows each showing model name, requests made, and cost subtotal, and a header showing the session total and total request count derived from at least 6 seeded usage events that each carry prompt tokens and completion tokens"
 type = "binary"
 weight = 1.0
 
@@ -147,14 +147,14 @@ weight = 1.0
 [[criterion]]
 id = "1.13"
 name = "cost_row_sources_disclosure"
-description = "Activating a cost row's contributing-events count trigger opens a list of that model's usage events with timestamp, request label, token count, and cost, and activating an entry's model link highlights that model's row in the catalog table without any outbound navigation"
+description = "Activating a cost row's contributing-events count trigger opens a list of that model's usage events with timestamp, request label, prompt tokens, completion tokens, and cost, and activating an entry's model link highlights that model's row in the catalog table without any outbound navigation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.14"
 name = "simulation_stream_updates_rollups"
-description = "Scripted probe: record the session total, one model's request count and subtotal, and the pie chart state; start the simulation and wait for at least two usage events to appear in the feed; confirm the feed gained the events with timestamp, model, tokens, and cost, and the affected models' rows, the session total, the total request count, and the pie chart all changed together without a reload"
+description = "Scripted probe: record the session total, one model's request count and subtotal, the pie chart state, and the remaining-budget readout; start the simulation and wait for at least two usage events to appear in the feed; confirm the feed gained the events with timestamp, model, request label, prompt tokens, completion tokens, and cost, and the affected models' rows, the session total, the total request count, the pie chart, and the remaining-budget readout all changed together without a reload"
 type = "binary"
 weight = 1.0
 
@@ -175,7 +175,7 @@ weight = 1.0
 [[criterion]]
 id = "1.17"
 name = "compare_flow_round_trip"
-description = "Scripted probe: select three model rows by checkbox, confirm the Compare control enables only once two or more are selected, open it, confirm the modal shows a side-by-side table with name, provider, context window, input cost, output cost, and free/paid state for all three, close the modal, and confirm the three rows remain selected"
+description = "Scripted probe: select three model rows by checkbox, confirm the Compare control enables only once two or more are selected, open it, confirm the modal shows a side-by-side table with name, provider, context window, input cost, output cost, free/paid state, and pinned state for all three, close the modal, and confirm the three rows remain selected"
 type = "binary"
 weight = 1.0
 
@@ -210,9 +210,89 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "1.22"
+name = "pin_watchlist_and_pinned_filter"
+description = "At least 2 seeded models open pre-pinned; toggling a row's pin control fills or clears its pin treatment; activating the Pinned-only filter chip narrows the table to pinned models only and the shown-of-total count matches"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "session_budget_ceiling_and_over_budget"
+description = "A session budget control sets a dollar ceiling; the remaining-budget readout equals ceiling minus session total and updates live; when the session total exceeds the ceiling the readout shows a 2 pixel error-colored border and an Over budget label; raising the ceiling above the total clears that treatment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "budget_field_contract_rejects_invalid"
+description = "Submitting a session budget of 0, a negative number, a non-numeric value, or a value with more than 2 decimal places shows an inline message naming the budget field and leaves the previous ceiling in effect"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "manual_usage_log_field_contract"
+description = "Log usage opens a modal; model must exactly match a catalog name, request label must be 1 to 80 non-empty characters, and prompt tokens and completion tokens must be integers greater than or equal to 0; invalid fields show inline messages naming each field and submit stays disabled until valid; cost preview equals (prompt tokens × input cost per 1k / 1000) + (completion tokens × output cost per 1k / 1000) and is not editable to a different number"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "manual_usage_log_updates_derived_surfaces"
+description = "Submitting a valid Log usage event appends it at the top of the feed with timestamp, model, request label, prompt tokens, completion tokens, and cost, and the affected model's request count and subtotal, session total, total request count, pie chart, and remaining-budget readout all recompute in the same interaction without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "undo_redo_mutating_edits"
+description = "Toolbar Undo and Redo apply to alert saves, session budget changes, pin toggles, and successful manual usage logs; each is disabled when there is nothing to undo or redo; undoing a manual log removes that event and restores the prior session total, per-model subtotals, pie chart, and remaining budget exactly; Redo reapplies the step; a new mutation after undo clears and disables Redo"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "command_palette_destinations_and_actions"
+description = "Pressing Control-K or Command-K opens a command palette whose search fuzzy-matches at least model catalog, cost sidebar, event feed, alert settings, log usage, export panel, start simulation, pause simulation, refresh catalog, and export session; choosing a destination opens that surface and closes the palette; Escape closes the palette and returns focus"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "export_routing_session_report_live"
+description = "Export session opens a panel with Session JSON and Usage CSV tabs compiled live from the store; Session JSON includes schema version routing-session-report-v1, exported_at, catalog records with name, provider, context_window, input_cost_per_1k, output_cost_per_1k, pricing_tier free or paid, and pinned, usage_events with timestamp, model, request_label, prompt_tokens, completion_tokens, and cost, cost_rollups, session_total, total_requests, alert_config, session_budget_usd, compare_selected, and pinned_models; Usage CSV has header timestamp,model,request_label,prompt_tokens,completion_tokens,cost and one line per event; after a manual log the request_label and cost appear in both previews before copy or download; Copy places the visible preview on the clipboard with confirmation; Download offers the same text as a file"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "import_session_json_round_trip"
+description = "After mutating the session with a manual log and at least one pin change, importing a previously exported Session JSON restores the feed labels, session total, pins, budget, compare selection, and both export previews to match the imported document; malformed JSON or a document missing routing-session-report-v1 or required arrays shows an inline error naming the import field and leaves the session unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "export_omits_session_mutations"
+description = "After a successful manual usage log or pin toggle that is visible in the UI, the Session JSON or Usage CSV export preview omits that mutation (missing request_label, cost, or pinned model name), revealing a stale or hardcoded export"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.32"
+name = "undo_does_not_restore"
+description = "After a successful manual usage log, activating Undo leaves the event in the feed or leaves the session total unchanged from the post-log value"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true
+

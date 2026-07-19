@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -60,80 +60,95 @@ allowed_tools = [
 [scoring]
 aggregation = "weighted_mean"
 
+
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "no_flips_empty_state"
+description = "With the flips-only filter active, switching to a label pair with no flips shows a designed empty state naming that no criteria flipped, with a control that clears the filter"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "adjudication_and_bulk_validate_inline"
+description = "Adjudication and bulk-apply forms show inline per-field validation before a successful submit when classification is unset or rationale is outside 20–2000 characters"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "errors_name_fields"
+description = "Validation and import errors name the offending field and the rule broken rather than only saying Invalid"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "copy_and_import_confirmation"
+description = "Export Copy shows visible confirmation, and a successful import shows visible confirmation that adjudications were applied"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "terminal_streaming_affordance"
+description = "Terminal-bearing steps show a streaming-versus-complete status affordance while output appears progressively"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "undo_at_empty_stack"
+description = "Undo with an empty history leaves adjudications unchanged and the Undo control stays disabled; Redo with an empty forward stack stays disabled"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "screenshot_step_placeholder"
+description = "Selecting a criterion whose evidence links to a scorer step with a screenshot shows the placeholder screenshot frame in that step's detail with descriptive alternative text"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "semantic_controls"
+description = "Buttons, inputs, checkboxes, and labels for adjudication, bulk apply, export, and import use semantic interactive elements rather than clickable plain text alone"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "overlays_close_paths"
+description = "The adjudication form, export drawer, import surface, and command palette each close via an explicit control and Escape, returning focus to the opener"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "import_rejects_bad_contract"
+description = "Importing malformed Review Package JSON or a document that breaks the field contract shows visible validation naming the offending field and leaves adjudication counts unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "arrow_keys_stop_at_ends"
+description = "Arrow-key navigation in either trajectory stops at its first and last steps without wrapping or console errors"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "double_submit_single_record"
+description = "Double-activating the adjudication submit control records exactly one adjudication for that criterion"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_flips_has_no_feedback"
+description = "A flips-only view with no flips shows a blank region with no empty-state copy and no control to clear the filter"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +156,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n2"
 name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+description = "Validation or import failures are surfaced only in the browser console"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,15 +164,15 @@ weight = 1.0
 [[criterion]]
 id = "4.n3"
 name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+description = "Adjudication, copy, or import actions lack visible feedback and silently succeed or fail"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "import_mutates_without_validation"
+description = "Importing a document that violates the Review Package field contract still mutates adjudications"
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +180,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n5"
 name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+description = "Non-semantic div or span tags wrap the only interactive path for adjudicate, export, or import"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +188,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n6"
 name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+description = "The export drawer, import surface, or command palette cannot be dismissed via keyboard"
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +196,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n7"
 name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+description = "Adjudication or bulk-apply validation feedback is missing or delayed with no UI indication"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,23 +204,23 @@ weight = 1.0
 [[criterion]]
 id = "4.n8"
 name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+description = "Export, Import, Adjudicate, or Apply classification controls have ambiguous or missing labels"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "undo_corrupts_or_errors"
+description = "Activating Undo or Redo at empty-stack boundaries throws, corrupts adjudications, or enables the control incorrectly"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "rationale_overlength_accepted"
+description = "A rationale longer than 2000 characters is accepted and recorded without validation naming the rationale field"
 type = "binary"
 negate = true
 weight = 1.0

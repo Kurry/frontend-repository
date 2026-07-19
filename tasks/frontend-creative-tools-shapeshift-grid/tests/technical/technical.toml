@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -159,6 +159,21 @@ weight = 1.0
 id = "2.14"
 name = "external_asset_requests_made"
 description = "The browser issues network requests to external origins for fonts, icons, libraries, or other assets during load or use"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.15"
+name = "form_and_export_share_board_session_schema"
+description = "Save board, rename, and Import enforce the same Board/Session field contracts the Export session JSON uses (name ≤40 unique, tag ≤24 non-empty, schemaVersion shapeshift-session-v1, closed brushMode/paletteColor/mirrorMode enums, cellSize 16–64): invalid values show inline per-field errors before commit, and Export/Import round-trip only contracted shapes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.16"
+name = "form_export_schema_disagreement"
+description = "Save board or rename validation, or Import validation, accepts values the Export session JSON field contract forbids (or rejects values that contract allows), so form records and export payloads disagree on required fields, enums, or bounds"
 type = "binary"
 weight = 1.0
 negate = true

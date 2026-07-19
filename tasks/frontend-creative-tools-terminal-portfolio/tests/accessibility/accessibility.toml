@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,86 +62,86 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "keyboard_operable_all_primary_controls"
+description = "After boot, every interactive control — traffic lights, mode toggle, board filters and sort, selection checkboxes, batch actions, featured toggles, consent buttons, undo/redo, export Copy/Download, Config Studio fields, and the command prompt — is reachable and operable with the keyboard alone, each showing a visible focus indicator."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "prompt_receives_focus_after_boot"
+description = "After dismissing the boot sequence (Enter, click, or touch), the command prompt receives focus so typing immediately enters a command without an extra click."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "traffic_lights_have_accessible_labels"
+description = "The macOS-style traffic-light window controls carry accessible names describing close, minimize, and maximize (not unlabeled colored dots alone)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "command_output_announced_via_live_region"
+description = "New command output appended to the terminal is announced through an aria-live polite region (or equivalent) so assistive technology hears each result as it appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+name = "forms_explicitly_labeled"
+description = "Project create/edit, identity profile, skill, and import form fields use explicit labels associated with each control."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+name = "autocomplete_keyboard_navigation"
+description = "The autocomplete dropdown is navigable with up/down arrows, Enter or Tab selects the highlighted entry, and Escape closes it without changing the input value."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "terminal_landmarks_present"
+description = "The app exposes semantic landmarks (for example main for the terminal workspace) so assistive technology can navigate past wallpaper chrome to the interactive shell."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+name = "readable_contrast_in_all_four_themes"
+description = "Terminal text and primary controls keep readable contrast against the terminal background in all four themes — dark, light, retro, and glass."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "controls_use_button_semantics"
+description = "Traffic lights, mode toggle, filter controls, consent buttons, and board interactive cards use button/role semantics with accessible names rather than unlabeled clickable divs."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion set, boot typewriter cadence, post-boot ASCII/welcome enter, staggered CLI output reveal, and skill-bar width animations are removed or reduced to instant state changes while boot dismiss, commands, and mode switch remain completable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
-name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+name = "terminal_controls_unreachable_by_keyboard"
+description = "A traffic-light control, mode toggle, board filter, board card, consent button, or the command prompt cannot be reached or activated via keyboard alone after boot."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n2"
-name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+name = "focus_indicators_missing_on_controls"
+description = "Focused traffic lights, mode toggle, filters, board cards, consent buttons, or the command prompt show no visible focus indicator or the indicator is obscured."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,55 +149,55 @@ weight = 1.0
 [[criterion]]
 id = "1.n3"
 name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+description = "Traffic lights, mode toggle, board filters, or consent controls use non-semantic tags without ARIA roles or accessible names."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+name = "status_or_error_color_only"
+description = "Project status badges or validation errors are conveyed by color alone with no text label or other non-color cue."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "exit_overlay_traps_without_escape"
+description = "After closing the terminal with the red traffic light, keyboard users cannot reach the Reopen control or otherwise restore the terminal."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+name = "unreadable_contrast_in_a_theme"
+description = "In dark, light, retro, or glass theme, terminal body text or primary control labels are unreadable due to poor contrast against their background."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+name = "output_or_errors_visual_only"
+description = "New command output or validation errors appear visually only with no aria-live region or accessible association for assistive technology."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+name = "traffic_lights_missing_accessible_names"
+description = "Traffic-light window controls are missing accessible names describing close, minimize, or maximize."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+name = "heading_order_skipped_in_output"
+description = "Terminal section headings in command output or board chrome skip levels (for example jumping H1 to H3) or have no coherent order."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,10 +205,32 @@ weight = 1.0
 [[criterion]]
 id = "1.n10"
 name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+description = "With prefers-reduced-motion set, boot typewriter, staggered CLI output reveal, skill-bar fill, or post-boot enter animations still run fully."
 type = "binary"
 negate = true
 weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "validation_announced_live_region"
+description = "Form and export validation messages are exposed through a polite live region as well as shown visually."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "featured_not_color_alone"
+description = "Featured indicators and status badges are conveyed by text or icon plus color, never color alone."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n11"
+name = "export_controls_keyboard_unreachable"
+description = "Export Copy/Download or Config Studio fields cannot be reached or activated via keyboard alone."
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "accessibility.catchall"

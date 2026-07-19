@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -63,78 +63,78 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+name = "export_summary_or_schema_badge"
+description = "Beyond required export, a compact CalibrationPack summary strip or live schemaVersion badge appears above the export preview and updates with session state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "score_count_up_or_chip_crossfade_polish"
+description = "Beyond baseline motion, re-run score count-up or threshold chip crossfade feels polished and readable during real UI control use"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+name = "optional_operator_coachmarks"
+description = "Optional coachmarks or first-run tips explain heatmap, variance triage, or Export without blocking the required flows"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+name = "chart_or_distribution_extra_affordance"
+description = "The score-by-harness chart or drawer distribution chart adds an extra readability affordance such as clearer legend focus or linked highlighting"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+name = "keyboard_undo_redo_shortcuts"
+description = "Beyond clicking toolbar controls, keyboard shortcuts trigger Undo or Redo while focus is in the calibration console"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+name = "chart_model_memory_within_session"
+description = "Within a session, the chart model selector or series visibility preference stays sticky as the operator moves among views"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+name = "meridian_console_brand_presence"
+description = "Meridian Calibration reads as a named analytics console brand in the header rather than a generic untitled dashboard"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+name = "optional_density_or_theme_touch"
+description = "An optional density or theme touch beyond the required ramp and chips is available without breaking contrast"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+name = "copy_calibration_pack_frictionless"
+description = "Copying CalibrationPack JSON or Variance CSV is one obvious control away with clear confirmation, reducing export friction"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+name = "operator_trust_affordances"
+description = "Operator-trust affordances such as export summary counts or schemaVersion visibility make the session artifact easier to verify"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.n1"
 name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+description = "The console meets only the minimum letter of the spec with no observable polish beyond required controls"
 type = "binary"
 negate = true
 weight = 1.0
@@ -142,7 +142,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n2"
 name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
+description = "The UI reads as a generic unbranded admin template with no Meridian Calibration identity"
 type = "binary"
 negate = true
 weight = 1.0
@@ -150,7 +150,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n3"
 name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
+description = "No optional guidance, summary strip, or keyboard affordance helps an operator trust Export or triage"
 type = "binary"
 negate = true
 weight = 1.0
@@ -158,7 +158,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n4"
 name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
+description = "Heatmap, chart, and export surfaces show no extra polish beyond bare required widgets"
 type = "binary"
 negate = true
 weight = 1.0
@@ -166,7 +166,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n5"
 name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
+description = "Aside from required motion, the interface feels entirely flat and static with no microinteraction polish"
 type = "binary"
 negate = true
 weight = 1.0
@@ -174,7 +174,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n6"
 name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
+description = "Clipboard copy confirmation or download affordances for CalibrationPack are awkward or missing beyond the letter of Export"
 type = "binary"
 negate = true
 weight = 1.0
@@ -182,7 +182,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n7"
 name = "personalization_is_impossible"
-description = "Personalization is impossible."
+description = "Chart model or series choices reset when navigating views within the same session"
 type = "binary"
 negate = true
 weight = 1.0
@@ -190,7 +190,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n8"
 name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
+description = "Completed re-run and classification moments have no toast or motion polish at all"
 type = "binary"
 negate = true
 weight = 1.0
@@ -198,7 +198,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n9"
 name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
+description = "The calibration console has no distinctive visual or interaction twist beyond a stock table grid"
 type = "binary"
 negate = true
 weight = 1.0
@@ -206,7 +206,7 @@ weight = 1.0
 [[criterion]]
 id = "11.n10"
 name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
+description = "Implementation stops at MVP widgets with no operator-trust extras around Export or triage"
 type = "binary"
 negate = true
 weight = 1.0

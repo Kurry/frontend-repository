@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,88 +62,133 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "14.1"
-name = "multi_facet_round_trip"
-description = "Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline — never a mix."
+name = "multi_facet_campaign_reload_round_trip"
+description = "Multi-facet round-trip: set a fighter display name, buy one Cantina upgrade, equip a Mask if owned (or note none), unlock progress that changes Pesos, and Save Checkpoint from a paused run; reload. All facets survive together — name, upgrade level, Pesos, Masks, unlocks, and Resume Run — never a mix of surviving and reverted facets."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.2"
-name = "sort_reversal_proves_live_data"
-description = "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders."
+name = "stage_selection_reversal_proves_live_state"
+description = "Selection-reversal proof (genre stand-in for sort reversal): with Stages 1 and 2 unlocked, start Stage 1 and note the scene identity, return to map, start Stage 2 and note a different scene/enemy setup, then return and start Stage 1 again. Stage 1 combat returns — proving stage start is derived from live selection, not one hardcoded battle."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.3"
-name = "derived_view_responds_to_input"
-description = "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input."
+name = "upgrade_derived_hud_sensitivity"
+description = "Derived-view sensitivity: buy Max health in the Cantina and start a run; confirm the HUD maximum Health capacity rises meaningfully versus the pre-purchase run rather than redrawing an identical meter capacity."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.4"
-name = "cross_view_echo_without_reload"
-description = "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list ↔ detail, board ↔ stats) without reload."
+name = "cantina_purchase_echoes_on_stage_map"
+description = "Cross-view echo: buy an upgrade in the Cantina; without reload confirm Pesos on the Stage-select map and the Cantina both reflect the exact deducted cost and the upgrade level change."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.5"
-name = "count_delta_is_exact"
-description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+name = "pesos_count_delta_exact"
+description = "Count-delta integrity: measure Pesos on the Stage map, buy a Cantina upgrade with a shown cost, and re-measure immediately — Pesos decreases by exactly that cost (no off-by-one, no lagging counter)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.6"
-name = "different_inputs_change_outcomes"
-description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+name = "different_masks_different_fury_color"
+description = "Input-dependent output: equip Mask A and trigger Fiesta Fury noting the effect color; equip a different Mask B (or unequip) and trigger Fiesta Fury again. The two full-screen effect colors differ in the ways the inputs dictate."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.7"
-name = "interleaved_flows_preserve_state"
-description = "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state."
+name = "interleaved_pause_and_cantina_flows"
+description = "Interleaved-flow integrity: start a Stage, Pause, open Cantina from the map after Save Checkpoint, buy an upgrade, then Resume Run; confirm the checkpoint combat values restore and the Cantina purchase still shows on the map — neither flow corrupted the other."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.8"
-name = "empty_to_repopulated_round_trip"
-description = "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions."
+name = "reset_then_reprogress_round_trip"
+description = "Edge-state round-trip: confirm Reset Progress to Stage 1 defaults (no Masks, starting Pesos, no checkpoint), then complete Stage 1 Victory and buy one upgrade; confirm unlocks, Pesos, and Cantina level track through both transitions."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "export_import_round_trip_preserves_campaign"
+description = "Mutate → derived → export → import: change fighter.displayName and buy an upgrade; confirm Export Campaign JSON contains those values and schemaVersion fandangofury.campaign.v1; change the name away; Import the exported document; confirm Stage map name, Pesos, and Cantina level return to the exported values."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "history_undo_round_trip_restores_surfaces"
+description = "Undo round-trip: Apply Scenario Change or a progression change so Pesos/unlocks update, Undo restores the prior visible snapshot on Stage map surfaces, Redo reapplies it — never a surface left stale."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.11"
+name = "save_resume_checkpoint_round_trip"
+description = "Save/resume probe: Pause mid-wave noting Health and Wave indicator, Save Checkpoint, refresh, Resume Run; confirm Health, wave/boss phase, and Fury match the saved checkpoint and combat continues."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.n1"
-name = "partial_persistence_is_incoherent"
-description = "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence."
+name = "partial_persistence_after_reload"
+description = "After configuring name, upgrades, Pesos, Masks, and a checkpoint then reloading, some facets survive while others reset — incoherent partial persistence"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n2"
-name = "derived_surface_ignores_inputs"
-description = "A derived surface renders identically regardless of its inputs."
+name = "derived_hud_ignores_upgrades"
+description = "Buying Max health leaves the next-run HUD max Health identical to the pre-purchase capacity — a derived surface ignoring its inputs"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n3"
-name = "different_inputs_produce_identical_output"
-description = "Repeating an action with different inputs yields byte-identical output."
+name = "different_inputs_identical_export"
+description = "Two campaigns with different displayName and pesos values produce byte-identical Export Campaign JSON text"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "State changes appear in one view but not another until reload."
+name = "cross_view_state_stale_until_reload"
+description = "After a Cantina purchase or Mask equip, Stage map or Export preview still shows stale values until a full page reload"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "export_text_ignores_session_mutations"
+description = "After mutating displayName and an upgrade level, Export Campaign JSON is identical to the pre-mutation text — an export that omits the session actual work"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n6"
+name = "undo_leaves_surfaces_stale"
+description = "After Undo of a progression change, Stage map Pesos or unlocks still show the post-change values while History state restored"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n7"
+name = "resume_run_ignores_checkpoint"
+description = "After Save Checkpoint and refresh, Resume Run starts a fresh Stage 1 wave instead of restoring the saved Health/wave/boss phase"
 type = "binary"
 negate = true
 weight = 1.0
@@ -151,7 +196,8 @@ weight = 1.0
 [[criterion]]
 id = "behavioral.catchall"
 name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0
+

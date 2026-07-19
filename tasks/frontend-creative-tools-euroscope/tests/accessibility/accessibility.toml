@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,78 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "wizard_controls_keyboard_accessible"
+description = "Every interactive control in the patching wizard — Base theme, Base icon set, swatch pickers and hex fields, Back, Continue, Generate, and Download — is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter, or Space)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "select_controls_arrow_key_operable"
+description = "The Base theme and Base icon set controls are operable with arrow keys and Enter or Space, and expose their selected option to assistive technology."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "swatch_fields_labelled_by_role"
+description = "Each swatch colour picker and hex field is labelled with its swatch role name (Backdrop darkest, Backdrop darker, Backdrop main, Backdrop lighter, Backdrop lightest, or Foreground secondary) so the label is programmatically associated with the control."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "validation_and_status_live_regions"
+description = "Inline hex validation messages and the replaced-count status line are announced via an aria-live polite region as well as shown visually."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+name = "progress_bar_exposes_current_step"
+description = "The progress bar conveys the current wizard step to assistive technology (for example via aria attributes or an accessible name that includes the stage), not only by colour."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+name = "visible_keyboard_focus_indicators"
+description = "Every interactive wizard control shows a clearly visible focus indicator when focused from the keyboard."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "landmarks_and_heading_order"
+description = "The patching workspace exposes semantic landmarks (for example main) and headings follow a logical order with no skips from H1 to deeper levels."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+name = "text_and_controls_meet_contrast"
+description = "Primary body text, stage labels, and control labels on the light neutral surfaces meet at least WCAG AA contrast (about 4.5:1 for text; about 3:1 for interactive control boundaries)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "icons_have_accessible_names"
+description = "Header badge, alert, check-mark, and control icons that convey meaning have descriptive accessible names (alt text or aria-label); purely decorative icons are hidden from the accessibility tree."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "reduced_motion_keeps_functionality"
+description = "With prefers-reduced-motion enabled on a fresh load, transitions are removed and every wizard state change still completes with full functionality (advance, return, theme select, icon-set toggle, generate)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
-name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+name = "keyboard_cannot_reach_wizard_controls"
+description = "Core wizard controls (Base theme, Base icon set, swatch hex fields, Back, Continue, Generate, or Download) cannot be reached or activated via keyboard Tab/Enter/Space."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,71 +141,83 @@ weight = 1.0
 [[criterion]]
 id = "1.n2"
 name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+description = "Focus indicators are missing or obscured on interactive wizard controls when focused from the keyboard."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n3"
-name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+name = "selects_lack_accessible_selection"
+description = "The Base theme or Base icon set control exposes no selected option to assistive technology and cannot be operated with arrow keys plus Enter or Space."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+name = "validation_or_status_visual_only"
+description = "Inline hex validation or the replaced-count status line is visual only: no aria-live polite announcement when the message or count updates."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "progress_step_is_color_only"
+description = "The current wizard step is indicated by colour alone on the progress bar, with no non-colour or programmatic cue for assistive technology."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+name = "animations_ignore_reduced_motion"
+description = "With prefers-reduced-motion set, step-body transitions, progress-circle fills, button hover/press motion, or the patched-result entrance animation still run."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
+id = "1.11"
+name = "command_palette_dialog_a11y"
+description = "The command palette uses role dialog with aria-modal true, traps focus while open, closes on Escape, and returns focus to the control that opened it."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "contrast_pass_fail_not_color_only"
+description = "Contrast matrix Pass/Fail is not colour-only: each row includes a text mark such as Pass or Fail alongside the ratio."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "undo_export_controls_keyboard"
+description = "Undo, Redo, snapshot controls, colour-blindness options, bitmap checkboxes, bulk actions, export tabs, Copy export, and Import recipe are reachable and operable with the keyboard alone with a visible focus indicator."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "copy_and_contrast_live_regions"
+description = "Contrast pass/fail updates and the Copy export confirmation are announced via an aria-live polite region as well as shown visually."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+name = "palette_lacks_focus_trap"
+description = "While the command palette is open, Tab moves focus outside the overlay, Escape leaves it open, or closing it returns focus to a control other than the opener."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n10"
-name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+name = "contrast_status_color_only"
+description = "Contrast matrix rows indicate Pass/Fail by colour alone with no text mark readable by assistive technology."
 type = "binary"
 negate = true
 weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,164 +62,166 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "2.1"
-name = "2_1"
-description = "The portfolio overview appears interactive with no blank page, fatal error overlay, login wall, or generic starter content."
+name = "overview_serves_without_gate"
+description = "The portfolio overview serves via the documented start path and appears interactive with no blank page, fatal error overlay, login wall, or generic starter content."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
-name = "2_2"
-description = "Adding a holding completes with no uncaught exception or unhandled promise rejection in the console."
+name = "shared_collection_coherence"
+description = "Filter, add, edit, and delete all recompute the visible holdings, net-worth total, meta line, and allocation from one shared holdings collection rather than a second disconnected copy — a change in one surface is reflected everywhere without reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
-name = "2_3"
-description = "Filtering or selecting a holding produces no same-origin 4xx or 5xx responses, excluding a favicon probe."
+name = "market_value_and_allocation_invariants"
+description = "For visible holdings, each row's market value equals quantity times unit price, the net-worth total equals the sum of visible market values, and allocation percentages for visible classes sum to 100 percent."
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "2.4"
-name = "2_4"
-description = "Filter, add, edit, and delete all recompute the visible holdings, totals, and allocation from one shared collection rather than a second disconnected copy."
+name = "persistence_round_trip"
+description = "After adding a holding and an activity, a full page reload restores the same holdings collection, activities collection, and the updated net-worth total from localStorage or equivalent client storage, with no login step."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.5"
-name = "2_5"
-description = "Reloading initializes the holdings and totals without duplicated rows, a stuck overlay, or a hydration failure."
+name = "add_flow_console_clean"
+description = "Adding a holding completes with no uncaught exception or unhandled promise rejection in the console."
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "2.6"
-name = "hidden_ground_truth_state_exposed"
-description = "A hidden element, attribute, or unexpected global variable exposes internal ground-truth state (the computed net worth or allocation) that a user could not reach through normal visible interaction."
+name = "hydration_clean_console"
+description = "The console is hydration-clean: no hydration mismatch errors or warnings on first load of the root route, and none after client-side interactions on the overview."
 type = "binary"
 weight = 1.0
-negate = true
 
 [[criterion]]
 id = "2.7"
-name = "judge_addressed_text_present"
-description = "A judge-visible surface (rendered text, DOM comments, alt text, title, or console output) contains language addressed to an AI judge or grading system."
+name = "deep_link_root_parity"
+description = "Loading the root URL directly renders the same portfolio overview chrome, seeded holdings baseline, and layout as remaining on the root after in-app interactions — no blank shell and no alternate route content."
 type = "binary"
 weight = 1.0
-negate = true
 
 [[criterion]]
 id = "2.8"
-name = "fabricated_or_hardcoded_success"
-description = "Repeating the add workflow with two different inputs yields constant or hardcoded output, or a reported success leaves no matching holding behind after a reload."
+name = "same_origin_assets_only"
+description = "Network activity during load and exercise shows only same-origin requests for scripts, styles, fonts, icons, and data — no CDN imports for those assets."
 type = "binary"
 weight = 1.0
-negate = true
 
 [[criterion]]
 id = "2.9"
-name = "automation_detection_branching"
-description = "The app behaves differently when it detects automation (navigator.webdriver or similar signals) than under normal use."
+name = "ui_survives_rapid_interaction"
+description = "Rapid successive filter, sort, select, and form interactions leave table, detail, and totals coherent with no desynced surfaces."
 type = "binary"
-weight = 1.0
-negate = true
+weight = 0.5
 
 [[criterion]]
 id = "2.10"
-name = "keyboard_only_core_flow"
-description = "A core flow can be completed with the keyboard alone: form fields are reachable by Tab, the form submits on Enter, and table rows can be selected with Enter or Space while focused."
+name = "no_debug_artifacts"
+description = "The running app shows no debug overlays, leftover placeholder scaffolding, or console.log spam that clutters the console during normal portfolio flows."
 type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.n1"
+name = "persistence_absent_after_reload"
+description = "After adding a holding and an activity and reloading the page, the holdings or activities collection reverts to the seeded baseline: the mandated client-storage persistence of holdings, activities, and totals is absent."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n2"
+name = "external_requests_or_outbound_links"
+description = "The network log shows requests to external origins for scripts, styles, fonts, icons, or data, or app chrome contains navigational links that leave the app."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n3"
+name = "views_desync_on_mutation"
+description = "After add, edit, delete, or filter, the same holding or total shows different values in the table, detail panel, net-worth summary, or allocation until reload."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n4"
+name = "console_errors_on_normal_flows"
+description = "Console errors or unhandled promise rejections appear during normal add, edit, filter, sort, select, delete, export, or import flows."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n5"
+name = "hydration_content_flash"
+description = "Server-rendered or statically exported content visibly flashes and is replaced by different client content after hydration: mismatched text, reflowing layout, or restyled elements between first paint and interactive."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n6"
+name = "blank_or_broken_start_path"
+description = "The documented start path fails to serve or renders a blank/broken page instead of the portfolio overview."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n7"
+name = "reload_violates_persistence_rule"
+description = "Reload produces a state inconsistent with mandated persistence: holdings or net worth after reload diverge from the pre-reload persisted collection."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n8"
+name = "allocation_or_net_worth_invariant_broken"
+description = "Visible allocation percentages fail to sum to 100, or the net-worth total disagrees with the sum of visible holdings' market values, or a row's market value disagrees with quantity times unit price."
+type = "binary"
+negate = true
 weight = 1.0
 
 [[criterion]]
 id = "2.11"
-name = "selected_row_exposes_aria_state"
-description = "The selected table row exposes its selected state to assistive technology (for example aria-selected or an equivalent programmatic state), not only through its visual styling."
+name = "export_import_share_one_store"
+description = "Export JSON/CSV and Import portfolio operate on the same shared holdings collection as the table and totals: after import, table rows, net worth, allocation, and a subsequent export all agree."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.12"
-name = "live_region_announces_changes"
-description = "A visually hidden live region announces added, updated, and removed holdings when those actions are performed."
-type = "binary"
-weight = 0.5
-
-[[criterion]]
-id = "2.13"
-name = "validation_messages_programmatically_associated"
-description = "Inline validation messages are programmatically associated with their fields (for example aria-describedby with aria-invalid) and are exposed to assistive technology when they appear, in addition to being shown visually."
-type = "binary"
-weight = 0.5
-
-[[criterion]]
-id = "2.14"
-name = "interactive_within_two_seconds"
-description = "On a local cold load, the app renders the overview and responds to interaction within 2 seconds."
+name = "payload_invariants_on_export"
+description = "Every exported holding shows marketValue equal to quantity times unitPrice, assetClass is one of Equity, ETF, Cash, Crypto, and the JSON version field is 1."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.15"
-name = "hydration_clean_console"
-description = "The console shows no hydration mismatch errors or warnings on a direct load of the root URL, and none after exercising the app's interactions."
+id = "2.n9"
+name = "export_desynced_from_store"
+description = "Export preview holdings disagree with the visible table (missing rows, wrong quantities, or marketValue not equal to quantity times unitPrice) after a create/edit/delete."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "2.16"
-name = "hydration_content_flash"
-description = "The initially rendered content visibly flashes and is replaced by different client content after hydration: mismatched text, reflowing layout, or restyled elements between first paint and interactive."
-type = "binary"
-weight = 1.0
 negate = true
-
-[[criterion]]
-id = "2.17"
-name = "console_clean_full_exercise"
-description = "No console errors or warnings appear during a full exercise of adding, editing, filtering, sorting, selecting, and deleting holdings."
-type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.18"
-name = "responsive_under_rapid_input"
-description = "Under rapid repeated input (quick successive filter changes, sorts, and selections), the UI stays responsive with no hangs, freezes, or dropped interactions."
-type = "binary"
-weight = 0.5
 
-[[criterion]]
-id = "2.19"
-name = "external_requests_or_outbound_links"
-description = "The network log shows requests to external origins for scripts, styles, fonts, icons, or data, or app chrome contains navigational links that leave the app."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.20"
-name = "visible_focus_indicator_on_keyboard_focus"
-description = "Every interactive control (buttons, inputs, the class filter, table rows) shows a visible focus indicator when focused from the keyboard."
-type = "binary"
-weight = 0.5
-
-[[criterion]]
-id = "2.21"
-name = "persistence_absent_after_reload"
-description = "After adding a holding and reloading the page, the holdings collection reverts to the seeded baseline: the mandated client-storage persistence of holdings and totals is absent."
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical defect (console, storage, coherence, hydration, or stability) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, or page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0

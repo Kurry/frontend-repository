@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,49 +63,49 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "6.1"
 name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+description = "After New Note, sidebar count +1, Untitled row at top, title focused, and Quick Switcher lists the same note without reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "invalid_export_and_title_inline_validation"
+description = "Invalid Export as .txt filename or an over-length title triggers immediate inline validation naming the field; confirm stays disabled for bad filenames and no download occurs."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
 name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+description = "Editing title and body updates the sidebar row, counters, and Export Workspace JSON notes entry for that note without reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
 name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+description = "Confirming delete removes the note from the sidebar, editor selection, Quick Switcher, and Workspace JSON notes array without reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "focus_and_overlays_retain_note"
+description = "Toggling Focus Mode and opening Quick Switcher or Shortcuts retains the open note; dismissing overlays returns to that note."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
 name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+description = "After deleting the last note, sidebar empty-state and welcome panel appear, and Workspace JSON shows notes [] with selectedNoteId null."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "search_filters_sidebar_list"
+description = "Search Notes narrows the sidebar with highlighted matches; clearing restores the prior full order."
 type = "binary"
 weight = 1.0
 
@@ -208,6 +208,13 @@ name = "navigation_dead_end_requires_reload"
 description = "Navigation dead ends or requires reload for recovery."
 type = "binary"
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "artifact_end_state_export_import"
+description = "Create two notes, pin one, embed an image, open Export Workspace — JSON shows schemaVersion swiftnote-workspace-v1 and both notes with required fields — then Import that JSON after a destructive clear or on a fresh path and the same titles, pins, and images return"
+type = "binary"
 weight = 1.0
 
 [[criterion]]

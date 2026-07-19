@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,150 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "7.1"
-name = "layout_adapts_desktop_to_mobile"
-description = "Layout adapts gracefully from 1440px desktop to 375px mobile."
+name = "desktop_queue_alongside_table"
+description = "At 1440px width the build-queue region is visible alongside the candidates table and the header shows navigation plus Export, Import, Undo, and Redo"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
-name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+name = "tablet_queue_collapses"
+description = "At widths of 768px and below the build-queue region collapses into a toggleable panel reachable from the header, and the quota grid scrolls within its own container if needed"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
-name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+name = "mobile_no_page_overflow"
+description = "At 375px width no content clips or overflows the viewport and no page-level horizontal scrolling appears; the candidates table scrolls within its own container"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
-name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+name = "mobile_header_menu_reaches_actions"
+description = "At 375px width header actions collapse into a compact menu that still reaches Export, Import, Undo, Redo, and the command palette"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
-name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+name = "quota_grid_scrolls_in_container"
+description = "At narrow widths the quota grid remains usable by scrolling inside its own container rather than forcing page-level horizontal scroll"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.6"
-name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+name = "export_panel_usable_on_mobile"
+description = "At 375px width the export and import panels remain readable and operable without clipped tabs or unreachable Download/Copy controls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.7"
-name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+name = "bulk_tray_adapts"
+description = "At 768px and 375px widths the bulk action tray remains usable with readable selected count and Bulk Score/Select/Reject actions"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.8"
-name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+name = "typography_remains_legible"
+description = "At 375px width repository names, chips, and rollup counts remain legible without overlapping"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.9"
-name = "media_and_canvases_resize"
-description = "Images, grids, and canvases size responsively to fit the layout."
+name = "touch_targets_reach_controls"
+description = "At 375px width primary controls (row actions, queue moves, header menu items) remain hittable without overlapping neighbors"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.10"
-name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
+name = "layout_stable_across_breakpoints"
+description = "Resizing from 1440px to 768px to 375px and back does not permanently break the queue panel, filters, or export entry points"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.n1"
-name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+name = "desktop_queue_missing"
+description = "At 1440px width there is no dedicated build-queue region alongside the candidates table"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n2"
-name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+name = "mobile_page_scrolls_horizontally"
+description = "At 375px width the page itself scrolls horizontally or clips chips, rollups, or queue controls"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n3"
-name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+name = "collapsed_queue_unreachable"
+description = "At 768px width the collapsed build-queue panel cannot be opened from the header"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n4"
-name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+name = "mobile_actions_unreachable"
+description = "At 375px width Export, Import, Undo, Redo, or the command palette cannot be reached"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n5"
-name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
+name = "quota_forces_page_overflow"
+description = "The quota grid at narrow width forces page-level horizontal overflow instead of self-contained scrolling"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n6"
-name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
+name = "export_panel_unusable_narrow"
+description = "At 375px width export/import tabs or Download/Copy controls are clipped or inoperable"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n7"
-name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
+name = "bulk_tray_unusable_narrow"
+description = "At narrow widths the bulk tray overlaps content or its actions cannot be activated"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n8"
-name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
+name = "text_illegible_on_mobile"
+description = "At 375px width table text, chips, or rollups overlap or become unreadable"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n9"
-name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
+name = "controls_too_small_or_stacked_wrong"
+description = "At 375px width primary row or header controls are too small to activate or stacked so they obscure each other"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n10"
-name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
+name = "breakpoint_resize_breaks_chrome"
+description = "After resizing across breakpoints, navigation, queue, or export controls remain broken until reload"
 type = "binary"
 negate = true
 weight = 1.0
@@ -213,7 +213,7 @@ weight = 1.0
 [[criterion]]
 id = "responsiveness.catchall"
 name = "responsiveness_catchall"
-description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable responsiveness or layout defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

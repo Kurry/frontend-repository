@@ -1,0 +1,174 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "layout_sidebar_and_view_switcher"
+description = "The layout shows a left sidebar with the queue, History tab, and suite entries, and a main area that swaps between the annotation card, Taxonomy, Review queue, Agreement, and Export views via a toolbar view switcher; the assist step list and timeline render alongside the queue while a run is active"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "thumbs_icon_button_treatment"
+description = "The thumbs-up and thumbs-down controls use an icon-button style where the selected state renders the icon in the brand blue with a filled background and the unselected button is outlined in a subtle border tone"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "slider_label_and_value_placement"
+description = "Each rubric slider shows its dimension label above the track and its numeric value to the right of the track"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.4"
+name = "response_tile_reading_comfort"
+description = "The response body sits in a tile with a soft light-gray background and generous line height"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "queue_structured_list_badges"
+description = "The queue sidebar renders as a structured list where suites with remaining items show a count tag badge and skipped counts render as a second, visually distinct badge"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "state_chip_color_mapping_consistent"
+description = "Review-state chips use one consistent color mapping everywhere they appear — Unlabeled neutral gray, Labeled blue, Reviewed green, Disputed red — identical in the queue, the review queue tiers, the agreement table, and the card header"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "class_color_consistency"
+description = "A class color is identical across its taxonomy swatch, its picker entry, its boxes on the image, and its region list rows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "disagreement_warning_not_color_only"
+description = "Disagreement-flagged agreement rows carry a distinct warning treatment combining a tinted background with an icon, not color alone"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "typography_hierarchy"
+description = "Typography shows a clear hierarchy: the app title larger than panel headings, which are larger than table body and label text, consistent across views"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "spacing_rhythm_consistent"
+description = "Gaps between the sidebar, card, region area, and panels are visually regular with no crowded or orphaned regions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "control_state_treatments"
+description = "Buttons, inputs, selects, sliders, and toggles show distinct default, hover, focus (visible ring), disabled, and error treatments"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.12"
+name = "single_icon_set"
+description = "One consistent icon set is used throughout the toolbar, queue entries, step statuses, and row actions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n1"
+name = "palette_incoherent_or_offspec"
+description = "Colors are random or inconsistent relative to the specified mappings — for example a Disputed chip that is not red in one view, or brand-blue used for destructive actions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n2"
+name = "text_overlap_or_clipping"
+description = "At 1440px width, any heading, table cell, badge, or preview text overlaps another element or is clipped by its container"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n3"
+name = "default_unstyled_controls"
+description = "Form or button controls render with browser default styling where the spec styles them, or the annotation card reads as an unstyled wireframe rather than a designed surface"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "visual_design.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

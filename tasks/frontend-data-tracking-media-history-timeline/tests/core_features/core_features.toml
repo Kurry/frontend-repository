@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,140 +62,140 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
+name = "stage_opens_with_seeded_pins"
 description = "On load, Scrub/Explore mode shows a timeline stage with seeded event pins or markers for MediaHistoryTimeline"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
+name = "library_shows_seeded_events"
 description = "On load (or after opening Library/Filter), the events list shows multiple seeded events with title and year visible"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
-description = "After creating an event titled 'Signal Tower Demo' with a valid year, the text 'Signal Tower Demo' is visible in the events list"
+name = "create_signal_tower_demo_visible"
+description = "After creating an event titled Signal Tower Demo with a valid year, place, categories, summary, and detail, the text Signal Tower Demo is visible in the events list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
+name = "three_creates_add_three_rows"
 description = "After adding 3 new events on top of the initial user-managed count, the list shows exactly 3 more rows than before those creates"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
+name = "category_filter_narrows_visible_set"
 description = "After filtering by a category/band (with mixed categories present), only matching events remain visible in the filtered list or stage"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
-description = "After editing an event title to 'Evening Broadcast', the text 'Evening Broadcast' is visible and the previous title is not"
+name = "edit_title_to_evening_broadcast"
+description = "After editing an event title to Evening Broadcast, the text Evening Broadcast is visible and the previous title is not"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
+name = "delete_removes_title_from_list"
 description = "After deleting an event, that event's title is no longer visible in the events list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
+name = "empty_state_after_clearing_user_events"
 description = "After deleting all user-managed events (or clearing the editable set), an empty state is visible in the list region"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
-description = "After submitting create with an empty required title, the events count does not increase and validation feedback is visible"
+name = "empty_title_rejected_with_feedback"
+description = "After submitting create with an empty required title, the events count does not increase and validation feedback naming title is visible"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
+name = "scrubber_updates_visible_pins"
 description = "After adjusting the year scrubber/window, the set of visible pins or in-view count updates without full page navigation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
+name = "mode_switch_without_reload"
 description = "After switching between Scrub/Explore and Library/Filter modes, the main canvas shows the other mode without full page navigation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
+name = "hover_feedback_on_pins_and_chrome"
 description = "When hovering pins, list rows, or scrubber controls, a visible hover wash, scale, or glow appears"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "1_13"
+name = "detail_next_prev_wraps"
 description = "Click a pin to open its detail panel with title and summary, then use Next/Previous and confirm stepping wraps around at the ends of the sorted filtered set"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.14"
-name = "1_14"
+name = "pan_and_wheel_zoom_live"
 description = "Drag the stage to pan and use the wheel to zoom; confirm the pins reposition and the year-range readout changes without full page navigation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.15"
-name = "1_15"
+name = "filter_and_search_recompute"
 description = "Toggle a category filter and type in the search box; confirm the visible pins and list recompute to matching events"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.16"
-name = "1_16"
+name = "console_clean_during_session"
 description = "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.17"
-name = "1_17"
+name = "crud_updates_shared_collection"
 description = "Timeline events collection supports create, edit, and delete with list rows and derived counts updating from shared application state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.18"
-name = "1_18"
+name = "two_interaction_modes"
 description = "At least two distinct views or interaction modes are switchable without full page navigation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.19"
-name = "1_19"
-description = "Domain state beyond CRUD is implemented (filters, status/priority/mode, or equivalent) and recomputes visible results from the shared collection"
+name = "filters_recompute_from_shared_collection"
+description = "Domain state beyond CRUD is implemented (filters, year window, category tally) and recomputes visible results from the shared collection"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.21"
-name = "1_21"
+name = "static_html_only_no_crud"
 description = "Timeline events list is static HTML only with no working create/edit/delete against shared state"
 type = "binary"
 weight = 1.0
@@ -203,7 +203,7 @@ negate = true
 
 [[criterion]]
 id = "1.22"
-name = "1_22"
+name = "outbound_navigation_links"
 description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
 type = "binary"
 weight = 1.0
@@ -211,36 +211,36 @@ negate = true
 
 [[criterion]]
 id = "1.23"
-name = "1_23"
+name = "detail_panel_fields_and_stepping"
 description = "Selecting a pin opens an in-page detail panel with a year-and-place kicker, title, category pills, summary, and detail, plus Previous/Next controls that step through the sorted filtered events with wraparound"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.24"
-name = "1_24"
+name = "combined_filters_chronological"
 description = "Filtering combines category toggles (an event shows when any of its categories is active), a live text search across title/place/summary/detail, and the year window, recomputing the visible pins and list chronologically"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.25"
-name = "1_25"
+name = "dual_handle_scrubber_full_span"
 description = "A dual-handle footer scrubber sets the from/to years with handles that cannot cross and keep a minimum gap, a Full span control fits the whole corpus, and a readout shows the current range in BCE/CE form"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.26"
-name = "1_26"
-description = "Escape closes the topmost of the About modal, Filters drawer, or detail panel, and ArrowLeft/ArrowRight step Previous/Next while a detail is open (suppressed while typing in a field)"
+name = "escape_and_arrow_detail_keys"
+description = "Escape closes the topmost of the About modal, Filters drawer, Export drawer, or detail panel, and ArrowLeft/ArrowRight step Previous/Next while a detail is open (suppressed while typing in a field)"
 type = "binary"
 weight = 0.5
 optional = true
 
 [[criterion]]
 id = "1.27"
-name = "1_27"
+name = "pins_noninteractive"
 description = "Timeline pins are non-interactive so clicking a pin opens no detail panel"
 type = "binary"
 weight = 1.0
@@ -333,7 +333,7 @@ weight = 1.0
 [[criterion]]
 id = "1.40"
 name = "inline_errors_and_disabled_submit"
-description = "In the create/edit form, an inline error message naming the field appears next to an empty title or an invalid year before submit, and the submit control stays disabled until every required field is valid"
+description = "In the create/edit form, an inline error message naming the field appears next to an empty title, empty place, empty summary, empty detail, missing categories, or an invalid year before submit, and the submit control stays disabled until every required field is valid"
 type = "binary"
 weight = 1.0
 
@@ -350,6 +350,78 @@ name = "shift_scroll_slides_year_window"
 description = "Shift-scroll (or horizontal scroll) over the stage slides the visible year window earlier or later in time, live and without reload"
 type = "binary"
 weight = 0.5
+
+[[criterion]]
+id = "1.43"
+name = "api_field_contract_on_create"
+description = "A valid create requires title, year (-3200 to 2024 integer), place, one or more categories from the seeded set, summary, and detail; the Library row and detail panel show those same field values for the new event"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "year_bounds_rejected"
+description = "Submitting a year below -3200 or above 2024 (or a non-integer year) shows an inline error naming year and does not increase the events count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "category_tally_tracks_visible_set"
+description = "A live category tally strip shows counts per active category for the currently visible filtered set and recomputes when filters, search, year window, create, edit, delete, bulk actions, undo, or redo change the set"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "bulk_set_category_and_delete"
+description = "In Library/Filter mode, checking at least 2 rows and applying bulk Set category adds the chosen category to each checked event; bulk Delete with confirm removes every checked row and the visible count drops by exactly that number"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "undo_redo_create_round_trip"
+description = "After creating an event, Undo removes that row and restores the prior visible count and category tally; Redo restores the created event; Undo and Redo are disabled when their stacks are empty"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "export_drawer_json_csv_live"
+description = "Export timeline opens a drawer with Timeline JSON and Events CSV tabs compiled live from the store; after creating Signal Tower Demo and Evening Broadcast, both titles appear in the JSON events array and the CSV text, and totals.eventCount equals the live collection length"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "export_download_and_copy"
+description = "Download JSON offers timeline-pack.json matching the JSON tab, Download CSV offers timeline-events.csv matching the CSV tab, and Copy on the active tab shows a visible Copied confirmation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "import_round_trip_reconstructs"
+description = "After mutations, export JSON, clear to an empty/user-cleared state, then Import that JSON — Library list, stage pins, year window, filters, and category tally match the export, and a fresh export's events array matches"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "export_omits_session_mutations"
+description = "After creating or editing an event, the export preview omits that session mutation (missing title or stale fields) while the UI shows it"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.52"
+name = "import_malformed_mutates_state"
+description = "Importing malformed JSON or a pack missing required event fields silently changes the collection or filters without a visible inline error naming the import field"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.catchall"

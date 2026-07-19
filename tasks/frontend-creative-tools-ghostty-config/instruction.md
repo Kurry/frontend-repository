@@ -181,17 +181,24 @@ Module specs:
 </module_spec>
 
 Bindings:
-- Editor operations: select; update_property; delete; preview
-- Editor object types: application; terminal; clipboard; window; colors; fonts; keybinds; mouse; gtk; linux; macos
-- Editor properties: font-family; font-size; font-thicken; cursor-style; cursor-color; cursor-opacity; cursor-style-blink; background; foreground; background-opacity; theme; window-padding-x; window-padding-y; window-decoration; scrollback-limit; mouse-scroll-multiplier; clipboard-read; clipboard-write; copy-on-select
-- Artifact operations: export; copy
-- Destinations: application; terminal; clipboard; window; colors; fonts; keybinds; mouse; gtk; linux; macos
+- Editor operations: select; update_property; delete; preview; switch_mode; add
+- Editor object types: application; terminal; clipboard; window; colors; fonts; keybinds; mouse; gtk; linux; macos; profile
+- Editor properties: font-family; font-size; font-thicken; cursor-style; cursor-color; cursor-opacity; cursor-style-blink; background; foreground; background-opacity; theme; window-padding-x; window-padding-y; window-decoration; scrollback-limit; mouse-scroll-multiplier; clipboard-read; clipboard-write; copy-on-select; profile-name
+- Editor modes: edit; diff
+- Value bounds: font-size 4-60; cursor-style in {block, bar, underline, block_hollow}; background/foreground/cursor-color #RRGGBB; background-opacity/cursor-opacity 0-1; clipboard-read/clipboard-write in {ask, allow, deny}; copy-on-select in {true, false, clipboard}; window-decoration in {auto, none, client, server}; window-padding-x/y non-negative; scrollback-limit non-negative integer; palette N=#RRGGBB with N 0-255; keybind trigger=action; duplicate triggers conflict; profile-name non-empty
+- Artifact operations: export; copy; import
+- Export formats: config
+- Import modes: config-text
+- Destinations: application; terminal; clipboard; window; colors; fonts; keybinds; mouse; gtk; linux; macos; profiles; command-palette
+- Filters: setting-search
 - Themes: Dracula; Nord; Gruvbox Dark; Catppuccin Mocha; Solarized Dark - Patched; Builtin Dark
 
 Mechanics exclusions:
 - Terminal-preview cursor blink stays Playwright-observed
 - Dock open/close stays Playwright-observed
 - Color-picker/slider drag stays Playwright-driven
+- Command-palette open gesture and fuzzy highlight stay Playwright-observed
+- Undo/redo stack scrubbing stays Playwright-observed
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

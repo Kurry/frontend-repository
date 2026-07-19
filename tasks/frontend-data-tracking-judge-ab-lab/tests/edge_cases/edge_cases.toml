@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,110 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "designed_empty_and_agreement_states"
+description = "Before both Compare labels are picked the region shows a designed empty state naming what to pick; a trial pair with zero flips shows the designed agreement state; a pair with no tagged flips shows a zero-state rollup naming how to tag one; and deselecting every Cost series leaves a designed empty chart state."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "rescore_and_attribution_inline_validation"
+description = "Submitting the rescore form with a duplicate case-insensitive labelName, empty labelName, missing scorerModel, or configNote longer than 120 characters shows an inline message naming the offending field and starts no run; submitting attribution with no cause or note longer than 200 characters shows an inline message naming the field and saves nothing."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "saved_pair_validation_names_field"
+description = "Saving a comparison pair with an empty name, duplicate name, name longer than 40 characters, or labelA equal to labelB shows an inline message naming the offending field and adds no menu entry."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "self_compare_blocked"
+description = "Selecting the same label for both A and B is blocked with the already-chosen label disabled or a visible rejection message, and no self-comparison table renders."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "double_submit_single_rescore"
+description = "Double-activating the rescore submit control starts exactly one run and creates exactly one label."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "undo_disabled_is_noop"
+description = "With Undo disabled, activating Undo changes no attribution state; after one undo, Redo restores exactly the prior tag."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "seeded_export_is_schema_valid"
+description = "Opening Export lab results before any in-session rescore or attribution still produces valid JSON for the seeded 12 trials and 4 labels with schemaVersion rescore-ab-lab-v1 and every required top-level key; the panel never shows an empty or broken region."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "import_rejects_contract_invalid"
+description = "Importing malformed JSON, or parseable JSON that fails the lab results field contract (missing schemaVersion, schemaVersion not rescore-ab-lab-v1, cause outside the closed enum, note longer than 200 characters, savedPairs name longer than 40 characters, or pass inconsistent with totalReward), leaves attributions and saved pairs unchanged and shows validation naming the offending field."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "palette_escape_preserves_drilldown"
+description = "Closing the command palette with Escape while a Compare drill-down is open leaves the drill-down intact."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "cost_legend_empty_state"
+description = "Deselecting every series in the Cost view legend leaves a designed empty chart state, and re-enabling a series restores it."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "invalid_forms_mutate_state"
+description = "An invalid rescore, attribution, or saved-pair submission mutates labels, attributions, or the saved-pair menu anyway."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "import_mutates_on_invalid_payload"
+description = "Importing parseable JSON that violates the lab results field contract still mutates attributions or saved pairs."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "self_compare_renders"
+description = "A self-comparison with the same label as A and B renders a paired table."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "double_submit_creates_two_labels"
+description = "Double-activating rescore submit creates two labels or starts two runs."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "empty_regions_show_nothing"
+description = "Compare before pair pick, zero-flip agreement, zero attribution rollup, or empty Cost legend shows nothing with no designed empty or agreement state."
 type = "binary"
 negate = true
 weight = 1.0

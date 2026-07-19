@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -60,80 +60,88 @@ allowed_tools = [
 [scoring]
 aggregation = "weighted_mean"
 
+
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "interactive_controls_keyboard_operable"
+description = "Every interactive control (command input, autocomplete rows, board cards and filters, banner Accept/Decline, titlebar dots, overlay CTAs) is reachable and operable with the keyboard alone, with a visible focus indicator."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "exit_overlay_focus_trap_and_return"
+description = "While the exit overlay is open, focus stays within it; dismissing/reopening via keyboard restores the terminal and returns focus so the command input can be used again."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "decorative_canvases_hidden_from_a11y_tree"
+description = "Matrix-rain and confetti canvases are decorative: they are hidden from the accessibility tree (aria-hidden or equivalent) and never trap focus or block the command input."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "validation_uses_polite_live_region"
+description = "Form and command validation messages are exposed to assistive technology via a polite live region as well as shown visually."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+name = "create_edit_fields_have_accessible_names"
+description = "Project create and edit fields expose explicit labels or equivalent accessible names for every required field."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+name = "terminal_headings_logical_order"
+description = "Where the terminal renders section headings in command output (for example /help groups or project detail headings), heading levels follow a logical order without skipping levels that break the outline."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "main_landmark_or_terminal_region"
+description = "The post-boot terminal exposes a main landmark or an equivalently labeled primary region wrapping the command output and prompt."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+name = "contrast_across_themes"
+description = "Terminal text and primary controls meet usable contrast against their surfaces in dark, light, retro, and glass themes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "semantic_buttons_for_chrome_and_banner"
+description = "Titlebar traffic lights, cookie-banner actions, board filters, and overlay CTAs use semantic button controls (or ARIA button roles) rather than unlabeled clickable divs."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "reduced_motion_disables_stagger_and_canvas"
+description = "With prefers-reduced-motion emulated on a fresh load, staggered/enter boot animations and matrix/confetti canvas animations are disabled or substantially reduced while the shell remains operable."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "autocomplete_keyboard_complete"
+description = "The autocomplete dropdown is keyboard operable: arrow keys move the highlight and Tab or Enter completes the highlighted command without requiring the pointer."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
 name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+description = "A primary interactive control (command input, autocomplete row, board filter, banner button, titlebar dot, or overlay CTA) cannot be reached or activated via keyboard."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n2"
 name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+description = "Focused interactive controls in the terminal chrome show no visible focus indicator or the indicator is fully obscured."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,55 +157,55 @@ weight = 1.0
 [[criterion]]
 id = "1.n3"
 name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+description = "Titlebar dots, board filters, or overlay CTAs use non-semantic tags without ARIA roles or accessible names."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+name = "status_or_error_color_only"
+description = "Project status badges or validation errors rely on color alone with no text or non-color cue naming the state."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "exit_overlay_fails_focus_trap"
+description = "While the exit overlay is open, keyboard focus escapes behind it into the blurred terminal."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+name = "poor_contrast_in_a_theme"
+description = "In dark, light, retro, or glass theme, terminal body text is unreadable due to poor contrast against its surface."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+name = "validation_visual_only"
+description = "Project validation errors appear visually only and are not exposed through a live region or other assistive-technology-accessible channel."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+name = "canvases_trap_or_block_input"
+description = "An active matrix-rain or confetti canvas traps focus or blocks typing in the command input."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+name = "heading_order_skipped_in_output"
+description = "Command-output headings skip levels in a way that breaks the document outline (for example jumping from H1 to H3 with no H2)."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +213,37 @@ weight = 1.0
 [[criterion]]
 id = "1.n10"
 name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+description = "With prefers-reduced-motion set, staggered boot/output reveals or canvas easter-egg animations continue at full motion."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "palette_and_bulk_keyboard_operable"
+description = "The command palette (Ctrl+K), undo/redo controls, board selection checkboxes, bulk actions, export Copy/Download, and archive Restore are reachable and operable with the keyboard alone with a visible focus indicator."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "command_palette_focus_trap"
+description = "While the command palette is open, focus stays within it; Escape closes it and returns focus to the command input."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n11"
+name = "palette_or_bulk_keyboard_blocked"
+description = "The command palette, bulk actions bar, export Copy, or archive Restore cannot be reached or activated via keyboard."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n12"
+name = "palette_focus_escapes"
+description = "While the command palette is open, keyboard focus escapes behind it into the terminal body."
 type = "binary"
 negate = true
 weight = 1.0

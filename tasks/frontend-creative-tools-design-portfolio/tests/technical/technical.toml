@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -98,7 +98,7 @@ weight = 1.0
 [[criterion]]
 id = "2.8"
 name = "form_error_state_integrity"
-description = "Invalid and extreme project form input produces specific inline per-field feedback before submit, preserves the last valid state, and repeated identical submissions do not create duplicate records"
+description = "Invalid and extreme project form input against the project field contract (empty name/slug, illegal slug characters, status outside shipped|wip|archived, tags outside 1–8, year outside 1990–2100) produces specific inline per-field feedback before submit, preserves the last valid state, and repeated identical submissions do not create duplicate records"
 type = "binary"
 weight = 1.0
 
@@ -146,6 +146,50 @@ description = "The browser requests a script, stylesheet, font, icon, component 
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "2.13"
+name = "undo_export_state_coherence"
+description = "Undo and redo of a project mutation keep Projects Board, /work, /stats, archive, and export preview mutually coherent without reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.14"
+name = "import_replaces_shared_collection"
+description = "Importing a valid Portfolio JSON replaces the active projects collection such that board, /work, /stats, and export preview all reflect the imported set from the same shared state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n4"
+name = "export_preview_desyncs_from_board"
+description = "After a create, delete, or archive, the export preview project set disagrees with Projects Board or /work during the same session."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.15"
+name = "project_form_validation_matches_field_contract"
+description = "Project create/edit and Import enforce the declared field contracts in the UI: empty or illegal name/slug, status outside shipped|wip|archived, tags outside 1–8 unique entries, or year outside 1990–2100 are rejected with inline feedback naming the field; Import of JSON that fails required version/theme/consent/projects keys or closed enums is rejected with feedback naming the offending field and does not mutate projects"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.16"
+name = "theme_consent_cross_field_match_export"
+description = "Switching theme via /retro and choosing Accept on consent updates the Portfolio JSON theme field to retro and consent field to accepted without a reload — a cross-field contract between session state and the export payload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n5"
+name = "import_accepts_schema_invalid_payload"
+description = "Import accepts a parseable JSON document that violates the Portfolio JSON field contract (missing required keys, version not \"1.0\", theme/consent outside closed enums, or a project entry breaking the project field contract) and still mutates the projects collection"
+type = "binary"
+negate = true
+weight = 1.0
 
 [[criterion]]
 id = "2.catchall"

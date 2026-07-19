@@ -1,0 +1,135 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "10.1"
+name = "serves_clean_and_fast"
+description = "The app serves via its documented npm start path on port 3000, renders a working interface (not a blank or broken page), and is interactive within 2 seconds of a local cold load"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.2"
+name = "shared_state_coherence"
+description = "Deleting a document from the index panel immediately removes its card from any visible results, decreases the result count, and updates the index statistics — the same datum never shows different values in two places without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.3"
+name = "reload_resets_to_seed"
+description = "A page reload returns the app to its seeded baseline: the seeded corpus, an empty query, no history entries, no saved searches, no feedback, and a fully built index"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.4"
+name = "console_stays_clean"
+description = "No console errors or unhandled promise rejections appear on load or during a full exercise of searching, feedback, palette use, bulk operations, undo/redo, and a complete re-index run"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.5"
+name = "derived_surfaces_agree"
+description = "The export report, the compare view, the cluster group counts, and the visible result list all agree with each other for the same query state — counts sum and rankings match across surfaces"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.6"
+name = "rapid_interaction_stays_synced"
+description = "Rapid interleaved interaction — quick threshold drags, fast feedback clicks, palette open/close, view switches during a re-index run — leaves all views consistent with each other, with no desynced counts or stale panels"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.n1"
+name = "browser_storage_used"
+description = "localStorage, sessionStorage, or another browser storage API is non-empty after a full exercise of the app (this is an in-memory-only task)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "10.n2"
+name = "outbound_requests_present"
+description = "Devtools show outbound network requests to other origins (CDNs, fonts, embedding or search APIs) beyond the app's own local origin"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "10.n3"
+name = "runtime_exceptions_or_debug_artifacts"
+description = "Specific interactions throw runtime exceptions visible in the console, or the running app shows debug artifacts such as console.log spam, debug overlays, or leftover placeholder scaffolding"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "10.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

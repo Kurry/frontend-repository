@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,126 +62,126 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "spacing_and_sizing_follow_scale"
-description = "Spacing and sizing follow the design system's scale, with no arbitrary one-off values visible in computed styles."
+name = "workspace_spacing_matches_reference_scale"
+description = "At 1440px, spacing among the top header, left storyboard sidebar, storyboard nav bar (Tile/List/Slide), and multi-column scene grid follows a consistent scale matching the reference screenshots — no arbitrary one-off gaps that break the docs/storyboard composition."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "typography_matches_spec"
-description = "Typography matches the spec for all headings and body copy."
+name = "gabarito_typography_matches_spec"
+description = "Workspace UI type matches the Gabarito-based light storyboard look from the spec/reference: header titles (Demo Projects, 1. Getting Started), Welcome to Docs!, and scene card copy read as one hierarchical system — not a default system UI stack."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "layout_matches_reference"
-description = "Layout matches reference screenshots to within a small tolerance at all specified breakpoints; fidelity tasks achieve near pixel-parity."
+name = "desktop_composition_matches_reference"
+description = "At 1440px the layout matches the reference composition within a small tolerance: product header + left storyboard sidebar + Tile/List/Slide nav + multi-column imaged scene grid with Welcome to Docs! — a docs/storyboard workspace, not a marketing landing."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.4"
-name = "specified_state_changes_animate"
-description = "Transitions or animations are applied to the state changes the spec calls out, such as add, delete, filter, or view switch."
+name = "specified_state_changes_have_motion"
+description = "State changes the spec calls out — scene enter stagger on first load, newly created card enter, deleted card exit with renumber settle, Tile/List/Slide re-layout, Slide prev/next advance, description edit wash, demo toasts, and right drawers — show the specified transitions rather than hard cuts (verified via real UI controls)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "responsive_behavior_matches_reference"
-description = "Responsive behavior matches reference patterns."
+name = "responsive_behavior_matches_reference_patterns"
+description = "Responsive behavior matches the reference patterns: at widths of 1024px and below the left sidebar collapses behind a toggle/overlay; the scene grid steps down toward a single column at 375px while header tools and view-mode toggles stay reachable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.6"
-name = "control_styling_matches_spec"
-description = "Button and form radii, padding, and shadows conform to the spec."
+name = "controls_styled_not_browser_default"
+description = "Buttons, Tile/List/Slide toggles, kebab menus, create-form fields, and drawers use the light/yellow storyboard chrome styling rather than unstyled browser-default controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.7"
-name = "typography_has_clear_hierarchy"
-description = "Typography has a clear hierarchy that distinguishes section and body text."
+name = "typography_hierarchy_header_and_cards"
+description = "Typography hierarchy clearly distinguishes header project/storyboard titles, Welcome to Docs!, scene numbers/titles, and body descriptions."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.8"
 name = "component_states_match_spec"
-description = "Component states (default, hover, active, disabled) match the spec where specified."
+description = "Buttons, view-mode toggles, and form fields show distinct default, hover, focus (visible ring), disabled (for example Slide prev on first / next on last, or disabled create submit), and error treatments as specified."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.9"
-name = "surface_treatments_match_spec"
-description = "Color, depth, and border treatments are precise per the design."
+name = "light_yellow_surface_treatments"
+description = "Color, depth, and border treatments match the light workspace with yellow accent: header/sidebar chrome, scene cards, and yellow edit wash read as one coherent system per the reference."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.10"
-name = "microinteractions_match_spec"
-description = "Microinteraction feedback for hover and press follows the spec in duration and motion."
+name = "hover_microinteractions_match_spec"
+description = "Hover/press microinteractions match the spec when driven through real UI paths: scene cards ease upward with soft shadow, scene images brighten, and header/mode toggles ease background/press."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.n1"
-name = "sizing_or_spacing_contradicts_scale"
-description = "Visible sizing or spacing values contradict the specified scale."
+name = "spacing_contradicts_workspace_scale"
+description = "Visible sizing or spacing among header, sidebar, nav bar, and scene grid contradicts the reference scale with arbitrary one-off gaps."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n2"
-name = "colors_fall_outside_palette"
-description = "Colors appear outside the specified palette."
+name = "colors_outside_light_yellow_palette"
+description = "Workspace colors fall outside the specified light/yellow docs palette in a way that clearly contradicts the reference (for example a dark marketing theme or unrelated accent system)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n3"
-name = "sizing_mismatches_spec"
-description = "Sizing mismatches the spec."
+name = "scene_card_sizing_mismatches_reference"
+description = "Scene card image/title sizing or grid density clearly mismatches the reference storyboard card anatomy at 1440px."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n4"
-name = "required_animations_missing_or_wrong"
-description = "Animations are missing or incorrect where the spec requires them."
+name = "required_motion_missing"
+description = "Required motion is missing or incorrect where the spec requires it (no scene enter stagger, no card enter/exit, no view-mode re-layout transition, or no drawer slide) when exercised via real UI controls."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n5"
-name = "specified_controls_use_browser_defaults"
-description = "Form or button controls use browser default styles when the spec styles them."
+name = "controls_use_browser_defaults"
+description = "Primary form or button controls (Add Scene submit, view-mode toggles, kebab menus) use unstyled browser-default appearance when the spec styles them as storyboard chrome."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n6"
-name = "layout_misaligned_at_breakpoints"
-description = "The grid or layout is misaligned at reference breakpoints."
+name = "layout_misaligned_at_1440"
+description = "At 1440px the header, left sidebar, and scene grid are misaligned or broken relative to the reference desktop composition."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n7"
-name = "elements_are_clipped_or_offscreen"
-description = "Elements render off-screen or clipped."
+name = "elements_clipped_or_offscreen"
+description = "Header titles, sidebar rows, scene cards, or drawer content render off-screen or clipped at the reference desktop width."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,23 +189,23 @@ weight = 1.0
 [[criterion]]
 id = "3.n8"
 name = "structure_deviates_from_reference"
-description = "Section order, content, or structure deviates from the reference on fidelity tasks."
+description = "Section order or structure clearly deviates from the reference: missing left storyboard sidebar, missing Tile/List/Slide nav, or a marketing-landing layout instead of the docs/storyboard workspace."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n9"
-name = "heading_and_body_text_undifferentiated"
-description = "Heading and body text have no distinction."
+name = "heading_and_body_undifferentiated"
+description = "Header titles, Welcome to Docs!, scene titles, and description body text have no visible typographic distinction."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n10"
-name = "microinteractions_deviate_from_reference"
-description = "Microinteractions are missing or deviate from the provided reference."
+name = "hover_microinteractions_missing"
+description = "Scene-card hover lift/shadow, image brighten, or header/mode toggle hover feedback is missing when the pointer hovers the real UI controls."
 type = "binary"
 negate = true
 weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -153,6 +153,44 @@ description = "Statically rendered content visibly flashes and is replaced by di
 type = "binary"
 weight = 1.0
 negate = true
+
+
+[[criterion]]
+id = "2.20"
+name = "in_memory_export_undo_state"
+description = "After create/edit/delete, contact lead append, export, undo, and theme toggle, the app keeps working from in-memory client state: Export catalog and ridge-session-leads.json reflect the session and Undo restores mutations without reading browser storage APIs for events/leads/theme"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.21"
+name = "filters_sorts_shared_collection"
+description = "Status/category filters and date/title sorts recompute the visible Events Manager rows from one shared collection — changing sort after a filter still shows only the filtered membership"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.22"
+name = "lead_log_and_exports_share_one_store"
+description = "Shared-state coherence: after a successful contact submit, the Session leads list/total, Download leads JSON, and Export JSON leads array agree on counts and payload fields without reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n5"
+name = "export_or_undo_uses_storage"
+description = "Export catalog persistence, session leads log, or undo history is implemented via localStorage/sessionStorage/IndexedDB rather than in-memory Nano Stores state"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n6"
+name = "lead_list_and_export_desync"
+description = "After a successful contact submit or Undo last lead, the Session leads panel count/list disagrees with the contents of a subsequent ridge-session-leads.json or Export JSON leads array"
+type = "binary"
+negate = true
+weight = 1.0
 
 [[criterion]]
 id = "2.catchall"

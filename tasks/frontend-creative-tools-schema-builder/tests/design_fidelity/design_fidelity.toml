@@ -1,0 +1,157 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "spacing_and_sizing_follow_scale"
+description = "Spacing and sizing follow a consistent design-system scale across the sidebar, tree, panel, and panes, with no arbitrary one-off values visible in computed styles"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "specified_treatments_implemented"
+description = "The treatments the spec calls out exist as described: monospace type badges with per-type colors, the error-accent required asterisk, syntax-styled code surfaces, and the roughly 280 pixel docked configuration panel"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "layout_matches_specified_composition"
+description = "The desktop layout matches the specified composition — library sidebar with metadata builder, central tree, and right tabbed panes for schema text, example, and format instruction"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "specified_state_changes_animate"
+description = "The state changes the spec calls out animate at roughly their specified durations: 150 millisecond add expansion, 120 millisecond remove collapse, 200 millisecond reorder slide, panel slide, and step-ordered annotation pop-ins"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "responsive_behavior_matches_spec"
+description = "Responsive behavior matches the spec: the sidebar collapses behind a toggle at 768 pixels and below, the panes stack as full-width tabs, and 375 pixels shows no page-level horizontal scroll"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "control_styling_cohesive"
+description = "Buttons, tags, inputs, tabs, and form controls share cohesive radii, padding, and depth treatments rather than mixing unrelated styles"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "typography_has_clear_hierarchy"
+description = "Typography distinguishes app title, panel headings, tree rows, and body text as specified, with monospace reserved for badges and code"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "component_states_match_spec"
+description = "Default, hover, focus, disabled, and error states are all present and visually distinct on interactive controls, as specified"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.n1"
+name = "specified_treatment_missing"
+description = "A spec-named treatment is absent or wrong — proportional-font type badges, no required asterisk, unstyled plain-text code panes, or diff categories without their semantic colors"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.n2"
+name = "controls_use_browser_defaults"
+description = "Form or button controls render with unstyled browser defaults where the spec styles them"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.n3"
+name = "required_animations_missing"
+description = "Animations are missing where the spec requires them — fields snap in and out, reorders jump, or the panel appears instantly (with reduced motion not set)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.n4"
+name = "elements_clipped_or_offscreen"
+description = "Elements render off-screen or clipped at the specified breakpoints"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "design_fidelity.catchall"
+name = "design_fidelity_catchall"
+description = "The app exhibits a significant, browser-observable deviation from the specified design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

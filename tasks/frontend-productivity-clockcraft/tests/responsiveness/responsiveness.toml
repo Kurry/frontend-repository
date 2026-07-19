@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "7.1"
 name = "layout_adapts_desktop_to_mobile"
-description = "Layout adapts gracefully from 1440px desktop to 375px mobile."
+description = "Layout reflows from desktop to about 375px into a single column with no page-level horizontal scrolling."
 type = "binary"
 weight = 1.0
 
@@ -84,14 +84,14 @@ weight = 1.0
 [[criterion]]
 id = "7.4"
 name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+description = "At about 375px, Start timer, Add entry, Export session, weekly chart, heat-map, and timeline stay usable without clipping at the viewport edge."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
 name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+description = "At narrow widths Export session, bulk action bar, and overlays remain fully visible and operable rather than rendering off-screen."
 type = "binary"
 weight = 1.0
 
@@ -112,7 +112,7 @@ weight = 1.0
 [[criterion]]
 id = "7.8"
 name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+description = "At about 375px the document has no horizontal scrolling and cards stack in one column."
 type = "binary"
 weight = 1.0
 

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.5
@@ -71,21 +71,21 @@ weight = 0.5
 [[criterion]]
 id = "15.2"
 name = "actions_use_specific_labels"
-description = "Where the app renders button or action labels, they are specific verbs ('Add expense', 'Start session'), not generic ('Submit', 'OK') when a specific label is possible."
+description = "Where the app renders button or action labels, they are specific verbs such as Submit job, Export queue, Import queue, Copy, and Download, not generic labels like Submit or OK when a specific label is possible."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.3"
 name = "errors_name_problem_and_fix"
-description = "Where the app renders error messages, they name the problem and the fix ('Amount must be a positive number'), not just a rejection ('Invalid')."
+description = "Where the app renders validation or import errors, they name the field and the rule broken (for example trialCount must be 1 to 10, sweepModel must differ from model, schemaVersion eval-queue-v1), not just a rejection like Invalid."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.4"
 name = "empty_states_explain_next_step"
-description = "Where the app renders empty states, the copy explains what belongs there and how to add it."
+description = "Where the app renders empty states (zero-match filters), the copy explains what belongs there and how to clear the filters or submit a job."
 type = "binary"
 weight = 0.5
 

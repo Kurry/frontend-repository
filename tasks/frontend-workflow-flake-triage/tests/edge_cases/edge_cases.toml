@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,99 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "filter_empty_state_present"
+description = "When active filters match no tests, the queue shows an empty state message with a clear-filters control rather than a bare table."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "rerun_validates_runcount_inline"
+description = "Submitting the re-run form without choosing a runCount shows an inline message naming the runCount field and starts no re-run."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "import_errors_name_problem"
+description = "Import errors name the import problem or offending field (for example schemaVersion, tests, quarantine, verdict, or reason) rather than only saying Invalid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "copy_and_import_show_confirmation"
+description = "Copy on an export tab and a successful Import each show visible confirmation feedback (toast or icon swap)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "rerun_shows_progress"
+description = "While a re-run is active, an overall progress indicator advances as each run ticks in."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "stop_before_any_run_preserves_matrix"
+description = "Stopping a re-run before any run completes leaves the test's previous matrix and verdict fully intact."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "divergence_sort_help_or_label"
+description = "The divergence sort control has a visible label or accessible name explaining it orders by diverging runs."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
 name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+description = "Suite switcher, reason selects, re-run and stop controls, export and import controls, and filter controls use semantic button, select, or input elements (or equivalent ARIA roles)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "export_import_escape_closes"
+description = "The export and import surfaces close via an explicit close control and via Escape, returning focus to the opener."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "ten_run_rerun_shows_progress_steps"
+description = "A 10-run re-run shows progressive run results filling in rather than jumping straight to a final matrix with no intermediate feedback."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "invalid_import_leaves_suite_unchanged"
+description = "Importing Triage report JSON with wrong schemaVersion, missing tests or quarantine, or a reason outside the 7-item vocabulary shows a named error, leaves reasons and matrices unchanged, and produces no console errors."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "double_submit_starts_one_rerun"
+description = "Double-activating the re-run submit control starts exactly one re-run; the audit timeline gains one re-run started entry, not two."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "empty_quarantine_export_headings_only"
+description = "When every test in view is keep, both quarantine lists show empty states and Quarantine text contains only group headings with no identifiers while Triage report JSON has empty allFail and flaky arrays."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
 name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+description = "A filter that matches no tests or an empty quarantine list shows nothing and provides no empty-state feedback."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +162,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n2"
 name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+description = "Re-run validation or import field-contract failures are surfaced only in the browser console."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,15 +170,15 @@ weight = 1.0
 [[criterion]]
 id = "4.n3"
 name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+description = "Copy, Import, re-run complete, or stop succeed or fail with no visible feedback."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "stop_silently_rewrites_matrix"
+description = "Stopping a re-run before any run completes silently rewrites the prior matrix or verdict."
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,15 +186,15 @@ weight = 1.0
 [[criterion]]
 id = "4.n5"
 name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+description = "Primary interactive controls (reason select, re-run, export, import) are non-semantic div or span tags without button/select roles."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "export_import_not_keyboard_dismissible"
+description = "Export or import surfaces cannot be dismissed via Escape."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +202,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n7"
 name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+description = "Re-run runCount validation or import field-contract rejection feedback is missing or delayed with no UI indication."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,15 +210,15 @@ weight = 1.0
 [[criterion]]
 id = "4.n8"
 name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+description = "Primary action controls lack specific labels such as Start re-run, Stop run, Export triage report, Import triage report, Copy, or Download."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "invalid_import_treated_as_success"
+description = "An invalid Triage report JSON import is treated as a successful mutation (toast success, timeline entry, or changed reasons) despite field-contract failure."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +226,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n10"
 name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+description = "Export triage report, Import triage report, or re-run controls are visually hidden or inaccessible when a test is selected."
 type = "binary"
 negate = true
 weight = 1.0

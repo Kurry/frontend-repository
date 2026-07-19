@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.1"
 name = "shared_state_coherence"
-description = "A change made in one surface (creating, editing, deleting, favoriting, or filtering a palette) is immediately reflected in every other view showing that data — Browse layouts, Detail/Editor, and filter results — without a reload"
+description = "A change made in one surface (creating, editing, deleting, duplicating, favoriting, batching, filtering, sorting, or exporting a palette) is immediately reflected in every other view showing that data — Browse layouts, Detail/Editor, contrast matrix, and Export previews — without a reload"
 type = "binary"
 weight = 1.0
 
@@ -77,66 +77,106 @@ weight = 1.0
 [[criterion]]
 id = "2.3"
 name = "browser_storage_used"
-description = "Uses localStorage or sessionStorage to persist palettes or filters"
+description = "Uses localStorage or sessionStorage to persist palettes, filters, sort, undo stacks, or export state"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "2.4"
 name = "views_desync_stale_data"
-description = "The same datum shows different values in two places — e.g. a palette renamed in the editor still shows its old name in a Browse layout, or a deleted palette's swatches linger in one view until reload"
+description = "The same datum shows different values in two places — e.g. a palette renamed in the editor still shows its old name in a Browse layout or export JSON, or a deleted palette's swatches linger in one view until reload"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "2.5"
 name = "console_clean_full_exercise"
-description = "The browser console stays free of errors, warnings, and unhandled promise rejections during a full exercise of the app: switching layouts, creating, editing, deleting, filtering, favoriting, and copying"
+description = "The browser console stays free of errors, warnings, and unhandled promise rejections during a full exercise of the app: switching layouts, creating, editing, deleting, duplicating, filtering, sorting, favoriting, batch actions, undo/redo, contrast matrix updates, vision simulation, exporting, importing, and copying"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.6"
-name = "keyboard_operable_with_focus"
-description = "Every interactive control — view toggles, period filter, swatches, favorite flags, editor fields, popup controls — is reachable and operable with the keyboard alone, with a visible focus indicator"
+name = "reload_returns_seeded_baseline"
+description = "A page reload returns the app to its seeded baseline (seeded palettes, Nomenclature, all-periods, Name A–Z, empty undo/redo, vision None, no selection) consistent with the in-memory genre rule"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.7"
-name = "dialog_focus_management"
-description = "The Detail/Editor panel and the subscribe popup use dialog semantics: focus moves into them on open, stays trapped while they are open, and returns to the invoking control on close"
+name = "export_compiled_from_live_store"
+description = "Export previews update from the same shared store as the library — after a create/edit/delete the preview text changes without requiring a separate disconnected export model"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.8"
-name = "copy_announced_aria_live"
-description = "Copying a swatch's hex announces the confirmation through an aria-live polite region in addition to the on-swatch label"
+name = "undo_redo_coherent_with_ui"
+description = "Undo and Redo change the same collection the Browse layouts and export read; enabled/disabled control states match whether a step is available"
 type = "binary"
-weight = 0.5
+weight = 1.0
 
 [[criterion]]
 id = "2.9"
 name = "outbound_network_requests"
 description = "Network requests to other origins (CDN scripts, fonts, icon sets, or a remote color-name dataset) appear in devtools during load or a full exercise of the app"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "2.10"
 name = "interactions_stay_smooth"
-description = "Switching among the three layouts, filtering, and opening the editor stay smooth, with no hangs or dropped interactions even under rapid input"
+description = "Switching among the three layouts, filtering, sorting, opening the editor or export drawer, and toggling vision simulation stay smooth, with no hangs or dropped interactions even under rapid input"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+id = "2.11"
+name = "export_import_share_archive_schema"
+description = "Archive JSON export and import use the same API-shaped schema: a valid exported document (version palette-archive.v1 + palettes with id/name/artist/period/swatches/favorite) re-imports cleanly, and a payload that violates those field contracts is rejected with visible import feedback while the shared collection stays unchanged"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "2.n1"
+name = "chrome_navigates_away"
+description = "External chrome anchors navigate away from the app to another origin"
+type = "binary"
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n2"
+name = "debug_artifacts_or_placeholders"
+description = "Visible debug output, console.log spam overlays, or leftover placeholder scaffolding appear in the running app"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n3"
+name = "nondeterministic_nomenclature"
+description = "Two loads of the same seeded state produce different Nomenclature hex order or duplicate rows for the same hex — nondeterministic rendering of deterministic state"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n4"
+name = "import_accepts_schema_violations"
+description = "Importing archive JSON that is missing required palette fields, uses a period outside the closed list, or includes an invalid hex swatch still mutates the shared collection as if the import succeeded"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0
+

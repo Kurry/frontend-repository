@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -177,6 +177,52 @@ type = "binary"
 weight = 0.5
 negate = true
 optional = true
+
+# HARDEN_MARKUPFLOW_V1
+
+[[criterion]]
+id = "TI-13"
+name = "versions_and_export_text_in_shared_store"
+description = "Saving a snapshot, restoring it, and compiling Export project JSON all stay coherent with Layers and canvas from one shared store — restoring a snapshot updates every surface together, and the JSON preview matches the live annotation set without a disconnected copy"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "TI-14"
+name = "project_json_round_trip_persists_semantics"
+description = "Importing a previously exported MarkupFlow project JSON restores image, annotations, and layer order into the same shared store; a subsequent reload still shows the imported workspace (localStorage persistence of image + annotations)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "TI-15"
+name = "export_import_share_api_shaped_schema"
+description = "Export project JSON and Import project use the same MarkupFlowProject and Annotation field contracts: a conforming export re-imports cleanly, and the live preview's schemaVersion, imageDataUrl (data:image/…), imageWidth, imageHeight, and annotations field names (including type-specific geometry keys) match the payload Import accepts — validation rejects non-conforming shapes with named field/import errors before mutating the store"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "TI-16"
+name = "saved_and_snapshot_forms_share_annotation_contract"
+description = "SavedProjectCreate and SnapshotCreate forms validate name (trimmed non-empty, at most 80 characters) and store annotations that conform to the same Annotation field contract Export project JSON emits — opening a saved project or restoring a snapshot yields annotations whose exported JSON still shows the required id/type/x/y/color/strokeWidth and type-specific geometry/text keys"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "TI-N5"
+name = "export_json_static_or_stale"
+description = "Export project JSON / Copy project JSON remains a static stale payload after the user adds or deletes annotations — the preview/copy text ignores the live session mutations"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "TI-N6"
+name = "form_schema_diverges_from_export"
+description = "SavedProjectCreate or SnapshotCreate name validation, or Import validation, accepts values the MarkupFlowProject or Annotation field contract forbids (or rejects values that contract allows), so form records and export payloads disagree on required fields, enums, bounds, or geometry cross-field rules"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "TI.catchall"

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.5
@@ -63,91 +63,105 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "15.1"
-name = "headings_use_consistent_capitalization"
-description = "For fidelity tasks, rendered copy must match the reference. Where the app renders headings and section titles, they use consistent capitalization (one convention — title case or sentence case — throughout)."
+name = "headings_match_mandated_casing"
+description = "Where the app renders headings and section titles (Design and launch outstanding websites, Enjoy easy workflow, Teams of all sizes create websites with Canvasly, Get the best support, Try for free), they keep the mandated casing and phrasing consistently."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.2"
-name = "actions_use_specific_labels"
-description = "Where the app renders button or action labels, they are specific verbs ('Add expense', 'Start session'), not generic ('Submit', 'OK') when a specific label is possible."
-type = "binary"
-weight = 0.5
-
-[[criterion]]
-id = "15.3"
-name = "errors_name_problem_and_fix"
-description = "Where the app renders error messages, they name the problem and the fix ('Amount must be a positive number'), not just a rejection ('Invalid')."
-type = "binary"
-weight = 0.5
-
-[[criterion]]
-id = "15.4"
-name = "empty_states_explain_next_step"
-description = "Where the app renders empty states, the copy explains what belongs there and how to add it."
+name = "cta_labels_specific"
+description = "Where the app renders primary action labels, they use the mandated specific copy (Try Canvasly, Sign up, Log in, Menu, View pricing, or choose your subscription plan) rather than generic Submit/OK alone."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.5"
-name = "body_copy_is_well_written"
-description = "Where the app renders body or marketing copy, rate how free it is of spelling and grammatical errors."
+name = "marketing_copy_spelling_grammar"
+description = "Where the app renders body or marketing copy (hero subtitle, four feature-card bodies, support sentence), rate how free it is of spelling and grammatical errors."
 type = "likert"
 points = 5
 weight = 0.5
 
 [[criterion]]
 id = "15.6"
-name = "terminology_is_consistent"
-description = "Where the app renders labels for the same concept in multiple places, terminology is consistent (not 'task' here and 'todo' there)."
+name = "canvasly_terminology_consistent"
+description = "Where the app renders the product name, terminology stays consistent as Canvasly / Canvasly Studio (not mixed with leftover source-product naming)."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.7"
-name = "numbers_dates_and_units_are_consistent"
-description = "Where the app renders numbers, dates, and units, formatting is consistent (same date format, same decimal precision, units labeled)."
+name = "copyright_year_and_email_exact"
+description = "Where the app renders the footer copyright and support contact, they show exactly © 2026 Canvasly Studio and support@canvasly.example."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.8"
-name = "success_messages_are_specific"
-description = "Where the app renders confirmation and success messages, they state what happened ('Entry saved'), not vague affirmations."
+name = "mandated_feature_card_copy_exact"
+description = "Where the app renders the four workflow feature cards, titles and bodies match exactly: Enjoy easy workflow; Streamline teamwork; Attract with interactivity; Expand functionality to infinity — each with its mandated body paragraph."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.9"
+name = "tile_and_marquee_labels_exact"
+description = "Where the app renders use-case tile and traveling marquee labels, they match the mandated sets: tiles Portfolios, Landing pages, Editorials, Company websites, Design studios, and by Canvasly team; marquee Company websites, Landing pages, Editorials, Presentations, Design studios, and Portfolios."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.10"
+name = "footer_link_labels_exact"
+description = "Where the app renders footer link labels, the four groups show the exact mandated labels for company, product, resources, and solutions columns."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.n1"
-name = "placeholder_copy_is_visible"
-description = "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI."
+name = "placeholder_copy_visible"
+description = "Lorem ipsum or placeholder text (TODO, Lorem, asdf, or template variables like {{title}}) is visible anywhere in the shipped UI."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n2"
-name = "prominent_copy_has_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as headings, hero text, or primary buttons."
+name = "prominent_copy_has_typos"
+description = "Spelling or grammatical errors appear in prominent copy such as Design and launch outstanding websites, Enjoy easy workflow, Get the best support, or primary CTA labels."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n3"
-name = "concept_names_are_inconsistent"
-description = "The same concept is named inconsistently across surfaces."
+name = "source_brand_names_in_copy"
+description = "Rendered copy, wordmark text, or placeholder media captions still name the source product, real agencies, or third-party brands instead of the fictional Canvasly system."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n4"
-name = "copy_is_truncated_or_overflowing"
-description = "Truncated or overflowing text renders copy unreadable."
+name = "copy_truncated_or_overflowing"
+description = "Truncated or overflowing text renders mandated headings, card bodies, tile labels, or footer links unreadable at 1440 or 390."
 type = "binary"
 negate = true
+weight = 0.5
+
+[[criterion]]
+id = "15.11"
+name = "trial_brief_action_labels_specific"
+description = "Where the app renders trial brief actions, labels stay specific (Download JSON, Copy brief, Import brief, Submit trial brief, Load sample brief, Reset, Undo, Redo) rather than generic Submit/OK alone."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.12"
+name = "trial_brief_validation_and_success_copy"
+description = "Where the app renders trial brief validation, messages name the field and the fix (for example Email must be a valid address, Name must be at least 2 characters, Team size must be 1 for Free trial, Interests required for Pro); the success line reads Trial brief ready — download or copy your JSON above."
+type = "binary"
 weight = 0.5
 
 [[criterion]]

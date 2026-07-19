@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,78 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "keyboard_core_flow_complete"
+description = "A core portfolio flow can be completed with the keyboard alone: Add holding form fields are reachable by Tab, the form submits on Enter when valid, holdings table rows can be selected with Enter or Space while focused, and Export portfolio, Import portfolio, and export format tabs are keyboard-reachable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "selected_row_exposes_aria_state"
+description = "When a holdings table row is selected through the real row control, the row exposes its selected state to assistive technology (for example aria-selected or an equivalent programmatic state), not only through visual styling."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "live_region_announces_holding_changes"
+description = "A visually hidden ARIA live region announces when a holding or activity is added, updated, or removed through the real UI controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "validation_associated_and_announced"
+description = "Inline validation messages on the Add/edit holding form and on Import are programmatically associated with their fields and announced when they appear, as well as shown visually."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+name = "visible_keyboard_focus_indicators"
+description = "Every interactive control (buttons, inputs, class filter, sortable headers, table rows) shows a clearly visible focus indicator when focused from the keyboard."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+name = "form_fields_have_explicit_labels"
+description = "Every Add holding form field (name, symbol, class, quantity, unit price) uses an explicit visible label element, not placeholder-only labeling."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "landmarks_and_heading_order"
+description = "The portfolio overview exposes semantic landmarks (for example main) and headings follow a logical order with no skips from H1 to deeper levels."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+name = "text_and_controls_meet_contrast"
+description = "Primary body text and control labels on the light green-tinted dashboard meet at least WCAG AA contrast (about 4.5:1 for text; about 3:1 for interactive control boundaries)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "icons_have_accessible_names"
+description = "Brand-bar, button, empty-state, and sort-indicator icons that convey meaning have descriptive accessible names (alt text or aria-label); decorative icons are hidden from the accessibility tree."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "reduced_motion_keeps_functionality"
+description = "With prefers-reduced-motion enabled on a fresh load, animations are removed and every state change still completes with full functionality (add, delete, filter, select)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
-name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+name = "keyboard_cannot_reach_core_controls"
+description = "Core interactive controls (Add holding, class filter, table row selection, save, delete) cannot be reached or activated via keyboard Tab/Enter/Space."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,71 +141,47 @@ weight = 1.0
 [[criterion]]
 id = "1.n2"
 name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+description = "Focus indicators are missing or obscured on interactive controls when focused from the keyboard."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n3"
-name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+name = "selection_is_color_only"
+description = "The selected holdings row is indicated by color alone, with no non-color cue such as a teal left border and no programmatic selected state for assistive technology."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+name = "validation_visual_only"
+description = "Inline validation or holding change feedback is visual only: no programmatic field association for errors and no live-region announcement for add/update/remove."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "animations_ignore_reduced_motion"
+description = "With prefers-reduced-motion set, row enter/exit, net-worth transitions, toast motion, or allocation-bar animation still run."
 type = "binary"
 negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "1.11"
+name = "export_drawer_focus_trap_escape"
+description = "The export drawer traps focus while open, closes on Escape, and returns focus to the control that opened it."
+type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n10"
-name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+name = "export_drawer_focus_escapes"
+description = "While the export drawer is open, keyboard focus reaches controls behind the drawer, or pressing Escape leaves the drawer open without returning focus to the opener."
 type = "binary"
 negate = true
 weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "3.1"
 name = "dark_studio_shell_lockup"
-description = "Dark studio shell with near-black surfaces, light shell text, an indigo/Material primary accent, Roboto type, and Material iconography; the header brand lockup with a cyan Material logo mark sits above the three-tab bar, and the layout keeps full-viewport tool density rather than a marketing landing"
+description = "Dark studio shell with near-black surfaces, light shell text, an indigo/Material primary accent, Roboto type, and Material iconography; the header brand lockup with a cyan Material logo mark sits above the four-tab bar (Preview / Components / Saved Themes / Export), and the layout keeps full-viewport tool density rather than a marketing landing"
 type = "binary"
 weight = 1.0
 
@@ -128,6 +128,28 @@ weight = 1.0
 id = "3.10"
 name = "horizontal_overflow_at_768"
 description = "At 768 pixel viewport width, content clips or a horizontal viewport scrollbar appears"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.11"
+name = "export_panel_dense_tool_surface"
+description = "Export mode shows a monospaced live preview block with JSON / CSS format tabs, Download and Copy controls, and an Import ThemeOptions affordance as a dense tool surface — not a marketing CTA card"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.12"
+name = "wcag_and_harmonics_compact_meta"
+description = "WCAG contrast labels and harmonic suggestion chips read as compact meta beside Palette fields, not large promo cards competing with the editor"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.n11"
+name = "export_looks_like_marketing_cta"
+description = "The Export panel is styled as a marketing CTA / empty hero rather than a dense monospaced artifact preview with format tabs and download/copy controls"
 type = "binary"
 weight = 1.0
 negate = true

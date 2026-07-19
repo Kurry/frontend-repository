@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "6.1"
 name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+description = "Create flow: a new stop or expense created via the UI appears everywhere it should — the stop in its day section and on the map, the expense in the ledger grid, spreadsheet, and derived totals."
 type = "binary"
 weight = 1.0
 
@@ -127,6 +127,48 @@ weight = 1.0
 id = "6.10"
 name = "flow_recovers_without_reload"
 description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "ingestion_review_commit_flow"
+description = "Ingestion flow: paste confirmation text or drop a CSV, review the drafts or diagnostics, commit, and confirm the accepted items land in the ledger or itinerary while discarded or excluded ones do not appear anywhere."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "expense_to_settlement_flow"
+description = "Settlement flow: add an expense, open the debt visualizer, mark a computed transaction settled in the checklist, and open the settlement report — each step's output feeds the next with no reload and no dead end."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "undo_restores_bulk_delete"
+description = "Undo flow: after a bulk delete from the mutation tray, one Undo restores every deleted row to the ledger, the spreadsheet, and the charts; Redo re-applies the delete."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "spreadsheet_edit_echoes_to_cards"
+description = "Spreadsheet flow: an inline cell edit committed in the matrix is visible on the corresponding card or ledger row immediately, and continuing to navigate cells with the keyboard keeps working after the edit."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "export_import_round_trip_flow"
+description = "Export/import flow: mutate the plan (rename a stop, create one valid expense with a unique description, change one expense currency), Download or Copy the trip JSON, reload to the seeded baseline, Import that JSON, and confirm list rows, ledger rows, balances, charts, markdown, ICS, trip JSON, settlement report, and budget summary all match the pre-export mutated state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.16"
+name = "stop_create_updates_export_artifacts"
+description = "Create flow ending at artifacts: after creating a valid stop, the plan list gains the row and the export canvas markdown, ICS, and trip JSON all include the new stop without a reload."
 type = "binary"
 weight = 1.0
 
@@ -206,6 +248,14 @@ weight = 1.0
 id = "6.n10"
 name = "navigation_dead_end_requires_reload"
 description = "Navigation dead ends or requires reload for recovery."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "export_import_flow_dead_ends"
+description = "The export/import round-trip flow dead-ends: Import is missing, fails silently after a valid trip JSON export, or leaves the workspace on the seeded baseline with no error after a successful-looking import."
 type = "binary"
 negate = true
 weight = 1.0

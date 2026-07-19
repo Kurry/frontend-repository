@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,150 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "7.1"
-name = "layout_adapts_desktop_to_mobile"
-description = "Layout adapts gracefully from 1440px desktop to 375px mobile."
+name = "layout_adapts_1440_to_375"
+description = "Resizing from 1440px desktop to 375px mobile keeps a usable prompt workbench: editor, response panel, binding panel, and toolbar controls remain present and operable at both widths."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
-name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+name = "mobile_tap_targets_adequate"
+description = "At 375px width, Run/Stop, Save, Insert Variable, suggestion chips, binding inputs, and library rows present tap targets at least 44px in at least one dimension."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
-name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+name = "typography_readable_both_widths"
+description = "Panel titles, toolbar labels, binding-row names, and library titles remain legible at both 1440px and 375px — type scales or reflows without becoming unreadably small on mobile."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
-name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+name = "no_clip_or_overflow_at_375"
+description = "At 375px width, no content clips or overflows the viewport."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
-name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+name = "bindings_stack_below_1024"
+description = "Below 1024px wide, the variable binding panel moves below the editor stack so the layout becomes a single column, and every control remains reachable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.6"
-name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+name = "narrow_stack_order_stays_usable"
+description = "At 375px width, editor, response, and binding regions reflow into a logical stacking order without covering each other into an unusable pile."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.7"
-name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+name = "mobile_controls_tappable"
+description = "At 375px width, tap/click activation works on Run, Save, Insert Variable, suggestion chips, binding inputs, and library/workbench switch controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.8"
-name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+name = "no_horizontal_scroll_at_375"
+description = "At 375px width no page-level horizontal scrolling appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.9"
-name = "media_and_canvases_resize"
-description = "Images, grids, and canvases size responsively to fit the layout."
+name = "toolbar_wraps_instead_of_overflow"
+description = "At 375px width the toolbar wraps its controls instead of overflowing the viewport."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.10"
-name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
+name = "overlays_remain_operable_at_small_widths"
+description = "The Save modal, Insert Variable popover, and attachment picker stay fully visible and operable at 375px rather than rendering off-screen."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.n1"
-name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+name = "layout_breaks_at_375_or_1440"
+description = "At 375px or 1440px the workbench layout breaks: overlapping panels, overflow, or unusable stacking."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n2"
-name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+name = "mobile_controls_too_small"
+description = "At 375px width, Run, Save, Insert Variable, chips, or binding inputs are too small or misaligned to operate reliably."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n3"
-name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+name = "workbench_text_unreadable_on_mobile"
+description = "At 375px width, panel titles, binding names, or library titles are too small to read."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n4"
-name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+name = "content_cropped_with_spurious_scrollbars"
+description = "At 375px or 1440px, workbench content is cropped or unnecessary page-level horizontal scrollbars appear."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n5"
-name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
+name = "binding_panel_unreachable_below_1024"
+description = "Below 1024px wide, the variable binding panel is missing or unreachable after the single-column reflow."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n6"
-name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
+name = "fixed_toolbar_obscures_content"
+description = "Fixed-position toolbar or chrome obscures the editor, response panel, or binding controls so they cannot be used."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n7"
-name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
+name = "overlap_at_narrow_width"
+description = "At 375px width, editor, response, and binding panels overlap into an unusable stack."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n8"
-name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
+name = "mobile_save_or_insert_inoperable"
+description = "At 375px width, the Save modal or Insert Variable popover cannot be opened or operated."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n9"
-name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
+name = "toolbar_overflows_without_wrap"
+description = "At 375px width the toolbar overflows the viewport instead of wrapping its controls."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n10"
-name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
+name = "controls_disappear_at_width"
+description = "At 375px or 1440px, required controls (Run, Save, Insert Variable, model selector, or binding inputs) disappear from the layout."
 type = "binary"
 negate = true
 weight = 1.0

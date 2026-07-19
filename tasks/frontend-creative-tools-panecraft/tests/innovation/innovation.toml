@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -63,150 +63,86 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+name = "pane_enter_polish_beyond_minimum"
+description = "Beyond the required enter animation, newly created panes include an extra delightful microinteraction (for example a richer settle, staggered control reveal, or celebratory highlight) that remains browser-observable (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "chart_transition_storytelling"
+description = "Chart panes offer an advanced transition beat beyond basic mark swaps — for example coordinated crossfades or memorable axis reflows when the date range changes — verified through real date-range interaction (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+name = "guided_first_run_for_builder"
+description = "A brief guided first-run or coachmark flow introduces Create Pane, the Data Source Library, and date-range filtering without blocking the tool (bonus beyond required empty-state copy)."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+name = "chart_tooltip_or_analysis_extra_usability"
+description = "An interactive graphic aid beyond the required hover tooltip — for example crosshair sync across panes or a mini sparkline in saved-analysis cards — adds usability while staying local and browser-observable (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+name = "keyboard_pane_nudge_beyond_buttons"
+description = "Beyond basic Tab/Enter operability, panes support an alternate grid input such as arrow-key nudging for Move when focused (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+name = "session_personalization_beyond_requirements"
+description = "Within the session, the app offers a small personalization beyond requirements (for example remembering last date-range preference or last saved-analysis view) that is visible without inventing forbidden external APIs (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+name = "branded_builder_narrative_polish"
+description = "The PaneCraft header, page tabs, and pane cards read as a cohesive branded dashboard-builder narrative rather than generic unstyled controls (bonus execution quality)."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+name = "status_and_share_craft_beyond_minimum"
+description = "Status pill badges and the Share panel's monospace link treatment go beyond bare compliance — cohesive tokenized accents across badges, toasts, and share chrome (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+name = "local_platform_enhancement"
+description = "A genre-appropriate local enhancement (for example high-quality local Poppins rendering or offline-capable app shell assets) is visible without CDN dependence (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+name = "competition_level_dashboard_builder_feel"
+description = "The overall builder feels competition-grade: wizard flow, chart hover, refresh jitter labeling, and collaboration scenario polish read as a professional dashboard instrument rather than a wired demo (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+name = "barebones_unstyled_form_only"
+description = "The shipped UI is a bare unstyled form or plain text controls with no PaneCraft header, pane grid, Data Source Library, or chart immersion."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
+name = "generic_dashboard_template_look"
+description = "The experience is a generic dashboard/card-grid template that ignores the specified PaneCraft composition (navy header, page tabs, library, four-column pane grid with three seeded panes)."
 type = "binary"
 negate = true
 weight = 1.0

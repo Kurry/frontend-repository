@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,153 +62,226 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "my_themes_empty_state_after_remove_all"
+description = "After removing every custom theme, My themes shows an empty-state message explaining that created themes appear there and how to add one, while all 35 built-ins stay listed and selectable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "empty_name_inline_validation_before_create"
+description = "Submitting a custom-theme create with an empty or whitespace-only name shows an inline validation message naming the name field before the theme is added, and the My themes count stays unchanged."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "validation_names_name_field_and_fix"
+description = "Create/rename validation messages name the name field and the fix rather than only saying 'Invalid'."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "copy_shows_copied_confirmation"
+description = "Clicking Copy to clipboard on the CSS export shows a brief copied confirmation before resetting."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "hold_to_add_shows_progress_indicator"
+description = "Pressing and holding Hold to add theme shows a visible inset progress fill during the ~3s hold; early release cancels with the progress fill resetting."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "early_release_cancels_hold_to_add"
+description = "Releasing Hold to add theme before the ~3s hold completes cancels the add: progress fill resets and the My themes count is unchanged."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "malformed_theme_hash_falls_back_safely"
+description = "Loading a page whose theme= hash payload is malformed or undecodable falls back to the seeded default theme without breaking the page and without uncaught console errors."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "theme_and_token_controls_use_semantic_tags"
+description = "Theme rows, Name field, swatch pickers, radius/size selectors, toggles, and Remove/Random/CSS actions use semantic button/input/label elements rather than unlabeled decorative wrappers."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "chrome_dropdowns_dismissible"
+description = "Version, theme, and language chrome dropdowns can be dismissed via Escape or an outside click/close path without a page reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "double_remove_deletes_exactly_one"
+description = "Double-activating a Remove control on the active custom theme deletes exactly one theme: the My themes count decreases by one, not two."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_my_themes_shows_nothing"
+description = "After My themes is empty, the My themes region shows nothing — no empty-state message or add guidance — while built-ins may still appear elsewhere."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "validation_errors_only_in_console"
+description = "Invalid empty-name create failures surface only in the browser console with no visible inline field feedback."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "token_edit_or_random_silent"
+description = "Changing a color swatch, radius/size control, or clicking Random produces no visible change to the editor swatches, live preview, or CSS export (silent failure)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "remove_control_unlabeled_as_destructive"
+description = "Removing a custom theme proceeds with no visible Remove labeling or destructive-action affordance distinguishing it from a non-destructive control."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "interactive_studio_controls_nonsemantic"
+description = "Primary interactive controls (theme rows, Hold to add theme, Remove, Random, CSS, swatches, tabs) are non-semantic div/span click targets without button/role semantics."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "chrome_dropdown_not_keyboard_dismissible"
+description = "With a version, theme, or language chrome dropdown open, keyboard users cannot dismiss it (no Escape path and no focusable close control)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "early_release_still_adds_theme"
+description = "Releasing Hold to add theme before ~3s still adds a My themes row — the cancel-on-early-release path is broken."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "ambiguous_or_missing_action_labels"
+description = "Primary actions (Hold to add theme, Remove, Random, CSS, Copy) show blank, placeholder, or ambiguous labels such as 'Submit', 'OK', or 'Button' instead of naming the action."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "long_theme_name_breaks_layout"
+description = "A theme name longer than roughly 30 characters overflows its My themes row or breaks the Themes panel layout."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "hold_or_remove_affordance_inaccessible"
+description = "Hold to add theme or Remove is visually hidden or inaccessible while still required for create/delete flows."
 type = "binary"
 negate = true
 weight = 1.0
+
+
+[[criterion]]
+id = "4.12"
+name = "empty_undo_redo_disabled"
+description = "With empty undo and redo stacks, Undo and Redo controls are disabled; activating them does nothing and produces no console errors."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "invalid_import_leaves_state"
+description = "Importing JSON that is not valid declared-theme field-contract shape leaves My themes count unchanged and shows validation feedback naming the import problem."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "colorblind_none_restores_unfiltered"
+description = "Turning Color blindness filter to Protanopia then back to None restores the unfiltered preview without altering stored token values in the editor or artifact text."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "before_after_without_snapshot_hint"
+description = "Opening Before/After with no snapshot saved shows a clear empty hint and does not blank the live preview."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "import_missing_color_key_names_field"
+description = "Importing declared-theme JSON that omits a required colors key (for example primary or base-100) leaves My themes unchanged and shows validation feedback naming that colors field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.17"
+name = "import_non_hex_or_bad_enum_rejected"
+description = "Importing JSON with a non-#RRGGBB color value, or with radius/size/border/fontFamily outside the closed enums, leaves counts unchanged and names the offending field in visible validation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.18"
+name = "illegal_or_overlong_name_rejected"
+description = "A theme name longer than 30 characters, or containing characters outside lowercase letters, digits, hyphens, and underscores, is rejected with validation naming the name field and is not applied (My themes count and active name stay unchanged)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.19"
+name = "import_cross_field_default_dark_rejected"
+description = "Importing JSON with options.defaultDarkTheme true while options.darkColorScheme is false leaves My themes unchanged and shows validation naming the offending options field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n20"
+name = "invalid_import_mutates_themes"
+description = "Applying malformed import JSON, or JSON that fails the declared-theme field contract, still increases My themes or changes the active theme without visible validation feedback."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.n21"
+name = "radius_size_ui_offers_out_of_enum_values"
+description = "Radius, size, or border controls offer or write values outside the closed enums (not among 0rem/0.25rem/0.5rem/1rem/2rem for radius, xs/sm/md/lg/xl for size, or 0.5px/1px/1.5px/2px for border) into the JSON Artifact tab."
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "edge_cases.catchall"

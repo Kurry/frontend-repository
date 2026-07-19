@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,157 +63,157 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "9.1"
 name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+description = "Cold start to interactive document workspace is under 2 seconds on local render"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
 name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+description = "Browser devtools show no errors or warnings during place, edit, export, import, undo, and signing flows"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
-name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+name = "field_updates_respond_immediately"
+description = "Placing, selecting, reassigning, and deleting fields update the canvas immediately with no perceptible multi-second lag"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.4"
-name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+name = "export_regeneration_stays_responsive"
+description = "Opening Export and switching Template JSON / Signing summary tabs regenerates previews without freezing the UI"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.5"
-name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+name = "many_fields_render_without_lag"
+description = "Placing many fields in succession keeps the canvas and counts responsive without perceived lag"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.6"
 name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+description = "The UI remains interactive during undo/redo, template switches, and Export open/close"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
-name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+name = "field_entrance_animations_smooth"
+description = "Field entrance/exit animations maintain smooth motion when motion is allowed"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "9.8"
 name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+description = "Rapid palette clicks and undo/redo do not hang or freeze the app"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.9"
 name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+description = "An extended session of place/delete/export/import shows no runaway resource use that freezes the tab"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+name = "import_parse_has_fallback_feedback"
+description = "Malformed Import shows validation feedback without hanging the UI"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.n1"
 name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+description = "More than 2 seconds pass before interaction is possible on local render"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n2"
 name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+description = "Errors or warnings are present in the console during place, export, import, or signing flows"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n3"
 name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+description = "Export modal or field transitions block or lag the UI"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n4"
-name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
+name = "export_or_import_hangs_ui"
+description = "Export regeneration or Import parsing causes the UI to hang or freeze"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n5"
-name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+name = "many_fields_kill_frame_rate"
+description = "A dense field canvas kills interactivity so clicks are dropped"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n6"
 name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
+description = "Input becomes unresponsive during field entrance or toast animation"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n7"
 name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
+description = "The UI blocks rendering while loading local resources on first open"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n8"
 name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
+description = "Memory leaks or runaway browser resource usage occur during repeated place/delete cycles"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n9"
 name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
+description = "Nothing is displayed while the workspace settles on first load"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "9.n10"
 name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+description = "The app crashes under rapid placement, undo, export, or import"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "performance.catchall"
 name = "performance_catchall"
-description = "The app exhibits a significant, browser-observable defect in performance or stability that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in performance or stability that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true

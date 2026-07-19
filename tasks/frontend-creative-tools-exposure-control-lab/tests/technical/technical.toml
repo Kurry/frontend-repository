@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,7 +62,7 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "2.3"
-name = "2_3"
+name = "uses_browser_storage_apis"
 description = "Uses localStorage or sessionStorage to persist presets or dial state"
 type = "binary"
 weight = 1.0
@@ -78,7 +78,7 @@ weight = 1.0
 [[criterion]]
 id = "2.6"
 name = "console_clean_during_full_exercise"
-description = "No console errors or unhandled promise rejections appear during a full exercise of the dials, both modes, preset create/edit/delete/filter, and the help panel"
+description = "No console errors or unhandled promise rejections appear during a full exercise of the dials, both modes, presets, snapshots, undo/redo, before/after, export/import, and the help panel"
 type = "binary"
 weight = 1.0
 
@@ -135,6 +135,58 @@ weight = 1.0
 id = "2.14"
 name = "outbound_requests_for_assets"
 description = "Network requests to other origins occur for fonts, imagery, scripts, or data during load or a full exercise of the app"
+type = "binary"
+weight = 1.0
+negate = true
+
+
+[[criterion]]
+id = "2.15"
+name = "export_panel_coherent_with_store"
+description = "After mutating dials and presets, the Export panel JSON and every other surface showing those values agree without a reload — a single coherent store, not a disconnected export snapshot"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.16"
+name = "reload_resets_including_snapshots_and_stacks"
+description = "A page reload returns the app to its seeded baseline: default dials, seeded presets, seeded snapshots, and empty undo/redo stacks — consistent with the in-memory genre rule"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.17"
+name = "undo_redo_coherent_across_surfaces"
+description = "Undo and redo restore or reapply dials, presets, snapshots, meter/EV/histogram, and Export panel text together from the same shared state with no surface left stale"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n15"
+name = "export_desynced_from_visible_session"
+description = "Visible dials or presets disagree with the Export panel JSON for the same session state without a reload"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.18"
+name = "api_shaped_schemas_drive_forms_and_export"
+description = "Preset create/edit, snapshot name, and import paste forms enforce the documented API-shaped field contracts with inline named-field errors before submit; the lab-package Export panel JSON uses the same field names, enums, and bounds (schemaVersion exposure-control-lab.package.v1, aperture/shutter/iso stop lists, lookTag closed enum, name max 40 uniqueness) that those forms accept"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.19"
+name = "import_validates_same_schemas"
+description = "Import rejects lab-package JSON that violates the ExposurePreset or DialSnapshot field contracts (wrong lookTag, out-of-list stops, or missing required fields) with a visible named error and leaves the shared store unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n16"
+name = "forms_accept_contract_violations"
+description = "Preset or snapshot forms save records that violate the documented field contracts (duplicate names, lookTag outside the closed enum, or stops outside the discrete lists) without naming the offending field"
 type = "binary"
 weight = 1.0
 negate = true

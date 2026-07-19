@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.5
@@ -63,97 +63,112 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "15.1"
-name = "headings_use_consistent_capitalization"
-description = "Where the app renders headings and section titles, they use consistent capitalization (one convention — title case or sentence case — throughout)."
+name = "sentence_case_ui_microcopy"
+description = "Where the app renders section titles, notes, and control labels, they use concise sentence-case UI text with numerals for counts."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.2"
-name = "actions_use_specific_labels"
-description = "Where the app renders button or action labels, they are specific verbs ('Add expense', 'Start session'), not generic ('Submit', 'OK') when a specific label is possible."
+name = "specific_verbs_on_export_actions"
+description = 'Where the app renders button or action labels, they use specific verbs such as "Copy", "Download", and "Reset all" rather than generic "Submit"/"OK" when a specific label is possible.'
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.3"
-name = "errors_name_problem_and_fix"
-description = "Where the app renders error messages, they name the problem and the fix ('Amount must be a positive number'), not just a rejection ('Invalid')."
+name = "validation_names_setting_and_format"
+description = 'Where the app renders validation messages, they name the setting and the accepted range, format, or enum from the Ghostty field contract (for example font-size 4–60, cursor-style block/bar/underline/block_hollow, or #RRGGBB for colors), not only a bare rejection like "Invalid".'
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.4"
-name = "empty_states_explain_next_step"
-description = "Where the app renders empty states, the copy explains what belongs there and how to add it."
+name = "empty_config_copy_explains_state"
+description = 'Where the app renders the zero-override empty state, the copy explains that there are no changes yet ("# No changes to the default config yet") rather than a blank panel.'
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.5"
-name = "body_copy_is_well_written"
-description = "Where the app renders body or marketing copy, rate how free it is of spelling and grammatical errors."
+name = "section_notes_polished"
+description = "Where the app renders section notes explaining what a setting does, rate how free they are of spelling and grammatical errors and filler."
 type = "likert"
 points = 5
 weight = 0.5
 
 [[criterion]]
 id = "15.6"
-name = "terminology_is_consistent"
-description = "Where the app renders labels for the same concept in multiple places, terminology is consistent (not 'task' here and 'todo' there)."
+name = "terminology_consistent_across_surfaces"
+description = "Where the app renders labels for the same setting in the form, generated-config keys, and preview chrome, terminology stays consistent (for example font-family / font-size / theme) rather than inventing conflicting names."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.7"
-name = "numbers_dates_and_units_are_consistent"
-description = "Where the app renders numbers, dates, and units, formatting is consistent (same date format, same decimal precision, units labeled)."
+name = "generated_output_key_equals_value"
+description = "Where the app renders generated configuration text, comment lines start with # and every override renders as a key = value line under the two header comments using the contracted Ghostty keys and value shapes."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.8"
-name = "success_messages_are_specific"
-description = "Where the app renders confirmation and success messages, they state what happened ('Entry saved'), not vague affirmations."
+name = "toast_success_messages_specific"
+description = "Where the app renders confirmation or success feedback after Copy, Download, or Reset all, the copy states what happened rather than a vague affirmation alone."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.n1"
-name = "placeholder_copy_is_visible"
-description = "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI."
+name = "placeholder_copy_visible"
+description = "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI, including section notes."
 type = "binary"
-negate = true
 weight = 0.5
+negate = true
 
 [[criterion]]
 id = "15.n2"
-name = "prominent_copy_has_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as headings, hero text, or primary buttons."
+name = "prominent_copy_has_spelling_errors"
+description = "Spelling or grammatical errors appear in prominent copy such as category names, section titles, export buttons, or header comments."
 type = "binary"
-negate = true
 weight = 0.5
+negate = true
 
 [[criterion]]
 id = "15.n3"
-name = "concept_names_are_inconsistent"
-description = "The same concept is named inconsistently across surfaces."
+name = "inconsistent_setting_naming"
+description = "The same setting concept is named inconsistently across the form label, generated key, and preview chrome in a way that would confuse a user."
 type = "binary"
-negate = true
 weight = 0.5
+negate = true
 
 [[criterion]]
 id = "15.n4"
-name = "copy_is_truncated_or_overflowing"
-description = "Truncated or overflowing text renders copy unreadable."
+name = "truncated_or_overflowing_labels"
+description = "Section titles, setting labels, validation messages, or generated-config lines are truncated or overflowing so the copy is unreadable."
 type = "binary"
-negate = true
 weight = 0.5
+negate = true
+
+[[criterion]]
+id = "15.9"
+name = "hardened_empty_states_explain_next_step"
+description = "Where the app renders empty states for Diff no-differences, empty search filter, and empty Profiles list, the copy explains what belongs there and the next step."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.n5"
+name = "empty_profile_or_diff_copy_blank"
+description = "The Diff no-differences state, empty search filter, or empty Profiles list is blank or uses placeholder copy instead of explaining the next step."
+type = "binary"
+weight = 0.5
+negate = true
 
 [[criterion]]
 id = "writing.catchall"
 name = "writing_catchall"
-description = "The app exhibits a significant, browser-observable defect in rendered copy quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app's rendered text exhibits a significant copy-quality defect not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true

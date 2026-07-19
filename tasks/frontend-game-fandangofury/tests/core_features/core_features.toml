@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,64 +62,64 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
+name = "stage_map_first_load_locked_stages"
 description = "On load with empty storage, the app opens at / into the FandangoFury Stage-select map with Stage 1 (Plaza del Sol) unlocked and playable and the later Stage nodes shown as locked"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
-description = "After starting Stage 1 and pressing Z to land a Light Attack on an approaching bandit, a distinct attack animation plays, the enemy's health drops, and the on-screen combo counter shows 1"
+name = "light_attack_damages_and_combo_one"
+description = "After starting Stage 1 and pressing Z to land a Light Attack on an approaching bandit, a distinct attack animation plays, the enemy health drops, and the on-screen combo counter shows 1"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
+name = "fiesta_combo_light_light_heavy"
 description = "After chaining Light, Light, then Heavy (Z, Z, X) against an enemy, a named Fiesta Combo fires with a distinct celebratory flash or label beyond the plain combo counter"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
+name = "dodge_cooldown_blocks_second_roll"
 description = "After a Dodge Roll (Space), a visible dodge cooldown indicator appears, and an immediate second Dodge Roll before it clears does not grant another invulnerability"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
+name = "fiesta_fury_gated_then_clears_meter"
 description = "After landing hits until the Fury meter reads full, the Fiesta Fury control becomes enabled only then, and activating it fires a screen-wide hit on all enemies and resets the Fury meter to empty"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
-description = "During a Stage the combat HUD shows the Health bar, the Fury meter, and a 'Wave X of Y' indicator at once, and the current-wave number increments after a wave is cleared while the total stays fixed until a named Boss Duel begins"
+name = "wave_indicator_and_boss_duel"
+description = "During a Stage the combat HUD shows the Health bar, the Fury meter, and a Wave X of Y indicator at once, and the current-wave number increments after a wave is cleared while the total stays fixed until a named Boss Duel begins"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
 name = "cantina_purchase_flow_multi_surface"
-description = "Starting from the Stage-select map with enough Pesos, buying the Max health upgrade in the Cantina decreases the Pesos balance shown in the Cantina AND on the Stage-select map by exactly the shown cost, raises that upgrade's displayed level by one with a strictly higher next cost, and the next run's HUD shows a higher maximum Health capacity — all without a reload"
+description = "Starting from the Stage-select map with enough Pesos, buying the Max health upgrade in the Cantina decreases the Pesos balance shown in the Cantina AND on the Stage-select map by exactly the shown cost, raises that upgrade level by one with a strictly higher next cost, and the next run HUD shows a higher maximum Health capacity — all without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
+name = "mask_states_and_single_equip"
 description = "After opening the Masks screen, locked, unlocked-but-unequipped, and equipped Masks show visibly different card treatments, and equipping one Mask marks it equipped and unequips any previously equipped Mask"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
-description = "After the fighter's Health reaches 0, a Derrota screen appears showing the Pesos earned that attempt, and its Try Again control restarts the current Stage from its first wave with Health restored to full"
+name = "derrota_try_again_clean_restart"
+description = "After the fighter Health reaches 0, a Derrota screen appears showing the Pesos earned that attempt, and its Try Again control restarts the current Stage from its first wave with Health restored to full and no state leaking from the lost attempt"
 type = "binary"
 weight = 1.0
 
@@ -133,96 +133,96 @@ weight = 1.0
 [[criterion]]
 id = "1.11"
 name = "progress_restored_after_refresh"
-description = "After establishing progress and performing a full page refresh, the unlocked Stages, equipped Mask, owned Masks, Peso balance, purchased upgrades, and the saved fighter display name are all restored exactly as before the refresh"
+description = "After establishing progress and performing a full page refresh, the unlocked Stages, equipped Mask, owned Masks, Peso balance, purchased upgrades, the saved fighter display name, and any mid-run checkpoint are all restored exactly as before the refresh"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
 name = "reset_flow_multi_surface_and_refresh"
-description = "After opening Reset Progress and cancelling the confirmation, progress is unchanged; triggering it again and confirming returns the Stage-select map, the Masks screen, and the Cantina together to Stage 1 defaults (only Stage 1 unlocked, no Mask equipped, no owned Masks, the starting Peso balance, no upgrades) without a reload, and reloading afterwards does not revive the old progress"
+description = "After opening Reset Progress and cancelling the confirmation, progress is unchanged; triggering it again and confirming returns the Stage-select map, the Masks screen, and the Cantina together to Stage 1 defaults (only Stage 1 unlocked, no Mask equipped, no owned Masks, the starting Peso balance, no upgrades, no checkpoint) without a reload, and reloading afterwards does not revive the old progress"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "1_13"
+name = "history_undo_redo_adjacent"
 description = "After opening the History panel, using Apply Scenario Change to make several changes, and clicking Undo, the visible state returns to the immediately prior snapshot, the History state region shows the current snapshot, Redo restores the undone state, and an invalid Undo or Redo control is disabled"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.14"
-name = "1_14"
+name = "history_branch_after_undo"
 description = "After undoing one or more steps and then making a different change through the real controls, the History panel marks a separate selectable alternate branch rather than a single flat list, and selecting that branch restores its exact prior visible state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.16"
-name = "1_16"
+name = "light_and_heavy_distinct_damage"
 description = "Light Attack (Z or the Strike button) and Heavy Attack (X or the Smash button) each play a distinct animation, deal different damage to the nearest in-range enemy whose health drops, and advance the on-screen combo counter"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.17"
-name = "1_17"
+name = "fiesta_combo_and_idle_reset"
 description = "Chaining Light, Light, then Heavy triggers a named Fiesta Combo that deals bonus damage, and an idle chain resets the next combo counter to 1 rather than continuing to climb"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.18"
-name = "1_18"
+name = "block_and_dodge_mechanics"
 description = "Holding Block reduces the damage taken from an enemy attack compared with taking it unblocked, and a Dodge Roll grants brief invulnerability then a cooldown that prevents another dodge until it clears"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.20"
-name = "1_20"
-description = "The 'Wave X of Y' indicator's current-wave number increments after each wave is cleared while the total stays fixed, and clearing the final wave advances into a named Boss Duel with a labelled boss health bar"
+name = "waves_then_named_boss_duel"
+description = "The Wave X of Y indicator current-wave number increments after each wave is cleared while the total stays fixed, and clearing the final wave advances into a named Boss Duel with a labelled boss health bar"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.23"
-name = "1_23"
+name = "one_mask_equipped_with_bonus"
 description = "The Masks screen equips exactly one Mask at a time — equipping a second Mask unequips the first — and the equipped Mask grants its passive stat bonus"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.25"
-name = "1_25"
+name = "history_panel_anatomy"
 description = "The History panel exposes Undo, Redo, a region labelled History state showing the current snapshot, a snapshot list, and an Apply Scenario Change action, and Undo and Redo restore the exact adjacent visible states while an invalid Undo or Redo control is disabled"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.28"
-name = "1_28"
-description = "The combat scene is static or non-interactive: attacks do not damage enemies, waves do not advance, or the game does not progress against shared application state"
+name = "combat_scene_static_or_noninteractive"
+description = "The combat scene is static or non-interactive: attacks leave enemy health unchanged, waves stay frozen, or the game fails to progress against shared application state"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "1.29"
-name = "1_29"
+name = "history_flattens_abandoned_branch"
 description = "Undoing and then making a different change silently discards or flattens the abandoned history states into one linear list instead of preserving them as a selectable branch"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "1.30"
-name = "1_30"
+name = "fabricated_success_or_constant_outcome"
 description = "A success or completion state — a landed combo, a purchase, a Stage unlock, or a Victory — appears while the underlying action did not occur, or an outcome stays constant regardless of the inputs given"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "1.31"
@@ -234,35 +234,94 @@ weight = 1.0
 [[criterion]]
 id = "1.32"
 name = "mask_equip_flow_changes_fury_color"
-description = "Equipping a Mask in the Masks screen moves the equipped treatment to that Mask's card and removes it from any previously equipped Mask in the same list, and in the next combat run the Fiesta Fury full-screen effect's color differs from the effect shown with the prior Mask (or no Mask) equipped"
+description = "Equipping a Mask in the Masks screen moves the equipped treatment to that Mask card and removes it from any previously equipped Mask in the same list, and in the next combat run the Fiesta Fury full-screen effect color differs from the effect shown with the prior Mask (or no Mask) equipped"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.33"
 name = "stale_phase_input_ignored"
-description = "Pressing the combat keys (Z, X, C, Space, F) while the Victory screen, the Derrota screen, or the Stage-select map is showing leaves the visible state unchanged — combat input from an earlier phase cannot mutate the current state"
+description = "Pressing the combat keys (Z, X, C, Space, F) while the Victory screen, the Derrota screen, the Pause overlay, or the Stage-select map is showing leaves the visible state unchanged — combat input from an earlier phase cannot mutate the current state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.34"
 name = "stage_map_chrome_complete"
-description = "The Stage-select map at / shows a title, a row of Stage nodes named Plaza del Sol, Mercado Nocturno, and Fortaleza Roja, a Pesos balance, an owned-Masks count, and visible controls that open the Cantina, the Masks screen, Fighter Settings, the History panel, and Reset progress — all without any login"
+description = "The Stage-select map at / shows a title, a row of Stage nodes named Plaza del Sol, Mercado Nocturno, and Fortaleza Roja, a Pesos balance, an owned-Masks count, and visible controls that open the Cantina, the Masks screen, Fighter Settings, Export Campaign, Import Campaign, the History panel, and Reset progress — all without any login"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.35"
 name = "session_five_lifecycle_transitions"
-description = "In one session driven through visible controls, the app crosses at least five legal lifecycle transitions — starting a run, an active-state change during combat, reaching a terminal or checkpoint screen (Victory or Derrota), restarting, and a pause or return-to-Stage-select mode switch — with no reload, blank screen, or dead end between them"
+description = "In one session driven through visible controls, the app crosses at least five legal lifecycle transitions — starting a run, an active-state change during combat, reaching a terminal or checkpoint screen (Victory, Derrota, or Save Checkpoint), restarting, and a pause or return-to-Stage-select mode switch — with no reload, blank screen, or dead end between them"
 type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "pause_freezes_and_resume_continues"
+description = "During an active combat run, pressing Pause (P or the Pause button) freezes enemy movement and attack resolution and shows a Pause overlay; Resume continues the same run with the same Health, Fury, wave or boss phase, and enemies that were frozen"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "save_checkpoint_resume_after_refresh"
+description = "From a paused run, Save Checkpoint returns to the Stage-select map with Resume Run available; after a full page refresh, Resume Run restores the same Stage, wave index or boss phase, fighter Health, Fury meter, and Pesos earned this run"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "campaign_export_contains_session_mutations"
+description = "After changing the fighter display name, buying a Cantina upgrade, and noting the Pesos balance, opening Export Campaign shows a Campaign JSON preview whose text includes schemaVersion fandangofury.campaign.v1, the edited fighter.displayName, the raised upgrade level, and the current pesos value"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "campaign_export_copy_and_download"
+description = "In Export Campaign, Copy shows a brief copied confirmation and Download triggers a real file download whose contents match the previewed Campaign JSON text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "campaign_import_round_trip"
+description = "After exporting a mutated campaign, changing a visible field away from the export, then Importing that same Campaign JSON document, the Stage map, Pesos, Cantina levels, Masks, and fighter display name match the imported document without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "campaign_import_rejects_invalid_schema"
+description = "Importing malformed JSON or JSON that fails the Campaign field contract (wrong schemaVersion, displayName outside 2–20, effectsIntensity outside 0–100, masks.equipped not in owned, or checkpoint.phase outside wave|boss) shows validation naming the offending field and leaves Pesos, Masks, Stages, and Export preview unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "export_omits_session_mutations"
+description = "After mutating fighter display name or a Cantina upgrade level, the Export Campaign JSON preview is identical to the pre-mutation text or omits the mutated field values"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "resume_run_restores_wrong_state"
+description = "After Save Checkpoint and Resume Run (including after refresh), the restored run shows a different Stage, wave/boss phase, Health, or Fury than the values frozen at save time"
+type = "binary"
+negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
+

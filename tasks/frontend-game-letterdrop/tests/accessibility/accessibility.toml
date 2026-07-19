@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,173 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "Canvas play is exempt from per-element semantics; menus, pause screens, and score readouts must be keyboard-reachable and announced. All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "chrome_controls_keyboard_accessible"
+description = "Canvas tile taps are exempt from per-element keyboard semantics, but Start game, Pause, Resume, Submit Word, Undo Last Tile, Save Progress, Resume Saved Run, Export Run, Play again, the Game/History/Achievements view tabs, and the Settings control are all reachable and activatable with Tab, Shift+Tab, Enter, or Space."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "settings_form_manages_focus"
+description = "Opening the Settings form moves keyboard focus into the form; closing it (Save or dismiss) returns focus to the Settings control or another sensible chrome control."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "chrome_icons_have_accessible_names"
+description = "Where the chrome renders Iconify icons as meaningful controls (Settings, tabs, or run controls), each has an accessible name via aria-label, visually adjacent text, or equivalent — decorative icons are marked so they are ignored."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "toasts_and_errors_use_live_regions"
+description = "Transient toasts (valid-word score, Bomb/Slow, Board Cleared!, achievement unlock) and the settings inline validation message are exposed to assistive tech via an ARIA live region or role=status/alert in addition to being visually visible."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+name = "settings_fields_have_explicit_labels"
+description = "In the Settings form, the playerName field and startingTier select each have an explicit associated label element naming the field."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+name = "heading_order_includes_letterdrop"
+description = "The page exposes a logical heading order with LetterDrop as an H1 and subsequent chrome section titles (if any) not skipping levels (no H1→H3 jump)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "landmark_or_main_present"
+description = "The document exposes at least one landmark such as main (or a role=main region) wrapping the game chrome so assistive tech can skip past repeated UI."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "1.8"
-name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+name = "hud_text_meets_contrast"
+description = "HUD labels, score/Best Score readouts, view tabs, and primary button text on #007AFF / #E6EEF7 surfaces meet WCAG AA contrast against their backgrounds."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "chrome_uses_semantic_controls"
+description = "View tabs and run controls (Start game, Pause, Resume, Submit Word, Undo Last Tile, Save) are implemented as buttons or links with button/link semantics, not unlabeled clickable divs."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion enabled, non-essential motion (toast fades, history list insert animation, settings open/close transition, celebratory particle bursts) is reduced or disabled while the game remains fully playable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
-name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+name = "run_controls_unreachable_by_keyboard"
+description = "Start game, Pause, Resume, Submit Word, Undo Last Tile, Save Progress, Export Run, Play again, or the view tabs cannot be reached or activated via keyboard alone."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n2"
-name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+name = "focus_indicators_missing_on_chrome"
+description = "Keyboard Tab focus is missing or obscured on view tabs, game controls, or settings form fields."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n3"
-name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+name = "settings_controls_lack_semantics"
+description = "Settings form controls or primary run buttons are non-semantic clickable elements without button/link roles or accessible names."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+name = "achievement_state_color_only"
+description = "Locked versus unlocked achievement states are distinguishable only by color, with no text or shape cue."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "settings_fails_to_trap_or_return_focus"
+description = "While the Settings form is open, Tab focus escapes into the page behind it with no return path, or closing the form leaves focus lost."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+name = "poor_contrast_on_hud_copy"
+description = "HUD or settings text is unreadable due to poor contrast against the #F5F5F7 or panel backgrounds."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+name = "toast_steals_keyboard_focus"
+description = "A transient toast steals keyboard focus from the control that was focused when the toast appeared."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+name = "meaningful_icons_missing_names"
+description = "A meaningful chrome icon control is exposed without an accessible name."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+name = "heading_order_skipped"
+description = "Headings skip levels (for example H1 directly to H3) in the LetterDrop chrome."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "1.n10"
 name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+description = "With prefers-reduced-motion enabled, toast fades, particle bursts, or settings transitions continue at full motion as if the preference were unset."
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "1.11"
+name = "hud_score_announced_as_text"
+description = "HUD score, Best Score, streak, and tier readouts are exposed as readable text (or an equivalent live region) so assistive tech can announce score changes without relying on the canvas alone."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "export_import_dialogs_manage_focus"
+description = "Where Export Run, Export History, or Import opens a dialog, it takes focus when open, traps focus while open, closes on Escape, and returns focus to the control that opened it."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n11"
+name = "hud_score_canvas_only_inaccessible"
+description = "Score, Best Score, streak, and tier exist only as painted canvas pixels with no readable DOM text or live-region announcement for HUD chrome."
 type = "binary"
 negate = true
 weight = 1.0
@@ -217,3 +240,4 @@ description = "The app exhibits a significant, browser-observable defect in acce
 type = "binary"
 negate = true
 weight = 1.0
+

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,64 +62,78 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "14.1"
-name = "multi_facet_round_trip"
-description = "Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline — never a mix."
+name = "multi_facet_reload_resets_to_seed"
+description = "Starting from seed: create a folder and note, pin it, set a color, open Trash then return to All Notes, open Export Nest on Markdown vault; then reload. Confirm every facet coherently resets to the seeded baseline — no surviving session notes/folders beyond seed, empty undo/redo, no multi-select, All Notes selected — never a mix of surviving and reverted facets."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.2"
-name = "sort_reversal_proves_live_data"
-description = "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders."
+name = "folder_selection_reversal_proves_live_list"
+description = "Selection-reversal proof: select folder A and note its note list, select folder B with a different set of notes, then re-select A. Confirm A's list returns identically — proving the middle pane is derived from the live folder selection, not two hardcoded snapshots."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.3"
-name = "derived_view_responds_to_input"
-description = "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input."
+name = "search_derived_list_sensitivity"
+description = "Derived-view sensitivity: create two notes with distinct unique keywords in title/body; search for each keyword separately and confirm the result list changes to match only the corresponding note, rather than redrawing identically regardless of query."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.4"
-name = "cross_view_echo_without_reload"
-description = "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list ↔ detail, board ↔ stats) without reload."
+name = "pin_and_color_echo_across_views_and_export"
+description = "Cross-view echo: pin a note and set color green in All Notes; without reload confirm the Pinned section, the home folder list, matching search results, and Nest JSON pinned/color fields all reflect the same state."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.5"
-name = "count_delta_is_exact"
-description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+name = "create_note_count_delta_exact"
+description = "Count-delta integrity: measure a folder's count badge, create one titled note via New Note, and re-measure immediately — the badge increases by exactly one."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.6"
-name = "different_inputs_change_outcomes"
-description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+name = "different_titles_different_exports"
+description = "Input-dependent output: create two notes with different distinctive titles; confirm both appear in All Notes with those titles and the Nest JSON / Markdown vault previews differ appropriately rather than identical hardcoded output."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.7"
-name = "interleaved_flows_preserve_state"
-description = "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state."
+name = "interleaved_create_search_and_export"
+description = "Interleaved-flow integrity: start creating a note (open New Note, enter a title), open the command palette and close it, switch search query then clear it, open Export Nest, return and finish creating a second valid note; confirm exactly one completed new note appears, search cleared, and export previews include it without corrupting the other flow's state."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.8"
-name = "empty_to_repopulated_round_trip"
-description = "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions."
+name = "empty_trash_then_repopulate"
+description = "Edge-state round-trip: move every active note to Trash then Empty Trash (empty Trash message visible; export still compiles), then create two valid notes; confirm empty states clear, both notes appear in All Notes and Nest JSON, and folder badges track."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "export_import_round_trip_pipeline"
+description = "Mutate → derived → export → import: create a folder and a note with a unique title, pin it, set color blue; confirm Nest JSON shows schemaVersion notenest-v1 and those fields; Copy or Download Nest JSON; mutate away; Import Nest that document; confirm tree, note, pin, color, and export previews match the pre-export mutated state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "batch_trash_undo_export_pipeline"
+description = "Full pipeline: select two notes, confirm Batch Trash (count −2, both in Trash and absent from Nest JSON notes array), then Session Undo — both notes return, badges restore, and Nest JSON notes again contain both titles."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.n1"
-name = "partial_persistence_is_incoherent"
-description = "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence."
+name = "partial_persistence_after_reload"
+description = "After configuring folders, notes, pins, and export tab then reloading, some user-configured facets survive while others reset — incoherent partial persistence instead of a full return to the seeded baseline."
 type = "binary"
 negate = true
 weight = 1.0
@@ -127,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "14.n2"
 name = "derived_surface_ignores_inputs"
-description = "A derived surface renders identically regardless of its inputs."
+description = "Changing search query, folder selection, or pin/color leaves the note list or Nest JSON preview visually identical — a derived surface ignoring its inputs."
 type = "binary"
 negate = true
 weight = 1.0
@@ -135,15 +149,31 @@ weight = 1.0
 [[criterion]]
 id = "14.n3"
 name = "different_inputs_produce_identical_output"
-description = "Repeating an action with different inputs yields byte-identical output."
+description = "Creating two notes with different titles yields identical visible titles and identical Nest JSON preview text."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "State changes appear in one view but not another until reload."
+name = "cross_view_state_stale_until_reload"
+description = "After pinning, coloring, or moving a note, All Notes, the folder list, search results, or Nest JSON still show stale values until a full page reload."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "export_ignores_session_mutations"
+description = "Export Nest previews remain seed-only or otherwise omit visible session creates/edits/deletes/pins/colors/batch actions — export not compiled live from the store."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n6"
+name = "undo_does_not_restore_workspace"
+description = "After Batch Trash or a single delete-to-Trash, Session Undo does not restore the prior notes, badges, and Nest JSON membership."
 type = "binary"
 negate = true
 weight = 1.0

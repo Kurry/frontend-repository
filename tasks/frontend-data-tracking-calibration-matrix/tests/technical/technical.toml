@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -93,7 +93,7 @@ negate = true
 [[criterion]]
 id = "2.5"
 name = "console_clean_full_exercise"
-description = "The console is free of errors and warnings on first load and stays clean after a complete re-run, triage classifications, rapid slider movement, filter changes, and chart interactions"
+description = "The console is free of errors and warnings on first load and stays clean after a complete re-run, triage classifications, rapid slider movement, filter changes, chart interactions, Export preview switches, and Import attempts"
 type = "binary"
 weight = 1.0
 
@@ -136,6 +136,14 @@ weight = 1.0
 id = "2.11"
 name = "no_outbound_chrome_links"
 description = "App chrome contains zero navigational outbound links: tabs, panels, and controls change views through client state and never navigate to another origin"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "2.12"
+name = "api_shaped_form_schemas_surface_inline_errors"
+description = "Classify, bulk Apply classification, and Import paste validate against the Classification / CalibrationPack / TriagePack field contracts with inline per-field errors before submit, and a valid Classify submit produces a record matching that Classification request body"
 type = "binary"
 weight = 1.0
 

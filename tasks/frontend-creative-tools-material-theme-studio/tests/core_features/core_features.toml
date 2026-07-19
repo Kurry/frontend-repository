@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -126,7 +126,7 @@ weight = 1.0
 [[criterion]]
 id = "1.10"
 name = "tab_switch_no_navigation"
-description = "After switching from Preview to Saved Themes (or Components), the main canvas shows the other mode without full page navigation"
+description = "After switching from Preview to Saved Themes, Components, or Export, the main canvas shows the other mode without full page navigation"
 type = "binary"
 weight = 1.0
 
@@ -184,7 +184,7 @@ weight = 1.0
 [[criterion]]
 id = "1.24"
 name = "palette_accordion_intent_fields"
-description = "The Palette tool lists expandable accordion rows including a Light/Dark Type toggle, Background, Text, Divider, and the six intent colors (primary, secondary, error, warning, info, success), each intent expanding to main / light / dark / contrastText fields kept live with the editor"
+description = "The Palette tool lists expandable accordion rows including a Light/Dark Type toggle (palette.type light or dark), Background, Text, Divider, and the six intent colors (primary, secondary, error, warning, info, success), each intent expanding to main / light / dark / contrastText fields that accept six-digit hex with a leading hash and stay live with the editor"
 type = "binary"
 weight = 1.0
 
@@ -242,14 +242,14 @@ weight = 1.0
 [[criterion]]
 id = "1.32"
 name = "typography_font_size_bounded"
-description = "The Typography tool sets the font family from the loaded fonts and a base font size; entering a size outside the bounded numeric range is rejected or clamped with visible feedback instead of being applied verbatim"
+description = "The Typography tool sets typography.fontFamily from the loaded fonts and typography.fontSize as an integer from 8 through 24 inclusive; shape.borderRadius is a number from 0 through 24 inclusive kept live with the editor; entering a size outside 8 through 24 or a borderRadius outside 0 through 24 is rejected or clamped with visible feedback naming the fontSize or borderRadius field instead of being applied verbatim"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.33"
 name = "snippet_preset_applies_toast"
-description = "Activating a Snippets preset (e.g. Dense spacing, Rounded shapes, or Button casing) visibly patches the ThemeOptions source and shows a confirmation toast"
+description = "Activating a Snippets preset (e.g. Dense spacing, Rounded shapes, or Button casing) visibly patches the ThemeOptions source — Rounded shapes updates shape.borderRadius within 0–24 — and shows a confirmation toast"
 type = "binary"
 weight = 1.0
 
@@ -294,6 +294,122 @@ name = "load_resets_dirty_state"
 description = "Loading a saved theme resets the save status to saved and clears the pending dirty/undo state, shown by the status text immediately after the load"
 type = "binary"
 weight = 0.5
+
+[[criterion]]
+id = "1.40"
+name = "export_panel_live_json_css"
+description = "The Export panel shows live-compiled ThemeOptions JSON and CSS variables format tabs; after changing primary main to a distinct #RRGGBB hex and shape.borderRadius to a distinct value within 0–24, both previews update to include those values without a reload, and the JSON preview also shows palette.type, typography.fontFamily, typography.fontSize, and shape.borderRadius field names with the session's values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "export_download_and_copy"
+description = "Export offers Download JSON, Download CSS, and Copy export: Download triggers a real file download of the visible format text, and Copy writes that exact visible text to the clipboard with a confirmation toast"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "import_themeoptions_applies"
+description = "Import ThemeOptions with a valid declared-theme JSON payload (name ≤64 chars, palette.type light|dark, intent main/light/dark/contrastText #RRGGBB channels, typography.fontFamily, typography.fontSize 8-24, shape.borderRadius 0-24, Type↔palette.type cross-field) replaces editor, tools, Type toggle, and preview with those options and flips save status to unsaved; a malformed or contract-invalid payload shows a visible error naming the offending field and leaves the current theme unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "wcag_contrast_readout_live"
+description = "Each Palette intent color row shows a live WCAG contrast readout for main versus contrastText labeled Pass AA, Pass AAA, or Fail; changing either color recomputes the label immediately"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "harmonics_apply_secondary"
+description = "Activating a Harmonics suggestion (Analogous, Complementary, or Triadic) derived from primary main writes a derived hex into secondary main, rewrites the editor source, and recolors the preview without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "color_blindness_preview_filter"
+description = "Choosing Protanopia, Deuteranopia, or Tritanopia on the Preview chrome applies an SVG filter overlay to the framed sample site only; choosing None removes the filter — both without reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "before_after_compare_toggle"
+description = "Before / After compare toggles the framed sample between the current ThemeOptions and the last saved snapshot of the active theme while the editor and tool panels keep showing the current editable options"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "theme_versions_save_restore"
+description = "Save version with a valid name adds exactly one snapshot under Versions; Restore on a selected snapshot writes those options into editor, tools, and preview and marks the theme unsaved; an empty version name adds nothing and shows an inline error naming the name field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "command_palette_fuzzy_jump"
+description = "Pressing Ctrl+K (Cmd+K on macOS) opens a command palette; typing fuzzy-matches tabs, tools, saved themes, or templates; Enter on a highlighted theme result loads that theme and closes the palette; Escape returns focus"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "theme_name_uniqueness_enforced"
+description = "Submitting New Theme or rename with a name that already exists on another saved theme (after trim), or a name longer than 64 characters, leaves the card count unchanged and shows an inline validation message naming the name field; a successful create writes a would-be request body whose palette.type matches the current Type toggle"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "intent_hex_format_validated"
+description = "Entering a non-#RRGGBB value into an intent color channel such as primary.main, or a shape.borderRadius outside 0 through 24, shows an inline error naming that field path and does not update the editor source, preview, or Export text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "export_json_enumerates_themeoptions_fields"
+description = "The ThemeOptions JSON export preview enumerates name, palette.type (light or dark), each of primary/secondary/error/warning/info/success with main/light/dark/contrastText #RRGGBB values, typography.fontFamily, typography.fontSize, and shape.borderRadius as visible field names and values, with palette.type agreeing with the Type toggle (cross-field)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n40"
+name = "export_omits_session_mutations"
+description = "After editing palette or typography values, the Export JSON or CSS preview still shows stale or seed-only values that omit the session's actual customizations"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n41"
+name = "export_is_static_demo_text"
+description = "The Export panel shows a static hardcoded ThemeOptions or CSS block that stays identical after Palette color and Light/Dark type edits"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n49"
+name = "duplicate_theme_name_still_creates"
+description = "Submitting create or rename with a duplicate saved-theme name still adds or renames a theme and changes the card count"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n50"
+name = "non_hex_intent_color_still_applied"
+description = "A non-#RRGGBB intent color value or an out-of-range shape.borderRadius is applied to editor, preview, or Export text without an inline error naming the field path"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.catchall"

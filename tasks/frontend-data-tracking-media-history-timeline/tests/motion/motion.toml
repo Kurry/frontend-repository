@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -69,7 +69,7 @@ weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "4_2"
+name = "mode_switch_keeps_hover_feedback"
 description = "Mode switches update without full reload and keep hover feedback"
 type = "binary"
 weight = 0.5
@@ -77,7 +77,7 @@ optional = true
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
+name = "omits_hover_feedback"
 description = "Omits hover feedback on pins or list rows so the stage feels static on pointer hover"
 type = "binary"
 weight = 1.0
@@ -85,14 +85,14 @@ negate = true
 
 [[criterion]]
 id = "4.4"
-name = "4_4"
+name = "pan_and_wheel_zoom_live"
 description = "Dragging the stage pans the pins and wheel-zoom narrows or widens the visible year window about its midpoint, live and without reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "4_5"
+name = "stage_drag_does_nothing"
 description = "Dragging or wheel-scrolling the stage does nothing because pins are rendered at fixed positions rather than from the visible year window"
 type = "binary"
 weight = 1.0
@@ -115,14 +115,14 @@ weight = 1.0
 [[criterion]]
 id = "4.8"
 name = "drawer_and_modal_slide_fade"
-description = "The Filters drawer and the About modal enter and exit with a short slide/fade transition rather than appearing and disappearing instantly (opened via their chrome buttons)"
+description = "The Filters drawer, About modal, and Export drawer enter and exit with a short slide/fade transition rather than appearing and disappearing instantly (opened via their chrome buttons)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
 name = "feedback_messages_animate"
-description = "Feedback messages (validation errors, confirmation toasts) appear with visible motion — a short slide or fade — and dismiss the same way"
+description = "Feedback messages (validation errors, Copied confirmation, import errors) appear with visible motion — a short slide or fade — and dismiss the same way"
 type = "binary"
 weight = 0.5
 
@@ -132,6 +132,13 @@ name = "reduced_motion_preference_respected"
 description = "With prefers-reduced-motion: reduce emulated, non-essential fades and settles are shortened or removed while panning, scrubbing, and filtering remain fully functional"
 type = "binary"
 weight = 0.5
+
+[[criterion]]
+id = "4.11"
+name = "bulk_delete_rows_animate_out"
+description = "Bulk Delete animates each removed Library row out rather than snapping the entire list away in one frame"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "4.catchall"

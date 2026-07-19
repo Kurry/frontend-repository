@@ -128,9 +128,9 @@ Contract version: zto-webmcp-v1
 
 Modules:
 - browse-query-v1
-- command-session-v1
 - entity-collection-v1
 - form-workflow-v1
+- artifact-transfer-v1
 
 Module specs:
 <module_spec id="browse-query-v1">
@@ -150,26 +150,6 @@ Module specs:
     "Visible navigation state must update via the same handlers as UI controls."
   ],
   "tool_name_prefix": "browse"
-}
-</module_spec>
-
-<module_spec id="command-session-v1">
-{
-  "id": "command-session-v1",
-  "contract_version": "zto-webmcp-v1",
-  "title": "Command / session",
-  "purpose": "Media, games, presentations, simulations, demos, and remote-control shells.",
-  "permitted_operations": ["start", "pause", "resume", "stop", "restart", "advance", "trigger_demo", "connect", "disconnect"],
-  "binding_keys": {
-    "required_any_of": [["session_operations"]],
-    "optional": ["demos", "visible_postconditions"]
-  },
-  "restrictions": [
-    "No batching or replay of gameplay.",
-    "Timing, animation, collision, repeated input, and transient UI require immediate Playwright observation.",
-    "Tool output cannot prove successful playback or connection."
-  ],
-  "tool_name_prefix": "session"
 }
 </module_spec>
 
@@ -217,27 +197,55 @@ Module specs:
 }
 </module_spec>
 
+<module_spec id="artifact-transfer-v1">
+{
+  "id": "artifact-transfer-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Artifact transfer",
+  "purpose": "Import, export, copy, print, and conversion workflows.",
+  "permitted_operations": ["import", "export", "copy", "print_preview", "convert"],
+  "binding_keys": {
+    "required_any_of": [["artifact_operations"]],
+    "optional": ["import_modes", "export_formats", "conversion_modes", "visible_postconditions"]
+  },
+  "restrictions": [
+    "No raw files, filesystem paths, blobs, base64, or artifact contents in WebMCP arguments or results.",
+    "File picker interaction, clipboard contents, and downloaded artifacts remain Playwright responsibilities."
+  ],
+  "tool_name_prefix": "artifact"
+}
+</module_spec>
+
 Bindings:
 - Browsable entity: trials
-- Destinations: task-catalog; task-page; trial-viewer; reference-filesystem; trial-filesystem; annotations-list; classification-report
+- Destinations: task-catalog; task-page; trial-viewer; reference-filesystem; trial-filesystem; annotations-list; classification-report; export-panel; command-palette
+- Filters: step-type
 - Sorts: reward-asc; reward-desc
-- Session operations: start; advance
-- Demos: trial-ingest; step-playback
 - Entity: annotation
-- Entity operations: create; select; delete
+- Entity operations: create; select; update; delete
 - Entity fields: note-text; step-index
 - Form fields: note-text; stage; root-cause; behavior; impact; evidence; implicated-steps
 - Form operations: validate; submit
+- Value bounds: {"stage":["planning","tool-use","verification","recovery"],"root-cause":["wrong-tool","missing-context","hallucinated-path","timeout"],"behavior":["loops","abandons","invents-files","ignores-errors"],"impact":["score-zero","partial-credit","flaky-pass","false-pass"],"note-text":"non-empty string, at most 500 characters","evidence":"string of at least 20 and at most 2000 characters","implicated-steps":"one or more step indices that exist on the active trial","step-index":"integer step index present on the active trial","step-type":["reasoning","tool-call","observation","terminal","screenshot","all"]}
+- Artifact operations: export; import; copy
+- Export formats: json; markdown
+- Import modes: review-package
 - Workflow completion: active-step-index
 - Workflow completion: file-change-badges
 - Workflow completion: report-card-present
+- Workflow completion: export-preview-present
+- Workflow completion: annotation-count
 
 Mechanics exclusions:
-- Scrubber continuous-drag updating is a gesture-fidelity criterion — Playwright-only; session advance covers discrete step state
+- Scrubber continuous-drag updating is a gesture-fidelity criterion — Playwright-only; timeline clicks and arrow keys cover discrete step state
 - Terminal progressive streaming, auto-follow, and jump-to-latest visuals are streaming mechanics observed live via Playwright
-- Ingest checklist tick animation and per-item pacing stay Playwright-observed (session start trial-ingest only initiates it)
+- Ingest checklist tick animation and per-item pacing stay Playwright-observed when a trial row is opened
 - File renderer visuals — syntax coloring, copy-to-clipboard confirmation, image scaling, markdown rendering — are Playwright/clipboard observations; no file contents in WebMCP results
 - Cross-fade pane transitions and reasoning-disclosure chevron animation stay Playwright-observed
+- Command-palette open gesture, typeahead narrowing, and keyboard highlight movement stay Playwright-observed when mechanism matters
+- Clipboard contents and download of the review-package export stay Playwright responsibilities; no raw file paths, blobs, or base64 in WebMCP args or results
+- Undo and redo timeline microinteractions stay Playwright-observed
+- Step-playback scrubbing and continuous advance visuals stay Playwright-observed
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

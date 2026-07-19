@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,86 +62,86 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "12.1"
-name = "mandated_modules_are_bound"
-description = "All contract-mandated modules are initialized and bound."
+name = "three_modules_bound"
+description = "All three contract-mandated modules form-workflow-v1, structured-editor-v1, and artifact-transfer-v1 are initialized and bound so webmcp_session_info / webmcp_list_tools surface tools for each."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.2"
-name = "handlers_match_visible_ui_logic"
-description = "Exposed tool handlers match visible UI command logic."
+name = "handlers_match_visible_ui"
+description = "Exposed form, editor, and artifact tool handlers call the same application logic as the visible UI for advance/return, theme and icon-set selection, swatch property updates, preview, and export."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.3"
-name = "only_documented_operations_exist"
-description = "Only documented operations and routes are available."
+name = "workflow_steps_bound"
+description = "Workflow steps upload-euroscope-executable, update-theme-colours, update-embedded-bitmaps, and download-new-executable are bound; form advance/return move between adjacent steps through the same path as Back/Continue."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.4"
-name = "contract_is_automation_exercisable"
-description = "The contract can be fully exercised via automation."
+name = "editor_object_types_bound"
+description = "Editor object types base-theme and base-icon-set support select/switch_mode operations that update the visible Base theme and Base icon set controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.5"
-name = "declared_entity_operations_work"
-description = "Entity operations declared in the contract, including create, update, delete, and reorder, all work."
+name = "swatch_properties_update"
+description = "Editor properties backdrop-darkest, backdrop-darker, backdrop-main, backdrop-lighter, backdrop-lightest, and foreground-secondary accept update_property and refresh the matching swatch row and live Preview."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.6"
-name = "form_flow_operations_are_bound"
-description = "Form submission validation, error, and cancel operations are clearly bound."
+name = "editor_modes_theme_and_bitmaps"
+description = "Editor modes theme-colours and embedded-bitmaps are reachable via switch_mode and align with the visible Update theme colours and Update embedded bitmaps steps."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.7"
-name = "queries_match_allowed_spec"
-description = "Query destinations and filters match the allowed specification."
+name = "artifact_export_patched_executable"
+description = "Artifact export with format patched-executable drives the same generate/download path as the visible Download control; patch-recipe-json and theme-css align with the Export center tabs; no file contents appear in WebMCP arguments or results."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.8"
-name = "capabilities_stay_declared"
-description = "No extra or undeclared module routes or capabilities are exposed."
+name = "no_undeclared_modules_or_ops"
+description = "No extra modules beyond form-workflow-v1, structured-editor-v1, and artifact-transfer-v1, and no undeclared steps, properties, modes, or operations beyond the Bindings block, are exposed."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.9"
-name = "session_tool_and_invoke_apis_work"
-description = "Session info, tool list, and invocation are correctly surfaced."
+name = "session_list_invoke_work"
+description = "webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool correctly surface session data, the tool list, and successful invocations for the bound form/editor/artifact tools."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.10"
-name = "mcp_initializes_without_harness_edits"
-description = "MCP initialization works without manual editing or test harness changes."
+name = "contract_exercisable_via_automation"
+description = "The declared contract can be fully exercised via automation: advance/return through the four workflow steps, select base-theme and base-icon-set, update a swatch property, preview, and export patched-executable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.n1"
 name = "mcp_tools_missing_or_noop"
-description = "MCP tooling is unbound, missing, or a no-op."
+description = "Required form, editor, or artifact WebMCP tools are unbound, missing, or no-op when invoked."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n2"
-name = "handlers_diverge_from_ui_logic"
-description = "Handlers do not match UI logic because actions mismatch or state does not sync."
+name = "handlers_diverge_from_ui"
+description = "A WebMCP advance/return, theme/icon select, swatch update_property, or export leaves the UI out of sync with the tool result (handlers diverge from visible UI logic)."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,63 +149,74 @@ weight = 1.0
 [[criterion]]
 id = "12.n3"
 name = "undeclared_capabilities_exposed"
-description = "Undeclared destinations or entity operations are exposed."
+description = "Undeclared modules, workflow steps, editor properties, modes, or artifact operations beyond the Bindings block are exposed through the tool list."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n4"
-name = "automation_cannot_exercise_contract"
-description = "The contract cannot be exercised from automation."
+name = "validation_bypass_desyncs_mcp_ui"
+description = "Updating a swatch property via WebMCP with an invalid colour bypasses validation and desynchronizes MCP state from the visible hex-field rules."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n5"
-name = "validation_bypass_desyncs_state"
-description = "Validation bypasses lead to inconsistent MCP and UI state."
+name = "export_leaks_artifact_bytes"
+description = "Artifact export returns raw file contents, filesystem paths, blobs, or base64 payload data in WebMCP arguments or results."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n6"
-name = "session_or_tool_api_errors"
-description = "The session or tool API returns errors or incomplete data."
+name = "session_or_tool_api_broken"
+description = "webmcp_session_info or webmcp_list_tools returns errors or incomplete data for the mandated form, editor, and artifact modules."
 type = "binary"
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "12.11"
+name = "artifact_import_copy_bound"
+description = "Artifact operations import and copy are bound alongside export; import with mode patch-recipe and copy drive the same paths as Import recipe and Copy export without putting file contents in WebMCP results."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.12"
+name = "export_formats_recipe_and_css"
+description = "Export formats patch-recipe-json and theme-css are bound in addition to patched-executable and produce the same live preview content as the visible Export center tabs."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.13"
+name = "snapshot_and_bitmap_editor_types"
+description = "Editor object types palette-snapshot and bitmap-tile support add/select/update_property/delete paths that match Save snapshot, restore snapshot, and Keep original toggles in the UI."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.14"
+name = "colour_blindness_and_compare_properties"
+description = "Editor properties colour-blindness and compare-mode accept update_property and refresh the visible colour-blindness control and Before/After compare state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.15"
+name = "form_reset_and_export_center_mode"
+description = "Form operation reset and editor mode export-center are bound; reset restores base-theme swatches like Reset to base, and switch_mode to export-center aligns with the step-four export surface."
+type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.n7"
-name = "mcp_relies_on_undocumented_hacks"
-description = "MCP relies on manual or undocumented test hacks."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n8"
-name = "required_contract_module_missing"
-description = "No module contract is implemented where one is declared required."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n9"
-name = "mcp_is_stubbed_or_commented_out"
-description = "The MCP interface is commented out or only stubbed."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n10"
-name = "automated_contract_validation_fails"
-description = "The project fails automated MCP contract validation."
+name = "recipe_export_mcp_omits_mutations"
+description = "Invoking artifact export for patch-recipe-json succeeds in the tool result while the visible Patch recipe JSON preview still omits the session's current swatch or keep-original mutations, drops a required field-contract key (schemaVersion, colours.*, iconSet, bitmaps keepOriginal), or violates cross-field agreement with the Base theme / icon set controls."
 type = "binary"
 negate = true
 weight = 1.0
@@ -213,7 +224,7 @@ weight = 1.0
 [[criterion]]
 id = "mcp_contract.catchall"
 name = "mcp_contract_catchall"
-description = "The app exhibits a significant, browser-observable defect in the declared MCP contract that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The MCP contract for form-workflow-v1 / structured-editor-v1 / artifact-transfer-v1 with the EuroScope Bindings block deviates from its declaration in a way NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to automation or a real user. If present, name the defect and cite concrete evidence. If already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

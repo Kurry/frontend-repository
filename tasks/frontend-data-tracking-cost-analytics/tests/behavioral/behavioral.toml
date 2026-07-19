@@ -1,0 +1,171 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "14.1"
+name = "multi_facet_seeded_reset"
+description = "Multi-facet round-trip: apply a drill-down, recategorize some events, edit a ceiling, save a view, and set a what-if rate, then reload; every facet coherently resets to the seeded baseline (seeded events and tags, original rates and ceilings, no views, default range) — never a mix of kept and reset state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.2"
+name = "sort_reversal_proves_live_data"
+description = "Sort-reversal proof: sort the event table by cost ascending, note the order, then descending; the order reverses correctly relative to ascending, proving sort derives from live data"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.3"
+name = "derived_views_respond_to_inputs"
+description = "Derived-view sensitivity: switching the breakdown dimension, changing the date range, and toggling a series each change the plotted chart meaningfully — never an identical redraw regardless of input"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.4"
+name = "cross_view_echo_recategorize"
+description = "Cross-view echo: recategorizing events from one team to another moves spend between those teams in the budget panel, wheel, and breakdown chart without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.5"
+name = "count_delta_exact"
+description = "Count-delta integrity: the bulk bar's selection count tracks each checkbox exactly, and generating a report moves the capacity gauge by exactly one record, measured immediately before and after"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.6"
+name = "different_inputs_change_outcomes"
+description = "Input-dependent output: two different bulk recategorizations shift the aggregates in correspondingly different directions, and two different estimator texts produce different token counts and costs"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.7"
+name = "interleaved_flows_intact"
+description = "Interleaved-flow integrity: begin configuring the schedule form, apply a drill-down, return and finish the schedule; both the saved schedule and the active drill-down are intact"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.8"
+name = "zero_match_round_trip"
+description = "Edge-state round-trip: drive the filters to a zero-event combination, then clear them; the table, charts, formula result, and tiles all track through both transitions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "what_if_reprice_revert_exact"
+description = "What-if pipeline probe: record a KPI total, a chart bar's tooltip value, and a table row's cost; drag a rate slider and confirm all three change together; Revert and confirm all three return to the exact recorded values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "report_tracks_full_state"
+description = "Report truthfulness probe: recategorize events and edit a ceiling, then export and generate a snapshot; both carry the mutated totals matching the live tiles and panels, not the seeded originals"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n1"
+name = "partial_revert_incoherent"
+description = "After Revert or Undo, one derived surface keeps mutated values while others return to their originals"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n2"
+name = "charts_identical_after_recategorization"
+description = "The breakdown chart, tiles, or budget panel render identically before and after a bulk recategorization that moved spend between members"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n3"
+name = "report_omits_session_mutations"
+description = "An export or snapshot carries pre-mutation numbers while the dashboard shows post-mutation values"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n4"
+name = "stale_cross_view_state"
+description = "A recategorization, ceiling edit, or filter change appears in one surface but not another until a reload"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "behavioral.catchall"
+name = "behavioral_catchall"
+description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

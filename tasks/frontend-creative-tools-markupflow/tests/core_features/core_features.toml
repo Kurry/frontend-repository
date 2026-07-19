@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "workspace_loads_with_all_regions"
-description = "On load, the workspace shows the header (edit/preview, Undo, Redo, Export PNG), the Shapes/Effects/Style tool rail, an empty canvas drop zone with Choose image and Try sample image buttons, and a Layers panel showing a friendly no-annotations-yet message"
+description = "On load, the workspace shows the header (edit/preview, Undo, Redo, Compare, Save snapshot, Export PNG, Export project JSON, Import project, Copy project JSON), the Shapes/Effects/Style/Presets tool rail, an empty canvas drop zone with Choose image and Try sample image buttons, and right-column Layers (with History/Versions) showing a friendly no-annotations-yet message"
 type = "binary"
 weight = 1.0
 
@@ -219,7 +219,7 @@ weight = 1.0
 [[criterion]]
 id = "1.33"
 name = "save_form_validates_project_name"
-description = "The Save control in the Saved projects form stays visibly disabled while the project name field is empty, and submitting with an invalid name shows an inline validation message naming the name field while the Saved projects list count stays unchanged"
+description = "The Save control in the Saved projects form stays visibly disabled while the project name field is empty, and submitting with an invalid name (empty after trim, or longer than 80 characters) shows an inline validation message naming the name field while the Saved projects list count stays unchanged"
 type = "binary"
 weight = 1.0
 
@@ -285,6 +285,139 @@ name = "flow_move_buttons_reorder_and_persist"
 description = "Starting with at least three annotations that visibly overlap: click a Layers row's up or down move button and confirm the row order changes in the panel, the annotation stacking on the canvas changes immediately so the topmost row renders frontmost, and after a full page reload the new order is still in effect in both the panel and the canvas"
 type = "binary"
 weight = 1.0
+
+# HARDEN_MARKUPFLOW_V1
+
+[[criterion]]
+id = "1.43"
+name = "four_named_markup_presets_present"
+description = "The Presets section lists exactly four named recipes — Blur redaction, Callout arrow, Highlight band, and Spotlight focus — as distinct activatable controls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "callout_arrow_preset_adds_arrow_and_text"
+description = "After loading an image and activating Callout arrow, the Layers panel gains exactly two new rows (arrow and text with Bold caption reading Callout), Undo becomes enabled, and both marks appear on the canvas without a separate apply step"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "blur_highlight_spotlight_presets_add_one_each"
+description = "On a loaded image, Blur redaction adds exactly one Blur row, Highlight band adds exactly one Highlighter row, and Spotlight focus adds exactly one Spotlight row, each selected or visible on the canvas"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "copy_paste_style_updates_selection"
+description = "After drawing a Thick color-A rectangle, Copy style, drawing a Thin color-B oval, selecting the oval, and Paste style, the oval updates to Thick and color A on the canvas while the rectangle stays unchanged; Paste style is disabled before any Copy style"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "history_panel_lists_and_jumps"
+description = "After drawing a shape, the History panel shows a newest-on-top human-readable entry for the add; clicking an older History entry restores that prior canvas and Layers snapshot and makes newer entries redoable until a new mutation discards the redo branch"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "snapshot_restore_and_compare"
+description = "With annotations present, Save snapshot under a non-empty name adds a Versions row; drawing one more shape then Restore removes the extra shape from canvas and Layers; Compare hides every annotation so only the base image shows, and ending Compare restores the annotated view"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "export_project_json_live_compiled"
+description = "After adding annotations, Export project JSON shows a read-only preview compiled LIVE from the store that conforms to MarkupFlowProject: schemaVersion exactly markupflow-project-v1, imageDataUrl beginning with data:image/, positive imageWidth and imageHeight, and an annotations array whose entries carry id, type, x, y, color, and strokeWidth (thin/medium/thick) with type-specific geometry/text fields; Download project JSON triggers a client-side .json Blob download with no network upload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "copy_project_json_reflects_session"
+description = "Copy project JSON writes the live-compiled project text to the clipboard and shows a brief copied confirmation; a copy taken after adding annotations differs from a copy taken before those annotations"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "import_project_json_round_trip"
+description = "After drawing at least two shapes and reordering Layers, Download project JSON, Reset workspace, then Import project with that file restores the same annotations and stacking order onto canvas and Layers"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.52"
+name = "annotation_export_fields_match_contract"
+description = "After drawing a rectangle and a text annotation, the Export project JSON preview shows those annotations with type, color as #RRGGBB, strokeWidth as thin/medium/thick, the rectangle's positive width and height, and for text the textStyle (plain/bold-caption/outline/highlight-box/shadow) and fontSize between 10 and 72 — the same Annotation field-contract names, enums, and bounds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.53"
+name = "import_rejects_nonconforming_project_schema"
+description = "Importing a project JSON that fails the MarkupFlowProject or Annotation field contract (wrong schemaVersion, missing annotations, imageDataUrl not beginning with data:image/, invalid type or strokeWidth enum, fontSize outside 10–72, or a rectangle missing positive width/height) shows an inline error naming the import problem and leaves canvas and Layers unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.54"
+name = "saved_project_name_field_contract"
+description = "The SavedProjectCreate form enforces the API-shaped name contract: empty name keeps Save disabled; a name over 80 characters shows an inline validation message naming the name field and adds no Saved projects row"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.55"
+name = "arrow_and_loupe_geometry_fields_in_export"
+description = "After drawing an arrow and placing a loupe, the Export project JSON preview shows the arrow annotation with x2 and y2 numbers and the loupe annotation with cx and cy numbers under those field names"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n2"
+name = "export_omits_session_annotations"
+description = "Export project JSON or Copy project JSON produces a payload that omits annotations the user just drew, or invents annotations that are not on the canvas"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n3"
+name = "preset_or_paste_style_inert"
+description = "A named Preset control or Paste style is present but produces no visible Layers/canvas change when activated under valid conditions (image loaded / style copied)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n4"
+name = "export_missing_required_schema_fields"
+description = "With annotations present, the Export project JSON preview is missing schemaVersion markupflow-project-v1, imageDataUrl beginning with data:image/, imageWidth, imageHeight, annotations, or an annotation's required id/type/x/y/color/strokeWidth fields"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n5"
+name = "import_accepts_invalid_schema"
+description = "Import project accepts a payload that violates the MarkupFlowProject or Annotation field contract (wrong schemaVersion, invalid enums, missing required keys, or geometry cross-field violations) and mutates canvas or Layers without an inline error naming the import problem"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n6"
+name = "export_omits_type_geometry_keys"
+description = "After drawing a rectangle and an arrow, the Export project JSON preview shows those annotations but omits the rectangle's width/height or the arrow's x2/y2 fields the Annotation field contract requires"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.catchall"

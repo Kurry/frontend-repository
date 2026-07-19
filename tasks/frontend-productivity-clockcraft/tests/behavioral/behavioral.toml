@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,64 +62,64 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "14.1"
-name = "multi_facet_round_trip"
-description = "Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline — never a mix."
+name = "multi_facet_reload_resets_to_empty"
+description = "Multi-facet round-trip: create two entries with different categories, assign a custom tag, apply the Meaningful filter, open Export so Session JSON is non-empty, then reload. Confirm every facet coherently resets to the empty seeded baseline — no entries, no tags, All filter, empty export previews, empty heat-map — never a mix of surviving and cleared facets."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.2"
-name = "sort_reversal_proves_live_data"
-description = "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders."
+name = "category_filter_reversal_proves_live_list"
+description = "Filter-reversal proof (genre stand-in for sort reversal): with Meaningful and Draining entries present, select Meaningful and note only Meaningful rows, select Draining and note only Draining rows, then select All. Confirm All restores both sets — proving the list is derived from the live collection."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.3"
-name = "derived_view_responds_to_input"
-description = "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input."
+name = "category_change_moves_chart_and_ratio"
+description = "Derived-view sensitivity: change an entry from Draining to Meaningful and confirm the Meaningful ratio, today's Weekly overview segments, and heat-map cell change meaningfully rather than redrawing identically."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.4"
-name = "cross_view_echo_without_reload"
-description = "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list ↔ detail, board ↔ stats) without reload."
+name = "manual_add_echoes_list_timeline_export"
+description = "Cross-view echo: submit a manual entry named Deep Work; without reload confirm it appears in All entries, Today's timeline, and both Export session format previews."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.5"
-name = "count_delta_is_exact"
-description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+name = "manual_add_count_delta_exact"
+description = "Count-delta integrity: measure the All entries list count, submit one valid manual entry, and re-measure immediately — the count increases by exactly one."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.6"
-name = "different_inputs_change_outcomes"
-description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+name = "different_durations_different_timeline_blocks"
+description = "Input-dependent output: add a 30-minute entry and a 60-minute entry; confirm the 60-minute timeline block is roughly twice as tall as the 30-minute block and Export CSV rows show the two different durationMinutes values."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.7"
-name = "interleaved_flows_preserve_state"
-description = "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state."
+name = "interleaved_timer_and_export_flows"
+description = "Interleaved-flow integrity: start the Live timer, open Export session and note the preview, stop the timer (completing interruption if shown), then reopen Export; confirm the new entry appears in Session JSON and CSV without corrupting the prior entries."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.8"
-name = "empty_to_repopulated_round_trip"
-description = "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions."
+name = "empty_then_repopulate_derived_surfaces"
+description = "Edge-state round-trip: delete every entry (empty states and zero Today's minutes), then add two manual entries; confirm empty states clear and ratio, chart, heat-map, and export previews track both transitions."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.n1"
-name = "partial_persistence_is_incoherent"
-description = "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence."
+name = "partial_persistence_after_reload"
+description = "After creating entries, tags, and a non-All filter then reloading, some facets survive while others reset — incoherent partial persistence instead of a full return to the empty baseline."
 type = "binary"
 negate = true
 weight = 1.0
@@ -127,15 +127,15 @@ weight = 1.0
 [[criterion]]
 id = "14.n2"
 name = "derived_surface_ignores_inputs"
-description = "A derived surface renders identically regardless of its inputs."
+description = "Changing an entry's category or duration leaves the Meaningful ratio, Weekly overview, or heat-map visually identical."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n3"
-name = "different_inputs_produce_identical_output"
-description = "Repeating an action with different inputs yields byte-identical output."
+name = "different_inputs_produce_identical_export"
+description = "Two sessions with different entry names and durations produce byte-identical Session JSON or Timesheet CSV export text."
 type = "binary"
 negate = true
 weight = 1.0
@@ -143,7 +143,37 @@ weight = 1.0
 [[criterion]]
 id = "14.n4"
 name = "cross_view_state_is_stale"
-description = "State changes appear in one view but not another until reload."
+description = "After adding or editing an entry, the timeline, list, ratio, or Export preview still shows stale values until a full page reload."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "export_import_round_trip_preserves_session"
+description = "Mutate → derived → export → import: create entries and a custom tag; confirm Export Session JSON contains them and rollup matches header stats; Download Session JSON; delete all entries; Import the downloaded JSON with confirmation; confirm list, timeline, tags, ratio, chart, heat-map, and Export reconstruct the exported state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "undo_round_trip_restores_export_surfaces"
+description = "Undo round-trip: add a manual entry (list, timeline, Export update), Undo restores the prior empty-or-previous collection everywhere those surfaces show it including Export previews, Redo reapplies the entry everywhere."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "export_text_ignores_session_mutations"
+description = "After mutating entries, Export Session JSON or Timesheet CSV text is identical to the pre-mutation text — an export that omits the session's actual work."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n6"
+name = "undo_leaves_export_stale"
+description = "After Undo of an add or edit, Export previews still show the undone entry while the list restored."
 type = "binary"
 negate = true
 weight = 1.0

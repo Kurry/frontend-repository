@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -113,7 +113,7 @@ weight = 1.0
 [[criterion]]
 id = "3.8"
 name = "nav_theme_scroll_sync"
-description = "The fixed nav's theme swaps to match whichever section sits under the top-of-viewport probe as the page scrolls, recoloring the nav in step with the section beneath it"
+description = "The fixed nav's theme swaps to match whichever section sits under the top-of-viewport sample point as the page scrolls, recoloring the nav in step with the section beneath it"
 type = "binary"
 weight = 1.0
 
@@ -214,6 +214,21 @@ name = "reduced_motion_settled_and_operable"
 description = "With prefers-reduced-motion enabled, smooth scrolling, drifting thumbnails, decorative autoplay, marquees, and pinned throw transforms stop while all cards, headings, controls, and form fields remain visible and operable in their settled states"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "3.22"
+name = "palette_and_brief_panel_transitions"
+description = "On the real UI path, the command palette and discovery brief panel enter and exit with a brief opacity/scale transition; the Copy confirmation appears briefly then reverts."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.n21"
+name = "palette_brief_snap_open_only"
+description = "The command palette or discovery brief panel snaps open/closed with no transition on the real open/close control path."
+type = "binary"
+negate = true
+weight = 0.5
 
 [[criterion]]
 id = "3.catchall"

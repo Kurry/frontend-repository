@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.5
@@ -63,65 +63,51 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "15.1"
-name = "headings_use_consistent_capitalization"
-description = "For fidelity tasks, rendered copy must match the reference. Where the app renders headings and section titles, they use consistent capitalization (one convention — title case or sentence case — throughout)."
+name = "category_and_display_title_casing"
+description = "Where the app renders category names and display titles, they keep the specified strings and casing (Organic & Early Modernism, Expressive, Monumental Modernism, Place / culture continuity; hero American modernism) consistently."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.2"
-name = "actions_use_specific_labels"
-description = "Where the app renders button or action labels, they are specific verbs ('Add expense', 'Start session'), not generic ('Submit', 'OK') when a specific label is possible."
-type = "binary"
-weight = 0.5
-
-[[criterion]]
-id = "15.3"
-name = "errors_name_problem_and_fix"
-description = "Where the app renders error messages, they name the problem and the fix ('Amount must be a positive number'), not just a rejection ('Invalid')."
-type = "binary"
-weight = 0.5
-
-[[criterion]]
-id = "15.4"
-name = "empty_states_explain_next_step"
-description = "Where the app renders empty states, the copy explains what belongs there and how to add it."
+name = "nav_and_affordance_labels_specific"
+description = "Where the app renders navigation and action labels (About, overscroll to open the next case, close), they are specific rather than generic Submit/OK placeholders."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.5"
-name = "body_copy_is_well_written"
-description = "Where the app renders body or marketing copy, rate how free it is of spelling and grammatical errors."
+name = "editorial_prose_spelling_grammar"
+description = "Where the app renders the hero paragraph, category thesis lines, architect biographies, and the about essay, rate how free the long-form editorial prose is of spelling and grammatical errors."
 type = "likert"
 points = 5
 weight = 0.5
 
 [[criterion]]
 id = "15.6"
-name = "terminology_is_consistent"
-description = "Where the app renders labels for the same concept in multiple places, terminology is consistent (not 'task' here and 'todo' there)."
+name = "architect_names_consistent"
+description = "Where the app renders the eight fictional architect names (Ada Mercer, Elias North, Mara Voss, Julian Kade, Imani Vale, Pavel Rowan, Lucian Shore, Mae Calder), terminology stays consistent across home tags, case headings, sibling tags, and document titles."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.7"
-name = "numbers_dates_and_units_are_consistent"
-description = "Where the app renders numbers, dates, and units, formatting is consistent (same date format, same decimal precision, units labeled)."
+name = "uppercase_nav_footer_monospace"
+description = "Where the app renders navigation, footer, and monospace scrapbook labels, they keep one consistent uppercase convention."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.8"
-name = "success_messages_are_specific"
-description = "Where the app renders confirmation and success messages, they state what happened ('Entry saved'), not vague affirmations."
+name = "exact_document_titles"
+description = "Where the app sets document titles, home is exactly Field Notes Archive—American Modernist Architecture; about is exactly About Field Notes Archive—The Archive & The Idea; and each case matches its exact string (e.g. Julian Kade—Field Notes Archive)."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.n1"
-name = "placeholder_copy_is_visible"
-description = "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI."
+name = "placeholder_or_lorem_visible"
+description = "Lorem ipsum or placeholder filler text (TODO, Lorem, asdf, or template variables such as {{title}}) is visible anywhere in the shipped UI, including hero, theses, biographies, or the about essay."
 type = "binary"
 negate = true
 weight = 0.5
@@ -129,23 +115,38 @@ weight = 0.5
 [[criterion]]
 id = "15.n2"
 name = "prominent_copy_has_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as headings, hero text, or primary buttons."
+description = "Spelling or grammatical errors appear in prominent copy such as the hero title American modernism, category names, or primary navigation."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n3"
-name = "concept_names_are_inconsistent"
-description = "The same concept is named inconsistently across surfaces."
+name = "architect_names_inconsistent"
+description = "The same architect is named inconsistently across home tags, case headings, sibling tags, or document titles."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n4"
-name = "copy_is_truncated_or_overflowing"
-description = "Truncated or overflowing text renders copy unreadable."
+name = "copy_truncated_or_overflowing"
+description = "Truncated or overflowing text renders hero, thesis, biography, or about essay copy unreadable."
+type = "binary"
+negate = true
+weight = 0.5
+
+[[criterion]]
+id = "15.9"
+name = "dossier_and_reading_list_labels_specific"
+description = "Where the app renders reading-list empty state, dossier import validation naming the offending field or payload, field-note overlong validation naming the note field, and action labels such as Pin, Field note, Save note, Undo, Redo, Export dossier, Copy, Download, and Import dossier, labels stay specific and free of placeholder filler."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.n5"
+name = "new_chrome_uses_placeholder_labels"
+description = "Reading-list, dossier, or pin/note chrome shows lorem ipsum, TODO, or generic OK/Submit placeholders instead of the specified action labels."
 type = "binary"
 negate = true
 weight = 0.5

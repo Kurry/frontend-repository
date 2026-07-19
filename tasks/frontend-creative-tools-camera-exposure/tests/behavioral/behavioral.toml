@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,88 +62,110 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "14.1"
-name = "multi_facet_round_trip"
-description = "Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline — never a mix."
+name = "multi_facet_reload_resets_to_seed"
+description = "Starting from defaults: step aperture and ISO off default, create a valid preset, mark one favorite, save a snapshot, apply a look pack; then reload. Confirm every facet coherently resets — dials f/16, 1/60, ISO 100, zeroed sliders, centered meter, empty snapshots, empty undo/redo, no active look pack, and exactly the seeded presets."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.2"
-name = "sort_reversal_proves_live_data"
-description = "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders."
+name = "favorites_filter_reversal_proves_live_list"
+description = "Mark at least two presets favorite, switch to favorites-only and record the exact visible names, clear the filter, then re-enable favorites-only. Confirm the favorites-only set returns identically."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.3"
-name = "derived_view_responds_to_input"
-description = "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input."
+name = "filter_derived_list_sensitivity"
+description = "With mixed favorites and look tags present, switch the presets filter from all → favorites-only → a specific look tag → all. Confirm the visible list membership changes meaningfully for each input."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.4"
-name = "cross_view_echo_without_reload"
-description = "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list ↔ detail, board ↔ stats) without reload."
+name = "apply_preset_echoes_in_meter_lab"
+description = "In Presets/Compare apply a seeded preset whose stops differ from the current dials; switch to Meter/Lab without reload. Confirm all three dial readouts, the preview stack, and the meter position match that preset."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.5"
-name = "count_delta_is_exact"
-description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+name = "preset_create_count_delta_exact"
+description = "In Presets/Compare measure the visible preset row count, create one valid preset, and re-measure immediately — the count increases by exactly one."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.6"
-name = "different_inputs_change_outcomes"
-description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+name = "different_stops_different_preview"
+description = "From defaults, step aperture two stops toward open and note brightness/blur/meter; reset; then step ISO upward two stops and note brightness/grain/meter. Confirm the two outcomes differ in the ways the inputs dictate."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.7"
-name = "interleaved_flows_preserve_state"
-description = "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state."
+name = "interleaved_create_and_dial_flows"
+description = "Start creating a preset (open form, enter a name), switch to Meter/Lab and step a dial, return to Presets/Compare and finish creating a second valid preset; confirm the dial change persisted and exactly one new completed preset appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.8"
-name = "empty_to_repopulated_round_trip"
-description = "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions."
+name = "empty_then_repopulate_presets"
+description = "Delete every preset (empty state visible), then create two valid presets; confirm the empty state clears, both new rows appear, and favorites/tag filters operate on the repopulated collection."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "pixel_export_input_dependent"
+description = "Export PNG at a bright edit state and again at a dark edit state; the two downloaded bitmaps differ visibly, proving export is input-dependent rather than a hardcoded file."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "edit_stack_round_trip_schema_coherent"
+description = "Mutate dials and sliders, save a snapshot, Download edit stack (confirm schemaVersion camera-exposure.edit-stack.v1 and bounds), Reset, Import — every restored facet matches the export including lookPack and snapshots."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.n1"
-name = "partial_persistence_is_incoherent"
-description = "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence."
+name = "partial_persistence_after_reload"
+description = "After configuring dials and presets then reloading, some user-configured facets survive while others reset — incoherent partial persistence instead of a full return to the seeded baseline."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n2"
-name = "derived_surface_ignores_inputs"
-description = "A derived surface renders identically regardless of its inputs."
+name = "preview_identical_across_different_stops"
+description = "Stepping aperture, shutter, or ISO across clearly different stops leaves brightness, blur, motion frame, grain, and meter visually identical."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n3"
-name = "different_inputs_produce_identical_output"
-description = "Repeating an action with different inputs yields byte-identical output."
+name = "different_presets_apply_identical_dials"
+description = "Applying two presets that declare different aperture/shutter/ISO values yields identical dial readouts and preview/meter state."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "State changes appear in one view but not another until reload."
+name = "mode_switch_shows_stale_dials_until_reload"
+description = "After applying a preset or stepping dials, the other mode still shows stale values until a full page reload."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "edit_stack_export_missing_schema_fields"
+description = "A Download edit stack artifact is missing schemaVersion, stop fields, slider fields, lookPack, or snapshots, or carries values outside the documented bounds."
 type = "binary"
 negate = true
 weight = 1.0
@@ -151,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "behavioral.catchall"
 name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling not covered by any other criterion in this file. If present, name the defect and cite concrete evidence. If already covered — even partially — answer no."
 type = "binary"
 negate = true
 weight = 1.0

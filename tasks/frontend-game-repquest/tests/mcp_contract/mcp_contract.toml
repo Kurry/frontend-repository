@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,158 +62,103 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "12.1"
-name = "mandated_modules_are_bound"
-description = "All contract-mandated modules are initialized and bound."
+name = "mandated_modules_bound"
+description = "Contract-mandated modules browse-query-v1, entity-collection-v1, command-session-v1, and artifact-transfer-v1 are initialized and bound"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.2"
-name = "handlers_match_visible_ui_logic"
-description = "Exposed tool handlers match visible UI command logic."
+name = "handlers_match_visible_ui"
+description = "Exposed tool handlers call the same application logic as the visible UI for destinations, rep-set entity ops, session ops, and artifact export/import/copy"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.3"
-name = "only_documented_operations_exist"
-description = "Only documented operations and routes are available."
+name = "only_documented_operations"
+description = "Only documented operations and destinations from the contract bindings are available — no undeclared routes"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.4"
-name = "contract_is_automation_exercisable"
-description = "The contract can be fully exercised via automation."
+name = "contract_automation_exercisable"
+description = "The contract can be exercised via webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool against the running page"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.5"
-name = "declared_entity_operations_work"
-description = "Entity operations declared in the contract, including create, update, delete, and reorder, all work."
+name = "entity_rep_set_ops_work"
+description = "Entity operations create, delete, select, and toggle for entity rep-set work through WebMCP using fields reps, setId, gearId, and note within reps bounds 1 through 9999"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.6"
-name = "form_flow_operations_are_bound"
-description = "Form submission validation, error, and cancel operations are clearly bound."
+name = "browse_destinations_work"
+description = "Browse destinations quest, history, gear, and settings open the matching visible tabs/panels via the same handlers as UI controls"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.7"
-name = "queries_match_allowed_spec"
-description = "Query destinations and filters match the allowed specification."
+name = "session_ops_drive_challenge"
+description = "Session operations start, pause, resume, stop, restart, and trigger_demo drive Challenge run lifecycle through the same handlers as the visible controls"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.8"
-name = "capabilities_stay_declared"
-description = "No extra or undeclared module routes or capabilities are exposed."
+name = "artifact_ops_bound"
+description = "Artifact operations export, import, and copy are bound with export formats json and csv and import mode quest-log"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.9"
-name = "session_tool_and_invoke_apis_work"
-description = "Session info, tool list, and invocation are correctly surfaced."
+name = "session_tool_apis_work"
+description = "webmcp_session_info and webmcp_list_tools succeed and list the mandated prefixed tools without harness edits to the page"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.10"
 name = "mcp_initializes_without_harness_edits"
-description = "MCP initialization works without manual editing or test harness changes."
+description = "MCP tools initialize from the app's own registration without requiring the judge to patch page globals"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.n1"
 name = "mcp_tools_missing_or_noop"
-description = "MCP tooling is unbound, missing, or a no-op."
+description = "Mandated WebMCP tools are missing or no-op while the UI appears to succeed"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "12.n2"
-name = "handlers_diverge_from_ui_logic"
-description = "Handlers do not match UI logic because actions mismatch or state does not sync."
+name = "handlers_diverge_from_ui"
+description = "WebMCP handlers mutate different state than the visible controls for the same operation"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "12.n3"
 name = "undeclared_capabilities_exposed"
-description = "Undeclared destinations or entity operations are exposed."
+description = "Extra undeclared module routes or capabilities are exposed beyond the contract bindings"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "12.n4"
-name = "automation_cannot_exercise_contract"
-description = "The contract cannot be exercised from automation."
+name = "artifact_returns_raw_bytes"
+description = "Artifact WebMCP tools return raw file paths, blobs, base64, or artifact contents in tool results"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "12.n5"
-name = "validation_bypass_desyncs_state"
-description = "Validation bypasses lead to inconsistent MCP and UI state."
+name = "required_module_missing"
+description = "A required contract module (browse-query-v1, entity-collection-v1, command-session-v1, or artifact-transfer-v1) is missing"
 type = "binary"
 negate = true
 weight = 1.0
-
-[[criterion]]
-id = "12.n6"
-name = "session_or_tool_api_errors"
-description = "The session or tool API returns errors or incomplete data."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n7"
-name = "mcp_relies_on_undocumented_hacks"
-description = "MCP relies on manual or undocumented test hacks."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n8"
-name = "required_contract_module_missing"
-description = "No module contract is implemented where one is declared required."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n9"
-name = "mcp_is_stubbed_or_commented_out"
-description = "The MCP interface is commented out or only stubbed."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n10"
-name = "automated_contract_validation_fails"
-description = "The project fails automated MCP contract validation."
-type = "binary"
-negate = true
-weight = 1.0
-
 [[criterion]]
 id = "mcp_contract.catchall"
 name = "mcp_contract_catchall"
-description = "The app exhibits a significant, browser-observable defect in the declared MCP contract that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "A significant MCP contract defect is present that is NOT covered by any other criterion in this file. If present, name it and cite concrete evidence. If already covered, answer no here."
 type = "binary"
 negate = true
 weight = 1.0

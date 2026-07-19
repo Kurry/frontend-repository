@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,118 +62,118 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "9.1"
-name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+name = "cold_start_interactive_under_2s"
+description = "LetterDrop is interactive within 2 seconds of a local cold load (title, HUD, and Start game reachable)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
-name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+name = "console_clean_full_session"
+description = "No console errors appear during a full session covering start, play, pause, resume, save/resume, export/import, Game Over, restart, and the History and Achievements tabs."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
-name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+name = "run_controls_respond_promptly"
+description = "Start game, Pause, Resume, Submit Word, and tab switches respond without multi-second lag after first paint (chrome interactions feel under ~100ms)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.4"
-name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+name = "toasts_never_block_play"
+description = "Score, Bomb/Slow, Board Cleared!, and achievement toasts appear without hanging the UI or blocking further tile taps and Submit Word."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.5"
-name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+name = "busy_board_stays_responsive"
+description = "With many tiles on the six-column board at a higher tier, tile taps, Undo Last Tile, and Submit Word remain usable without perceived multi-second freezes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.6"
-name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+name = "interactive_during_run_state_changes"
+description = "The UI remains interactive during Pause/Resume, valid-word clears, and Game Over → Play again transitions (controls stay clickable)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
-name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+name = "tile_fall_stable_frame_rate"
+description = "Tile fall motion stays smooth without visible hitching while tiles spawn, fall, and clear at the highest reached tier."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.8"
-name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+name = "rapid_run_controls_never_freeze"
+description = "The UI stays responsive under rapid repeated input on Start game, Pause, Resume, and Submit Word with no hangs, blank screens, or dropped interactions."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+name = "extended_play_session_stable"
+description = "After an extended play session (multiple runs, History/Achievements visits, pause/resume), the app remains responsive without runaway resource use that freezes interaction."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+name = "first_paint_shows_chrome"
+description = "On cold load the LetterDrop chrome (title/HUD/board placeholder) appears promptly rather than a prolonged blank screen before interaction."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.n1"
-name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+name = "cold_load_exceeds_two_seconds"
+description = "More than 2 seconds pass before LetterDrop is interactive on a local cold load."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n2"
-name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+name = "console_errors_during_game_flows"
+description = "Console errors or unhandled rejections appear during start, play, pause, resume, save/resume, export/import, Game Over, restart, History, or Achievements."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n3"
-name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+name = "pause_or_submit_transitions_block"
+description = "Pause/Resume or Submit Word transitions block interaction for multiple seconds."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n4"
-name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
+name = "toast_or_clear_hangs_ui"
+description = "A score toast, Bomb/Slow toast, or board-clear celebration freezes the UI so run controls stop responding."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n5"
-name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+name = "high_tier_kills_frame_rate"
+description = "At a high tier with many falling tiles, frame rate collapses so fall motion visibly stutters or freezes."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n6"
-name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
+name = "fall_animation_blocks_input"
+description = "During tile fall or clear animations, Submit Word, Pause, or tile taps become unresponsive."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +181,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n7"
 name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
+description = "The UI blocks with a blank page while fonts, icons, or the bundled dictionary load instead of showing the LetterDrop chrome."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,23 +189,23 @@ weight = 1.0
 [[criterion]]
 id = "9.n8"
 name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
+description = "An extended play session shows runaway browser resource usage that freezes LetterDrop."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "9.n9"
 name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
+description = "Nothing is displayed while the app initializes — no title, HUD, or board chrome."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n10"
-name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+name = "rapid_use_crashes_app"
+description = "Rapid repeated Start game / Pause / Resume / Submit Word crashes the app or leaves it permanently unresponsive."
 type = "binary"
 negate = true
 weight = 1.0
@@ -213,7 +213,7 @@ weight = 1.0
 [[criterion]]
 id = "performance.catchall"
 name = "performance_catchall"
-description = "The app exhibits a significant, browser-observable defect in performance or stability that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in LetterDrop performance or stability that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

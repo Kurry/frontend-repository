@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -177,6 +177,21 @@ weight = 0.5
 id = "3.16"
 name = "placeholder_text_visible_in_ui"
 description = "Placeholder or lorem text (for example \"Lorem\", \"TODO\", or template variable names) is visible somewhere in the shipped UI."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.17"
+name = "diff_and_palette_chrome_craft"
+description = "Diff mode marks changed keys with a clear changed treatment for default vs current values; the command palette is a centered overlay with a search field and scrollable result list; Undo/Redo/Import/Diff/Profiles sit in editor chrome without crowding the form or generated-config panel."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.n17"
+name = "hardened_chrome_crowds_primary"
+description = "Undo, Redo, Import, Diff, or Profiles chrome crowds or obscures the primary settings form or generated-config panel so the two-pane composition is lost."
 type = "binary"
 weight = 1.0
 negate = true

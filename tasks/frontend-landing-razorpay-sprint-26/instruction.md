@@ -160,6 +160,8 @@ Contract version: zto-webmcp-v1
 Modules:
 - browse-query-v1
 - command-session-v1
+- entity-collection-v1
+- artifact-transfer-v1
 
 Module specs:
 <module_spec id="browse-query-v1">
@@ -202,10 +204,60 @@ Module specs:
 }
 </module_spec>
 
+<module_spec id="entity-collection-v1">
+{
+  "id": "entity-collection-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Entity collection",
+  "purpose": "Carts, records, favorites, calendar events, list items, and local entities.",
+  "permitted_operations": ["create", "select", "update", "delete", "toggle", "quantity", "reorder"],
+  "binding_keys": {
+    "required_any_of": [["entity"], ["entity_operations"]],
+    "optional": ["entity_fields", "value_bounds", "visible_postconditions"]
+  },
+  "restrictions": [
+    "Closed entity and field enums only.",
+    "Bounded string and numeric values.",
+    "No generic state setter or arbitrary patch object.",
+    "Invokes the same domain command used by the visible control.",
+    "Delete requires explicit confirm=true.",
+    "Reorder only when gesture mechanics are not being evaluated."
+  ],
+  "tool_name_prefix": "entity"
+}
+</module_spec>
+
+<module_spec id="artifact-transfer-v1">
+{
+  "id": "artifact-transfer-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Artifact transfer",
+  "purpose": "Import, export, copy, print, and conversion workflows.",
+  "permitted_operations": ["import", "export", "copy", "print_preview", "convert"],
+  "binding_keys": {
+    "required_any_of": [["artifact_operations"]],
+    "optional": ["import_modes", "export_formats", "conversion_modes", "visible_postconditions"]
+  },
+  "restrictions": [
+    "No raw files, filesystem paths, blobs, base64, or artifact contents in WebMCP arguments or results.",
+    "File picker interaction, clipboard contents, and downloaded artifacts remain Playwright responsibilities."
+  ],
+  "tool_name_prefix": "artifact"
+}
+</module_spec>
+
 Bindings:
-- Destinations: hero; agentic-stack; international; payment-gateway; d2c; marketing; business-banking
+- Browsable entity: features
+- Destinations: hero; agentic-stack; international; payment-gateway; d2c; marketing; business-banking; shortlist; compare; sprint-brief
+- Filters: all; agentic-stack; international; payment-gateway; d2c; marketing; business-banking
 - Session operations: start; stop; trigger_demo
-- Demos: mobile-menu
+- Demos: mobile-menu; command-palette
+- Entity: shortlist-item
+- Entity operations: create; delete; toggle
+- Entity fields: feature_name; pinned
+- Artifact operations: export; copy; import
+- Export formats: json; markdown
+- Import modes: file; sample
 
 Mechanics exclusions:
 - Preloader translateY exit stays Playwright-observed
@@ -214,6 +266,9 @@ Mechanics exclusions:
 - Rive lazy hydration + hover scale(1.03) stays Playwright-observed
 - Word-reveal heading sequencing stays Playwright-observed
 - Video-modal scroll lock stays Playwright-observed
+- Command palette open/close transition stays Playwright-observed
+- File-picker Import stays Playwright-only per artifact-transfer no-raw-file-contents restriction; webmcp only drives Load sample brief and its confirm dialog
+- Clipboard contents and downloaded sprint-brief artifacts remain Playwright responsibilities
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

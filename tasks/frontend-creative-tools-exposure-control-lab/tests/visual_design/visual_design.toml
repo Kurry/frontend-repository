@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,21 +62,21 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
+name = "full_viewport_lab_composition"
 description = "Full-viewport lab composition with overlaid dials and a dense presets list/panel remains tool-like"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
+name = "empty_presets_state_visible"
 description = "Empty presets state is visually present when the collection is empty"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
+name = "marketing_card_grid_replaces_lab"
 description = "Replaces the lab with a marketing card grid and no live exposure preview"
 type = "binary"
 weight = 1.0
@@ -84,7 +84,7 @@ negate = true
 
 [[criterion]]
 id = "3.4"
-name = "3_4"
+name = "three_dials_and_vertical_meter"
 description = "Three circular dial controls (APERTURE / SPEED / ISO) with up/down steppers and a vertical exposure meter captioned UNDER EXPOSED / OVER EXPOSED overlay the full-viewport photo preview"
 type = "binary"
 weight = 1.0
@@ -99,14 +99,14 @@ weight = 1.0
 [[criterion]]
 id = "3.6"
 name = "preset_rows_show_name_stops_badges"
-description = "Presets/Compare presents a dense list or strip of looks where each row shows a name, a stop readout, and favorite/tag badges"
+description = "Presets/Compare presents a dense list or strip of looks where each row shows a name, a stop readout, and favorite/lookTag badges"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.7"
 name = "single_icon_set_throughout"
-description = "One icon set is used consistently across the steppers, favorites, filters, and the help trigger — no mixed icon styles"
+description = "One icon set is used consistently across the steppers, favorites, filters, undo/redo, export, and the help trigger — no mixed icon styles"
 type = "binary"
 weight = 0.5
 
@@ -170,6 +170,36 @@ weight = 0.5
 id = "3.16"
 name = "placeholder_text_visible"
 description = "Lorem ipsum, 'TODO', template-variable, or other placeholder text is visible somewhere in the shipped UI"
+type = "binary"
+weight = 1.0
+negate = true
+
+
+[[criterion]]
+id = "3.17"
+name = "ev_and_histogram_in_lab_chrome"
+description = "An EV numeric readout and a luma histogram graph sit in the lab chrome without replacing the overlaid three-dial composition"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.18"
+name = "export_panel_monospace_json"
+description = "An Export panel shows a monospaced JSON lab-package preview with visible API-shaped field names (schemaVersion, aperture, shutter, iso, ev, presets, snapshots, lookTag, favorite) and Download lab package and Copy lab package controls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.19"
+name = "batch_bar_and_snapshot_strip_visible"
+description = "Presets/Compare rows include selection checkboxes, a batch bar appears when multiple rows are selected, and a Snapshots strip shows named stop readouts"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.n17"
+name = "export_is_screenshot_only_dead_end"
+description = "The only export affordance is a screenshot-shaped or empty dead end with no structured JSON lab package the user can download or copy"
 type = "binary"
 weight = 1.0
 negate = true

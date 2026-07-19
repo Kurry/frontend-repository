@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -61,103 +61,104 @@ allowed_tools = [
 aggregation = "weighted_mean"
 
 [[criterion]]
-id = "3.1"
-name = "creative_tool_stage_composition"
-description = "The page uses a saturated blue field framing a light paint stage with a large centered canvas and floating black toolbar, reading as a desktop-first creative tool rather than a dashboard or card grid"
+id = "2.1"
+name = "saturated_blue_stage_composition"
+description = "The page presents a saturated blue field framing a light/white paint stage with high-contrast ink and condensed UI type in a desktop-first creative-tool composition, not a dashboard card grid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.2"
-name = "title_and_type_system"
-description = "The high-contrast condensed visual system includes the exact angle-bracket title <GRID PAINT STUDIO> and a clearly legible angle-bracketed typewriter-style intro above the stage"
+id = "2.2"
+name = "angle_bracket_title_and_intro"
+description = "An angle-bracket display title reading <GRID PAINT STUDIO> and a typewriter-style angle-bracketed intro line appear above the stage."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.3"
-name = "static_poster_instead_of_tool"
-description = "Shows only a static poster with no paintable grid or gallery collection"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.4"
-name = "toolbar_control_order_and_density"
-description = "The floating black toolbar presents, in order, the labelled Cell slider; QR/Color/Eraser and Grid toggle; seven square swatches; and Upload, Camera, Undo, Clear, Download, and Share actions in a compact but readable arrangement"
+id = "2.3"
+name = "floating_black_toolbar_anatomy"
+description = "A floating black toolbar carries a labelled Cell slider, QR/Color/Flood Fill/Eraser mode buttons, Grid On/Off, Mirror control, seven square swatches, and Upload/Camera/Undo/Redo/Clear/Export/Share actions in a coherent tool strip."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.5"
-name = "exact_palette_visuals"
-description = "The seven square swatches visibly match black #000000, white #ffffff, red #ff0000, yellow #ffff00, green #00ff00, blue #0000ff, and pink #ff0098, with a clear ring around the active swatch"
+id = "2.4"
+name = "exact_palette_hex_swatches"
+description = "Seven swatches render black #000000, white #ffffff, red #ff0000, yellow #ffff00, green #00ff00, blue #0000ff, and pink #ff0098, with the active swatch visibly ringed."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.6"
-name = "gallery_card_density_and_empty_state"
-description = "Gallery uses dense, aligned board cards or rows with readable names, snapshot thumbnails, tags, favorite and delete affordances, and a purposeful empty-state treatment in the same list region after the last deletion"
+id = "2.5"
+name = "histogram_and_vision_chrome"
+description = "The live histogram shows seven color bars plus a blank bar with readable labels, and Vision mode chips make the active simulation discernible."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.7"
-name = "responsive_canvas_and_toolbar"
-description = "At desktop and narrow touch widths, the canvas remains centered and usable, toolbar controls remain reachable, the Cell range adapts from roughly 16–64 to the narrower roughly 36–48 band, and the page avoids clipped actions or unintended horizontal overflow"
+id = "2.6"
+name = "gallery_cards_and_bulk_bar"
+description = "Gallery mode shows dense board cards/rows with names, tags, checkboxes, favorite and delete affordances; a bulk action bar appears when any card is selected; an empty state is visible when none remain."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.8"
-name = "toolbar_or_canvas_overlap"
-description = "At a supported viewport, the toolbar or gallery chrome obscures essential canvas content or controls, the draggable panel escapes the stage, or labels and actions overlap or clip"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.9"
-name = "narrow_viewport_docked_toolbar"
-description = "At a 375px-wide viewport the toolbar docks as a fixed panel instead of floating free, every tool, swatch, and action remains visible and reachable, and no content clips or forces horizontal scrolling"
+id = "2.7"
+name = "export_center_monospace_previews"
+description = "Export center shows monospaced Project JSON and CSS palette preview blocks, a PNG preview, and Copy/Download controls with clear section labels."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.10"
-name = "touch_drag_paint_parity"
-description = "On a narrow touch viewport, a real touch drag across the canvas paints continuously across every crossed cell, matching the desktop pointer-drag behavior"
+id = "2.8"
+name = "versions_and_compare_labels"
+description = "Versions list entries show thumbnails; Compare split labels each side so before/after are readable without relying on color alone."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.11"
+id = "2.9"
 name = "component_state_treatments"
-description = "Toolbar buttons, palette swatches, and the save/rename form fields show visually distinct default, hover, focus, disabled, and error treatments rather than one static look"
+description = "Toolbar buttons, swatches, and form fields show distinct default, hover, focus, disabled, and error treatments."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.12"
-name = "consistent_actionable_copy"
-description = "Toolbar labels, gallery actions, and form labels follow one consistent capitalization convention, validation messages name the field and the fix, and empty states explain what belongs there and how to add it"
+id = "2.10"
+name = "large_centered_canvas"
+description = "A large centered canvas stage sits under the toolbar as the dominant paint surface."
 type = "binary"
-weight = 0.5
+weight = 1.0
 
 [[criterion]]
-id = "3.13"
-name = "placeholder_text_shipped"
-description = "Placeholder or lorem-ipsum text (e.g. 'Lorem', 'TODO', 'asdf', or template variable names) is visible somewhere in the shipped UI"
+id = "2.n1"
+name = "generic_dashboard_layout"
+description = "The first viewport reads as a generic multi-card dashboard rather than a single creative paint stage with branded toolbar."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
-id = "3.catchall"
+id = "2.n2"
+name = "palette_swatches_wrong_colors"
+description = "Palette swatches mismatch the specified seven colors (black, white, red, yellow, green, blue, pink) or the active swatch has no visible ring."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n3"
+name = "clipped_or_overlapping_chrome"
+description = "Toolbar, histogram, gallery cards, or Export center previews visibly clip, overlap unreadable text, or leave orphaned controls at desktop width."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "visual_design.catchall"
 name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick or taste disagreement. If present, name the defect and cite the concrete browser evidence (element, page state, viewport, or screenshot) that demonstrates it. If the defect is already covered—even partially—by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable visual design defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0
+

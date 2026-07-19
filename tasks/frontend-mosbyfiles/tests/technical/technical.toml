@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -195,6 +195,51 @@ id = "2.20"
 name = "required_authored_asset_files_load"
 description = "Browser network and playback evidence shows all portraits, scrapbook imagery, five distinct VP9 WebM/poster pairs, both Julian Kade audio files and waveform datasets, four gallery images, marks, and SVG artwork loading from same-origin paths with no 404, decode, or playback failure"
 type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.40"
+name = "in_memory_pins_notes_clear_on_reload"
+description = "After pinning architects and saving field notes, a full page reload returns pins, notes, scrapbook offsets, and undo stacks to the seeded empty/baseline state (in-memory only; no localStorage persistence)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.41"
+name = "dossier_compiles_from_live_store"
+description = "Export dossier preview updates from the live shared store when pins, notes, or scrapbook offsets change, without requiring a document reload, and the JSON preview keeps schemaVersion field-notes-archive.dossier.v1 with pins, notes, and scrapbookOffsets keys."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.42"
+name = "field_note_and_import_show_named_validation"
+description = "Invalid Field note (body over 500 characters) and schema-invalid Import dossier each show visible validation naming the offending field or payload before any state mutation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.n40"
+name = "pins_or_notes_persist_in_browser_storage"
+description = "After a reload, pins or field notes survive via localStorage or sessionStorage contrary to the in-memory genre rule (unless restored only through an explicit Import dossier action)."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "10.n41"
+name = "dossier_preview_stale_until_reload"
+description = "Pin or field-note mutations leave the Export dossier preview unchanged until a full page reload."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "10.n42"
+name = "validation_errors_unnamed_or_silent"
+description = "Overlong field-note save or schema-invalid dossier import fails silently with no named field/payload feedback, or mutates state despite the error."
+type = "binary"
+negate = true
 weight = 1.0
 
 [[criterion]]

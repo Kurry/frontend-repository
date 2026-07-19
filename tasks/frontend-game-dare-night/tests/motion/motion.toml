@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -69,14 +69,14 @@ weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
+name = "toasts_auto_dismiss"
 description = "Awarding a point, logging a forfeit, reshuffling the deck, and adding or deleting a custom card each show a transient toast that appears and then disappears on its own after a few seconds."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
+name = "hover_and_pressed_feedback"
 description = "Hovering a button, category chip, intensity button, or the card shows a visible hover state distinct from its resting state, and pressing a button gives immediate pressed feedback."
 type = "binary"
 weight = 1.0
@@ -90,7 +90,7 @@ weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "3_5"
+name = "timer_pulse_near_zero"
 description = "With the round timer on, the countdown updates each second and visibly pulses as it nears zero."
 type = "binary"
 weight = 0.5
@@ -98,7 +98,7 @@ optional = true
 
 [[criterion]]
 id = "3.6"
-name = "3_6"
+name = "missing_hover_and_card_snap"
 description = "Interactive controls show no hover state and the card content snaps in with no transition when the Draw card button is pressed."
 type = "binary"
 weight = 1.0
@@ -146,7 +146,15 @@ weight = 1.0
 [[criterion]]
 id = "3.12"
 name = "reduced_motion_fallback"
-description = "With prefers-reduced-motion enabled, the card flip, toasts, dialog transitions and the confetti burst are replaced by instant state changes and the game remains fully playable."
+description = "With prefers-reduced-motion enabled, the card flip, toasts, dialog transitions, the Winner celebration and the confetti burst are replaced by instant state changes and the game remains fully playable."
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "3.13"
+name = "winner_celebration_on_finish"
+description = "When a Done press made through the visible control brings a player to 10 points, a short Winner celebration burst plays tied to that finishing action rather than looping ambiently."
 type = "binary"
 weight = 1.0
 

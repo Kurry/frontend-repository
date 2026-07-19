@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -63,150 +63,43 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+name = "optional_routing_insights_beyond_spec"
+description = "Optional: beyond the required catalog, budget, and export surfaces, the app offers an extra routing insight such as a cheapest-eligible-model suggestion for the current alert minimum context window or a live cost-per-request sparkline"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "optional_keyboard_power_user_depth"
+description = "Optional: beyond the required command palette, the app adds further keyboard power-user depth such as jumplist recent models or chord shortcuts for pin and compare"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+name = "optional_export_diff_preview"
+description = "Optional: the export panel shows a compact diff or change summary of what changed since seed before download"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+name = "optional_budget_burn_projection"
+description = "Optional: beyond the required remaining-budget readout, the app projects session burn rate or time-to-exhaustion while the simulation is running"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+name = "optional_provider_health_affordance"
+description = "Optional: provider rows or chips show a simulated health or latency cue that is not required by the core features"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
+name = "innovation_breaks_core_flows"
+description = "An optional enhancement beyond the spec breaks a required flow such as Log usage, Export session, or Undo so the core monitor becomes unusable"
 type = "binary"
 negate = true
 weight = 1.0
@@ -214,6 +107,7 @@ weight = 1.0
 [[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
-description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "Optional: the app shows an additional browser-observable innovation that clearly goes beyond the written specification and is NOT covered by any other criterion in this file. If present, name it and cite the concrete evidence. If nothing beyond the spec is present, answer no."
 type = "binary"
 weight = 1.0
+

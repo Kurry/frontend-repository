@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,71 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "interactive_controls_keyboard_operable"
+description = "Every interactive control (sidebar/mobile nav items, Book CTAs, hamburger, menu close, carousel next/previous, shortlist toggles, Undo/Redo, FAQ items, inquiry fields, consent Αποδοχή / Απόρριψη, footer links) is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "menu_overlay_keyboard_operable"
+description = "At 390px, the hamburger, the open menu overlay's four nav links, and its close control are all reachable and operable with the keyboard alone while the menu is open."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.5"
-name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+name = "photographs_and_icons_have_alt"
+description = "Every photograph and icon image carries descriptive alt text (or empty alt when purely decorative), including the hero lifestyle image, map markers, amenity slides, feature icons, community photos, and social-style icons."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+name = "headings_logical_order_from_hero_h1"
+description = "Headings follow a logical order from the hero H1 (Home of the uniquely awesome.) without skipping levels that break the outline."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "landmarks_header_nav_main_footer"
+description = "Page chrome uses semantic HTML landmarks: header, navigation, main, and footer are present."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+name = "contrast_on_colored_bands_and_cards"
+description = "Text on colored bands and cards stays readable at WCAG-AA contrast or better using the mandated contrast pairs (e.g. red marquee yellow text on rgb(234,55,55); blue marquee green text on rgb(0,114,227)), never tone-on-tone illegible."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "semantic_interactive_chrome"
+description = "Interactive chrome uses real controls (links/buttons) with semantic roles for nav, Book CTAs, hamburger, carousel arrows, and consent buttons rather than canvas-only hit targets."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "reduced_motion_keeps_content_reachable"
+description = "With prefers-reduced-motion emulated on a fresh load, the skeleton intro, marquee loops, cursor motion, and scroll reveals are disabled while all content remains present, readable, and reachable."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "html_lang_el"
+description = "The document declares html lang el."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
 name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+description = "A primary interactive control (hamburger, menu close, carousel arrow, Book CTA, consent button, or nav link) cannot be reached or activated via keyboard."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +134,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n2"
 name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+description = "Focused interactive controls (nav items, Book CTAs, hamburger, menu close, carousel next/previous, consent buttons, footer links) show no visible focus indicator or the indicator is fully obscured."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,47 +142,31 @@ weight = 1.0
 [[criterion]]
 id = "1.n3"
 name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+description = "Custom interactive chrome (hamburger, menu overlay close, carousel arrows, consent buttons) uses non-semantic tags without ARIA roles/labels."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "menu_focus_not_managed"
+description = "At 390px with the menu open, keyboard focus cannot reach the overlay's links or close control, or the overlay traps the user with no keyboard path to dismiss."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+name = "poor_contrast_unreadable_text"
+description = "Marquee, band, or card copy is unreadable due to contrast below WCAG-AA (tone-on-tone or off-pair colors versus the mandated pairs)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+name = "media_missing_alt_text"
+description = "A photograph or icon image is missing descriptive alt text (and is not marked decorative with empty alt)."
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +174,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n9"
 name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+description = "Headings are skipped or unordered, such as jumping from the hero H1 straight to H3 with no H2."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +182,29 @@ weight = 1.0
 [[criterion]]
 id = "1.n10"
 name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+description = "With prefers-reduced-motion set, the skeleton intro, marquee loops, cursor motion, or scroll reveals continue to run."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "inquiry_dialog_focus_trap_escape"
+description = "The booking inquiry overlay uses a dialog with aria-modal true, traps focus while open, closes on Escape, and returns focus to the control that opened it."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "inquiry_errors_live_region"
+description = "Inquiry validation errors and the success copy Inquiry ready — export your packet are announced through a polite live region as well as shown visually."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n11"
+name = "inquiry_dialog_no_focus_trap"
+description = "The open booking inquiry overlay leaves keyboard focus free to move into the page behind it, or Escape fails to dismiss it while Close/submit stay unreachable."
 type = "binary"
 negate = true
 weight = 1.0

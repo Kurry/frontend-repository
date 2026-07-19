@@ -1,0 +1,282 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_library_and_tree"
+description = "On first load the sidebar lists at least 4 seeded schemas (an evaluation result, an agent task, prompt metadata, and a classification response), the first is active and marked, and its tree renders at least 6 fields including at least one nested object and one array, each row showing key name, a type badge, and a required toggle, with chevrons collapsing object and array children"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "add_field_and_inline_rename"
+description = "Clicking Add Field on an object node appends a child with a default name and string type; clicking a node's name makes it editable inline and committing the edit renames it in the tree, the compiled text, and the example payload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "delete_with_inline_confirm_root_protected"
+description = "A node's Delete control shows an inline confirmation; confirming removes the node and all its descendants, canceling leaves it intact, and the root node offers no Delete control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "drag_reorder_and_nesting"
+description = "Dragging a node with the real pointer reorders it among its siblings immediately on drop, and the nest/un-nest controls move a node into the preceding object sibling or out to its parent's level, with the tree and compiled text updating immediately"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "bulk_node_actions"
+description = "Multi-selecting nodes via checkboxes reveals a contextual action bar with Set required, Clear required, and Delete selected (its confirmation naming the count), and each action applies to exactly the selected nodes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "config_panel_type_dependent"
+description = "Clicking a node opens a side configuration panel with type select, description, and type-dependent constraint inputs — enum values and pattern for string, minimum and maximum for number — and the visible constraint inputs change when the type changes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "constraint_validation_blocks_invalid"
+description = "Entering a minimum greater than the maximum, or an invalid pattern expression, shows an inline message naming the field and the offending rule, and the invalid value is not applied to the compiled schema"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "constraint_templates_apply"
+description = "The templates library lists at least Email pattern, Percentage 0 to 100, ISO date pattern, Non-empty string, and Status enum, and applying one fills the matching constraint inputs on the selected node with visible values that appear in the compiled text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "compiled_text_live_and_faithful"
+description = "The compiled JSON Schema text updates within roughly 100 milliseconds of any tree or configuration edit and is standard, consumable JSON Schema — valid JSON that parses, with a draft-07 $schema declaration and the standard type, properties, required, enum, minimum, maximum, and pattern keywords for the nodes defining them; renames and deletions change the text correspondingly, and its Copy control puts the exact text on the clipboard with visible confirmation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "example_satisfies_schema"
+description = "The Example tab shows a generated JSON object satisfying the current schema — enum fields use one of their enum values, numbers fall within bounds, and required fields are present — and the Regenerate control produces different randomized values that still satisfy the schema"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "example_tracks_every_edit"
+description = "Adding, renaming, retyping, or constraining a field immediately changes the example payload correspondingly, and the example never shows a field the schema no longer contains"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "format_instruction_and_prompt_draft"
+description = "The Format Prompt tab shows a natural-language instruction naming each field with its type and required status, updating when the schema changes, and the Insert into prompt draft control appends it to the editable prompt draft drawer with a success toast"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "validation_run_steps_visible"
+description = "Run validation on a pasted payload starts a simulated run with one visible step per top-level schema field, each advancing through pending, running, and complete or failed as the run progresses"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "retry_backoff_and_resume_from_step"
+description = "A step that retries shows a visible backoff countdown and attempt counter (such as retry 2 of 3); a step that exhausts retries is marked failed with an inline error summary and a manual Retry control that resumes the run from that step while completed steps keep their outcomes and never re-execute"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "pause_resume_rollup_timeline"
+description = "Pausing a running validation freezes at the current step and resuming continues from exactly that step; a rollup of fields checked out of total and failure count derives live from the step states, and an ordered event timeline of step transitions with timestamps can be filtered by status"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "annotations_map_onto_tree"
+description = "When the run completes, per-field pass/fail annotations appear on the tree — success markers on passing nodes and error markers with messages naming the field path and the violated constraint (for example, score must be at most 100) on failing nodes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "invalid_json_blocks_run"
+description = "Pasting a payload that is not valid JSON shows an inline parse error naming the position and does not start a validation run"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "import_inference_follows_example"
+description = "Pasting a JSON object into Import from example produces an inferred schema draft whose field names, types, and constraints match the pasted object's keys and values, with per-field accept and reject toggles; pasting a different object produces a visibly different draft"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "apply_import_replaces_tree"
+description = "Applying the reviewed import draft replaces the working tree with exactly the accepted fields — rejected fields are omitted — and the compiled text and example payload update to match"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "version_save_validation"
+description = "Save version requires a name — saving with an empty name shows an inline message naming the field and saves nothing — and saved versions list with name and timestamp, newest first"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "structural_diff_color_coded"
+description = "The Diff view compares two selected versions with added fields in a success treatment, removed fields in an error treatment, and changed fields (type, required, or constraints) in a warning treatment each labeled with what changed; changing a selection updates the diff without a reload and diffing a version against itself shows an explicit no-differences state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "library_new_delete_duplicate"
+description = "The sidebar's New button starts a blank schema with a root object, Delete removes the selected schema after confirmation, Duplicate copies it under a copy-suffixed name, and clicking any entry loads it into the tree with the active entry visually marked"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "metadata_field_builder"
+description = "The metadata field builder accepts a field label (required) and a type (text, number, date, or dropdown with options); defined fields immediately render as editable inputs on every library entry's details, and values entered there display on that entry"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "undo_redo_with_labels"
+description = "Undo and Redo revert and reapply adds, renames, retypes, constraint edits, reorders, nesting, deletions, bulk actions, and imports, each control showing the label of the action it will affect and disabling when its stack is empty; undoing a drag reorder restores the previous sibling order in the tree and compiled text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "history_timeline_slider_scrubs"
+description = "The history timeline slider spans the active schema's edit history, and dragging it scrubs the tree, compiled text, and example payload backward and forward through recorded states with the current position labeled by its action name"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "export_modal_live_and_copyable"
+description = "The Export modal offers the compiled schema text and, after a completed run, a validation report with the payload summary, per-field outcomes, and failure count; both reflect the latest edits and run when reopened, and each Copy control puts the exact text on the clipboard with visible confirmation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "boundary_states_handled"
+description = "Deleting every child of the root yields a valid empty object schema (compiled text shows an object with no properties, the example shows an empty object), a sibling-duplicate rename shows a conflict message and is not applied, and an empty enum entry shows a message and is not added"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n1"
+name = "example_payload_goes_stale"
+description = "After a tree or constraint edit, the example payload still shows the pre-edit shape — a removed or renamed field lingers, or a value violates a newly applied constraint — indicating the example does not derive from the live schema"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n2"
+name = "inference_ignores_pasted_example"
+description = "The Import from example draft shows fields, types, or constraints unrelated to the pasted object, or two clearly different pasted objects produce the same inferred draft"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n3"
+name = "identical_annotations_for_different_payloads"
+description = "Validating two clearly different payloads against the same schema produces identical per-field pass/fail annotations and an identical validation report, indicating hardcoded rather than computed validation"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core schema-editing, validation, or library features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

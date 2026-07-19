@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,232 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "For fidelity tasks, evaluate whether the app matches the reference's UX affordances. Empty state UI is present and renders when a collection is empty."
+name = "hero_video_fallback_keeps_headline_legible"
+description = "If the hero background video cannot play, the matching freeze-frame still fallback renders at the same full-bleed size and the headline Make. Every Day. Better. remains fully legible over it."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "escape_noop_when_no_overlay_open"
+description = "With no mobile menu, Responsibility dropdown, or preferences modal open, pressing Escape changes nothing visible on the page."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "news_carousel_final_next_stays_bounded"
+description = "At the final news card, activating Next produces no broken state: the track never scrolls past its last card into blank space and the page never gains a horizontal scrollbar."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "rapid_mobile_menu_toggle_no_stack_or_lock"
+description = "Below 1000px, rapidly toggling the mobile menu open and closed never stacks multiple overlays and never leaves the page scroll-locked after the overlay is closed."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "preferences_dismiss_without_save_keeps_banner"
+description = "Opening the cookie preferences modal and dismissing it without saving leaves the We use cookies banner visible with Accept all, Reject all, and Manage preferences still operable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "overlays_mutually_exclusive"
+description = "The Responsibility dropdown, mobile menu overlay, and cookie preferences modal are never open simultaneously; opening one dismisses or blocks the others."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "consent_save_gives_visible_confirmation"
+description = "Saving cookie preferences visibly closes the modal and removes the banner in the same pass (clear confirmation that the action applied)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "interactive_chrome_uses_semantic_controls"
+description = "Header nav, Menu/Responsibility toggles, carousel Prev./Next, and cookie banner actions use semantic buttons or links rather than unlabeled non-interactive shells."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "preferences_modal_and_menu_keyboard_dismissible"
+description = "The open cookie preferences modal and the open mobile menu overlay can each be dismissed via Escape (and their Close control where present), restoring the page."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "consent_toggles_show_immediate_state"
+description = "In the preferences modal, switching a per-category consent control updates that control's visible on/off state immediately before save."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "hero_fallback_missing_or_illegible"
+description = "When the hero video cannot play, no freeze-frame still appears at hero size, or the Make. Every Day. Better. headline becomes illegible over the media."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "escape_mutates_page_with_nothing_open"
+description = "With no menu, dropdown, or modal open, pressing Escape changes visible page state (scroll jump, chrome hide, or unintended overlay)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "carousel_next_past_end_breaks_layout"
+description = "At the final news card, activating Next scrolls into blank track space or introduces a horizontal page scrollbar."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "mobile_menu_leaves_scroll_locked"
+description = "After closing the mobile menu (especially after rapid open/close), the page remains scroll-locked or multiple overlays remain stacked."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "dismiss_preferences_hides_banner_without_save"
+description = "Dismissing the preferences modal without saving also dismisses the cookie banner or disables Accept all / Reject all / Manage preferences."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "multiple_overlays_open_together"
+description = "The Responsibility dropdown, mobile menu, and/or preferences modal are visible open at the same time."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "overlay_not_keyboard_dismissible"
+description = "An open mobile menu or preferences modal cannot be dismissed via Escape or a focusable Close control."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "primary_action_labels_ambiguous_or_missing"
+description = "Cookie banner actions, Menu/Close, or carousel Prev./Next controls lack readable labels or use blank/ambiguous text."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "consent_toggle_gives_no_visible_state"
+description = "Switching a preferences-modal consent category produces no visible change to that control's state."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "cookie_actions_silently_fail"
+description = "Accept all, Reject all, or Manage preferences produce no visible banner/modal change after activation."
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "4.11"
+name = "palette_mutually_exclusive_with_overlays"
+description = "The Responsibility dropdown, mobile menu, preferences modal, and command palette are never open simultaneously; opening one dismisses or blocks the others."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "double_pin_does_not_duplicate"
+description = "Pinning the same news card twice in a row does not duplicate its title in the shortlist or increment the count past a single pin for that card."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "empty_undo_redo_disabled_noop"
+description = "Undo with an empty undo stack and Redo with an empty redo stack are disabled; activating the disabled controls does nothing and produces no console errors."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "empty_shortlist_export_still_valid"
+description = "Downloading or copying the briefing while zero stories are pinned still produces a valid artifact that satisfies the Investor briefing JSON field contract with pinnedTitles as an empty array (or the Markdown empty-state line), schemaVersion 1, all eleven brands, market quote fields, and the current consent object."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "necessary_consent_locked_on"
+description = "Necessary consent cannot be turned off in the preferences modal; attempting to toggle it leaves it on, and any save attempt with necessary false is rejected with a named necessary field error while a normal save still succeeds with necessary true."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "palette_stacks_with_other_overlays"
+description = "The command palette is visible open at the same time as the mobile menu, Responsibility dropdown, or preferences modal."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n12"
+name = "necessary_toggle_turns_off"
+description = "The Necessary consent category can be turned off and saved as false in the preferences modal."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "dismiss_without_save_does_not_write_payload"
+description = "Opening the preferences modal and dismissing it without saving leaves the banner visible with its actions still operable and does not write a consent payload into the Investor briefing consent object."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n13"
+name = "dismiss_without_save_mutates_consent"
+description = "Dismissing the preferences modal without saving still writes a consent payload or dismisses the cookie banner."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.17"
+name = "malformed_briefing_import_keeps_state"
+description = "Importing malformed or undecodable briefing JSON, or JSON that violates the field contract (wrong schemaVersion, missing quote or brands, unknown pinnedTitles entry, consent with necessary false or a missing boolean key, generatedAt not ending in Z), shows a visible error naming the import problem, leaves shortlist and consent unchanged, and produces no console errors."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n14"
+name = "malformed_briefing_import_corrupts_state"
+description = "Importing schema-invalid briefing JSON mutates the shortlist or consent state without a visible named import error."
 type = "binary"
 negate = true
 weight = 1.0

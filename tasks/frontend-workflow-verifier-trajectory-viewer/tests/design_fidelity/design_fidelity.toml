@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -60,96 +60,97 @@ allowed_tools = [
 [scoring]
 aggregation = "weighted_mean"
 
+
 [[criterion]]
 id = "3.1"
-name = "spacing_and_sizing_follow_scale"
-description = "Spacing and sizing follow the design system's scale, with no arbitrary one-off values visible in computed styles."
+name = "split_instrument_matches_spec"
+description = "The review workspace matches the specified split-instrument composition: agent and scorer trajectory panes with a strong vertical divider, persistent side headers, and the verdict table with rollup docked below or beside them"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "typography_matches_spec"
-description = "Typography matches the spec for all headings and body copy."
+name = "typography_roles_match_spec"
+description = "Typography matches the spec: monospaced face for code, terminal, paths, criterion ids, step indices, and export JSON; UI sans elsewhere with clear title > heading > body hierarchy"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "layout_matches_reference"
-description = "Layout matches reference screenshots to within a small tolerance at all specified breakpoints; fidelity tasks achieve near pixel-parity."
+name = "status_color_system_matches_spec"
+description = "The status and verdict color system matches the spec (green yes/pass, red no/fail, amber running/in-review, accent for active/selected) with text labels or glyphs so color is never the only indicator"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.4"
 name = "specified_state_changes_animate"
-description = "Transitions or animations are applied to the state changes the spec calls out, such as add, delete, filter, or view switch."
+description = "Transitions are applied to the state changes the spec calls out: linked-highlight easing, label-switch cross-fade and rollup animation, flips-filter row enter/exit, adjudication mark emphasis, and export drawer enter"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "responsive_behavior_matches_reference"
-description = "Responsive behavior matches reference patterns."
+name = "responsive_behavior_matches_spec"
+description = "Responsive behavior matches the spec: side-by-side trajectories at 1440px, one-pane with switcher at 1024px and below, no page-level horizontal scroll at 375px"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.6"
-name = "control_styling_matches_spec"
-description = "Button and form radii, padding, and shadows conform to the spec."
+name = "export_surface_matches_spec"
+description = "The export drawer matches the specified treatment: format tabs, scrollable monospaced preview, Copy and Download, consistent with the review-console chrome"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.7"
 name = "typography_has_clear_hierarchy"
-description = "Typography has a clear hierarchy that distinguishes section and body text."
+description = "Typography has a clear hierarchy that distinguishes page titles, section headings, and verdict/body text"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.8"
 name = "component_states_match_spec"
-description = "Component states (default, hover, active, disabled) match the spec where specified."
+description = "Component states (default, hover wash, focus ring, active selection, disabled Undo/Redo when empty) match the spec where specified"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.9"
-name = "surface_treatments_match_spec"
-description = "Color, depth, and border treatments are precise per the design."
+name = "badge_treatments_match_spec"
+description = "Flip flags, adjudication classifications, and file change badges each have distinct treatments that always include their words as specified"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.10"
 name = "microinteractions_match_spec"
-description = "Microinteraction feedback for hover and press follows the spec in duration and motion."
+description = "Hover washes, button press, copy confirmation, and disclosure chevron rotation follow the specified microinteraction feedback"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.n1"
-name = "sizing_or_spacing_contradicts_scale"
-description = "Visible sizing or spacing values contradict the specified scale."
+name = "composition_is_card_stack_not_instrument"
+description = "The review workspace reads as a stacked card dashboard rather than the specified split instrument with trajectory panes and docked verdict table"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n2"
-name = "colors_fall_outside_palette"
-description = "Colors appear outside the specified palette."
+name = "colors_fall_outside_status_system"
+description = "Verdict and status colors invent an unrelated palette that breaks the specified green/red/amber/accent system"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n3"
-name = "sizing_mismatches_spec"
-description = "Sizing mismatches the spec."
+name = "export_surface_missing_or_unstyled"
+description = "Export review package is missing or renders without the specified format tabs, monospaced preview, and Copy/Download"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,15 +158,15 @@ weight = 1.0
 [[criterion]]
 id = "3.n4"
 name = "required_animations_missing_or_wrong"
-description = "Animations are missing or incorrect where the spec requires them."
+description = "Required animations for label switch, flips filter, linked highlight, or adjudication mark are missing or snap with no transition when motion is allowed"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n5"
-name = "specified_controls_use_browser_defaults"
-description = "Form or button controls use browser default styles when the spec styles them."
+name = "controls_use_browser_defaults_only"
+description = "Primary review controls use unstyled browser defaults that ignore the specified dense register treatment"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +174,7 @@ weight = 1.0
 [[criterion]]
 id = "3.n6"
 name = "layout_misaligned_at_breakpoints"
-description = "The grid or layout is misaligned at reference breakpoints."
+description = "The split layout is misaligned at 1440px or fails to collapse correctly at 1024px"
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,15 +182,15 @@ weight = 1.0
 [[criterion]]
 id = "3.n7"
 name = "elements_are_clipped_or_offscreen"
-description = "Elements render off-screen or clipped."
+description = "Trajectory panes, verdict table, or export drawer render off-screen or clipped at specified breakpoints"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n8"
-name = "structure_deviates_from_reference"
-description = "Section order, content, or structure deviates from the reference on fidelity tasks."
+name = "structure_deviates_from_spec"
+description = "Section order or structure omits a specified major surface (agent pane, judge pane, verdict table, or export)"
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,15 +198,15 @@ weight = 1.0
 [[criterion]]
 id = "3.n9"
 name = "heading_and_body_text_undifferentiated"
-description = "Heading and body text have no distinction."
+description = "Heading and body text have no visible distinction across the review workspace"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n10"
-name = "microinteractions_deviate_from_reference"
-description = "Microinteractions are missing or deviate from the provided reference."
+name = "badges_color_only"
+description = "Flip flags, classifications, or change badges are color chips only with no word labels"
 type = "binary"
 negate = true
 weight = 1.0
@@ -213,7 +214,7 @@ weight = 1.0
 [[criterion]]
 id = "design_fidelity.catchall"
 name = "design_fidelity_catchall"
-description = "The app exhibits a significant, browser-observable defect in fidelity to the spec or reference that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in fidelity to the instruction visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

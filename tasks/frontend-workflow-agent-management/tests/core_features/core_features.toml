@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -84,14 +84,14 @@ weight = 1.0
 [[criterion]]
 id = "1.4"
 name = "register_valid_agent_appears"
-description = "Submitting Register Agent with a valid name, type, editor integration, and access key closes the modal and adds exactly one new row with idle status and a fresh last-seen timestamp, and the rollup total increases by one"
+description = "Submitting Register Agent with a payload that satisfies the field contract (name 2 to 40 unique chars, agent type and editor integration from their closed sets, access key 16 to 64 letters/digits/hyphen/underscore) closes the modal and adds exactly one new idle row with a fresh last-seen timestamp, and the rollup total increases by one"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
 name = "register_invalid_shows_inline_errors"
-description = "Submitting the registration form with an empty name, missing type, or empty access key shows an inline error naming each invalid field, adds no row, and the submit control stays disabled until required fields are valid"
+description = "Submitting the registration form with an empty name, a name outside 2 to 40 characters, a duplicate name ignoring case, a missing type, a missing editor integration, an empty access key, an access key outside 16 to 64 characters, or disallowed access-key characters shows an inline error naming each invalid field, adds no row, and the submit control stays disabled until required fields are valid"
 type = "binary"
 weight = 1.0
 
@@ -215,6 +215,58 @@ description = "A status change made in one surface (row control, bulk action, or
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "1.23"
+name = "fleet_export_live_snapshot"
+description = "Export fleet opens a preview of structured fleet JSON with version, exported-at ISO-8601 timestamp, rollup counts matching the strip, and an agents array whose entries carry name, agentType, editorIntegration, accessKey, status, lastSeen, timeline, and run; after a register or status mutation the reopened preview includes that mutation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "export_copy_and_download"
+description = "The export surface offers Copy, which places the exact visible preview text on the clipboard with visible confirmation, and Download, which starts a .json file download of that same text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "fleet_import_round_trip"
+description = "Importing a previously exported valid fleet JSON reconstructs the registry so visible names, statuses, and rollup counts match the pre-export mutated state, and the next Export preview matches those values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "undo_redo_registry_mutations"
+description = "After a register, edit, or remove, Undo restores the prior registry rows and rollup counts and Redo reapplies them; Undo and Redo controls are disabled when their stacks are empty"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "command_palette_jump_and_actions"
+description = "Ctrl+K or Cmd+K opens a command palette listing Jump to agent entries plus Register Agent, Export fleet, Undo, and Redo; choosing a Jump entry opens that agent's detail panel and Escape closes the palette without mutating the registry"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "export_omits_session_mutations"
+description = "After registering an agent or changing an agent's status through a real control, reopening Export fleet shows JSON that omits the new agent or still shows the pre-change status, proving the export is stale or hardcoded"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.29"
+name = "import_accepts_invalid_contract"
+description = "Importing malformed JSON or a document that violates the agent field contract mutates the registry or clears it without showing an inline import error"
+type = "binary"
+weight = 1.0
+negate = true
+
 
 [[criterion]]
 id = "1.catchall"

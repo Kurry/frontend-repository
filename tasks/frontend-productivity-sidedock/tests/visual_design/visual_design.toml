@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -76,8 +76,8 @@ weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
-description = "Cards, buttons, and inputs use a 12px radius; primary buttons are solid --color-accent with white text and no shadow, and secondary buttons are white with a 1px border and a subtle shadow"
+name = "workspace_accent_marks_tab_and_header"
+description = "Each workspace tab shows its chosen accent as an underline or background tint and the active workspace header bar uses that same accent color so the active workspace color scheme is unmistakable"
 type = "binary"
 weight = 1.0
 

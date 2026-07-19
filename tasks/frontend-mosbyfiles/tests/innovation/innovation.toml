@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -63,157 +63,73 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "For fidelity tasks, score execution quality rather than invention beyond the reference. The app has unique, delightful microinteractions."
+name = "folder_open_execution_quality"
+description = "Score execution quality of the reference experience (not invention beyond it): the folder-open morph from stack slot into case layout with 3D cover rotateY feels polished and coherent rather than an unfinished opacity crossfade stub."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "choreographed_case_entrance_execution"
+description = "On opening a case via a real home tag click, the choreographed sequence (cover open, character-staggered architect name, sibling tags rising, scrapbook rising/fading) executes smoothly as one timeline rather than four unrelated fades."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
-type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+name = "filing_cabinet_narrative_arc"
+description = "The archive reads as one Field Notes Archive filing-cabinet narrative from home stack through case folders and the about essay rather than disconnected template blocks."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
-id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+id = "11.a1"
+name = "designed_experience_narrative_arc"
+description = "The page reads as a designed experience with a narrative arc — home stack, case folders, scrapbook, and about build on each other visually and the signature folder interaction is memorable as faithful reference execution, not a template with effects sprinkled on."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
-id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+id = "11.a2"
+name = "showcase_rechoreographed_at_narrow_widths"
+description = "Impeccable execution across breakpoints: at 390 the showcase composition is re-choreographed (stack heights, tag sizes, case broken-grid, about single column) rather than a broken shrink of the desktop layout."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
-type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+name = "signature_folder_motion_absent_or_stubbed"
+description = "Signature reference motions are absent or stubbed: no 3D folder open/close, no choreographed case entrance, and no scrapbook rise when opening a case via the real UI path."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
+name = "recreation_feels_generic_template"
+description = "The recreation reads as a generic portfolio template with default type/spacing and none of the reference's filing-cabinet stack, broken-grid case, or kinetic-type execution quality."
 type = "binary"
 negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
-type = "binary"
-negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
+name = "archive_flat_static_no_immersion"
+description = "The archive is flat and static with no folder morph, no stack hover/unfold language, and no scrapbook layering despite the reference requiring them."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
-id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
+id = "11.8"
+name = "dossier_panel_execution_polish"
+description = "Optional execution quality: the research dossier panel and reading-list drawer feel polished and coherent with the filing-cabinet archive rather than bolted-on default modals — still faithful to the reference language, not a competing product invention."
 type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
-type = "binary"
-negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
-description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app demonstrates a noteworthy, browser-observable execution-quality enhancement of the reference experience that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick, and must not invent design beyond the reference. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,158 +62,195 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "place_field_updates_all_surfaces"
+description = "Place-field flow: clicking a palette type adds a field box on the canvas, increases the left-rail template field count and panel summary by exactly one, and adds one to the active submitter breakdown — all without reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "invalid_field_name_shows_inline_validation"
+description = "Create/edit flow: clearing a selected field name to empty or whitespace-only triggers immediate inline validation naming the name field and does not remove the field"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "reassign_updates_canvas_panel_and_breakdown"
+description = "Edit flow: reassigning a selected field submitter updates the canvas colour, the panel control, and the per-submitter breakdown in the same step"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "delete_field_updates_all_surfaces"
+description = "Delete flow: deleting the selected field removes it from the canvas and decreases the rail row count, panel summary, and per-submitter breakdown"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "build_preview_switch_retains_fields"
+description = "View/mode switch: toggling Build/Preview changes the canvas presentation while retaining the same placed fields and assignments without reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "last_delete_leaves_zero_count_canvas"
+description = "Edge: after deleting the last remaining field, document sheets remain with a field count of zero and the palette still places new fields"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "template_switch_preserves_per_template_fields"
+description = "Switching templates swaps sheets and fields; returning to the prior template shows its fields exactly as left, including newly placed ones"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "export_modal_preserves_workspace"
+description = "Opening Export and dismissing it returns to the same open template, selection, and counts without losing workspace state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "export_import_overlays_support_flows"
+description = "Export and Import overlays support Copy, Download, dismiss, and valid Template JSON import without trapping the user"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "failed_send_recovers_without_reload"
+description = "Recovery: a failed Send for signing shows feedback and leaves the status pill unchanged so the user can fix fields and retry without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
 name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+description = "Place, reassign, delete, Export, or Import (or genre-equivalent primary flows) are not enabled from the UI"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "new_fields_missing_or_duplicated"
+description = "Newly placed fields fail to show up on the canvas or appear duplicated unexpectedly"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n3"
 name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+description = "Field or submitter state changes appear in one surface but not another (canvas vs panel vs counts) until reload"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n4"
 name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+description = "Build/Preview or template switching breaks the layout or loses the open template fields"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n5"
 name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+description = "Deleting the last field produces a broken canvas or missing panel summary"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "template_views_disagree"
+description = "Two templates disagree about which fields belong to them after switching back and forth"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "export_cannot_reopen_after_dismiss"
+description = "After dismissing Export, the Export control cannot reopen the artifact dialog"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "export_modal_blocks_with_no_exit"
+description = "The Export modal blocks interaction with no Escape, close, or dismiss path"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n9"
 name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+description = "A failed Send for signing or Import provides no user-visible feedback"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "export_or_import_dead_end_requires_reload"
+description = "Recovering from Export or Import requires a full page reload — the UI reaches a dead end"
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
+
+[[criterion]]
+id = "6.11"
+name = "duplicate_then_undo_redo_flow"
+description = "Duplicate then undo: with a field selected, Duplicate field increases the field count by exactly one with matching type and submitter; Undo removes that duplicate and restores prior selection and counts; Redo restores the duplicate again — all without reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "export_import_template_json_round_trip_flow"
+description = "Artifact end state: place a field, rename it uniquely, reassign to Second Party, open Export, confirm Template JSON and Signing summary contain that field type, name, and Second Party; Copy confirms; Download Template JSON then Import reconstructs the same visible fields and Export previews"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "batch_reassign_then_undo_flow"
+description = "With two fields selected, Batch reassign to Second Party recolours both and updates counts; Undo restores the prior submitter assignments and colours"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "export_formats_missing_session_edits"
+description = "After placing, renaming, and reassigning a field, at least one Export format tab still shows the pre-edit values — the artifact omits the session work"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "6.n12"
+name = "undo_after_duplicate_leaves_orphan"
+description = "After Duplicate field, Undo leaves an orphan duplicate on the canvas or leaves counts inconsistent with visible boxes"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "user_flows.catchall"
 name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,64 +62,64 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "14.1"
-name = "multi_facet_round_trip"
-description = "Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline — never a mix."
+name = "multi_facet_refresh_and_workspace_round_trip"
+description = "Multi-facet round-trip: create two notes, pin one, embed an image, select one note; after a full page refresh all facets restore (text, pin, image, selection). Separately, Export Workspace then Import Workspace of that JSON reconstructs the same visible notes and selection — never a mix of restored and reset state."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.2"
-name = "sort_reversal_proves_live_data"
-description = "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders."
+name = "edit_recency_and_pin_sort_live"
+description = "Sort proof: edit note A then note B so B sorts above A among unpinned notes; pin A so A rises above B; unpin A so B returns above A — ordering is derived from live pin and edit-recency data rather than a hardcoded list."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.3"
-name = "derived_view_responds_to_input"
-description = "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input."
+name = "search_and_counters_track_edits"
+description = "Derived-view sensitivity: type into Search Notes so the list narrows with highlighted matches, then edit the open note body and confirm word/character counters and the sidebar preview change with the text rather than staying identical."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.4"
-name = "cross_view_echo_without_reload"
-description = "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list ↔ detail, board ↔ stats) without reload."
+name = "edit_echoes_sidebar_switcher_and_export"
+description = "Cross-view echo: rename a note title and change its body in the editor; without reload confirm the sidebar row, Quick Switcher entry, and Export Workspace JSON notes entry all reflect the new title and bodyHtml."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.5"
-name = "count_delta_is_exact"
-description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+name = "new_note_count_delta_exact"
+description = "Count-delta integrity: measure sidebar note count immediately before and after New Note; the delta is exactly +1 with the new Untitled row at the top and no lagging counter."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.6"
-name = "different_inputs_change_outcomes"
-description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+name = "different_notes_different_workspace_exports"
+description = "Input-dependent output: create two notes with different titles and bodies; confirm both appear distinctly in the sidebar and the Workspace JSON notes array lists both with those distinct titles and bodyHtml values rather than identical hardcoded output."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.7"
-name = "interleaved_flows_preserve_state"
-description = "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state."
+name = "interleaved_edit_export_and_search"
+description = "Interleaved-flow integrity: start editing note A, open Export Workspace, run a Search Notes query, return to the editor and finish editing note A; confirm the search state or clear restores correctly, note A kept its edits, and the Workspace JSON includes those edits without corrupting the other flow."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.8"
-name = "empty_to_repopulated_round_trip"
-description = "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions."
+name = "empty_then_repopulate_and_export"
+description = "Edge-state round-trip: delete every note (sidebar empty state and welcome panel visible; Export Workspace still compiles with an empty notes array and selectedNoteId null), then create two notes; confirm empty state clears, both notes appear, and Workspace JSON lists both."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.n1"
 name = "partial_persistence_is_incoherent"
-description = "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence."
+description = "After refresh or Workspace import, some note facets (title, pin, image, selection) restore while others silently revert, producing incoherent partial persistence."
 type = "binary"
 negate = true
 weight = 1.0
@@ -127,7 +127,7 @@ weight = 1.0
 [[criterion]]
 id = "14.n2"
 name = "derived_surface_ignores_inputs"
-description = "A derived surface renders identically regardless of its inputs."
+description = "Search results, word/character counters, or Workspace JSON export render identically regardless of note edits or search input."
 type = "binary"
 negate = true
 weight = 1.0
@@ -135,7 +135,7 @@ weight = 1.0
 [[criterion]]
 id = "14.n3"
 name = "different_inputs_produce_identical_output"
-description = "Repeating an action with different inputs yields byte-identical output."
+description = "Creating two notes with different titles and bodies yields identical sidebar titles and identical Workspace JSON notes entries."
 type = "binary"
 negate = true
 weight = 1.0
@@ -143,7 +143,22 @@ weight = 1.0
 [[criterion]]
 id = "14.n4"
 name = "cross_view_state_is_stale"
-description = "State changes appear in one view but not another until reload."
+description = "After editing a note, the sidebar, Quick Switcher, or Workspace JSON export still shows stale title or body until a full page reload."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "workspace_export_import_pipeline"
+description = "Full pipeline: create a note with a unique title and body, pin it, open Export Workspace — JSON contains that note under the field contract — then Import that JSON after deleting all notes; the unique title, body, and pin return and Export Workspace again lists them."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "export_ignores_session_mutations"
+description = "Export Workspace JSON remains empty or otherwise omits visible session creates, edits, pins, or deletes — export not compiled live from the store."
 type = "binary"
 negate = true
 weight = 1.0

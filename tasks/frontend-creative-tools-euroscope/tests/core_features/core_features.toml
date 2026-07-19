@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,21 +62,21 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
+name = "four_step_wizard_progress"
 description = "On load, the app shows a four-step patching wizard whose progress bar names the stages Upload EuroScope executable, Update theme colours, Update embedded bitmaps, and Download new executable, with step 1 active"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
+name = "seeded_upload_continue"
 description = "On load, step 1 shows a loaded sample named EuroScope.exe and a Continue button; clicking Continue advances to the Update theme colours step without requiring a file to be picked"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
+name = "five_base_themes_listed"
 description = "On the Update theme colours step, the Base theme control lists exactly EuroScope, Grey, Primer, Ayu, Solarised"
 type = "binary"
 weight = 1.0
@@ -90,42 +90,42 @@ weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
+name = "single_swatch_edit_isolated"
 description = "After editing the Backdrop lighter swatch, the Preview updates and the other five swatch values stay unchanged"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
+name = "vector_icon_set_ten_of_ten"
 description = "After clicking Continue to the Update embedded bitmaps step and selecting the Vector icon set, the bitmap preview grid recolours to the chosen theme and a status line reads 10 of 10 bitmaps set to Vector"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
+name = "icon_change_preserves_colours"
 description = "After changing the icon set on the Update embedded bitmaps step, the previously chosen colour set is still selected and the colour Preview is unchanged"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
+name = "generate_confirmation_summary"
 description = "After clicking Generate, the Download new executable step shows a Patched result generated confirmation and a chosen-replacements summary naming the selected colour set"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
+name = "back_from_download_retains_theme"
 description = "After reaching the Download new executable step, clicking Back returns to the Update embedded bitmaps step and then Back again returns to Update theme colours with the earlier colour set still selected"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
+name = "grey_theme_survives_step_return"
 description = "After choosing colour set Grey, advancing a step, and returning, the Base theme control still shows Grey and the same Preview"
 type = "binary"
 weight = 1.0
@@ -146,14 +146,14 @@ weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "1_13"
+name = "reload_restores_step_and_theme"
 description = "After choosing a colour set and reloading the page, the app restores the same wizard step and the same chosen replacements"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.24"
-name = "1_24"
+name = "seeded_sample_and_bitmaps"
 description = "The workflow is non-empty on first load: a sample scope is loaded so step 1 advances without a user file, and at least ten sample bitmaps back the icon preview"
 type = "binary"
 weight = 1.0
@@ -244,7 +244,7 @@ weight = 0.5
 
 [[criterion]]
 id = "1.25"
-name = "1_25"
+name = "no_backward_navigation"
 description = "The wizard has no working backward navigation: no Back control returns to the previous step, so an earlier choice cannot be revisited"
 type = "binary"
 weight = 1.0
@@ -252,7 +252,7 @@ negate = true
 
 [[criterion]]
 id = "1.26"
-name = "1_26"
+name = "back_resets_choices"
 description = "Moving backward a step loses or resets the earlier colour or icon choice instead of keeping it selected"
 type = "binary"
 weight = 1.0
@@ -260,19 +260,164 @@ negate = true
 
 [[criterion]]
 id = "1.27"
-name = "1_27"
-description = "Selecting a different colour set or icon set does not change the preview or the generated summary, or the output is constant regardless of the choice"
+name = "choice_does_not_update_preview"
+description = "Selecting a different colour set or icon set leaves the preview and generated summary unchanged, or yields constant identical output regardless of the choice"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "1.28"
-name = "1_28"
+name = "outbound_chrome_links"
 description = "App chrome navigates via real outbound links to another origin instead of driving the wizard through in-app client state"
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "1.41"
+name = "undo_redo_controls_present"
+description = "Undo and Redo controls are visible in the wizard chrome; both are disabled when their stacks are empty, and Undo reverses a base-theme select or swatch edit across swatches, Preview, contrast matrix, and export preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "contrast_matrix_live_aa"
+description = "On the Update theme colours step, a live ATC contrast matrix lists at least three pairings (Backdrop darkest on Foreground secondary, Backdrop main on Foreground secondary, Backdrop lightest on Backdrop darkest) with contrast ratios and Pass/Fail marks against WCAG AA 4.5:1; editing a swatch recomputes the ratios immediately"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "colour_blindness_filter_preview_only"
+description = "Choosing Protanopia or Deuteranopia on the colour-blindness control visibly shifts both Preview panels while the six swatch hex field values stay unchanged; choosing None removes the filter"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "named_snapshot_save_and_restore"
+description = "Saving a snapshot with a valid name (for example Night ops) adds exactly one row whose payload matches the Palette snapshot field contract (non-empty name plus six #RRGGBB colours keys); selecting that snapshot restores its six colours into the working swatches and retints the Preview and contrast matrix"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "before_after_snapshot_compare"
+description = "After saving a snapshot and editing two swatches, the Before / After toggle shows the snapshot colours in the Preview on Before and the edited colours on After without mutating the undo stack"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "keep_original_decrements_replaced_count"
+description = "With Vector selected, turning Keep original on two tiles via the advanced per-bitmap list mutes those tiles and drops the replaced-count status by exactly two"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "batch_keep_original_selected"
+description = "Selecting three bitmap tiles and activating Keep original selected mutes all three at once, decrements the replaced count by three, and clears the selection"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "export_center_three_tabs_live"
+description = "On step four, the Export center shows Patch recipe JSON, Theme CSS, and Summary tabs; after a swatch edit or icon-set change, the active preview text updates without a reload to reflect the session's actual replacements"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "copy_export_and_download_recipe"
+description = "Copy export puts the visible preview text on the clipboard and shows a confirmation that reverts; Download recipe downloads a .json file whose contents match the Patch recipe JSON preview and still include every required field-contract key"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "import_recipe_round_trip"
+description = "After configuring theme, icon set, and a keep-original override, exporting then importing the Patch recipe JSON (after Reset to base) reconstructs the same six swatches, icon set, keep-original map, Preview colours, and export preview; the Patch recipe JSON still shows schemaVersion euroscope-patch-v1 and the six colours keys, and Theme CSS still shows all six --es-* tokens"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.53"
+name = "patch_recipe_api_shaped_field_contract"
+description = "The Patch recipe JSON export preview is a single object with no undeclared top-level keys whose visible text includes the required field contract: schemaVersion exactly euroscope-patch-v1; target.product exactly EuroScope and target.executableName ending in .exe; baseTheme exactly one of EuroScope, Grey, Primer, Ayu, Solarised; colours keyed exactly backdropDarkest, backdropDarker, backdropMain, backdropLighter, backdropLightest, foregroundSecondary each as #RRGGBB; iconSet exactly none or vector; and bitmaps entries for every seeded id each carrying boolean keepOriginal"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.54"
+name = "theme_css_es_token_contract"
+description = "The Theme CSS export preview is a :root block whose visible custom-property names are exactly --es-backdrop-darkest, --es-backdrop-darker, --es-backdrop-main, --es-backdrop-lighter, --es-backdrop-lightest, and --es-foreground-secondary, each assigned the matching working swatch's current #RRGGBB value"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.55"
+name = "swatch_form_matches_recipe_colours"
+description = "After selecting a base theme and editing a swatch through the form controls, the Patch recipe JSON colours object shows the same six camelCase keys and #RRGGBB values the swatch forms produced — the form record is the export payload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "command_palette_stage_and_theme"
+description = "Pressing Ctrl+K (or Cmd+K) opens the command palette; activating an Update embedded bitmaps stage result jumps to step three, and activating an Ayu theme result applies the Ayu palette"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.52"
+name = "reset_to_base_restores_palette"
+description = "After editing swatches away from the selected base theme, activating Reset to base restores all six working swatches to that base theme's palette and retints the Preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n5"
+name = "export_omits_session_mutations"
+description = "The Patch recipe JSON or Theme CSS export preview omits the session's actual swatch hex values, icon-set choice, or keep-original overrides after those mutations were made"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n6"
+name = "undo_does_not_restore_surfaces"
+description = "After a theme or swatch mutation, Undo leaves swatches, Preview, contrast matrix, or export preview in the post-mutation state instead of restoring the prior values"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n7"
+name = "contrast_matrix_static_or_missing"
+description = "The contrast matrix is missing, or its ratios and Pass/Fail marks stay identical after a swatch edit that should change a pairing"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n8"
+name = "patch_recipe_missing_required_contract_keys"
+description = "An open Patch recipe JSON export preview omits required contract keys (schemaVersion, target, baseTheme, a required colours key, iconSet, or bitmaps keepOriginal), shows an undeclared top-level key, shows baseTheme / iconSet values outside their closed enums, or shows colours values that are not #RRGGBB"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n9"
+name = "theme_css_missing_es_tokens"
+description = "An open Theme CSS export preview omits one or more required --es-* theme tokens (--es-backdrop-darkest through --es-foreground-secondary) or assigns a token a value that is not the matching swatch's #RRGGBB"
+type = "binary"
+negate = true
+weight = 1.0
 
 [[criterion]]
 id = "1.catchall"

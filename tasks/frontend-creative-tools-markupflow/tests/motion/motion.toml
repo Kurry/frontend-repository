@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -163,6 +163,38 @@ description = "Switching between the edit and preview views, or any other state 
 type = "binary"
 weight = 1.0
 negate = true
+
+# HARDEN_MARKUPFLOW_V1
+
+[[criterion]]
+id = "MO-12"
+name = "compare_fade_annotations"
+description = "Entering Compare through the real Compare control fades annotations out over a short transition (or instantly under reduced motion); leaving Compare fades them back in — verified via the visible UI path, not a state shortcut"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "MO-13"
+name = "preset_layers_pulse_and_copy_confirm"
+description = "Applying a preset through a real Preset control briefly pulses the new Layers rows, and Copy project JSON shows a short copied confirmation that auto-dismisses"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "MO-14"
+name = "snapshot_row_animates_in"
+description = "Saving a valid snapshot animates the new Versions row into the list rather than snapping it in"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "MO-N4"
+name = "compare_hard_cuts_with_no_transition"
+description = "Toggling Compare hard-cuts annotations with no transition and no reduced-motion-respecting instant complete swap when motion is enabled"
+type = "binary"
+weight = 0.5
+negate = true
+optional = true
 
 [[criterion]]
 id = "MO.catchall"

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -209,6 +209,21 @@ description = "Controls disappear at specific sizes."
 type = "binary"
 negate = true
 weight = 1.0
+
+[[criterion]]
+id = "7.11"
+name = "kanban_and_drawers_adapt"
+description = "Below 1024 px the kanban columns scroll horizontally inside their own container without page-level horizontal scroll, and at 768 px and below the ideas bucket and activity log open as overlay drawers"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.n11"
+name = "modal_or_coachmarks_clip_mobile"
+description = "At 375 px width the conflict modal or a coachmark step clips off-screen, overlaps its target unreadably, or forces page-level horizontal scrolling"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "responsiveness.catchall"

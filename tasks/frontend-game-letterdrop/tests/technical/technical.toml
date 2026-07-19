@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,14 +63,14 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.1"
 name = "best_score_survives_reload"
-description = "After a completed run, a full page refresh restores the exact Best Score from localStorage."
+description = "After a completed run that beats the previous best, a full page refresh restores the exact Best Score from localStorage."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
 name = "match_history_survives_reload"
-description = "After a completed run, a full page refresh restores the exact Match History rows (score, tiles-cleared, duration) in the same order."
+description = "After a completed run, a full page refresh restores the exact Match History game-result rows (score, tilesCleared, durationSec, playerName, tierReached, endedAt) in the same most-recent-first order."
 type = "binary"
 weight = 1.0
 
@@ -90,46 +90,46 @@ weight = 1.0
 
 [[criterion]]
 id = "2.5"
-name = "stale_input_and_illegal_action_rejection"
-description = "Stale input from a paused or ended phase does not mutate the current run, and illegal actions are rejected with specific visible feedback."
+name = "stale_input_rejected"
+description = "Stale input from a paused or Game Over phase does not mutate the current run; illegal actions are rejected with specific visible feedback rather than corrupting state."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.6"
 name = "branching_history_state_region"
-description = "Undo, Redo and a visible History state region let an undo-then-different-edit create a selectable branch, and restoring a branch restores the exact prior visible state."
+description = "Undo, Redo, and a visible History state region support Apply Scenario Change: undo then a different change creates a selectable branch, and restoring a branch restores the exact prior visible board/run state."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.7"
-name = "hidden_ground_truth_state"
-description = "A hidden DOM element, attribute, or unexpected window global exposes internal ground-truth state (scores, answers, upcoming tile letters) that a real user could not reach through visible interaction."
+name = "views_desync_same_datum"
+description = "The same datum (live score, Best Score, streak, or History top-row score) shows conflicting values in two visible surfaces at once without a reload."
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "2.8"
-name = "judge_addressed_text"
-description = "A judge-visible surface (rendered text, DOM comments, alt text, page title, console output) contains language addressed to an AI judge or grading system."
+name = "debug_artifacts_visible"
+description = "Visible debug output, leftover placeholder scaffolding, or verbose console.log spam appears in the running production UI during normal play."
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "2.9"
-name = "fabricated_success_state"
-description = "A success or completion state (scored word, Board Cleared, achievement unlock) appears without the underlying action actually occurring, or repeating an action with different inputs yields identical hardcoded output."
+name = "blank_or_broken_start_path"
+description = "Loading / via the documented start path renders a blank or broken page instead of the LetterDrop shell."
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "2.10"
-name = "automation_detection_branching"
-description = "The app renders or behaves differently when it detects automation (navigator.webdriver or other automation-specific signals) than it does under normal use."
+name = "nondeterministic_baseline_on_reload"
+description = "Two cold loads with the same persisted storage show different History rows, Best Score, or achievement unlock sets without user action."
 type = "binary"
 weight = 1.0
 negate = true
@@ -144,38 +144,39 @@ negate = true
 
 [[criterion]]
 id = "2.12"
-name = "keyboard_operability"
-description = "Start game, Pause, Resume, Submit Word, Undo Last Tile, the view tabs, and the settings form fields are all reachable and operable with the keyboard alone, with a visible Tab focus indicator on every interactive control."
+name = "single_route_panels_via_client_state"
+description = "Match History, Achievements, and Settings are shown and hidden within the single route / via client state without a full document navigation to another path."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.13"
-name = "toast_focus_and_nonvisual_state_cues"
-description = "Transient toasts appear without stealing keyboard focus from the current control, and locked versus unlocked achievement states are distinguishable by a text or shape cue in addition to color."
+name = "shared_store_coherence_across_tabs"
+description = "A change made in one surface (score after a valid word, Clean Sweep unlock, saved playerName) is immediately reflected in every other surface showing that datum without reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.14"
-name = "cold_load_interactive_under_2s"
-description = "The app is interactive within 2 seconds of a local cold load."
+name = "app_serves_on_start_path"
+description = "The app serves and runs via its documented npm start path on port 3000 with the LetterDrop UI interactive and no boot-time console errors."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.15"
-name = "console_clean_full_session"
-description = "The browser console shows zero errors and no unhandled promise rejections during a full session covering start, play, pause, resume, Game Over, restart, and the History and Achievements tabs."
+name = "console_clean_during_exercise"
+description = "The browser console shows zero errors and no unhandled promise rejections while exercising start, play, pause, resume, save/resume, export/import, Game Over, restart, History, Achievements, and Settings."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.16"
-name = "high_tier_fall_smoothness"
-description = "Tile fall motion stays smooth without visible hitching while tiles spawn, fall, and clear at the highest tier reached during the session."
+name = "mandated_persistence_absent"
+description = "After a completed run and achievement unlock, a full page refresh loses Best Score, Match History, unlocked achievements, or saved settings even though localStorage persistence is required."
 type = "binary"
-weight = 0.5
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "2.17"
@@ -187,22 +188,54 @@ negate = true
 
 [[criterion]]
 id = "2.18"
-name = "cross_view_state_coherence"
-description = "A change made in one surface (score, streak, Best Score, history, achievements, saved settings) is immediately reflected in every other surface showing that datum, without a reload and with no view left showing a stale value."
+name = "external_link_navigates_away"
+description = "Chrome that looks like an in-app control is actually an external <a href> that navigates the tab away from the app origin during normal use."
 type = "binary"
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "2.19"
 name = "saved_settings_survive_reload"
-description = "After saving a player name and starting tier in the settings form, a full page refresh restores the saved settings: reopening the form shows the saved name and tier, and a new run still starts at the chosen tier."
+description = "After saving playerName and startingTier in Settings, a full page refresh restores them: reopening the form shows the saved playerName and startingTier, and a new run still starts at the chosen tier."
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "2.20"
+name = "save_checkpoint_survives_reload"
+description = "After Save Progress mid-run, a full page refresh keeps the checkpoint available: Resume Saved Run restores the saved score, tray, streak, tier, and board rather than discarding it."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect (console, storage, coherence, performance, or accessibility) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, console line, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+id = "2.21"
+name = "console_clean_with_export_and_save"
+description = "The browser console shows zero errors while exercising save/resume, Export Run, Export History, Import, Game Over, and History alongside ordinary play."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.22"
+name = "export_import_round_trip_schema"
+description = "Exporting a finished run as letterdrop-game-v1 JSON and re-importing it reconstructs History fields (score, tilesCleared, durationSec, playerName, tierReached, endedAt, words) without console errors or fabricated extra runs."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n22"
+name = "checkpoint_lost_on_reload"
+description = "After Save Progress, a full page refresh loses the mid-run checkpoint so Resume Saved Run is unavailable or restores an empty run."
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect (console, storage, coherence, or runtime) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence. If already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true
+

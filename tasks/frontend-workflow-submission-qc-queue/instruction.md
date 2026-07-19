@@ -1,5 +1,5 @@
 <summary>
-Build a quality-control triage queue for contributor task submissions on an evaluation platform using Vue 3, Pinia, Tailwind CSS 4.3.2, and Naive UI.
+Build a quality-control triage queue for contributor task submissions on an evaluation platform using Vue 3, Pinia, Tailwind CSS 4.3.2, and Naive UI. The app produces the operator's QC package — structured export files compiled live from the session — so triage work leaves the browser as an interoperable artifact.
 </summary>
 
 <core_features>
@@ -20,11 +20,17 @@ Feature: Submission detail and the gate banner —
 - Adding, removing, re-tiering, or overriding a finding flips the gate banner immediately when the blocker condition changes, without a reload
 
 Feature: Review actions —
-- An Add finding control opens a form with tier (required), category (required), and description (required, at least 10 characters); each invalid field shows an inline message naming that field before submit, the submit control stays disabled until all required fields are valid, and submitting a valid form appends exactly one finding and updates the queue row's tier chips
+- An Add finding control opens a form whose fields mirror the finding-create payload: tier (required, exactly one of blocker, major, or minor), category (required, exactly one of correctness, instruction-clarity, rubric-alignment, environment, scoring, or tooling), description (required, at least 10 characters), and evidence (optional text); each invalid field shows an inline message naming that field before submit, the submit control stays disabled until all required fields are valid, and submitting a valid form appends exactly one finding and updates the queue row's tier chips
 - A Request revision control opens a form requiring a summary comment of at least 20 characters; a shorter comment shows an inline message with the minimum length and blocks submit; submitting moves the submission's stage to needs-revision in the detail view and the queue row, and appends the comment to the submission's history
 - An Approve control is enabled only when the submission is in-review and has zero open blocker findings; while any blocker is open, or the stage is not in-review, the control is disabled with an inline explanation naming the reason (open blocker findings, or wrong stage); approving from a valid state moves the stage to approved and the payout state to released
 - Each finding offers an Override action that opens a form requiring justification text of at least 10 characters; an overridden finding renders struck-through with an overridden label and its justification, stops counting toward the gate banner and the queue tier chips, and can flip the gate to passed when it was the last open blocker
 - A Mark revised control on a needs-revision submission returns its stage to in-review, and the stage tag updates in both the detail view and the queue row
+
+Feature: Bulk queue actions —
+- Each queue row has a checkbox; selecting one or more rows reveals a bulk action bar showing the live selected count
+- The bulk bar offers Move to in-review (sets every selected submission whose stage is submitted to in-review), Hold payout (sets every selected submission's payout state to held unless it is already released), and Clear selection
+- Bulk actions update every affected queue row immediately and, if a selected submission is open in the detail view, update that detail view in the same session without a reload
+- When no rows are selected the bulk bar is hidden; selecting all visible rows then clearing selection restores the bar to hidden
 
 Feature: Failure-profile panel —
 - The detail view (or an adjoining panel) shows a per-criterion failure profile computed from at least 8 seeded trial results: one horizontal bar per criterion, sorted by failure rate descending, each showing the criterion name, its failure rate as a percentage, and its mean score
@@ -39,6 +45,24 @@ Feature: Contributor detail drawer —
 Feature: Re-check run —
 - A Run re-check control on a submission starts a simulated check run rendered as a task progress list of at least 4 named steps that tick to completion one by one with per-step status icons and an overall progress indicator; while running, a loading affordance is visible
 - When the run completes, a summary line reports the outcome and the list remains visible until dismissed; starting a new run resets the list to pending and replays the progression
+
+Feature: Command palette —
+- Pressing Ctrl+K (Cmd+K on macOS) opens a command palette overlay with its search input focused; typing fuzzy-matches across submission titles, contributor names, and view names (queue, export), and the result list narrows as the user types
+- Arrow keys move a visible highlight and Enter activates the highlighted result: a submission result opens that submission's detail view, a contributor result opens that contributor's drawer, and a view result switches to that view; Escape closes the palette; a query matching nothing shows an empty-state line
+
+Feature: Undo and redo —
+- Undo and Redo controls in the header respond to Ctrl+Z and Ctrl+Shift+Z (Cmd variants on macOS) and are disabled when their stacks are empty
+- Undo reverses the most recent mutating action — add finding, override finding, request revision, mark revised, approve, or a bulk stage or payout change — restoring the exact prior stages, findings, gate banner, queue chips, and export preview text
+- Performing a new mutating action after an undo clears the redo stack and disables Redo
+
+Feature: QC package export —
+- An Export view compiles two live artifacts from the current session store: QC package JSON and QC report markdown, shown in a monospaced preview with a format switch between the two
+- The QC package JSON is API-shaped like a review-service payload: a package object with exported_at, queue_summary (total count plus counts per stage and per payout state), and a submissions array where each submission carries id, title, contributor_name, stage (exactly one of submitted, in-review, needs-revision, approved), payout_state (exactly one of pending, held, released), gate_status (exactly one of passed or failed), open_finding_counts (blocker, major, minor integers), findings (each with id, tier, category, description, evidence, status that is exactly open or overridden, and override_justification when overridden), and history (each with type, timestamp, and summary)
+- The QC report markdown is a human-readable triage document listing the same queue summary, then one section per submission with its stage, payout, gate status, open finding counts, each finding's tier and category and description, and history summaries in order
+- Field names and enum values in the JSON preview are visible in the preview text and match the form contracts: a finding created through Add finding appears under findings with the same tier, category, description, and evidence the form accepted; an override sets that finding's status to overridden and includes the justification text
+- The preview regenerates from live state: adding a finding, overriding, changing stage or payout (including bulk actions), or approving changes the corresponding preview values without a reload; an export that omits a session mutation is incorrect
+- A Copy export control puts the exact visible preview text on the clipboard and shows a visible confirmation (icon swap or toast) that reverts after a moment
+- A Download export control offers the visible preview as a downloadable file (JSON or markdown matching the active format) whose contents match the preview text
 </core_features>
 
 <user_flows>
@@ -46,26 +70,33 @@ Feature: Re-check run —
 - Revision loop: on an in-review submission add a major finding, request a revision with a valid 20-plus-character summary, observe the stage move to needs-revision in the detail view, the queue row, and the contributor timeline (new timestamped event), then mark it revised and observe the stage return to in-review
 - Approval gate: attempt to approve an in-review submission that has an open blocker and observe the disabled control with its explanation; resolve the blocker by override, approve, and observe stage approved and payout released in both detail and queue
 - Profile sensitivity: record two criteria's failure rates in the failure-profile panel, narrow the date range and observe the bars and percentages change, then restore the full range and observe the original values return exactly
-- A page reload returns the app to its seeded state: the seeded submissions at their seeded stages, findings, and payout states, with no filters active
+- Bulk hold and export: select at least two queue rows, activate Hold payout, confirm both rows show held (unless already released), open Export, confirm the QC package JSON lists those submissions with payout_state held, copy the export and see the confirmation
+- Undo after mutation: add a finding, confirm it appears in the detail list and the export preview, activate Undo, and confirm the finding is gone from the list, the gate and queue chips restore, and the export preview no longer contains that finding
+- A page reload returns the app to its seeded state: the seeded submissions at their seeded stages, findings, and payout states, with no filters active, empty undo history, and an export preview matching the seeded baseline
 </user_flows>
 
 <edge_cases>
 - Submitting Add finding with an empty tier, category, or a description under 10 characters shows inline messages naming those fields and appends no finding; the finding count is unchanged
+- Submitting Add finding with a category outside the closed vocabulary is impossible from the UI — the category control offers only the six allowed values
 - Submitting Request revision with a comment under 20 characters shows an inline message stating the minimum and does not change the stage
 - Overriding every finding on a submission leaves the findings list showing all entries struck-through, the gate banner passed, and the queue row's tier chips at zero
 - A submission with zero findings shows a designed empty state in its findings region naming what belongs there and offering the Add finding control
 - Approve remains disabled on submitted, needs-revision, and approved stages even with zero blockers, with the wrong-stage explanation
 - Double-activating the Add finding submit control appends exactly one finding
+- Undo with an empty stack and Redo with an empty redo stack are disabled and produce no console errors
+- Opening Export before any session mutation still shows a complete package for the seeded queue; after mutations the preview differs from that seeded baseline in the mutated fields
+- Bulk Move to in-review on a selection that includes non-submitted stages leaves those stages unchanged while moving only submitted ones
 </edge_cases>
 
 <visual_design>
-- Ops-console composition: a full-width queue table with a filter toolbar above it, a detail view with the gate banner spanning the top, the findings list on the leading side, and the failure-profile panel adjoining it; regions separate with hairline borders or elevation
+- Ops-console composition: a full-width queue table with a filter toolbar above it, a detail view with the gate banner spanning the top, the findings list on the leading side, and the failure-profile panel adjoining it; regions separate with hairline borders or elevation; Export is a distinct view reachable from chrome
 - Stage tags use four consistent, distinguishable treatments (submitted, in-review, needs-revision, approved) and payout states three (pending, held, released); the same stage always renders the same treatment in the queue, detail view, drawer, and timeline
 - Tier chips escalate visually: blocker reads most severe (strongest hue), major intermediate, minor subdued, consistently everywhere they appear
 - The gate banner's failed and passed states are visibly different beyond color alone (icon or label change) and readable at a glance
 - Load-bearing criteria in the failure-profile panel use one distinct accent color that other bars never use
-- Typography hierarchy: submission titles are visibly larger than section headings, which are larger than metadata and body text; numeric columns and percentages align consistently
+- Typography hierarchy: submission titles are visibly larger than section headings, which are larger than metadata and body text; numeric columns and percentages align consistently; the export preview uses a monospaced face
 - Buttons, selects, inputs, and toggles show distinct default, hover, focus (visible ring), disabled, and error treatments; the disabled Approve control is visibly muted beside its inline explanation
+- The bulk action bar and command palette read as intentional chrome, not floating decorative stickers; selected queue rows have a clear selected treatment distinct from hover
 </visual_design>
 
 <motion>
@@ -76,40 +107,43 @@ Feature: Re-check run —
 - Failure-profile bars ease to their new widths when the date range changes rather than jumping
 - Re-check steps tick with an animated status transition (icon swap plus eased progress indicator), and the completion summary fades in
 - Evidence disclosures expand and collapse with an animated height transition and rotating chevron
-- Feedback toasts after add finding, request revision, approve, and override slide in, remain readable, and auto-dismiss with a fade
+- Feedback toasts after add finding, request revision, approve, override, bulk actions, and copy export slide in, remain readable, and auto-dismiss with a fade
+- The command palette opens with a short opacity and scale transition of roughly 200 to 300 milliseconds; the bulk bar appears and dismisses with a short eased height or fade rather than snapping
 - With prefers-reduced-motion set, animations are removed and state changes apply instantly while every flow remains available
 </motion>
 
 <responsiveness>
 - At desktop widths the queue table shows all columns; at widths of 768 pixels and below the table condenses (stacked or horizontally scrollable within its own container) and the detail view stacks the findings list above the failure-profile panel
-- At 375 pixel width no content clips or overflows the viewport and no page-level horizontal scrolling appears; the contributor drawer becomes full-width
+- At 375 pixel width no content clips or overflows the viewport and no page-level horizontal scrolling appears; the contributor drawer becomes full-width; the bulk bar and export preview remain usable within the viewport
 </responsiveness>
 
 <accessibility>
-- Every interactive control — queue rows, filters, sort, review action controls, finding disclosures, drawer, date-range control, re-check control — is reachable and operable with the keyboard alone, with a visible focus indicator
-- The contributor drawer traps focus while open, closes on Escape, and returns focus to the control that opened it
+- Every interactive control — queue rows, row checkboxes, filters, sort, bulk actions, review action controls, finding disclosures, drawer, date-range control, re-check control, undo/redo, export format switch, copy and download, and command palette — is reachable and operable with the keyboard alone, with a visible focus indicator
+- The contributor drawer traps focus while open, closes on Escape, and returns focus to the control that opened it; the command palette traps focus while open, closes on Escape, and returns focus to the prior control
 - Stage, tier, and gate states are not conveyed by color alone: each carries a text label or icon; form validation messages are associated with their fields so each message names the field it belongs to
 - Evidence disclosures expose their expanded or collapsed state to assistive technology
+- Copy export and bulk action confirmations are announced through an aria-live region as well as shown visually
 </accessibility>
 
 <performance>
 - The app is interactive within 2 seconds of a local cold load
 - No console errors or warnings appear on load or during a full exercise of the app
-- Filtering, sorting, gate recomputation, and profile recomputation respond instantly with no visible lag, and the UI stays responsive under rapid repeated filter and toggle input with no hangs
+- Filtering, sorting, gate recomputation, profile recomputation, bulk updates, undo/redo, and export preview regeneration respond instantly with no visible lag, and the UI stays responsive under rapid repeated filter and toggle input with no hangs
 </performance>
 
 <requirements>
-Shared application state must live in Pinia (in-memory only): the submissions collection with findings, stages, payout states, and stage-history events, the seeded trial results, queue filters and sort, the active submission and view, drawer and disclosure state, re-check run progress, and UI chrome. Do not use localStorage, sessionStorage, or other browser storage APIs.
+Shared application state must live in Pinia (in-memory only): the submissions collection with findings, stages, payout states, and stage-history events, the seeded trial results, queue filters and sort, selection set, the active submission and view, drawer and disclosure state, re-check run progress, undo and redo stacks, the export preview text, command palette state, and UI chrome. Do not use localStorage, sessionStorage, or other browser storage APIs.
 State contracts (behavioral, not storage keys):
-- Adding a valid finding grows that submission's findings and updates the queue row's tier chips and the gate banner
-- Stage changes (request revision, mark revised, approve) update the stage tag everywhere it appears (queue, detail, drawer, timeline) and append matching timeline events
-- Overriding a finding updates its rendering, the gate banner, and queue chips from the same shared record
+- Adding a valid finding grows that submission's findings and updates the queue row's tier chips, the gate banner, and the export preview from the same shared record
+- Stage changes (request revision, mark revised, approve, bulk move) update the stage tag everywhere it appears (queue, detail, drawer, timeline) and append matching timeline events
+- Overriding a finding updates its rendering, the gate banner, queue chips, and export preview from the same shared record
 - Filters and sort recompute the visible queue from the shared collection; they do not create a second disconnected copy
 - The failure-profile panel derives from the shared trial results and the selected date range; it never renders from a frozen copy
+- Undo and redo restore prior shared collection snapshots so every derived surface agrees after the restore
 - Active view and drawer state are shared client state; switching them does not reload the document
 - WebMCP tool handlers, where required by delivery, invoke the same store commands as the visible controls
-Build tooling: Vite or an equivalent SPA setup. Styling is Tailwind CSS 4.3.2 (pinned) with design tokens in the theme layer. Naive UI is the component library for the data table, tags, drawer, dialogs, selects, date-range control, progress indicators, and toasts; no other component library. @vueuse/motion and AutoAnimate allowed for animation; no other animation libraries. One icon set only, installed via unplugin-icons from its npm packages — no raw copy-pasted SVG icon sets. All forms — Add finding, Request revision, Override, and any filter/settings forms — are driven by VeeValidate validating through a Zod schema: the schema defines the rules and inline per-field errors render before submit. All libraries installed via npm and bundled locally; no CDN imports. No backend or authentication.
-- Seed at least 12 submissions across at least 4 contributors covering all four stages and all three payout states, with findings spanning all three tiers, and at least 8 trial results spanning at least two date buckets, so every view is non-empty on first load
+Build tooling: Vite or an equivalent SPA setup. Styling is Tailwind CSS 4.3.2 (pinned) with design tokens in the theme layer. Naive UI is the component library for the data table, tags, drawer, dialogs, selects, date-range control, progress indicators, and toasts; no other component library. @vueuse/motion and AutoAnimate allowed for animation; no other animation libraries. One icon set only, installed via unplugin-icons from its npm packages — no raw copy-pasted SVG icon sets. All forms — Add finding, Request revision, Override, bulk actions, and any filter/settings forms — are driven by VeeValidate validating through a Zod schema: the schema defines the API-shaped field contracts (closed tier and category enums, description and justification minimum lengths, revision summary minimum length, optional evidence) and inline per-field errors render before submit. The record each form creates is exactly the object shape that appears in the QC package JSON for that entity — same field names, bounds, and enums. All libraries installed via npm and bundled locally; no CDN imports. No backend or authentication.
+- Seed at least 12 submissions across at least 4 contributors covering all four stages and all three payout states, with findings spanning all three tiers and all six categories, and at least 8 trial results spanning at least two date buckets, so every view is non-empty on first load
 - Invalid form submissions must not change any submission; show visible validation feedback
 - Empty findings regions and zero-match filter results show designed empty states
 - Zero navigational outbound links for app chrome — in-app controls only; view changes via shared client state
@@ -132,7 +166,7 @@ Modules:
 - browse-query-v1
 - entity-collection-v1
 - form-workflow-v1
-- command-session-v1
+- artifact-transfer-v1
 
 Module specs:
 <module_spec id="browse-query-v1">
@@ -199,48 +233,53 @@ Module specs:
 }
 </module_spec>
 
-<module_spec id="command-session-v1">
+<module_spec id="artifact-transfer-v1">
 {
-  "id": "command-session-v1",
+  "id": "artifact-transfer-v1",
   "contract_version": "zto-webmcp-v1",
-  "title": "Command / session",
-  "purpose": "Media, games, presentations, simulations, demos, and remote-control shells.",
-  "permitted_operations": ["start", "pause", "resume", "stop", "restart", "advance", "trigger_demo", "connect", "disconnect"],
+  "title": "Artifact transfer",
+  "purpose": "Import, export, copy, print, and conversion workflows.",
+  "permitted_operations": ["import", "export", "copy", "print_preview", "convert"],
   "binding_keys": {
-    "required_any_of": [["session_operations"]],
-    "optional": ["demos", "visible_postconditions"]
+    "required_any_of": [["artifact_operations"]],
+    "optional": ["import_modes", "export_formats", "conversion_modes", "visible_postconditions"]
   },
   "restrictions": [
-    "No batching or replay of gameplay.",
-    "Timing, animation, collision, repeated input, and transient UI require immediate Playwright observation.",
-    "Tool output cannot prove successful playback or connection."
+    "No raw files, filesystem paths, blobs, base64, or artifact contents in WebMCP arguments or results.",
+    "File picker interaction, clipboard contents, and downloaded artifacts remain Playwright responsibilities."
   ],
-  "tool_name_prefix": "session"
+  "tool_name_prefix": "artifact"
 }
 </module_spec>
 
 Bindings:
 - Browsable entity: submissions
-- Destinations: queue; submission-detail; contributor-drawer
+- Destinations: queue; submission-detail; contributor-drawer; export-center
 - Filters: stage; tier; contributor; date-range
 - Sorts: open-finding-count-asc; open-finding-count-desc
 - Entity: submission
 - Entity operations: select; update
 - Entity fields: stage; payout-state
 - Value bounds: stage in {submitted, in-review, needs-revision, approved}; payout-state in {pending, held, released}; approve only from in-review with zero open blockers
-- Form fields: tier; category; description; revision-summary; override-justification
+- Form fields: tier; category; description; revision-summary; override-justification; evidence; bulk-stage; bulk-payout-state
 - Form operations: validate; submit; cancel
-- Workflow steps: add-finding; request-revision; override-finding; approve; mark-revised
-- Session operations: start; restart
-- Demos: re-check-run
+- Workflow steps: add-finding; request-revision; override-finding; approve; mark-revised; bulk-update; undo; redo; export-package
 - Workflow completion: gate banner flips when blocker condition changes
 - Workflow completion: queue tier chips and contributor timeline update after stage/finding changes
+- Workflow completion: export preview reflects live submission stages findings gate statuses and history
+- Workflow completion: copy export confirmation appears after copy control
+- Artifact operations: export; copy
+- Export formats: qc-package-json; qc-report-markdown
 
 Mechanics exclusions:
 - Contributor drawer slide-in/out easing stays Playwright-observed
 - Gate banner cross-fade and struck-through override animate-in stay Playwright-observed
 - Failure-profile bar width easing on date-range change stays Playwright-observed
 - Re-check step tick animation timing stays Playwright-observed
+- File picker interaction, clipboard contents, and downloaded artifacts remain Playwright responsibilities.
+- Command-palette open gesture and keyboard navigation stay Playwright-observed when mechanism matters
+- Undo/redo keyboard shortcuts stay Playwright-observed
+- Re-check run start/progress is UI-only and Playwright-observed (no session module)
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

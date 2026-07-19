@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,88 +62,133 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "14.1"
-name = "multi_facet_round_trip"
-description = "For fidelity tasks, evaluate the reference's stateful behaviors. Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline — never a mix."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "14.2"
-name = "sort_reversal_proves_live_data"
-description = "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders."
+name = "in_memory_scrapbook_and_route_reload_reset"
+description = "Starting on a case: drag scrapbook items to new positions and note the active architect; then reload that case URL. Scrapbook items coherently reset to seeded positions and the case returns to its seeded baseline — never a mixed survival of drag offsets while other facets reset (in-memory genre)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.3"
-name = "derived_view_responds_to_input"
-description = "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input."
+name = "case_surfaces_change_with_architect"
+description = "Derived-view sensitivity: open Julian Kade then navigate to Imani Vale via sibling tag; the largest heading, folder cover color, document title, and sibling tag set all change meaningfully to Imani Vale's values rather than redrawing identically."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.4"
-name = "cross_view_echo_without_reload"
-description = "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list ↔ detail, board ↔ stats) without reload."
+name = "case_echo_across_header_title_heading"
+description = "Cross-view echo: after opening Ada Mercer from a home tag, confirm without reload that the case sub-header category, the largest heading, and the document title all show Ada Mercer's values together — never a stale mix from a prior case."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.5"
-name = "count_delta_is_exact"
-description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+name = "overscroll_advances_exactly_one_delta"
+description = "Count-delta integrity: note the current architect on a case, trigger the overscroll affordance once, and confirm the visible case advances by exactly one architect in sequence with matching heading and document title — no off-by-one skip."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.6"
-name = "different_inputs_change_outcomes"
-description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+name = "different_tags_open_different_cases"
+description = "Input-dependent output: clicking Ada Mercer versus Mara Voss on the home stack yields different case headings, folder colors, document titles, and scrapbook contents appropriate to each architect."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.7"
-name = "interleaved_flows_preserve_state"
-description = "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state."
+name = "interleaved_media_and_sibling_nav"
+description = "Interleaved-flow integrity: on a video case open the media popup, close it, then click a sibling tag to another case; the new case renders correctly with no stuck popup, and returning shows media closed — neither flow corrupted the other."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.8"
-name = "empty_to_repopulated_round_trip"
-description = "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions."
+name = "mara_voss_solo_sibling_edge_round_trip"
+description = "Edge-state round-trip: open Mara Voss (solo sibling tag that does not navigate away), then navigate home and reopen another case; Mara Voss still shows only its own non-navigating sibling tag, and other cases still show their multi-sibling sets."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.n1"
-name = "partial_persistence_is_incoherent"
-description = "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence."
+name = "partial_in_memory_state_survives_reload"
+description = "After dragging scrapbook items on a case, a reload leaves an incoherent mix (e.g. some items keep dragged offsets while others reset, or popup/play state survives alone)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n2"
-name = "derived_surface_ignores_inputs"
-description = "A derived surface renders identically regardless of its inputs."
+name = "case_surfaces_ignore_navigation"
+description = "Navigating between architects leaves heading, folder color, and document title identical to the previous case (derived surfaces ignore the route input)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n3"
-name = "different_inputs_produce_identical_output"
-description = "Repeating an action with different inputs yields byte-identical output."
+name = "different_tags_produce_identical_cases"
+description = "Clicking two different architect tags (e.g. Ada Mercer vs Mara Voss) yields byte-identical heading, folder color, and document title."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "State changes appear in one view but not another until reload."
+name = "header_title_stale_until_reload"
+description = "After a case or sibling navigation, the sub-header category or document title keeps the prior architect until a full page reload."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "dossier_tracks_pin_and_note_mutations"
+description = "Derived-view sensitivity: pin Julian Kade, save note token kade-note-alpha, confirm Export dossier JSON contains schemaVersion field-notes-archive.dossier.v1, julian-kade in pins, and kade-note-alpha under notes; unpin and confirm the next compiled preview no longer lists that pin/token."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "dossier_round_trip_after_reload"
+description = "Multi-facet reload round-trip (in-memory genre): after exporting a field-contract-valid dossier with two pins and notes, reload clears pins/notes; importing the JSON restores the same pin set and note bodies; scrapbook offsets included in the export also restore on those cases."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.11"
+name = "undo_then_new_drag_clears_redo"
+description = "Interleaved scrapbook history: drag an item, undo, then perform a new drag; Redo stays disabled or is a no-op until another undo, and the new drag position remains."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.12"
+name = "invalid_import_preserves_prior_pins"
+description = "Edge-state integrity: with at least one pin present, import a dossier payload with wrong schemaVersion or an unknown architect slug; validation names the problem and the prior pin set and notes remain visible without reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "dossier_identical_for_different_sessions"
+description = "Two sessions with different pin/note sets produce identical Export dossier JSON preview text (export ignores session inputs)."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n6"
+name = "import_fails_to_restore_after_reload"
+description = "After reload clears in-memory pins/notes, importing a valid previously exported dossier leaves the reading list empty or note bodies missing."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n7"
+name = "schema_invalid_import_mutates_session"
+description = "Importing a schema-invalid dossier (wrong schemaVersion or unknown architect) changes the visible pin set or note bodies."
 type = "binary"
 negate = true
 weight = 1.0

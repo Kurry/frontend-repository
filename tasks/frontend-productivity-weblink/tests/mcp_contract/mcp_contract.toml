@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,78 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "12.1"
-name = "mandated_modules_are_bound"
-description = "All contract-mandated modules are initialized and bound."
+name = "command_session_and_artifact_transfer_bound"
+description = "Contract-mandated modules command-session-v1 and artifact-transfer-v1 are initialized and bound."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.2"
-name = "handlers_match_visible_ui_logic"
-description = "Exposed tool handlers match visible UI command logic."
+name = "session_and_artifact_handlers_match_ui"
+description = "session_connect/disconnect and artifact_import/export/copy handlers drive the same badge, queue, and Session Pack surfaces as Join Room, Leave Room, choose-file, Export Session, and Copy."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.3"
-name = "only_documented_operations_exist"
-description = "Only documented operations and routes are available."
+name = "only_declared_session_and_artifact_ops"
+description = "Only declared operations are available: session connect/disconnect and artifact import/export/copy with export format session-json."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.4"
-name = "contract_is_automation_exercisable"
-description = "The contract can be fully exercised via automation."
+name = "session_and_artifact_tools_automation_exercisable"
+description = "session_connect, session_disconnect, artifact_import, artifact_export, and artifact_copy can be exercised via webmcp_invoke_tool automation."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.5"
-name = "declared_entity_operations_work"
-description = "Entity operations declared in the contract, including create, update, delete, and reorder, all work."
+name = "session_connect_disconnect_work"
+description = "Declared session operations connect and disconnect update the visible connection badge through the same state machine as the UI."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.6"
-name = "form_flow_operations_are_bound"
-description = "Form submission validation, error, and cancel operations are clearly bound."
+name = "session_connect_respects_room_id_contract"
+description = "Invoking session_connect with an empty or illegal room_id does not advance the badge out of idle and aligns with the JoinSession field-contract rejection visible in the UI."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.7"
-name = "queries_match_allowed_spec"
-description = "Query destinations and filters match the allowed specification."
+name = "artifact_export_format_is_session_json"
+description = "Artifact export is bound to the declared session-json export format that surfaces Session Pack JSON in the UI."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.8"
-name = "capabilities_stay_declared"
-description = "No extra or undeclared module routes or capabilities are exposed."
+name = "no_undeclared_modules_or_ops"
+description = "No extra modules beyond command-session-v1 and artifact-transfer-v1, and no undeclared operations beyond connect, disconnect, import, export, and copy, are exposed."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.9"
-name = "session_tool_and_invoke_apis_work"
-description = "Session info, tool list, and invocation are correctly surfaced."
+name = "webmcp_session_list_invoke_work"
+description = "webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool are present and callable; list_tools includes the declared session and artifact tools."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.10"
-name = "mcp_initializes_without_harness_edits"
-description = "MCP initialization works without manual editing or test harness changes."
+name = "webmcp_initializes_on_load"
+description = "WebMCP tools initialize on app load without manual editing or test-harness changes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.n1"
-name = "mcp_tools_missing_or_noop"
-description = "MCP tooling is unbound, missing, or a no-op."
+name = "session_or_artifact_tools_missing_or_noop"
+description = "session_connect, session_disconnect, artifact_import, artifact_export, or artifact_copy is unbound, missing, or a no-op."
 type = "binary"
 negate = true
 weight = 1.0
@@ -148,8 +148,8 @@ weight = 1.0
 
 [[criterion]]
 id = "12.n3"
-name = "undeclared_capabilities_exposed"
-description = "Undeclared destinations or entity operations are exposed."
+name = "undeclared_webmcp_capabilities_exposed"
+description = "Undeclared modules, destinations, or operations beyond the weblink contract bindings are exposed."
 type = "binary"
 negate = true
 weight = 1.0
@@ -164,8 +164,8 @@ weight = 1.0
 
 [[criterion]]
 id = "12.n5"
-name = "validation_bypass_desyncs_state"
-description = "Validation bypasses lead to inconsistent MCP and UI state."
+name = "webmcp_bypasses_field_contract"
+description = "WebMCP session_connect accepts an illegal room_id that the Join Room UI rejects, desyncing MCP and UI field-contract state."
 type = "binary"
 negate = true
 weight = 1.0
@@ -188,8 +188,8 @@ weight = 1.0
 
 [[criterion]]
 id = "12.n8"
-name = "required_contract_module_missing"
-description = "No module contract is implemented where one is declared required."
+name = "command_session_or_artifact_module_missing"
+description = "command-session-v1 or artifact-transfer-v1 is declared but not implemented."
 type = "binary"
 negate = true
 weight = 1.0

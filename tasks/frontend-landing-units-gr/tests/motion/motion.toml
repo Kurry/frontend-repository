@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -132,7 +132,7 @@ optional = true
 [[criterion]]
 id = "mo-hover"
 name = "hover_feedback_on_interactive_chrome"
-description = "Hovering nav items, buttons, and CTAs produces clear color/fill/underline or wash feedback, and keyboard focus remains visible on interactive controls"
+description = "Hovering nav items, buttons, CTAs, shortlist toggles, and FAQ items produces clear color/fill/underline or wash feedback, and keyboard focus remains visible on interactive controls"
 type = "binary"
 weight = 1.0
 
@@ -204,6 +204,20 @@ description = "The signature home-skeleton intro and hero height reveal move wit
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "mo-inquiry-overlay-fade"
+name = "inquiry_and_palette_fade_via_ui"
+description = "Opening and closing the booking inquiry overlay and the command palette via the real UI controls shows a short opacity fade (~0.3–0.5s); verified through the real controls, never a state shortcut"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "mo-faq-expand"
+name = "faq_accordion_expand_collapse_motion"
+description = "Opening and closing a FAQ accordion item via the real control shows a brief height/opacity transition rather than an instant snap"
+type = "binary"
+weight = 0.5
 
 [[criterion]]
 id = "motion.catchall"

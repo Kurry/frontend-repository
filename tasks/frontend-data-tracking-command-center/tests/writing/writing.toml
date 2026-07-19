@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.5
@@ -64,35 +64,35 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "15.1"
 name = "headings_use_consistent_capitalization"
-description = "Where the app renders headings and section titles, they use consistent capitalization (one convention — title case or sentence case — throughout)."
+description = "Where the app renders headings and section titles (KPI strip, agent panel, activity feed, export drawer), they use one consistent capitalization convention"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.2"
 name = "actions_use_specific_labels"
-description = "Where the app renders button or action labels, they are specific verbs ('Add expense', 'Start session'), not generic ('Submit', 'OK') when a specific label is possible."
+description = "Where the app renders actions, labels are specific verbs such as Connect agent, Disconnect selected, Export session, Copy, Download, Undo, and Redo rather than generic Submit or OK when a specific label is possible"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.3"
-name = "errors_name_problem_and_fix"
-description = "Where the app renders error messages, they name the problem and the fix ('Amount must be a positive number'), not just a rejection ('Invalid')."
+name = "errors_name_field_and_rule"
+description = "Where the app renders validation or import errors, they name the field and the violated rule rather than only saying Invalid"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.4"
 name = "empty_states_explain_next_step"
-description = "Where the app renders empty states, the copy explains what belongs there and how to add it."
+description = "Where the app renders empty states for the agent panel or filtered feed, the copy explains what belongs there and how to add or clear filters"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.5"
 name = "body_copy_is_well_written"
-description = "Where the app renders body or marketing copy, rate how free it is of spelling and grammatical errors."
+description = "Where the app renders body copy in the feed, dialogs, and export drawer, rate how free it is of spelling and grammatical errors"
 type = "likert"
 points = 5
 weight = 0.5
@@ -100,28 +100,28 @@ weight = 0.5
 [[criterion]]
 id = "15.6"
 name = "terminology_is_consistent"
-description = "Where the app renders labels for the same concept in multiple places, terminology is consistent (not 'task' here and 'todo' there)."
+description = "Where the app refers to agents, feed events, and export formats, terminology stays consistent (not mixing agent/bot or Session JSON/session file inconsistently)"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.7"
-name = "numbers_dates_and_units_are_consistent"
-description = "Where the app renders numbers, dates, and units, formatting is consistent (same date format, same decimal precision, units labeled)."
+name = "numbers_dates_and_units_consistent"
+description = "Where the app renders KPI numbers, relative timestamps, and HH:MM schedule times, formatting is consistent"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.8"
 name = "success_messages_are_specific"
-description = "Where the app renders confirmation and success messages, they state what happened ('Entry saved'), not vague affirmations."
+description = "Where the app renders confirmation after export Copy or import, messages state what happened rather than vague affirmations"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.n1"
 name = "placeholder_copy_is_visible"
-description = "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI."
+description = "Lorem ipsum or placeholder text (TODO, Lorem, asdf, or template variable names) is visible anywhere in the shipped UI"
 type = "binary"
 negate = true
 weight = 0.5
@@ -129,7 +129,7 @@ weight = 0.5
 [[criterion]]
 id = "15.n2"
 name = "prominent_copy_has_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as headings, hero text, or primary buttons."
+description = "Spelling or grammatical errors appear in prominent copy such as panel titles, Export session, or Connect agent"
 type = "binary"
 negate = true
 weight = 0.5
@@ -137,7 +137,7 @@ weight = 0.5
 [[criterion]]
 id = "15.n3"
 name = "concept_names_are_inconsistent"
-description = "The same concept is named inconsistently across surfaces."
+description = "The same concept is named inconsistently across panel, feed, and export drawer"
 type = "binary"
 negate = true
 weight = 0.5
@@ -145,7 +145,7 @@ weight = 0.5
 [[criterion]]
 id = "15.n4"
 name = "copy_is_truncated_or_overflowing"
-description = "Truncated or overflowing text renders copy unreadable."
+description = "Truncated or overflowing text renders export tab labels or validation messages unreadable"
 type = "binary"
 negate = true
 weight = 0.5

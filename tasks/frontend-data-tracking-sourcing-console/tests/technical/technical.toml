@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,14 +63,14 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.1"
 name = "shared_state_coherence"
-description = "All views derive from one shared collection: a status transition, queue reorder, or fetch-more append made anywhere is immediately reflected in the table, rollup strip, quota grid, build-queue panel, and timeline without a reload, with no surface disagreeing with another"
+description = "All views derive from one shared collection: a status transition, queue reorder, bulk action, undo, import, or fetch-more append made anywhere is immediately reflected in the table, rollup strip, quota grid, build-queue panel, timeline, and export text without a reload, with no surface disagreeing with another"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
 name = "no_storage_reload_seeded"
-description = "No browser storage is used: localStorage and sessionStorage remain empty after transitions, pinning, queue edits, and fetch-more runs, and a page reload returns the app to its seeded state (seeded candidates and statuses, default filters, seeded queue and timeline baselines)"
+description = "No browser storage is used: localStorage and sessionStorage remain empty after transitions, pinning, queue edits, bulk actions, imports, and fetch-more runs, and a page reload returns the app to its seeded state (seeded candidates and statuses, default filters and search, seeded queue and timeline baselines, empty undo history)"
 type = "binary"
 weight = 1.0
 
@@ -79,34 +79,34 @@ id = "2.3"
 name = "external_network_requests"
 description = "The devtools network log shows requests to external origins or third-party CDNs (scripts, styles, fonts, icons, or data) during load or a full exercise of the app, including during a fetch-more run"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "2.4"
 name = "console_clean_full_session"
-description = "The console is free of errors, warnings, and unhandled promise rejections on first load and stays clean after sorting, filtering, transitions, guard blocks, pinning, queue reorders, removals, and fetch-more runs"
+description = "The console is free of errors, warnings, and unhandled promise rejections on first load and stays clean after sorting, filtering, search, transitions, guard blocks, pinning, queue reorders, bulk actions, undo/redo, export, import, and fetch-more runs"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.5"
 name = "rapid_input_stability"
-description = "The app is interactive (navigation and table controls respond) within 2 seconds of a local cold load, and under rapid repeated input (fast filter changes, quick view switches, rapid queue move activations) the UI stays responsive with no hangs and no surface showing stale counts another surface already updated, with the fetch-more control unable to start a second run while one is in progress"
+description = "The app is interactive (navigation and table controls respond) within 2 seconds of a local cold load, and under rapid repeated input (fast filter changes, quick view switches, rapid queue move activations, palette open/close) the UI stays responsive with no hangs and no surface showing stale counts another surface already updated, with the fetch-more control unable to start a second run while one is in progress"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.6"
 name = "keyboard_operability_focus"
-description = "Every interactive control — navigation, sortable headers (exposing their sort state programmatically), filter controls, row actions, the rejection select, dialog fields, queue move and remove controls, and the copy control — is reachable and operable with the keyboard alone, with a visible focus indicator at each stop; queue reordering is fully achievable without a pointer and a keyboard reorder is announced via a polite live region naming the entry and its new position"
+description = "Every interactive control — navigation, sortable headers (exposing their sort state programmatically), filter and search controls, row actions and checkboxes, the rejection select, dialog fields, queue move and remove controls, bulk tray, Undo/Redo, Export/Import, copy controls, and command palette results — is reachable and operable with the keyboard alone, with a visible focus indicator; queue reordering is fully achievable without a pointer and a keyboard reorder is announced via a polite live region naming the entry and its new position"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.7"
 name = "dialog_focus_and_aria_semantics"
-description = "The pin confirm dialog traps focus while open, closes on Escape, and returns focus to its opener, and validation messages are associated with the fields they name"
+description = "The pin confirm dialog, command palette, and export/import panels trap focus while open, close on Escape, and return focus to their opener, and validation messages are associated with the fields they name"
 type = "binary"
 weight = 1.0
 
@@ -115,21 +115,36 @@ id = "2.8"
 name = "outbound_links_in_chrome"
 description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "2.9"
 name = "real_branding_in_seed_data"
 description = "Seeded or generated content references real products, companies, or people — repository or org names, categories, or commit hashes carry recognizable real-world brands, identities, or real commits"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "field_contracts_enforced"
+description = "Rejection requires one of the five reason tokens, pin notes longer than 200 characters are rejected inline, commit hashes shown after pin are exactly 12 lowercase hex characters, and import rejects documents whose schemaVersion is not sourcing-pack/v1 or whose status/license enums are outside the allowed sets"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "export_import_contracts_disagree"
+description = "Export Queue JSON omits required top-level keys (schemaVersion, generatedAt, quotaFillPercent, queue, candidates, quota, timeline) or import accepts illegal schemaVersion/status values while still mutating session state"
+type = "binary"
+negate = true
+weight = 1.0
 
 [[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0

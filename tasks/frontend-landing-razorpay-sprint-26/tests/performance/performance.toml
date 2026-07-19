@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,152 +62,172 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "9.1"
-name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+name = "interactive_before_3d_finishes"
+description = "The page is interactive before the 3D hero scene finishes loading: the nav, GET ACCESS rail, and copy respond immediately while the scene region holds its space and streams in."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
-name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+name = "console_clean_on_load_and_scroll"
+description = "No console errors, hydration mismatch errors/warnings, or unhandled rejections appear on load or during a full top-to-bottom scroll of /sprint/26."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
-name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+name = "nav_and_rail_respond_quickly"
+description = "After first paint, segment-nav clicks and GET ACCESS rail hover/focus respond without multi-second lag (chrome interactions feel under ~100ms)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.4"
-name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+name = "preloader_shows_progress_while_loading"
+description = "While critical hero assets load, the preloader progress track/bar provides visible loading feedback rather than hanging the UI with a blank black screen."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.5"
-name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+name = "long_scroll_without_multi_second_freeze"
+description = "Scrolling the full long-scroll page (hero through all six thematic sections and footer) remains usable without perceived multi-second freezes between sections."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.6"
-name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+name = "interactive_during_scene_stream_in"
+description = "While the 3D hero scene streams in, the UI remains interactive — nav, rail, and hash links stay clickable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
-name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+name = "scroll_storytelling_holds_frame_rate"
+description = "Continuous scrolling from top to bottom shows no visible hitching or dropped frames through the hero scrub, pinned sections, and card grids."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.8"
-name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+name = "rapid_nav_clicks_never_freeze"
+description = "Rapid successive segment-nav clicks never freeze the page or leave it permanently unresponsive."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+name = "extended_scroll_session_stable"
+description = "After an extended top-to-bottom scroll with modal open/close and nav jumps, the page remains responsive without runaway resource use that freezes interaction."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "9.10"
+name = "lazy_card_animations_below_fold"
+description = "Feature-card canvas animations hydrate lazily as cards enter the viewport; cards far below the fold do not run animations before they are reached."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+id = "9.a1"
+name = "scroll_linked_animation_frame_rate"
+description = "Scroll-linked 3D camera scrub, section pinning/parallax, and stacked-band reveals hold a smooth frame rate through the full page length on a 1440-wide viewport with no visible hitching during continuous scroll."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.a4"
+name = "layout_stable_after_load"
+description = "After first paint, no visible layout jumps occur as fonts, images, or the 3D scene finish loading — media and scene regions reserve their space from first paint."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.a5"
+name = "webgl_capability_fallback"
+description = "When WebGL/GPU support is missing, the hero falls back to a complete static composition and the page remains whole, navigable, and visually coherent without the 3D scene."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.a6"
+name = "heavy_assets_progressive"
+description = "Heavy scene parsing does not block the nav or controls: the page becomes interactive before 3D models/textures finish loading, and the scene region holds reserved space while streaming in."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.n1"
-name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+name = "chrome_blocked_until_3d_ready"
+description = "Nav, rail, and copy stay non-interactive until the entire 3D hero scene finishes loading."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n2"
-name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+name = "console_errors_during_scroll"
+description = "Console errors, hydration mismatch warnings, or unhandled rejections appear during load or a full top-to-bottom scroll."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n3"
-name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+name = "scroll_or_pinning_blocks_input"
+description = "Hero scrub or section pinning blocks interaction for multiple seconds during continuous scroll."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
-id = "9.n4"
-name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n5"
-name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+id = "9.a3"
+name = "heavy_assets_collapse_frame_rate"
+description = "Heavy visual assets (3D scene, feature-card canvas animations, or scroll scripts) cause frame-rate collapse, delayed first render, or input latency during signature scroll/hover interactions."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n6"
-name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
+name = "animation_blocks_nav_input"
+description = "During preloader exit or hero intro fades, primary controls (segment nav, GET ACCESS) become unresponsive."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n7"
-name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n8"
-name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
+name = "blank_page_while_assets_load"
+description = "The UI blocks rendering with a blank page while fonts, images, or the 3D scene load instead of showing reserved-space layout with an operable preloader/nav."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n9"
-name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
+name = "eager_card_animations_jank_scroll"
+description = "Feature-card canvas animations all start eagerly on first paint and visibly jank scrolling before those cards are reached."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n10"
-name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+name = "rapid_use_crashes_page"
+description = "Rapid nav clicking, fast continuous scrolling, or repeated modal open/close crashes the page or leaves it permanently unresponsive."
 type = "binary"
 negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "9.20"
+name = "palette_brief_undo_stay_responsive"
+description = "Opening the command palette, regenerating the Sprint launch brief after shortlist and filter mutations, and rapid Undo/Redo never freeze the page or drop nav or rail responsiveness."
+type = "binary"
 weight = 1.0
 
 [[criterion]]

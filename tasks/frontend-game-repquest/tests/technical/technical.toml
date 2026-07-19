@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,117 +63,96 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.1"
 name = "console_clean_during_full_exercise"
-description = "No console errors, warnings, or unhandled promise rejections occur during a full exercise of the app: logging sets, deleting history entries, gear purchases, mode switches, undo/redo, and a guarded Reset Quest"
+description = "No console errors, warnings, or unhandled promise rejections occur during a full exercise: logging sets, deleting history, gear purchases, mode switches, challenge Victory and Defeat, save/resume, export/import, undo/redo, and a guarded Reset Quest"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "2.2"
 name = "refresh_restores_persisted_state"
-description = "After logging sets and refreshing the page, lifetime reps, current waypoint, streak, quest points, unlocked zones and gear, equipped gear, and the full rep history are restored exactly as they were before the refresh"
+description = "After logging sets and refreshing the page, lifetime reps, current waypoint, streak, quest points, unlocked zones and gear, equipped gear, the full rep history, settings, personal records, heat-map day totals, and any challenge checkpoint are restored exactly as they were"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "2.3"
 name = "canvas_surfaces_render_and_resize"
 description = "The quest map and weekly summary chart render inside canvas elements (not DOM or SVG chart markup) and redraw correctly, without distortion or blanking, after a viewport resize"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "2.4"
 name = "stale_run_input_never_leaks"
 description = "Rep input typed before a challenge run started, or left over from an ended run, never mutates lifetime reps or the current run once game state has moved past that phase"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "2.5"
 name = "state_lost_after_refresh"
-description = "Lifetime reps, streak, quest points, unlocked zones/gear, equipped gear, or rep history are lost or reset to defaults after a full page refresh"
+description = "Lifetime reps, streak, quest points, unlocked zones/gear, equipped gear, rep history, settings, or challenge checkpoint are lost or reset to defaults after a full page refresh"
 type = "binary"
-weight = 1.0
 negate = true
-
+weight = 1.0
 [[criterion]]
 id = "2.6"
 name = "hidden_state_exposed_to_judge"
 description = "A hidden element, attribute, or window global exposes internal game state (computed totals, boss outcomes, quest points) that a real user could not reach through the visible UI"
 type = "binary"
-weight = 1.0
 negate = true
-
+weight = 1.0
 [[criterion]]
 id = "2.7"
 name = "fabricated_success_states"
-description = "A success state (Zone Unlocked message, boss-defeated marker, gear unlocked) appears without the underlying condition (reps reached, minimum-rep set logged, quest points spent) actually having been met"
+description = "A success state (Zone Unlocked message, boss-defeated marker, gear unlocked, Victory) appears without the underlying condition actually having been met"
 type = "binary"
-weight = 1.0
 negate = true
-
+weight = 1.0
 [[criterion]]
 id = "2.8"
 name = "automation_detection_branching"
 description = "The app's behavior or visible controls differ depending on whether navigator.webdriver or another automation signal is present"
 type = "binary"
-weight = 1.0
 negate = true
-
-[[criterion]]
-id = "2.9"
-name = "keyboard_only_operability"
-description = "Every interactive control (tabs, form fields, buttons, toggles) is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space), with a visible focus indicator"
-type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "2.10"
-name = "reset_dialog_focus_management"
-description = "The Reset Quest confirmation dialog traps keyboard focus while open, closes on Escape, and returns focus to the Reset Quest control on close"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "2.11"
-name = "notifications_announced_aria_live"
-description = "Transient notification banners (zone unlocked, boss defeated, gear bought, quest reset, daily reminder) are announced through an aria-live region as well as shown visually"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "2.12"
-name = "canvas_accessible_labels_and_text_mirror"
-description = "Each canvas surface (quest map, weekly summary chart) carries an accessible label describing what it shows, and the numbers it visualizes (today's total, lifetime reps, per-day totals) are also available as visible text outside the canvas"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "2.13"
-name = "cold_load_interactive_2s"
-description = "The app is interactive within 2 seconds of a local cold load"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "2.14"
-name = "canvas_stays_smooth"
-description = "Canvas rendering stays smooth during character movement and chart updates, with no visible freezes or blanked frames, including during rapid successive log actions"
-type = "binary"
-weight = 1.0
-
 [[criterion]]
 id = "2.15"
-name = "external_network_requests_present"
-description = "Devtools network activity shows outbound requests to CDNs or other third-party origins for scripts, styles, fonts, or icons while the app loads and runs"
+name = "api_shaped_rep_set_create"
+description = "A valid Log Reps submit creates a History record whose visible fields match the create-rep-set contract (reps in 1 through 9999, optional note up to 120 chars, setId, loggedAt timestamp)"
 type = "binary"
 weight = 1.0
+[[criterion]]
+id = "2.16"
+name = "api_shaped_settings_save"
+description = "Saving Settings persists dailyGoal, reminderEnabled, and reminderHour as the settings request body and those values drive Quest goal and reminder banner behavior after reload"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "2.17"
+name = "export_schema_fields_present"
+description = "Export Quest Log JSON includes required top-level fields schemaVersion, exportedAt, dailyGoal, streak, lifetimeReps, questPoints, unlockedZones, unlockedGearIds, equippedGearId, defeatedBossIds, and sets"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "2.18"
+name = "localstorage_guard_no_crash"
+description = "With storage unavailable or blocked, the production build still loads the shell without crashing; when storage is available, refresh restores committed state"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "2.19"
+name = "shared_store_single_source"
+description = "Logging a set updates lifetime reps, today's total, History, weekly chart, and export-bound values consistently from one shared state — panels never show conflicting totals for the same moment"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "2.20"
+name = "stack_identity_claimed_in_ui"
+description = "The running UI claims a specific framework, state library, or schema library name as a visible success criterion rather than exhibiting the behaviors those tools enable"
+type = "binary"
 negate = true
-
+weight = 1.0
 [[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect (console, network, storage, accessibility, performance, or state coherence) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "A significant technical or requirements defect is present that is NOT covered by any other criterion in this file. If present, name it and cite concrete browser evidence. If already covered, answer no here."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0

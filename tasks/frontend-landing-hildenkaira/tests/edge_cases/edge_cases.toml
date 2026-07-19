@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,237 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "For fidelity tasks, evaluate whether the app matches the reference's UX affordances. Empty state UI is present and renders when a collection is empty."
+name = "contact_invalid_email_or_terms_blocks_success"
+description = "Submitting the contact form with an empty or invalid email, with the Privacy Policy agreement unchecked, or with a phone value outside the phone field contract, does not reveal Thanks for your submission!, marks the offending field, and keeps the popup open."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "contact_inline_validation_before_success"
+description = "Contact form inline validation runs before success: invalid fields are marked in the popup with field-naming feedback rather than allowing the success state to appear."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "contact_errors_name_offending_field"
+description = "Contact validation errors name the offending field (email or Privacy Policy agreement) with actionable text rather than only saying Invalid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "contact_success_replaces_fields"
+description = "A valid contact submit reveals Thanks for your submission! in place of the form fields inside the popup."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "early_contact_submit_antispam_silent"
+description = "A contact submission attempted within the first few seconds after load is silently ignored as anti-spam: no success state appears and no request is sent."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "only_front_flick_card_player_interactive"
+description = "Only the front flick card's video player responds to play/pause/seek input; partially visible rear cards never start playback."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "client_decks_have_distinct_local_media"
+description = "Every client deck shows at least three distinct local VP9 WebM/poster pairs, all five client marks (Loom House, Second Circle, New Current, Roadkind, Motive Lab) are newly authored visuals, no video is reused across different client identities, and no slot shows a broken-media indicator."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "testimonials_rotator_cycles_with_indicator"
+description = "Advancing the testimonials rotator repeatedly cycles through at least five quotes with client name and role, and the current-position indicator always matches the visible quote."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "contact_popup_dismissible"
+description = "The contact popup can be dismissed via its close control (and keyboard where focusable), restoring the page beneath without leaving /."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "cookie_essential_locked_others_toggleable"
+description = "In cookie preferences, Essential stays locked on while Marketing, Analytics, and Personalization each toggle independently without affecting Essential."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "rear_flick_cards_start_playback"
+description = "A partially visible rear flick card starts video playback or accepts player input while it is not the front card."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "contact_errors_only_in_console"
+description = "Submitting an invalid contact form surfaces errors only in the browser console with no inline field marking in the popup."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "contact_or_cookie_actions_silent"
+description = "A valid contact submit or cookie Accept produces no visible success/dismiss feedback after the action."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "early_submit_shows_false_success"
+description = "A contact submission within the first few seconds after load still reveals Thanks for your submission! or sends a request despite the anti-spam rule."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "broken_or_reused_client_media"
+description = "A client deck slot shows a broken-media indicator, references a nonexistent file, or reuses the same video across different client identities."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "contact_popup_not_keyboard_dismissible"
+description = "The open contact popup cannot be dismissed via keyboard (Escape or a focusable close control)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "contact_validation_feedback_missing"
+description = "An empty or invalid contact submit shows no inline validation indication marking the offending field."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "primary_cta_labels_ambiguous_or_missing"
+description = "Primary CTA controls (We'll call you, Contact us, Accept, Show case, or service buttons) lack readable labels or use blank ambiguous text."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "testimonials_indicator_mismatches_quote"
+description = "After advancing the testimonials rotator, the current-position indicator disagrees with the visible quote or author details."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "invalid_contact_shows_success"
+description = "Submitting the contact form with an empty/invalid email, unchecked Privacy Policy/terms, or out-of-bounds phone still reveals Thanks for your submission!."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "empty_shortlist_brief_still_valid"
+description = "Opening Export brief with an empty shortlist still produces valid JSON whose schemaVersion is 1, shortlistedClients is an empty array, and other keys satisfy the Discovery brief JSON field contract for the live session, without crash or lorem placeholder text."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "malformed_import_rejected"
+description = "Importing a malformed or schema-invalid discovery-brief JSON (missing schemaVersion, brand, or shortlistedClients; schemaVersion not 1; or locale outside en/fi) leaves shortlist count, locale, cookie toggles, carousel, and flick decks unchanged and shows an inline import error naming the problem."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "empty_undo_redo_noop"
+description = "On a fresh load with empty undo/redo stacks, Undo and Redo do nothing visible: shortlist count stays 0 and cookie categories stay at seeded defaults."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "duplicate_shortlist_not_inflated"
+description = "Activating Shortlist twice on the same client does not duplicate that title in shortlistedClients or inflate the nav count past the number of distinct shortlisted clients."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "malformed_import_applies_partial_state"
+description = "Importing malformed discovery-brief JSON partially mutates shortlist, locale, or cookie state without a named inline import error."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "cookie_invalid_draft_rejected"
+description = "Opening cookie preferences and forcing an invalid draft (essential false or a missing boolean category) keeps preferences open on save, shows named field errors on the offending keys, leaves the banner visible, and leaves discovery-brief cookieCategories unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "cookie_dismiss_without_save_no_payload"
+description = "Opening cookie preferences and dismissing without saving leaves the banner visible with Accept still operable and does not write a consent payload into cookieCategories."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.17"
+name = "essential_locked_on_rejects_false"
+description = "Essential cannot be turned off in cookie preferences; attempting to toggle it leaves it on, and a save that would set essential false is rejected with a named field error."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.18"
+name = "import_rejects_broken_form_contracts"
+description = "Importing discovery-brief JSON whose cookieCategories, contactEmail/contactSubmitted pairing, or shortlistedClients membership breaks the Discovery brief / cookie / contact field contracts leaves shortlist, locale, cookie toggles, carousel, and flick decks unchanged and shows an inline import error naming the problem."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n12"
+name = "invalid_cookie_draft_still_commits"
+description = "Saving cookie preferences with essential false or a missing/non-boolean category still dismisses the banner or mutates cookieCategories without named field errors."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.19"
+name = "invalid_then_valid_contact_one_success"
+description = "A failed empty or invalid contact submit (named field errors, no Thanks for your submission!) followed immediately by a valid submit under the contact field contract reveals success exactly once — the invalid attempt never sets contactSubmitted true or writes contactEmail into the discovery brief."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n13"
+name = "invalid_contact_writes_brief_contact"
+description = "Submitting the contact form with an empty/invalid email, unchecked terms, or out-of-bounds phone still sets discovery-brief contactSubmitted true or writes a contactEmail."
 type = "binary"
 negate = true
 weight = 1.0

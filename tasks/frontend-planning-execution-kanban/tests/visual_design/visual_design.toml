@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,60 +63,65 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.1"
 name = "columns_fixed_width_scrollable"
-description = "The board renders as a horizontal scrolling container of fixed-width column tiles, and a column with many cards scrolls its card list inside itself rather than stretching the page vertically past the other columns"
+description = "The board renders as a horizontal scrolling container of fixed-width column tiles, and a column with many cards scrolls inside itself rather than stretching the page"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "2.2"
 name = "column_accent_colors"
-description = "Cards carry a left accent border color-coded by column — gray for Backlog, blue for In Progress, yellow for Review, green for Done — moving a card to another column changes its accent to the destination color, and column counts render as compact rounded tag/badge components adjacent to the column names"
+description = "Cards carry a left accent border color-coded by column — gray for Backlog, blue for In Progress, yellow for Review, green for Done — and moving a card updates its accent to the destination column color"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "2.4"
 name = "status_chip_palette_consistent"
-description = "Execution status chips use one consistent palette everywhere: pending neutral gray, running blue with an active indicator, retrying amber, failed red, complete green — and every chip carries a text label naming the state, never color alone"
+description = "Execution status chips use one consistent palette everywhere: pending neutral gray, running blue with an active indicator, retrying amber, failed red, complete green; each chip label names the state in text"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "2.5"
 name = "drag_ghost_and_shadow"
 description = "During a real pointer drag, the dragged card raises with a visible shadow and a ghost placeholder indicates the exact insertion position in the target column"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "2.6"
 name = "consistent_icons_and_typography"
-description = "One consistent icon set is used across prompt chips, move menus, run/retry controls, and the toolbar, and typography keeps a clear hierarchy (board title larger than column headers, larger than card titles, larger than metadata text)"
+description = "One consistent icon set is used across prompt chips, move menus, run/retry controls, and the toolbar, and typography keeps board title > column headers > card titles > metadata"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "2.7"
 name = "component_states_styled"
-description = "Buttons, selects, and inputs show distinct default, hover, focus (visible ring), disabled, and error treatments, with no bare browser-default-styled controls anywhere"
+description = "Buttons, selects, and inputs show distinct default, hover, focus (visible ring), disabled, and error treatments, with no bare browser-default controls"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "2.8"
 name = "responsive_no_overflow"
-description = "At 375 pixels wide no content clips or overflows the viewport and no page-level horizontal scrollbar appears (the board container itself may scroll horizontally); at 768 pixels the toolbar stacks its filter, search, and actions without clipping"
+description = "At 375 pixels wide no content clips or overflows the viewport and no page-level horizontal scrollbar appears (board-internal column scroll is allowed)"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "2.9"
 name = "text_overlap_or_clipping"
-description = "At 1440 or 375 pixel widths, any card, column, chip, or toolbar text overlaps another element or is clipped by its container so it becomes unreadable"
+description = "At 1440 or 375 pixel widths, any card, column, chip, or toolbar text overlaps another element or is clipped by its container"
 type = "binary"
 weight = 1.0
 negate = true
-
+[[criterion]]
+id = "2.10"
+name = "export_and_wip_chrome_designed"
+description = "Export drawer shows format tabs, monospaced preview, and Copy/Download/Import; WIP limit and breach labels sit beside In Progress and Review counts; undo/redo sit in the toolbar; bulk action bar is a compact tray when selection is active"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "2.11"
+name = "wip_breach_missing_or_wrong"
+description = "When In Progress or Review exceeds three visible cards, the column lacks a deep amber warning background or a text breach label"
+type = "binary"
+weight = 1.0
+negate = true
 [[criterion]]
 id = "2.catchall"
 name = "visual_design_catchall"

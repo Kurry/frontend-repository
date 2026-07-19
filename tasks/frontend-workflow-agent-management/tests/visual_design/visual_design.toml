@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.1"
 name = "console_layout_composition"
-description = "At 1440 pixel width the app composes as a full-width data table with checkbox selection and per-row overflow menus, a toolbar carrying Register Agent, the bulk controls, and the status filter, and a right-docked detail panel approximately 320 pixels wide with Configuration / History / Activity tabs"
+description = "At 1440 pixel width the app composes as a full-width data table with checkbox selection and per-row overflow menus, a toolbar carrying Register Agent, Export fleet, Import fleet, Undo, Redo, the bulk controls, and the status filter, and a right-docked detail panel approximately 320 pixels wide with Configuration / History / Activity tabs"
 type = "binary"
 weight = 1.0
 
@@ -122,6 +122,21 @@ negate = true
 id = "2.9"
 name = "mobile_overflow_present"
 description = "At 375 pixel width, page-level horizontal scrolling appears or content clips outside the viewport instead of the table scrolling within its own container and the detail panel opening as a dismissible overlay"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.10"
+name = "export_drawer_monospace_preview"
+description = "The export fleet surface shows a monospaced JSON preview block with Copy and Download actions, visually consistent with the console's toolbar and panel language"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "export_preview_unstyled_dump"
+description = "The export preview renders as an unstyled plain text dump or missing Copy/Download controls, breaking the designed console export surface"
 type = "binary"
 weight = 1.0
 negate = true

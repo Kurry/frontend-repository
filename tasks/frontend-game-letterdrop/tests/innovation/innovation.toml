@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -63,157 +63,117 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+name = "delightful_score_and_power_feedback"
+description = "Beyond bare score increments: valid-word, Bomb/Slow, and streak-multiplier feedback feels polished (count-up, distinctive toast timing, or tray/board juice) rather than a static number swap."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "tier_acceleration_feels_authored"
+description = "Fall-speed and spawn-rate acceleration across Tier 1→2→3+ reads as intentional game feel (eased ramp, readable tier cue) rather than an abrupt unexplained snap."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+name = "pre_start_guidance_polish"
+description = "The pre-start board message Press Start game to begin! plus clear control labeling forms a light guided first-run path beyond a blank canvas."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+name = "power_tiles_read_at_a_glance"
+description = "Bomb and Slow tiles are visually distinct from ordinary letters and each other in a way that improves play readability beyond the minimum color swap."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+name = "touch_and_click_parity_polish"
+description = "Where present, click and tap selection on falling tiles feel equally reliable, with selection feedback that makes tray membership obvious."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+name = "settings_personalization_beyond_mvp"
+description = "playerName and startingTier settings feel integrated (History game-results show playerName; tier readout reflects startingTier) as personalization polish, not a disconnected stub form."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+name = "achievement_unlock_moment"
+description = "Unlocking Clean Sweep / Combo Master / Marathon (or milestone badges) delivers a memorable celebratory moment (toast + particle burst) tied to the real unlock."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+name = "hud_state_at_a_glance"
+description = "Streak badge, tier readout, Best Score, and danger line form a readable at-a-glance HUD language beyond sparse unlabeled numbers."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+name = "offline_local_dictionary_polish"
+description = "Bundled in-browser dictionary play feels complete offline — common short words clear regularly — as a platform-appropriate local experience."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+name = "competition_level_game_feel"
+description = "Overall LetterDrop play feel (fall easing, clear juice, pause dim, history insert) reads competition-polished rather than a bare prototype loop."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n1"
 name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+description = "The build is purely barebones: HUD scores swap as static numbers while Board Cleared! and achievement unlocks occur as silent state flips with neither toast juice nor a celebration burst."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
+name = "experience_is_generic_template"
+description = "Interactions and visuals read as a generic unstyled template: Bomb/Slow tiles look like ordinary letters and the danger line is absent or indistinguishable from the board background."
 type = "binary"
 negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
-type = "binary"
-negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
+name = "interface_flat_no_immersion"
+description = "During an active run the UI stays flat and static: tiles teleport rather than ease, streak/tier chrome stays inert, and Pause leaves the board visually undimmed."
 type = "binary"
 negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
-type = "binary"
-negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
+name = "delightful_moments_absent"
+description = "Board Cleared!, achievement unlocks, and power-tile activations complete as silent state changes with only a numeric HUD update and no distinctive user-facing moment."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
+
 
 [[criterion]]
-id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
+id = "11.11"
+name = "run_record_export_feels_useful"
+description = "Optional polish: Export Run / Export History feels like a useful takeaway artifact (clear JSON preview, Copy confirmation, or history archive) beyond a bare download stub."
 type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
-type = "binary"
-negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
-description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the LetterDrop spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0

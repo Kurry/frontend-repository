@@ -1,0 +1,170 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "layout_composition"
+description = "The layout matches the spec: a top toolbar with the Library, Test Bench, and Compare view switcher, search, filters, undo/redo, and export, with the library view showing the card grid beside a left tag facet rail"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "responsive_grid_columns"
+description = "The card grid is 3 columns at desktop width, 2 at medium, and 1 at narrow, and cards keep a consistent footprint that the flip preserves"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "role_color_borders"
+description = "Each card carries a colored top border by role — Coder blue, Writer green, Analyst cyan, Reviewer yellow — and the same role colors key the role filter and the comparison headers"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.4"
+name = "badge_families_distinct"
+description = "The tone badge renders as a neutral tag, and the promoted and blended badges are visually distinct from tone and tag chips"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "card_back_code_block"
+description = "The card back shows the full prompt body in a monospaced code-style block with a copy affordance"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "archived_treatment"
+description = "Archived cards render dimmed with an Archived label, and selection checkboxes and the bulk tray share one accent color"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "radar_series_consistency"
+description = "Radar charts use one series color per persona, consistent between the trait editor, the comparison overlay, and its legend, and the delta highlight appears only when a trait pair differs by more than 10 points"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "typography_hierarchy"
+description = "Typography shows a clear hierarchy: app title larger than view headings, which are larger than card titles, which are larger than body and label text, consistent across views"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "spacing_rhythm"
+description = "Spacing across the toolbar, facet rail, grid, and panels follows a visually regular rhythm with no crowded or orphaned regions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "control_state_treatments"
+description = "Buttons, inputs, selects, sliders, and toggles show distinct default, hover, focus (visible ring), disabled, and error treatments, checked through the real pointer and keyboard states"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "consistent_icon_set"
+description = "One consistent icon set is used across the toolbar, cards, tray, and status indicators, with no mixed icon styles"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.n1"
+name = "role_or_state_color_only"
+description = "Role category, promoted state, or archived state is distinguishable only by color, with no label, icon, or text reinforcement"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n2"
+name = "overlap_or_clipping_desktop"
+description = "At 1440 pixel width, any card, chart, overlay, or drawer content overlaps another element or is clipped by its container"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n3"
+name = "flip_breaks_footprint"
+description = "The card flip changes the card's footprint, shifting neighboring cards or breaking the grid alignment"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "visual_design.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

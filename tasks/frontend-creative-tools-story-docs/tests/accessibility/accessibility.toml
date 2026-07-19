@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,78 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "storyboard_controls_keyboard_operable"
+description = "Every interactive control — header tools (notifications bell, dashboard, account, kebab), sidebar storyboard rows, Add Storyboard, Help, Tile/List/Slide toggles, Add Scene, create/edit fields, per-scene kebab menus, drawer controls, and Slide prev/next — is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space), each showing a visible focus indicator when focused."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "drawers_escape_and_return_focus"
+description = "Open notifications or account drawers can be dismissed with Escape and return focus to the control that opened them."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "scene_images_have_descriptive_alt"
+description = "Scene card images carry descriptive alt text, and icon-only controls (header tools, kebabs, view-mode icons) expose accessible names."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "create_validation_announced_live"
+description = "Create-form inline validation messages for empty required title/description fields are shown visually and announced through a polite ARIA live region."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+name = "create_form_fields_explicitly_labeled"
+description = "Add Scene create-form fields (title and description/body) use explicit label elements associated with their controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+name = "heading_order_workspace"
+description = "Workspace headings follow a logical order with no skips (for example the Welcome to Docs! / storyboard title line into section headings), without jumping H1→H3."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "workspace_landmarks_present"
+description = "The app exposes semantic landmarks (for example nav for the left storyboard sidebar and/or storyboard nav bar, and main for the scene board) so assistive technology can navigate the workspace."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+name = "light_workspace_contrast"
+description = "Header titles (Demo Projects, 1. Getting Started), sidebar rows, scene titles/descriptions, and primary controls meet sufficient contrast against the light workspace surfaces."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "semantic_controls_and_menus"
+description = "Header tools, view-mode toggles, Add Scene, kebab triggers, and form submits use semantic button/input roles rather than unlabeled decorative wrappers."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "kebab_menu_keyboard_and_escape"
+description = "Per-scene kebab menus open as keyboard-operable menus: arrow keys move between the edit and delete items and Escape closes the menu."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
 name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+description = "Header tools, Tile/List/Slide toggles, Add Scene, per-scene kebabs, create fields, drawer controls, or Slide prev/next cannot be activated or reached via keyboard."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,71 +141,71 @@ weight = 1.0
 [[criterion]]
 id = "1.n2"
 name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+description = "Focused storyboard controls (view-mode toggles, Add Scene, kebab items, create fields, drawer triggers) show no visible focus indicator or the indicator is obscured."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n3"
-name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+name = "icon_only_controls_lack_names"
+description = "Icon-only header tools, kebab triggers, or view-mode icons lack accessible names/ARIA labels."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+name = "create_error_color_only"
+description = "Empty required-field validation on the create form is indicated by color alone with no text message naming the empty field."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "drawers_fail_escape_or_focus_return"
+description = "Pressing Escape leaves an open notifications or account drawer still visible, or closing the drawer leaves focus away from the control that opened it."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+name = "poor_contrast_workspace_text"
+description = "Scene descriptions, Welcome to Docs!, or header titles are unreadable due to poor contrast on the light workspace."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+name = "create_errors_visual_only"
+description = "Create-form validation feedback is visual only and is not announced to assistive technology (no live region or equivalent association)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+name = "scene_images_missing_alt"
+description = "One or more seeded scene images is missing descriptive alt text."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+name = "heading_order_skipped"
+description = "Headings in the storyboard workspace are skipped or unordered (for example jumping from H1 to H3)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n10"
-name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+name = "reduced_motion_ignored"
+description = "With prefers-reduced-motion set, scene-card staggers, scroll reveals, or card enter/exit transitions still animate instead of applying instantly."
 type = "binary"
 negate = true
 weight = 1.0

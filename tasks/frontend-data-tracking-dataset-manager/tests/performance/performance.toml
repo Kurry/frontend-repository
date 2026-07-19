@@ -1,0 +1,180 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "9.1"
+name = "cold_start_is_under_two_seconds"
+description = "Cold start to an interactive seeded workspace is under 2 seconds on local render"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.2"
+name = "console_is_clean"
+description = "Browser devtools show no errors or warnings on load or during a full exercise of the app"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.3"
+name = "virtualized_scroll_is_smooth"
+description = "Scrolling the 500-row flagship dataset from first to last row is smooth with no hangs, blank flashes, or visible frame drops"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.4"
+name = "scan_shows_progress_not_freeze"
+description = "The duplicate scan shows its staged progress while running and never freezes the UI"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.5"
+name = "derived_recomputes_feel_instant"
+description = "Formula results, threshold flags, pivot summaries, and export text recompute without perceptible lag after an edit"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.6"
+name = "ui_interactive_during_operations"
+description = "The UI stays interactive while an import commits, a scan runs, or batches animate in — other controls still respond"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.7"
+name = "animations_maintain_smooth_frame_rate"
+description = "Batch fade-ins, drawer slides, and the gauge animation stay smooth without stutter"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.8"
+name = "rapid_input_does_not_freeze"
+description = "Rapid repeated input — fast verified toggles, quick dataset switches, rapid undo/redo — never hangs the app or drops interactions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.9"
+name = "extended_sessions_avoid_resource_runaway"
+description = "An extended session of imports, edits, scans, and exports shows no runaway resource use or progressive slowdown"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "9.n1"
+name = "local_load_exceeds_two_seconds"
+description = "More than 2 seconds pass before the seeded workspace is interactive on local render"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n2"
+name = "console_errors_during_flows"
+description = "Errors or warnings appear in the console while exercising import, editing, scan, pivot, splits, undo, or export"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n3"
+name = "large_grid_kills_frame_rate"
+description = "The 500-row grid janks, blanks, or drops frames while scrolling"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n4"
+name = "operations_hang_ui"
+description = "An import commit, duplicate scan, or pivot recompute hangs or freezes the UI"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n5"
+name = "animation_blocks_input"
+description = "Input becomes unresponsive while batches, drawers, or the gauge animate"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n6"
+name = "rapid_or_edge_use_crashes"
+description = "The app crashes or renders a broken page under rapid or edge-case use"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "performance.catchall"
+name = "performance_catchall"
+description = "The app exhibits a significant, browser-observable defect in performance or stability that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,92 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_annotations_state"
+description = "When a trial has no annotations yet, the annotations region shows a designed empty state explaining that notes attach to steps and naming the annotate control"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
 name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+description = "Inline validation appears on the note form and failure classification form before any review state changes"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
 name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+description = "Validation and import error messages name the invalid field or problem (for example note_text, evidence, trial_id) rather than only saying Invalid"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "copy_export_confirmation"
+description = "Copy export shows visible confirmation after placing the preview text on the clipboard"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "ingest_shows_progress"
+description = "Opening a trial shows the ingest checklist with per-item progress before the viewer appears"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "undo_available_for_review_edits"
+description = "Undo is available after annotation create/edit/delete and classification submit/update, and restores the prior review state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "failed_step_keeps_viewer_working"
+description = "A trial containing a failed step shows an error status on that step in the timeline and an error-styled output in its tool invocation panel, and the viewer keeps working when that step is activated"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "long_filenames_truncate"
+description = "File names longer than their tree row truncate with an ellipsis in the tree and show the full name in the content pane header when selected"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "empty_filter_timeline_state"
+description = "Choosing a step-type filter that matches no steps shows a designed empty timeline state naming the active filter and a control that clears it"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "import_wrong_trial_rejected"
+description = "Importing a Review JSON whose trial_id does not match the open trial shows an inline error naming trial_id and changes no annotations or report"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "arrow_keys_stop_at_ends"
+description = "Arrow-key navigation stops at the first and last visible steps without wrapping or throwing errors"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "empty_undo_redo_disabled"
+description = "Undo with an empty stack and Redo with an empty redo stack are disabled and produce no console errors"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
 name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+description = "An empty annotations list or empty filtered timeline shows nothing and provides no UI feedback"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +155,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n2"
 name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+description = "Note, classification, or import errors are surfaced only in the browser console"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,15 +163,15 @@ weight = 1.0
 [[criterion]]
 id = "4.n3"
 name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+description = "Copy export, annotate, classify, or import actions lack visible feedback and silently succeed or fail"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "double_submit_duplicates_report"
+description = "Double-activating the classification submit control produces two or more report cards"
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +179,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n5"
 name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+description = "Non-semantic div or span tags wrap interactive timeline, filter, palette, or export controls without button/link semantics"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +187,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n6"
 name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+description = "The command palette or note form overlay cannot be dismissed via Escape"
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +195,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n7"
 name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+description = "Validation feedback is missing or delayed with no UI indication on invalid note or classification submit"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,15 +203,15 @@ weight = 1.0
 [[criterion]]
 id = "4.n8"
 name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+description = "Primary action labels are ambiguous or missing on annotate, classify, copy export, or import controls"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "markdown_copy_grabs_json"
+description = "With the Review markdown tab active, Copy export places JSON text on the clipboard instead of the visible markdown"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +219,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n10"
 name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+description = "Export, undo, filter, or command-palette affordances are visually hidden or inaccessible"
 type = "binary"
 negate = true
 weight = 1.0

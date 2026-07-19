@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,28 +62,28 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
+name = "meter_lab_shows_preview_and_dials"
 description = "On load, Meter/Lab mode shows the photo preview with aperture, shutter, and ISO dials plus the exposure meter"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
+name = "seeded_presets_at_least_six"
 description = "On load (or after opening Presets/Compare), the presets list shows at least 6 seeded exposure looks with names and stop readouts"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
+name = "create_preset_golden_hour_soft_visible"
 description = "After creating a preset named 'Golden Hour Soft' with valid stops, the text 'Golden Hour Soft' is visible in the presets list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
+name = "adding_three_presets_increases_count"
 description = "After adding 3 new presets on top of the seed set, the presets list shows exactly 3 more rows than the initial seeded count"
 type = "binary"
 weight = 1.0
@@ -104,7 +104,7 @@ weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
+name = "delete_preset_removes_from_list"
 description = "After deleting a preset, that preset's name is no longer visible in the presets list"
 type = "binary"
 weight = 1.0
@@ -118,49 +118,49 @@ weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
+name = "empty_name_rejects_create"
 description = "After submitting create with an empty required preset name, the presets count does not increase and validation feedback is visible"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
-description = "After filtering presets by favorites or a look tag (with mixed items present), only matching presets remain visible"
+name = "favorites_or_looktag_filter_narrows_list"
+description = "After filtering presets by favorites or a lookTag (with mixed items present), only matching presets remain visible"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
+name = "mode_switch_without_navigation"
 description = "After switching between Meter/Lab and Presets/Compare modes, the main canvas shows the other mode without full page navigation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
+name = "hover_wash_on_lab_controls"
 description = "When hovering steppers, preset rows, or primary controls, a visible hover wash, brightness, or shadow change appears"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.14"
-name = "1_14"
+name = "edge_stepper_faded_noninteractive"
 description = "At a stop-list edge, the corresponding up or down stepper is faded and non-interactive and does not change the dial value further"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.15"
-name = "1_15"
+name = "help_panel_explainer_visible"
 description = "After opening the help panel, an aperture / shutter / ISO explainer is visible on-page without leaving the simulator"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.17"
-name = "1_17"
+name = "presets_static_html_only"
 description = "Exposure presets list is static HTML only with no working create/edit/delete against shared state"
 type = "binary"
 weight = 1.0
@@ -168,7 +168,7 @@ negate = true
 
 [[criterion]]
 id = "1.18"
-name = "1_18"
+name = "outbound_link_chrome"
 description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
 type = "binary"
 weight = 1.0
@@ -176,21 +176,21 @@ negate = true
 
 [[criterion]]
 id = "1.19"
-name = "1_19"
+name = "stepper_updates_and_aperture_direction"
 description = "Pressing a stepper updates its dial value instantly, and the aperture up control raises the f-number (narrows the aperture) while its down control lowers it (widens the aperture)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.20"
-name = "1_20"
+name = "steppers_change_preview_stack"
 description = "Pressing the steppers visibly changes the live preview: it brightens as the aperture widens, the shutter slows, or ISO rises (and darkens for the opposite moves), depth-of-field blur increases as the aperture widens, and the ISO noise overlay grows more opaque as ISO climbs"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.21"
-name = "1_21"
+name = "meter_dot_tracks_exposure"
 description = "The vertical exposure meter dot climbs toward OVER EXPOSED when overexposed and drops toward UNDER EXPOSED when underexposed, clamping within the track at the extremes"
 type = "binary"
 weight = 1.0
@@ -227,14 +227,14 @@ weight = 1.0
 [[criterion]]
 id = "1.29"
 name = "iso_step_updates_three_surfaces"
-description = "Starting from the default stops in Meter/Lab: step ISO up one stop and confirm, without a reload, that all three surfaces change together — the ISO dial label shows the next stop in the list, the tiled noise overlay becomes visibly more opaque than immediately before the press, and the exposure meter dot moves up the vertical track from its prior position"
+description = "Starting from the default stops in Meter/Lab: step ISO up one stop and confirm, without a reload, that all three surfaces change together — the ISO dial label shows the next stop in the list, the tiled noise overlay becomes visibly more opaque than immediately before the press, the exposure meter dot moves up the vertical track from its prior position, and both the EV number and the histogram shape change"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.30"
 name = "create_preset_flow_survives_mode_switch"
-description = "In Presets/Compare: note the visible preset count, create a valid preset with a look tag, and confirm the count increases by exactly one (measured immediately around the submit), the new row shows its name and stop readout, applying its look tag filter still shows the new row, and switching to Meter/Lab and back to Presets/Compare shows the same new preset without a reload"
+description = "In Presets/Compare: note the visible preset count, create a valid preset with a lookTag from the closed enum (soft, crisp, grainy, night, daylight, cinematic), and confirm the count increases by exactly one (measured immediately around the submit), the new row shows its name and stop readout, applying its lookTag filter still shows the new row, the Export panel JSON presets array includes that name and lookTag, and switching to Meter/Lab and back to Presets/Compare shows the same new preset without a reload"
 type = "binary"
 weight = 1.0
 
@@ -248,7 +248,7 @@ weight = 1.0
 [[criterion]]
 id = "1.32"
 name = "reload_resets_all_facets_to_seed"
-description = "After stepping the dials off their defaults, creating one preset, and marking one favorite: reload the page and confirm every facet returns to the seeded baseline together — dials back at f/16, 1/60, ISO 100 and only the seeded presets in the collection — never a mix of reset and surviving facets"
+description = "After stepping the dials off their defaults, creating one preset, and marking one favorite: reload the page and confirm every facet returns to the seeded baseline together — dials back at f/16, 1/60, ISO 100, only the seeded presets and seeded snapshots, and empty undo/redo stacks — never a mix of reset and surviving facets"
 type = "binary"
 weight = 1.0
 
@@ -261,8 +261,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.34"
-name = "long_preset_name_truncates_with_ellipsis"
-description = "A preset whose name is longer than 40 characters shows a truncated name with an ellipsis in its list row, while the edit form shows the full name"
+name = "long_preset_name_rejected_at_max_40"
+description = "Submitting a preset name longer than 40 characters is rejected with an error naming the name field (or input is blocked before submit) so no row is saved with a name over 40 characters"
 type = "binary"
 weight = 1.0
 
@@ -272,6 +272,152 @@ name = "brand_chip_is_inert"
 description = "A brand chip labeled 'Camera Exposure Simulator' is visible, and activating it neither navigates away nor changes the view — it is an inert label, not a link"
 type = "binary"
 weight = 0.5
+
+
+[[criterion]]
+id = "1.36"
+name = "live_ev_readout_updates_with_dials"
+description = "A live EV readout near the meter shows a numeric exposure value; stepping aperture, shutter, or ISO changes that EV number on the same press without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "live_histogram_reshapes_with_exposure"
+description = "A live luma histogram is visible in the lab chrome; brightening the exposure (wider aperture, slower shutter, or higher ISO) visibly shifts histogram mass toward the right, and darkening shifts it toward the left — two clearly different stop combinations never leave an identical histogram shape"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "before_hold_shows_defaults_then_restores"
+description = "With dials off defaults: holding the Before control shows the default exposure (f/16, 1/60, ISO 100) on the preview, meter, EV readout, and histogram without discarding the current stops; releasing Before restores the off-default dials and all derived surfaces immediately"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "seeded_snapshots_restore_dials"
+description = "On load the Snapshots strip shows at least 2 named snapshots with stop readouts; restoring a snapshot whose stops differ from the current dials writes those stops into the shared dials so preview, meter, EV, and histogram all match"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "snapshot_create_increases_count_by_one"
+description = "Saving a valid named snapshot of the current stops increases the visible snapshot count by exactly one and shows the new row with its name and stop readout"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "undo_redo_restore_dial_and_preset_state"
+description = "After stepping a dial and creating a preset: Undo restores the prior dials and removes the new preset (count decreases by one); Redo reapplies both; Undo/Redo are disabled when their stacks are empty"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "export_json_contains_session_mutations"
+description = "After stepping dials off defaults and creating a valid preset: the Export panel monospaced JSON is API-shaped with visible field names schemaVersion (exactly exposure-control-lab.package.v1), aperture, shutter, iso, ev, presets, and snapshots; it includes the current aperture/shutter/iso/ev and a presets entry carrying name, aperture, shutter, iso, lookTag, and favorite for the new preset; an export that still shows only the pre-mutation seeded package fails"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "download_and_copy_lab_package"
+description = "Download lab package offers a real download of the visible lab-package JSON, and Copy lab package puts that exact JSON text on the clipboard and shows a brief copied confirmation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "import_lab_package_reconstructs_session"
+description = "After exporting a mutated session (dials + a created preset + a created snapshot), reloading to seed, then importing that package: dials, the new preset, the new snapshot, EV, histogram, and Export panel text all match the pre-export session"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "copy_stops_onto_selected_preset"
+description = "With a preset selected whose stops differ from the dials: activating Copy stops overwrites that preset's aperture, shutter, and ISO with the current dial values and updates that preset's stop readout in the list and in the Export panel JSON without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "batch_delete_selected_presets"
+description = "Selecting at least two presets shows a batch bar; Delete selected removes every selected preset at once, the visible count decreases by exactly the selected count, and the selection clears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n36"
+name = "export_omits_session_mutations"
+description = "After creating a preset or changing dials, the Export panel JSON still omits those session mutations (missing the new preset name or still showing only default stops) while the UI shows the mutations"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n37"
+name = "undo_does_not_restore_prior_state"
+description = "After a dial step or preset create, activating Undo leaves dials, presets, or the Export panel unchanged from the post-action state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n38"
+name = "histogram_identical_across_exposures"
+description = "Stepping to clearly brighter vs darker stop combinations leaves the luma histogram visually identical"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.47"
+name = "exposure_preset_field_contract_enforced"
+description = "The preset create/edit form enforces the ExposurePreset field contract: name required non-empty max 40 and unique; aperture/shutter/iso restricted to their discrete stop lists; lookTag restricted to soft, crisp, grainy, night, daylight, cinematic; invalid fields show inline errors naming that field and the submit control stays disabled until every required field is valid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "dial_snapshot_field_contract_enforced"
+description = "The snapshot form enforces the DialSnapshot field contract: name required non-empty max 40 and unique among snapshots; aperture/shutter/iso restricted to their discrete stop lists; invalid fields show inline errors naming that field and no snapshot row is added until valid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "lab_package_api_shaped_field_names"
+description = "The Export panel JSON visibly uses the lab-package field contract: top-level schemaVersion exactly exposure-control-lab.package.v1 plus aperture, shutter, iso, and ev; each presets element shows name, aperture, shutter, iso, lookTag, and favorite; each snapshots element shows name, aperture, shutter, and iso — and a newly created preset or snapshot appears in the matching array with those same field names"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "form_record_matches_export_shape"
+description = "After creating a valid preset, the object shape in the Export panel presets array matches the form payload (same field names name/aperture/shutter/iso/lookTag plus favorite); after creating a valid snapshot, the snapshots array entry matches the DialSnapshot payload field names"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n39"
+name = "export_missing_contract_field_names"
+description = "The Export panel JSON omits required lab-package field names (for example no schemaVersion, no lookTag on presets, no ev at the top level, or no snapshots array) while the UI shows presets and snapshots"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n40"
+name = "invalid_looktag_or_stops_accepted"
+description = "The preset form accepts and saves a lookTag outside soft/crisp/grainy/night/daylight/cinematic or an aperture/shutter/iso value outside the discrete stop lists"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.catchall"

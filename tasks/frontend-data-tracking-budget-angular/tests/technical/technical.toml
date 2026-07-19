@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -77,7 +77,7 @@ weight = 1.0
 [[criterion]]
 id = "2.3"
 name = "serves_without_blank_page_or_starter_content"
-description = "The app loads with no blank page, fatal error overlay, or generic Angular starter content, and required same-origin resources (scripts, styles) load without 4xx or 5xx responses"
+description = "The app loads with no blank page, fatal error overlay, or generic framework starter content, and required same-origin resources (scripts, styles) load without 4xx or 5xx responses"
 type = "binary"
 weight = 1.0
 
@@ -196,7 +196,7 @@ weight = 1.0
 [[criterion]]
 id = "2.19"
 name = "responsive_under_rapid_input"
-description = "Period switches, view switches, and filter changes update the visible content immediately, and the UI stays responsive under rapid repeated input (e.g. clicking the period arrow several times quickly) with no hangs or dropped interactions"
+description = "Period switches, view switches, and filter changes update the visible content immediately, and the UI stays responsive under rapid repeated input (e.g. clicking the period arrow five times quickly) with no hangs or dropped interactions"
 type = "binary"
 weight = 0.5
 
@@ -211,7 +211,29 @@ negate = true
 [[criterion]]
 id = "2.21"
 name = "partial_persistence_facet_reverts"
-description = "After making several independent changes (add an expense, change the period, rename a category, edit the display name) and reloading, at least one facet silently reverts to its seeded value while others survive — an incoherent partial restore from client storage"
+description = "After making four independent changes (add an expense, change the period, rename a category, edit the display name) and reloading, at least one facet silently reverts to its seeded value while others survive — an incoherent partial restore from client storage"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.22"
+name = "forms_and_import_enforce_field_contracts"
+description = "Add/edit expense, category name, account displayName, and Import JSON enforce the declared field contracts in the UI: invalid expense value/date/category, empty or duplicate category name, empty or over-length displayName, and BudgetDocument payloads that fail required keys or enums are rejected with inline feedback naming the offending field and do not mutate store state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.23"
+name = "export_import_share_budget_document_schema"
+description = "After a valid expense create through the form, the JSON export expenses entry shows the same value, datetime, categoryId, counterparty, and period the form produced — form, export, and import share one BudgetDocument / expense field contract"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n22"
+name = "import_mutates_on_contract_invalid_payload"
+description = "Import JSON accepts a parseable payload that violates the BudgetDocument field contract and still replaces expenses, categories, display name, or active period"
 type = "binary"
 weight = 1.0
 negate = true

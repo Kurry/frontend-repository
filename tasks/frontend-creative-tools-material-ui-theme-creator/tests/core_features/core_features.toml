@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,136 +62,136 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
-description = "On load, Saved Themes (or the saved list after opening that tab) shows at least 3 seeded theme rows with names visible"
+name = "seeded_saved_themes_visible"
+description = "On load, Saved Themes shows at least 3 seeded theme rows with names visible."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
-description = "After adding 3 new saved themes on top of the seed set, Saved Themes shows exactly 3 more rows than the initial seeded count"
+name = "three_new_themes_increase_count"
+description = "After adding 3 new saved themes on top of the seed set, Saved Themes shows exactly 3 more rows than the initial seeded count."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
-description = "After loading a saved theme, the Preview surfaces and/or Monaco editor reflect that theme's options"
+name = "load_theme_updates_editor_preview"
+description = "After loading a saved theme, the Preview surfaces and the theme source editor reflect that theme's options."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
-description = "After editing a saved theme name to 'Evening Paper', the text 'Evening Paper' is visible and the previous name is not"
+name = "rename_saved_theme_updates_card"
+description = "After editing a saved theme name to Evening Paper, the text Evening Paper is visible and the previous name is not."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
-description = "After deleting a saved theme, that theme name is no longer visible under Saved Themes"
+name = "delete_removes_theme_from_list"
+description = "After deleting a saved theme, that theme name is no longer visible under Saved Themes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
-description = "After deleting all saved themes, an empty state message is visible in the Saved Themes region"
+name = "delete_all_shows_empty_state"
+description = "After deleting all saved themes, an empty state message is visible in the Saved Themes region."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
 name = "empty_name_create_rejected_inline"
-description = "With the New Theme name field empty, the submit control is disabled; attempting submission surfaces an inline validation message naming the name field, and the saved themes count does not increase"
+description = "With the New Theme name field empty, the submit control is disabled; attempting submission surfaces an inline validation message naming the name field, and the saved themes count does not increase."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
-description = "After toggling Light/Dark palette Type, preview surfaces recolor without full page navigation"
+name = "light_dark_toggle_recolors_preview"
+description = "After toggling Light/Dark palette Type, preview surfaces recolor without full page navigation."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
-description = "After switching from Preview to Saved Themes (or Components), the main canvas shows the other mode without full page navigation"
+name = "main_tabs_switch_in_app"
+description = "After switching from Preview to Saved Themes or Components, the main canvas shows the other mode without full page navigation."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
-description = "After switching among Phone / Tablet / Desktop device frames, the preview chrome reframes without leaving the page"
+name = "device_frames_reframe_preview"
+description = "After switching among Phone / Tablet / Desktop device frames, the preview chrome reframes without leaving the page."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
-description = "When hovering buttons, saved theme rows, or tabs, a visible hover wash, underline, or brightness change appears"
+name = "hover_wash_on_interactive_controls"
+description = "When hovering buttons, saved theme rows, or tabs with the real pointer, a visible hover wash, underline, or brightness change appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.15"
-name = "1_15"
-description = "In the Components tab, typing a component name in search narrows the visible demo sections"
+name = "components_search_narrows_gallery"
+description = "In the Components tab, typing a component name in search narrows the visible demo sections."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.21"
-name = "1_21"
-description = "Saved themes list is static HTML only with no working create/edit/delete against shared state"
+name = "saved_themes_static_html_only"
+description = "Saved themes list is static HTML only with no working create/edit/delete against shared state."
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "1.22"
-name = "1_22"
-description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
+name = "chrome_uses_outbound_navigation"
+description = "App chrome navigates via real outbound links to other origins instead of in-app view state."
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "1.23"
-name = "1_23"
-description = "Editing valid source in the Monaco editor updates the live preview and tool controls, and changing a tool control writes back into the Monaco source (bi-directional sync)"
+name = "editor_tools_bidirectional_sync"
+description = "Editing valid source in the theme source editor updates the live preview and tool controls, and changing a tool control writes back into the editor source (bi-directional sync)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.24"
-name = "1_24"
-description = "Expanding a Palette accordion row and changing a color updates preview surfaces and the Monaco source live"
+name = "palette_accordion_live_updates"
+description = "Expanding a Palette accordion row and changing a color updates preview surfaces and the editor source live."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.25"
 name = "components_jump_links_same_document"
-description = "In the Components tab, activating a jump link in the left drawer scrolls the gallery to that component's section via a same-document hash, without leaving the page or triggering a reload"
+description = "In the Components tab, activating a jump link in the left drawer scrolls the gallery to that component's section via a same-document hash, without leaving the page or triggering a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.26"
 name = "delete_loaded_theme_clears_active"
-description = "Starting with a saved theme loaded: note the saved themes count, delete that same theme, and confirm its card disappears, the list count decreases by exactly one measured immediately around the delete, and no surface (editor toolbar, saved list, preview) still marks it as the active/loaded theme"
+description = "Starting with a saved theme loaded: note the saved themes count, delete that same theme, and confirm its card disappears, the list count decreases by exactly one measured immediately around the delete, and no surface still marks it as the active/loaded theme."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.27"
-name = "1_27"
-description = "The Monaco/code panel is a static read-only block that does not reflect palette or tool changes and does not update the preview"
+name = "editor_pane_static_readonly"
+description = "The theme source panel is a static read-only block whose text stays fixed when palette or tool controls change, leaving the preview unchanged."
 type = "binary"
 weight = 1.0
 negate = true
@@ -199,106 +199,230 @@ negate = true
 [[criterion]]
 id = "1.29"
 name = "create_theme_multi_surface_flow"
-description = "Scripted probe: note the saved themes count, submit New Theme with the valid name 'Harbor Indigo', and confirm the count increases by exactly one measured immediately around the submit, the new card shows 'Harbor Indigo', and after switching to Preview and back to Saved Themes the card is still present without a page reload"
+description = "Scripted probe: note the saved themes count, submit New Theme with the valid name Harbor Indigo, and confirm the count increases by exactly one measured immediately around the submit, the new card shows Harbor Indigo, and after switching to Preview and back to Saved Themes the card is still present without a page reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.30"
 name = "load_theme_reflected_across_tabs"
-description = "Scripted probe: load a seeded saved theme with a visibly distinct palette, then confirm the editor source, tool controls, and framed sample site all reflect its options immediately, the Components tab demos show the same theme without a reload, and the theme stays active after cycling through Preview, Components, and Saved Themes"
+description = "Scripted probe: load a seeded saved theme with a visibly distinct palette, then confirm the editor source, tool controls, framed sample site, contrast matrix, and Theme Files export all reflect its options immediately, the Components tab demos show the same theme without a reload, and the theme stays active after cycling through Preview, Components, and Saved Themes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.31"
 name = "palette_change_echoes_in_components_tab"
-description = "Scripted probe: change the primary color from the Palette tool to a clearly different value, confirm the preview surfaces recolor and the matching value is rewritten in the editor source, then open the Components tab and confirm the same new color is visible in the component demos without a reload"
+description = "Scripted probe: change the primary color from the Palette tool to a clearly different value, confirm the preview surfaces recolor and the matching value is rewritten in the editor source, then open the Components tab and confirm the same new color is visible in the component demos without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.32"
 name = "palette_type_persists_across_tabs"
-description = "Scripted probe: toggle the palette type from light to dark (or dark to light), confirm preview surfaces and the editor source recolor immediately, then switch through Preview, Components, and Saved Themes and confirm the chosen type remains applied in each"
+description = "Scripted probe: toggle the palette type from light to dark (or dark to light), confirm preview surfaces and the editor source recolor immediately, then switch through Preview, Components, and Saved Themes and confirm the chosen type remains applied in each."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.33"
 name = "rename_and_save_options_roundtrip"
-description = "Scripted probe: rename a saved theme to 'Evening Paper Two' and confirm the same card updates with no duplicate created; then edit the active options, use the save control, load a different theme, reload 'Evening Paper Two', and confirm it reproduces the edited options"
+description = "Scripted probe: rename a saved theme to Evening Paper Two and confirm the same card updates with no duplicate created; then edit the active options, use the save control, load a different theme, reload Evening Paper Two, and confirm it reproduces the edited options."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.34"
 name = "invalid_source_diagnostics_shell_usable"
-description = "After editing the theme source into invalid TypeScript, diagnostics are surfaced in the editor region while the main tabs, preview, and tool controls keep working with the last valid options"
+description = "After editing the theme source into invalid TypeScript, diagnostics are surfaced in the editor region while the main tabs, preview, and tool controls keep working with the last valid options."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.35"
 name = "saved_theme_search_no_match_and_reset"
-description = "Typing in the saved-themes search narrows the list to matching names, a query matching nothing shows an empty result state, and clearing the search restores the full list to exactly its prior contents"
+description = "Typing in the saved-themes search narrows the list to matching names, a query matching nothing shows an empty result state, and clearing the search restores the full list to exactly its prior contents."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.36"
 name = "undo_redo_disabled_at_boundaries"
-description = "Undo and redo toolbar controls are disabled when their history direction is empty, and activating them at a history boundary produces no console error or crash"
+description = "Undo and redo toolbar controls are disabled when their history direction is empty, and activating them at a history boundary produces no console error or crash."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.37"
 name = "double_submit_creates_single_theme"
-description = "Scripted probe: note the saved themes count, double-activate the New Theme submit control with a valid name, and confirm exactly one new card appears and the count increases by exactly one"
+description = "Scripted probe: note the saved themes count, double-activate the New Theme submit control with a valid name, and confirm exactly one new card appears and the count increases by exactly one."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.38"
 name = "editor_toolbar_copy_and_save_status"
-description = "The editor toolbar exposes Editor Settings, a Copy theme code control that gives visible feedback when activated, undo/redo, and a save control whose status reads 'All changes saved' when the source matches the active theme"
+description = "The editor toolbar exposes Editor Settings, a Copy theme code control that gives visible feedback when activated, undo/redo, a history timeline scrubber, and a save control whose status reads All changes saved when the source matches the active theme."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.39"
-name = "fonts_typography_snippets_tools_work"
-description = "The Fonts tool adds a font by name from the locally bundled set so it becomes available to Typography and preview text, the Typography tool changes font family/size of preview variants, and the Snippets tool visibly applies a built-in snippet into the theme source"
+name = "fonts_typography_shape_snippets_tools_work"
+description = "The Fonts tool adds a font by name from the locally bundled set so it becomes available to Typography and preview text; the Typography tool changes font family/size of preview variants; the Shape tool changes border radius on preview corners and writes into the editor source; the Snippets tool visibly applies a built-in snippet into the theme source."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.40"
 name = "tutorial_opens_in_page_modal"
-description = "Activating the Tutorial control opens an in-page modal/flow without navigating away, and the modal can be closed to return to the workspace"
+description = "Activating the Tutorial control opens an in-page modal/flow without navigating away, and the modal can be closed to return to the workspace."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "1.41"
 name = "inert_affordances_never_navigate"
-description = "The version chip, GitHub icon, and per-component Docs affordances look interactive but activating them never navigates away from the app"
+description = "The version chip, GitHub icon, and per-component Docs affordances look interactive but activating them never navigates away from the app."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.42"
 name = "preview_template_tabs_switch_in_app"
-description = "Inside the framed sample site on the Preview tab, the nested tabs Instructions, Sign Up, Dashboard, Blog, Pricing, and Checkout are present and selecting each one switches to a visibly distinct themed sample template without leaving the page or reloading"
+description = "Inside the framed sample site on the Preview tab, the nested tabs Instructions, Sign Up, Dashboard, Blog, Pricing, and Checkout are present and selecting each one switches to a visibly distinct themed sample template without leaving the page or reloading."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.43"
 name = "components_gallery_breadth"
-description = "The Components tab renders a searchable left drawer/jump list plus a scrollable gallery of themed component demos covering at least 15 distinct components from the set Accordion, App Bar, Avatar, Badge, Buttons, Card, Checkboxes, Chip, Dialog, List, Menu, Select, Slider, Snackbar, Stepper, Switch, Table, Tabs, TextField, Tooltip, Typography"
+description = "The Components tab renders a searchable left drawer/jump list plus a scrollable gallery of themed component demos covering at least 15 distinct components from the set Accordion, App Bar, Avatar, Badge, Buttons, Card, Checkboxes, Chip, Dialog, List, Menu, Select, Slider, Snackbar, Stepper, Switch, Table, Tabs, TextField, Tooltip, Typography."
 type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "theme_files_export_contains_session_mutations"
+description = "Change primary to a unique #RRGGBB color, open Theme Files Export, and confirm both the JSON theme package and the CSS custom-properties block contain that color (and regenerate after further edits)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "theme_files_copy_and_download"
+description = "In Theme Files, Copy writes the previewed artifact text with visible confirmation, and Download transfers the same JSON or CSS text shown in the drawer."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "import_declared_theme_applies_options"
+description = "Importing a valid declared-theme JSON package that conforms to the theme-package schema (name, paletteType light|dark, themeOptions with matching palette.type and #RRGGBB mains) replaces the live options so the editor source, preview, contrast matrix, and Theme Files export reflect the imported package."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "preset_packs_apply_multi_token"
+description = "Applying Material Blue, Ocean, Forest, or High Contrast updates multiple palette tokens at once across editor source, preview, contrast matrix, and Theme Files export without reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "contrast_matrix_live_badges"
+description = "The Contrast matrix lists at least primary-on-background, secondary-on-background, text-on-background, and primary-on-primary-contrast pairings with ratio numerals and AA / AAA / Fail badges that update when palette colors or Light/Dark change."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "color_blindness_filter_non_destructive"
+description = "Selecting Protanopia, Deuteranopia, or Tritanopia applies a visible simulation filter over the framed sample site without changing editor theme options; Off restores the unfiltered preview matching the live options."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "snapshot_and_before_after_compare"
+description = "Saving a Snapshot with a valid name stores current options; after changing a palette color, Before / After toggles the framed preview between snapshot colors and live colors while the editor stays on the live options."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "command_palette_jumps_targets"
+description = "Opening the Command palette (control or Cmd+K / Ctrl+K) and choosing a Components section or tool result navigates or focuses that target in-app without leaving the page."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.52"
+name = "history_timeline_scrubs_options"
+description = "After several palette or source edits, dragging the history timeline scrubber moves the active options through recorded states with a labeled position, and the preview/editor track the scrubbed state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.53"
+name = "theme_package_api_shaped_field_contract"
+description = "The Theme Files JSON preview is API-shaped like a Material theme create/update payload: a top-level object with required keys name (trimmed non-empty, at most 64 characters), paletteType (exactly light or dark), and themeOptions; themeOptions.palette.type equals paletteType; primary/secondary/error/warning/info/success each expose a main color as #RRGGBB hex (hash plus six hex digits); themeOptions.shape.borderRadius is a required number from 0 through 24 inclusive; when present, typography.fontSize is between 10 and 24 inclusive — these field names, enums, hex format, bounds, and the cross-field rule are visible in the preview text and match the live swatches and Shape tool."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.54"
+name = "form_record_matches_export_request_body"
+description = "Submitting New Theme with a valid unique name creates a saved-theme record that matches the theme-package request body (name, paletteType from current Light/Dark, themeOptions from live options including shape.borderRadius); after save-options or Snapshot, the Theme Files JSON / snapshot payload uses the same field names, bounds, and enums the forms enforce."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.55"
+name = "unique_name_and_border_radius_contract_enforced"
+description = "New Theme rejects a duplicate or over-64-character name with an inline error naming the name field and no card-count change; Shape borderRadius outside 0–24 is rejected with an inline error naming borderRadius and is not applied to preview or Theme Files JSON."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n1"
+name = "export_omits_session_mutations"
+description = "After editing palette/typography/shape options, the Theme Files JSON or CSS artifact still shows the pre-edit values and omits the session's actual customizations."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n2"
+name = "import_silently_fails_or_corrupts"
+description = "Importing a valid declared-theme JSON leaves the live theme unchanged with no feedback, or replaces options with a broken/empty theme that desyncs editor and preview."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n3"
+name = "preset_or_contrast_surfaces_inert"
+description = "Preset packs or the Contrast matrix are visible but inert: applying a pack leaves options unchanged, or contrast badges stay fixed when palette colors change."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n4"
+name = "export_drops_theme_package_field_contract"
+description = "The Theme Files JSON omits required keys name, paletteType, themeOptions, or shape.borderRadius, shows paletteType outside light/dark, has themeOptions.palette.type disagreeing with paletteType, shows primary.main in a format other than #RRGGBB, or shows borderRadius outside 0–24."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n5"
+name = "duplicate_or_overlong_name_accepted"
+description = "New Theme or rename accepts a duplicate seeded name or a name longer than 64 characters and mutates the saved-themes collection without an inline error naming the name field."
+type = "binary"
+negate = true
 weight = 1.0
 
 [[criterion]]

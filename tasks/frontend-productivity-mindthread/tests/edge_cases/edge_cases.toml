@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,154 +62,146 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_states_on_blank_workspace"
+description = "Empty state UI is present: inbox shows 'Capture your first spark', threads show 'No threads yet', and Today shows 'No sparks captured yet today' when empty."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "forms_validate_field_contracts_inline"
+description = "Inline validation appears on capture, thread title, tag, reflection, and Import before any record is written, naming the offending field."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "errors_name_field_and_rule"
+description = "Error messages name the field and rule (e.g. Enter a thought to add a spark; tag format/length; schemaVersion) rather than only saying Invalid."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "actions_show_confirmation_toasts"
+description = "Success or confirmation feedback appears after assign, status, pin, merge, archive, copy export, and successful Import."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "merge_two_step_progress_feedback"
+description = "The Merge Into… two-step confirm (Continue then Confirm Merge) provides clear step progress rather than a silent multi-click."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "destructive_merge_delete_cancel_or_undo"
+description = "Destructive Merge confirm and bulk Delete support cancel; domain Undo can reverse captures/deletes/bulk actions."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "command_palette_labels_actions"
+description = "Command palette rows use specific action labels (Home, Today, Archived, Export, Import, focus capture) so non-obvious shortcuts are discoverable."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.8"
 name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+description = "Buttons, inputs, checkboxes, and labels for capture, bulk tray, Export, and Import use semantic interactive tags."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "modals_support_close_paths"
+description = "Merge, Export, Import, and command palette close via explicit close and Escape."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "import_validation_names_offending_field"
+description = "Import of a document failing the workspace field contract shows visible validation naming the offending field and changes nothing."
 type = "binary"
 weight = 1.0
-
+[[criterion]]
+id = "4.11"
+name = "tag_contract_rejects_spaces_punctuation"
+description = "A tag with spaces, punctuation, or length over 32 characters is rejected naming the tag field and creates no tag."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.12"
+name = "spark_text_over_2000_rejected"
+description = "Spark text longer than 2000 characters is rejected naming the text field and adds no spark."
+type = "binary"
+weight = 1.0
 [[criterion]]
 id = "4.n1"
 name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+description = "An empty inbox or thread list shows nothing and provides no empty-state copy."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n2"
 name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+description = "Validation or Import errors are surfaced only in the browser console."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n3"
 name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+description = "Assign, merge, copy, or Import lack visible feedback and silently succeed or fail."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n4"
 name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+description = "Merge Confirm or bulk Delete proceed with no warning/confirm step."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n5"
 name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+description = "Primary interactive controls are only non-semantic div/span click targets with no button/input semantics."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n6"
 name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+description = "Merge, Export, Import, or command palette cannot be dismissed via Escape."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n7"
 name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+description = "Field-contract validation feedback is missing or delayed with no UI indication."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n8"
 name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+description = "Primary action buttons lack specific labels (e.g. generic Submit instead of Add Spark / Export / Import)."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "import_accepts_invalid_workspace"
+description = "Import accepts a document that fails the mindthread-workspace-v1 field contract and mutates the workspace anyway."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n10"
 name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+description = "Export, Import, Undo, or bulk checkboxes are visually hidden or inaccessible when data exists to use them."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"

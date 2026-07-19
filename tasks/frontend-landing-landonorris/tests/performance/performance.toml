@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,113 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "9.1"
-name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+name = "cold_start_interactive_under_2s"
+description = "The homepage is interactive within about 2 seconds of a local cold load."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
-name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+name = "console_clean_on_full_exercise"
+description = "Loading and exercising the full page (preloader dismiss, menu open/close, race select, shortlist toggles, press kit open with format switches and copy, command palette open/filter/activate, hover states, scroll-linked sections, hover-to-play video, marquees, newsletter submit, undo/redo) emits no console errors, hydration warnings, or unhandled promise rejections."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
-name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+name = "chrome_interactions_stay_responsive"
+description = "Menu open/close, STORE hover, and Subscribe respond without multi-second lag after first paint (chrome interactions feel under ~100ms to begin)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.4"
-name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+name = "preloader_clears_without_hang"
+description = "The LOAD VALE preloader clears within about one to two seconds and never permanently blocks interaction while heavier media finish streaming."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.5"
-name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+name = "long_page_scroll_without_lag"
+description = "Scrolling the full long-form homepage (hero through footer) remains usable without perceived multi-second freezes between sections."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.6"
-name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+name = "interactive_during_media_stream"
+description = "The UI stays interactive while heavier media, 3D, and vector-animation assets finish streaming in — nav, menu, and newsletter remain operable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
-name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+name = "scroll_sections_hold_smooth_frame_rate"
+description = "Continuous scrolling from top to bottom shows no visible hitching or dropped frames through every animated section (pinned horizontal media, impact fill, marquees, footer)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.8"
-name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+name = "rapid_menu_clicks_never_freeze"
+description = "Rapidly clicking the hamburger and X several times never freezes the page."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+name = "extended_scroll_session_stable"
+description = "After an extended scroll-through with menu open/close, video hover cycles, and newsletter submit, the page remains responsive without runaway resource use that freezes interaction."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "9.10"
+name = "layout_stable_while_assets_load"
+description = "After first paint no visible layout jumps occur as fonts, images, or the hero scene finish loading; media regions hold their space from the start."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+id = "9.a1"
+name = "scroll_linked_media_frame_rate"
+description = "Scroll-linked horizontal media travel and section storytelling hold a smooth frame rate through the full page length on a 1440-wide viewport with no visible hitching during continuous scroll."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.a2"
+name = "smooth_scroll_preserves_sticky_pin"
+description = "In-page smooth-scroll jumps (HOME, ON TRACK, OFF TRACK, CALENDAR, wordmark) feel continuous and settle naturally without lag, while the horizontal pin's position:sticky relationship stays intact."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.a4"
+name = "layout_stable_no_reflow_jumps"
+description = "Layout is stable after load: no visible reflow jumps as fonts, images, or the hero scene finish loading — media and embed regions reserve their space from first paint."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.a5"
+name = "webgl_capability_fallback"
+description = "WebGL/3D features detect capability before initializing and fall back to a complete static hero composition when GPU support is missing — the page remains whole, navigable, and visually coherent without the scene."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.a6"
+name = "heavy_assets_load_progressively"
+description = "Heavy assets load progressively: the page becomes interactive before 3D models, textures, and animation files finish loading; scene regions hold reserved space while streaming in; no interaction is blocked waiting on an asset."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.n1"
-name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+name = "cold_load_exceeds_two_seconds"
+description = "More than 2 seconds pass before the homepage is interactive on a local cold load."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,31 +176,23 @@ weight = 1.0
 [[criterion]]
 id = "9.n2"
 name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+description = "Console errors, hydration mismatch warnings, or unhandled rejections appear during load, menu exercise, scroll-through, video hover, or newsletter submit."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n3"
-name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+name = "scroll_or_menu_transitions_block"
+description = "Scroll-driven horizontal media travel or menu overlay transitions block interaction for multiple seconds."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
-id = "9.n4"
-name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n5"
-name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+id = "9.a3"
+name = "heavy_assets_collapse_frame_rate"
+description = "Heavy visual assets (WebGL hero, scroll-linked media, marquees, or vector animation) cause frame-rate collapse, delayed first render, or input latency during signature scroll/hover interactions."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +200,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n6"
 name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
+description = "During preloader, menu open, or scroll-linked sections, primary controls (hamburger, STORE) become unresponsive."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,31 +208,30 @@ weight = 1.0
 [[criterion]]
 id = "9.n7"
 name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n8"
-name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n9"
-name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
+description = "The UI blocks rendering with a blank page while fonts, images, or the hero scene load instead of showing reserved-space layout."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n10"
-name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+name = "rapid_use_crashes_page"
+description = "Rapid menu toggling or fast continuous scrolling crashes the page or leaves it permanently unresponsive."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.11"
+name = "press_kit_regen_stays_responsive"
+description = "Opening the press kit and regenerating previews after selection/shortlist changes stays responsive without freezing the page."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.n11"
+name = "press_kit_regen_freezes_page"
+description = "Regenerating press-kit previews after race or shortlist changes freezes the page for multiple seconds."
 type = "binary"
 negate = true
 weight = 1.0

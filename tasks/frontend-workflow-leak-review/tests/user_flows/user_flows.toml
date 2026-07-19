@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,86 +62,86 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "triage_threshold_flow"
+description = "Triage flow: on the queue, note the Review triggered count in the rollup strip, drag the threshold from 0.75 down to 0.60, and confirm additional Unreviewed rows at or above 0.60 flip to Review triggered, the rollup count rises to match, and the Review triggered filter shows exactly those rows — with no confirmed row changing state and no reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "invalid_decision_shows_inline_validation"
+description = "Decision create flow: submitting with no verdict or a rationale outside 20 to 2000 characters shows immediate inline validation naming the offending field and records no decision"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "review_flow_end_to_end"
+description = "Review flow: open a Review triggered submission, step matched pairs with Next until the last pair, choose Confirm leak, enter a rationale of at least 20 characters, and submit; the queue chip reads Confirmed leak, the row leaves the Review triggered filter, the Confirmed leak rollup increases by exactly one, and the audit timeline gains exactly one entry carrying that rationale"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "canary_failing_strip_flow"
+description = "Canary flow: open the canary view, expand the task carrying the failing post-strip check, and confirm the alert banner names the file where the token survived while the placement checklist still shows per-token N of M counts"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "mutation_toggle_flow"
+description = "Mutation flow: on a comparison card, note the flip count, toggle off one included flipped test, and confirm the flip count decreases by exactly one; toggle it back on and the original count is restored"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "artifact_export_end_state"
+description = "Artifact end state: after one Confirm leak decision with a distinct rationale token, a threshold change, and one mutation include toggle, Export Review report JSON shows schemaVersion leak-review.report.v1, the new threshold, that decisions entry, matching rollup counts, and the toggled included boolean; Copy confirms; Download offers a .json file"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "export_import_round_trip_flow"
+description = "Export then import: after session mutations, Download or Copy Review report JSON, reload to clear in-memory state, Import that JSON, and confirm queue chips, rollup, audit rationale, threshold, mutation toggles, and a subsequent export preview match the imported document"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "view_switch_retains_session_state"
+description = "After recording a decision, switching among queue, canary, mutation, and audit views retains the confirmed chip, rollup counts, and audit entry without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "export_panel_supports_format_choice"
+description = "The Export panel supports choosing Review report JSON or Summary text and shows a live-compiled monospaced preview for the active format"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "reload_without_import_resets_seed"
+description = "A page reload without Import returns the app to its seeded state: at least 12 submissions with seeded states, threshold 0.75, and an audit timeline empty of user-made decisions"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "primary_review_flows_unavailable"
+description = "Threshold triage, reviewer decision submit, Export, or Import are not operable from the visible UI"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "decision_missing_or_duplicated"
+description = "A valid decision submit fails to show the confirmed chip or appends duplicate audit entries"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n3"
 name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+description = "A decision or threshold change updates one surface but leaves the rollup strip, filter membership, or audit timeline stale until reload"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,47 +157,47 @@ weight = 1.0
 [[criterion]]
 id = "6.n4"
 name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+description = "Switching views breaks the layout or loses the selected submission / confirmed state"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_triggered_filter_breaks_ui"
+description = "When every triggered submission has been decided, the Review triggered filter shows a broken or blank UI instead of an explanatory empty state"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "export_preview_disagrees_with_strip"
+description = "The Review report JSON rollup counts disagree with the on-screen rollup strip after a decision or threshold change"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "import_round_trip_fails"
+description = "After exporting valid Review report JSON and importing it following a reload, queue chips, threshold, or audit timeline show a state that mismatches the imported document"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "export_panel_blocks_navigation"
+description = "The Export panel blocks navigation with no exit option"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "failed_decision_lacks_feedback"
+description = "An invalid decision submit provides no inline field feedback"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n10"
 name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+description = "View navigation or Export/Import recovery requires a full page reload"
 type = "binary"
 negate = true
 weight = 1.0

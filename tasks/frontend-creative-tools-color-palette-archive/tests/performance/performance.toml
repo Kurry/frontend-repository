@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,78 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "9.1"
-name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+name = "cold_start_under_two_seconds"
+description = "On a local cold load the palette archive becomes interactive with all seeded palettes visible within 2 seconds."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
-name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+name = "console_clean_during_full_exercise"
+description = "No console errors or warnings appear during a full exercise of switching layouts, creating, editing, deleting, duplicating, filtering, sorting, favoriting, batch actions, undo/redo, contrast matrix updates, vision simulation, exporting, importing, and copying."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
-name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+name = "view_switch_responds_under_100ms"
+description = "Switching among Nomenclature, Palette, and Swatch via the view toggle updates the canvas with UI response in under 100ms (perceived immediate)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.4"
-name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+name = "color_name_data_does_not_blank_ui"
+description = "While the bundled color-name dataset populates historical names, the library chrome and seeded palettes remain visible rather than a blank screen with no controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.5"
-name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+name = "seeded_library_scrolls_smoothly"
+description = "With at least 6 seeded palettes and their swatches visible across layouts, scrolling the library and switching views shows no perceived lag."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.6"
-name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+name = "ui_interactive_during_layout_and_editor"
+description = "The UI remains interactive while switching layouts, opening Detail/Editor or Export, applying period filters, and toggling vision simulation — controls accept input during those state changes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
-name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+name = "list_animations_stay_smooth"
+description = "Palette card enter/exit and swatch row rearrange animations (when motion is enabled) maintain smooth playback without visible hitching during create/delete."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.8"
-name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+name = "rapid_swatch_copies_no_freeze"
+description = "Rapid successive swatch clicks, fast view-toggle switching, and rapid undo/redo leave the app responsive with no hang or freeze."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+name = "contrast_matrix_recompute_no_freeze"
+description = "Contrast-matrix recomputation after a swatch edit completes without freezing the editor controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+name = "historical_names_load_gracefully"
+description = "If historical color names populate after first paint, the Nomenclature/Swatch labels fill in gracefully without blocking interaction with the seeded library."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.n1"
-name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+name = "cold_load_exceeds_two_seconds"
+description = "More than 2 seconds pass before the seeded library is interactive on a local cold load."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,31 +141,31 @@ weight = 1.0
 [[criterion]]
 id = "9.n2"
 name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+description = "Errors or warnings appear in the console during layout switches, CRUD, batch, undo/redo, export/import, filtering, favoriting, or swatch copy."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n3"
-name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+name = "view_switch_blocks_or_lags"
+description = "Switching among the three Browse layouts blocks input or lags perceptibly beyond a brief transition."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n4"
-name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
+name = "color_name_load_hangs_ui"
+description = "Loading or matching historical color names freezes the UI so view toggles and filters stop responding."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n5"
-name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+name = "seeded_library_kills_frame_rate"
+description = "With the seeded palette collection visible, scrolling or view switching kills frame rate into obvious jank."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,15 +173,15 @@ weight = 1.0
 [[criterion]]
 id = "9.n6"
 name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
+description = "During palette card enter/exit, editor swatch rearrange, or export drawer animation, input becomes unresponsive."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n7"
-name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
+name = "contrast_matrix_freezes_editor"
+description = "Recoloring a swatch freezes Detail/Editor controls while the contrast matrix recomputes."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,23 +189,23 @@ weight = 1.0
 [[criterion]]
 id = "9.n8"
 name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
+description = "Extended browsing, filtering, export, and copy interactions cause runaway browser resource usage or progressive memory growth that degrades the session."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n9"
-name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
+name = "blank_while_library_loading"
+description = "Nothing is displayed while seeded palettes or historical names are loading — a blank page with no chrome."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n10"
-name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+name = "rapid_use_crashes"
+description = "Rapid view switching, swatch copying, batch actions, undo/redo, or create/delete sequences crash the app or leave it unrecoverable."
 type = "binary"
 negate = true
 weight = 1.0
@@ -217,3 +217,4 @@ description = "The app exhibits a significant, browser-observable defect in perf
 type = "binary"
 negate = true
 weight = 1.0
+

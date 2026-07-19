@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -84,7 +84,7 @@ weight = 1.0
 [[criterion]]
 id = "4.4"
 name = "reload_restores_seeded_baseline"
-description = "After exercising the app (registration, runs, pauses, filters), a page reload returns it to the seeded baseline: the seeded agents and histories, no active filter, and no open panel"
+description = "After exercising the app (registration, runs, pauses, filters, export, import, undo), a page reload returns it to the seeded baseline: the seeded agents and histories, no active filter, no open panel, empty undo and redo stacks, and no open export or import surface"
 type = "binary"
 weight = 1.0
 
@@ -125,6 +125,13 @@ description = "Specific interactions (run start, retry, pause, resume, bulk acti
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "4.10"
+name = "export_and_import_share_store"
+description = "Export preview text and a successful import both derive from the same live registry as the table and rollup: a mutation visible in the table appears in the next export, and an import updates the table and rollup together without a reload"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "4.catchall"

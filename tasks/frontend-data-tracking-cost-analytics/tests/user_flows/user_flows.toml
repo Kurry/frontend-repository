@@ -1,0 +1,226 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "6.1"
+name = "recategorize_flow_lands_everywhere"
+description = "Bulk-recategorizing selected events updates the table tags and every aggregate — tiles, both charts, budget panel, anomaly list, formula result — consistently in one pass"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.2"
+name = "invalid_forms_inline_validation"
+description = "Submitting the save-view form without a name, the schedule form with zero sections, or an invalid date range triggers immediate inline validation naming the field, creating nothing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.3"
+name = "ceiling_edit_updates_displays"
+description = "Editing a team ceiling updates the budget panel, wheel ring, and overage state everywhere without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.4"
+name = "saved_view_delete_flow"
+description = "Deleting a saved view after confirmation removes it from the menu while the currently applied filters remain active"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.5"
+name = "view_switches_retain_state"
+description = "Switching breakdown dimensions, toggling stacked/grouped, and toggling compare mode retain the applied filters, selection, and sort"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.6"
+name = "zero_match_empty_state"
+description = "Driving the filters to a zero-event combination shows the designed empty state with a clear-filters control that restores the full dataset"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.7"
+name = "drilldown_filter_flow"
+description = "A segment drill-down filters the table, updates the formula result, and its chip removal restores the wider dataset everywhere"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.8"
+name = "collapsed_chrome_continuity"
+description = "Collapsing header controls into the narrow-width menu and reopening them preserves the configured cap, filters, and range"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.9"
+name = "overlays_support_flows"
+description = "The save-view form, schedule form, confirmation dialogs, and anomaly disclosures each open, complete their flow, and close without losing surrounding state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.10"
+name = "recovery_without_reload"
+description = "A mis-step — an invalid formula, an abandoned form, an accidental drill-down — recovers to a working dashboard without a reload or dead end"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "what_if_export_pipeline"
+description = "The what-if pipeline works end to end: dragging a rate slider repricing every surface, exporting during the what-if produces matching repriced figures, and Revert restores every number exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n1"
+name = "primary_flows_unavailable"
+description = "Filtering, recategorizing, repricing, saving views, or exporting is not achievable from the UI"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n2"
+name = "saved_views_missing_or_duplicated"
+description = "A saved view fails to appear in the menu or appears more than once"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n3"
+name = "aggregates_desync_from_table"
+description = "A recategorization or rate change is reflected in the table but not in a chart, tile, or panel (or vice versa)"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n4"
+name = "view_switch_loses_filters"
+description = "Switching dimension, chart mode, or compare mode drops the applied filters or selection"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n5"
+name = "zero_match_breaks_ui"
+description = "A zero-event filter combination produces a broken or blank region instead of the empty state"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n6"
+name = "filtered_surfaces_disagree"
+description = "The table, formula result, and export disagree about which events the active filters match"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n7"
+name = "collapsed_menu_stuck"
+description = "The narrow-width header menu cannot be reopened once collapsed"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n8"
+name = "overlay_blocks_navigation"
+description = "A form, menu, or disclosure blocks the dashboard with no exit option"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n9"
+name = "failed_flow_silent"
+description = "A failed flow — invalid formula, rejected form, empty selection action — gives no user feedback"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n10"
+name = "dead_end_requires_reload"
+description = "Any flow dead-ends so that only a page reload recovers the app"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "user_flows.catchall"
+name = "user_flows_catchall"
+description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,77 +63,77 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "6.1"
 name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+description = "Create flow: creating a valid stop adds exactly one day-list row and one map pin in that day's color and includes the stop in markdown, ICS, and trip JSON without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
 name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+description = "Create flow: submitting with an empty title or endTime before startTime triggers immediate inline validation naming the offending field and adds no stop"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
 name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+description = "Edit flow: renaming a stop updates the day-list row, place-detail card, map popup, markdown export, ICS SUMMARY, and trip JSON title without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
 name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+description = "Delete flow: deleting a stop removes it from the day section, map pins, selection, markdown, ICS, and trip JSON in the same interaction"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
 name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+description = "View/mode switch: switching Plan List and Map modes keeps the same selected stop and shows it in both without a full page reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
 name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+description = "Edge: after deleting all stops, the plan list empty state is visible, the map shows no numbered pins, and ICS has zero VEVENT blocks"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
 name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+description = "Edge: applying a day or category filter narrows the plan list and map pins together, and Clear filters restores the full plan"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
 name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+description = "Collapsible chrome: Hide sidebar collapses the left nav and the toggle reopens it as a drawer or sidebar with the current day selection preserved"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
 name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+description = "Overlays: place-detail, conflict-resolution, and export canvas open and dismiss without trapping the user; dismiss returns to the underlying plan"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
 name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+description = "Recovery: after a failed import or Viewer-blocked action, a visible error or notice appears and the user can dismiss it and continue editing without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
 name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+description = "Create, edit, and delete of itinerary stops are not enabled from the UI"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n2"
 name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+description = "A newly created stop fails to appear in the day list or map, or appears duplicated across days"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n3"
 name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+description = "Stop edits are not synced across plan list, map, kanban, and export previews"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +157,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n4"
 name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+description = "Switching Plan List and Map modes breaks the three-pane layout or loses the selected stop"
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +165,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n5"
 name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+description = "Emptying all stops produces a broken plan list or missing empty state with leftover pins"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n6"
 name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+description = "Day or category filter results disagree between the plan list and the map pins"
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +181,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n7"
 name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+description = "After Hide sidebar, the sidebar cannot be re-opened from the toggle"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n8"
 name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+description = "Place-detail, conflict modal, or export canvas blocks the plan with no operable dismiss control"
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +197,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n9"
 name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+description = "A failed import or invalid stop submit provides no visible user feedback"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,11 +205,84 @@ weight = 1.0
 [[criterion]]
 id = "6.n10"
 name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+description = "After opening place detail, conflict modal, or export canvas the user cannot return to the plan without a full page reload"
 type = "binary"
 negate = true
 weight = 1.0
 
+[[criterion]]
+id = "6.11"
+name = "drag_reassign_updates_route_and_log"
+description = "Dragging a stop from one day to another updates the old day section, the new day section, both days' polylines and distance labels, the adjacent buffer cards, and appends an activity log entry describing the move, all without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "vote_promotion_end_to_end"
+description = "Running a bucket poll to its winning threshold moves the item out of the bucket onto the timeline, and the promoted stop then appears in Plan List mode, on the map in its day's color, and under its day heading in the export markdown"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "conflict_merge_end_to_end"
+description = "Resolving a simulated edit conflict with the Merge choice leaves the merged content visible in the block's row, in its detail card, and in the export markdown, with a matching activity log entry"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "undo_redo_round_trip_flow"
+description = "Deleting a stop then pressing Undo restores it to its day section, its map pin, and the export document, and pressing Redo removes it again from all three"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "kanban_status_echoes_plan_list"
+description = "Changing a stop's status by dragging its card between kanban columns is reflected on that stop's row in Plan List mode and in status-filtered results without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.16"
+name = "role_round_trip_preserves_edits"
+description = "Switching to Viewer disables all mutating controls, and switching back to Owner re-enables them with every edit made before the switch still intact"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "promotion_duplicates_or_orphans_item"
+description = "After a poll promotion the item exists twice (still in the bucket and on the timeline) or the promoted copy is a dead render that cannot be edited, dragged, or deleted like a normal stop"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "6.n12"
+name = "merge_choice_ignored"
+description = "The conflict modal accepts a resolution choice but the block afterwards shows content that ignores the choice — for example Take theirs leaves the user's version, or Merge discards the incoming peer edit entirely"
+type = "binary"
+weight = 1.0
+negate = true
+
+
+[[criterion]]
+id = "6.17"
+name = "export_import_round_trip_flow"
+description = "Export then import flow: mutate the plan (rename + new stop), Download or Copy trip JSON, reload to seeded baseline, Import that JSON, and confirm list, map, markdown, ICS, and trip JSON match the pre-export mutated state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n13"
+name = "exports_diverge_after_mutation"
+description = "After a create or rename, the markdown, ICS, and trip JSON previews disagree with each other or with the plan list about which stops exist"
+type = "binary"
+weight = 1.0
+negate = true
 [[criterion]]
 id = "user_flows.catchall"
 name = "user_flows_catchall"

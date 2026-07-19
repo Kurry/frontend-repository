@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -144,6 +144,28 @@ weight = 1.0
 id = "14.n4"
 name = "cross_view_state_is_stale"
 description = "State changes appear in one view but not another until reload."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "mutate_then_export_contains_work"
+description = "Full pipeline: create a uniquely titled memo, change its priority, switch Theme Core, then open Export session; the JSON preview's memos array contains that title and priority and themeCore matches the selected core."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "export_import_round_trip_restores_state"
+description = "Export then import round-trip: after mutating channels/memos/theme, export session JSON, clear state, import the same JSON; sidebar, memo list, Theme Core, and export preview match the pre-clear mutated state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "export_preview_stale_after_mutation"
+description = "After creating or editing a memo, the Export session JSON preview still omits that mutation or keeps a prior themeCore."
 type = "binary"
 negate = true
 weight = 1.0

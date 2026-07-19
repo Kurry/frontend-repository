@@ -149,6 +149,9 @@ Contract version: zto-webmcp-v1
 
 Modules:
 - browse-query-v1
+- entity-collection-v1
+- form-workflow-v1
+- artifact-transfer-v1
 
 Module specs:
 <module_spec id="browse-query-v1">
@@ -171,9 +174,80 @@ Module specs:
 }
 </module_spec>
 
+<module_spec id="entity-collection-v1">
+{
+  "id": "entity-collection-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Entity collection",
+  "purpose": "Carts, records, favorites, calendar events, list items, and local entities.",
+  "permitted_operations": ["create", "select", "update", "delete", "toggle", "quantity", "reorder"],
+  "binding_keys": {
+    "required_any_of": [["entity"], ["entity_operations"]],
+    "optional": ["entity_fields", "value_bounds", "visible_postconditions"]
+  },
+  "restrictions": [
+    "Closed entity and field enums only.",
+    "Bounded string and numeric values.",
+    "No generic state setter or arbitrary patch object.",
+    "Invokes the same domain command used by the visible control.",
+    "Delete requires explicit confirm=true.",
+    "Reorder only when gesture mechanics are not being evaluated."
+  ],
+  "tool_name_prefix": "entity"
+}
+</module_spec>
+
+<module_spec id="form-workflow-v1">
+{
+  "id": "form-workflow-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Form workflow",
+  "purpose": "Forms, setup flows, authentication shells, and multi-step workflows.",
+  "permitted_operations": ["validate", "submit", "cancel", "reset", "advance", "return"],
+  "binding_keys": {
+    "required_any_of": [["form_fields"], ["form_operations"]],
+    "optional": ["workflow_steps", "value_bounds", "visible_postconditions"]
+  },
+  "restrictions": [
+    "Declared fields only.",
+    "Normal validation and visible errors remain active.",
+    "Cannot manufacture authentication or bypass guarded routes.",
+    "Backend-free apps must surface honest unavailable state through product handlers."
+  ],
+  "tool_name_prefix": "form"
+}
+</module_spec>
+
+<module_spec id="artifact-transfer-v1">
+{
+  "id": "artifact-transfer-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Artifact transfer",
+  "purpose": "Import, export, copy, print, and conversion workflows.",
+  "permitted_operations": ["import", "export", "copy", "print_preview", "convert"],
+  "binding_keys": {
+    "required_any_of": [["artifact_operations"]],
+    "optional": ["import_modes", "export_formats", "conversion_modes", "visible_postconditions"]
+  },
+  "restrictions": [
+    "No raw files, filesystem paths, blobs, base64, or artifact contents in WebMCP arguments or results.",
+    "File picker interaction, clipboard contents, and downloaded artifacts remain Playwright responsibilities."
+  ],
+  "tool_name_prefix": "artifact"
+}
+</module_spec>
+
 Bindings:
 - Browsable entity: sections
-- Destinations: home-hero; locations; living; typical-unit; community; what-we-stand-for; insta-feed; book-cta; menu
+- Destinations: home-hero; locations; living; typical-unit; community; what-we-stand-for; insta-feed; book-cta; faq; shortlist; book-inquiry; menu
+- Entity: shortlist-studio
+- Entity operations: toggle; select; delete
+- Entity fields: tier; monthly_rent; selected
+- Form fields: full_name; email; phone; studio_tier; move_in_month; message; privacy_consent
+- Form operations: validate; submit; cancel; reset
+- Artifact operations: export; import; copy
+- Export formats: json; markdown
+- Import modes: inquiry-packet
 
 Mechanics exclusions:
 - Custom cursor press/scale gesture stays Playwright-observed
@@ -181,6 +255,9 @@ Mechanics exclusions:
 - Home skeleton intro timeline stays Playwright-observed
 - Marquee infinite horizontal loop stays Playwright-observed
 - Swiper drag/slide transition stays Playwright-observed
+- Command-palette open/close and fuzzy highlight animation stays Playwright-observed
+- Inquiry overlay enter/exit fade stays Playwright-observed
+- Download file picker / clipboard contents stay Playwright responsibilities
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

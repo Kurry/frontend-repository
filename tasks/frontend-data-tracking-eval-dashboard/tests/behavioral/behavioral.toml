@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,88 +62,95 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "14.1"
-name = "multi_facet_round_trip"
-description = "Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline — never a mix."
+name = "multi_facet_reload_resets_seeded"
+description = "Multi-facet round-trip: create a suite, toggle Night Mode, sort results descending, open comparison, then reload — all facets coherently reset to the seeded baseline (seeded suites, historical runs, default view, no night-mode schedules), never a mix of persisted and reset state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.2"
-name = "sort_reversal_proves_live_data"
-description = "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders."
+name = "score_sort_reversal"
+description = "Sort-reversal proof: sort the results table by score ascending, note the order, then sort descending; the order reverses relative to ascending"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.3"
-name = "derived_view_responds_to_input"
-description = "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input."
+name = "charts_track_new_run"
+description = "Derived-view sensitivity: complete a new run and confirm the bar chart redraws with new per-model averages and the trend line gains a new point rather than redrawing identically"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.4"
-name = "cross_view_echo_without_reload"
-description = "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list ↔ detail, board ↔ stats) without reload."
+name = "comparison_echoes_results"
+description = "Cross-view echo: note a prompt's score in the results table, switch to comparison, and confirm the same prompt/model cell shows that score without reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.5"
-name = "count_delta_is_exact"
-description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+name = "suite_count_delta_exact"
+description = "Count-delta integrity: measure the suite list count immediately before and after a valid New Suite submit; the delta is exactly +1"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.6"
-name = "different_inputs_change_outcomes"
-description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+name = "two_runs_differ"
+description = "Input-dependent output: run the same suite twice and confirm the two result sets are not byte-identical in scores and latencies"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.7"
-name = "interleaved_flows_preserve_state"
-description = "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state."
+name = "export_contains_session_run"
+description = "Full-pipeline export probe: complete a run, open Export results, and confirm the JSON results array length equals the visible table row count and each exported score matches the corresponding row"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.8"
-name = "empty_to_repopulated_round_trip"
-description = "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions."
+name = "import_export_round_trip"
+description = "Edge-state round-trip: export JSON after a run, overwrite latest results so the table differs, import the JSON, and confirm table, charts, suite badge, and a fresh export match the imported document"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "undo_round_trip"
+description = "Undo round-trip: create a suite, Undo removes it, Redo restores the same name and prompt count, and the suite count returns to the post-create value"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.n1"
-name = "partial_persistence_is_incoherent"
-description = "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence."
+name = "export_omits_completed_run"
+description = "After completing a run, the export JSON contains wrong scores relative to the visible results table or a mismatched result count"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n2"
-name = "derived_surface_ignores_inputs"
-description = "A derived surface renders identically regardless of its inputs."
+name = "derived_charts_ignore_run"
+description = "Completing a new run leaves the bar chart and trend chart identical to their pre-run state"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n3"
-name = "different_inputs_produce_identical_output"
-description = "Repeating an action with different inputs yields byte-identical output."
+name = "identical_rerun_hardcoded"
+description = "Two runs of the same suite yield byte-identical scores and latencies"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "State changes appear in one view but not another until reload."
+name = "partial_reload_persistence"
+description = "After reload, some session mutations survive while others reset, producing incoherent partial persistence"
 type = "binary"
 negate = true
 weight = 1.0

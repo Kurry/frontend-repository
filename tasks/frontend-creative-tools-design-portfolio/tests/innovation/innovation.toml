@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -61,155 +61,130 @@ allowed_tools = [
 [scoring]
 aggregation = "weighted_mean"
 
+
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+name = "easter_egg_delight_beyond_stubs"
+description = "Hidden easter eggs feel finished and delightful: /matrix rain, /konami confetti, and sudo hire designer progress read as polished moments rather than unfinished stubs."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "crt_and_glass_theme_craft"
+description = "/retro reads as a convincing CRT look (scanline/glow feel) and /glass as translucent glass, going beyond a flat class rename with no visual character."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+name = "boot_sequence_narrative"
+description = "On a fresh load, the sequential boot status lines ending in a ready prompt create a guided onboarding narrative into the portfolio shell."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+name = "ascii_art_and_pixel_rocket_craft"
+description = "Post-boot ASCII YOUR NAME art and the pixel/ASCII rocket in the welcome box provide distinctive interactive graphic craft beyond plain text dump."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+name = "konami_and_shell_extras_as_alt_input"
+description = "The Konami keyboard code and shell-themed extras (for example whoami, ls, git log) offer playful alternative input paths discoverable via /secrets."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+name = "session_theme_personalization"
+description = "Session-scoped theme switching across dark, light, retro, and glass lets the user personalize the terminal look without reload."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+name = "designer_portfolio_narrative_arc"
+description = "Section commands (/about, /philosophy, /work, /awards, /testimonials) read as one coherent designer-portfolio narrative rather than disconnected dumps."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+name = "macos_chrome_immersion"
+description = "macOS-style traffic-light chrome, wallpaper depth (blurred/sharp minimize), and the kill-style exit overlay create immersive windowing beyond a bare terminal box."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+name = "natural_language_command_matching"
+description = "Natural-language phrases resolve to the correct commands, adding intent matching beyond exact slash syntax alone."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+name = "dual_mode_cli_and_board_polish"
+description = "Terminal CLI and Projects Board modes feel like one polished product with coherent shared projects rather than two disconnected demos."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+name = "easter_eggs_are_stubs"
+description = "Required easter eggs are decorative stubs: /matrix, /konami, or sudo hire designer leave the promised canvas/progress state unchanged."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
+name = "themes_are_generic_renames"
+description = "Theme commands only rename a class with no visible CRT/glass character — retro and glass look identical to dark aside from a label."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
+name = "boot_lacks_narrative_presence"
+description = "Boot skips straight to a static prompt with no sequential status-line narrative or ready prompt."
 type = "binary"
 negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
-type = "binary"
-negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
+name = "shell_feels_flat_static"
+description = "The shell is flat and static: no boot presence, no theme character, and no easter-egg moments despite the spec requiring them."
 type = "binary"
 negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
-type = "binary"
-negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
+name = "no_delightful_moments"
+description = "The running app has no delightful moments — missing working matrix/confetti/progress easter eggs and lifeless theme switches."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
-id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
+id = "11.11"
+name = "portable_portfolio_package_delight"
+description = "Optional: the live Portfolio JSON + Resume Markdown export package feels like a finished takeaway artifact a designer would actually download, beyond a static dump."
 type = "binary"
-negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
-id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
+id = "11.12"
+name = "command_palette_craft"
+description = "Optional: the Ctrl+K command palette feels keyboard-first and fast, with clear kind labels and empty-state craft beyond a bare filtered list."
 type = "binary"
-negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "innovation.catchall"

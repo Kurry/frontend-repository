@@ -1,0 +1,219 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "empty_states_are_designed"
+description = "Every empty condition renders a designed empty state: a repository whose PR list matches none of the active filters names those filters with a clear-filters control, an emptied library explains what belongs there, and an empty timeline filter result shows a message rather than a blank area"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "forms_validate_inline_before_submit"
+description = "The Add repository form, the connection panel fields, and the bundle import all surface inline validation before any submission takes effect, each message tied to its field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "errors_carry_status_and_fix"
+description = "Error surfaces are actionable: a failed credential check shows the failure status or message on its row, a failed stage shows its status code and message with a Retry control, and validation messages name the field and the required shape rather than only saying invalid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "actions_confirm_visibly"
+description = "Copying a package part, undoing a triage action, completing a run, and importing a bundle each produce visible confirmation feedback such as a toast or inline confirmation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "async_work_shows_activity"
+description = "Simulated or live async work shows a visible activity affordance: the credential checking status, the streaming indicator on Evaluate and Generate, the rate-limit countdown, and the batch n-of-m progress indicator"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "destructive_actions_guarded"
+description = "Destructive or consequential actions are guarded: deleting a library package requires confirmation, and triage actions offer Undo for at least the most recent action"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "guidance_for_non_obvious_controls"
+description = "Non-obvious surfaces carry in-app guidance: first-run coachmarks point out the Connections panel, the Triage board, and the pipeline runner, and the Reset tips control restores them"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "controls_use_semantic_tags"
+description = "Buttons, inputs, selects, and labels across the console use semantic tags rather than generic clickable divs or spans"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "overlays_close_by_multiple_paths"
+description = "The Connections slide-over, the reject-reason chooser, the delete confirmation, and the command palette each close via their close control, via Escape, and — where an overlay backdrop exists — via clicking the backdrop"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "long_flows_show_progress"
+description = "Long flows expose progress throughout: a pipeline run shows per-stage statuses advancing in order, and a batch shows per-item progression under the overall n-of-m indicator"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n1"
+name = "empty_condition_shows_nothing"
+description = "An empty condition — no matching PRs, an emptied library, or an empty timeline filter — renders a blank region with no explanatory feedback"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n2"
+name = "errors_only_reach_console"
+description = "A credential failure, stage failure, or import rejection is surfaced only in the browser console with no visible UI error"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n3"
+name = "actions_fail_or_succeed_silently"
+description = "An action gives no visible feedback — an invalid import is silently ignored, a copy control gives no confirmation, or a blocked oversized-PR run shows no message"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n4"
+name = "destructive_delete_has_no_warning"
+description = "Deleting a library package removes it immediately with no confirmation step"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n5"
+name = "interactive_elements_use_nonsemantic_tags"
+description = "Non-semantic div or span tags wrap interactive elements such as triage actions, stage retry controls, or filter chips"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n6"
+name = "modal_not_keyboard_dismissible"
+description = "An overlay — the slide-over, reject chooser, confirmation, or palette — cannot be dismissed via the keyboard"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n7"
+name = "validation_feedback_missing_or_delayed"
+description = "Validation feedback for the repository field, connection fields, or import is missing, or arrives only after the invalid submission has already taken effect"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n8"
+name = "button_text_ambiguous_or_missing"
+description = "Button text is ambiguous or missing where a specific action label is possible — bare icons without accessible names, or generic OK labels on consequential actions"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n9"
+name = "rate_limited_stage_hangs_silently"
+description = "A rate-limited stage sits with no countdown, no retrying status, and no attempt counter — the run silently hangs instead of showing the reset countdown and automatic retry"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n10"
+name = "affordances_hidden_or_inaccessible"
+description = "A specified affordance — the Undo control, a stage Retry control, or the load-next-page control — is visually hidden or cannot be reached when its condition applies"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "edge_cases.catchall"
+name = "edge_cases_catchall"
+description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

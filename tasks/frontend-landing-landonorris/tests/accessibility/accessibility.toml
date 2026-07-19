@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,92 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "interactive_controls_keyboard_operable"
+description = "Every interactive control (STORE, PRESS KIT, hamburger, menu items, socials, legal links, shortlist controls, race rows, status filter, Undo, Redo, email field, Subscribe, palette search/results) is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "menu_modal_focus_trap_and_return"
+description = "The menu overlay behaves as a modal dialog: it traps focus while open, closes on Escape, and returns focus to the hamburger button on close."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "media_have_accessible_names"
+description = "Editorial images, helmet cards, partner marks, and the social video poster carry descriptive alt text or accessible labels where they convey content."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "newsletter_feedback_uses_live_region"
+description = "Newsletter inline error and confirmation messages are announced through an aria-live region as well as shown visually."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+name = "newsletter_field_has_explicit_label"
+description = "The newsletter email field uses an explicit label association (or equivalent accessible name)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+name = "headings_logical_order"
+description = "Section headings follow a logical heading order through the homepage with no skipped levels that break the outline."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "landmarks_nav_main_footer"
+description = "The document exposes HTML-first landmarks: header/nav chrome, a main content landmark wrapping the homepage sections, and a footer landmark."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+name = "contrast_cream_and_dark_sections"
+description = "Text over the cream hero and dark-green sections, and all control labels, meet WCAG AA contrast; lime STORE button text on lime stays high-contrast (dark text on rgb(210, 255, 0))."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "semantic_interactive_chrome"
+description = "Interactive chrome uses real controls (button, label, native links) with semantic roles; custom overlays expose matching ARIA roles only where native elements cannot carry the behavior."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "reduced_motion_settles_immediately"
+description = "With prefers-reduced-motion emulated on a fresh load, scroll-linked animation settles immediately, the LOAD VALE preloader does not block content, in-page jumps use instant scroll, and continuous marquees do not run — while the page remains fully scrollable and operable."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.a1"
+name = "split_text_aria_label_on_container"
+description = "Split-text headlines (impact statement and footer brand statement) keep the original phrase as an aria-label on the heading container while individual character/word spans are aria-hidden from the accessibility tree."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.a2"
+name = "hero_webgl_labelled_or_decorative"
+description = "The hero canvas or WebGL layer is treated as decorative or labelled: role=img with a descriptive aria-label, or aria-hidden when a static silhouette sibling already conveys the artwork."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
 name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+description = "A primary interactive control (STORE, hamburger, menu item, email field, or Subscribe) cannot be reached or activated via keyboard."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,63 +155,63 @@ weight = 1.0
 [[criterion]]
 id = "1.n2"
 name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+description = "Focused interactive controls show no visible focus indicator or the indicator is fully obscured."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n3"
-name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+name = "icon_only_controls_lack_names"
+description = "The hamburger or menu close control lacks a descriptive accessible name."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+name = "newsletter_errors_color_only"
+description = "Newsletter validation errors are indicated only by color with no text or live-region announcement."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "menu_fails_to_trap_focus"
+description = "With the menu open, keyboard focus escapes into the background page while overlay controls remain open."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+name = "poor_contrast_unreadable_text"
+description = "Body or UI text over the cream hero or dark-green sections is unreadable due to contrast below WCAG AA."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+name = "newsletter_feedback_visual_only"
+description = "Newsletter error or confirmation appears visually only with no aria-live region exposure."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
-id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+id = "1.a4"
+name = "split_heading_character_soup"
+description = "A split/kinetic headline (impact or footer statement) is exposed to the accessibility tree as character soup — no aria-label on the container and the split spans are not aria-hidden."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
-id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+id = "1.a5"
+name = "canvas_only_control_unreachable"
+description = "A canvas-only interactive control in the hero is unreachable by keyboard and has no representation in the accessibility tree."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +219,44 @@ weight = 1.0
 [[criterion]]
 id = "1.n10"
 name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+description = "With prefers-reduced-motion set, scroll-linked horizontal media travel, continuous marquees, or a blocking preloader continue to run."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "press_kit_and_palette_modal_a11y"
+description = "The press-kit drawer and command palette each behave as modal dialogs: Escape closes them, focus is trapped while open, and focus returns to the control that opened them."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "shortlist_controls_accessible_names"
+description = "Icon-only shortlist controls on helmet and editorial cards expose descriptive accessible names."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "selection_counts_live_region"
+description = "Selected races N and shortlist count changes are announced via an aria-live region as well as shown visually."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n11"
+name = "press_kit_or_palette_no_focus_trap"
+description = "With the press kit or command palette open, keyboard focus escapes into the background page while the overlay remains open."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n12"
+name = "shortlist_or_race_row_not_keyboard"
+description = "A shortlist control or race row cannot be reached or activated via keyboard."
 type = "binary"
 negate = true
 weight = 1.0

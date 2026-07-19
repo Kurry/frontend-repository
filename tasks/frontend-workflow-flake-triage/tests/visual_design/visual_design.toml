@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -84,7 +84,7 @@ weight = 1.0
 [[criterion]]
 id = "2.4"
 name = "typography_hierarchy_and_monospace"
-description = "Suite and panel titles are visibly larger than test identifiers, which are larger than condition and timestamp text, and test identifiers, reason identifiers, and the export block render in a monospaced face"
+description = "Suite and panel titles are visibly larger than test identifiers, which are larger than condition and timestamp text, and test identifiers, reason identifiers, and the export previews render in a monospaced face"
 type = "binary"
 weight = 1.0
 
@@ -112,7 +112,7 @@ weight = 1.0
 [[criterion]]
 id = "2.8"
 name = "copy_conventions_consistent"
-description = "Headings and action labels use one consistent capitalization convention, action labels are specific verbs (such as Start re-run, Stop run, Copy export), and no placeholder or lorem-ipsum text appears anywhere in the shipped UI"
+description = "Headings and action labels use one consistent capitalization convention, action labels are specific verbs (such as Start re-run, Stop run, Export triage report, Import triage report, Copy, Download), and no placeholder or lorem-ipsum text appears anywhere in the shipped UI"
 type = "binary"
 weight = 0.5
 

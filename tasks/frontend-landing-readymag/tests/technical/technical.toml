@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -152,6 +152,43 @@ name = "required_authored_asset_files_load"
 description = "Browser network and playback evidence shows the complete Canvasly marks, project art, local VP9 WebM/poster pair, illustrations, slideshow frames, tile graphics, cursor art, share image, and icons loading from same-origin paths with no 404, decode, or playback failure"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "brief_state_coherent_across_surfaces"
+description = "Shared-state coherence: editing trial brief fields updates the live preview and any subsequent Download JSON / Copy brief artifact together without reload; undo restores form and preview together."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "reload_resets_brief_in_memory"
+description = "After filling the trial brief and opening the command palette, a reload returns empty brief fields, closed palette, first slideshow frame, and closed menus — in-memory genre baseline, with localStorage/sessionStorage still empty."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "trial_brief_api_shaped_schema_validation"
+description = "The trial brief form validates the trial-signup request-body field contract entirely client-side (no network request) with inline per-field errors naming the field and Submit trial brief disabled until valid; every preview keeps all seven required keys (empty-string unset scalars, [] interests); a valid submit produces that request-body object; Download JSON / Copy brief always emit the live preview; Import rejects non-conforming JSON without mutating the brief; Reset returns the empty baseline without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "brief_preview_desyncs_from_form"
+description = "After editing name, plan, or interests, the live preview shows different values than the form controls until a full page reload."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.n12"
+name = "brief_commits_without_field_contract"
+description = "Submit trial brief can succeed, or Import can accept a file, without enforcing name 2–80, dotted-domain email, closed plan/team_size enums, interests closed-list uniqueness, or the Free-trial/Team/Pro cross-field rules — yet still shows Trial brief ready or mutates the preview."
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.catchall"

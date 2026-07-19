@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -131,6 +131,13 @@ name = "copy_quality_consistent"
 description = "Headings, buttons, and tab labels follow one consistent capitalization convention, action labels are specific verbs such as Add Page and Create Pane, and no placeholder, lorem ipsum, or debugging text appears anywhere in the UI"
 type = "binary"
 weight = 0.5
+
+[[criterion]]
+id = "3.11"
+name = "export_center_monospace_previews"
+description = "The Export center shows monospaced Workspace JSON and Markdown report preview blocks with clear format tabs or section labels and visible Copy and Download controls distinct from the rest of the workspace chrome"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "3.catchall"

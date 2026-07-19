@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,99 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_column_offers_add_task"
+description = "After deleting every task in a column, or on a column that started empty, the empty column still offers Add task and reads a 0:00 planned-time total"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "forms_validate_inline_before_submit"
+description = "Add task and edit forms show inline validation naming invalid fields before submit, including empty title and out-of-enum channel or oversized plannedTime"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
 name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+description = "Validation and import error messages name the problem and the fix in plain language rather than only saying Invalid"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "copy_and_toast_confirmations"
+description = "Copy on the export canvas and chrome demo toasts show visible confirmation feedback after the action"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "bulk_delete_confirm_step"
+description = "Delete selected requires a visible confirm step before tasks are removed"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "undo_available_after_destructive_delete"
+description = "After deleting a task, Undo is available and restores the deleted task; with an empty undo history Undo is disabled or inert"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "conflict_drawer_explains_collisions"
+description = "The Conflicts control and drawer explain colliding same-day startTimes by listing task titles so the overlap is understandable"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "4.8"
 name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+description = "Add task, checkboxes, Export, Import, Undo, Redo, and bulk tray actions use semantic button or input elements rather than clickable bare divs"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "edit_dialog_supports_close_paths"
+description = "The task edit dialog closes from an explicit close or cancel control and from Escape, returning focus to the opener"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "import_error_leaves_session_unchanged"
+description = "Importing malformed or contract-violating planner JSON shows a visible error naming the import problem, leaves the current session unchanged, and produces no console errors"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "double_submit_creates_exactly_one"
+description = "Double-activating a valid Add task submit creates exactly one task: the column card count increases by exactly one"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "empty_selection_bulk_is_inert"
+description = "With zero tasks selected, Complete selected, Move to day, and Delete selected stay disabled or inert and change nothing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "unscheduled_tasks_skip_hour_grid"
+description = "A task with no scheduled start never appears on the calendar hour grid, and a task with no planned time contributes nothing to its column footer"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
 name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+description = "An emptied day column shows nothing and provides no UI feedback — no Add task and no 0:00 total"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +162,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n2"
 name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+description = "Validation or import errors are surfaced only in the browser console"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,15 +170,15 @@ weight = 1.0
 [[criterion]]
 id = "4.n3"
 name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+description = "Copy, demo toast, or bulk actions lack visible feedback and silently succeed or fail"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "bulk_delete_lacks_confirm"
+description = "Delete selected removes tasks immediately with no confirm step"
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,15 +186,15 @@ weight = 1.0
 [[criterion]]
 id = "4.n5"
 name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+description = "Primary interactive controls are wrapped only in non-semantic div or span tags without button or input roles"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "edit_dialog_not_keyboard_dismissible"
+description = "The task edit dialog cannot be dismissed via Escape or keyboard"
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +202,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n7"
 name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+description = "Validation feedback for empty title or invalid plannedTime is missing or delayed with no UI indication"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,15 +210,15 @@ weight = 1.0
 [[criterion]]
 id = "4.n8"
 name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+description = "Export, Import, Undo, or bulk tray buttons have ambiguous or missing labels"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "malformed_import_corrupts_session"
+description = "Importing malformed planner JSON corrupts or clears the current board without a recoverable error state"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +226,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n10"
 name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+description = "Add task, Export, selection checkboxes, or Conflicts controls are visually hidden or inaccessible"
 type = "binary"
 negate = true
 weight = 1.0

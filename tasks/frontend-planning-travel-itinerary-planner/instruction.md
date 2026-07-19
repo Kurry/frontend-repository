@@ -119,6 +119,7 @@ Modules:
 - browse-query-v1
 - entity-collection-v1
 - form-workflow-v1
+- artifact-transfer-v1
 
 Module specs:
 <module_spec id="browse-query-v1">
@@ -185,18 +186,47 @@ Module specs:
 }
 </module_spec>
 
+<module_spec id="artifact-transfer-v1">
+{
+  "id": "artifact-transfer-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Artifact transfer",
+  "purpose": "Import, export, copy, print, and conversion workflows.",
+  "permitted_operations": ["import", "export", "copy", "print_preview", "convert"],
+  "binding_keys": {
+    "required_any_of": [["artifact_operations"]],
+    "optional": ["import_modes", "export_formats", "conversion_modes", "visible_postconditions"]
+  },
+  "restrictions": [
+    "No raw files, filesystem paths, blobs, base64, or artifact contents in WebMCP arguments or results.",
+    "File picker interaction, clipboard contents, and downloaded artifacts remain Playwright responsibilities."
+  ],
+  "tool_name_prefix": "artifact"
+}
+</module_spec>
+
 Bindings:
 - Browsable entity: activities
-- Destinations: overview; day-detail; activity-form
-- Filters: day
+- Destinations: overview; day-detail; activity-form; export-canvas
+- Filters: day; category; cost-tier; status; search
+- Themes: light; dark
 - Entity: activity
-- Entity operations: create; select; update; delete; reorder
-- Entity fields: title; day; location
-- Form fields: title; day; location; notes
+- Entity operations: create; select; update; delete; reorder; toggle
+- Entity fields: title; day; location; startTime; endTime; category; costTier; status; tags; notes; lat; lng
+- Value bounds: {"day":["2025-07-05","2025-07-06","2025-07-07","2025-07-08","2025-07-09","2025-07-10","2025-07-11","unscheduled"],"category":["lodging","food","transit","activity","idea"],"costTier":["1","2","3","4"],"status":["to-visit","reserved","completed"]}
+- Form fields: title; day; location; startTime; endTime; category; costTier; status; tags; notes; lat; lng
 - Form operations: validate; submit; cancel
+- Artifact operations: export; import; copy; print_preview
+- Export formats: ics; trip-json; markdown
+- Import modes: trip-json
+- Workflow completion: export ics and trip-json and markdown reflect session mutations after create edit delete promote or merge
+- Workflow completion: import trip-json reconstructs stops matching Stop field contract
 
 Mechanics exclusions:
 - Map pan/zoom / marker drag stays Playwright
+- Stop card drag-and-drop gesture fidelity stays Playwright-observed; WebMCP entity reorder/update proves state parity only
+- Raw file paths/blobs forbidden in WebMCP args; file picker, clipboard contents, and downloads stay Playwright responsibilities
+- Coachmark and toast enter/exit timing stays Playwright-observed
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

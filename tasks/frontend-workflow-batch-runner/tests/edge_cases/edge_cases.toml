@@ -1,0 +1,219 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "empty_states_designed"
+description = "The empty main panel after deleting the selected job, the empty timeline filter result, and a queue with nothing pending each render a designed empty state with a message, not a blank region"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "forms_validate_inline"
+description = "The composer and schedule forms validate inline before submit — required fields, end-after-start times, and at least one dataset row"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "errors_are_actionable"
+description = "Parse and validation errors name the problem and the offending field (for example which line of the pasted CSV failed), not just a generic rejection"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "actions_show_confirmation"
+description = "Creating, deleting, exporting, copying the calendar text, and completing a run each give visible success feedback such as a toast"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "simulated_work_shows_activity"
+description = "Simulated inference shows visible activity indicators — running spinners, backoff countdowns, the reconciling indicator — never a silently frozen grid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "destructive_actions_guarded"
+description = "Job deletion requires confirmation and is reversible through Undo; Stop All warns or is visually distinct as destructive"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "nonobvious_controls_have_help"
+description = "Non-obvious controls — the concurrency limit, Simulate window start, Retry failed items, the flip markers — carry tooltips or descriptive labels"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "controls_use_semantic_tags"
+description = "Buttons, inputs, and labels across the composer, grid, and toolbar use semantic elements"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "modal_close_paths"
+description = "Modals close via their close control, Escape, and a background click where appropriate"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "long_runs_show_progress"
+description = "A long 200-item run continuously shows progress — the bar, fraction label, and rollups never stall visually while items advance"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n1"
+name = "empty_state_missing"
+description = "An emptied surface (no jobs, no timeline matches, no pending items) shows nothing with no feedback"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n2"
+name = "errors_console_only"
+description = "A paste, validation, or run error is surfaced only in the browser console"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n3"
+name = "silent_success_or_failure"
+description = "Launching, exporting, copying, or retrying gives no visible feedback either way"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n4"
+name = "unguarded_destruction"
+description = "Deleting a job or stopping a run happens with no warning, confirmation, or undo path"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n5"
+name = "divs_wrap_interactives"
+description = "Non-semantic div or span elements wrap the grid's or toolbar's interactive controls"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n6"
+name = "modal_not_keyboard_dismissible"
+description = "The composer, schedule form, or confirmation dialog cannot be dismissed with the keyboard"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n7"
+name = "validation_feedback_delayed"
+description = "Composer or schedule validation feedback is missing or appears only after a silent delay"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n8"
+name = "ambiguous_button_text"
+description = "Toolbar or macro button text is ambiguous or missing, leaving the action unclear"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n9"
+name = "no_guidance_for_flows"
+description = "The compare, schedule, or retry flows have no in-app guidance at all"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n10"
+name = "hidden_affordances"
+description = "Interactive affordances such as row actions or queue move controls are visually hidden with no discoverable path"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "edge_cases.catchall"
+name = "edge_cases_catchall"
+description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

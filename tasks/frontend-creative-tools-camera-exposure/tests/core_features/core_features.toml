@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,135 +62,135 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
+name = "aperture_open_brightens_and_blurs"
 description = "Press the aperture stepper toward open: the f-number readout lowers and the preview visibly brightens with more background blur"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
+name = "shutter_steps_advance_motion_frames"
 description = "Step the shutter dial from its slowest toward its fastest stop: distinct motion frames advance in order and the meter moves toward UNDER EXPOSED"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
+name = "apply_seeded_preset_updates_dials"
 description = "Apply a seeded preset: all three dial readouts change to the preset's stops and the preview and meter update to match"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
+name = "meter_lab_shows_preview_dials_meter"
 description = "On load, Meter/Lab mode shows the photo preview with aperture, shutter, and ISO dials plus the exposure meter"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
+name = "seeded_presets_at_least_six"
 description = "On load (or after opening Presets/Compare), the presets list shows at least 6 seeded exposure looks with names and stop readouts"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
-description = "After creating a preset named 'Golden Hour Soft' with valid stops, the text 'Golden Hour Soft' is visible in the presets list"
+name = "create_preset_golden_hour_soft_visible"
+description = "After creating a preset named 'Golden Hour Soft' with valid stops and lookTag, the text 'Golden Hour Soft' is visible in the presets list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
+name = "adding_three_presets_increments_count"
 description = "After adding 3 new presets on top of the seed set, the presets list shows exactly 3 more rows than the initial seeded count"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
+name = "edit_preset_name_night_street_grain"
 description = "After editing a preset name to 'Night Street Grain', the text 'Night Street Grain' is visible in the list and the previous name is not"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
+name = "delete_preset_removes_name"
 description = "After deleting a preset, that preset's name is no longer visible in the presets list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
+name = "delete_all_shows_empty_state"
 description = "After deleting all presets, an empty state message is visible and no preset rows remain"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
-description = "After submitting create with an empty required preset name, the presets count does not increase and validation feedback is visible"
+name = "empty_name_rejects_create"
+description = "After submitting create with an empty required preset name, the presets count does not increase and validation feedback naming the name field is visible"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "1_13"
+name = "filter_favorites_or_tag"
 description = "After filtering presets by favorites or a look tag (with mixed items present), only matching presets remain visible"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.14"
-name = "1_14"
+name = "mode_switch_without_navigation"
 description = "After switching between Meter/Lab and Presets/Compare modes, the main canvas shows the other mode without full page navigation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.17"
-name = "1_17"
+name = "presets_crud_shared_state"
 description = "Exposure presets collection supports create, edit, and delete with list rows and derived counts updating from shared application state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.19"
-name = "1_19"
-description = "Domain state beyond CRUD is implemented (filters, status/priority/mode, or equivalent) and recomputes visible results from the shared collection"
+name = "favorites_and_tag_filters_recompute"
+description = "Favorites and look-tag filters recompute the visible preset list from the shared collection when toggled"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.21"
-name = "1_21"
+name = "presets_static_html_only"
 description = "Exposure presets list is static HTML only with no working create/edit/delete against shared state"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "1.22"
-name = "1_22"
+name = "outbound_link_chrome"
 description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "1.23"
-name = "1_23"
+name = "stepper_moves_one_stop_with_formats"
 description = "Pressing a dial's up/down stepper moves exactly one stop along that control's list and updates that dial's readout on the same press; APERTURE reads f/N (default f/16), SPEED reads 1/N (default 1/60), and ISO reads a bare integer (default 100)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.24"
-name = "1_24"
+name = "aperture_stepper_inverted"
 description = "The aperture stepper is inverted relative to the raw f-number: the open direction widens the aperture toward a lower f-number (e.g. f/16 to f/11) and the other direction narrows it toward a higher f-number"
 type = "binary"
 weight = 0.5
@@ -198,14 +198,14 @@ optional = true
 
 [[criterion]]
 id = "1.25"
-name = "1_25"
+name = "dial_updates_whole_preview_stack"
 description = "Pressing a dial updates the whole preview together on that press — frame brightness, depth-of-field blur, the visible shutter motion frame, the ISO noise overlay opacity, and the vertical exposure meter indicator all respond"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.26"
-name = "1_26"
+name = "shutter_distinct_motion_frames_ordered"
 description = "Each shutter stop shows its own distinct motion frame and stepping from slow to fast advances the frames in order"
 type = "binary"
 weight = 0.5
@@ -213,44 +213,44 @@ optional = true
 
 [[criterion]]
 id = "1.27"
-name = "1_27"
+name = "stop_edge_and_meter_capped"
 description = "At the first or last stop of a control the stepper button fades to invisible and stops responding to clicks so the value cannot step past the edge, and the exposure meter dot is likewise capped at the track ends"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.28"
-name = "1_28"
-description = "Reset returns all three dials to their defaults (f/16, 1/60, ISO 100), restores the default preview, and re-centers the exposure meter"
+name = "reset_restores_defaults"
+description = "Reset returns all three dials to their defaults (f/16, 1/60, ISO 100), zeros Contrast/Highlights/Shadows, restores the default preview, re-centers the exposure meter, and clears the active look pack and snapshot selection"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.29"
-name = "1_29"
-description = "The '?' help trigger opens a side help panel carrying distinct Aperture, Shutter Speed, and ISO explainer paragraphs and its glyph swaps to 'X' to close again; opening or closing help never navigates away or reloads"
+name = "help_panel_aperture_shutter_iso"
+description = "The ? help trigger opens a side help panel carrying distinct Aperture, Shutter Speed, and ISO explainer paragraphs and its glyph swaps to X to close again; opening or closing help never navigates away or reloads"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.30"
-name = "1_30"
-description = "Pressing the dial steppers changes the readout number but the photo preview (brightness, blur, noise, or exposure meter) does not respond"
+name = "dials_change_without_preview_response"
+description = "Pressing the dial steppers changes the readout number while the photo preview stack stays frozen — brightness, blur, noise, and exposure meter ignore the new stop"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "1.31"
 name = "preset_lifecycle_cross_mode_chain"
-description = "Starting in Presets/Compare with the seeded list: create a valid preset and confirm the form closes and the visible preset row count increases by exactly one (measured immediately before and after); switch to Meter/Lab and back and confirm the same new preset row is still present without a reload; edit that preset's name and confirm the same row shows the new name (and any compare panel showing it updates); delete it and confirm the row count decreases by exactly one and the preset no longer appears in the list, in any selection, or in favorites/tag filter results"
+description = "Starting in Presets/Compare with the seeded list: create a valid preset and confirm the form closes and the visible preset row count increases by exactly one (measured immediately before and after); switch to Meter/Lab and back and confirm the same new preset row is still present without a reload; edit that preset's name and confirm the same row shows the new name; delete it and confirm the row count decreases by exactly one"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.32"
 name = "apply_look_cross_mode_chain"
-description = "Applying a preset from Presets/Compare then switching to Meter/Lab shows, without a reload: all three dial readouts at the preset's values, the preview stack (brightness, blur, motion frame, grain) matching those stops, and the exposure meter at the corresponding position"
+description = "Applying a preset from Presets/Compare then switching to Meter/Lab shows, without a reload: all three dial readouts at the preset's values, the preview stack matching those stops, and the exposure meter at the corresponding position"
 type = "binary"
 weight = 1.0
 
@@ -271,7 +271,7 @@ weight = 1.0
 [[criterion]]
 id = "1.35"
 name = "double_submit_creates_exactly_one_preset"
-description = "Double-activating the preset create submit control in quick succession creates exactly one preset: the visible row count increases by exactly one and exactly one new row appears"
+description = "Double-activating the preset create submit control in quick succession creates exactly one preset: the visible row count increases by exactly one"
 type = "binary"
 weight = 1.0
 
@@ -294,13 +294,13 @@ id = "1.38"
 name = "login_gate_or_multipage_shell_blocks_simulator"
 description = "A login screen, admin gate, or multi-page shell must be traversed before the simulator preview and dials appear"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "1.39"
 name = "iso_grain_capped_at_max"
-description = "Stepping ISO to its maximum stop (3200) makes the tiled grain overlay clearly more visible than at ISO 100, yet the underlying photo remains discernible (the grain never fully hides it)"
+description = "Stepping ISO to its maximum stop (3200) makes the tiled grain overlay clearly more visible than at ISO 100, yet the underlying photo remains discernible"
 type = "binary"
 weight = 0.5
 optional = true
@@ -314,9 +314,123 @@ weight = 0.5
 optional = true
 
 [[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+id = "1.41"
+name = "live_ev_readout_updates"
+description = "A live EV readout near the dials shows 0.0 EV at defaults and updates when a dial or light slider changes"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "light_sliders_update_preview"
+description = "Moving Contrast, Highlights, or Shadows away from 0 (range -100 to 100 with live integer readout) visibly changes the preview tones on the same gesture and updates the histogram"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "histogram_shifts_with_exposure"
+description = "Brightening the frame (wider aperture or higher ISO) visibly shifts histogram mass toward the right; darkening shifts it toward the left — the histogram is not static"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "look_packs_apply_multi_control_state"
+description = "Clicking Warm, Subtle, Strong, or B&W applies a multi-control edit state in one press (dials and light sliders update, preview and histogram match); B&W removes visible color while the other packs keep a color image; the active pack shows a selected treatment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "before_after_hold_shows_original"
+description = "Holding the Before/After control shows the original unedited photo for the hold duration and releasing returns to the current edit state without changing stored dial or slider values — probe via the real hold control, not a state shortcut"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "snapshot_save_apply_delete"
+description = "Saving a named snapshot stores the current dials, light sliders, and look pack; Apply restores that exact edit state; Delete removes the row; an empty snapshot name is rejected with inline validation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "undo_redo_edit_mutations"
+description = "After a dial step and a light-slider change, Undo reverses each mutation in order and restores the prior preview; Redo reapplies them; a new edit after Undo clears and disables Redo"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "download_png_bakes_pixels"
+description = "Download PNG triggers a real file download named exposure-export.png whose pixels carry the current dial, slider, look-pack, blur, and grain edits — not a CSS-filter-only preview recipe"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "download_jpeg_bakes_pixels"
+description = "Download JPEG triggers a real file download named exposure-export.jpg with the current edits baked into the image pixels"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "two_edit_states_different_exports"
+description = "Exporting PNG at defaults versus after opening aperture two stops with Contrast raised produces two visibly different image files; the active on-screen preview matches the tonal look of the just-exported file"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "edit_stack_json_export_and_copy"
+description = "Download edit stack downloads JSON compiled live from aperture, shutter, ISO, Contrast, Highlights, Shadows, active look pack, and snapshots with schemaVersion camera-exposure.edit-stack.v1; Copy edit stack copies the same text and shows a visible confirmation that reverts after a moment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.52"
+name = "edit_stack_import_restores_state"
+description = "After editing dials/sliders and saving a snapshot, exporting the edit stack, Resetting, then importing that JSON restores dials, sliders, look pack, snapshots, preview, histogram, and meter to the exported state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.53"
+name = "edit_stack_schema_fields_present"
+description = "A valid Download edit stack document includes required fields schemaVersion (exactly camera-exposure.edit-stack.v1), aperture, shutter, iso, contrast, highlights, shadows, lookPack, and snapshots, with stop and slider values inside the documented bounds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.54"
+name = "preset_payload_field_contract"
+description = "Creating a valid preset with name, aperture, shutter, iso, and lookTag within the documented bounds adds a row whose stop readout matches the submitted payload; out-of-list stops are rejected with a field-named error"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.55"
+name = "export_omits_session_edits"
+description = "A PNG/JPEG or edit-stack export matches the unedited seed while the UI shows dial, slider, look-pack, or snapshot mutations — the artifact ignores the work just performed"
+type = "binary"
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.56"
+name = "css_filter_only_fake_export"
+description = "Download PNG or JPEG produces a file whose pixels match the unedited source image while only the on-screen preview uses CSS filters or overlays — edits are not baked into the downloaded bitmap"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence. If already covered — even partially — by another criterion in this file, answer no here."
+type = "binary"
+negate = true
+weight = 1.0

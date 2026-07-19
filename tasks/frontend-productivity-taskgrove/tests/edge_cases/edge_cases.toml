@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,92 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_tree_and_archive_messages"
+description = "On first load with no data, the tree area shows an empty-state message inviting the first root task, and the Archive panel shows a short explanatory message instead of a blank area."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "blank_title_inline_field_contract"
+description = "Submitting New root task or Add Child with a blank or whitespace-only title shows an inline error naming the title field before submit and adds no task."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "field_errors_name_offending_field"
+description = "Task title and tag name/color validation errors name the offending field (title, name, or color) and the fix rather than only saying Invalid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "durable_actions_show_toast"
+description = "Adding a task or child, archiving, restoring, Move To, and importing a grove package each show a transient confirmation toast."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "overlength_title_rejected"
+description = "A title longer than 120 characters is rejected with an inline error naming the title field and adds no task."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "tag_duplicate_and_invalid_color_rejected"
+description = "Submitting a tag with a duplicate name (case-insensitive) is rejected naming the name field; a color outside the closed hex enum is rejected naming the color field; no invalid tag is added."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "sixth_tag_attachment_blocked"
+description = "Attempting to attach a 6th tag to a node that already has 5 is blocked and the node still shows exactly 5 chips."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "incomplete_branch_hides_archive"
+description = "A node whose branch is not fully complete does not show an Archive control."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "move_picker_escape_closes"
+description = "The Move To picker closes on Escape and returns focus to the control that opened it."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "double_submit_single_task"
+description = "Double-activating a task submit control creates exactly one task: exactly one new node appears in the tree."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "malformed_grove_import_rejected"
+description = "Importing malformed Grove package JSON leaves the tree, tags, archive, and theme unchanged and shows visible validation naming the import problem."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "schema_invalid_grove_import_rejected"
+description = "Importing parseable JSON that fails the Grove package field contract — wrong schemaVersion, theme outside light|dark|forest, tag color outside the closed hex enum, blank title, or node tags longer than 5 — leaves the session unchanged and shows validation naming the offending field or rule."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_tree_has_no_feedback"
+description = "An empty tree or empty Archive panel shows nothing and provides no UI feedback."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +155,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n2"
 name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+description = "Title, tag, or import field-contract failures are surfaced only in the browser console."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,15 +163,15 @@ weight = 1.0
 [[criterion]]
 id = "4.n3"
 name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+description = "Adding a task, archiving, or importing a grove package lacks visible feedback and silently succeeds or fails."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "parent_completes_with_incomplete_leaf"
+description = "A parent can be manually marked complete while an incomplete descendant leaf remains."
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,15 +179,15 @@ weight = 1.0
 [[criterion]]
 id = "4.n5"
 name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+description = "Non-semantic div or span tags wrap interactive elements such as New root task, Add Child, or tag submit."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "move_picker_not_keyboard_dismissible"
+description = "The Move To picker cannot be dismissed via Escape."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +195,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n7"
 name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+description = "Blank title or blank tag name validation feedback is missing or delayed with no UI indication naming the field."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,23 +203,23 @@ weight = 1.0
 [[criterion]]
 id = "4.n8"
 name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+description = "Primary action buttons use ambiguous or missing labels instead of specific verbs such as Add Child or Export grove."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "schema_invalid_import_mutates_session"
+description = "Importing JSON that fails the Grove package field contract still mutates the tree, tags, archive, or theme."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "malformed_import_mutates_session"
+description = "Importing malformed Grove package JSON still mutates the tree, tags, archive, or theme."
 type = "binary"
 negate = true
 weight = 1.0

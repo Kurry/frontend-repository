@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -106,7 +106,7 @@ optional = true
 [[criterion]]
 id = "2.7"
 name = "accessible_names_and_roles"
-description = "Interactive controls (mode buttons, copy, download, share, theme, profile, inputs) expose non-empty accessible names and correct roles in the accessibility tree"
+description = "Interactive controls (mode buttons, copy, download, share, import, theme, profile, join inputs) expose non-empty accessible names and correct roles in the accessibility tree"
 type = "binary"
 weight = 0.5
 optional = true
@@ -218,6 +218,21 @@ name = "deep_link_renders_full_shell"
 description = "Loading the room's URL path directly in a fresh tab renders the complete workspace shell and state baseline with no 404, half-rendered shell, or missing chrome compared to in-app navigation"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "2.22"
+name = "document_package_field_contract_enforced"
+description = "Profile, join, and Import package enforce the Document package field contracts in the UI: invalid displayName or non-#RRGGBB color are rejected with inline feedback naming the field; invalid roomId is rejected naming roomId; Import of JSON that fails required keys or closed enums (schemaVersion mduy-document-v1, roomId 10/20 A-Z, theme light|dark, profile bounds) is rejected with feedback naming the offending field and does not mutate source, theme, or profile"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.23"
+name = "import_accepts_schema_invalid_payload"
+description = "Import accepts a parseable JSON document that violates the Document package field contract (wrong schemaVersion, invalid roomId, theme outside light|dark, missing markdown or profile, or non-#RRGGBB color) and still mutates source, theme, or profile"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "2.catchall"

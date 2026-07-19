@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -160,8 +160,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.15"
-name = "setup_form_blocks_missing_difficulty"
-description = "On the setup screen with no difficulty selected, Start match is disabled, and attempting to start without a selection shows an inline message that names the difficulty field instead of starting a match"
+name = "setup_form_validates_player_and_difficulty"
+description = "On the setup screen, Start match stays disabled until playerName (2 to 20 characters) and difficulty are valid; a one-character playerName shows an inline message naming playerName and the length rule, and missing difficulty shows an inline message naming the difficulty field"
 type = "binary"
 weight = 1.0
 
@@ -310,6 +310,65 @@ name = "illegal_actions_rejected_with_feedback"
 description = "Acting out of turn, revealing an already-revealed or flagged tile, using a hint past the limit, or revealing while paused is rejected with specific visible feedback naming why, and the board, scores, strikes, and history are left unchanged"
 type = "binary"
 weight = 1.0
+
+
+[[criterion]]
+id = "1.36"
+name = "match_log_record_after_complete"
+description = "After Match Complete, the Match log shows a new top match-result entry with the same playerName, difficulty, winner, and round-win counts as the finished match"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "export_match_json_contains_session"
+description = "From Match Complete or that Match log entry, Export Match produces downloadable or copyable JSON that includes the session's playerName, difficulty, winner, playerRoundWins, rivalRoundWins, playerTotalOre, rivalTotalOre, rounds, and endedAt — compiled from the finished match, not a blank stub"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "export_archive_lists_matches"
+description = "With at least one finished match, Export Archive downloads a JSON archive whose matches array includes that match's actual playerName, difficulty, winner, round wins, totals, rounds, and endedAt"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "save_progress_checkpoint_resume"
+description = "During an active or paused round after at least one reveal, Save Progress shows a Saved confirmation; after a full page reload, Resume Saved Match restores the same scores, strikes, turn, hints remaining, round wins, and visible board"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "import_match_json_appends_log"
+description = "Importing a previously exported single-match JSON appends a Match log entry whose playerName, difficulty, winner, round wins, totals, and endedAt match the imported record"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "copy_export_shows_copied"
+description = "Copying an Export Match or Export Archive payload shows a brief Copied confirmation that does not block further play"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.n42"
+name = "export_omits_session_match_fields"
+description = "Export Match JSON omits the session's actual playerName, difficulty, winner, round wins, or totals, or shows hardcoded placeholder values unrelated to the finished match"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n43"
+name = "resume_starts_fresh_instead_of_checkpoint"
+description = "After Save Progress and a full page reload, Resume Saved Match starts a fresh setup or empty board instead of restoring the saved scores, strikes, turn, and visible board"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.catchall"

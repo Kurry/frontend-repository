@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -97,8 +97,8 @@ weight = 1.0
 
 [[criterion]]
 id = "12.6"
-name = "form_flow_operations_are_bound"
-description = "Form submission validation, error, and cancel operations are clearly bound."
+name = "artifact_transfer_operations_are_bound"
+description = "Artifact-transfer export, import, and copy operations for session-json are bound and invoke the same handlers as the Session archive UI controls."
 type = "binary"
 weight = 1.0
 
@@ -206,6 +206,21 @@ weight = 1.0
 id = "12.n10"
 name = "automated_contract_validation_fails"
 description = "The project fails automated MCP contract validation."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "12.11"
+name = "session_archive_destination_reachable"
+description = "Browse destination session-archive is reachable via the contract and surfaces the Session archive export/import panel consistent with the visible UI."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.n11"
+name = "artifact_export_returns_raw_file_bytes"
+description = "WebMCP artifact export or copy returns raw file contents, blobs, or base64 payload bodies instead of triggering the same UI path Playwright observes."
 type = "binary"
 negate = true
 weight = 1.0

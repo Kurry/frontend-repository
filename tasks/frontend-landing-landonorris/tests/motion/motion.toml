@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -129,7 +129,7 @@ optional = true
 [[criterion]]
 id = "4.10"
 name = "reduced_motion_respected"
-description = "Under prefers-reduced-motion reduce the page settles immediately rather than hanging on scroll-linked animation, the preloader does not block content, in-page jumps use instant scroll, and the continuous marquees do not run"
+description = "Under prefers-reduced-motion reduce the page settles immediately rather than hanging on scroll-linked animation, the preloader does not block content, in-page jumps use instant scroll, continuous marquees do not run, and press-kit/palette enter transitions collapse to immediate show/hide"
 type = "binary"
 weight = 0.5
 optional = true
@@ -153,7 +153,7 @@ negate = true
 [[criterion]]
 id = "4.13"
 name = "static_pointer_response"
-description = "Interactive chrome (Store button, hamburger, menu close control, nav and footer links, helmet cards, Subscribe control, video card) gives no visible hover feedback so the page feels static under the pointer"
+description = "Interactive chrome (Store button, PRESS KIT, hamburger, menu close, nav and footer links, helmet cards, shortlist controls, race rows, Subscribe, video card) gives no visible hover feedback so the page feels static under the pointer"
 type = "binary"
 weight = 1.0
 negate = true
@@ -222,7 +222,7 @@ negate = true
 [[criterion]]
 id = "4.23"
 name = "scroll_story_section_sequence"
-description = "On a fresh load, continuous vertical scrolling advances through the cream hero, the pinned horizontal media chapter, the impact statement character fill, the helmet grid, the collaborators marquee, the social video card, and the footer statement fill as a sequential narrative rather than unrelated static blocks"
+description = "On a fresh load, continuous vertical scrolling advances through the cream hero, the pinned horizontal media chapter, the impact statement character fill, the helmet grid, the race calendar, the collaborators marquee, the social video card, and the footer statement fill as a sequential narrative rather than unrelated static blocks"
 type = "binary"
 weight = 0.5
 optional = true
@@ -232,6 +232,35 @@ id = "4.24"
 name = "interactive_vector_motif_reacts"
 description = "Using the real UI path on a fresh load, hovering, pressing, opening the menu, or advancing scroll progress causes the original local vector motif to transition crisply between states rather than remaining static or autoplaying an unrelated identical loop"
 type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.25"
+name = "press_kit_open_close_animates"
+description = "Opening PRESS KIT via the real control expands the drawer/dialog with about a 0.3s opacity/transform transition on cubic-bezier(0.65, 0.05, 0, 1); closing reverses it rather than snapping."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.26"
+name = "command_palette_enter_animates"
+description = "Opening the command palette with Meta+K/Control+K enters with a short ~0.2s fade/scale on cubic-bezier(0.65, 0.05, 0, 1); filtering updates results without layout jank."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.27"
+name = "race_and_shortlist_select_transition"
+description = "Selecting a race or shortlisting an asset via the real UI shows an immediate ~0.2s selected-state transition (lime accent or check) rather than a hard snap with no feedback."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n25"
+name = "press_kit_or_palette_snaps"
+description = "The press-kit drawer or command palette snaps open/closed with no transition on the real UI control path."
+type = "binary"
+negate = true
 weight = 1.0
 
 [[criterion]]

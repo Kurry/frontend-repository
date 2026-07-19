@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -279,7 +279,7 @@ weight = 1.0
 [[criterion]]
 id = "1.35"
 name = "reload_restores_seeded_baseline_coherently"
-description = "After creating an event, disabling a category filter, and narrowing the year window, a page reload returns every facet to the seeded state together — seeded corpus, default year window, all categories enabled, and no user-created events — never a partial mix of reset and surviving facets"
+description = "After creating an event, disabling a category filter, narrowing the year window, and performing an undoable mutation, a page reload returns every facet to the seeded state together — seeded corpus, default year window, all categories enabled, empty undo/redo stacks, no selection, and no user-created events — never a partial mix of reset and surviving facets"
 type = "binary"
 weight = 1.0
 
@@ -328,7 +328,7 @@ weight = 1.0
 [[criterion]]
 id = "1.42"
 name = "inline_errors_name_field_and_block_submit"
-description = "On the create and edit forms, an empty title or an invalid year shows an inline error message naming that field next to it, and the submit control stays disabled or rejects submission until all fields are valid"
+description = "On the create and edit forms, an empty title, invalid year outside -4000..2100, empty place, empty summary, or zero categories shows an inline error naming that field next to it, and the submit control stays disabled or rejects submission until the TimelineEvent payload contract is satisfied"
 type = "binary"
 weight = 1.0
 
@@ -345,6 +345,93 @@ name = "shift_wheel_translates_year_window"
 description = "In Scrub/Explore mode, Shift+wheel (or a dominant horizontal wheel gesture) over the stage translates the year window — the from/to readout shifts and pins move accordingly — rather than zooming or scrolling the page"
 type = "binary"
 weight = 0.5
+
+
+[[criterion]]
+id = "1.45"
+name = "closed_category_enum_and_named_eras"
+description = "Category filters expose exactly the ten closed enum labels Print, Broadcast, Photography, Cinema, Computing, Networks, Audio, Typography, Publishing, and Telecom, and the stage shows the five named era bands Oral Tradition, Manuscript Age, Print Revolution, Broadcast Era, and Network Age"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "category_density_strip_tracks_in_view"
+description = "A category density strip lists each enabled category with a live count of events currently in view; narrowing the year window or toggling a category filter changes those counts in the same interaction"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "library_year_sort_reverses_order"
+description = "Switching the Library year sort between Year ascending and Year descending reverses the visible library row order relative to the other choice"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "multi_select_tray_batch_categorize"
+description = "Selecting two or more user-managed library rows reveals a selection tray; Batch categorize applies one chosen closed-enum category to every selected user-managed event at once and updates list badges, pin colors, density counts, and the Timeline JSON export preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "batch_delete_removes_selected_count"
+description = "Selecting two user-managed events and confirming Batch delete decreases the catalogued-events count by exactly two, removes both rows and pins, and drops both titles from the Timeline JSON export preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "undo_redo_restore_mutations"
+description = "After deleting a user-managed event, Undo restores that event's row, pin, and counts; Redo deletes it again; after a new create following an undo, Redo is disabled"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "export_drawer_three_live_formats"
+description = "Opening Export timeline shows an export drawer with Timeline JSON, Events CSV, and Window Markdown tabs; each tab shows a monospaced preview compiled live from the current store, and Copy shows a brief confirmation while Download starts a file download of the same preview text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.52"
+name = "timeline_json_package_shape"
+description = "The Timeline JSON preview includes version, document media-timeline, window with fromYear and toYear, enabledCategories, eras with name/fromYear/toYear, and an events array whose entries carry title, year, place, categories, summary, and source"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.53"
+name = "export_reflects_session_mutations"
+description = "After creating an event with a distinctive title, both the Timeline JSON and Events CSV export previews contain that title before copy or download; after deleting it, the title is absent from both previews"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.54"
+name = "import_timeline_json_round_trip"
+description = "After mutating the collection, importing a previously exported Timeline JSON restores library titles, years, enabled categories, year window, density counts, and export previews to match the pre-export mutated state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.55"
+name = "export_omits_session_mutations"
+description = "After a visible create, edit, delete, or batch mutation, the Timeline JSON or Events CSV export preview still omits that session change (title missing after create, or still present after delete)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.56"
+name = "undo_fails_to_restore_event"
+description = "After deleting a user-managed event, activating Undo leaves the event absent from the library list and stage pins"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.catchall"

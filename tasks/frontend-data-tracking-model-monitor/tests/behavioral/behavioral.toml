@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,63 +63,84 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "14.1"
 name = "multi_facet_round_trip"
-description = "Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline — never a mix."
+description = "Multi-facet round-trip: enable alerts, set a custom session budget, pin a model, log a usage event, and open the export panel, then reload. Because this is an in-memory good-app task, all facets coherently reset to the seeded baseline (seeded catalog and usage, alerts off, default budget, simulation paused, empty undo stacks) — never a mix of preserved and reset facets"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.2"
 name = "sort_reversal_proves_live_data"
-description = "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders."
+description = "Compare selection proof: select two models, open Compare and note their order, deselect and select a different pair, reopen Compare; the modal shows the newly selected pair's catalog values rather than the prior pair, proving comparison derives from live selection"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.3"
 name = "derived_view_responds_to_input"
-description = "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input."
+description = "Derived-view sensitivity: submit two Log usage events with different prompt_tokens or models and confirm the session total, the affected per-model subtotals, the pie chart, and the remaining-budget readout all change by the amounts those inputs dictate rather than redrawing identically"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.4"
 name = "cross_view_echo_without_reload"
-description = "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list ↔ detail, board ↔ stats) without reload."
+description = "Cross-view echo: log a usage event and confirm the same cost appears in the event feed, the cost sidebar row, the pie chart share, and the Session JSON usage_events preview without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.5"
 name = "count_delta_is_exact"
-description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+description = "Count-delta integrity: measure total request count and the affected model's request count immediately before and after a successful Log usage submit; each increases by exactly one"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.6"
 name = "different_inputs_change_outcomes"
-description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+description = "Input-dependent output: log two usage events with different request_label values and different prompt_tokens; the feed shows both distinct labels and the session total differs by the two computed costs"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.7"
 name = "interleaved_flows_preserve_state"
-description = "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state."
+description = "Interleaved-flow integrity: start Log usage, open the command palette and jump to the cost sidebar, finish submitting the log, then open Export; the new event is present in rollups and in the export preview, and palette navigation did not drop the draft or double-submit"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.8"
 name = "empty_to_repopulated_round_trip"
-description = "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions."
+description = "Edge-state round-trip: toggle every pie legend entry off to the empty chart state, then re-enable models or append a usage event so slices return; totals and the chart track through both transitions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "export_contains_session_work"
+description = "Full-pipeline export probe: pin a model, log a usage event with a unique request_label, open Export session, and confirm Session JSON pinned_models includes the pin and usage_events includes that request_label and cost, and Usage CSV contains the same label"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "import_export_round_trip_probe"
+description = "Import/export round-trip probe: after mutating pins and logging usage, export Session JSON, import it, and confirm visible feed labels, session total, pins, budget, and both export previews match the imported document"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.11"
+name = "undo_round_trip_probe"
+description = "Undo round-trip probe: log a usage event, note session total and feed length, Undo, confirm both restore to prior values, Redo, confirm both return to the post-log values"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.n1"
 name = "partial_persistence_is_incoherent"
-description = "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence."
+description = "After reload, some in-session mutations survive while others reset, producing incoherent partial persistence in an in-memory-only app"
 type = "binary"
 negate = true
 weight = 1.0
@@ -127,7 +148,7 @@ weight = 1.0
 [[criterion]]
 id = "14.n2"
 name = "derived_surface_ignores_inputs"
-description = "A derived surface renders identically regardless of its inputs."
+description = "The session total, pie chart, or remaining-budget readout renders identically regardless of logged or simulated usage inputs"
 type = "binary"
 negate = true
 weight = 1.0
@@ -135,7 +156,7 @@ weight = 1.0
 [[criterion]]
 id = "14.n3"
 name = "different_inputs_produce_identical_output"
-description = "Repeating an action with different inputs yields byte-identical output."
+description = "Logging two usage events with different token counts or models yields identical session totals and identical export costs"
 type = "binary"
 negate = true
 weight = 1.0
@@ -143,7 +164,15 @@ weight = 1.0
 [[criterion]]
 id = "14.n4"
 name = "cross_view_state_is_stale"
-description = "State changes appear in one view but not another until reload."
+description = "A usage log or pin change appears in one surface but not in the export preview or cost sidebar until reload"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "export_omits_mutations_behavioral"
+description = "After a visible manual log or pin toggle, the export preview omits that session work"
 type = "binary"
 negate = true
 weight = 1.0
@@ -155,3 +184,4 @@ description = "The app exhibits a significant, browser-observable defect in beha
 type = "binary"
 negate = true
 weight = 1.0
+

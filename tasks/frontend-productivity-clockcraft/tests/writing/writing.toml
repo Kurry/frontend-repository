@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.5
@@ -71,21 +71,21 @@ weight = 0.5
 [[criterion]]
 id = "15.2"
 name = "actions_use_specific_labels"
-description = "Where the app renders button or action labels, they are specific verbs ('Add expense', 'Start session'), not generic ('Submit', 'OK') when a specific label is possible."
+description = "Where the app renders button or action labels, they are specific verbs (Start timer, Add entry manually, Export session, Import session, Set category), not generic (Submit, OK) when a specific label is possible."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.3"
 name = "errors_name_problem_and_fix"
-description = "Where the app renders error messages, they name the problem and the fix ('Amount must be a positive number'), not just a rejection ('Invalid')."
+description = "Where the app renders validation errors, they name the offending field from the entry or Session JSON field contract and the fix, not just Invalid."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.4"
 name = "empty_states_explain_next_step"
-description = "Where the app renders empty states, the copy explains what belongs there and how to add it."
+description = "Where the app renders empty timeline/list states and no-results messages, the copy explains what belongs there and how to add or restore it."
 type = "binary"
 weight = 0.5
 
@@ -114,7 +114,7 @@ weight = 0.5
 [[criterion]]
 id = "15.8"
 name = "success_messages_are_specific"
-description = "Where the app renders confirmation and success messages, they state what happened ('Entry saved'), not vague affirmations."
+description = "Where the app renders toasts, they name the action (saved entry, timer switch, export, import) rather than a generic success message."
 type = "binary"
 weight = 0.5
 

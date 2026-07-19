@@ -99,7 +99,7 @@ weight = 1.0
 [[criterion]]
 id = "3.6"
 name = "concise_sentence_case_microcopy"
-description = "UI microcopy is concise UI writing in sentence case: verb-first buttons (Convert, Download, Remove, Clear queue), numeral counters (\"1 queued, 0 ready, 1 done\"), second-person help text, and error or unsupported messages that state the problem plainly without codes or blame."
+description = "UI microcopy is concise UI writing in sentence case: verb-first buttons (Convert, Download, Remove, Clear queue, Batch set format, Batch remove, Download all done, Undo, Redo, Save preset, Apply preset, Copy, Download session), numeral counters (\"1 queued, 0 ready, 1 done\"), second-person help text, and error or unsupported messages that state the problem plainly without codes or blame."
 type = "binary"
 weight = 0.5
 optional = true
@@ -124,7 +124,7 @@ optional = true
 [[criterion]]
 id = "3.9"
 name = "queue_row_worklist_anatomy"
-description = "Each queue row reads as a dense worklist entry: the filename emphasized, a muted sub-line for formats and sizes, a compact format selector, a pill-shaped status indicator, and right-aligned Download and Remove actions."
+description = "Each queue row reads as a dense worklist entry: a selection checkbox, the filename emphasized, a muted sub-line for formats and sizes, a compact format selector, a pill-shaped status indicator, and right-aligned Download and Remove actions."
 type = "binary"
 weight = 1.0
 
@@ -138,7 +138,7 @@ weight = 1.0
 [[criterion]]
 id = "3.11"
 name = "single_consistent_icon_family"
-description = "Icons across the navbar, drop zone, status pills, and category cards come from one consistent glyph family with a matching visual style — no mixed icon styles."
+description = "Icons across the navbar, drop zone, status pills, batch tray, and category cards come from one consistent glyph family with a matching visual style — no mixed icon styles."
 type = "binary"
 weight = 0.5
 optional = true
@@ -149,6 +149,43 @@ name = "narrow_viewport_layout_operable"
 description = "At a 320-pixel-wide viewport the hero stacks, the catalog collapses to one column, file rows stack, and the drop zone, queue controls, and format selectors remain operable with no horizontal page scrolling."
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "3.13"
+name = "batch_tray_compact_bar"
+description = "When multi-select is active, the batch tray reads as a compact bar above or below the queue with Batch set format, Batch remove, and Download all done — not a second dashboard."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.14"
+name = "session_export_panel_anatomy"
+description = "Session export is a panel or drawer with format tabs (session JSON and conversion-report), a monospaced preview, and Copy / Download / Import controls."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.15"
+name = "presets_compact_named_list"
+description = "Conversion presets read as a compact named list with Apply and Delete actions, not a second dashboard of cards."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.16"
+name = "undo_redo_near_queue_chrome"
+description = "Undo and Redo sit near the queue chrome with clear enabled/disabled visual states."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.n13"
+name = "batch_tray_looks_like_dashboard"
+description = "The batch tray or presets list is presented as a heavy second dashboard of cards that visually competes with the drop zone and queue worklist."
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "3.catchall"

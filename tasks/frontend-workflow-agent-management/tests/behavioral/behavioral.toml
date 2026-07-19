@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,88 +62,102 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "14.1"
-name = "multi_facet_round_trip"
-description = "Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline — never a mix."
+name = "in_memory_reload_resets_coherently"
+description = "Multi-facet round-trip: register an agent, apply a status filter, open a detail panel, then reload — the app coherently resets to the seeded baseline (seeded agents, no filter, no panel, empty undo stacks), never a mix of persisted and reset facets"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.2"
-name = "sort_reversal_proves_live_data"
-description = "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders."
+name = "status_filter_union_proves_live"
+description = "Status-filter proof: select one status and note the visible set, then add a second status; the visible set becomes the union of both, and clearing restores all agents, proving filters derive from the live collection"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.3"
-name = "derived_view_responds_to_input"
-description = "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input."
+name = "export_derived_view_tracks_mutations"
+description = "Derived-view sensitivity: register an agent or change a status, reopen Export fleet, and confirm the JSON agents array and rollup counts change to match the session rather than redrawing identical hardcoded text"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.4"
-name = "cross_view_echo_without_reload"
-description = "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list ↔ detail, board ↔ stats) without reload."
+name = "cross_view_row_panel_export_echo"
+description = "Cross-view echo: edit an agent's name in the modal and confirm the table row, detail panel Configuration tab, and Export fleet preview all show the new name without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.5"
-name = "count_delta_is_exact"
-description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+name = "rollup_count_delta_exact"
+description = "Count-delta integrity: measure the rollup total immediately before and after a valid register; the delta is exactly plus one with no lag"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.6"
-name = "different_inputs_change_outcomes"
-description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+name = "different_agents_different_export"
+description = "Input-dependent output: register two agents with different valid names and confirm the Export fleet JSON contains both distinct names rather than identical entries"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.7"
-name = "interleaved_flows_preserve_state"
-description = "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state."
+name = "interleaved_register_and_run"
+description = "Interleaved-flow integrity: start registering an agent, cancel, start a run on another agent, then complete a new register — the running agent's progress continues and the new agent appears once without corrupting either flow"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.8"
-name = "empty_to_repopulated_round_trip"
-description = "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions."
+name = "empty_then_repopulate_tracks_export"
+description = "Edge-state round-trip: remove agents down to empty (empty state visible, export agents array empty), then register one valid agent; the table, rollup total, and Export preview all show exactly that one agent"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "undo_round_trip_restores_export"
+description = "Undo round-trip: remove an agent, confirm it disappears from Export preview, Undo once, and confirm the agent returns in the table and Export preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "export_import_reconstructs_state"
+description = "Export/import pipeline: mutate the registry, export fleet JSON, import that JSON, and confirm visible names, statuses, and rollup counts match the exported document"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.n1"
-name = "partial_persistence_is_incoherent"
-description = "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence."
+name = "partial_reload_incoherence"
+description = "After mutations, a reload keeps some session facets (for example a filter or registered agent) while resetting others, producing incoherent partial persistence in this in-memory genre"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n2"
-name = "derived_surface_ignores_inputs"
-description = "A derived surface renders identically regardless of its inputs."
+name = "export_ignores_session_inputs"
+description = "Export fleet preview text is identical before and after a register or status change that should alter agents or rollup"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n3"
-name = "different_inputs_produce_identical_output"
-description = "Repeating an action with different inputs yields byte-identical output."
+name = "different_names_identical_export_rows"
+description = "Registering two differently named agents yields export entries that are byte-identical including the name field"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "State changes appear in one view but not another until reload."
+name = "cross_view_stale_after_edit"
+description = "An edit updates the table row but leaves the detail panel or Export preview showing the old name until reload"
 type = "binary"
 negate = true
 weight = 1.0

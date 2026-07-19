@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,126 +62,126 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "connect_agent_updates_panel_feed_export"
+description = "Connecting an agent with valid fields adds exactly one panel row with matching name/model/description, appends an agent-connected feed event, increases the visible agent count by one, and both Session JSON and Agents CSV export previews include the new agent — without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "invalid_connect_shows_field_contract_errors"
+description = "Submitting Connect agent with empty name, oversized name, missing model, or oversized description shows inline messages naming the field and violated rule, adds no row, and leaves the agent count unchanged"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "rename_updates_all_agent_surfaces"
+description = "Renaming an agent updates the panel row, expanded detail, feed references, and both export previews to the new name in the same session without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "disconnect_updates_panel_kpi_feed_export"
+description = "Disconnecting an agent removes its row, updates the active agents KPI when it was running, appends a disconnected feed event, and removes it from both export previews"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "kpi_detail_and_back_retain_dashboard_state"
+description = "Opening a KPI detail view then Back returns to the dashboard with feed filter selection and expanded agent rows unchanged"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "last_disconnect_shows_agent_empty_state"
+description = "Disconnecting every agent shows an empty state in the agent panel naming what belongs there and offering Connect agent; export previews still compile without errors"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "feed_filters_update_visible_events"
+description = "Selecting the error filter chip narrows the feed to error-chip events with a matching visible count; Clear filters restores the prior full feed order"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "command_palette_preserves_workflow"
+description = "Opening the command palette, running Export session, then closing returns focus and leaves the dashboard usable with the export drawer available"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "overlays_support_connect_export_palette"
+description = "Connect agent dialog, export drawer, night-mode popover, and command palette open from their triggers, support expected confirm/cancel paths, and close without trapping the user"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "retry_recovers_error_agent_without_reload"
+description = "Activating Retry on an error-state agent flips its chip to idle, removes danger treatment, and appends a retry feed event without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "primary_agent_flows_unavailable"
+description = "Connect, rename, disconnect, export, or import flows are not enabled from the UI"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "new_agents_missing_or_duplicated"
+description = "Connecting an agent produces duplicate panel rows or leaves the new agent absent from Session JSON and Agents CSV export previews"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "agent_state_desyncs_across_surfaces"
+description = "Agent name, state, or count changes appear in the panel but not in the KPI strip, feed, or export previews until reload"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "view_switch_breaks_or_loses_filters"
+description = "KPI detail navigation or Back breaks layout or loses feed filter selection"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_agents_breaks_ui"
+description = "Disconnecting every agent produces a blank broken panel with no empty state or Connect recovery control"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "filtered_feed_disagrees_with_count"
+description = "Feed filter chips disagree with the visible event count or Clear filters fails to restore the prior feed"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "export_drawer_cannot_reopen"
+description = "After closing the export drawer or command palette it cannot be reopened from its control"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,15 +189,15 @@ weight = 1.0
 [[criterion]]
 id = "6.n8"
 name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+description = "Connect dialog, export drawer, or command palette blocks navigation with no Escape or close path"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "failed_connect_or_import_lacks_feedback"
+description = "Invalid Connect or malformed Import provides no visible per-field feedback"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,10 +205,40 @@ weight = 1.0
 [[criterion]]
 id = "6.n10"
 name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+description = "Recovering from a detail view, closed overlay, or failed import requires a full page reload"
 type = "binary"
 negate = true
 weight = 1.0
+
+
+[[criterion]]
+id = "6.11"
+name = "bulk_disconnect_flow"
+description = "Selecting two agent checkboxes and confirming Disconnect selected removes exactly those two rows and appends two disconnected feed events in one action"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "undo_after_connect_then_redo"
+description = "Connecting an agent then Undo removes that agent and its connected feed event and restores prior export previews; Redo restores the agent and event"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "export_import_round_trip_flow"
+description = "After mutating the session (connect or rename at least one agent), exporting Session JSON then importing that same JSON restores agent names, feed length, active-agents KPI, and both export previews to the pre-export mutated state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "export_import_round_trip_breaks"
+description = "Export then import of Session JSON after a visible agent mutation leaves agents, feed, or export previews different from the pre-export mutated state without an import error"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "user_flows.catchall"

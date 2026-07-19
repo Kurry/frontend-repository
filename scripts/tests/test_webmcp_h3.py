@@ -99,10 +99,10 @@ class TestWebmcpContract(unittest.TestCase):
             self.assertIn("@playwright/mcp@0.0.76", pw_args)
             self.assertIn("$WEBMCP_CDP_ENDPOINT", pw_args)
 
-    def test_assignment_map_covers_89(self) -> None:
+    def test_assignment_map_covers_103(self) -> None:
         data = json.loads((ROOT / "schemas/webmcp-assignments.json").read_text())
         self.assertEqual(data["contract_version"], "zto-webmcp-v1")
-        self.assertEqual(len(data["assignments"]), 89)
+        self.assertEqual(len(data["assignments"]), 103)
         for entry in data["assignments"]:
             contract = webmcp_h3.render_contract(entry)
             self.assertIn("<webmcp_action_contract>", contract)

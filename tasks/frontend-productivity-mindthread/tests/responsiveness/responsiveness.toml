@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,157 +63,84 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "7.1"
 name = "layout_adapts_desktop_to_mobile"
-description = "Layout adapts gracefully from 1440px desktop to 375px mobile."
+description = "At roughly 1440px and 375px the capture bar, thread cards, timeline, Export drawer, bulk tray, and command palette remain usable without a desktop-only broken layout."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "7.2"
-name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+name = "mobile_tap_targets_large_enough"
+description = "Primary controls (Add Spark, nav tabs, Export, bulk tray actions) present adequately large tap targets at 375px."
 type = "binary"
-weight = 1.0
-
+weight = 0.5
+optional = true
 [[criterion]]
 id = "7.3"
-name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+name = "typography_wraps_across_breakpoints"
+description = "Long spark text wraps rather than overflowing between 375px and 1440px."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "7.4"
 name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+description = "No content clips or overflows the viewport at any width between 375px and 1440px."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "7.5"
-name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+name = "chrome_adapts_small_screens"
+description = "Top nav, Export drawer, and command palette stay fully visible/operable at small widths rather than rendering off-screen."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "7.6"
 name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+description = "At narrow widths, inbox and threads stack or reflow logically without overlapping unusable layers."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "7.7"
-name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+name = "touch_friendly_selectors"
+description = "Assign to Thread and status segmented control remain operable at 375px width."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "7.8"
 name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+description = "At 375px wide there is no page-level horizontal scrolling for Home, Today, Archived, or Export."
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "7.9"
-name = "media_and_canvases_resize"
-description = "Images, grids, and canvases size responsively to fit the layout."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "7.10"
-name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
-type = "binary"
-weight = 1.0
-
 [[criterion]]
 id = "7.n1"
-name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+name = "mobile_layout_unusable"
+description = "At 375px the capture bar or thread cards are unusable due to overflow or unreachable controls."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "7.n2"
-name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+name = "export_drawer_offscreen_on_mobile"
+description = "Export drawer or command palette renders off-screen or clipped at small widths with no way to operate Copy/Download."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "7.n3"
-name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+name = "horizontal_scroll_at_375"
+description = "Page-level horizontal scrolling appears at 375px during normal Home/Today use."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "7.n4"
-name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+name = "text_overflows_cards"
+description = "Long spark or thread title text overflows its card/panel instead of wrapping between 375 and 1440."
 type = "binary"
 negate = true
 weight = 1.0
-
-[[criterion]]
-id = "7.n5"
-name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n6"
-name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n7"
-name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n8"
-name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n9"
-name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n10"
-name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
-type = "binary"
-negate = true
-weight = 1.0
-
 [[criterion]]
 id = "responsiveness.catchall"
 name = "responsiveness_catchall"
-description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in responsiveness that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

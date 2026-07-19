@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -176,6 +176,43 @@ weight = 1.0
 id = "2.16"
 name = "external_origin_requests_present"
 description = "Outbound network requests to external origins (CDN scripts, remote fonts, remote icon sets, or analytics) appear in the network log during load or use."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.17"
+name = "persistence_includes_profiles"
+description = "After editing settings and saving a profile, a reload restores the edited controls, generated lines, override count, and saved profiles from client storage coherently."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.18"
+name = "shared_state_includes_undo_diff_profiles"
+description = "Undo/redo stacks, Diff mode, profiles, and search/palette query derive from the same shared client state as settings — applying a profile or undoing an edit updates controls, preview, and generated config together."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n17"
+name = "profiles_lost_on_reload"
+description = "Saved profiles or edited overrides fail to restore after reload despite the persistence mandate."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.19"
+name = "api_shaped_schemas_drive_forms_and_artifacts"
+description = "Setting editors, the profile name form, and Import validate against the same Ghostty key = value create/update field contracts the generated export uses (non-empty font-family, font-size 4–60, cursor-style enum, #RRGGBB colors, opacities 0–1, declared theme set, clipboard/copy-on-select/window-decoration enums, non-negative padding and scrollback-limit, palette N=#RRGGBB, keybind trigger=action with duplicate-trigger conflict, non-empty profile-name, boolean true/false): invalid values show inline per-field errors before commit, a valid commit produces the would-be request body, and Export/Import round-trip only contracted shapes."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n18"
+name = "import_export_schema_mismatch"
+description = "Export emits lines that Import cannot restore, or Import accepts values that the setting editors reject under the same Ghostty field contracts — form and artifact schemas disagree."
 type = "binary"
 weight = 1.0
 negate = true

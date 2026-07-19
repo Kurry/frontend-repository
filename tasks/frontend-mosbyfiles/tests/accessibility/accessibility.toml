@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,71 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "archive_controls_keyboard_operable"
+description = "The header wordmark and About item, architect tags, sibling tags, overscroll affordance, and every red circular close button are reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space), each with a visible focus indicator."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "media_popup_traps_and_restores_focus"
+description = "Opening a media popup moves focus into the dialog, traps focus while open, and closing it returns focus to the element that opened it."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.5"
-name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+name = "portraits_and_gallery_have_alt"
+description = "Architect portraits, about-gallery architecture photographs, and other informative images carry descriptive alt text or accessible names."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+name = "headings_logical_order_across_routes"
+description = "Headings on home, about, and case routes follow a logical order with no skipped levels that break the outline."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "landmarks_present"
+description = "The document exposes landmark regions (navigation and main content at minimum) so assistive tech can move between chrome and archive content."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+name = "cream_and_cover_contrast_aa"
+description = "Cream primary text on the dark surface (rgb(253,250,247) on rgb(25,25,25)) and white text on the four saturated category covers meet WCAG AA contrast."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "semantic_buttons_and_links"
+description = "Interactive controls use semantic HTML buttons and links with accessible names; the media popup is exposed as a dialog."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "reduced_motion_collapses_timelines"
+description = "With prefers-reduced-motion emulated on a fresh load: smooth scrolling is disabled, folder open/close and hero split timelines collapse to their end state immediately, and essential opacity states remain for readability while routes stay operable."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.a1"
+name = "split_headings_keep_phrase_label"
+description = "Character-split display headings (hero title American modernism and case architect names) keep the full phrase available to assistive technology through a label on the heading container while individual character spans stay out of the accessibility tree (aria-hidden)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
-name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+name = "primary_controls_unreachable_by_keyboard"
+description = "A primary interactive control (wordmark, About, architect tag, sibling tag, overscroll affordance, or red close button) cannot be reached or activated via keyboard."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +134,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n2"
 name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+description = "Focused interactive archive controls show no visible focus indicator or the indicator is fully obscured."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,55 +142,39 @@ weight = 1.0
 [[criterion]]
 id = "1.n3"
 name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+description = "Custom interactive chrome (tags, close buttons, overscroll affordance, or media popup) uses non-semantic tags without ARIA roles or accessible names."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
-id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+id = "1.a4"
+name = "split_heading_character_soup"
+description = "A split/kinetic headline (hero title or case architect name) is exposed to the accessibility tree as character soup — no aria-label (or equivalent) on the container and the split spans are not aria-hidden."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "media_popup_fails_focus_trap"
+description = "While a media popup is open, keyboard focus escapes into the scroll-locked background behind the dialog."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+name = "poor_contrast_unreadable_text"
+description = "Cream primary text on the dark surface or white text on a category cover fails WCAG AA contrast and is unreadable."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+name = "portraits_or_gallery_missing_alt"
+description = "An architect portrait or about-gallery photograph lacks descriptive alt text or an accessible name."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +182,37 @@ weight = 1.0
 [[criterion]]
 id = "1.n10"
 name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+description = "With prefers-reduced-motion set, smooth scrolling continues, or folder open/close and hero split timelines still run their full animated sequences instead of collapsing to end state."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "palette_drawer_dossier_focus_trap"
+description = "The command palette, reading-list drawer, and dossier export panel trap focus while open, close on Escape, and return focus to the control that opened them."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "pin_note_export_controls_keyboard"
+description = "The Pin control, Field note area, Save note control, category filter, home search field, Undo, Redo, Export dossier, Copy, Download, and Import dossier controls are keyboard operable with visible focus indicators and accessible names."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n11"
+name = "dossier_or_palette_no_focus_return"
+description = "Closing the command palette, reading-list drawer, or dossier export panel via Escape leaves focus lost or trapped away from the opener."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n12"
+name = "pin_export_controls_keyboard_blocked"
+description = "Pin, Field note, Undo/Redo, Export dossier, or Import dossier cannot be reached or activated via keyboard alone."
 type = "binary"
 negate = true
 weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -60,90 +60,143 @@ allowed_tools = [
 [scoring]
 aggregation = "weighted_mean"
 
-[[criterion]]
-id = "14.1"
-name = "multi_facet_round_trip"
-description = "Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline — never a mix."
-type = "binary"
-weight = 1.0
 
 [[criterion]]
-id = "14.2"
-name = "sort_reversal_proves_live_data"
-description = "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders."
+id = "14.1"
+name = "in_memory_multi_facet_reload_resets"
+description = "Starting after boot: create a project named Northline Studio, switch theme with /retro, open Projects Board, Accept the cookie banner, archive one project, and open Export; then reload. All facets coherently reset to the seeded baseline (boot replays, /work shows only seeded projects, theme/mode/consent/archive/undo/export return to defaults) — never a mixed partial survival."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.3"
-name = "derived_view_responds_to_input"
-description = "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input."
+name = "board_filter_derived_view_sensitivity"
+description = "Derived-view sensitivity: apply a status:shipped syntax query or status filter in Projects Board and confirm the visible card set changes meaningfully; clear the query/filter and confirm the full seeded set returns exactly."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.4"
-name = "cross_view_echo_without_reload"
-description = "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list ↔ detail, board ↔ stats) without reload."
+name = "edit_echoes_board_work_detail_export"
+description = "Cross-view echo: edit a seeded project's name, then without reload confirm Projects Board, /work output, that project's shortcut detail, and the Portfolio JSON export preview all show the edited name."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.5"
-name = "count_delta_is_exact"
-description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+name = "create_count_delta_exact"
+description = "Count-delta integrity: measure the Projects Board card count, /work entry count, and /stats total immediately before and after creating one valid project; all three increase by exactly one with no off-by-one lag."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.6"
-name = "different_inputs_change_outcomes"
-description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+name = "different_project_names_different_outputs"
+description = "Input-dependent output: create two projects with different names (Northline Studio then Coral Relay); their board cards, /work lines, shortcut detail blocks, and Portfolio JSON entries differ according to those names."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.7"
-name = "interleaved_flows_preserve_state"
-description = "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state."
+name = "interleaved_create_and_theme"
+description = "Interleaved-flow integrity: start creating a project, run /retro to switch theme, finish creating the project, then open Projects Board and Export; the new project is present in board and Portfolio JSON, the retro theme remains applied, and neither flow corrupted the other."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.8"
-name = "empty_to_repopulated_round_trip"
-description = "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions."
+name = "empty_then_repopulate_projects"
+description = "Edge-state round-trip: delete every active project until empty states show in Board and /work, then create one valid project; both surfaces leave the empty state and show exactly that one project, and /stats total equals 1."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "bulk_archive_undo_restores_export"
+description = "Full-pipeline probe: select three board projects, Archive selected, confirm they leave the board and export preview and appear in /archive with /stats down by three; press Ctrl+Z and confirm all three return to the board, /stats prior totals, and Portfolio JSON names."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "export_import_round_trip_probe"
+description = "Round-trip: create Northline Atlas with a valid project field-contract payload, open Export and confirm Portfolio JSON contains Northline Atlas under projects[] with required version/theme/consent/projects keys, copy that JSON, delete Northline Atlas, import the copied JSON, and confirm Northline Atlas returns on the board and in /work with the same status, tags, slug, and stats."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.12"
+name = "artifact_field_contract_probe"
+description = "Full-pipeline probe: create or edit a project, switch to /retro, Accept cookie consent, open Export, and confirm Portfolio JSON shows version exactly \"1.0\", theme exactly \"retro\", consent exactly \"accepted\", and a projects entry whose name, slug, blurb, status, tags, stats, type, and year match the form values."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.13"
+name = "schema_invalid_import_leaves_state"
+description = "Edge-state: import a parseable JSON payload that fails the Portfolio JSON field contract (for example version \"2.0\" or status \"draft\"); board card count, /work listing, and export preview stay unchanged and a validation message names the offending field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.11"
+name = "stats_sensitive_to_status_edit"
+description = "Derived-view sensitivity: edit one project's status from shipped to wip and confirm /stats shipped count decreases by one and wip increases by one without reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.n1"
-name = "partial_persistence_is_incoherent"
-description = "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence."
+name = "partial_in_memory_state_survives_reload"
+description = "After configuring theme, mode, a created project, consent, and archive state, a reload leaves an incoherent mix (for example the created project survives while theme resets, or consent stays accepted while projects reset)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n2"
-name = "derived_surface_ignores_inputs"
-description = "A derived surface renders identically regardless of its inputs."
+name = "board_filter_ignores_status_input"
+description = "Applying different status or tag filters or syntax queries leaves the Projects Board card set identical regardless of the filter input."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n3"
-name = "different_inputs_produce_identical_output"
-description = "Repeating an action with different inputs yields byte-identical output."
+name = "different_names_yield_identical_records"
+description = "Creating two projects with different names yields byte-identical board cards, detail blocks, and Portfolio JSON entries that ignore the distinct inputs."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "State changes appear in one view but not another until reload."
+name = "edit_stale_until_reload_across_views"
+description = "After editing a project name, Projects Board, /work, or the export preview still shows the old name until a full page reload."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "export_hardcoded_ignores_session"
+description = "Portfolio JSON export content stays identical before and after creating a distinctly named project in the session."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n6"
+name = "undo_skips_export_or_stats"
+description = "After bulk archive, Undo restores the board but leaves /stats or the export preview in the archived state."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n7"
+name = "export_lacks_api_shaped_contract"
+description = "After creating a valid project and opening Export, the Portfolio JSON preview lacks required version/theme/consent/projects keys or shows project entries that omit name, slug, blurb, status, tags, stats, type, or year."
 type = "binary"
 negate = true
 weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,86 +62,86 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "keyboard_operable_theme_controls"
+description = "Every interactive control — theme rows, token pickers, segmented radius/size choices, Depth/Noise toggles, chrome dropdowns, preview tabs, Hold to add, Random, Undo/Redo, Export format tabs, Import, snapshots, Before / After, and vision mode — is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space), each showing a visible focus indicator when focused."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "export_modal_focus_trap_and_return"
+description = "The Export modal uses role dialog with aria-modal true, traps focus while open, closes on Escape, and returns focus to the control that opened it."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "chrome_icons_have_accessible_names"
+description = "Meaningful chrome icons (stars, docs, components, and similar controls) expose descriptive accessible names or alt text so assistive technology can identify them."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "theme_name_validation_announced"
+description = "Validation messages for the theme name, snapshot name, and Import are rendered visually and associated with their fields (for example via described-by or an ARIA live region) so assistive technology announces them."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+name = "theme_name_field_explicitly_labeled"
+description = "The editable theme name field uses an explicit label element associated with the control."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+name = "color_pickers_named_by_token"
+description = "Color pickers and the content \"A\" badges carry accessible names that identify which semantic token they edit (for example primary face vs primary content)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "workspace_landmarks_present"
+description = "The app exposes semantic landmarks (for example nav for top chrome and main for the themes/editor/preview workspace) so assistive technology can navigate the tool."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+name = "chrome_and_editor_contrast"
+description = "Chrome labels, editor section titles, theme row names, and primary controls meet sufficient contrast against their surfaces in the default chrome theme."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "dropdowns_and_tabs_keyboard_semantics"
+description = "Chrome dropdowns and preview tabs are keyboard-operable: arrow keys move through options, Enter or Space selects, and the selected option is exposed as active to assistive technology; controls use button/role semantics rather than unlabeled clickable divs."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion set, hold-to-add progress, theme-row enter/exit, Random toast, preview recolor easing, Before / After, vision-mode, and export-modal transitions are removed or reduced to instant state changes while every flow — hold-to-add, undo/redo, export, and import included — remains completable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
-name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+name = "theme_controls_unreachable_by_keyboard"
+description = "A theme row, token picker, segmented choice, toggle, dropdown, tab, Hold to add, Random, or CSS-export control cannot be reached or activated via keyboard alone."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n2"
-name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+name = "focus_indicators_missing_on_controls"
+description = "Focused theme rows, token pickers, segmented choices, dropdown triggers, or form fields show no visible focus indicator or the indicator is obscured."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,55 +149,55 @@ weight = 1.0
 [[criterion]]
 id = "1.n3"
 name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+description = "Theme rows, content \"A\" badges, or chrome dropdowns use non-semantic tags without ARIA roles or accessible names."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+name = "active_theme_or_error_color_only"
+description = "Active theme selection or name-field error state is conveyed by color alone with no text, highlight label, or other non-color cue."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "css_export_modal_no_focus_trap"
+description = "With the CSS-export modal open, Tab moves focus to controls behind the overlay without trapping focus in the dialog."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+name = "unreadable_contrast_on_chrome_or_editor"
+description = "Chrome labels, editor titles, or primary button labels are unreadable due to poor contrast against their background."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+name = "validation_errors_visual_only"
+description = "Theme-name validation feedback is visual only and is not associated for assistive technology (no described-by, label wiring, or live region)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+name = "meaningful_icons_missing_names"
+description = "Meaningful chrome or editor icons that convey actions are missing alt text or an accessible name."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+name = "heading_order_skipped_in_editor"
+description = "Editor section headings or workspace chrome headings skip levels (for example jumping H1 to H3) or have no coherent order."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,22 @@ weight = 1.0
 [[criterion]]
 id = "1.n10"
 name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+description = "With prefers-reduced-motion set, hold-to-add progress, theme-row enter/exit, Random toast, or export-modal transitions still animate fully."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "contrast_results_not_color_only"
+description = "Contrast AA/AAA results are exposed as text (pass/fail labels or ratios), not color alone, and Undo/Redo expose their disabled state to assistive technology when stacks are empty."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n11"
+name = "contrast_fail_color_only_no_text"
+description = "Failing Contrast pairs are indicated by color alone with no textual pass/fail or ratio for assistive technology."
 type = "binary"
 negate = true
 weight = 1.0

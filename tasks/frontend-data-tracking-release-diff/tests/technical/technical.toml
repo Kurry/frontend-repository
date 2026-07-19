@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,14 +63,14 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.1"
 name = "shared_state_coherence"
-description = "All views derive from one shared store: sealing a cut updates the sidebar, pickers, and timeline together; changing a diff picker recomputes classification and summary counts from the same manifests; advancing rotation updates panel, history, and timeline in one action — all without a reload and with no view showing stale data another view already updated"
+description = "All views derive from one shared store: sealing a cut updates the sidebar, pickers, timeline, and Export Release pack JSON together; changing a diff picker recomputes classification and summary counts from the same manifests; advancing rotation updates panel, history, timeline, and export rotation.cycle in one action; a successful import replaces versions/rotation/timeline from that same store — all without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
 name = "no_storage_reload_seeded"
-description = "No browser storage is used: localStorage and sessionStorage remain empty after cutting a release, retrying a rank-stability check, advancing rotation, and switching tabs, and a page reload returns the app to its seeded state"
+description = "No browser storage is used: localStorage and sessionStorage remain empty after cutting a release, exporting/importing a release pack, retrying a rank-stability check, advancing rotation, and switching tabs, and a page reload returns the app to its seeded state"
 type = "binary"
 weight = 1.0
 
@@ -93,7 +93,7 @@ negate = true
 [[criterion]]
 id = "2.5"
 name = "console_clean_full_exercise"
-description = "The console is free of errors and warnings on first load and stays clean after a complete cut with a failed-then-retried rank-stability check, diff pair changes, rotation advances, and copy actions"
+description = "The console is free of errors and warnings on first load and stays clean after a complete cut with a failed-then-retried rank-stability check, export/import of Release pack JSON, diff pair changes, rotation advances, and copy actions"
 type = "binary"
 weight = 1.0
 
@@ -114,14 +114,14 @@ weight = 1.0
 [[criterion]]
 id = "2.8"
 name = "keyboard_operability_focus"
-description = "Every interactive control — sidebar entries, tabs, version pickers, the disclosure row, form fields, the copy control, Retry check, Advance rotation — is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space), showing a visible focus indicator at each stop"
+description = "Every interactive control — sidebar entries, tabs, version pickers, the disclosure row, form fields, Export/Import controls, copy and download controls, Retry check, Advance rotation — is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space), showing a visible focus indicator at each stop"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.9"
 name = "dialog_focus_trap_escape"
-description = "The cut dialog traps focus while open, closes on Escape, and returns keyboard focus to the Cut release control"
+description = "The cut dialog and the Export and Import panels trap focus while open, close on Escape, and return keyboard focus to the control that opened them"
 type = "binary"
 weight = 1.0
 
@@ -136,6 +136,14 @@ weight = 1.0
 id = "2.11"
 name = "no_outbound_chrome_links"
 description = "App chrome contains zero navigational outbound links: tabs, sidebar entries, and controls change views through client state and never navigate to another origin"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "2.12"
+name = "cut_and_import_zod_field_contracts"
+description = "Cut form and import validation enforce the declared field contracts client-side (semver unique name, notes max 500, Release pack JSON schemaVersion larkspur-release-pack/v1 with task-manifest entry rules); invalid cases show field-named errors and do not mutate the shared store"
 type = "binary"
 weight = 1.0
 

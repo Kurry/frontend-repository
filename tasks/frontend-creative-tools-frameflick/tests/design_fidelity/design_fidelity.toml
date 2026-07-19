@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,165 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "spacing_and_sizing_follow_scale"
-description = "Spacing and sizing follow the design system's scale, with no arbitrary one-off values visible in computed styles."
+name = "spacing_follows_4px_scale"
+description = "At desktop width, panel gaps, card padding, and control spacing follow the 4px base spacing unit rather than arbitrary odd-pixel one-offs visible in computed styles."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "typography_matches_spec"
-description = "Typography matches the spec for all headings and body copy."
+name = "typography_matches_frameflick_spec"
+description = "Heading and body text use the specified ui-sans-serif/system stack, and primary heading and section headings render at 16px as specified."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "layout_matches_reference"
-description = "Layout matches reference screenshots to within a small tolerance at all specified breakpoints; fidelity tasks achieve near pixel-parity."
+name = "layout_matches_reference_screenshots"
+description = "At 1440 desktop width, the three-column editor (left tools, center canvas stage, right controls) and header Editor/Collaboration tabs match /reference-screenshots/ overview and segment panels within a small tolerance for structure and density; where a screenshot and the instruction text conflict, the text wins."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.4"
-name = "specified_state_changes_animate"
-description = "Transitions or animations are applied to the state changes the spec calls out, such as add, delete, filter, or view switch."
+name = "specified_state_change_motions_present"
+description = "Spec-required motion states are present via the real UI path: background swatch/frame/preset hover lift, preset list entry animate-in on save and animate-out on confirmed delete, Recent thumbnail animate-in, and Copied! label swap after Copy image."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "responsive_behavior_matches_reference"
-description = "Responsive behavior matches reference patterns."
+name = "stacked_narrow_layout_matches_spec"
+description = "On a narrow viewport the three-column editor collapses to a single stacked column with upload panel, canvas preview, and style controls all reachable by scrolling, matching the responsiveness spec."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.6"
-name = "control_styling_matches_spec"
-description = "Button and form radii, padding, and shadows conform to the spec."
+name = "pill_buttons_and_8px_card_radius"
+description = "Primary buttons are fully pill-shaped with background #FDE047 and text #713F12 plus a soft layered inset-plus-outline shadow, and panels/cards use an 8px border radius rather than unstyled browser defaults."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.7"
-name = "typography_has_clear_hierarchy"
-description = "Typography has a clear hierarchy that distinguishes section and body text."
+name = "section_vs_body_type_hierarchy"
+description = "Panel section headers are visually distinct from body/control labels within the 16px heading system so Background, Caption, Watermark, and Saved presets read as section titles."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.8"
-name = "component_states_match_spec"
-description = "Component states (default, hover, active, disabled) match the spec where specified."
+name = "selected_and_disabled_control_states"
+description = "Selected background swatch, active Frame style option, and active toggles show a yellow accent ring; Save preset stays visually disabled while the name field is empty."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.9"
-name = "surface_treatments_match_spec"
-description = "Color, depth, and border treatments are precise per the design."
+name = "palette_tokens_and_surfaces_match"
+description = "Color treatments match the spec: soft cream page background, deep-brown (#713F12) header with yellow (#FDE047) FrameFlick branding, off-white panels with hairline amber borders, and CSS custom properties --color-primary / --color-accent #FDE047, --color-background #FFFFFF, --color-text-primary and --color-link #713F12."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.10"
-name = "microinteractions_match_spec"
-description = "Microinteraction feedback for hover and press follows the spec in duration and motion."
+name = "hover_lift_and_button_ease_match_spec"
+description = "Via the real pointer path, background swatches, frame options, and preset thumbnails lift and gain shadow on hover, and buttons ease their background and lift slightly on hover/press."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.n1"
-name = "sizing_or_spacing_contradicts_scale"
-description = "Visible sizing or spacing values contradict the specified scale."
+name = "spacing_contradicts_4px_scale"
+description = "Visible major panel gaps use arbitrary odd-pixel spacing that contradicts the 4px base spacing unit."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n2"
-name = "colors_fall_outside_palette"
-description = "Colors appear outside the specified palette."
+name = "colors_outside_amber_brown_palette"
+description = "Surfaces or accents use colors outside the warm amber-and-brown system (for example a purple-on-white theme wash) instead of cream, #713F12, and #FDE047."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n3"
-name = "sizing_mismatches_spec"
-description = "Sizing mismatches the spec."
+name = "heading_size_mismatches_16px"
+description = "Primary heading or section headings are grossly mismatched versus the specified 16px size."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n4"
-name = "required_animations_missing_or_wrong"
-description = "Animations are missing or incorrect where the spec requires them."
+name = "required_list_feedback_motion_missing"
+description = "Saving a preset snaps the new Saved presets entry in with no entry animation, or confirming delete snaps the entry out with no exit animation, when exercised through the real UI controls."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n5"
-name = "specified_controls_use_browser_defaults"
-description = "Form or button controls use browser default styles when the spec styles them."
+name = "primary_buttons_use_browser_defaults"
+description = "Primary actions such as Download PNG, Copy image, or Save preset render as unstyled browser-default buttons instead of pill-shaped #FDE047 / #713F12 controls."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n6"
-name = "layout_misaligned_at_breakpoints"
-description = "The grid or layout is misaligned at reference breakpoints."
+name = "three_column_layout_misaligned"
+description = "At 1440 desktop width the left tools, center canvas, and right controls columns are misaligned, overlapping, or missing versus the three-column editor layout."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n7"
-name = "elements_are_clipped_or_offscreen"
-description = "Elements render off-screen or clipped."
+name = "canvas_or_panels_clipped"
+description = "The canvas preview, style panels, or header tabs render clipped or off-screen at 1440 desktop width."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n8"
-name = "structure_deviates_from_reference"
-description = "Section order, content, or structure deviates from the reference on fidelity tasks."
+name = "workspace_structure_deviates_from_reference"
+description = "Section order or structure of the editor workspace (left upload/recent/presets, center canvas/export, right style controls, Editor/Collaboration header tabs) visibly contradicts the reference screenshots and instruction layout."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n9"
-name = "heading_and_body_text_undifferentiated"
-description = "Heading and body text have no distinction."
+name = "heading_and_body_undifferentiated"
+description = "Panel section headers and body/control labels have no visual distinction across the editor."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n10"
-name = "microinteractions_deviate_from_reference"
-description = "Microinteractions are missing or deviate from the provided reference."
+name = "hover_states_missing_on_swatches"
+description = "Background swatches, frame options, or preset thumbnails show no hover lift/shadow feedback when hovered via the real pointer path."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "export_preview_and_paste_dialog_match_spec"
+description = "The Export preview shows style JSON in a monospaced read-only block, and the paste-settings dialog lists Background, Composition, Frame, Caption, and Watermark checkboxes with Confirm paste and Cancel — matching the visual_design spec."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.n11"
+name = "hardened_chrome_missing_from_layout"
+description = "Undo/Redo, Before/After, Export scale, or the Export preview region is missing from the editor chrome despite being specified."
 type = "binary"
 negate = true
 weight = 1.0
@@ -213,7 +228,7 @@ weight = 1.0
 [[criterion]]
 id = "design_fidelity.catchall"
 name = "design_fidelity_catchall"
-description = "The app exhibits a significant, browser-observable defect in fidelity to the spec or reference that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in fidelity to the FrameFlick spec or reference that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

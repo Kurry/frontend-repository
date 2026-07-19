@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,150 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "9.1"
-name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+name = "cold_start_under_two_seconds"
+description = "The app is interactive within 2 seconds of a local cold load: navigation and table controls respond"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
-name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+name = "console_clean_on_load"
+description = "No console errors or warnings appear on first load"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
-name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+name = "console_clean_full_exercise"
+description = "No console errors or warnings appear during a full exercise including fetch-more, bulk actions, command palette, export, and import"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.4"
-name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+name = "sort_filter_search_smooth"
+description = "Sorting, filtering, and name-search stay smooth with the full seeded table plus fetch-more appends; no interaction hangs the UI"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.5"
-name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+name = "rapid_input_stable"
+description = "Rapid repeated input — fast filter changes, quick view switches, rapid queue reorders, palette open/close — causes no dropped interactions or stale counts"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.6"
-name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+name = "export_regenerates_without_freeze"
+description = "Opening Export sourcing pack regenerates Queue JSON, Candidates CSV, and Sourcing report from live state without freezing the UI for more than a brief moment"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
-name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+name = "fetch_more_stays_responsive"
+description = "During a fetch-more run the UI remains responsive enough to show step status changes without locking the entire chrome permanently"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.8"
-name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+name = "bulk_action_updates_promptly"
+description = "Bulk Score/Select/Reject updates chips and rollups in the same interaction without multi-second UI lock"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+name = "import_applies_without_hang"
+description = "A valid import applies statuses and queue order without hanging the page or leaving a permanent spinner"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+name = "undo_redo_feels_immediate"
+description = "Undo and Redo restore or reapply state without multi-second delay or frozen chrome"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.n1"
-name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+name = "cold_start_exceeds_two_seconds"
+description = "Cold load to interactive controls takes more than 2 seconds on a local render"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n2"
-name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+name = "console_errors_on_load"
+description = "Console errors or warnings appear on first load"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n3"
-name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+name = "console_errors_during_exercise"
+description = "Console errors or warnings appear during fetch-more, bulk, export, or import"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n4"
-name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
+name = "sort_or_filter_hangs_ui"
+description = "Sorting, filtering, or search hangs the UI or drops frames badly enough that controls stop responding"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n5"
-name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+name = "rapid_input_drops_interactions"
+description = "Rapid filter or view switching drops interactions or leaves a surface with stale counts another surface already updated"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n6"
-name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
+name = "export_freezes_ui"
+description = "Opening Export sourcing pack locks the UI for multiple seconds while the three tabs stay empty or show pre-mutation text"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n7"
-name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
+name = "fetch_more_locks_chrome"
+description = "During fetch-more, navigation stays locked after steps should have completed, or step indicators remain stuck in running without reaching complete"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n8"
-name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
+name = "bulk_action_multi_second_lock"
+description = "A bulk tray action locks the UI for multiple seconds before chips and rollups update"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n9"
-name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
+name = "import_hangs_or_spins_forever"
+description = "After confirming Import, a permanent spinner remains on screen with no applied state and no inline error message"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n10"
-name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+name = "undo_redo_unresponsive"
+description = "Undo or Redo ignores activation or freezes the chrome"
 type = "binary"
 negate = true
 weight = 1.0
@@ -213,7 +213,7 @@ weight = 1.0
 [[criterion]]
 id = "performance.catchall"
 name = "performance_catchall"
-description = "The app exhibits a significant, browser-observable defect in performance or stability that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable performance defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

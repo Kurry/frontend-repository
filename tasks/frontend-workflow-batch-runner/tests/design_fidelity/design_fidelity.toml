@@ -1,0 +1,219 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "spacing_follows_design_scale"
+description = "Spacing and sizing follow the design system's scale with no arbitrary one-off values visible in computed styles"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "typography_matches_spec"
+description = "Typography matches the specified hierarchy for the app title, panel headings, and grid body text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "layout_matches_described_composition"
+description = "The rendered layout matches the described composition — sidebar, rollup strip with progress bar, central grid, queue and timeline alongside, inspector as a side panel"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "specified_state_changes_animate"
+description = "The state changes the spec calls out — item completion, status fades, queue reorder, macro flips, modal open and close — carry their specified transitions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "responsive_behavior_matches_spec"
+description = "The 768 pixel sidebar collapse and the 375 pixel container-scroll behavior match the specified responsive patterns"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "component_kit_styling_consistent"
+description = "Buttons, modals, tables, tags, and notifications share one consistent component-kit styling — radii, padding, and shadows do not vary arbitrarily between surfaces"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "heading_body_distinction"
+description = "Headings and body text are clearly distinct in size and weight across every panel"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "component_states_match_spec"
+description = "Default, hover, focus, disabled, and error states match the specified treatments on buttons, inputs, and toggles"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "status_and_amber_treatments_precise"
+description = "The specified color treatments — amber concurrency saturation, red failed, green complete, amber retrying, muted stopped — render precisely and consistently"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "microinteraction_durations_match"
+description = "Specified durations — roughly 60 millisecond item stagger, 200 to 300 millisecond modals — are observably in range"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.n1"
+name = "spacing_contradicts_scale"
+description = "Visible sizing or spacing values contradict the consistent scale (crowded pockets next to loose ones)"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n2"
+name = "colors_outside_specified_semantics"
+description = "Status or guard colors fall outside the specified semantic assignments (for example failed items rendered green or amber)"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n3"
+name = "sizing_mismatches_spec"
+description = "Element sizing visibly mismatches the spec — for example the 16 pixel icon scale or condensed grid density is ignored"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n4"
+name = "required_animations_missing"
+description = "Transitions the spec requires — modal scale, item stagger, countdown ticking — are missing or wrong"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n5"
+name = "browser_default_controls"
+description = "Form or button controls render with browser default styles where the spec styles them"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n6"
+name = "grid_misaligned_at_breakpoints"
+description = "The grid or panel layout is misaligned at the specified breakpoints"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n7"
+name = "elements_clipped_or_offscreen"
+description = "Elements render off-screen or clipped in the default desktop layout"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n8"
+name = "structure_deviates_from_spec"
+description = "The structural composition deviates from the spec — for example no rollup strip, or the queue buried inside a modal"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n9"
+name = "heading_body_undifferentiated"
+description = "Heading and body text have no visible distinction"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n10"
+name = "microinteractions_deviate"
+description = "Microinteraction feedback deviates from the specified duration or motion so far it reads as a different design"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "design_fidelity.catchall"
+name = "design_fidelity_catchall"
+description = "The app exhibits a significant, browser-observable defect in fidelity to the spec that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -60,160 +60,177 @@ allowed_tools = [
 [scoring]
 aggregation = "weighted_mean"
 
+
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "search_empty_state_is_present"
+description = "When Identities search matches nothing, an empty state explaining no matches is shown with a way to clear the search"
 type = "binary"
 weight = 1.0
+
 
 [[criterion]]
 id = "4.2"
 name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+description = "Create and rename validate the label field inline before submit for empty, whitespace-only, and over-40-character values"
 type = "binary"
 weight = 1.0
+
 
 [[criterion]]
 id = "4.3"
 name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+description = "Validation and import errors name the offending field and the fix rather than only saying Invalid"
 type = "binary"
 weight = 1.0
+
 
 [[criterion]]
 id = "4.4"
 name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+description = "Create, permission toggle, copy, export, and import show visible success feedback such as a toast"
 type = "binary"
 weight = 1.0
 
+
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "import_shows_error_not_hang"
+description = "A non-conforming vault import shows an inline error promptly rather than hanging without feedback"
 type = "binary"
 weight = 1.0
+
 
 [[criterion]]
 id = "4.6"
 name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+description = "Delete and import require confirmation with a cancel path, and Undo reverses create/rename/delete/toggle/import mutations"
 type = "binary"
 weight = 1.0
 
+
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "reveal_and_copy_have_clear_affordance"
+description = "Reveal/hide and Copy npub controls have clear labels reflecting their action"
 type = "binary"
 weight = 1.0
+
 
 [[criterion]]
 id = "4.8"
 name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+description = "Buttons, inputs, switches, and labels use semantic interactive elements"
 type = "binary"
 weight = 1.0
+
 
 [[criterion]]
 id = "4.9"
 name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+description = "Delete and import confirmation dialogs close via cancel/Escape without applying the action"
 type = "binary"
 weight = 1.0
 
+
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "double_submit_creates_one"
+description = "Double-activating create submit adds exactly one identity"
 type = "binary"
 weight = 1.0
+
+
+[[criterion]]
+id = "4.11"
+name = "reveal_not_carried_across_identities"
+description = "Revealing one identity's nsec does not reveal another's after switching active identity"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "4.12"
+name = "last_identity_delete_blocked"
+description = "Attempting to delete the sole remaining identity leaves the collection unchanged with a visible explanation"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "4.13"
+name = "import_rejects_bad_schema"
+description = "Import of vault JSON with wrong version, empty identities, invalid label, bad npub/nsec prefix, incomplete grants, or invalid theme shows a field-named error and mutates nothing"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "4.14"
+name = "long_label_layout_holds"
+description = "A 40-character label truncates or wraps inside its card without overlapping the npub or neighbouring cards"
+type = "binary"
+weight = 1.0
+
 
 [[criterion]]
 id = "4.n1"
 name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+description = "A no-match search shows nothing and provides no UI feedback."
 type = "binary"
 negate = true
 weight = 1.0
+
 
 [[criterion]]
 id = "4.n2"
 name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+description = "Validation or import errors are surfaced only in the browser console."
 type = "binary"
 negate = true
 weight = 1.0
+
 
 [[criterion]]
 id = "4.n3"
 name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+description = "Create, toggle, copy, export, or import lack visible feedback and silently succeed or fail."
 type = "binary"
 negate = true
 weight = 1.0
+
 
 [[criterion]]
 id = "4.n4"
 name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+description = "Delete or import replace applies immediately with no confirmation or cancel path."
 type = "binary"
 negate = true
 weight = 1.0
+
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "invalid_label_still_creates"
+description = "An empty, whitespace-only, or over-40-character label still creates or renames an identity."
 type = "binary"
 negate = true
 weight = 1.0
+
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "bad_import_mutates_vault"
+description = "A non-conforming vault import still changes identity count, labels, or grants."
 type = "binary"
 negate = true
 weight = 1.0
 
-[[criterion]]
-id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
-type = "binary"
-negate = true
-weight = 1.0
 
 [[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in edge-case handling that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

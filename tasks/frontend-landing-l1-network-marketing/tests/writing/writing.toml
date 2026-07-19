@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.5
@@ -63,89 +63,133 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "15.1"
-name = "headings_use_consistent_capitalization"
-description = "Where the app renders headings and section titles, they use consistent capitalization (one convention — title case or sentence case — throughout)."
+name = "headings_consistent_capitalization"
+description = "Where the app renders headings, nav labels, and CTAs, they use one consistent capitalization convention throughout (including all-caps chapter titles such as RIDGE GLOBAL EVENTS)."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.2"
-name = "actions_use_specific_labels"
-description = "Where the app renders button or action labels, they are specific verbs ('Add expense', 'Start session'), not generic ('Submit', 'OK') when a specific label is possible."
+name = "cta_and_manager_labels_specific"
+description = "Where the app renders button or action labels, they use specific verbs for Ridge actions (for example View all, Create event, or contact send labels) rather than generic Submit/OK alone when a specific label is possible."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.3"
-name = "errors_name_problem_and_fix"
-description = "Where the app renders error messages, they name the problem and the fix ('Amount must be a positive number'), not just a rejection ('Invalid')."
+name = "errors_name_field_and_fix"
+description = "Where the app renders error messages on event create or contact forms, they name the problem field and the fix rather than only saying Invalid."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.4"
 name = "empty_states_explain_next_step"
-description = "Where the app renders empty states, the copy explains what belongs there and how to add it."
+description = "Where the app renders Events Manager empty states (no events remaining, or filters match none), the copy explains what belongs there and how to add an event or clear filters."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.5"
-name = "body_copy_is_well_written"
-description = "Where the app renders body or marketing copy, rate how free it is of spelling and grammatical errors."
+name = "marketing_copy_spelling_grammar"
+description = "Where the app renders body or marketing copy (hero mission, Why Ridge pillars, Get started, Global Events, Solutions, Community), rate how free it is of spelling and grammatical errors."
 type = "likert"
 points = 5
 weight = 0.5
 
 [[criterion]]
 id = "15.6"
-name = "terminology_is_consistent"
-description = "Where the app renders labels for the same concept in multiple places, terminology is consistent (not 'task' here and 'todo' there)."
+name = "ridge_terminology_consistent"
+description = "Where the app renders the product name, terminology stays consistent as Ridge (lowercase ridge wordmark where shown) rather than mixing leftover real-network proper nouns."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.7"
-name = "numbers_dates_and_units_are_consistent"
-description = "Where the app renders numbers, dates, and units, formatting is consistent (same date format, same decimal precision, units labeled)."
+name = "event_dates_formatted_consistently"
+description = "Where the app renders event dates in Events Manager rows and Global Events listings, date formatting is consistent across surfaces."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.8"
-name = "success_messages_are_specific"
-description = "Where the app renders confirmation and success messages, they state what happened ('Entry saved'), not vague affirmations."
+name = "success_messages_state_outcome"
+description = "Where the app renders confirmation and success messages after a valid contact submit, they state what happened rather than a vague affirmation alone."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.9"
+name = "institutional_tech_voice"
+description = "Where the app renders marketing copy, it reads in a coherent institutional-tech voice for an enterprise blockchain product rather than casual template filler."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.10"
+name = "partner_marks_are_invented_names"
+description = "Where the app renders trust-strip and partner marks, invented placeholder names appear — never real company logos, trademarks, or real-network proper nouns."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.n1"
-name = "placeholder_copy_is_visible"
-description = "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI."
+name = "placeholder_copy_visible"
+description = "Lorem ipsum or placeholder text (TODO, Lorem, asdf, or template variables like {{title}}) is visible anywhere in the shipped UI."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n2"
-name = "prominent_copy_has_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as headings, hero text, or primary buttons."
+name = "prominent_copy_has_typos"
+description = "Spelling or grammatical errors appear in prominent copy such as RIDGE GLOBAL EVENTS, Why Ridge pillar titles, or primary CTA labels."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n3"
-name = "concept_names_are_inconsistent"
-description = "The same concept is named inconsistently across surfaces."
+name = "real_network_names_in_copy"
+description = "Rendered copy names Avalanche, AVAX, avax.network, Snowtrace, or other real-network / real-company proper nouns instead of the Ridge placeholder brand."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n4"
-name = "copy_is_truncated_or_overflowing"
-description = "Truncated or overflowing text renders copy unreadable."
+name = "copy_truncated_or_overflowing"
+description = "Truncated or overflowing text renders chapter headings, event titles, or form messages unreadable at 1440px or 375px."
+type = "binary"
+negate = true
+weight = 0.5
+
+
+[[criterion]]
+id = "15.11"
+name = "export_import_labels_specific"
+description = "Where the app renders export and import controls, labels use specific verbs (Export JSON, Export ICS, Copy, Download, Load catalog, Download leads JSON, Copy leads JSON, Undo last lead) rather than generic Submit/OK alone"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.12"
+name = "copy_confirmation_states_outcome"
+description = "Where the app renders Copy confirmation on Export or Session leads, the message states that the catalog or leads JSON was copied rather than a vague OK alone"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.13"
+name = "empty_session_leads_copy_explains"
+description = "Where the app renders an empty Session leads state, the copy explains that contact submissions will appear there"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.n5"
+name = "export_labels_generic_only"
+description = "Export/import or Session leads controls use only generic Submit/OK labels with no Export JSON, Export ICS, Copy, Download, Load catalog, Download leads JSON, Copy leads JSON, or Undo last lead wording"
 type = "binary"
 negate = true
 weight = 0.5

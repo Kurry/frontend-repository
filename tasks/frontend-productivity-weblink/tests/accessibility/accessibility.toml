@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,14 +63,14 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+description = "All interactive controls (name, roomId, Join Room, Leave Room, theme toggle, composer, choose-file, Export Session, Import Session, Copy, Download) are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
 name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+description = "Export Session and Import Session surfaces move focus inside on open, support Escape to close, and return focus to the invoking control on close."
 type = "binary"
 weight = 1.0
 
@@ -84,7 +84,7 @@ weight = 1.0
 [[criterion]]
 id = "1.4"
 name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+description = "Connection badge state changes and field-contract errors (displayName, roomId, text, Import) are conveyed both visually and via ARIA live regions or equivalent programmatic association."
 type = "binary"
 weight = 1.0
 

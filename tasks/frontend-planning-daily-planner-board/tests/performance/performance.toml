@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,78 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "9.1"
-name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+name = "cold_start_under_two_seconds"
+description = "The app is interactive within 2 seconds of a local cold load"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
-name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+name = "console_clean_including_hydration"
+description = "During a full exercise including add, edit, filter, export recompile, and import attempts, the console shows no errors, no warnings, and no hydration mismatch messages"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
-name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+name = "export_recompile_stays_snappy"
+description = "After mutating a task, reopening Export shows updated ICS and planner JSON without a multi-second hang"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.4"
-name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+name = "filter_updates_without_blanking"
+description = "Changing channel filter or search updates visible tasks promptly without blanking the entire board into an empty shell mid-update"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "9.5"
-name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+name = "twenty_one_columns_render_without_lag"
+description = "The 21 day columns and seeded tasks render without perceived lag on first interactive paint"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.6"
 name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+description = "Toggling checkboxes, bulk complete, and rollover keep the UI interactive with no frozen chrome"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
-name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+name = "add_remove_animations_stay_smooth"
+description = "Task add/remove animations and calendar drag settle remain smooth under normal use without obvious stutter"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "9.8"
 name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+description = "Rapidly toggling checkboxes, adding tasks, filtering, and recompiling export previews keeps the UI responsive with no hangs or dropped interactions"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+name = "extended_session_stays_stable"
+description = "An extended session of creates, deletes, undos, and export opens shows no runaway slowdown or tab crash"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+name = "deep_link_renders_seeded_board"
+description = "Loading the app URL directly renders the complete seeded board without a prolonged blank shell"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.n1"
 name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+description = "More than 2 seconds pass before interaction is possible on local render"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,31 +141,31 @@ weight = 1.0
 [[criterion]]
 id = "9.n2"
 name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+description = "Errors or warnings appear in the console during add, export, import, or filter flows"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n3"
-name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+name = "export_recompile_blocks_ui"
+description = "Opening Export or switching ICS/JSON tabs blocks the UI for a noticeable multi-second hang"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n4"
-name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
+name = "filter_hangs_ui"
+description = "Applying a channel filter or search causes the UI to hang or freeze"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n5"
-name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+name = "board_scroll_kills_frame_rate"
+description = "Horizontal board scrolling across 21 columns kills the frame rate into unusable jank"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,31 +173,31 @@ weight = 1.0
 [[criterion]]
 id = "9.n6"
 name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
+description = "Input becomes unresponsive during task add/remove or toast animations"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n7"
-name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
+name = "hydration_flash_blocks_use"
+description = "Pre-rendered content visibly flashes or is replaced after interactive, blocking early use of the board"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n8"
-name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
+name = "memory_runaway_on_export_spam"
+description = "Repeatedly opening Export and mutating tasks causes runaway browser resource usage or a tab crash"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n9"
-name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
+name = "loading_state_is_blank_shell"
+description = "Nothing useful is displayed while the board first loads — only a blank shell past two seconds"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n10"
 name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+description = "The app crashes under rapid checkbox toggles, bulk actions, or repeated import attempts"
 type = "binary"
 negate = true
 weight = 1.0

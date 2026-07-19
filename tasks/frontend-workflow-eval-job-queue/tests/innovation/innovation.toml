@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -64,28 +64,28 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "11.1"
 name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+description = "Optional bonus: beyond required toasts and progress motion, the queue monitor adds unique microinteractions around submit, export, or lane state changes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.2"
 name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+description = "Optional bonus: beyond the required dialog and progress transitions, the app adds advanced motion such as coordinated lane/progress storytelling."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.3"
 name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+description = "Optional bonus: a short coachmarks tour highlights the jobs table, Export queue, and Submit job on first visit, dismissible and never blocking the primary workflow."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.4"
 name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+description = "Optional bonus: beyond the required mean-reward chart, aggregates or lanes offer extra interactive graphics that aid operator decisions."
 type = "binary"
 weight = 1.0
 

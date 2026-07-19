@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -150,10 +150,75 @@ negate = true
 [[criterion]]
 id = "2.13"
 name = "document_title_names_trip"
-description = "The browser document title references the French Riviera trip rather than a framework default like 'Vite App' or 'Qwik App'"
+description = "The browser document title references the French Riviera trip rather than a build-tool or framework default placeholder title"
 type = "binary"
 weight = 0.5
 
+[[criterion]]
+id = "2.14"
+name = "collab_simulation_is_real_state"
+description = "Simulated collaboration mutates the same shared collection the UI reads: a promoted bucket item becomes a normal stop that can be edited, dragged, and deleted, and simulated mutations appear in the same activity log as the user's own"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.15"
+name = "role_timezone_theme_no_reload"
+description = "Switching role, timezone mode, or theme updates every affected surface as shared client state without reloading the document"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.16"
+name = "ics_structure_parses"
+description = "The rendered ICS payload is structurally valid: BEGIN:VCALENDAR and END:VCALENDAR wrap one VEVENT per scheduled stop, and each VEVENT carries a parseable DTSTART and a SUMMARY"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.17"
+name = "clipboard_copy_matches_display"
+description = "Activating the export Copy control places text on the clipboard that matches the displayed markdown document and raises a visible confirmation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.18"
+name = "print_layout_clean"
+description = "Under print media the plan renders as a clean paginated document of day sections with the map chrome, sidebar, and toolbars excluded"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.19"
+name = "bulk_or_recurring_desyncs_surfaces"
+description = "A bulk action or the repeat-daily generator leaves surfaces inconsistent — for example bulk Move to day updates the list rows while the map pins or polylines keep the old arrangement until a reload"
+type = "binary"
+weight = 1.0
+negate = true
+
+
+[[criterion]]
+id = "2.20"
+name = "trip_json_schema_contract"
+description = "The trip JSON preview conforms to the field contract: schemaVersion is the string 1, trip carries title/dateStart/dateEnd, and every stops element exposes title, day, location, category, costTier, status, lat, and lng using the closed enums and bounds from the instruction"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.21"
+name = "in_memory_only_no_storage"
+description = "During a full exercise including export and import, the app does not write to localStorage or sessionStorage; persistence is the portable artifacts and MCP surface only"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n5"
+name = "exports_use_divergent_field_names"
+description = "Trip JSON stop objects use different field names than the create/edit form (for example name instead of title) or status values outside to-visit, reserved, and completed"
+type = "binary"
+weight = 1.0
+negate = true
 [[criterion]]
 id = "2.catchall"
 name = "technical_catchall"

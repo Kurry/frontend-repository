@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,158 +62,143 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "spacing_and_sizing_follow_scale"
-description = "Spacing and sizing follow the design system's scale, with no arbitrary one-off values visible in computed styles."
+name = "overview_matches_reference_composition"
+description = "At desktop width, the overview composition matches /reference-screenshots/overview.png and segment screenshots within small tolerance: top brand bar, full-width net-worth summary, then holdings and detail cards — text wins if screenshot and instruction conflict."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "typography_matches_spec"
-description = "Typography matches the spec for all headings and body copy."
+name = "typography_roles_match_spec"
+description = "Typography matches the spec hierarchy visible in the reference: large weighted net-worth figure and card titles, regular table body text, and small uppercase eyebrow labels for section headers."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "layout_matches_reference"
-description = "Layout matches reference screenshots to within a small tolerance at all specified breakpoints; fidelity tasks achieve near pixel-parity."
+name = "card_chrome_matches_spec"
+description = "White cards show generous padding, large radius, hairline borders, and soft shadow consistent with the reference screenshots and the visual_design card treatment."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.4"
-name = "specified_state_changes_animate"
-description = "Transitions or animations are applied to the state changes the spec calls out, such as add, delete, filter, or view switch."
+name = "teal_accent_and_red_destructive"
+description = "A single teal accent carries brand mark, primary buttons, selection highlight, and allocation bars over a neutral base; a red family is reserved for destructive and error states, matching the specified palette."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "responsive_behavior_matches_reference"
-description = "Responsive behavior matches reference patterns."
+name = "holdings_table_column_alignment"
+description = "Holdings rows align name, symbol, class, quantity, and market value into consistent columns with tabular numerals for quantity and value, matching the reference table anatomy."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.6"
-name = "control_styling_matches_spec"
-description = "Button and form radii, padding, and shadows conform to the spec."
+name = "allocation_entry_anatomy_matches"
+description = "Each allocation entry shows class name, proportional bar, and right-aligned percentage as in the reference allocation breakdown."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.7"
-name = "typography_has_clear_hierarchy"
-description = "Typography has a clear hierarchy that distinguishes section and body text."
+name = "add_control_grouping_matches"
+description = "The Add holding control is grouped inside the holdings card directly above the form and table it affects, matching the specified layout grouping."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.8"
 name = "component_states_match_spec"
-description = "Component states (default, hover, active, disabled) match the spec where specified."
+description = "Default, hover, selected, and disabled control states for buttons, rows, and the class filter match the specified treatments (teal selection with left border; distinct hover wash)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.9"
-name = "surface_treatments_match_spec"
-description = "Color, depth, and border treatments are precise per the design."
+name = "desktop_breakpoint_matches_reference"
+description = "At about 1440px the holdings and detail cards sit side by side under a full-width net-worth summary as shown in the desktop reference screenshots."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.10"
-name = "microinteractions_match_spec"
-description = "Microinteraction feedback for hover and press follows the spec in duration and motion."
+name = "light_green_tinted_background"
+description = "The page background reads as a light, slightly green-tinted wealth-dashboard surface rather than a stark white or unrelated dark theme, matching the calm composition in the reference."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.n1"
-name = "sizing_or_spacing_contradicts_scale"
-description = "Visible sizing or spacing values contradict the specified scale."
+name = "composition_deviates_from_reference"
+description = "Section order or structure visibly deviates from the reference overview: missing brand bar, missing net-worth summary card, or holdings/detail not presented as the specified card pair."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n2"
-name = "colors_fall_outside_palette"
-description = "Colors appear outside the specified palette."
+name = "colors_outside_specified_palette"
+description = "Primary accent colors fall outside the specified teal-on-neutral system, or destructive/error states use arbitrary unrelated hues instead of the reserved red family."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n3"
-name = "sizing_mismatches_spec"
-description = "Sizing mismatches the spec."
+name = "browser_default_controls"
+description = "Primary buttons, inputs, or table chrome use unstyled browser defaults when the spec and reference show styled shadcn-like card and control chrome."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n4"
-name = "required_animations_missing_or_wrong"
-description = "Animations are missing or incorrect where the spec requires them."
+name = "elements_clipped_vs_reference"
+description = "At the desktop reference width, key overview elements render clipped, off-screen, or overlapping in ways that contradict the reference screenshots."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n5"
-name = "specified_controls_use_browser_defaults"
-description = "Form or button controls use browser default styles when the spec styles them."
+name = "type_hierarchy_collapsed"
+description = "Heading and body text collapse into one size and weight: the net-worth figure matches table body styling, or section eyebrows use the same size/case as body copy."
 type = "binary"
 negate = true
 weight = 1.0
+
+
+[[criterion]]
+id = "3.11"
+name = "export_chrome_respects_text_over_screenshots"
+description = "Where Export portfolio / Import portfolio chrome is present per the instruction but absent from reference screenshots, the live app still matches the specified wealth-dashboard composition and the instruction text wins over screenshot absence."
+type = "binary"
+weight = 0.5
+
+
+
+[[criterion]]
+id = "3.12"
+name = "new_surfaces_match_reference_language"
+description = "Transactions ledger and export entry points extend the reference wealth-dashboard language (teal accent, white cards, calm green-tinted ground) rather than introducing a conflicting visual system; text wins if screenshot and instruction conflict."
+type = "binary"
+weight = 0.5
 
 [[criterion]]
 id = "3.n6"
-name = "layout_misaligned_at_breakpoints"
-description = "The grid or layout is misaligned at reference breakpoints."
+name = "export_surfaces_clash_reference"
+description = "Export drawer or ledger chrome clashes with the reference palette and card language so severely that the overview no longer reads as the same wealth dashboard product."
 type = "binary"
 negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n7"
-name = "elements_are_clipped_or_offscreen"
-description = "Elements render off-screen or clipped."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n8"
-name = "structure_deviates_from_reference"
-description = "Section order, content, or structure deviates from the reference on fidelity tasks."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n9"
-name = "heading_and_body_text_undifferentiated"
-description = "Heading and body text have no distinction."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n10"
-name = "microinteractions_deviate_from_reference"
-description = "Microinteractions are missing or deviate from the provided reference."
-type = "binary"
-negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "design_fidelity.catchall"
 name = "design_fidelity_catchall"
-description = "The app exhibits a significant, browser-observable defect in fidelity to the spec or reference that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in fidelity to the spec or reference screenshots that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

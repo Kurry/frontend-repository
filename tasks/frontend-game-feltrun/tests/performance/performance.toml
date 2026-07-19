@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,158 +62,158 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "9.1"
-name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+name = "interactive_within_two_seconds"
+description = "The app is interactive within 2 seconds of a local cold load at /"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
-name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+name = "console_clean_full_session"
+description = "No console errors or uncaught exceptions appear during dealing, betting, showdown, rebuy, undo, save/load, export/import, and panel toggling"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
-name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+name = "betting_ui_stays_responsive"
+description = "Using betting controls and quick-bet shortcuts keeps the UI responsive with no multi-second hangs between action and visible stack/pot update"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.4"
-name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+name = "export_preview_updates_promptly"
+description = "After a completed hand the Export preview updates without a long freeze of the betting controls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.5"
-name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+name = "history_list_stays_smooth"
+description = "As Hand history grows across several completed hands, opening the panel and scrolling remain usable without multi-second lag"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "9.6"
 name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+description = "During showdown reveal, badge toast, and export copy confirmation the table controls remain interactive afterward"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
-name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+name = "confetti_does_not_jank_table"
+description = "A human-win confetti burst does not freeze the table or leave controls unresponsive after it finishes"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "9.8"
-name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+name = "rapid_betting_no_freeze"
+description = "Rapid repeated input on betting controls produces no hangs, blank screen, or dropped interactions"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+name = "extended_session_stable"
+description = "Playing through multiple hands with export and panel toggles shows no runaway slowdown that makes the table unusable"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+name = "reload_resume_prompt"
+description = "After reload of a saved mid-hand state the table becomes interactive again promptly with the restored position visible"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.n1"
-name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+name = "cold_load_over_two_seconds"
+description = "More than 2 seconds pass before the table is interactive on a local cold load"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n2"
-name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+name = "console_errors_during_play"
+description = "Uncaught exceptions or console errors appear during a normal deal/bet/export session"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n3"
-name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+name = "betting_hangs_ui"
+description = "A betting action freezes the UI for multiple seconds with no stack/pot update"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n4"
-name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
+name = "export_freezes_table"
+description = "Opening Export or compiling the session JSON freezes betting controls for multiple seconds"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n5"
-name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+name = "rapid_input_blank_or_freeze"
+description = "Rapid repeated betting input blanks the screen or freezes the table"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n6"
-name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
+name = "confetti_leaves_controls_dead"
+description = "After confetti the betting controls stay unresponsive"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n7"
-name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
+name = "history_growth_locks_ui"
+description = "After several hands, opening Hand history locks the UI"
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "9.n8"
-name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
+name = "reload_resume_never_interactive"
+description = "After reload of a saved table the app stays non-interactive with no usable betting or deal controls"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n9"
-name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
+name = "import_hangs_indefinitely"
+description = "Importing a session JSON hangs indefinitely with no error or completion"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n10"
-name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+name = "extended_play_runaway_slowdown"
+description = "An extended multi-hand session becomes progressively unusable due to runaway slowdown"
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "performance.catchall"
 name = "performance_catchall"
-description = "The app exhibits a significant, browser-observable defect in performance or stability that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable performance defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

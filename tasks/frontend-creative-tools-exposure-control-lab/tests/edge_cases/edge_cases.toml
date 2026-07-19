@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,158 +62,239 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_presets_state_with_create_control"
+description = "After deleting all presets, the presets list region shows an empty-state message and a control that opens the create flow."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "preset_form_inline_validation_before_submit"
+description = "On the preset create/edit form, invalid fields show an error message naming that field next to it before submit, and the submit control stays disabled until every required field is valid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "empty_name_validation_names_field"
+description = "Submitting create with an empty preset name shows visible validation feedback that names the name field and does not add a row."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "long_preset_name_rejected_over_40"
+description = "A preset name longer than 40 characters is rejected with an error naming the name field (or input is blocked before submit) so no row is saved with a name over 40 characters."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "stepper_edge_fades_and_noninteractive"
+description = "At each stop-list edge, the corresponding up/down stepper fades out and becomes non-interactive; pressing it changes nothing."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "meter_dot_clamps_within_track"
+description = "At extreme stop combinations the exposure meter dot clamps within the visible track — it never leaves the track bounds."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "help_explains_nonobvious_dials"
+description = "The in-page help panel provides aperture, shutter, and ISO explainer content so non-obvious dial behavior is guided in-app."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "preset_and_dial_controls_semantic"
+description = "Preset form inputs and dial/mode/help/preset controls use semantic button/input/label elements rather than unlabeled decorative wrappers."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "help_panel_dismissible_paths"
+description = "The help panel can be closed via its close control and via Escape, returning focus/workflow to the lab without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "double_submit_creates_exactly_one"
+description = "Double-activating the preset create submit control in quick succession creates exactly one preset: the visible row count increases by exactly one and exactly one new row appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_presets_shows_nothing"
+description = "After the presets collection is empty, the list region shows nothing — no empty-state message and no control that opens the create flow."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "validation_errors_only_in_console"
+description = "Invalid preset create/edit failures surface only in the browser console with no visible inline field feedback."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "step_silent_no_feedback"
+description = "Pressing a dial stepper produces no visible change to dial labels, preview, or meter (silent failure)."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "delete_preset_no_warning_affordance"
+description = "Deleting a preset proceeds with no visible affordance distinguishing the destructive action (no delete control labeling or confirmation cue where the UI provides delete)."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "interactive_controls_are_nonsemantic"
+description = "Primary interactive lab controls (steppers, mode switch, help trigger, preset actions) are non-semantic div/span click targets without button/role semantics."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "help_panel_not_keyboard_dismissible"
+description = "With the help panel open as an overlay, keyboard users cannot dismiss it (no focusable close control and no Escape/keyboard path)."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "edge_stepper_still_advances_past_end"
+description = "At a stop-list edge, clicking the faded/disabled-direction stepper still changes the dial value past the first or last stop."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "ambiguous_or_missing_action_labels"
+description = "Primary actions (apply preset, create/save preset, mode switch, help) show blank, placeholder, or ambiguous labels such as 'Submit', 'OK', or 'Button' instead of naming the action."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "no_in_app_dial_guidance"
+description = "There is no in-app help or guidance for aperture, shutter, or ISO — the help panel path is missing or empty."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "edge_controls_visually_hidden_but_needed"
+description = "At mobile or desktop widths, required dial steppers, meter, or mode switch are visually hidden or inaccessible while still needed for the flow."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
+
+
+[[criterion]]
+id = "4.11"
+name = "empty_undo_redo_disabled"
+description = "Undo with an empty undo stack and Redo with an empty redo stack are disabled controls; activating them changes nothing and produces no console errors."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "before_at_defaults_no_visible_change"
+description = "Holding Before while dials are already at defaults leaves the preview, meter, EV, and histogram visually unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "malformed_import_keeps_session"
+description = "Importing malformed, undecodable, or schema-invalid lab-package JSON (missing schemaVersion, wrong schemaVersion, missing required fields, out-of-list stops, or lookTag outside the closed enum) shows a visible error naming the import problem, leaves the current session state unchanged, and produces no console errors."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "empty_snapshot_name_adds_nothing"
+description = "Saving a snapshot with an empty name adds no snapshot row and shows inline validation naming the name field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "batch_favorite_requires_two_selected"
+description = "Batch Favorite selected with fewer than two presets selected is unavailable or does nothing; with two or more selected it marks every selected row favorite in one action."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "malformed_import_mutates_or_crashes"
+description = "Importing malformed lab-package JSON mutates the session, crashes the UI, or throws uncaught console errors."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.n12"
+name = "empty_undo_still_mutates_state"
+description = "Activating Undo while the undo stack is empty still changes dials, presets, or export text."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.16"
+name = "duplicate_preset_name_rejected"
+description = "Submitting create or edit with a preset name that already exists on another preset does not save and shows an error naming the name field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.17"
+name = "out_of_list_stops_and_looktag_rejected"
+description = "Choosing or forcing an aperture, shutter, or iso outside the discrete stop lists, or a lookTag outside soft/crisp/grainy/night/daylight/cinematic, does not save and shows an error naming that field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.18"
+name = "duplicate_or_invalid_snapshot_rejected"
+description = "Saving a snapshot with a duplicate name or out-of-list stops adds no snapshot row and shows inline validation naming the offending field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n13"
+name = "schema_invalid_import_mutates_session"
+description = "Importing JSON that parses but violates the lab-package field contracts (wrong enums or missing required fields) still mutates dials, presets, or snapshots."
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"
 description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true

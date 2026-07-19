@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -63,153 +63,115 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+name = "natural_language_intent_beyond_aliases"
+description = "Beyond required aliases and fuzzy matching, natural-language intent matching maps a typed phrase (for example 'show my work' or 'email me') to the closest command with a visible resolution — bonus polish over bare slash commands."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "easter_egg_canvas_craft_beyond_minimum"
+description = "Konami confetti and /matrix green-rain go beyond a minimal flash — layered particles or denser rain that still clear after a moment, verified through the real key/command path (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+name = "guided_boot_narrative_beyond_status_lines"
+description = "The boot sequence includes a brief narrative beat beyond sequential status lines (for example persona taglines or staged capability reveals) that still dismisses on Enter/click/touch (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+name = "skills_bars_extra_readout"
+description = "Beyond animating proficiency bars to width, /skills adds an extra usability cue such as numeric percents, tier labels, or category grouping that remains browser-observable (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+name = "history_autocomplete_power_user_polish"
+description = "Command history and autocomplete include an extra power-user affordance beyond up/down and Tab/Enter — for example reverse-search, recent-command chips, or fuzzy ranking highlights (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+name = "session_personalization_beyond_requirements"
+description = "Within the in-memory session, the app offers a small personalization beyond requirements (for example remembering last mode or last theme swatch highlight until reload) without using browser storage APIs (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+name = "branded_designer_cli_narrative"
+description = "ASCII name art, welcome box, and portfolio command copy read as a cohesive fictional designer CLI brand rather than generic unstyled shell chrome (bonus execution quality)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+name = "glass_or_retro_craft_beyond_token_swap"
+description = "Glass and/or retro theme craft goes beyond a bare background swap — cohesive accent treatments across titlebar, prompt, badges, and board cards without inventing a conflicting second product (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+name = "local_mono_wallpaper_enhancement"
+description = "A genre-appropriate local enhancement (high-quality bundled JetBrains Mono rendering and atmospheric wallpaper assets) is visible without CDN dependence (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+name = "competition_level_terminal_portfolio_feel"
+description = "The overall experience feels competition-grade: boot cadence, CLI thinking/reveal, board density, and theme craft read as a professional terminal portfolio rather than a wired demo (bonus)."
 type = "binary"
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+name = "barebones_plain_text_shell_only"
+description = "The shipped UI is a bare unstyled text area with no atmospheric wallpaper, traffic-light window chrome, or themed terminal immersion."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
+name = "generic_dashboard_template_look"
+description = "The experience is a generic dashboard/card-grid template that ignores the specified terminal-over-wallpaper CLI portfolio composition."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
-id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
+id = "11.11"
+name = "config_diff_craft_beyond_minimum"
+description = "Config Diff goes beyond a bare text dump — side-by-side or clearly marked changed treatments for identity, projects, skills, theme, and featured pins (bonus)."
 type = "binary"
-negate = true
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
-id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
+id = "11.12"
+name = "terminal_config_interop_polish"
+description = "Terminal Config and Theme CSS read as drop-in interoperable artifacts a designer could paste into a real shell/theme setup, not placeholder stubs (bonus)."
 type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
-type = "binary"
-negate = true
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "innovation.catchall"

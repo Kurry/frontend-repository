@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,96 +62,140 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "14.1"
-name = "multi_facet_round_trip"
-description = "Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline — never a mix."
+name = "multi_facet_reload_survives_persistence"
+description = "Starting from defaults: edit font-family, change font-size, select a theme on Colors, and leave Fonts as the active category; then reload. Confirm every facet survives — the same control values, live preview, generated lines (font-family, font-size, theme), override count, and active category — never a mix of surviving and reverted facets."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.2"
-name = "sort_reversal_proves_live_data"
-description = "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders."
+name = "theme_a_b_a_proves_live_derivation"
+description = "Theme round-trip proof (genre stand-in for sort reversal): select theme A and record the generated theme = line and preview colors; select a different theme B and confirm both change; re-select theme A. Confirm theme = and preview return to A's values — proving derivation from live theme state, not two hardcoded snapshots."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.3"
-name = "derived_view_responds_to_input"
-description = "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input."
+name = "derived_preview_and_config_sensitivity"
+description = "Derived-view sensitivity: change font-family, then font-size, then a base color. Confirm the generated-config lines and live terminal preview change meaningfully for each input rather than redrawing identically regardless of input."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.4"
-name = "cross_view_echo_without_reload"
-description = "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list ↔ detail, board ↔ stats) without reload."
+name = "control_preview_config_cross_echo"
+description = "Cross-view echo: change cursor-style via the Fonts/Terminal controls; without reload, confirm the control value, the dock terminal cursor preview shape, and the generated cursor-style line all agree."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.5"
-name = "count_delta_is_exact"
-description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+name = "override_count_delta_exact"
+description = "Count-delta integrity: measure the override count, edit one previously-default setting to a new valid value, and re-measure immediately — the count increases by exactly one (no off-by-one, no lagging counter)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.6"
-name = "different_inputs_change_outcomes"
-description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+name = "different_inputs_different_outputs"
+description = "Input-dependent output: set font-family to value A and note the generated line and preview face; reset that setting; set font-family to a different value B. Confirm the two outcomes differ in the ways the inputs dictate (not byte-identical generated lines/preview)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.7"
-name = "interleaved_flows_preserve_state"
-description = "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state."
+name = "interleaved_category_and_edit_flows"
+description = "Interleaved-flow integrity: start editing font-family on Fonts, switch to Colors and select a theme, return to Fonts and finish/confirm the font-family value; confirm both the theme override and the font-family override remain correct without corrupting each other."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.8"
-name = "empty_to_repopulated_round_trip"
-description = "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions."
+name = "empty_then_repopulate_overrides"
+description = "Edge-state round-trip: after at least two overrides, Reset all (empty state and count zero visible), then edit two settings again; confirm the empty state clears, both new generated lines appear, the override count is 2, and export actions re-enable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.n1"
-name = "partial_persistence_is_incoherent"
-description = "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence."
+name = "partial_persistence_after_reload"
+description = "After configuring several settings and the active category then reloading, some user-configured facets survive while others reset — incoherent partial persistence instead of all facets surviving together."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "14.n2"
-name = "derived_surface_ignores_inputs"
-description = "A derived surface renders identically regardless of its inputs."
+name = "preview_identical_across_different_inputs"
+description = "Changing font-family, font-size, or theme across clearly different values leaves the live preview and generated-config output visually identical — a derived surface ignoring its inputs."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "14.n3"
-name = "different_inputs_produce_identical_output"
-description = "Repeating an action with different inputs yields byte-identical output."
+name = "different_themes_produce_identical_output"
+description = "Selecting two different declared themes yields identical generated theme = lines and identical preview colors."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "State changes appear in one view but not another until reload."
+name = "category_switch_shows_stale_until_reload"
+description = "After editing a setting, another surface (preview or generated-config panel) still shows stale values until a full page reload."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
+
+[[criterion]]
+id = "14.9"
+name = "export_import_full_pipeline"
+description = "Mutate at least two settings, confirm generated lines track, export the config text, Reset all, Import the exported text, and confirm the session's actual overrides return on controls, preview, generated lines, and count — export omitting session work fails."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "undo_round_trip_integrity"
+description = "Edit font-family, Undo (surfaces revert), Redo (surfaces restore) — proving undo/redo operate on live history rather than no-ops."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.11"
+name = "profile_apply_echoes_all_surfaces"
+description = "Save a profile with two overrides, Reset all, apply the profile — generated panel, controls, and preview all echo the saved override set without reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "export_omits_mutations_behavioral"
+description = "An export taken after visible setting mutations omits those mutations from the artifact text while the UI still shows overrides."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "14.12"
+name = "schema_contract_export_import_pipeline"
+description = "Mutate font-size within 4–60, cursor-style to a contracted enum value (block/bar/underline/block_hollow), and a #RRGGBB color; confirm generated lines use those contracted shapes and Export contains them; Reset all; Import that export — restored controls and lines still satisfy the same Ghostty field contracts (keys, types, bounds, enums) as the pre-export would-be request body."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n6"
+name = "round_trip_breaks_field_contracts"
+description = "After export → Reset all → Import, a restored override violates its Ghostty field contract (wrong type, out-of-bound number, or out-of-enum value) or disagrees with the pre-export contracted shape, or a contract-invalid Import is accepted and mutates state."
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "behavioral.catchall"
 name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true

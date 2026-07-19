@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,86 +62,86 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "For landing pages, evaluate form validation, section feedback, and overlay behavior. Empty state UI is present and renders when a collection is empty."
+name = "empty_events_manager_shows_message_and_create"
+description = "After deleting all events, Events Manager shows an empty state with a message and a control that opens the create flow."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "event_and_contact_forms_validate_inline"
+description = "Event create/edit and contact/email forms validate inline per field before submit: each invalid field shows an error naming that field, and the submit control stays disabled until every required field is valid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "errors_name_field_and_fix"
+description = "Validation errors on event create and contact forms name the offending field and the fix rather than only saying Invalid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "contact_success_confirms_in_page"
+description = "A valid contact submit shows an in-page success confirmation rather than navigating away or staying silent."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "filtered_empty_state_offers_clear_filters"
+description = "When active Events Manager filters match no events, the list region shows an empty state with a clear-filters control that restores the full list."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "double_activate_create_adds_exactly_one"
+description = "Double-activating the event create submit control adds exactly one event: the count increases by one and one new row appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "invalid_create_leaves_count_unchanged"
+description = "Submitting an event create with an empty title or missing date does not add an event — the visible event count stays unchanged and an inline message names the offending field."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "form_controls_use_semantic_labels"
+description = "Event Manager and contact form fields use semantic inputs with visible labels (or accessible name equivalents) rather than unlabeled div shells."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "mega_menu_light_dismiss_and_escape"
+description = "The open mega-menu drawer closes via light-dismiss click outside the panel and via Escape, restoring the page underneath."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "contact_malformed_email_or_missing_consent"
+description = "Submitting a contact form with a malformed email, without privacy consent, name shorter than 2 characters, missing interest, or a provided message shorter than 10 characters shows inline errors naming the field, does not show the success state, and appends no Session lead."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_events_collection_has_no_feedback"
+description = "After deleting all events, Events Manager shows nothing — no empty-state message and no create control."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "validation_errors_only_in_console"
+description = "Invalid event create or contact submit surfaces errors only in the browser console with no inline field messages in the UI."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,15 +149,15 @@ weight = 1.0
 [[criterion]]
 id = "4.n3"
 name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+description = "Valid contact submit or event create produces no visible success or list update feedback after the action."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "invalid_contact_shows_success"
+description = "Submitting a contact form with a malformed email, without privacy consent, short name, missing interest, or short message still shows the success state or appends a Session lead."
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,23 +165,23 @@ weight = 1.0
 [[criterion]]
 id = "4.n5"
 name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+description = "Primary interactive controls (theme toggle, hamburger, manager filters, form submits) are non-semantic div/span shells without button/link roles."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "mega_menu_not_keyboard_dismissible"
+description = "The open mega-menu overlay cannot be dismissed via keyboard (Escape or a focusable close control)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "validation_feedback_missing"
+description = "An invalid event create or empty required contact field shows no inline validation indication naming the field."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,23 +189,90 @@ weight = 1.0
 [[criterion]]
 id = "4.n8"
 name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+description = "Primary create, filter, theme, or contact action controls lack readable labels or use ambiguous blank text."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "filtered_empty_state_missing_clear_control"
+description = "When filters match no events, the list region stays blank with no empty-state copy and no clear-filters control."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "double_submit_creates_duplicates"
+description = "Double-activating the event create submit adds more than one event or leaves the count increased by more than one."
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "4.11"
+name = "empty_collection_export_still_valid"
+description = "After deleting all events, status rollups show 0 / 0 / 0; Export JSON compiles a valid catalog with an empty events array (leads may still be non-empty); Export ICS is still a valid empty calendar (BEGIN:VCALENDAR and END:VCALENDAR with no VEVENT blocks)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "empty_undo_history_inert"
+description = "With an empty undo history the Undo control is disabled or inert, and activating it produces no state change and no console error."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "malformed_import_leaves_collection"
+description = "Importing a malformed declared-catalog payload leaves the current events collection and leads log unchanged, shows an inline error naming the catalog, and does not blank the manager UI."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "bulk_delete_zero_selection_inert"
+description = "Bulk Delete selected with zero rows selected is inert: no confirmation dialog, and the visible event count does not change."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "empty_leads_export_valid_schema"
+description = "With zero leads, Download leads JSON still produces ridge-session-leads.json with version 1, the current theme, counts.total 0, and an empty leads array; Copy leads JSON copies that same empty-log JSON and still shows Copied confirmation; Undo last lead leaves the empty state unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "invalid_contact_then_valid_appends_one"
+description = "A failed invalid contact submit followed immediately by a valid contact submit appends exactly one lead — the invalid attempt never appears in Session leads or either export."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "empty_export_invalid_or_crashes"
+description = "With zero events, Export JSON or ICS is invalid (missing BEGIN:VCALENDAR / END:VCALENDAR or a non-array events field) or opening Export crashes the UI."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n12"
+name = "malformed_import_wipes_manager"
+description = "Importing a malformed catalog blanks Events Manager or replaces the collection with an unusable broken state and no inline error."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n13"
+name = "invalid_contact_still_appends_lead"
+description = "An invalid contact submit (malformed email, privacy unchecked, short name, missing interest, or short message) still appends a Session leads row or changes counts.total."
 type = "binary"
 negate = true
 weight = 1.0

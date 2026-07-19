@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,154 +62,164 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_states_present"
+description = "Empty states render for empty My Saved Lines, Favorites Only with no stars, and a library search with no matches"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.2"
 name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+description = "Inline validation appears on save and rename before submit for empty name and other SavedLine field-contract violations"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.3"
 name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+description = "Validation and import error messages name the offending field or payload problem and the fix rather than only saying Invalid"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.4"
 name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+description = "Success or confirmation feedback appears after save, Copy export, bulk tag, and import"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "live_relay_shows_stream_status"
+description = "Live relay shows a visible stream status while Started, Paused, Disconnected, or catching up"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.6"
 name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+description = "Delete selected requires confirmation naming the count, and Undo can reverse save/delete/tag mutations"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.7"
 name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+description = "Empty states and Export center labels explain how to save a line, star an opening, or import a study pack"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.8"
 name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+description = "Buttons, inputs, and labels use semantic tags for save, theme, export, and palette controls"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.9"
 name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+description = "Save form, command palette, and confirmation overlays close via explicit close/Escape and return focus"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "export_import_show_progress_feedback"
+description = "Export Copy confirmation and import success or error provide visible progress/feedback steps"
 type = "binary"
 weight = 1.0
-
+[[criterion]]
+id = "4.11"
+name = "illegal_square_rejected"
+description = "Clicking a non-legal destination rejects the move with a visible message and leaves the position uncorrupted"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.12"
+name = "double_save_idempotent"
+description = "Double-activating save creates exactly one entry and increases the header count by exactly one"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.13"
+name = "malformed_import_rejected"
+description = "Importing malformed Study pack JSON shows a visible error and leaves favorites, saved lines, and boardTheme unchanged"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.14"
+name = "bulk_delete_disabled_when_none_selected"
+description = "With zero checkboxes checked, the bulk bar stays hidden or its actions stay disabled so nothing is deleted"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.15"
+name = "empty_undo_redo_disabled"
+description = "Undo with an empty undo stack and Redo with an empty redo stack are disabled and activating them changes nothing"
+type = "binary"
+weight = 1.0
 [[criterion]]
 id = "4.n1"
 name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+description = "An empty My Saved Lines or Favorites Only view shows nothing and provides no UI feedback"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n2"
 name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+description = "Save/import validation errors are surfaced only in the browser console"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n3"
 name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+description = "Save, Copy, bulk tag, or import lack visible feedback and silently succeed or fail"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n4"
 name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+description = "Bulk Delete selected has no confirmation naming the count"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n5"
 name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+description = "Non-semantic div or span tags wrap primary interactive controls such as Save this line or Export center"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n6"
 name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+description = "Save form, command palette, or confirmations cannot be dismissed via keyboard"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n7"
 name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+description = "SavedLine field-contract validation feedback is missing or delayed with no UI indication"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n8"
 name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+description = "Primary action labels are ambiguous or missing (generic OK/Submit instead of Save this line / Import study pack)"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n9"
 name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+description = "Empty Favorites Only or empty My Saved Lines have no in-app guidance at all"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n10"
 name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+description = "Export center, Undo/Redo, or command palette affordances are visually hidden or inaccessible"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -175,6 +175,49 @@ name = "brand_and_trip_signal_first_viewport"
 description = "The first viewport shows the Trip / Travel Planner product name with French Riviera — Côte d'Azur as the trip signal, and the initial view is the planner workspace rather than a marketing or login screen"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "3.17"
+name = "dual_pane_route_anatomy"
+description = "Day-colored route polylines carry small distance labels, cluster badges are circular with a visible count, and the isochrone circle renders translucent so the map beneath stays readable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.18"
+name = "scheduling_grid_anatomy"
+description = "Time blocks display their start-end times, overlapping blocks use an amber treatment with a warning icon, and travel buffer cards are visually distinct from stop cards (for example a dashed connector style) so the timeline reads as blocks joined by transit"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.19"
+name = "collaboration_chrome_anatomy"
+description = "Presence avatars render as overlapping colored circles in the top chrome, peer carets use each member's distinct color, and the conflict modal presents current and incoming versions in two clearly differentiated columns"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.20"
+name = "kanban_filter_bucket_anatomy"
+description = "Kanban pivot shows three equal-width columns titled To Visit, Reserved, and Completed each with a count badge, the filter ribbon reads as one row of labeled chips above the plan column, and bucket poll cards share the app's card treatment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.21"
+name = "dark_mode_coherent_panes"
+description = "In dark mode the sidebar, plan column, and map chrome all swap coherently to the dark palette with readable text throughout"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.22"
+name = "dark_mode_partial_wash"
+description = "After toggling dark mode, at least one pane or surface stays on the light palette or renders unreadable text (dark-on-dark or light-on-light)"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "3.catchall"

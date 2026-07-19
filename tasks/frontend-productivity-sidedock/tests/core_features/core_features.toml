@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -76,8 +76,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
-description = "After adding a bookmark with only a URL, it appears with a title derived from the URL, and adding a second with an explicit title uses that title verbatim"
+name = "bookmark_create_matches_field_contract"
+description = "After submitting the Add bookmark form with a valid http/https url and blank title, exactly one row appears whose title is derived from the URL path or domain and whose url matches the submitted address; submitting a second bookmark with an explicit title at most 120 characters uses that title verbatim"
 type = "binary"
 weight = 1.0
 
@@ -161,7 +161,7 @@ weight = 1.0
 [[criterion]]
 id = "1.28"
 name = "export_active_and_all_workspaces_download"
-description = "Activating Export bookmarks downloads the active workspace as a Netscape-format bookmarks HTML file, activating Export all downloads every workspace, and each export shows a confirmation toast"
+description = "Activating Export bookmarks downloads the active workspace as Netscape-format bookmarks HTML whose link HREF and text encode bookmark url and title values from field-contract-valid records, activating Export all downloads every workspace, and each export shows a confirmation toast"
 type = "binary"
 weight = 1.0
 
@@ -254,15 +254,15 @@ weight = 1.0
 
 [[criterion]]
 id = "1.41"
-name = "malformed_import_handled_gracefully"
-description = "Importing a malformed or unexpected Netscape-format file appends whatever valid entries can be parsed and the app keeps working with no blank screen or uncaught error"
+name = "malformed_netscape_import_skips_invalid"
+description = "Importing a malformed or unexpected Netscape-format file appends only entries that map to Bookmark and folder field-contract-valid records, skips invalid link targets, and keeps working with no blank screen or uncaught error"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.42"
 name = "flow_add_bookmark_search_reload_roundtrip"
-description = "Starting from a workspace with a known bookmark count: submit the Add bookmark form with a valid URL and confirm the list gains exactly one row measured immediately around the submit, search for the new bookmark's title and confirm it appears in results, then perform a full page reload and confirm the same workspace, folder placement, and bookmark with the same title and URL are restored"
+description = "Starting from a workspace with a known bookmark count: submit the Add bookmark form with a url and optional title that satisfy the Bookmark create field contract and confirm the list gains exactly one row measured immediately around the submit whose title and url match that payload, confirm the SideDock package preview includes that bookmark's url and title, search for the new bookmark's title and confirm it appears in results, then perform a full page reload and confirm the same workspace, folder placement, and bookmark with the same title and URL are restored"
 type = "binary"
 weight = 1.0
 
@@ -300,6 +300,50 @@ name = "flow_sidebar_view_survives_reload"
 description = "Toggling Show sidebar view narrows the content column to the fixed 375px width without horizontal scrolling, and after a full page reload the app reopens still in sidebar view with the same active workspace"
 type = "binary"
 weight = 1.0
+
+
+[[criterion]]
+id = "1.48"
+name = "sidedock_package_api_shaped_field_contract"
+description = "After creating a workspace with a closed-enum accentColor and adding a bookmark that satisfies the Bookmark create field contract, the Export SideDock package JSON preview is a single object whose visible text includes schemaVersion sidedock-package-v1, sidebarView, activeWorkspaceId, pinnedBookmarkIds, and a workspaces entry with name, accentColor from the nine-color enum, and a bookmark node carrying url, title, note, and pinned"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "sidedock_package_export_import_round_trip"
+description = "After creating a workspace, adding a distinctive bookmark url and title, and pinning it, Download or Copy the SideDock package JSON then Import that same document and confirm workspace tabs, tree, Pinned row, sidebar view, and package preview match the pre-export session"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "workspace_create_field_contract_validation"
+description = "Submitting Create workspace with a blank name or a name longer than 40 characters is rejected with an inline error naming the name field and adds no workspace tab; the accentColor picker offers only the nine closed-enum swatches"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "title_overlength_rejected_by_bookmark_contract"
+description = "Submitting the Add bookmark form with a valid url and a title longer than 120 characters is rejected with an inline error naming the title field and creates no bookmark row"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.52"
+name = "package_import_rejects_field_contract_failures"
+description = "Importing parseable JSON that fails the SideDock package field contract (wrong schemaVersion, accentColor outside the nine-color enum, blank workspace name, non-http/https bookmark url, or pinnedBookmarkIds longer than 8) leaves workspaces, pins, and sidebar view unchanged and shows validation naming the offending field or rule"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.53"
+name = "export_omits_session_mutations"
+description = "After creating a workspace and adding a bookmark with a distinctive url and title, the SideDock package JSON preview omits that workspace name, accentColor, bookmark url, or bookmark title"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.catchall"

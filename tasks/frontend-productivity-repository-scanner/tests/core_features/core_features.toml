@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "add_repository_form_validation"
-description = "The toolbar Add repository button opens a modal with a required local path input and an optional display name input; the submit control stays disabled while the path is empty, and an empty or invalid path shows an inline message naming the path field before submit"
+description = "The toolbar Add repository button opens a modal with a required local path input and an optional display name input; the submit control stays disabled while the path is empty, and an empty, whitespace-only, over-260-character, or otherwise invalid path shows an inline message naming the path field before submit"
 type = "binary"
 weight = 1.0
 
@@ -77,14 +77,14 @@ weight = 1.0
 [[criterion]]
 id = "1.3"
 name = "repository_row_anatomy_and_seed"
-description = "At least 3 seeded repositories are listed on first load, each row showing path, display name, last-scanned timestamp, document count, and a Scan Now button, with at least 8 documents per seeded repository reachable in the document tree"
+description = "At least 3 seeded repositories are listed on first load, each row showing a checkbox, path, display name, last-scanned timestamp, document count, and a Scan Now button, with at least 8 documents per seeded repository reachable in the document tree"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
 name = "rename_and_remove_repository"
-description = "Rename edits a repository's display name in place and the new name appears everywhere the repository is referenced; Remove asks for confirmation and then deletes the repository row and removes its documents from the document tree in the same interaction"
+description = "Rename edits a repository's display name in place under the displayName field contract and the new name appears everywhere the repository is referenced; Remove asks for confirmation and then deletes the repository row and removes its documents from the document tree in the same interaction"
 type = "binary"
 weight = 1.0
 
@@ -147,7 +147,7 @@ weight = 1.0
 [[criterion]]
 id = "1.13"
 name = "document_tree_grouped_by_type"
-description = "The document tree groups detected files by type — CLAUDE.md, AGENTS.md, .cursorrules, and README — in accordion sections whose headers show the per-group document count"
+description = "The document tree groups detected files by type — CLAUDE.md, AGENTS.md, .cursorrules, and README — in accordion sections whose headers show the per-group document count; each document carries path, type, content, and findings under the document field contract"
 type = "binary"
 weight = 1.0
 
@@ -194,6 +194,48 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
+id = "1.20"
+name = "batch_select_and_scan_selected"
+description = "Selecting one or more repository checkboxes enables Scan selected; activating it scans each selected repository in sequence and updates each row's document count and last-scanned timestamp; with none selected Scan selected starts no scans; Select all / Clear selection toggles every visible checkbox with the toolbar selected count matching checked rows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "undo_redo_repository_mutations"
+description = "Undo reverses add, rename, remove, and pattern-toggle mutations restoring the prior repositories list, document tree, and pattern configuration; Redo reapplies the undone step; after Undo a new mutation clears the redo stack; Undo and Redo are disabled at empty-stack boundaries"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "command_palette_actions_and_jump"
+description = "Opening the command palette via Cmd/Ctrl+K or the toolbar control shows filterable actions including Add repository, Scan selected, Export scan index, Import scan index, Undo, Redo, and jump-to entries for tracked repositories; activating an action closes the palette and performs it or focuses the matching row; Escape closes without changes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "export_scan_index_json_field_contract"
+description = "Export opens with Scan Index JSON and Inventory Markdown tabs regenerated live from the store; Scan Index JSON preview shows required schemaVersion repo-scan-index/v1, exportedAt, patterns (claude-md/agents-md/cursorrules/readme booleans with at least one true), and repositories array objects under the declared field contract"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "export_contains_session_mutations"
+description = "After adding a repository with a distinctive path and completing a scan that changes its document count, both Export format previews contain that path and the updated count; Copy shows a brief confirmation and Download is available on the active tab"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "import_scan_index_round_trip"
+description = "Downloading Scan Index JSON then Importing that same document reconstructs the same visible repositories, tree groups, findings, and pattern toggles; malformed JSON or a payload failing the field contract (wrong schemaVersion, all patterns false, illegal document type, empty path) leaves state unchanged and shows validation naming the offending field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.n1"
 name = "fabricated_scan_results"
 description = "Scans are fabricated: the progress bar or step statuses render without advancing over time, scanning different repositories yields byte-identical documents and timelines, or the document count and last-scanned timestamp change without any scan having run"
@@ -205,6 +247,22 @@ negate = true
 id = "1.n2"
 name = "missing_empty_states"
 description = "Removing every repository, or filtering the tree to zero matching documents, leaves a blank region with no empty-state message or recovery control"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n3"
+name = "export_omits_session_work"
+description = "After adding a repository and completing a scan, Export Scan Index JSON or Inventory Markdown text is identical to the pre-mutation export — an export that omits the session's actual repositories, counts, or findings"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n4"
+name = "undo_fails_to_restore"
+description = "After adding or renaming a repository, Undo leaves the list, tree, or pattern configuration in the mutated state instead of restoring the prior snapshot"
 type = "binary"
 weight = 1.0
 negate = true

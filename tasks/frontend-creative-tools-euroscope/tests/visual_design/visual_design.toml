@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,35 +62,35 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
+name = "wizard_not_dashboard_cards"
 description = "At desktop width the patcher presents a step-based wizard with colour swatches, icon previews, and progress rather than generic equal-weight dashboard cards"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
+name = "patching_primary_visual_focus"
 description = "The colour and icon patching is the primary visual focus while secondary metadata (hex values, bitmap dimensions, helper text) stays visually subordinate"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
+name = "final_step_visibly_complete"
 description = "After the colour set is chosen and the patched result is generated, the final step is visibly distinguished from its prior state through a visible selection, status, value, or content change"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.4"
-name = "3_4"
+name = "preview_and_grid_recolour"
 description = "The live colour Preview and the bitmap preview grid visibly recolour to reflect the currently selected theme and icon set"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "3_5"
+name = "mobile_stacked_hierarchy"
 description = "At mobile width the patcher reorganises the step-based wizard into a coherent stacked composition that preserves the primary-before-secondary hierarchy and keeps controls reachable without horizontal scrolling"
 type = "binary"
 weight = 0.5
@@ -98,7 +98,7 @@ optional = true
 
 [[criterion]]
 id = "3.6"
-name = "3_6"
+name = "colour_coded_alert_blocks"
 description = "The patcher's guidance uses colour-coded Information, Caution, and Warning alert blocks each with a leading icon and a heading"
 type = "binary"
 weight = 0.5
@@ -170,7 +170,7 @@ weight = 0.5
 
 [[criterion]]
 id = "3.7"
-name = "3_7"
+name = "reads_as_generic_dashboard"
 description = "The initial surface reads as a generic dashboard or starter page rather than a recognisable colour-and-icon patcher"
 type = "binary"
 weight = 1.0
@@ -178,7 +178,7 @@ negate = true
 
 [[criterion]]
 id = "3.8"
-name = "3_8"
+name = "mobile_horizontal_scroll_forced"
 description = "At 375px width the layout forces horizontal scrolling to reach the controls needed to choose a colour set and generate the patched result"
 type = "binary"
 weight = 1.0
@@ -191,6 +191,42 @@ description = "Placeholder text (lorem ipsum, TODO, asdf, or template variable n
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "3.19"
+name = "contrast_matrix_visual_treatment"
+description = "The contrast matrix uses compact ratio readouts with clear pass (green-tinted) and fail (amber or red-tinted) marks, and the colour-blindness control shows a segmented choice with a visible active selection."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.20"
+name = "export_center_monospace_tabs"
+description = "The export center presents a monospaced preview block with visible tab labels for Patch recipe JSON, Theme CSS, and Summary."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.21"
+name = "command_palette_overlay_craft"
+description = "The command palette is a centered overlay with a search field, kind labels (Stage or Theme) on result rows, and a highlighted keyboard selection."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.22"
+name = "undo_redo_disabled_legible"
+description = "Empty Undo/Redo and disabled export actions read as non-interactive while their labels stay legible."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.n4"
+name = "export_center_unstyled_dump"
+description = "The export center is missing or renders as an unstyled plain dump with no tab labels or monospaced preview treatment."
+type = "binary"
+negate = true
+weight = 1.0
 
 [[criterion]]
 id = "3.catchall"

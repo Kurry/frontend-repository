@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -84,7 +84,7 @@ weight = 1.0
 [[criterion]]
 id = "2.5"
 name = "workspace_layout_composition"
-description = "The layout composes as left palette panel, central canvas, collapsible right Saved Workflows panel, a toolbar above the canvas containing Run, Pause/Resume, Retry from failed node, Save, and the live rollup, and a timeline panel below the canvas; one consistent icon set is used across the palette, toolbar, badges, and timeline, and typography keeps a clear hierarchy between panel titles, node titles, and metadata text"
+description = "The layout composes as left palette, central canvas, collapsible Saved Workflows panel, toolbar with Run/Pause/Resume/Retry/Undo/Redo/Save/Artifact/Delete selected (when multi-select active)/rollup, Artifact panel with format tabs and Copy/Download/Import when open, and timeline below; one consistent icon set and clear type hierarchy"
 type = "binary"
 weight = 1.0
 
@@ -96,24 +96,39 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "2.10"
+name = "multi_select_and_validity_chrome"
+description = "Multi-selected nodes share a distinct selection chrome stronger than single-select; the Artifact preview uses a monospaced block; the graph-validity badge uses valid (green-tinted) vs incomplete (amber-tinted) treatments and always includes a text label"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "2.8"
 name = "responsive_panels_collapse"
-description = "At 1024 pixels the Saved Workflows panel collapses behind a toggle, at 768 pixels the palette collapses to a compact strip or toggle with the timeline still reachable, and at 375 pixels no content clips or overflows and no page-level horizontal scrollbar appears while the canvas remains pannable"
+description = "At 1024 pixels the Saved Workflows panel collapses behind a toggle, at 768 pixels the palette collapses and Artifact stacks below the canvas when open with timeline still reachable, and at 375 pixels no content clips or overflows and no page-level horizontal scrollbar appears while the canvas remains pannable"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.9"
 name = "overlap_or_unreadable_text"
-description = "At 1440 or 375 pixel widths, node labels, badges, toolbar controls, or timeline text overlap other elements or are clipped so they become unreadable"
+description = "At 1440 or 375 pixel widths, node labels, badges, toolbar controls, artifact preview, or timeline text overlap other elements or are clipped so they become unreadable"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n2"
+name = "status_color_only"
+description = "Status or validity is conveyed by color alone with no text label on badges"
+type = "binary"
+negate = true
+weight = 1.0
 
 [[criterion]]
 id = "2.catchall"
 name = "visual_design_catchall"
 description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,71 +62,71 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_states_before_entries"
+description = "Before any entry exists, the timeline and All entries list show friendly empty states inviting a first activity."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "manual_form_validates_inline"
+description = "Inline validation appears on the manual form, timer inputs, edit dialog, interruption reason step, and import confirmation before submit."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "field_contract_errors_are_actionable"
+description = "Validation messages name the offending field from the entry or Session JSON field contract rather than only saying Invalid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "actions_show_toast_confirmation"
+description = "Starting a timer, saving a manual entry, deleting, bulk categorize, export, and import each show a transient toast confirmation."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "interruption_step_is_clear"
+description = "The interruption reason step clearly requires Internal or External before a sub-25-minute stop commits."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "delete_and_import_support_cancel"
+description = "Delete confirmation and Import confirmation support cancel that leaves the collection unchanged."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "weekly_and_heatmap_tooltips"
+description = "Hover tooltips are present for Weekly overview bar segments and heat-map cells."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
 name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+description = "Buttons, inputs, checkboxes, and labels use semantic tags."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
 name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+description = "Export drawer, edit dialog, and other modals close via close control, backdrop click, and Escape."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "no_results_and_invalid_import_feedback"
+description = "A search/filter with no matches shows an explicit no-results message; invalid Import shows validation naming the offending field and changes nothing."
 type = "binary"
 weight = 1.0
 
@@ -157,7 +157,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n4"
 name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+description = "Delete or Import replace proceeds with no confirmation warning."
 type = "binary"
 negate = true
 weight = 1.0
@@ -196,8 +196,8 @@ weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "interruption_cancel_still_saves"
+description = "Cancelling the interruption reason step still saves an entry."
 type = "binary"
 negate = true
 weight = 1.0

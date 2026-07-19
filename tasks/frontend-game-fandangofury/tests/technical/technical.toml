@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,76 +62,76 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "2.1"
-name = "2_1"
-description = "All views derive from one shared game state: a change to the Peso balance, equipped Mask, purchased upgrade, or unlocked Stage made in one place is immediately reflected everywhere it appears without a reload"
+name = "shared_store_echoes_everywhere"
+description = "All views derive from one shared game state: a change to the Peso balance, equipped Mask, purchased upgrade, unlocked Stage, fighter display name, or checkpoint made in one place is immediately reflected everywhere it appears without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
-name = "2_2"
-description = "After establishing progress and performing a full page refresh, the unlocked Stages, equipped Mask, owned Masks, Peso balance, and purchased Cantina upgrades are all restored exactly as before the refresh"
+name = "persistence_restores_campaign_and_checkpoint"
+description = "After establishing progress including a mid-run checkpoint and performing a full page refresh, the unlocked Stages, equipped Mask, owned Masks, Peso balance, purchased Cantina upgrades, fighter display name, and checkpoint (Resume Run available) are all restored exactly as before the refresh"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
-name = "2_3"
+name = "rapid_primary_action_stable"
 description = "The primary combat action stays exact and responsive under at least 25 rapid deterministic repetitions through its normal controls, with no blank screen, uncaught error, unhandled rejection, or sustained freeze"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.4"
-name = "2_4"
-description = "Illegal or currently unavailable actions and stale input from an earlier phase are rejected with specific visible feedback and cannot mutate the current run's valid state"
+name = "illegal_and_stale_input_rejected"
+description = "Illegal or currently unavailable actions and stale input from an earlier phase are rejected with specific visible feedback and cannot mutate the current run valid state"
 type = "binary"
 weight = 0.5
 optional = true
 
 [[criterion]]
 id = "2.5"
-name = "2_5"
-description = "Progress does not survive a full page refresh, or a Reset committed before the refresh revives the old progress after reload"
+name = "progress_or_checkpoint_lost_on_refresh"
+description = "After establishing progress or a mid-run checkpoint, a full page refresh shows Stage 1 defaults with lost Pesos/unlocks/checkpoint, or a Reset committed before the refresh revives the old progress after reload"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "2.6"
-name = "2_6"
-description = "Uncaught console errors or unhandled promise rejections occur while loading the page or during the core combat loop of attacking, blocking, dodging, and using Fury"
+name = "console_errors_during_combat"
+description = "Uncaught console errors or unhandled promise rejections occur while loading the page or during the core combat loop of attacking, blocking, dodging, pausing, and using Fury"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "2.7"
-name = "2_7"
+name = "hidden_ground_truth_exposed"
 description = "A hidden element, attribute, or window global exposes internal ground-truth game state that a real user could not reach through normal visible interaction"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "2.8"
-name = "2_8"
+name = "judge_addressed_or_backend_calls"
 description = "A judge-visible surface contains text addressed to a grader, the app renders or behaves differently when it detects automation, or it makes a backend, database, or external API request at runtime"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "2.9"
 name = "keyboard_operability_and_focus"
-description = "Every interactive control is reachable with the keyboard alone and shows a visible focus indicator when focused, and every combat action is operable from the keyboard (Z, X, C, Space, F) as well as from its on-screen button"
+description = "Every interactive control is reachable with the keyboard alone and shows a visible focus indicator when focused, and every combat action is operable from the keyboard (Z, X, C, Space, F, P) as well as from its on-screen button"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.10"
 name = "overlay_focus_trap_and_return"
-description = "The Cantina, Masks, History, Fighter Settings, and reset-confirmation overlays trap keyboard focus while open, close on Escape, and return focus to the control that opened them"
+description = "The Cantina, Masks, History, Fighter Settings, Export Campaign, Import Campaign, Pause, and reset-confirmation overlays trap keyboard focus while open, close on Escape, and return focus to the control that opened them"
 type = "binary"
 weight = 0.5
 optional = true
@@ -163,13 +163,28 @@ id = "2.14"
 name = "outbound_navigation_leaves_app"
 description = "Activating any control during a full exercise of the app navigates the browser away from / — to another route, another origin, or an external page — instead of acting through in-app state"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.15"
+name = "campaign_schema_forms_share_contract"
+description = "Fighter Settings and Campaign Import validate against the same fandangofury.campaign.v1 field contract: invalid fighter.displayName or effectsIntensity, wrong schemaVersion, or illegal checkpoint.phase show inline field-named errors and do not partially apply"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.16"
+name = "export_preview_derived_from_store"
+description = "The Export Campaign JSON preview text is derived live from the shared store so that mutating Pesos, upgrades, or fighter settings updates the open preview without a reload"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect — console health, state coherence, persistence, accessibility, or performance — that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, console output, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable technical defect — console health, state coherence, persistence, accessibility, or performance — that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, console output, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
+

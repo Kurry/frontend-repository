@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -60,96 +60,104 @@ allowed_tools = [
 [scoring]
 aggregation = "weighted_mean"
 
+
 [[criterion]]
 id = "12.1"
-name = "mandated_modules_are_bound"
-description = "All contract-mandated modules are initialized and bound."
+name = "browse_entity_artifact_modules_bound"
+description = "Contract modules browse-query-v1, entity-collection-v1, and artifact-transfer-v1 are initialized and bound (webmcp_session_info / webmcp_list_tools show tools for browse, entity, and artifact prefixes)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.2"
-name = "handlers_match_visible_ui_logic"
-description = "Exposed tool handlers match visible UI command logic."
+name = "handlers_match_visible_shell_logic"
+description = "Exposed browse, entity, and artifact tool handlers drive the same visible UI logic as the shell, Projects Board, Export, and Archive (destinations, theme, filters, project CRUD, and export/import/copy)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.3"
-name = "only_documented_operations_exist"
-description = "Only documented operations and routes are available."
+name = "only_documented_ops_and_destinations"
+description = "Only documented browse, entity, and artifact operations are available, with destinations limited to terminal-home, project-detail, about, export-center, and archive-vault — no undeclared routes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.4"
-name = "contract_is_automation_exercisable"
-description = "The contract can be fully exercised via automation."
+name = "contract_exercisable_via_automation"
+description = "The contract can be fully exercised via webmcp_invoke_tool for browse open/set_theme/apply_filter/clear_filter, entity create/select/update/delete, and artifact export/import/copy against the bound values."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.5"
-name = "declared_entity_operations_work"
-description = "Entity operations declared in the contract, including create, update, delete, and reorder, all work."
+name = "entity_project_crud_ops_work"
+description = "Entity operations create, select, update, and delete work for the project entity (delete requires confirm=true) and update the same Projects Board / /work / export surfaces as the UI."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.6"
-name = "form_flow_operations_are_bound"
-description = "Form submission validation, error, and cancel operations are clearly bound."
+name = "entity_fields_title_summary_tags_status"
+description = "Entity create/update accept the declared fields title, summary, tags, and status and surface the same validation failures as the visible create/edit path when required values are missing."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.7"
-name = "queries_match_allowed_spec"
-description = "Query destinations and filters match the allowed specification."
+name = "destinations_filters_themes_match_bindings"
+description = "Browse destinations include terminal-home, project-detail, about, export-center, and archive-vault; filters include status and tag; themes include dark, light, retro, and glass; browsable entity is projects."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.8"
-name = "capabilities_stay_declared"
-description = "No extra or undeclared module routes or capabilities are exposed."
+name = "no_extra_undeclared_modules"
+description = "No extra modules, destinations, or operations beyond browse-query-v1 / entity-collection-v1 / artifact-transfer-v1 and the declared Bindings are exposed."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.9"
-name = "session_tool_and_invoke_apis_work"
-description = "Session info, tool list, and invocation are correctly surfaced."
+name = "session_list_invoke_apis_work"
+description = "webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool correctly surface session info, the tool list, and invocation results for the bound tools."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.10"
-name = "mcp_initializes_without_harness_edits"
-description = "MCP initialization works without manual editing or test harness changes."
+name = "mcp_init_without_harness_edits"
+description = "MCP initialization works from the delivered app without manual editing of the test harness or stdio bridge."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.11"
+name = "artifact_export_import_copy_bound"
+description = "Artifact operations export, import, and copy are bound for export formats json and markdown and import mode declared-portfolio, and invoking them updates or reads the same Export view surfaces as the UI."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.n1"
 name = "mcp_tools_missing_or_noop"
-description = "MCP tooling is unbound, missing, or a no-op."
+description = "Browse, entity, or artifact MCP tooling is unbound, missing, or a no-op when invoked."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n2"
-name = "handlers_diverge_from_ui_logic"
-description = "Handlers do not match UI logic because actions mismatch or state does not sync."
+name = "handlers_diverge_from_ui"
+description = "An entity create/update/delete, browse filter/theme, or artifact export/import tool succeeds while the visible Projects Board, /work output, theme class, or export preview stays unchanged (or the reverse)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n3"
-name = "undeclared_capabilities_exposed"
-description = "Undeclared destinations or entity operations are exposed."
+name = "undeclared_destinations_or_ops_exposed"
+description = "Undeclared destinations or operations beyond the bound browse destinations, entity create/select/update/delete, and artifact export/import/copy are exposed."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,15 +165,15 @@ weight = 1.0
 [[criterion]]
 id = "12.n4"
 name = "automation_cannot_exercise_contract"
-description = "The contract cannot be exercised from automation."
+description = "webmcp_invoke_tool cannot exercise browse open/set_theme, entity create/delete, or artifact export against the bound values."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n5"
-name = "validation_bypass_desyncs_state"
-description = "Validation bypasses lead to inconsistent MCP and UI state."
+name = "validation_bypass_desyncs_mcp_ui"
+description = "Entity create via MCP bypasses validation and leaves MCP/UI project counts inconsistent with the visible form rules."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +181,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n6"
 name = "session_or_tool_api_errors"
-description = "The session or tool API returns errors or incomplete data."
+description = "webmcp_session_info or webmcp_list_tools returns errors or an incomplete tool list missing browse, entity, or artifact tools."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,31 +189,31 @@ weight = 1.0
 [[criterion]]
 id = "12.n7"
 name = "mcp_relies_on_undocumented_hacks"
-description = "MCP relies on manual or undocumented test hacks."
+description = "MCP only works after undocumented manual harness edits or test-only stubs."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n8"
-name = "required_contract_module_missing"
-description = "No module contract is implemented where one is declared required."
+name = "required_modules_missing"
+description = "browse-query-v1, entity-collection-v1, or artifact-transfer-v1 is missing where the contract declares all three required."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n9"
-name = "mcp_is_stubbed_or_commented_out"
-description = "The MCP interface is commented out or only stubbed."
+name = "mcp_stubbed_or_commented_out"
+description = "The MCP interface is commented out or only stubbed so tools list empty or always fail."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n10"
-name = "automated_contract_validation_fails"
-description = "The project fails automated MCP contract validation."
+name = "fake_ui_success_without_tools"
+description = "Missing tools create fake UI success paths that report project or export mutations without the underlying collection or preview changing."
 type = "binary"
 negate = true
 weight = 1.0

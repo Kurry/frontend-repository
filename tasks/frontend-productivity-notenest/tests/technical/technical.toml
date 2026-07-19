@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -69,17 +69,18 @@ weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "4_2"
-description = "Creating a folder and a note with a checklist item, an attached image, a pinned state, and a color label, then performing a full page refresh, restores the folder, note, checklist done-state, image, pinned state, and color label exactly as before."
+name = "reload_resets_to_seeded_baseline"
+description = "After creating a folder and a note with checklist, pin, and color, a full page reload returns the app to its seeded baseline (empty or seed-only workspace) with empty session undo/redo — not a mix of surviving and cleared facets."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
-description = "Bold and italic formatting applied to words in the note body survive a full page refresh and remain visibly applied to the same words."
+name = "forbidden_browser_storage"
+description = "After exercising create, pin, color, batch trash, Export Nest, Import Nest, command palette, and session undo, localStorage, sessionStorage, IndexedDB, or another browser persistence store contains app folder/note/trash state."
 type = "binary"
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.4"
@@ -114,7 +115,7 @@ negate = true
 [[criterion]]
 id = "4.8"
 name = "4_8"
-description = "A core workflow shows a success or completion state without the action actually occurring, or the same action with different inputs yields identical hardcoded output or does not survive a reload."
+description = "A core workflow shows a success or completion state without the action actually occurring, or the same action with different inputs yields identical hardcoded output."
 type = "binary"
 weight = 1.0
 negate = true
@@ -129,8 +130,8 @@ negate = true
 
 [[criterion]]
 id = "4.10"
-name = "4_10"
-description = "An attached image is stored as an external http(s) link or a blob URL rather than a data URL inside the persisted state, so images are not self-contained after a reload."
+name = "image_not_data_url_in_export"
+description = "An attached image in a note or in the Nest JSON export uses an external http(s) link or a blob URL rather than a data URL beginning with data:."
 type = "binary"
 weight = 1.0
 negate = true
@@ -145,7 +146,7 @@ weight = 1.0
 [[criterion]]
 id = "4.12"
 name = "confirm_dialogs_trap_focus"
-description = "The folder-delete and Empty Trash confirm dialogs trap keyboard Tab focus while open and return focus to the invoking control when closed."
+description = "The folder-delete, Empty Trash, Batch Trash, Export Nest, Import Nest, and command-palette overlays trap keyboard Tab focus while open and return focus to the invoking control when closed; Escape closes them."
 type = "binary"
 weight = 1.0
 
@@ -159,7 +160,7 @@ weight = 0.5
 [[criterion]]
 id = "4.14"
 name = "keyboard_operable_controls"
-description = "Checklist checkboxes can be toggled from the keyboard, and the Pin toggle and color swatches are reachable and operable with the keyboard alone."
+description = "Checklist checkboxes, Pin toggle, color swatches, note selection checkboxes, batch actions, Undo/Redo, Export Nest, and Import Nest are reachable and operable with the keyboard alone with a visible focus indicator."
 type = "binary"
 weight = 1.0
 
@@ -177,6 +178,20 @@ description = "During load and a full exercise of the app, devtools shows outbou
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "4.17"
+name = "inline_form_validation_runtime"
+description = "Note title and folder name forms expose visible field-level validation before invalid submission can mutate the workspace, and Nest Import rejects non-conforming JSON with a message naming the offending field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.18"
+name = "export_import_live_store_coherence"
+description = "Nest JSON and Markdown vault export previews update from the same shared store as the folder tree and note lists; after a successful Import Nest, lists and export previews agree without a reload."
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "2.catchall"

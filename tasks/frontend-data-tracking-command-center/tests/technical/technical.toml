@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "5.2"
 name = "console_clean_full_exercise"
-description = "No console errors, warnings, or unhandled promise rejections appear on load or during a full exercise of the app (connect, rename, disconnect, retry, filters, detail views, theme change)"
+description = "No console errors, warnings, or unhandled promise rejections appear on load or during a full exercise of the app (connect, rename, disconnect, bulk disconnect, retry, filters, detail views, theme change, export, import, undo/redo, command palette)"
 type = "binary"
 weight = 1.0
 
@@ -85,14 +85,14 @@ negate = true
 [[criterion]]
 id = "5.4"
 name = "reload_returns_seeded_baseline"
-description = "After changing several facets (connect an agent, apply a feed filter, activate night mode, expand an agent row) a page reload returns the app to its seeded baseline: at least 12 seeded feed events, at least 4 seeded agents, the default light theme, and the dashboard view — all facets reset coherently, never a mix"
+description = "After changing several facets (connect an agent, apply a feed filter, activate night mode, open export drawer) a page reload returns the app to its seeded baseline: at least 12 seeded feed events, at least 4 seeded agents, the default light theme, dashboard view, and empty undo/redo stacks — all facets reset coherently, never a mix"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "5.5"
 name = "cross_view_state_coherence"
-description = "A change made in one view is immediately reflected everywhere the datum appears without a reload: renaming an agent updates its panel row, expanded detail, and feed references; connecting or disconnecting a running agent moves the active agents KPI in the same interaction"
+description = "A change made in one view is immediately reflected everywhere the datum appears without a reload: renaming an agent updates its panel row, expanded detail, feed references, and both export previews; connecting or disconnecting a running agent moves the active agents KPI in the same interaction"
 type = "binary"
 weight = 1.0
 
@@ -107,7 +107,7 @@ negate = true
 [[criterion]]
 id = "5.7"
 name = "rapid_input_stability"
-description = "Rapidly repeating actions (spamming Simulate activity, toggling filter chips, opening and closing the dialog) causes no hangs, dropped interactions, view desyncs, or runtime exceptions in the console"
+description = "Rapidly repeating actions (spamming Simulate activity, toggling filter chips, opening and closing Connect/export/palette) causes no hangs, dropped interactions, view desyncs, or runtime exceptions in the console"
 type = "binary"
 weight = 1.0
 
@@ -126,6 +126,22 @@ description = "The page exposes window.webmcp_session_info, window.webmcp_list_t
 type = "binary"
 weight = 0.5
 optional = true
+
+
+[[criterion]]
+id = "5.10"
+name = "export_preview_regen_stays_responsive"
+description = "Opening the export drawer and switching between Session JSON and Agents CSV regenerates the preview without freezing the UI or throwing console errors"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.n1"
+name = "export_or_import_throws_console_errors"
+description = "Opening Export session, switching format tabs, Copy, Download, or Import throws console errors or unhandled rejections"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "5.catchall"

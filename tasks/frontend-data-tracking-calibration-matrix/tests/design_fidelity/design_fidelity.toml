@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,78 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "spacing_and_sizing_follow_scale"
-description = "Spacing and sizing follow the design system's scale, with no arbitrary one-off values visible in computed styles."
+name = "dense_console_spacing_scale"
+description = "Heatmap, variance, triage summary, and export drawer spacing follow one consistent dense analytics scale rather than arbitrary gaps"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "typography_matches_spec"
-description = "Typography matches the spec for all headings and body copy."
+name = "tabular_figures_and_hierarchy"
+description = "View titles, panel headings, and cell/row text follow the stated hierarchy, and numeric score columns use tabular figures"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "layout_matches_reference"
-description = "Layout matches reference screenshots to within a small tolerance at all specified breakpoints; fidelity tasks achieve near pixel-parity."
+name = "heatmap_anchor_layout"
+description = "The heatmap is the visual anchor of the default view with variance, triage, chart, and timeline as surrounding tabs or panels"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.4"
-name = "specified_state_changes_animate"
-description = "Transitions or animations are applied to the state changes the spec calls out, such as add, delete, filter, or view switch."
+name = "drawer_slider_rerun_animate"
+description = "Cell drawer open/close, threshold chip changes, and re-run progress animate rather than only hard-cutting"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "responsive_behavior_matches_reference"
-description = "Responsive behavior matches reference patterns."
+name = "stack_below_1024_matches_spec"
+description = "Below 1024px panels stack vertically and the drawer becomes full-width as specified"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.6"
-name = "control_styling_matches_spec"
-description = "Button and form radii, padding, and shadows conform to the spec."
+name = "chips_slider_export_styled"
+description = "Classification chips, threshold slider, and export drawer chrome are styled as console controls rather than bare browser defaults"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.7"
-name = "typography_has_clear_hierarchy"
-description = "Typography has a clear hierarchy that distinguishes section and body text."
+name = "console_type_hierarchy_clear"
+description = "View titles are largest, panel headings next, and cell/row text smallest with clear hierarchy"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.8"
-name = "component_states_match_spec"
-description = "Component states (default, hover, active, disabled) match the spec where specified."
+name = "stable_divergent_badge_states"
+description = "Stable, divergent, capability-gap, and spec-defect chip/badge states are visually distinct and labeled"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.9"
-name = "surface_treatments_match_spec"
-description = "Color, depth, and border treatments are precise per the design."
+name = "shared_radius_shadow_borders"
+description = "Cards, drawer, and panels share consistent corner radii, shadow depth, and border treatments"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.10"
-name = "microinteractions_match_spec"
-description = "Microinteraction feedback for hover and press follows the spec in duration and motion."
+name = "hover_wash_and_copy_confirm"
+description = "Heatmap cell hover lift, variance row hover wash, and export Copy confirmation match the intended microinteractions"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.n1"
 name = "sizing_or_spacing_contradicts_scale"
-description = "Visible sizing or spacing values contradict the specified scale."
+description = "Heatmap or variance spacing contradicts the dense console scale with large empty voids or cramped collisions"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "3.n2"
 name = "colors_fall_outside_palette"
-description = "Colors appear outside the specified palette."
+description = "Heatmap ramp or chip colors clash so scores or labels lose readable contrast against cell backgrounds"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "3.n3"
 name = "sizing_mismatches_spec"
-description = "Sizing mismatches the spec."
+description = "Cell score text or chip labels are sized so two-decimal scores or classification text are unreadable"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +157,7 @@ weight = 1.0
 [[criterion]]
 id = "3.n4"
 name = "required_animations_missing_or_wrong"
-description = "Animations are missing or incorrect where the spec requires them."
+description = "Required drawer slide, re-run progress, or threshold chip crossfade is missing or snaps"
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +165,7 @@ weight = 1.0
 [[criterion]]
 id = "3.n5"
 name = "specified_controls_use_browser_defaults"
-description = "Form or button controls use browser default styles when the spec styles them."
+description = "Threshold slider, Classify, or Export controls render as unstyled browser defaults when the console styles them"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "3.n6"
 name = "layout_misaligned_at_breakpoints"
-description = "The grid or layout is misaligned at reference breakpoints."
+description = "At 1024px or 375px the heatmap, panels, or export drawer misalign or overflow"
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +181,7 @@ weight = 1.0
 [[criterion]]
 id = "3.n7"
 name = "elements_are_clipped_or_offscreen"
-description = "Elements render off-screen or clipped."
+description = "Heatmap model names, triage summary, or export tabs render clipped or off-screen at desktop width"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "3.n8"
 name = "structure_deviates_from_reference"
-description = "Section order, content, or structure deviates from the reference on fidelity tasks."
+description = "The default view buries the heatmap so the console no longer reads as a calibration heatmap-first tool"
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +197,7 @@ weight = 1.0
 [[criterion]]
 id = "3.n9"
 name = "heading_and_body_text_undifferentiated"
-description = "Heading and body text have no distinction."
+description = "View titles, panel headings, and cell text are visually undifferentiated"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "3.n10"
 name = "microinteractions_deviate_from_reference"
-description = "Microinteractions are missing or deviate from the provided reference."
+description = "Hover and open/close microinteractions are absent on heatmap cells, rows, and export chrome"
 type = "binary"
 negate = true
 weight = 1.0

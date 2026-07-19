@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,194 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "create_saved_theme_updates_all_surfaces"
+description = "Create flow: activating New Theme and submitting a valid name closes the form, increases the saved-themes card count by exactly one, shows the new card with swatches and meta line, and loading that card immediately rewrites the editor source and recolors the framed sample site without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "invalid_theme_name_inline_validation"
+description = "Create/rename flow: submitting an empty name shows an immediate inline validation message naming the name field, submit stays disabled or rejects, and the card count is unchanged."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "palette_edit_save_updates_all_surfaces"
+description = "Edit flow: changing the primary main color in the Palette tool recolors the sample site's primary surfaces immediately, rewrites the ThemeOptions source to the new hex, flips save status to unsaved, recomputes that intent's WCAG contrast label, and updates the Export panel's JSON and CSS text to include the new hex; after activating Save, status returns to saved and the active theme's Saved Themes card shows the updated swatch without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "delete_loaded_theme_clears_active"
+description = "Delete flow: confirming delete of the loaded theme removes its card, decreases the card count by exactly one, and clears the active-theme marker so no card is marked active until another theme is loaded."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "light_dark_round_trip_across_panels"
+description = "Light/Dark round-trip: toggling Type to Dark recolors preview background, paper, text, and divider surfaces and updates the editor source; switching to Components shows the same dark surfaces across demos; toggling back to Light restores light surfaces on every panel without a document navigation."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "last_delete_reveals_empty_saved_themes"
+description = "Edge: after deleting every saved theme, Saved Themes shows a clear empty state with a message and a way to create a new theme."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "search_filters_saved_theme_cards"
+description = "Search/filter flow: typing a query over saved theme names recomputes the visible cards from the collection; clearing the query restores the full card set."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "undo_redo_round_trip_across_surfaces"
+description = "Undo round-trip: after a tool edit, activating Undo restores the previous value in the tool field, the editor source, the preview, and the Export preview text together; activating Redo reapplies the edit across all four surfaces."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "tutorial_and_theme_form_overlays"
+description = "Overlays: Tutorial opens an in-page modal that can be dismissed; theme create/rename forms open, validate, and close without trapping the user — Close/Escape returns to the workspace."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "reload_returns_seeded_baseline"
+description = "Recovery/reload: a page reload returns the app to its seeded state — at least three seeded themes listed, the default theme active, and any unsaved edits from before the reload gone — with no dead end requiring a second reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "theme_crud_unavailable_from_ui"
+description = "Saved-theme create (New Theme), rename/save-options, Load, or Delete cannot be completed from the visible UI controls."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "create_fails_to_appear_or_duplicates"
+description = "Submitting a valid New Theme either fails to add a visible card or adds duplicate cards for a single submit."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "palette_edits_desync_surfaces"
+description = "After editing a Palette color or saving, the editor source, framed sample site, save status, and active Saved Themes swatch disagree about the same theme options."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "tab_switch_breaks_or_loses_theme"
+description = "Switching among Preview, Components, and Saved Themes breaks the layout or loses the active theme options / selection."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_saved_themes_region_broken"
+description = "After deleting all saved themes, the Saved Themes region is blank or broken with no empty-state message or create path."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "search_views_disagree"
+description = "After filtering saved themes by name, the visible card set disagrees with the query (wrong cards shown) or clearing the query fails to restore the full set."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "tool_panels_cannot_reopen"
+description = "After switching bottom tool-nav panels (Palette / Fonts / Typography / Snippets), a previously visited tool panel cannot be reopened."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "overlay_blocks_with_no_exit"
+description = "The Tutorial modal or a theme create/rename form blocks the workspace with no working exit (no Close or Escape)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "failed_name_validation_silent"
+description = "An empty theme-name create/rename attempt provides no visible validation feedback naming the name field."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "tab_or_overlay_dead_end_requires_reload"
+description = "Recovering from a tab switch, Tutorial modal, or theme form requires a full page reload — the UI reaches a dead end."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "export_import_round_trip_flow"
+description = "Export then import: after editing primary main to a distinct #RRGGBB hex and shape.borderRadius to a distinct in-range value, open Export and confirm the ThemeOptions JSON preview contains that hex under primary.main along with palette.type, typography.fontFamily, typography.fontSize, and shape.borderRadius; after changing the color and radius away, Import that same payload — editor, tools, Type toggle, preview, and Export text all return to the imported options including that hex and borderRadius without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "command_palette_loads_theme_flow"
+description = "Command palette jump: open with Ctrl+K, type part of a seeded theme name, press Enter on the highlighted theme result — that theme loads into editor and preview and the palette closes."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "version_save_restore_flow"
+description = "Version restore: after editing palette values, Save version with a valid name adds one snapshot; editing again then Restoring the snapshot returns editor, tools, preview, and Export text to the snapshotted options."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "duplicate_name_create_then_unique_succeeds"
+description = "Schema validation on create: attempting New Theme with a duplicate of a seeded theme name leaves the card count unchanged and shows an inline error naming the name field; submitting a unique valid name then succeeds and increases the count by exactly one."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "export_import_fails_to_round_trip"
+description = "After exporting ThemeOptions JSON that contains a session hex and importing it back, editor/preview/Export still show a different color — round-trip broken."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n12"
+name = "command_palette_dead_end"
+description = "Opening the command palette leaves the user stuck with no Escape close path or Enter activation that completes a jump."
 type = "binary"
 negate = true
 weight = 1.0

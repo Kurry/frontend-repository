@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,158 +62,118 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "Canvas play is exempt from per-element semantics; menus, pause screens, and score readouts must be keyboard-reachable and announced. All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "game_controls_keyboard_accessible"
+description = "Start match, Flag Mode, Hint, Pause/Resume, Sound, Undo, Redo, Apply Scenario Change, Rematch, New match, Export Match, Export Archive, Import, Save Progress, and Resume Saved Match are reachable and operable with the keyboard alone."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "overlays_manage_focus"
+description = "Round Result and Match Complete present as dialogs: they take focus when they open and return focus to game controls when play continues."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "icons_have_accessible_names"
+description = "Ore, mine, flag, strike, and sound icons expose accessible names or text equivalents rather than being nameless images."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "turn_live_region"
+description = "Turn changes are announced through a polite live region so the active side is conveyed without relying on color alone."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+name = "setup_fields_labelled"
+description = "The setup form fields playerName and difficulty have visible labels, and inline validation messages are associated with the fields they name."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+name = "visible_focus_indicators"
+description = "Every focused control shows a visible focus indicator."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "strike_counts_as_text"
+description = "Strike counts are exposed as text, not only as filled icons."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+name = "disabled_states_exposed"
+description = "Disabled controls (Undo at root, Redo with no child, spent Hint, Save Progress with no match, Resume Saved Match with no checkpoint) are exposed as disabled rather than silently ignoring activation."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "history_state_readable"
+description = "The History state region exposes its snapshot as readable text for assistive technology."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "export_import_keyboard_operable"
+description = "Export Match, Export Archive, Import, Copy, Save Progress, and Resume Saved Match are keyboard operable with visible focus."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
-name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+name = "keyboard_traps_in_overlays"
+description = "Keyboard focus is trapped in Round Result or Match Complete with no way to reach Rematch, next round, or New match."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.n2"
-name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+name = "turn_only_by_color"
+description = "Whose turn it is is conveyed only by color with no text or live-region announcement."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.n3"
-name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+name = "unlabelled_setup_fields"
+description = "playerName or difficulty inputs lack visible labels."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+name = "no_focus_indicator"
+description = "Focused controls show no visible focus indicator."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "disabled_controls_silently_ignored"
+description = "Activating a disabled Undo, spent Hint, or Resume-without-checkpoint control is silently ignored without disabled semantics."
 type = "binary"
-negate = true
 weight = 1.0
-
-[[criterion]]
-id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
-type = "binary"
 negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n10"
-name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
-type = "binary"
-negate = true
-weight = 1.0
 
 [[criterion]]
 id = "accessibility.catchall"
 name = "accessibility_catchall"
-description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true

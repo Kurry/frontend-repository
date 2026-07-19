@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,150 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "9.1"
-name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+name = "interactive_within_two_seconds"
+description = "The app is interactive within 2 seconds of a local cold load"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
-name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+name = "console_clean_on_load"
+description = "No console errors or warnings appear on load"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
-name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+name = "console_clean_during_exercise"
+description = "No console errors or warnings appear during a full exercise including connect, filters, export, and palette"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.4"
-name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+name = "rapid_simulate_stays_responsive"
+description = "Repeatedly activating Simulate activity keeps the UI responsive with no hangs or dropped interactions"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.5"
-name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+name = "rapid_filter_toggles_stay_responsive"
+description = "Rapidly toggling feed filter chips causes no hangs or frozen animations"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.6"
-name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+name = "export_tab_switch_no_freeze"
+description = "Opening the export drawer and switching between Session JSON and Agents CSV regenerates the preview without freezing the UI"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
-name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+name = "palette_filter_stays_snappy"
+description = "Typing in the command palette filter updates the result list without noticeable freezes"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.8"
-name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+name = "undo_redo_stays_responsive"
+description = "Rapid Undo/Redo after several connects/disconnects stays responsive without janky freezes"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+name = "detail_navigation_no_jank"
+description = "Opening KPI detail views and returning with Back stays responsive without multi-second stalls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+name = "bulk_disconnect_no_hang"
+description = "Bulk Disconnect selected on multiple agents completes without hanging the UI"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.n1"
-name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+name = "cold_load_exceeds_two_seconds"
+description = "Cold load takes more than 2 seconds before the dashboard is interactive"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n2"
-name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+name = "console_errors_on_load"
+description = "Console errors or warnings appear on load"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n3"
-name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+name = "ui_hangs_under_rapid_input"
+description = "Rapid Simulate activity or filter toggling hangs the UI or drops interactions"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n4"
-name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
+name = "export_freezes_ui"
+description = "Opening Export session or switching format tabs freezes the UI for a noticeable period"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n5"
-name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+name = "palette_typing_janks"
+description = "Command palette filtering stutters or freezes on each keypress"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n6"
-name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
+name = "animations_jank_under_load"
+description = "Feed insertion or row animations stutter heavily under repeated Simulate activity"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n7"
-name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
+name = "memory_leak_from_feed_growth"
+description = "Repeated Simulate activity degrades responsiveness as if unbounded work accumulates beyond the 50-event cap"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n8"
-name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
+name = "import_blocks_main_thread_long"
+description = "Importing Session JSON freezes the UI for several seconds with no progress feedback"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n9"
-name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
+name = "theme_switch_long_stall"
+description = "Night-mode theme switch stalls interaction for a noticeable period"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n10"
-name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+name = "detail_chart_render_stalls"
+description = "Opening a KPI detail chart stalls the UI for a noticeable period"
 type = "binary"
 negate = true
 weight = 1.0

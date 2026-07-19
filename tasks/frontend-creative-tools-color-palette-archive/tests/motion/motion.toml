@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -80,8 +80,8 @@ id = "4.3"
 name = "hover_feedback_missing"
 description = "Omits hover feedback on swatches or cards so the library feels static on pointer hover"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "4.4"
@@ -122,7 +122,7 @@ weight = 0.5
 [[criterion]]
 id = "4.9"
 name = "scroll_reveals_pause_for_overlays"
-description = "On a fresh page load, scroll-driven reveals or smooth scrolling pace the editorial page, and while an overlay that needs native scroll locking (the subscribe popup or a modal editor panel) is open, smooth-scroll is paused so the overlay scrolls natively"
+description = "On a fresh page load, scroll-driven reveals or smooth scrolling pace the editorial page, and while an overlay that needs native scroll locking (the subscribe popup, Export drawer, or a modal editor panel) is open, smooth-scroll is paused so the overlay scrolls natively"
 type = "binary"
 weight = 0.5
 optional = true
@@ -135,9 +135,47 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "4.11"
+name = "export_drawer_enter_exit"
+description = "Driven through the real Export control: the Export drawer enters and exits with a brief opacity/scale transition rather than hard-cutting"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "export_copy_confirmation_motion"
+description = "Export Copy shows a short copied confirmation with a brief transition before resetting"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.13"
+name = "vision_simulation_eases"
+description = "When prefers-reduced-motion is not set, changing vision-simulation mode eases the filter across the canvas rather than a hard cut"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.n1"
+name = "export_drawer_snaps"
+description = "Export drawer opens or closes with a hard cut and no opacity/scale transition when exercised via the real UI control"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n2"
+name = "jarring_list_or_overlay_motion"
+description = "Animations are jarring or distract from content during create/delete, export open/close, or vision-simulation changes"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
 id = "4.catchall"
 name = "motion_catchall"
 description = "The app exhibits a significant, browser-observable defect in motion or microinteractions (jank, jarring or missing transitions, animation-induced layout shifts) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (control path exercised, element, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
+

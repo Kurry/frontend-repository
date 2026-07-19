@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -194,6 +194,29 @@ description = "On a fresh load, the inline hero video plays once in view (muted,
 type = "binary"
 weight = 0.5
 optional = true
+
+
+[[criterion]]
+id = "3.20"
+name = "palette_and_briefing_open_transition"
+description = "Via the real UI path, the command palette and Investor briefing panel open/close with a short ~0.2s opacity/translate transition rather than an instant snap; verified without WebMCP state shortcuts."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.21"
+name = "pin_updates_shortlist_without_reload_flash"
+description = "Pinning or unpinning a news card updates the shortlist count in place without a full-page reload flash."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.n20"
+name = "palette_snaps_without_transition"
+description = "Opening or closing the command palette via the real UI path snaps instantly with no opacity/translate transition."
+type = "binary"
+negate = true
+weight = 0.5
 
 [[criterion]]
 id = "3.catchall"

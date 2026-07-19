@@ -1,0 +1,219 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "spacing_and_sizing_follow_scale"
+description = "Spacing and sizing follow one consistent scale across the portfolio, gate board, inspector, and stepper — no arbitrary one-off values visible in computed styles"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "specified_layout_implemented"
+description = "The specified compositions are implemented as written: rollup strip and calibration strip above the portfolio table; workspace header with slug, hero banner, recommendation, and breadcrumb; left-rail stepper; six gate cards in the fixed order; three-pane inspector"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "specified_vocabulary_rendered_exactly"
+description = "The fixed vocabulary renders exactly as specified: the three hero states, five gate statuses, four fix categories, four recommendations, eight check names, four re-run step names, and the five reviewer step names Resolve, Gate, Audit, Verdict, Bundle"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "specified_state_changes_animate"
+description = "The state changes the spec calls out animate as described — gate flip emphasis, hero cross-fade, fix-item resolve ease, step unlock expand, list enters and exits"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "responsive_behavior_matches_spec"
+description = "Responsive behavior matches the specified patterns: inspector stacks at 1024px and below, stepper goes horizontal and the table becomes cards at 768px and below, no overflow at 375px"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "control_styling_is_coherent"
+description = "Button and form radii, padding, and shadows are coherent across the app — controls of the same kind share one treatment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "typography_has_clear_hierarchy"
+description = "Typography carries the specified four-level hierarchy (app title, view titles, card headings, body/labels) distinguishably"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "component_states_match_spec"
+description = "Component states — default, hover, focus ring, disabled, error — appear as specified, including the beyond-color-alone treatment for disabled recommendations"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "status_color_semantics_match_spec"
+description = "Color semantics match the spec exactly: hero green/amber/red, gate pass green, fail red, errored purple, inconclusive amber, missing gray, applied wherever those states render"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "threshold_markers_match_spec"
+description = "The 0.80 and 0.90 threshold markers and the minimum-3-valid-trials reference render beside their measured values as the spec describes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.n1"
+name = "sizing_or_spacing_contradicts_scale"
+description = "Visible sizing or spacing values contradict the app's own scale, producing uneven rhythm between sibling components"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n2"
+name = "status_semantics_swapped_or_offspec"
+description = "A specified status color or label is wrong — a failing gate rendered green, an inconclusive gate rendered gray, a hero state paired with the wrong treatment, or specified vocabulary reworded"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n3"
+name = "specified_element_missing"
+description = "A specified surface — the calibration strip, rollup strip, threshold markers, breadcrumb, reasons lists, or the summary's gates table — is absent or structurally different from the spec"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n4"
+name = "required_animations_missing_or_wrong"
+description = "Animations are missing or wrong where the spec requires them (snapping hero change, instant status flips, no unlock motion)"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n5"
+name = "specified_controls_use_browser_defaults"
+description = "Form or button controls render with browser default styles where the spec styles them"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n6"
+name = "layout_misaligned_at_breakpoints"
+description = "The grid or layout is misaligned at the specified breakpoints (1440, 1024, 768, 375)"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n7"
+name = "elements_are_clipped_or_offscreen"
+description = "Elements render off-screen or clipped in any specified view"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n8"
+name = "gate_or_step_order_deviates"
+description = "The six gates, four re-run steps, or five reviewer steps render in an order different from the specified fixed order"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n9"
+name = "heading_and_body_text_undifferentiated"
+description = "Heading and body text render without visible hierarchy distinction"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n10"
+name = "microinteractions_deviate_from_spec"
+description = "Specified microinteraction feedback (hover wash, press effect, chevron rotation on expandable reasons, resolve strike) is missing or contradicts the spec"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "design_fidelity.catchall"
+name = "design_fidelity_catchall"
+description = "The app exhibits a significant deviation from the specified design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the deviation and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the deviation is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -171,6 +171,28 @@ description = "Statically delivered content visibly flashes and is replaced by d
 type = "binary"
 weight = 1.0
 negate = true
+
+
+[[criterion]]
+id = "4.20"
+name = "in_memory_session_state_resets"
+description = "Shortlist, compare, theme filter, search, watch log, brief preview, palette, and undo/redo live in in-memory client state only: after mutations, a reload coherently returns to the empty seeded baseline with no localStorage/sessionStorage persistence of those facets."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.21"
+name = "brief_export_reflects_live_store"
+description = "Download/Copy of the Sprint launch brief emit live-compiled, schema-valid JSON or Markdown that reflects the current shortlist, compare, theme filter, search, and watch-log mutations rather than a static fixture, with required string brand Novapay, required string event Sprint 26, required closed-enum themeFilter, and required ISO-8601 UTC generatedAt ending in Z."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.22"
+name = "brief_schema_first_export_import"
+description = "Sprint launch brief export/import follows schema-first API-shaped modeling: exported JSON always satisfies the required field contract (required string/array/enum keys), and Import refuses contract-invalid payloads (wrong brand, illegal themeFilter, compareFeatures length > 3, catalog-illegal feature name, or generatedAt not ending in Z) with a named field error and no partial tray or watch-log mutation."
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "4.catchall"

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,126 +62,126 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "9.1"
-name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+name = "cold_start_under_two_seconds"
+description = "The app is interactive within 2 seconds of a local cold load — paint stage, toolbar, and canvas respond without a long blank wait."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
-name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+name = "console_clean_during_studio_flows"
+description = "No console errors or warnings appear during a full exercise of painting, saving, loading, filtering, and mode switching."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
-name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+name = "paint_strokes_respond_immediately"
+description = "Continuous drag-painting across many cells stays smooth with no visible lag between pointer movement and cells filling (UI response under ~100ms)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.4"
-name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+name = "image_import_stays_responsive"
+description = "Uploading an image or capturing from the camera onto the grid completes without freezing the page; the UI remains interactive once pixelization finishes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.5"
-name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+name = "cell_rebuild_without_freeze"
+description = "Rebuilding the grid via the cell-size slider (while unlocked) completes without freezing the page."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.6"
-name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+name = "mode_switch_stays_interactive"
+description = "Switching between Paint and Gallery and saving/loading boards keeps the UI interactive during the state change."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
-name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+name = "rapid_drag_stays_smooth"
+description = "Rapid drag strokes across the grid keep painting smoothly with no hangs, dropped cells, or visible frame stutter."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.8"
-name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+name = "rapid_tool_and_undo_no_freeze"
+description = "Rapid tool switching (Q/B/E), swatch picks (1–7), and Undo/Backspace do not hang or freeze the studio."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+name = "extended_paint_session_stable"
+description = "An extended painting session with many strokes and several gallery saves shows no runaway slowdown or browser resource collapse."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+name = "camera_cancel_recovers_promptly"
+description = "Opening then cancelling the camera overlay recovers promptly without hanging the toolbar or paint stage."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.n1"
 name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+description = "More than 2 seconds pass before the paint stage is interactive on local render."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n2"
-name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+name = "console_errors_during_studio_flows"
+description = "Errors or warnings appear in the console during painting, saving, loading, filtering, or mode switching."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n3"
-name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+name = "paint_or_mode_transitions_lag"
+description = "Paint strokes, Paint/Gallery switches, or gallery card updates block or lag noticeably."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n4"
-name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
+name = "cell_rebuild_or_import_hangs_ui"
+description = "Moving the cell-size slider or importing an image causes the UI to hang or freeze."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n5"
-name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+name = "dense_grid_kills_frame_rate"
+description = "At a fine cell size / dense grid, painting or scrolling the stage kills the frame rate."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n6"
-name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
+name = "animation_blocks_paint_input"
+description = "Toolbar hover, overlay fade, or gallery card animation makes paint/tool input unresponsive."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n7"
-name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
+name = "resource_load_blocks_stage"
+description = "The paint stage blocks rendering while fonts, QR helper, or other local resources load — nothing usable appears."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,23 +189,23 @@ weight = 1.0
 [[criterion]]
 id = "9.n8"
 name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
+description = "Extended painting or repeated cell-size rebuilds cause memory leaks or runaway browser resource usage."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "9.n9"
-name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
+name = "blank_while_loading_stage"
+description = "Nothing is displayed while the studio loads — a prolonged blank page before the paint stage appears."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n10"
-name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+name = "rapid_strokes_crash_studio"
+description = "The app crashes or hard-locks under rapid drag strokes, rapid undo, or edge cell sizes."
 type = "binary"
 negate = true
 weight = 1.0

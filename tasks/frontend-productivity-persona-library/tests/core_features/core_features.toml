@@ -1,0 +1,325 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_card_grid"
+description = "On load, the card grid lists at least 8 seeded personas covering all 4 role categories; each card shows the persona name, role label, tone badge, up to 3 tag chips, and a two-line preview of the system prompt body"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "search_filters_incrementally"
+description = "Typing in the search input narrows the grid as the user types to personas whose name or role contains the query, and clearing restores all cards exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "role_and_tag_facets_combine"
+description = "The role filter select narrows by role category, the tag facet list narrows by tag with a live matching count per facet, and facets combine with search"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "archived_toggle"
+description = "The Archived toggle switches the grid between active and archived personas, and archived cards carry a visible archived treatment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "create_persona_full_form"
+description = "New Persona opens a modal with name (required), role select (required), tone select offering formal, neutral, casual, and assertive (required), repeating tag chips, repeating constraints, repeating example exchanges (user message plus persona reply), a goals field, and a required rich prompt body; Submit stays disabled until name, role, tone, and a non-empty body are present"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "rich_text_round_trips"
+description = "The prompt body toolbar formatting round-trips: applying bold renders bold and applying it again removes it, and headings and lists render in the editor and survive save and reopen"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "valid_submit_inserts_card"
+description = "Submitting a valid New Persona form closes the modal, inserts exactly one card into the grid, and shows a success toast naming the persona"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "invalid_submit_validation"
+description = "Submitting with a missing required field shows an inline validation message naming that field and inserts no card"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "edit_prefilled_saves_in_place"
+description = "Edit opens the same modal pre-filled with every field including formatting, and saving updates the card in place without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "clone_with_copy_suffix"
+description = "Clone creates a new persona with identical fields and the name suffixed with ' (copy)', and the clone card animates into the grid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "technique_variants_share_fields"
+description = "The editor offers at least 2 technique variant tabs each holding its own prompt body and example exchanges while name, role, tone, tags, and traits stay shared; switching tabs preserves shared fields and unsaved shared edits, and the card records the active variant"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "trait_sliders_with_readouts"
+description = "Each persona carries 5 trait sliders — formality, verbosity, creativity, empathy, assertiveness — ranging 0 to 100 with a live numeric readout beside each; typing a value at the readout that is non-numeric or outside 0 to 100 is rejected with an inline message naming the trait and its allowed range"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "radar_redraws_live"
+description = "The radar chart beside the sliders has one axis per trait and redraws immediately as any slider moves, with the plotted shape matching the current values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "traits_persist_with_persona"
+description = "Trait edits save with the persona: reopening the editor shows the same slider values and the card shows a compact trait summary"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "card_flip_preview"
+description = "Clicking a card outside its action controls flips it with a 3D rotation to show the full prompt body read-only in monospaced form; clicking again flips it back with a consistent front-to-back then back-to-front direction"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "composition_blend_preview"
+description = "The Compose builder offers two persona selects and a per-trait weighting slider; moving the slider recomputes the blended trait values, merged constraints, and generated preview immediately, and blends at 0 and 100 percent match the first and second persona exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "saved_blend_is_real_persona"
+description = "Saving a blend creates a new persona with a blended badge whose name defaults to both source names joined; it appears in the grid and can be edited, compared, and tested like any persona"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "test_bench_slot_and_attacher"
+description = "The Test Bench offers a persona slot fillable from an attacher drawer listing all personas — by choosing from the list or dragging an entry onto the slot, which shows a visible drop target while dragging — plus a scenario select with at least 4 seeded scenarios and a Run control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "streaming_run_with_stop"
+description = "Running streams the simulated response progressively — text appears incrementally, not all at once — with a status affordance distinguishing waiting, streaming, and complete; Run becomes Stop while streaming and stopping freezes the output at its current text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "traits_shape_response"
+description = "The simulated response visibly reflects the persona's traits: high formality yields formal salutations without contractions, low formality yields casual phrasing with contractions, higher verbosity yields visibly longer responses, and persona constraints are echoed as respected limits"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "autofollow_and_jump_to_latest"
+description = "While streaming, the transcript auto-follows the latest text; scrolling up pauses following and reveals a jump-to-latest control that resumes it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "run_history_restores_transcripts"
+description = "Each run appends a history entry showing persona, scenario, timestamp, and length; selecting an entry restores its full transcript"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "iteration_poll_with_promotion"
+description = "Start poll opens a voting overlay listing the persona's iterations; votes from at least 3 simulated teammates arrive visibly over a few seconds, and when the poll closes the winning iteration gains a promoted badge shown in the overlay and on the persona card, with tallies still viewable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "second_poll_can_move_badge"
+description = "Running a second poll can produce a different winner, moving the promoted badge to the new winning iteration"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "iteration_history_and_diff"
+description = "Each save creates an iteration entry with timestamp and change summary, listed newest first; selecting two shows a field-level diff with old and new values, before/after trait numbers, and line-level prompt changes marked added in green and removed in red"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "comparison_side_by_side"
+description = "The Compare view renders two personas side by side — name, role, tone, tags, constraints, goals, prompt body — plus a paired trait readout that highlights deltas over 10 points and a combined radar overlaying both trait shapes with a legend; swapping a slot redraws chart and deltas immediately"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "bulk_tray_actions"
+description = "Selecting cards via checkboxes raises a bulk tray with the live count offering Add tag, Remove tag, Archive, Unarchive, and Delete with a confirmation naming the count; applying updates every selected card and all facet counts, then clears the selection"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "undo_redo_coverage"
+description = "Undo and Redo toolbar controls plus Ctrl+Z and Ctrl+Shift+Z step through creation, edits, clones, deletes, archives, tag changes, and bulk actions, restoring facet counts, badges, and comparison slots exactly; both controls disable when their stack is empty"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "export_tabs_live_derived"
+description = "The export drawer's Persona pack tab shows JSON where every visible filtered persona is one payload object of the same declared shape — name, role, tone, tags, constraints, goals, examples as user/reply pairs, a traits object with five numbers within 0 to 100, variants, active iteration — and the Comparison report tab summarizes the two compared personas with per-trait deltas and leaders; editing a trait or changing the filter and reopening changes the text, and Copy places it on the clipboard with visible confirmation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "attach_actions_navigate"
+description = "Open in Test Bench fills the bench slot with that persona, navigates to the Test Bench view, and shows a confirming toast; Add to Comparison fills the next free Compare slot the same way, replacing the older slot with a toast note when both are full"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "empty_and_no_match_states"
+description = "A filter combination matching nothing shows an empty state naming the active filters with a working Clear filters control, and deleting every persona shows an empty state explaining how to create one"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "double_activation_single_effect"
+description = "Rapidly double-activating New Persona's Submit creates exactly one persona, and rapidly double-activating Run starts exactly one streaming run"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n1"
+name = "fabricated_streaming"
+description = "The test bench presents a complete response instantly or shows a completed status while no transcript text was actually produced by the run"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n2"
+name = "traits_ignored_by_output"
+description = "Running the same scenario with two personas whose trait profiles clearly differ produces identical or near-identical response text"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n3"
+name = "diff_or_export_ignores_edits"
+description = "The iteration diff or the export text fails to reflect edits made during the session, showing seeded content instead of live state"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n4"
+name = "payload_contract_violations_accepted"
+description = "Some editing path accepts a persona field that violates the payload contract — a trait outside 0 to 100, a role or tone outside the closed option lists, or a malformed example pair — without an error naming the offending field and its rule"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "core_features.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

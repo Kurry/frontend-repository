@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -60,147 +60,183 @@ allowed_tools = [
 [scoring]
 aggregation = "weighted_mean"
 
+
 [[criterion]]
 id = "6.1"
 name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+description = "Create flow: submitting a valid identity label adds a card, increments the identity-count tile by one, activates the new identity on the dashboard, and includes it in the Export vault JSON preview"
 type = "binary"
 weight = 1.0
+
 
 [[criterion]]
 id = "6.2"
 name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+description = "Create flow: empty, whitespace-only, or over-40-character labels trigger inline validation naming the label field and add no identity"
 type = "binary"
 weight = 1.0
 
+
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "rename_flow_updates_related_displays"
+description = "Rename flow: a valid rename updates the card label, the dashboard nickname when active, and the matching label in the Export vault JSON preview without a reload"
 type = "binary"
 weight = 1.0
+
 
 [[criterion]]
 id = "6.4"
 name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+description = "Delete flow: confirming delete on a non-sole identity removes the card, decreases the identity count by one, and drops the identity from the export preview"
 type = "binary"
 weight = 1.0
+
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "view_switch_retains_vault_state"
+description = "View switch: navigating Dashboard, Identities, Permissions, Audit log, and Settings retains the same active identity, grants, and export-preview vault contents"
 type = "binary"
 weight = 1.0
+
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "search_empty_state_and_clear"
+description = "Edge: a search that matches no identities shows an empty state with a clear-search control that restores every card"
 type = "binary"
 weight = 1.0
+
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "search_and_sort_update_grid"
+description = "Search and sort: search narrows cards and Label A–Z versus Label Z–A reverses order from the live collection"
 type = "binary"
 weight = 1.0
+
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "sidebar_collapse_preserves_workflow"
+description = "At 768px and below the sidebar collapses to a compact nav that still reaches all five destinations without losing the active identity"
 type = "binary"
 weight = 1.0
+
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "delete_and_import_dialogs_support_cancel"
+description = "Delete and import confirmations can be cancelled without mutating identities, grants, theme, or the export preview"
 type = "binary"
 weight = 1.0
 
+
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "failed_import_recovers_without_reload"
+description = "Recovery: a rejected import shows a field-named error and leaves the vault usable without a reload"
 type = "binary"
 weight = 1.0
+
+
+[[criterion]]
+id = "6.11"
+name = "export_import_round_trip_flow"
+description = "Export then import round-trip: after a create or grant toggle, importing the exported vault JSON restores dashboard, Identities, Permissions, theme, and export preview to the pre-export mutated state including version nostrpass-vault-v1"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "6.12"
+name = "undo_after_rename_or_delete_flow"
+description = "Rename then Undo restores the prior label on card, dashboard, and export preview; delete then Undo restores the identity with the same npub and grants"
+type = "binary"
+weight = 1.0
+
 
 [[criterion]]
 id = "6.n1"
 name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+description = "Create, rename, delete, select, permission toggle, export, or import are not enabled from the UI."
 type = "binary"
 negate = true
 weight = 1.0
+
 
 [[criterion]]
 id = "6.n2"
 name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+description = "New identities fail to show up or duplicate on create."
 type = "binary"
 negate = true
 weight = 1.0
+
 
 [[criterion]]
 id = "6.n3"
 name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+description = "Permission or active-identity changes are not synced across dashboard, Permissions, and export preview."
 type = "binary"
 negate = true
 weight = 1.0
+
 
 [[criterion]]
 id = "6.n4"
 name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+description = "View switching breaks layout or loses the active identity selection."
 type = "binary"
 negate = true
 weight = 1.0
 
+
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "blocked_last_delete_still_removes"
+description = "Deleting the last remaining identity still removes it or leaves the UI broken."
 type = "binary"
 negate = true
 weight = 1.0
+
 
 [[criterion]]
 id = "6.n6"
 name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+description = "Search results disagree with the cards actually shown."
 type = "binary"
 negate = true
 weight = 1.0
+
 
 [[criterion]]
 id = "6.n7"
 name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+description = "Collapsed sidebar cannot be re-opened to reach destinations."
 type = "binary"
 negate = true
 weight = 1.0
+
 
 [[criterion]]
 id = "6.n8"
 name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+description = "Delete, import, or export overlays block navigation with no exit option."
 type = "binary"
 negate = true
 weight = 1.0
 
+
 [[criterion]]
 id = "6.n9"
 name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+description = "A failed create, rename, or import provides no user feedback."
 type = "binary"
 negate = true
 weight = 1.0
+
 
 [[criterion]]
 id = "6.n10"
@@ -209,6 +245,7 @@ description = "Navigation dead ends or requires reload for recovery."
 type = "binary"
 negate = true
 weight = 1.0
+
 
 [[criterion]]
 id = "user_flows.catchall"

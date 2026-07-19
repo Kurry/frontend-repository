@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,78 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "7.1"
-name = "layout_adapts_desktop_to_mobile"
-description = "Evaluate only the breakpoints the reference actually supports. Layout adapts gracefully from 1440px desktop to 375px mobile."
+name = "breakpoint_1024_sidebar_vs_mobile_bar"
+description = "At >=1024px the fixed sidebar stays open with numbered nav; below 1024px the sidebar is replaced by a mobile bar showing the Noma wordmark, a Book your Studio button, and a hamburger button."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
-name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+name = "mobile_tap_targets_adequate"
+description = "At 390px, primary interactive controls (hamburger, Book your Studio, menu close, carousel next/previous, consent buttons) present tap targets at least about 44px in height or width."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
-name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+name = "fluid_type_and_radius_tokens"
+description = "Between 1440 and 390 widths, typography scales fluidly via clamp()/vw with no abrupt size jumps beyond the documented <=1023px overrides; at <=1023px marquee text drops to 14px and the card border-radius token resolves to about 30px."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
-name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+name = "no_clip_or_overflow_at_390"
+description = "At 390px width no content clips or overflows the viewport; marquee bands keep looping full-width."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
-name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+name = "sidebar_collapses_to_mobile_bar"
+description = "Below 1024px the fixed ~122px desktop sidebar is hidden and the mobile bar (wordmark, Book CTA, hamburger) is the operable chrome."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.6"
-name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+name = "locations_and_studio_stack_to_one_column"
+description = "Below 1024px the layout collapses to a single stacked column (main left margin 0), and the locations and typical-studio sections collapse from two columns to one."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.7"
-name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+name = "mobile_hamburger_opens_menu"
+description = "At 390px, tapping the hamburger opens the full-screen menu overlay with the four numbered nav links."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.8"
-name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+name = "no_horizontal_scrollbar_at_390"
+description = "At 390px width no horizontal scrollbar appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.9"
-name = "media_and_canvases_resize"
-description = "Images, grids, and canvases size responsively to fit the layout."
+name = "images_and_map_resize"
+description = "Hero photograph, map panel, amenity-slide images, studio gallery tiles, and community photos size responsively at 1440, 768, and 390 without fixed-size overflow."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.10"
-name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
+name = "custom_cursor_desktop_only"
+description = "The custom block cursor renders on desktop only: display block at 1440px, display none at 390px and 768px."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.n1"
-name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+name = "layout_breaks_at_product_breakpoints"
+description = "At 1440, 1023/1024, or 390 the layout breaks, overflows, or loses required chrome (sidebar vs mobile bar) for that width."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,71 +141,93 @@ weight = 1.0
 [[criterion]]
 id = "7.n2"
 name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+description = "At 390px primary controls are too small to tap reliably or visibly misaligned."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n3"
-name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+name = "type_unreadable_at_narrow_width"
+description = "At 390px body or heading text is too small to read or collapses illegibly."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n4"
-name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+name = "content_cropped_or_spurious_scrollbars"
+description = "At 1440, 768, or 390 content is cropped or unnecessary horizontal scrollbars appear."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n5"
-name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
+name = "mobile_nav_missing_or_unresponsive"
+description = "Below 1024px the hamburger is absent from the mobile bar, or tapping it leaves the menu overlay closed."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n6"
-name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
+name = "fixed_sidebar_obscures_content"
+description = "At 1440px the fixed sidebar permanently obscures hero or section content with no recoverable main-column offset (~167px left margin)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n7"
-name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
+name = "overlap_or_stacking_failure_at_width"
+description = "At 1440, 768, or 390 elements overlap incorrectly or stacking order breaks cards, marquees, or the hero Book CTA legibility."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n8"
-name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
+name = "desktop_chrome_on_mobile_or_inverse"
+description = "Below 1024px the fixed desktop sidebar remains the only nav path without a working hamburger, or at >=1024px the mobile bar/hamburger is the only nav with the sidebar unavailable."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n9"
-name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
+name = "media_static_size_overflows"
+description = "Hero, map, gallery, or community imagery uses a static size that overflows the viewport at 390 or 768."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n10"
-name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
+name = "book_cta_or_hamburger_disappears"
+description = "Below 1024px the Book your Studio button or hamburger disappears from the mobile bar while remaining required chrome."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.a1"
+name = "showcase_composition_reflow_preserves_hierarchy"
+description = "At 390px the asymmetric sidebar-plus-main desktop composition is re-choreographed into a stacked mobile composition (mobile bar, single-column sections) that preserves hierarchy rather than a broken shrink of the 122px sidebar shell."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "7.11"
+name = "overlays_usable_at_390"
+description = "At 390px the booking inquiry overlay, shortlist drawer, FAQ accordion, and command palette remain fully visible and operable without clipped fields or off-screen dismiss controls."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.n11"
+name = "inquiry_overlay_clipped_on_mobile"
+description = "At 390px the booking inquiry overlay or shortlist drawer clips required fields or hides its Close/dismiss control off-screen."
 type = "binary"
 negate = true
 weight = 1.0

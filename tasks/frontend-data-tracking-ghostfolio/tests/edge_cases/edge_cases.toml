@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,152 +62,179 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "last_delete_shows_empty_state"
+description = "Deleting the last remaining holding shows an empty state in the table region with a message and an Add holding control, the net-worth total reads zero, and the allocation region shows no class entries."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "unmatched_filter_empty_state"
+description = "When the active class filter matches no holdings, the table region shows an empty-state message, the meta line reports zero visible holdings, and the allocation region shows no entries."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "double_save_creates_one"
+description = "Double-activating the save control on a valid Add holding form creates exactly one holding: the row count increases by one and one new row appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "long_name_truncates_in_table"
+description = "A holding name longer than 40 characters and at most 80 is truncated with an ellipsis in its table row and shown in full in the detail panel; a name longer than 80 characters is rejected naming the name field."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "inline_validation_before_submit"
+description = "Typing an invalid value (empty name, name over 80 characters, empty or malformed symbol, non-positive quantity, or negative unitPrice) shows an inline validation message at that field naming the field and the rule it breaks, before the form is submitted; the submit control stays disabled until every field is valid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "toast_confirms_save_or_delete"
+description = "Saving or deleting a holding raises a brief confirmation toast that remains readable and then dismisses."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "empty_state_copy_is_actionable"
+description = "Where the table empty state renders after the last delete or an unmatched filter, the copy explains what belongs there and how to add a holding, and an Add holding control remains available."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "semantic_form_controls"
+description = "Add holding inputs, the class filter, and primary action buttons use semantic form/button controls with persistent visible labels rather than unlabeled placeholder-only fields."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
 name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+description = "After the last holding is deleted, the table region shows nothing usable: no empty-state message, no Add holding control, or the net-worth/allocation regions still show stale non-zero values."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "unmatched_filter_shows_stale_rows"
+description = "When the active class filter matches no holdings, the table still lists non-matching rows or the meta line reports a non-zero visible count."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "double_save_creates_duplicates"
+description = "Double-activating save on a valid Add holding form creates more than one new row for a single intended hold."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "long_name_clips_without_full_detail"
+description = "A holding name longer than 40 characters overflows or clips unreadably in the table without an ellipsis, or the detail panel also truncates it instead of showing the full name."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "validation_missing_or_console_only"
+description = "Invalid Add holding input is surfaced only in the browser console, or save proceeds with empty name/symbol or non-positive quantity and adds a holding."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "destructive_delete_lacks_feedback"
+description = "Deleting a holding produces no visible confirmation (toast or equivalent) and no immediate table/total update."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "add_control_missing_in_empty_state"
+description = "In the empty table state after the last delete, the Add holding control is missing or inaccessible."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
+id = "4.9"
+name = "symbol_and_unit_price_rejected"
+description = "A symbol that is empty, longer than 12 characters, or contains characters other than letters, digits, period, or hyphen is rejected naming the symbol field; a negative unit price is rejected naming the unit price field; neither invalid save mutates the holdings collection."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "empty_export_still_valid"
+description = "With an empty holdings collection, Export portfolio still produces Holdings CSV with only the header line and Portfolio JSON with an empty holdings array; Copy still shows a copied confirmation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "malformed_import_names_field"
+description = "Importing malformed Portfolio JSON, Holdings CSV, or Activities CSV, or a payload that breaks the holding or activity field contracts, shows an inline error naming the import field and leaves holdings, activities, net worth, and allocation unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "malformed_import_mutates_state"
+description = "Importing malformed Portfolio JSON or CSV mutates holdings or activities, or clears undo history as if the import succeeded."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "cross_field_violation_accepted"
+description = "A holding save with a broken cross-field rule (Cash/currency mismatch or illegal data source for the asset class) succeeds and adds a row."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
-id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+id = "4.12"
+name = "cross_field_rule_blocks_save"
+description = "Saving a holding that breaks a cross-field rule (Cash symbol not matching currency, Crypto with YAHOO, or Equity with COINGECKO) shows an inline validation message and adds no holding."
 type = "binary"
-negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "fee_interest_requires_zero_unit_price"
+description = "Saving an activity with type FEE or INTEREST and a non-zero unit price is blocked with an inline message naming unit price."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "sell_overshoot_blocked"
+description = "Saving a SELL whose quantity exceeds the matching holding quantity is blocked with an inline message naming quantity and leaves holdings unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "empty_ledger_state"
+description = "When the transactions ledger is empty, the ledger region shows an empty-state message and an Add activity control; export previews still compile."
+type = "binary"
 weight = 1.0
 
 [[criterion]]

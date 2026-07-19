@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,78 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "7.1"
-name = "layout_adapts_desktop_to_mobile"
-description = "Evaluate only the breakpoints the reference actually supports. Layout adapts gracefully from 1440px desktop to 375px mobile."
+name = "breakpoint_1025_desktop_vs_mobile_chrome"
+description = "At 1025px and wider the hover mega-menus, Start Building button, asymmetric desktop hero column split, and desktop card/table spacing appear; below 1025px the drawer navigation, stacked hero, and mobile spacing apply."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
-name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+name = "mobile_tap_targets_adequate"
+description = "Below 1025px, primary interactive controls (hamburger, theme toggle, form submit, carousel arrows) present tap targets at least about 44px in height or width."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
-name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+name = "fluid_type_and_padding_no_jump_at_1025"
+description = "Between 1440 and 390 widths, typography and section padding scale fluidly via clamp tokens with no abrupt size jump at the 1025px breakpoint."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
-name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+name = "no_clip_or_overflow_at_key_widths"
+description = "At 1440, 1024, and 390 widths, content never clips or overflows the viewport."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
-name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+name = "nav_collapses_to_hamburger_below_1025"
+description = "Below 1025px the navigation collapses to logo, theme toggle, and a hamburger; the desktop mega-menu row is hidden at 390 and the drawer is the operable nav."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.6"
-name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+name = "hero_and_cards_reflow_without_equal_stack_loss"
+description = "Below 1025px the hero reflows to stacked rows and card regions reflow logically without collapsing into a uniform equal-width card stack that loses cut-corner geometry."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.7"
-name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+name = "mobile_hamburger_and_drawer_tap_work"
+description = "Below 1025px, tapping the hamburger opens the overlay drawer and accordion taps expand/collapse as expected."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.8"
-name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+name = "no_horizontal_scrollbar_at_key_widths"
+description = "At 1440, 1024, and 390 widths no horizontal scrollbar appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.9"
-name = "media_and_canvases_resize"
-description = "Images, grids, and canvases size responsively to fit the layout."
+name = "images_and_video_panels_keep_aspect_ratios"
+description = "Images and video panels keep their aspect ratios at 1440, 1024, and 390 widths without fixed-size overflow."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.10"
-name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
+name = "fixed_nav_accessible_all_widths"
+description = "The fixed navigation remains reachable at 1440, 1024, and 390; measured nav height is about 67px at 1440, 88px at 1024, and 80px at 390, and the fixed nav background stays rgb(10, 10, 10) before and after scrolling past the hero (no scroll-triggered recolor)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.n1"
-name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+name = "layout_breaks_at_product_breakpoints"
+description = "At 1440, 1024, or 390 the layout breaks, overflows, or loses required chrome (mega-menu vs drawer) for that width."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,73 +141,87 @@ weight = 1.0
 [[criterion]]
 id = "7.n2"
 name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+description = "Below 1025px primary controls are too small to tap reliably or visibly misaligned."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n3"
-name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+name = "type_unreadable_at_narrow_width"
+description = "At 390 width body or heading text is too small to read or collapses illegibly."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n4"
-name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+name = "content_cropped_or_spurious_scrollbars"
+description = "At 1440, 1024, or 390 content is cropped or unnecessary scrollbars appear."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n5"
-name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
+name = "mobile_nav_missing_or_unresponsive"
+description = "Below 1025px the hamburger control is absent from the nav chrome, or tapping it leaves the overlay drawer closed."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n6"
-name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
+name = "fixed_nav_obscures_content"
+description = "The fixed navigation permanently obscures hero or section content with no recoverable scroll offset."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n7"
-name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
+name = "overlap_or_stacking_failure_at_width"
+description = "At 1440, 1024, or 390 elements overlap incorrectly or stacking order breaks cut-corner panels/sticky stacks."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n8"
-name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
+name = "desktop_chrome_shown_on_mobile_or_inverse"
+description = "Below 1025px hover mega-menus and the desktop Start Building row remain as the only nav path, or at ≥1025px the hamburger drawer is the only nav with mega-menus unavailable."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n9"
-name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
+name = "media_static_size_overflows"
+description = "Hero or editorial images/video panels use a static size that overflows the viewport at 390 or 1024."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n10"
-name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
+name = "theme_toggle_disappears_at_width"
+description = "The theme toggle disappears at 390 or 1024 while remaining required chrome."
 type = "binary"
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.a1"
+name = "showcase_composition_reflow_preserves_hierarchy"
+description = "At 390 the asymmetric hero and sticky Why Astra chapter are re-choreographed into a stacked mobile composition that preserves hierarchy rather than a flat equal-column dump of the desktop grid."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "7.20"
+name = "session_leads_usable_at_390"
+description = "At 390px width the Session leads panel, its live count, and Undo/Download/Copy controls remain fully visible and operable without horizontal overflow or clipped labels."
+type = "binary"
 weight = 1.0
 
 [[criterion]]

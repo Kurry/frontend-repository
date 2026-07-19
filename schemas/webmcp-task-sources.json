@@ -1,4 +1,9 @@
 {
+  "frontend-creative-tools-annotation-studio": {
+    "source": "feature-labeling-annotation-studio PRD",
+    "instruction": "tasks/frontend-creative-tools-annotation-studio/instruction.md",
+    "description": "Annotation studio with taxonomy builder, regions, agreement review."
+  },
   "frontend-creative-tools-camera-exposure": {
     "source": "CameraExposure",
     "instruction": "CameraExposure/instruction.md",
@@ -84,6 +89,11 @@
     "instruction": "Portfolioframe/instruction.md",
     "description": "Resume-and-portfolio builder good-app eval."
   },
+  "frontend-creative-tools-prompt-diff": {
+    "source": "feature-version-control-prompt-diff PRD",
+    "instruction": "tasks/frontend-creative-tools-prompt-diff/instruction.md",
+    "description": "Prompt version control with diffs, three-way merge, blame, and graph."
+  },
   "frontend-creative-tools-prompt-workbench": {
     "source": "feature-editor-prompt-workbench PRD",
     "instruction": "tasks/frontend-creative-tools-prompt-workbench/instruction.md",
@@ -93,6 +103,11 @@
     "source": "mercor-constellation rubric surfaces (debranded)",
     "instruction": "tasks/frontend-creative-tools-rubric-studio/instruction.md",
     "description": "Rubric authoring studio with version gates, tuning, and preview."
+  },
+  "frontend-creative-tools-schema-builder": {
+    "source": "feature-schema-builder-output-schema PRD",
+    "instruction": "tasks/frontend-creative-tools-schema-builder/instruction.md",
+    "description": "Output schema builder with tree editor, playground, and versions."
   },
   "frontend-creative-tools-shapeshift-grid": {
     "source": "Shapeshift",
@@ -138,6 +153,16 @@
     "source": "feature-dashboard-command-center PRD",
     "instruction": "tasks/frontend-data-tracking-command-center/instruction.md",
     "description": "Ops command center with KPIs, agent panel, and live activity feed."
+  },
+  "frontend-data-tracking-cost-analytics": {
+    "source": "feature-analytics-cost-analytics PRD",
+    "instruction": "tasks/frontend-data-tracking-cost-analytics/instruction.md",
+    "description": "Cost analytics with budgets, anomalies, what-if repricing, reports."
+  },
+  "frontend-data-tracking-dataset-manager": {
+    "source": "feature-data-manager-dataset-manager PRD",
+    "instruction": "tasks/frontend-data-tracking-dataset-manager/instruction.md",
+    "description": "Dataset manager with import wizard, pivot, splits, and snapshots."
   },
   "frontend-data-tracking-eval-dashboard": {
     "source": "feature-analytics-eval-dashboard PRD",
@@ -334,6 +359,11 @@
     "instruction": "Notenest/instruction.md",
     "description": "Nested-folder note-taking app good-app eval."
   },
+  "frontend-productivity-persona-library": {
+    "source": "feature-content-manager-persona-library PRD",
+    "instruction": "tasks/frontend-productivity-persona-library/instruction.md",
+    "description": "Persona library with trait matrix, blending, test bench, and packs."
+  },
   "frontend-productivity-prompt-library": {
     "source": "feature-content-manager-prompt-library PRD",
     "instruction": "tasks/frontend-productivity-prompt-library/instruction.md",
@@ -348,6 +378,11 @@
     "source": "Scribblespace",
     "instruction": "Scribblespace/instruction.md",
     "description": "ScribbleSpace freeform infinite-canvas notes board good-app eval."
+  },
+  "frontend-productivity-semantic-search": {
+    "source": "feature-search-semantic-search PRD",
+    "instruction": "tasks/frontend-productivity-semantic-search/instruction.md",
+    "description": "Semantic search with feedback re-ranking, clusters, and re-indexing."
   },
   "frontend-productivity-sidedock": {
     "source": "Sidedock",
@@ -374,10 +409,25 @@
     "instruction": "Weblink/instruction.md",
     "description": "Weblink peer-to-peer WebRTC chat and file-transfer client good-app eval."
   },
+  "frontend-workflow-ab-experiments": {
+    "source": "feature-experimentation-ab-testing PRD",
+    "instruction": "tasks/frontend-workflow-ab-experiments/instruction.md",
+    "description": "A/B experiment studio with variants, stats gating, and decisions."
+  },
   "frontend-workflow-agent-management": {
     "source": "feature-orchestration-agent-management PRD",
     "instruction": "tasks/frontend-workflow-agent-management/instruction.md",
     "description": "Agent registry with durable work runs, timelines, and status filters."
+  },
+  "frontend-workflow-automation-studio": {
+    "source": "feature-automation-browser-studio PRD",
+    "instruction": "tasks/frontend-workflow-automation-studio/instruction.md",
+    "description": "Browser automation studio with step builder, runs, and versioning."
+  },
+  "frontend-workflow-batch-runner": {
+    "source": "feature-batch-processor-batch-runner PRD",
+    "instruction": "tasks/frontend-workflow-batch-runner/instruction.md",
+    "description": "Durable batch runner with retries, checkpoints, scheduling, reports."
   },
   "frontend-workflow-daisyui-admin-dashboard": {
     "source": "DaisyUI",
@@ -409,10 +459,30 @@
     "instruction": "tasks/frontend-workflow-leak-review/instruction.md",
     "description": "Leak review console with similarity evidence, canaries, mutations."
   },
+  "frontend-workflow-live-task-factory": {
+    "source": "SWE-gen pipeline, live dual-mode (debranded)",
+    "instruction": "tasks/frontend-workflow-live-task-factory/instruction.md",
+    "description": "Live PR-to-task factory console with real GitHub/AI integration."
+  },
+  "frontend-workflow-quality-audit-desk": {
+    "source": "codebase-atlas quality audit (debranded)",
+    "instruction": "tasks/frontend-workflow-quality-audit-desk/instruction.md",
+    "description": "Quality audit desk with checks, rubric verdicts, and audit reports."
+  },
   "frontend-workflow-research-pipeline-console": {
     "source": "OpenThoughts-Agent concept (debranded)",
     "instruction": "tasks/frontend-workflow-research-pipeline-console/instruction.md",
     "description": "Research pipeline console chaining datagen, training, and eval."
+  },
+  "frontend-workflow-review-workbench": {
+    "source": "codebase-atlas review app (debranded)",
+    "instruction": "tasks/frontend-workflow-review-workbench/instruction.md",
+    "description": "Gated bundle review with verdicts, trial audit, and summary export."
+  },
+  "frontend-workflow-seed-dataset-studio": {
+    "source": "codebase-atlas seed pipeline (debranded)",
+    "instruction": "tasks/frontend-workflow-seed-dataset-studio/instruction.md",
+    "description": "Dataset factory studio: triage, authoring workbench, gates, exports."
   },
   "frontend-workflow-submission-qc-queue": {
     "source": "mercor-constellation QC surfaces (debranded)",

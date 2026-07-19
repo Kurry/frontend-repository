@@ -1,0 +1,155 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "workspace_layout_composition"
+description = "The app composes as a left job sidebar and a main area with the rollup strip and progress bar on top, the execution grid in the center, and the inspector as a side panel, with the pending queue and event timeline alongside the grid while a run is active or selected"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "status_color_system"
+description = "Item statuses are visually distinct at a glance — pending neutral, running with a blue active indicator, retrying amber, failed red, complete green, stopped muted — and the same treatment per status appears in the grid, pending queue, timeline, and comparison view"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "concurrency_strip_states"
+description = "The concurrency guard strip renders calm below the limit and switches to a clearly amber treatment while the running count equals the limit"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "consistent_currency_format"
+description = "Costs render with one consistent currency format (dollar sign and a fixed number of decimal places) across the grid, rollup strip, inspector, and exports"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "active_job_highlight"
+description = "The selected sidebar job carries a selected-layer background visibly distinct from the hover treatment of other entries"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "typography_hierarchy"
+description = "Typography shows a clear hierarchy — the app title larger than panel headings, which are larger than grid body and label text — consistent across views"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "spacing_rhythm"
+description = "Gaps between the sidebar, rollup strip, grid, queue, and inspector are visually regular with no crowded or orphaned regions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "control_state_treatments"
+description = "Buttons, inputs, selects, and toggles show distinct default, hover, focus (visible ring), disabled, and error treatments"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "single_icon_set"
+description = "One consistent icon set is used throughout the toolbar, sidebar entries, status cells, and row actions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "ics_monospace_block"
+description = "The ICS calendar text renders in a monospaced block visually distinct from surrounding UI text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.n1"
+name = "statuses_rely_on_color_only"
+description = "Any two item statuses are distinguishable only by hue with no accompanying icon, label, or marker, or the same status renders with different treatments in the grid, queue, timeline, or comparison view"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n2"
+name = "desktop_layout_overlap"
+description = "At 1440 pixel width any sidebar, grid, rollup, queue, or inspector content overlaps another element or is clipped by its container"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "visual_design.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

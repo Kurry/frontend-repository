@@ -1,0 +1,159 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+weight = 0.5
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "15.1"
+name = "headings_use_consistent_capitalization"
+description = "Where the app renders headings, buttons, badges, and pane titles, they use one consistent capitalization convention throughout."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.2"
+name = "actions_use_specific_labels"
+description = "Where the app renders action labels, they are specific verbs — Accept for authoring, Reject seed, Run harvest, Mark authored, Export package, Copy manifest — not generic ('Submit', 'OK') when a specific label is possible."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.3"
+name = "errors_name_problem_and_fix"
+description = "Where the app renders validation or gate messages, they name the exact field or condition and what satisfies it (for example the 20-character justification minimum, or each unmet gate condition), not just a rejection ('Invalid')."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.4"
+name = "empty_states_explain_next_step"
+description = "Where the app renders empty states (no-match queue, empty timeline filter), the copy explains what belongs there and how to recover or add it."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.5"
+name = "seeded_prose_is_well_written"
+description = "Where the app renders seeded titles, questions, criteria, and foil texts, rate how well they read as realistic engineering prose about the fictional repositories, free of spelling and grammatical errors."
+type = "likert"
+points = 5
+weight = 0.5
+
+[[criterion]]
+id = "15.6"
+name = "terminology_is_consistent"
+description = "Where the app renders the same concept in multiple places, terminology is consistent — seed, foil, criterion, golden answer, harvest, reject class — never a synonym in one pane and a different term in another."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.7"
+name = "numbers_dates_and_units_are_consistent"
+description = "Where the app renders counts, timestamps, percentages, and hashes, formatting is consistent (same timestamp format, same percent notation for caps, same hash truncation rule)."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.8"
+name = "success_messages_are_specific"
+description = "Where the app renders confirmation and success messages, they state what happened (a save, copy, export, or status change), not vague affirmations."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.n1"
+name = "placeholder_copy_is_visible"
+description = "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI."
+type = "binary"
+negate = true
+weight = 0.5
+
+[[criterion]]
+id = "15.n2"
+name = "prominent_copy_has_errors"
+description = "Spelling or grammatical errors appear in prominent copy such as the app title, pane headings, or primary action labels."
+type = "binary"
+negate = true
+weight = 0.5
+
+[[criterion]]
+id = "15.n3"
+name = "concept_names_are_inconsistent"
+description = "The same concept is named inconsistently across surfaces (for example 'foil' in one pane and 'distractor' in another)."
+type = "binary"
+negate = true
+weight = 0.5
+
+[[criterion]]
+id = "15.n4"
+name = "copy_is_truncated_or_overflowing"
+description = "Truncated or overflowing text renders copy unreadable outside the specified 80-character title truncation."
+type = "binary"
+negate = true
+weight = 0.5
+
+[[criterion]]
+id = "writing.catchall"
+name = "writing_catchall"
+description = "The app's rendered text exhibits a significant copy-quality defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 0.5

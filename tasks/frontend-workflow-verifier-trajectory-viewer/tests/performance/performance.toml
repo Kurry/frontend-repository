@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -60,80 +60,81 @@ allowed_tools = [
 [scoring]
 aggregation = "weighted_mean"
 
+
 [[criterion]]
 id = "9.1"
 name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+description = "Cold start to interactive is under 2 seconds on local render; task rows respond within that window"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
 name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+description = "No console errors or warnings appear on load or during a full exercise including export, import, bulk apply, and undo"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
-name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+name = "label_and_filter_transitions_snappy"
+description = "Label switches and flips-filter toggles update the verdict table without multi-second hangs"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.4"
-name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+name = "terminal_streaming_nonblocking"
+description = "Terminal streaming never blocks interaction with the verdict table, timelines, or export drawer"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.5"
-name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+name = "trajectories_scroll_without_lag"
+description = "Arrowing through 12+ agent steps and 8+ scorer steps stays responsive without perceived lag"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.6"
 name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+description = "The UI remains interactive during adjudication, bulk apply, undo, and export reopen"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
 name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+description = "Label-switch rollup animation, flips-filter row animation, and linked-highlight easing remain smooth without dropping the UI into an unresponsive state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.8"
 name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+description = "Rapidly switching labels, toggling flips-only, and reopening Export does not hang or freeze the app"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+name = "export_reopen_stays_snappy"
+description = "Reopening Export review package after mutations regenerates previews without multi-second freezes"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+name = "undo_redo_responsive"
+description = "Rapid undo/redo through several adjudication mutations stays responsive with no hangs"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.n1"
 name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+description = "More than 2 seconds pass before interaction is possible on local render"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +142,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n2"
 name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+description = "Console errors or warnings appear during load or during export/import/undo flows"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,23 +150,23 @@ weight = 1.0
 [[criterion]]
 id = "9.n3"
 name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+description = "Label-switch or flips-filter transitions block interaction for seconds"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n4"
-name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
+name = "terminal_streaming_hangs_ui"
+description = "Terminal streaming causes the UI to hang or freeze"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n5"
-name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+name = "trajectory_scrub_kills_frame_rate"
+description = "Arrowing through trajectories kills responsiveness"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,31 +174,31 @@ weight = 1.0
 [[criterion]]
 id = "9.n6"
 name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
+description = "Input becomes unresponsive during rollup or flips-filter animation"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n7"
-name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
+name = "export_freezes_ui"
+description = "Opening or regenerating Export review package freezes the UI"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n8"
-name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
+name = "undo_hangs"
+description = "Undo or Redo hangs the app"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n9"
-name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
+name = "import_locks_ui"
+description = "Import parsing locks the UI with no feedback"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +206,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n10"
 name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+description = "The app crashes under rapid label switching, bulk apply, or export reopen"
 type = "binary"
 negate = true
 weight = 1.0

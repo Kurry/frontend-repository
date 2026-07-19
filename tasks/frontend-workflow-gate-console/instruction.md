@@ -1,5 +1,5 @@
 <summary>
-Build a stage-gate acceptance console for a benchmark build pipeline using Svelte 5, Svelte stores (runes-based), Tailwind CSS 4.3.2, and shadcn-svelte.
+Build a stage-gate acceptance console for a benchmark build pipeline using Svelte 5, Svelte stores (runes-based), Tailwind CSS 4.3.2, and shadcn-svelte. The app produces the operator's acceptance package: a structured Acceptance Package JSON (plus a Certificate Chain markdown report) compiled live from the selected run's recorded gate results, certificates, notes, and timeline, downloadable and copyable, reflecting every session mutation.
 </summary>
 
 <core_features>
@@ -31,14 +31,39 @@ Feature: Gate registry browser —
 - A severity filter narrows the registry to S1, S2, or S3 gates; clearing the filter restores the full list exactly; when a filter matches nothing the registry region shows an empty state message instead of a blank list
 - Selecting a gate in the registry shows its full description and highlights which of the 5 pipeline stages include that gate, with the containing stages visibly marked and the others not
 
-Feature: Gate annotations —
-- Each gate row offers an add-note control that opens a small form with a note text field (required, 1 to 200 characters) and a category select (required, choices: observation, waiver-request, follow-up); each invalid field shows an inline message naming that field before submit, and the submit control stays disabled until both fields are valid
-- Submitting a valid note attaches it to that gate, visible in the gate's expanded evidence area, and appends a note entry to the run's event timeline; cancel closes the form without adding anything
+Feature: Gate annotations (API-shaped create payload) —
+- Each gate row offers an Add note control that opens a small form whose submitted record is exactly the gate-note create payload the console would POST to a stage-gate API: text and category
+- GateNote field contract (the form submit IS the would-be request body; Export Acceptance Package notes arrays and Import Acceptance Package use the same rules; all keys required unless marked optional; example values illustrative only):
+  - text: required trimmed non-empty string, length 1 through 200 inclusive
+  - category: required closed enum exactly one of observation, waiver-request, follow-up
+- Each invalid field shows an inline message naming that field before submit, and the submit control stays disabled until both fields are valid
+- Submitting a valid note attaches it to that gate (visible in the gate's expanded evidence area with the submitted text and category), appends a note entry to the run's event timeline, and includes that note under the gate in the next Acceptance Package JSON preview; cancel closes the form without adding anything
+- Submitting with empty or whitespace-only text, text longer than 200 characters, or a missing or out-of-enum category shows inline errors naming each invalid field, attaches nothing, and leaves the timeline and export preview unchanged
 
 Feature: Re-run simulation and event timeline —
 - A re-run control per stage starts a simulated gate re-run: the stage flips to running, and the gate checklist ticks through each gate one by one with statuses advancing pending, then running, then pass or fail, alongside an overall progress indicator that advances as gates complete
 - When the simulation finishes, either a certificate is issued for the stage (all hard gates passed and the aggregation outcome passes) or a rejection banner names the failing gates; the stage strip, chain visualization, and suite outcome all update to match the new results without a reload
 - Each run has an event timeline of ordered, timestamped entries; a re-run appends entries for the re-run start, its final outcome, and gate failures encountered; the timeline is filterable by entry type (re-run, rejection, certificate, note), and a run with no events yet shows an empty state naming what will appear there
+
+Feature: Acceptance package export —
+- An Export acceptance package control opens a drawer or modal with two format tabs — Acceptance Package JSON and Certificate Chain Markdown — each regenerated live from the currently selected run's store state whenever gate results, certificates, notes, or timeline entries change
+- Acceptance Package JSON is API-shaped like a stage-gate acceptance-service package response — a single object (not an array) whose field names and values are visible in the preview text and must conform to this field contract:
+  - Required schemaVersion: the exact string gate-console.acceptance-package.v1
+  - Required exportedAt: ISO-8601 timestamp string that updates when the preview regenerates
+  - Required runId: non-empty string matching the selected run's identifier
+  - Required submittedAt: ISO-8601 timestamp string matching the selected run's submitted-at value
+  - Required stages: array of exactly 5 stage objects in pipeline order Source, Build, Test Generation, Hardening, Publish; each stage object requires name (exactly one of those five stage names), status (exactly one of passed, rejected, running, pending), aggregationMode (exactly one of required-pass, all-pass, weighted-mean), scorePercent (number from 0 through 100 inclusive when aggregationMode is weighted-mean, otherwise null), gates (array of 6 to 10 gate objects), and certificate (null when the stage is not passed; otherwise an object with required fingerprint as a non-empty string and issuedAt as an ISO-8601 timestamp)
+  - Each gate object requires id (non-empty string), name (non-empty string), severity (exactly one of S1, S2, S3), state (exactly one of pass, fail), evidence (string), and notes (array of GateNote records each conforming to the GateNote field contract above, optionally carrying createdAt as an ISO-8601 timestamp)
+  - Required timeline: array of timeline entry objects each requiring type (exactly one of re-run, rejection, certificate, note), timestamp (ISO-8601), and summary (non-empty string)
+  - Cross-field rules: stages length is exactly 5 and names appear in the fixed pipeline order with no duplicates; a passed stage must carry a non-null certificate; a rejected, running, or pending stage must carry certificate null; weighted-mean stages must carry a numeric scorePercent and other aggregation modes must carry null
+- The Certificate Chain Markdown tab previews a human-readable report that names the runId, lists each of the 5 stages with status, and for every passed stage includes the fingerprint and a bullet per gate naming id, severity, and state
+- Export content that omits session work is invalid: after attaching at least one note or completing a re-run that changes recorded results, reopening Export must show that note under the gate's notes array (JSON) or the updated stage status and fingerprint (Markdown), matching the on-screen surfaces
+- Each format tab offers Copy (writes that format's exact preview text to the clipboard with visible confirmation) and Download (triggers a real file download whose contents match the previewed text for that format)
+
+Feature: Acceptance package import —
+- An Import acceptance package control accepts pasted Acceptance Package JSON text matching the export field contract
+- A valid import replaces the selected run's recorded stage results, certificates, gate notes, and timeline so the stage strip, chain visualization, suite outcomes, gate evidence notes, timeline entries, and the next Export preview match the imported document
+- Malformed JSON, or JSON that violates the field contract (schemaVersion not exactly gate-console.acceptance-package.v1, missing required keys, stages not exactly the 5 named stages in order, severity or category or status or aggregationMode outside their closed enums, text outside 1 to 200 characters, scorePercent present when aggregationMode is not weighted-mean, non-null certificate on a non-passed stage, or null certificate on a passed stage), shows visible validation feedback naming the offending field (or the payload when JSON is unparseable), leaves the selected run unchanged, and does not treat the attempt as a successful mutation
 </core_features>
 
 <user_flows>
@@ -46,14 +71,19 @@ Feature: Re-run simulation and event timeline —
 - Re-running a stage: start a re-run on a rejected stage, watch each gate tick through running to its result with the progress indicator advancing, and when it completes see the stage strip color, the chain visualization, and the event timeline all reflect the new outcome in the same session
 - Browsing the registry: filter the registry to S1 gates, select one, confirm its description appears and only its containing stages highlight; clear the filter and the full gate list returns exactly
 - Certifying and copying: open a passed stage's certificate, activate the fingerprint copy control, and see the confirmation appear and reset; the copied text matches the displayed hash exactly
-- A page reload returns the app to its seeded state: the seeded runs, recorded gate results, default view, and default theme, with no what-if or re-run changes surviving
+- Annotate then export: open a gate, submit a valid note whose text includes the distinct token note-alpha-17 and category observation, open Export acceptance package, and confirm Acceptance Package JSON shows schemaVersion exactly gate-console.acceptance-package.v1, that note under the gate's notes array with matching text and category, and Certificate Chain Markdown names the same runId
+- Mutation-to-export: after one valid note or a completed re-run, reopen Export and confirm the JSON notes array or the updated stage status and certificate fingerprint reflect that session mutation; Copy and Download are available on the active tab
+- Export then import round-trip: after attaching at least one note on the selected run, Copy or Download the Acceptance Package JSON, clear that run's notes via a path that empties them (or select another run then return and overwrite via import), Import that same JSON text, and confirm the gate evidence notes, timeline note entries, and the next Export preview match the pre-export package
+- A page reload returns the app to its seeded state: the seeded runs, recorded gate results, default view, and default theme, with no what-if, re-run, note, or import changes surviving
 </user_flows>
 
 <edge_cases>
-- Submitting the note form with an empty note or no category adds nothing: the gate's evidence area and the timeline are unchanged and inline messages name the invalid fields
+- Submitting the note form with empty text, text longer than 200 characters, or no category adds nothing: the gate's evidence area, the timeline, and the export preview are unchanged and inline messages name the invalid fields
 - Double-activating a stage's re-run control starts exactly one simulation: the timeline gains one re-run start entry, not two
 - What-if changes never leak: starting a re-run while simulated values differ from recorded values runs against recorded state, and the simulated markers are cleared when the re-run starts
 - Filtering the event timeline to a type with no entries shows an empty state message instead of a blank region
+- Importing malformed Acceptance Package JSON or a document that breaks the field contract (wrong schemaVersion, stages not exactly 5 in pipeline order, out-of-enum severity or category, text outside 1 to 200 characters, or certificate presence disagreeing with stage status) shows visible validation naming the offending field, leaves the selected run's note count and stage statuses unchanged, and does not crash the console
+- Opening Export with no run selected is impossible from the happy path: Export uses the currently selected run; if the list has a selection, the preview always shows that run's runId
 </edge_cases>
 
 <visual_design>
@@ -63,7 +93,8 @@ Feature: Re-run simulation and event timeline —
 - Typographic hierarchy: run and stage titles visibly larger than gate names, which are larger than evidence and timestamp text; gate identifiers and fingerprint hashes render in a monospaced face
 - A light/dark theme toggle in the header recolors all surfaces, chips, and the chain visualization without a reload
 - One consistent icon set across all chrome; buttons and inputs show distinct default, hover, focus (visible ring), disabled, and error treatments
-- Headings and action labels use one consistent capitalization convention, action labels are specific verbs (Start re-run, Copy fingerprint, Add note), and no placeholder text appears anywhere in the shipped UI
+- Headings and action labels use one consistent capitalization convention, action labels are specific verbs (Start re-run, Copy fingerprint, Add note, Export acceptance package, Import acceptance package), and no placeholder text appears anywhere in the shipped UI
+- The export drawer shows format tabs labelled Acceptance Package JSON and Certificate Chain Markdown, a scrollable monospaced preview, and Copy and Download controls
 </visual_design>
 
 <motion>
@@ -81,9 +112,9 @@ Feature: Re-run simulation and event timeline —
 </responsiveness>
 
 <accessibility>
-- Every interactive control — run rows, stage segments, gate rows, the what-if toggle, filters, form fields, and copy controls — is reachable and operable with the keyboard alone, with a visible focus indicator
-- Gate row disclosures toggle with Enter or Space and expose their expanded state via aria-expanded; the note form dialog closes on Escape and returns focus to the control that opened it
-- Rejection banners and copy/note confirmations are announced through an aria-live region as well as shown visually
+- Every interactive control — run rows, stage segments, gate rows, the what-if toggle, filters, form fields, Export, Import, and copy controls — is reachable and operable with the keyboard alone, with a visible focus indicator
+- Gate row disclosures toggle with Enter or Space and expose their expanded state via aria-expanded; the note form dialog and the export and import drawers close on Escape and return focus to the control that opened them
+- Rejection banners and copy, note, and import confirmations are announced through an aria-live region as well as shown visually
 </accessibility>
 
 <performance>
@@ -93,18 +124,20 @@ Feature: Re-run simulation and event timeline —
 </performance>
 
 <requirements>
-Shared application state must live in Svelte stores (runes-based) (in-memory only): the runs collection with per-stage gate results, the selected run and stage, what-if simulation overlays, re-run progress, timeline entries, filters, theme, and UI chrome. Do not use localStorage, sessionStorage, or other browser storage APIs.
+Shared application state must live in Svelte stores (runes-based) (in-memory only): the runs collection with per-stage gate results, certificates, notes, the selected run and stage, what-if simulation overlays, re-run progress, timeline entries, export and import drafts, filters, theme, and UI chrome. Do not use localStorage, sessionStorage, or other browser storage APIs.
 State contracts (behavioral, not storage keys):
-- Suite outcomes, stage statuses, the stage strip, and the chain visualization all derive live from the one store of gate results; they never disagree with each other
-- What-if is an overlay on the store, never a mutation: revert or navigation always restores recorded results exactly
-- A completed re-run writes new recorded results once, and every surface that shows that stage (strip, chain, outcome, timeline) reflects them without a reload
+- Suite outcomes, stage statuses, the stage strip, the chain visualization, and the Acceptance Package export preview all derive live from the one store of gate results and notes; they never disagree with each other
+- What-if is an overlay on the store, never a mutation: revert or navigation always restores recorded results exactly, and what-if overlays never appear in the Acceptance Package export
+- A completed re-run writes new recorded results once, and every surface that shows that stage (strip, chain, outcome, timeline, export preview) reflects them without a reload
 - Registry filters and timeline filters recompute their visible lists from the shared collections; they do not create a second disconnected copy
 - Theme and active view are shared client state; toggling them does not reload the document
 - Any automation or tool handlers exposed by the app invoke the same store commands the visible controls use
-Build tooling: Vite or an equivalent SPA setup. Styling is Tailwind CSS 4.3.2 (pinned) with design tokens in the theme layer. shadcn-svelte is the component library for dialogs, selects, tabs, badges, accordions, tooltips, and toasts; no other component library. svelte-motion and AutoAnimate allowed for animation; no other animation libraries. Phosphor icons only, installed via its Svelte npm package — no raw copy-pasted SVG icon sets. All forms — the gate note form and any filter or settings forms — are driven by Felte validating through a Zod schema: the schema defines the rules and inline per-field errors render before submit. All libraries installed via npm and bundled locally; no CDN imports. No backend or authentication.
+Build tooling: Vite or an equivalent SPA setup. Styling is Tailwind CSS 4.3.2 (pinned) with design tokens in the theme layer. shadcn-svelte is the component library for dialogs, selects, tabs, badges, accordions, tooltips, and toasts; no other component library. svelte-motion and AutoAnimate allowed for animation; no other animation libraries. Phosphor icons only, installed via its Svelte npm package — no raw copy-pasted SVG icon sets. All forms — the gate note form, the import surface, and any filter or settings forms — are driven by Felte validating through a Zod schema that models the GateNote create body and Acceptance Package JSON payloads: the schema defines the field contracts above and inline per-field errors render before submit. The record a successful Add note creates is exactly that GateNote create body; Acceptance Package export and a successful import conform to the same field names, enums, bounds, and cross-field rules. All libraries installed via npm and bundled locally; no CDN imports. No backend or authentication.
 - Seed at least 6 runs with recorded gate results for all 5 stages (6 to 10 gates per stage), including at least one fully passed run, one run rejected at an intermediate stage, and one run with pending stages
 - Fingerprint hashes, run identifiers, and gate identifiers are fictional seeded strings
 - Invalid note submissions must not attach a note or add a timeline entry; show visible validation feedback
+- Acceptance Package JSON export must be compiled live from the current store; after any session mutation that changes notes, recorded gate results, certificates, or timeline entries on the selected run, reopening Export acceptance package must include that mutation
+- Importing a valid Acceptance Package JSON reconstructs the same visible run state the JSON export produced for that runId, including every required stage, gate, note, certificate, and timeline field
 - Zero navigational outbound links for app chrome — in-app controls only; view changes via shared client state
 - Icon set and any imagery bundled locally
 </requirements>
@@ -208,7 +241,7 @@ Module specs:
 
 Bindings:
 - Browsable entity: runs
-- Destinations: run-list; run-detail; stage-detail; certificate; registry; timeline
+- Destinations: run-list; run-detail; stage-detail; certificate; registry; timeline; export; import
 - Filters: severity; timeline-entry-type
 - Themes: light; dark
 - Value bounds: severity in {S1, S2, S3}; timeline-entry-type in {re-run, rejection, certificate, note}; stage in {Source, Build, Test Generation, Hardening, Publish}
@@ -218,15 +251,20 @@ Bindings:
 - Editor properties: simulated-state; note-text; note-category
 - Session operations: start
 - Demos: stage-re-run
-- Artifact operations: copy
-- Export formats: fingerprint-hash
+- Artifact operations: export; import; copy
+- Export formats: fingerprint-hash; acceptance-package-json; certificate-chain-markdown
 - Workflow completion: what-if flips recompute suite outcome and stage status; revert restores recorded results exactly
 - Workflow completion: completed re-run updates stage strip, chain visualization, suite outcome, and appends timeline entries
+- Workflow completion: acceptance-package export preview includes session notes and recorded stage results for the selected run
+- Workflow completion: importing acceptance-package replaces selected run notes, stages, certificates, and timeline to match the document
+- Import modes: acceptance-package
 
 Mechanics exclusions:
 - Gate row evidence height-plus-opacity expand animation and chevron rotation stay Playwright-observed
 - What-if/rejection banner slide-in and toast fade timing stay Playwright-observed
 - Re-run status-icon transition and progress-indicator smoothness stay Playwright-observed
+- Clipboard contents and download of the acceptance-package export stay Playwright responsibilities; no raw file paths, blobs, or base64 in WebMCP args or results
+- Import paste surface validation mechanics stay Playwright-observed
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

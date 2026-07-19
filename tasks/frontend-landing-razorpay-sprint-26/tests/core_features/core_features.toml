@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -140,7 +140,7 @@ weight = 1.0
 [[criterion]]
 id = "1.12"
 name = "footer_copy_and_links"
-description = "The footer shows Copyright © Novapay FTX26, the copy AI-native fintech. / Built with ambition. For the world., a GET ACCESS CTA, Photos, Updates, and Network links, a www.novapay.example link, and a /SPRINT'26 word-mark."
+description = "The footer shows Copyright © Novapay FTX26, the copy AI-native fintech. / Built with ambition. For the world., a GET ACCESS CTA, Photos, Updates, and Network links, a www.novapay.example link, and a /SPRINT'26 word-mark."
 type = "binary"
 weight = 1.0
 
@@ -248,7 +248,7 @@ weight = 1.0
 [[criterion]]
 id = "1.33"
 name = "rapid_nav_clicks_settle"
-description = "Rapid successive clicks across several segment nav labels settle on the last clicked section with exactly one nav cell marked active."
+description = "Rapid successive clicks across three or more segment nav labels settle on the last clicked section with exactly one nav cell marked active."
 type = "binary"
 weight = 0.5
 optional = true
@@ -275,6 +275,94 @@ description = "EXPLORE and READ MORE calls to action on cards use an underline p
 type = "binary"
 weight = 0.5
 optional = true
+
+
+[[criterion]]
+id = "1.40"
+name = "feature_shortlist_pin_and_count"
+description = "Pinning Voice Payments then Quick Buy 2.0 raises the Shortlist tray count from 0 to 1 to 2, marks those cards pinned, and lists both names in pin order; unpinning Voice Payments drops the count to 1 and removes only that name."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "compare_tray_max_three"
+description = "Add to compare accepts up to three feature names in the Compare tray; attempting a fourth shows Compare is full (3/3) and leaves the tray at exactly three names."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "theme_filter_and_launch_search"
+description = "Choosing Theme filter Payment Gateway hides non-Payment-Gateway feature cards while section chrome stays; typing Card into Launch search further narrows to name matches; All plus clearing search restores every card."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "watch_log_records_executive"
+description = "Opening the Payment Gateway executive video modal appends Nikhil Rao to the Watch log; closing the modal leaves that entry present and visible in the Sprint launch brief panel."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "command_palette_jump_and_brief"
+description = "Pressing Ctrl+K opens the command palette with search focused; choosing Jump to Payment Gateway closes the palette and scrolls that section into view with its nav cell active; choosing Open sprint brief opens the Sprint launch brief panel."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "undo_redo_shortlist"
+description = "Pinning Voice Payments then Undo returns the Shortlist tray count to 0 and clears the pin mark while the brief preview shortlistedFeatures becomes []; Redo restores the pin, count 1, and preview together."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "sprint_brief_api_shaped_field_contract"
+description = "Export sprint brief opens JSON and Markdown tabs; JSON is an API-shaped payload with exactly the required keys: required string brand (Novapay), required string event (Sprint 26), required arrays shortlistedFeatures/compareFeatures/watchedExecutives, required closed-enum themeFilter, required string searchQuery (≤120 chars), and required string generatedAt (ISO-8601 UTC ending in Z); after pinning Voice Payments and Quick Buy 2.0, adding Biometric Card Authentication to compare, setting Theme filter Payment Gateway, typing Card, and watching Nikhil Rao's video, those live values appear in the JSON with a fresh generatedAt."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "sprint_brief_download_copy_import"
+description = "Download on the JSON tab offers novapay-sprint-26-brief.json containing the live schema-valid session values; Copy shows Copied; Import of a previously exported contract-valid brief restores shortlist, compare, theme filter, search, watchedExecutives/Watch log, and pinned marks to match."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "brief_import_rejects_contract_violations"
+description = "Importing a contract-invalid brief (brand not Novapay, themeFilter outside All/Agentic Stack/International Payments/Payment Gateway/D2C/Marketing/Business Banking, compareFeatures with four names, a shortlistedFeatures name not on the page catalog, or generatedAt not an ISO-8601 UTC string ending in Z) leaves shortlist, compare, theme filter, search, and watch log unchanged and shows an inline import error naming the offending field or rule."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n40"
+name = "export_omits_session_mutations"
+description = "After pinning features, mutating compare/theme/search, and watching an executive, the Sprint launch brief JSON omits those mutations (empty shortlistedFeatures, wrong themeFilter, or missing watchedExecutives) despite the visible UI showing them."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n41"
+name = "undo_does_not_restore_shortlist"
+description = "After pinning a feature, activating Undo leaves the Shortlist tray count elevated and that card still marked pinned."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n42"
+name = "brief_export_breaks_field_contract"
+description = "The exported Sprint launch brief JSON violates the API-shaped field contract: missing required string/array keys, brand other than Novapay, event other than Sprint 26, themeFilter outside the closed enum, compareFeatures longer than 3, catalog-illegal feature names, or generatedAt not an ISO-8601 UTC string ending in Z."
+type = "binary"
+negate = true
+weight = 1.0
 
 [[criterion]]
 id = "1.catchall"

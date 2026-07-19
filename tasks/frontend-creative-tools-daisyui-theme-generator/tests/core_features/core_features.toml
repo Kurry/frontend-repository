@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -91,7 +91,7 @@ weight = 1.0
 [[criterion]]
 id = "1.5"
 name = "rename_updates_all_surfaces"
-description = "After renaming the selected custom theme to 'Evening Tide', that name replaces the old name in My themes, the editor, the live preview, and exported CSS without reload"
+description = "After renaming the selected custom theme to 'Evening Tide', that name replaces the old name in My themes, the editor, the live preview, and the CSS/JSON/Config artifact texts without reload"
 type = "binary"
 weight = 1.0
 
@@ -140,7 +140,7 @@ weight = 1.0
 [[criterion]]
 id = "1.12"
 name = "complete_editor_controls"
-description = "The editor exposes the mytheme Name field, base-100/200/300/base-content plus all eight semantic face/content pairs, three five-choice radius groups, Depth and Noise toggles, two xs–xl size groups, border width, three Options toggles, Reset, Random, CSS, and Remove controls"
+description = "The editor exposes the mytheme Name field, base-100/200/300/base-content plus all eight semantic face/content pairs, three five-choice radius groups, Font family control, Depth and Noise toggles, two xs–xl size groups, border width, three Options toggles, Reset, Random, Export/Artifact, Undo/Redo, and Remove controls"
 type = "binary"
 weight = 1.0
 
@@ -154,7 +154,7 @@ weight = 1.0
 [[criterion]]
 id = "1.14"
 name = "css_export_reflects_all_tokens"
-description = "After changing a color, radius, size, border, depth, and noise value, clicking CSS exposes declarations matching all those current values, and Copy writes that CSS to the clipboard and shows a brief confirmation that resets"
+description = "After changing a color, radius, size, border, depth, noise, and font value, opening the Artifact center CSS tab exposes declarations matching all those current values; Copy writes that text to the clipboard with confirmation, and Download offers a real file of the same text"
 type = "binary"
 weight = 1.0
 
@@ -224,7 +224,7 @@ weight = 1.0
 [[criterion]]
 id = "1.24"
 name = "token_edit_preview_stays_stale"
-description = "Changing a color or radius control leaves the live preview unchanged so token edits do not re-theme the preview"
+description = "Changing a color or radius control leaves the live preview unchanged — token edits fail to re-theme the preview"
 type = "binary"
 weight = 1.0
 negate = true
@@ -248,7 +248,7 @@ negate = true
 [[criterion]]
 id = "1.27"
 name = "create_edit_preview_export_flow"
-description = "Starting from the initial My themes count: create 'Harbor Dawn', change its primary color, box radius, field size, depth, and noise, switch to Color Palette, then open CSS; the count is exactly one higher and the selected row, editor values, preview styling, palette values, URL hash, and exported declarations all agree without reload"
+description = "Starting from the initial My themes count: create 'Harbor Dawn', change its primary color, box radius, field size, depth, noise, and font, switch to Color Palette, then open the Artifact center; the count is exactly one higher and the selected row, editor values, preview styling, palette values, contrast badges, URL hash, and CSS/JSON/Config artifact texts all agree without reload"
 type = "binary"
 weight = 1.0
 
@@ -265,6 +265,115 @@ name = "double_remove_deletes_exactly_one"
 description = "Rapidly double-activating a custom theme's Remove control deletes exactly that one theme: the My themes count decreases by one, not two, and no other theme disappears"
 type = "binary"
 weight = 1.0
+
+
+[[criterion]]
+id = "1.30"
+name = "artifact_center_three_formats_live"
+description = "Opening the Artifact center shows three format tabs — CSS, JSON, and Config — each regenerating live from the active theme; after editing a distinctive primary color and name, all three tabs contain those edited values rather than stale defaults"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "artifact_copy_and_download"
+description = "In the Artifact center, Copy puts the exact visible format text on the clipboard with a brief confirmation that resets, and Download triggers a real file download whose contents match that visible text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "import_declared_theme_round_trip"
+description = "After exporting a custom theme as declared-theme JSON (with required name, colors hex keys, radius/size enums, depth/noise, fontFamily, options), removing it, pasting that JSON into Import and applying: My themes regains a theme with the same name and contract fields, and editor, preview, and Artifact center match the imported values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "undo_redo_restores_token_surfaces"
+description = "After a color token edit that changes preview and artifact text, Undo restores the prior color across editor, preview, contrast badge, and artifact text together; Redo reapplies the edit across those same surfaces; empty stacks disable their controls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "contrast_matrix_tracks_pairs"
+description = "The Contrast matrix lists every semantic face/content pair from the declared-theme colors keys (and base-100/base-content) with live contrast ratios and AA/AAA pass/fail badges that recompute immediately when either color in a pair changes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "color_blindness_filter_preview_only"
+description = "Choosing Protanopia, Deuteranopia, or Tritanopia on the Color blindness filter applies a visible filter to the live preview only; editor swatches and artifact text stay unfiltered; switching back to None restores the unfiltered preview without changing stored tokens"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "font_family_token_updates_surfaces"
+description = "Changing the Font family control among at least four bundled families updates preview body text and the font declaration in CSS, JSON, and Config artifact formats without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "snapshot_and_before_after_compare"
+description = "Snapshot saves the active theme tokens into a named row with a four-swatch chip; selecting it restores those tokens; Before/After compare shows the snapshot distinct from the live edit, and turning compare off returns to the live edit alone"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "declared_theme_json_field_contract"
+description = "With a custom theme active, the Artifact center JSON tab shows a single declared-theme object (the would-be request body) whose visible text includes required name; the full colors key set (base-100 through error-content) with #RRGGBB hex values; radius.box/field/selector as one of 0rem/0.25rem/0.5rem/1rem/2rem; size.field/selector as one of xs/sm/md/lg/xl; border as one of 0.5px/1px/1.5px/2px; depth and noise as 0 or 1; fontFamily as one of Outfit/system-ui/monospace/serif; and options.defaultTheme/defaultDarkTheme/darkColorScheme booleans"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "css_and_config_compiled_from_same_schema"
+description = "After editing a distinctive primary hex, box radius enum, field size enum, border enum, depth, noise, and fontFamily, the CSS tab custom-properties block and the Config tab theme-config snippet both contain those same session values (matching the JSON tab), not a second disconnected token set, and the CSS data-theme value equals the JSON name"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "import_rejects_incomplete_declared_theme"
+description = "Pasting Import JSON that omits a required colors key, uses a non-#RRGGBB color, sets radius/size/border/fontFamily outside the closed enums, or sets defaultDarkTheme true while darkColorScheme is false shows validation naming the offending field and leaves My themes count and the active theme unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "dark_color_scheme_cross_field_in_export"
+description = "Toggling the Dark color scheme Options control updates options.darkColorScheme in the Artifact center JSON tab to true when checked and false when unchecked, matching the editor toggle without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n4"
+name = "export_omits_session_customizations"
+description = "After editing color, radius, size, border, effect, or font tokens on a custom theme, the Artifact center CSS, JSON, or Config text still shows the pre-edit defaults and omits the session's actual customizations"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n5"
+name = "undo_fails_to_restore_dependent_surfaces"
+description = "After a token edit, Undo restores one surface (for example the editor swatch) while live preview, contrast badge, or artifact text remain on the edited values — incomplete undo"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n6"
+name = "json_export_missing_required_contract_fields"
+description = "The Artifact center JSON tab for an active custom theme is missing required declared-theme fields (name, a colors key from the required set, radius, size, border, depth, noise, fontFamily, or options), shows color values that are not #RRGGBB, or shows border outside 0.5px/1px/1.5px/2px"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.catchall"

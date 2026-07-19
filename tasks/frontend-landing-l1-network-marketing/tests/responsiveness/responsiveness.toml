@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,85 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "7.1"
-name = "layout_adapts_desktop_to_mobile"
-description = "Layout adapts gracefully from 1440px desktop to 375px mobile."
+name = "layout_adapts_1440_to_375"
+description = "Layout adapts from 1440px desktop to 375px mobile: bento hero cells stack vertically at mobile widths, and every chapter, form, and Events Manager remains reachable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
-name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+name = "mobile_tap_targets_adequate"
+description = "At 375px, primary interactive controls (hamburger, theme toggle, form submit, manager filters) present tap targets at least about 44px in height or width."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
 name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+description = "Display chapter titles and body copy resize between 1440px and 375px without becoming illegible at either width."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
-name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+name = "no_clip_or_overflow_at_key_widths"
+description = "At 1440px and 375px, content never clips or overflows the viewport."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
-name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+name = "mega_menu_becomes_fullscreen_drawer"
+description = "At mobile widths the mega-menu becomes a full-screen drawer opened from the oversized hamburger; sticky chrome still exposes the Ridge wordmark and theme toggle."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.6"
-name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+name = "why_ridge_pile_desktop_only"
+description = "At ≥768px the Why Ridge chapter uses the sticky card pile with progressively larger top offsets; below 768px the four pillars render as a static vertical list."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.7"
-name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+name = "get_started_column_reflow"
+description = "Get started renders as 1 column at mobile widths and three-up from the sm breakpoint; the hero pull-in composition applies at 1024px and up."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.8"
-name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+name = "no_horizontal_scroll_at_375"
+description = "At 375px width no horizontal scrolling appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.9"
-name = "media_and_canvases_resize"
-description = "Images, grids, and canvases size responsively to fit the layout."
+name = "hero_and_grids_resize"
+description = "The hero visual plane, Solutions grid, and News carousel size responsively to fit the layout at 1440px and 375px without fixed-size overflow."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.10"
-name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
+name = "sticky_chrome_accessible_all_widths"
+description = "Sticky top chrome (Ridge wordmark, theme toggle, hamburger) remains reachable at 1440px and 375px without permanently obscuring chapter content."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "7.a1"
+name = "showcase_mobile_rechoreography"
+description = "At 375px the brand-first bento hero, Why Ridge pillars, and Global Events chapter are re-choreographed into a stacked mobile composition that preserves hierarchy rather than a broken shrink of the desktop grid."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "7.n1"
 name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+description = "At 1440px or 375px the layout breaks, overflows, or loses required chrome (sticky header, hamburger drawer, or Events Manager entry)."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,71 +148,94 @@ weight = 1.0
 [[criterion]]
 id = "7.n2"
 name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+description = "At 375px primary controls are too small to tap reliably or visibly misaligned."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n3"
-name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+name = "type_unreadable_at_narrow_width"
+description = "At 375px body or chapter heading text is too small to read or collapses illegibly."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n4"
-name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+name = "content_cropped_or_spurious_scrollbars"
+description = "At 1440px or 375px content is cropped or unnecessary scrollbars appear."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n5"
-name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
+name = "mobile_menu_missing_or_unresponsive"
+description = "At 375px the hamburger is absent, or tapping it leaves the full-screen mega-menu drawer closed."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n6"
-name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
+name = "sticky_chrome_obscures_content"
+description = "Sticky chrome permanently obscures hero or chapter content with no recoverable scroll offset."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n7"
-name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
+name = "overlap_or_stacking_failure"
+description = "At 1440px or 375px elements overlap incorrectly, or the Why Ridge sticky pile / static list stacking order breaks."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n8"
-name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
+name = "why_ridge_pile_on_mobile"
+description = "Below 768px the Why Ridge pillars still behave as a sticky overlapping pile instead of falling back to a static vertical list."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n9"
-name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
+name = "media_static_size_overflows"
+description = "The hero visual plane or chapter imagery uses a static size that overflows the viewport at 375px."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n10"
-name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
+name = "theme_or_manager_disappears_at_width"
+description = "The theme toggle or Events Manager entry control disappears at 375px while remaining required chrome."
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "7.20"
+name = "palette_export_usable_at_375"
+description = "At 375px width the command palette, Export catalog, and Session leads panel stay fully on-screen and operable rather than clipping off the viewport"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.21"
+name = "bulk_bar_no_horizontal_scroll"
+description = "At 375px width the bulk action bar wraps or stacks without introducing horizontal scrolling"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.n11"
+name = "export_or_palette_clipped_mobile"
+description = "At 375px width Export catalog, Session leads, or the command palette clips off-screen or forces horizontal scroll"
 type = "binary"
 negate = true
 weight = 1.0

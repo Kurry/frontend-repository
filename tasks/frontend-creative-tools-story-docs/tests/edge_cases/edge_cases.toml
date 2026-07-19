@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,150 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_board_after_last_delete"
+description = "After deleting the last remaining scene, the board shows a clearly visible empty state with a message and an Add Scene path back into the create flow."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "empty_required_fields_inline_validation"
+description = "Submitting the create form with a required title or description empty adds no scene: the scene count is unchanged, an inline validation message names the empty field, and the submit control stays disabled until the required fields are valid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "validation_names_field_not_invalid_only"
+description = "Create-form validation copy names the empty field (title or description) rather than only saying 'Invalid'."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "inert_chrome_toasts_demo_only"
+description = "Clicking inert chrome (sidebar storyboard rows, Add Storyboard, Help, notifications bell, dashboard, account, or header kebab) shows a demo-only toast rather than navigating away, and the document URL stays on the app."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "double_submit_creates_exactly_one"
+description = "Double-activating a valid create submit adds exactly one scene: the visible scene count increases by one and one new card appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "slide_bounds_disable_prev_next"
+description = "In Slide mode the prev control is disabled on the first scene and the next control is disabled on the last scene; neither wraps around."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "delete_active_slide_moves_to_neighbor"
+description = "Deleting the scene currently shown in Slide mode moves the active slide to a valid neighboring scene rather than showing a blank slide."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "semantic_create_and_board_controls"
+description = "Add Scene, create-form fields, view-mode toggles, kebab triggers, and Slide prev/next use semantic button/input/label elements rather than unlabeled decorative wrappers."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "drawer_close_paths"
+description = "Notifications and account drawers close via an explicit close control and Escape, returning to the workspace without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "delete_kebab_is_discoverable_destructive"
+description = "Per-scene kebab delete is a clearly labeled destructive action (Delete) distinct from edit, and completing it removes that scene from the board."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_board_shows_nothing"
+description = "After the last scene is deleted, the board shows nothing — no empty-state message and no Add Scene path."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "validation_errors_only_in_console"
+description = "Empty required-field create failures surface only in the browser console with no visible inline field feedback."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "inert_chrome_silent_or_navigates"
+description = "Clicking an inert header/sidebar control either navigates away from the app or produces no visible feedback at all."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "delete_lacks_destructive_label"
+description = "Scene delete proceeds from an unlabeled or non-destructive-looking control with no Delete labeling distinguishing it from edit."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "interactive_controls_nonsemantic"
+description = "Primary interactive controls (view-mode toggles, Add Scene, kebabs, drawer triggers) are non-semantic div/span click targets without button/role semantics."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "drawers_not_keyboard_dismissible"
+description = "With a notifications or account drawer open, keyboard users cannot dismiss it (no Escape path and no focusable close control)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "invalid_create_still_adds_scene"
+description = "Submitting the create form with an empty required title or description still increases the scene count or enables submit while invalid."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "ambiguous_or_missing_action_labels"
+description = "Primary actions show blank, placeholder, or ambiguous labels such as 'Submit', 'OK', or 'Button' instead of specific labels like Add Scene, Tile, List, Slide, Edit, or Delete."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "slide_wraps_or_lands_blank"
+description = "In Slide mode, prev on the first scene or next on the last wraps around, or deleting the active slide leaves a blank slide with no valid neighbor."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "double_submit_duplicates_scene"
+description = "Double-activating a valid create submit adds more than one scene or leaves duplicate cards for a single intended create."
 type = "binary"
 negate = true
 weight = 1.0

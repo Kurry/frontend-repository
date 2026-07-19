@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,88 +62,88 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "14.1"
-name = "multi_facet_round_trip"
-description = "Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline — never a mix."
+name = "multi_facet_reload_round_trip"
+description = "Multi-facet reload round-trip: edit displayName, enter a valid roomId, send one chat line while connecting/waiting, queue one file, and toggle theme, then reload. Every facet (name, client ID, roomId, seeded plus sent transcript, file queue, theme) is restored from local storage — never a mix of restored and reset facets — and the connection badge resumes at idle or disconnected."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.2"
-name = "sort_reversal_proves_live_data"
-description = "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders."
+name = "session_pack_preview_tracks_mutations"
+description = "Derived Session Pack proof: note the Export Session preview, then change displayName and send a distinctive chat line; reopening Export shows those new values in peer.displayName and messages, proving the preview is derived from live store state rather than a static snapshot."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.3"
-name = "derived_view_responds_to_input"
-description = "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input."
+name = "badge_and_composer_track_session_state"
+description = "Derived-view sensitivity: Join Room moves the badge from idle through connecting to waiting and enables the composer; Leave Room returns disconnected and disables the composer with its note — both surfaces track session state rather than staying identical."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.4"
-name = "cross_view_echo_without_reload"
-description = "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list ↔ detail, board ↔ stats) without reload."
+name = "chat_and_export_cross_echo"
+description = "Cross-view echo: send a distinctive chat line while waiting, then open Export Session without reload; the Session Pack messages array contains that same text."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.5"
-name = "count_delta_is_exact"
-description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+name = "transcript_and_queue_count_deltas"
+description = "Count-delta integrity: measure transcript lines immediately before and after one valid send (delta exactly +1); measure queue rows immediately before and after choosing one file (delta exactly +1)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.6"
-name = "different_inputs_change_outcomes"
-description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+name = "different_room_ids_and_messages_differ"
+description = "Input-dependent output: join with roomId A and send message text A, note the Session Pack; leave and join with roomId B and send text B; Export shows roomId B and text B, not A."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.7"
-name = "interleaved_flows_preserve_state"
-description = "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state."
+name = "interleaved_chat_and_queue_preserve_state"
+description = "Interleaved-flow integrity: while waiting, send a chat line, queue a file, toggle theme, then send a second chat line; both transcript lines and the queue row remain, and Export Session contains all of them with the matching theme."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.8"
-name = "empty_to_repopulated_round_trip"
-description = "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions."
+name = "import_rejected_then_valid_round_trip"
+description = "Edge-state round-trip: attempt Import Session with JSON that fails the field contract (state unchanged with a named error), then Import a valid previously downloaded Session Pack; panels and a fresh Export reconstruct the pack."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.n1"
-name = "partial_persistence_is_incoherent"
-description = "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence."
+name = "partial_localstorage_persistence"
+description = "After reload, some of displayName, roomId, transcript, file queue, or theme silently revert while others survive, producing incoherent partial persistence."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n2"
-name = "derived_surface_ignores_inputs"
-description = "A derived surface renders identically regardless of its inputs."
+name = "session_pack_ignores_mutations"
+description = "The Session Pack export preview renders identically regardless of displayName, roomId, chat, file-queue, or theme mutations."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n3"
-name = "different_inputs_produce_identical_output"
-description = "Repeating an action with different inputs yields byte-identical output."
+name = "different_session_inputs_identical_export"
+description = "Joining different roomIds or sending different chat texts yields byte-identical Session Pack export previews."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "State changes appear in one view but not another until reload."
+name = "export_stale_until_reload"
+description = "Session mutations appear in the panels but not in Export Session until reload."
 type = "binary"
 negate = true
 weight = 1.0

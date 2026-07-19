@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,86 +62,86 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "submit_job_end_to_end"
+description = "Submit flow: open Submit job, watch the configuration preview update with create-payload field names as fields change, submit valid values, confirm exactly one new queued row appears in the jobs table and the chosen model's provider lane without a reload, and reopening Export queue shows that job with matching dataset, agent, model, and trialCount"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "invalid_submit_inline_validation"
+description = "Submit flow: missing dataset/agent/model, trialCount outside 1 to 10, or sweepModel equal to model shows inline errors naming each field and creates no job"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "sweep_submission_flow"
+description = "Sweep submission: choosing a sweepModel that differs from model and submitting once creates one job per selected model, each in its own lane, increasing the jobs table count by exactly the number of models chosen"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "cancel_keeps_completed_trials"
+description = "Cancel flow: confirming cancel on a queued or running job flips it to cancelled, stops progress, and keeps already-completed trial rewards and durations visible in the detail; declining leaves the job unchanged"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "view_switch_retains_queue_state"
+description = "View switch: moving between Jobs, Aggregates, and Timeline without a reload retains the current jobs collection, filters, and selection so returning to Jobs shows the same rows"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "retry_lifecycle_flow"
+description = "Retry lifecycle: a failed trial's backoff countdown ticks down and flips the trial to running; on an exhausted trial, manual retry returns only that trial to running"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "filters_update_jobs_table"
+description = "Filter flow: status, model, and dataset filters combine to narrow the jobs table, and clearing them restores the full table; a zero-match filter shows an empty state with a clear-filters control"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "pause_resume_lane_flow"
+description = "Pause and resume: pausing a lane through its confirm dialog freezes a running trial's completed count; after waiting the count has not advanced, resume continues from the same count with completed trials untouched"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "mutation_to_export_flow"
+description = "Mutation-to-export: after submitting a valid job, Export queue preview contains that job's dataset, agent, model, and trialCount, schemaVersion is eval-queue-v1, providers and timeline keys are present, and Copy and Download are available"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "export_import_round_trip_flow"
+description = "Export then import round-trip: after a submit or cancel mutation, importing the exported Queue Snapshot JSON reconstructs the same visible jobs, lane depths, and timeline, and the next Export preview matches again"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
 name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+description = "Submit job, Export queue, Import queue, cancel, or pause/resume controls are missing or non-functional from the UI"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "new_jobs_missing_or_duplicated"
+description = "A valid submit creates zero jobs, or rapidly double-submitting creates more than one identical job (or more than one per sweep model)"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n3"
 name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+description = "A submit, cancel, pause, or retry updates one surface (table, lanes, detail, or export) while another surface still shows the prior status or count until reload"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,15 +157,15 @@ weight = 1.0
 [[criterion]]
 id = "6.n4"
 name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+description = "Switching between Jobs, Aggregates, and Timeline breaks layout or loses the selected job without an explicit dismiss"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_filter_breaks_ui"
+description = "Filters that match no jobs leave a bare broken table with no empty state or clear-filters control"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,15 +173,15 @@ weight = 1.0
 [[criterion]]
 id = "6.n6"
 name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+description = "Applying the same status/model/dataset filters yields different visible job sets when revisited without changing filters"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "export_import_surfaces_missing"
+description = "Export queue or Import queue cannot be opened, or Export shows no Copy/Download after a valid session mutation"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n8"
 name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+description = "Submit, export, import, or confirmation overlays block navigation with no Escape or dismiss path"
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +197,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n9"
 name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+description = "An invalid submit or failed import provides no visible inline feedback naming the problem"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n10"
 name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+description = "After opening job detail, export, or import, recovery requires a full page reload"
 type = "binary"
 negate = true
 weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,142 +62,142 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "theme_studio_controls_keyboard_operable"
+description = "Every theme row, color swatch picker, radius and size selector, Depth/Noise toggle, preview tab, Hold to add theme, Remove, Undo/Redo, Artifact center controls, Import, snapshot rows, Color blindness filter, Font family control, and chrome dropdown is reachable and operable with the keyboard alone, each showing a visible focus indicator."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "chrome_dropdown_and_swatch_escape_returns_focus"
+description = "Opening a chrome dropdown, color swatch picker, or the Artifact center moves focus into that overlay; pressing Escape closes it and returns focus to the control that opened it; the Artifact center traps focus while open (dialog semantics)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "theme_swatch_chips_have_accessible_names"
+description = "Each theme row's four-swatch color preview exposes an accessible name or equivalent so assistive technology can identify the theme's color preview, not an unlabeled decorative cluster."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "copied_confirmation_uses_aria_live"
+description = "After Copy on the Artifact center, the brief copied confirmation is announced through an aria-live region as well as shown visually."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+name = "name_field_explicitly_labeled"
+description = "The editor Name field (placeholder 'mytheme') uses an explicit label element associated with the control."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+name = "panel_headings_follow_logical_order"
+description = "Headings in the Themes panel, token editor sections (Change Colors, Radius, Sizes, Options), and preview chrome follow a logical order with no skipped levels."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "studio_landmarks_present"
+description = "The three-panel workspace exposes semantic landmarks (for example nav for site chrome and main for the themes/editor/preview workspace) so assistive technology can navigate the tool."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+name = "chrome_and_editor_contrast_in_default_theme"
+description = "Text and controls in the site chrome and editor panels keep readable contrast against their surfaces in the default theme."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "semantic_buttons_for_studio_controls"
+description = "Theme rows, Hold to add theme, Remove, Random, CSS, Copy, radius/size selectors, Depth/Noise toggles, preview tabs, and chrome dropdown triggers are exposed as buttons or equivalent interactive roles — not unlabeled clickable divs."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "reduced_motion_respected_for_theme_studio"
+description = "With prefers-reduced-motion set, Hold-to-add progress, My themes row enter/exit, Random icon rotate, dropdown open, and preview re-theme easing are removed or instant while every control remains operable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
-name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+name = "theme_studio_controls_unreachable_by_keyboard"
+description = "A theme row, swatch picker, radius/size selector, Depth/Noise toggle, preview tab, Hold to add theme, Remove, or chrome dropdown cannot be reached or activated via keyboard alone."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n2"
-name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+name = "focus_indicators_missing_on_studio_controls"
+description = "Focused theme rows, swatch pickers, radius/size selectors, toggles, tabs, or chrome dropdown triggers show no visible focus indicator or the indicator is obscured."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n3"
-name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+name = "swatch_or_dropdown_lack_semantics"
+description = "Color swatch pickers or chrome dropdown menus use non-semantic tags without ARIA roles or accessible names."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+name = "validation_or_active_theme_color_only"
+description = "Create/rename validation or active-theme selection is conveyed by color alone with no text, selected-state label, or other non-color cue."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "dropdown_or_picker_no_escape_focus_return"
+description = "With a chrome dropdown or color swatch picker open, Escape fails to close it or focus is stranded away from the opening control."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+name = "unreadable_contrast_on_chrome_or_editor"
+description = "Site chrome labels, editor section headings, or primary action labels are unreadable due to poor contrast against their background in the default theme."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+name = "name_validation_visual_only"
+description = "Create/rename validation feedback naming the name field is visual only and is not associated for assistive technology (no described-by, label wiring, or live region)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+name = "theme_preview_chips_missing_accessible_name"
+description = "Theme-row four-swatch chips that convey color meaning are missing alt text or an accessible name."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+name = "heading_order_skips_in_editor_or_themes"
+description = "Themes panel or editor section headings skip levels (for example jumping H1 to H3) or have no coherent order."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,10 +205,33 @@ weight = 1.0
 [[criterion]]
 id = "1.n10"
 name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+description = "With prefers-reduced-motion set, Hold-to-add progress fill, My themes row enter/exit, Random icon rotate, or preview re-theme easing still animate."
 type = "binary"
 negate = true
 weight = 1.0
+
+
+[[criterion]]
+id = "1.11"
+name = "contrast_badges_not_color_only"
+description = "Contrast matrix AA/AAA results are exposed as readable text (or equivalent accessible name), not conveyed by color alone."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "import_validation_accessible"
+description = "Import validation messages for malformed or incomplete declared-theme JSON (missing required keys, non-#RRGGBB colors, out-of-enum radius/size/border/fontFamily, or defaultDarkTheme/darkColorScheme cross-field failures) are rendered in the DOM as text associated with the import control naming the offending field, not only as a color change."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n11"
+name = "artifact_dialog_focus_not_trapped"
+description = "With the Artifact center open, keyboard focus can escape the dialog into the page behind it, or Escape fails to return focus to the Export control that opened it."
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "accessibility.catchall"

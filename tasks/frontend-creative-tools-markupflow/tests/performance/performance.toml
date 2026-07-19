@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,167 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "9.1"
-name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+name = "cold_start_under_two_seconds"
+description = "On a local cold load the MarkupFlow annotation studio becomes interactive within 2 seconds, with the empty canvas drop zone (Choose image / Try sample image) and Layers empty-state message visible."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
-name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+name = "console_clean_during_full_exercise"
+description = "No console errors or warnings appear during a full exercise of drawing, effects, presets, layer reordering, undo/redo, History jumps, snapshot restore, Compare, saving a project, Collaboration sync, Export PNG, and Export project JSON."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
-name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+name = "live_draw_preview_follows_pointer"
+description = "While click-dragging a shape tool, the live dashed preview follows the pointer with no visible lag (perceived under 100ms response)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.4"
-name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+name = "shell_visible_while_settling"
+description = "While the app settles after first paint, the header, tool rail, canvas region, and Layers panel remain visible rather than a blank white screen with no controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.5"
-name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+name = "many_annotations_reorder_without_lag"
+description = "With a Layers list of many annotations (at least a dozen drawn shapes/effects), scrolling the list and reordering via up/down shows no perceived lag between the row move and the canvas stacking change."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.6"
-name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+name = "ui_interactive_during_state_changes"
+description = "During layer add/delete animations, theme toggle recolor, and Collaboration Syncing pulse, toolbar tools and Layers controls remain interactive — the UI does not freeze until transitions finish."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
-name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+name = "canvas_redraw_holds_stable_frame_rate"
+description = "Driven through real draw and reorder controls, canvas re-renders maintain a smooth frame rate without visible hitching during continuous drawing or rapid layer moves."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.8"
-name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+name = "rapid_undo_redo_never_hangs"
+description = "Rapid repeated undo/redo (at least five Ctrl+Z / Ctrl+Y or button presses in quick succession) keeps the UI responsive with no hangs and leaves canvas and Layers in agreement."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+name = "extended_annotation_session_stable"
+description = "After an extended session of many draws, effects, reorders, undos, saves, and exports, the tab remains responsive without runaway memory growth that freezes the UI."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+name = "no_layout_jumps_after_first_paint"
+description = "After first paint no visible layout jumps occur; header, tool rail, canvas, and Layers panel hold their space as the app settles."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.n1"
-name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+name = "cold_load_exceeds_two_seconds"
+description = "More than 2 seconds pass after local cold load before toolbar tools or Try sample image can be operated."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n2"
-name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+name = "console_errors_during_studio_flows"
+description = "Console errors, warnings, or unhandled rejections appear during drawing, effects, presets, layer reorder, undo/redo, History jumps, snapshot restore, Compare, save, Collaboration, Export PNG, or Export project JSON flows."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n3"
-name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+name = "draw_preview_or_reorder_blocks_ui"
+description = "Live draw preview or layer reordering blocks the main thread so subsequent clicks queue with visible lag."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n4"
-name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
+name = "canvas_redraw_hangs_ui"
+description = "Re-rendering the canvas after a draw, effect, or layer reorder hangs or freezes the UI until the redraw completes."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n5"
-name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+name = "large_layer_list_janks"
+description = "Scrolling or reordering a Layers list with many annotations produces sustained frame-rate collapse or multi-second jank."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n6"
-name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
+name = "animation_blocks_studio_input"
+description = "While Layers enter/exit or Syncing pulse animations run, toolbar tools and Layers controls ignore input."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n7"
-name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
+name = "settle_blocks_first_paint_of_controls"
+description = "The UI blocks rendering of header and panels until all assets finish loading, leaving a blank interactive void."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n8"
-name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
+name = "runaway_resources_after_rapid_draws"
+description = "Rapid drawing, undo/redo, or Export PNG clicks cause visible memory/CPU runaway that degrades or crashes the tab."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n9"
-name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
+name = "blank_while_loading"
+description = "Nothing is displayed (blank page) while the app loads — no header or three-region skeleton."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n10"
-name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+name = "crash_under_rapid_or_edge_use"
+description = "The app crashes or becomes permanently unresponsive under rapid undo/redo, rapid layer reorders, or after deleting all annotations and redrawing."
+type = "binary"
+negate = true
+weight = 1.0
+
+# HARDEN_MARKUPFLOW_V1
+
+[[criterion]]
+id = "9.11"
+name = "project_json_compile_stays_responsive"
+description = "With dozens of annotations on the canvas, Export project JSON compiles and shows its preview without freezing the UI for multiple seconds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.n11"
+name = "export_json_freezes_ui"
+description = "Compiling Export project JSON freezes the UI for multiple seconds or drops interactions while the preview builds"
 type = "binary"
 negate = true
 weight = 1.0

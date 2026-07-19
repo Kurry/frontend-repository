@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,21 +63,21 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.1"
 name = "shared_state_coherence"
-description = "All surfaces derive from one shared state: pausing a lane, cancelling a job, or a trial completing is reflected at once in the jobs table, the trial grid, the lanes panel, the aggregates, and the timeline without a reload, and no surface shows a status or count another surface already updated"
+description = "All surfaces derive from one shared state: pausing a lane, cancelling a job, submitting a job, or a trial completing is reflected at once in the jobs table, the trial grid, the lanes panel, the aggregates, the timeline, and the next Export queue preview without a reload, and no surface shows a status or count another surface already updated"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
 name = "no_storage_reload_seeded"
-description = "localStorage and sessionStorage remain empty after exercising the app (submitting, cancelling, pausing, filtering), and a page reload returns the app to its seeded jobs, lanes, and timeline with the default view active"
+description = "localStorage and sessionStorage remain empty after exercising the app (submitting, cancelling, pausing, filtering, exporting, importing), and a page reload returns the app to its seeded jobs, lanes, and timeline with the default view active and closed export/import surfaces"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
 name = "storage_persistence_used"
-description = "localStorage or sessionStorage holds jobs, trials, lane states, filters, or view state after exercising the app"
+description = "localStorage or sessionStorage holds jobs, trials, lane states, filters, view state, or export drafts after exercising the app"
 type = "binary"
 weight = 1.0
 negate = true
@@ -93,28 +93,35 @@ negate = true
 [[criterion]]
 id = "2.5"
 name = "console_clean_during_session"
-description = "No console errors, warnings, or unhandled promise rejections appear on load or during a full exercise of the app, including while the live simulation advances multiple running jobs"
+description = "No console errors, warnings, or unhandled promise rejections appear on load or during a full exercise of the app, including while the live simulation advances multiple running jobs and while opening Export or Import"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.6"
 name = "keyboard_operability_focus"
-description = "Every interactive control — filters, table rows and row actions, lane toggles, legend entries, form fields, and copy controls — is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space), showing a visible focus indicator at each stop"
+description = "Every interactive control — filters, table rows and row actions, lane toggles, legend entries, form fields, export and import controls, and copy controls — is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space), showing a visible focus indicator at each stop"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.7"
 name = "dialog_focus_labels"
-description = "The submit form and both confirmation dialogs use a dialog role, trap focus while open, close on Escape returning focus to their triggers; form fields have visible labels, each validation message names and is associated with its field, and job, trial, and lane statuses are conveyed by text or accessible labels in addition to color"
+description = "The submit form, export drawer, import surface, and both confirmation dialogs use a dialog role, trap focus while open, close on Escape returning focus to their triggers; form fields have visible labels, each validation message names and is associated with its field, and job, trial, and lane statuses are conveyed by text or accessible labels in addition to color"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.8"
 name = "cold_load_and_rapid_input"
-description = "The app is interactive within 2 seconds of a local cold load, stays responsive while the simulation runs and under rapid repeated input (fast filter changes, view switches) with no hangs, and async-feeling surfaces show a deliberate loading affordance rather than a blank region"
+description = "The app is interactive within 2 seconds of a local cold load, stays responsive while the simulation runs and under rapid repeated input (fast filter changes, view switches, export reopen) with no hangs, and async-feeling surfaces show a deliberate loading affordance rather than a blank region"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "export_compiled_live_from_store"
+description = "Queue Snapshot JSON is compiled live from the current store: after a session mutation that changes jobs, lanes, aggregates, or timeline, reopening Export queue includes that mutation under the declared field names"
 type = "binary"
 weight = 1.0
 

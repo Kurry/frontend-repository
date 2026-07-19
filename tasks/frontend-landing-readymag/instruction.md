@@ -16,7 +16,7 @@ ship screenshot pixels or source-site files.
 
 <core_features>
 Core features (each line is an observable behavior the finished app must exhibit):
-- This task is a single-page homepage only: on load the app renders one uninterrupted vertical homepage at route "/" with a sticky white header at the top, and the sections appear in this exact order: an oversized hero, a workflow section with four feature cards and a rotating slideshow, a "Teams of all sizes" use-case tile section, a dark support band, a traveling use-case marquee, a closing call-to-action, and a multi-column footer. No Pricing, Examples, Templates, Learn, Join, Login, About, or other secondary routes are built or graded.
+- This task is a single-page homepage only: on load the app renders one uninterrupted vertical homepage at route "/" with a sticky white header at the top, and the sections appear in this exact order: an oversized hero, a workflow section with four feature cards and a rotating slideshow, a "Teams of all sizes" use-case tile section, a dark support band, a traveling use-case marquee, a closing call-to-action that embeds the trial brief builder, and a multi-column footer. No Pricing, Examples, Templates, Learn, Join, Login, About, or other secondary routes are built or graded.
 - The sticky header stays fixed to the top of the viewport on scroll and shows an original placeholder wordmark in the logo position on the left (the wordmark swaps to a distinct hover mark on hover), a primary navigation group with a Solutions control plus Pricing, Examples, Templates, and Learn links, and account actions on the right: a "Log in" text link and a "Sign up" pill button.
 - Header, footer, CTA, tile, and Solutions-menu chrome links look and behave like real navigation, but they must keep the user on the homepage (same-page hash targets to homepage sections are fine); activating them must never land on a blank, error, or "Not found" page, and secondary destinations must never be promoted into separate features.
 - The Solutions control is a real keyboard-operable menu trigger, not a decorative link: clicking it (or pressing Enter/Space while focused) opens a menu listing Portfolios, Presentations, Editorials, Companies, Freelancers, and Students; pressing Escape closes it and returns focus to the trigger; clicking outside also closes it.
@@ -30,6 +30,11 @@ Core features (each line is an observable behavior the finished app must exhibit
 - The closing call-to-action is centered with the heading "Try for free", the line "or choose your subscription plan", a dark "Try Canvasly" pill button, and an underlined "View pricing" link.
 - The footer is a dark multi-column layout with four groups and these exact link labels: company (about, careers, reviews, terms of service, privacy policy, cookie policy); product (pricing, templates, product updates, affiliate program, referral program, npo discount); resources (examples, design almanac, design stories, help, forum, status, blog); solutions (portfolios, presentations, editorials, companies, freelancers, students). It ends with "© 2026 Canvasly Studio" and "support@canvasly.example".
 - A 43px custom image cursor (original cursor art) follows the pointer on fine-pointer devices and swaps to a hover image when it is over links, buttons, role=button elements, hotspots, and animated hover elements; the cursor never captures pointer events (it is pointer-transparent so clicks pass through to the elements beneath it).
+- The closing section embeds a trial brief panel headed "Build your Canvasly trial brief" with Name, Email, Plan (Free trial / Pro / Team), Team size (1 / 2-10 / 11-50 / 51+), multi-select interest chips (Portfolios, Presentations, Editorials, Companies, Freelancers, Students), Reset (returns the empty baseline — empty name/email strings, no plan, no team_size, empty interests, Submit disabled, success/error messages cleared — as one undoable mutation so Undo can restore the pre-Reset brief), Undo, Redo, Download JSON, Copy brief, Import brief, Load sample brief, and Submit trial brief. A monospaced live preview shows pretty-printed JSON and rewrites on every field edit without a reload.
+- Trial-signup request-body field contract (the live preview, Download JSON, Copy brief, and Import share this schema — a valid submit record IS the would-be request body): exactly seven required top-level keys product, name, email, plan, team_size, interests, and generated_at (no extras). product is always exactly Canvasly. name is a trimmed string length 2–80 when valid else "". email has exactly one @ and a dotted domain segment when valid else "". plan is exactly Free trial, Pro, or Team when valid else "". team_size is exactly 1, 2-10, 11-50, or 51+ when valid else "". interests is an array of unique closed-list labels in chip order (or []). generated_at is an ISO-8601 timestamp that updates on mutation. Empty baseline uses "" scalars and [] interests with product Canvasly.
+- Cross-field rules on every valid payload: Free trial requires team_size exactly 1 (interests may be empty); Team requires team_size one of 2-10, 11-50, or 51+; Pro or Team requires at least one interest label. While those rules fail, Submit trial brief stays disabled and named inline errors appear naming the field and the fix. A contract-valid Submit shows "Trial brief ready — download or copy your JSON above" via a polite live region without navigating away.
+- Download JSON offers canvasly-trial-brief.json whose text matches the visible preview; Copy brief writes that exact preview text to the clipboard and shows a Copied confirmation that reverts after about 1.5 seconds. An export that omits the session's current brief values is invalid. Import brief (paste or file) accepts a schema-conforming payload and restores form + preview together; malformed JSON or a non-conforming payload shows a visible error naming the import problem and leaves the brief unchanged. Load sample brief (after confirm) loads name Avery Lane, email avery@studio.example, plan Pro, team_size 2-10, and interests Portfolios and Editorials into the form and preview.
+- Pressing Ctrl/Cmd+K opens a command palette with a focused search input; choosing Jump to trial brief scrolls the trial brief panel into view and closes the palette; choosing Advance slideshow advances the six-frame slideshow one step with the same active/neighbor opacity treatment as the idle timer path; Escape or backdrop click closes the palette; opening the palette while Solutions is open closes Solutions first.
 </core_features>
 
 <user_flows>
@@ -39,14 +44,23 @@ End-to-end flows with tracked state (every step names its visible evidence):
 - Slideshow flow: leaving the page idle advances the six-frame slideshow on its own timer every 2200ms — the newly active frame becomes fully opaque while its neighbors drop to 0.35 opacity — and after the sixth frame it wraps back to the first; the advancing continues without any manual control being touched.
 - Scroll-reveal flow: on a fresh page load the four workflow feature cards start unrevealed; scrolling the workflow section into view fades and raises them into place with an 80ms stagger; they remain in their revealed resting state while scrolling onward; reloading the page restores the unrevealed starting state until the section is scrolled into view again.
 - Zoom-to-fit flow: resizing the viewport from 1440px down to 390px continuously rescales the whole 1024px design artboard to fit the viewport width, the scroll wrapper's height tracks the scaled document height, and at every intermediate width the full design width stays visible with no horizontal scrollbar and no cropped right edge.
+- Trial brief export flow: fill a contract-valid brief (e.g. Pro, team_size 11-50, at least one interest, name 2–80, dotted-domain email); confirm the live preview shows those seven keys with the session values; Download JSON or Copy brief emits that exact preview text; Submit shows the Trial brief ready message.
+- Trial brief validation flow: enter an email without a dotted domain, or choose Free trial with team_size 2-10, or choose Pro with empty interests — Submit stays disabled, named field errors appear, and Download/Copy still emit the current (invalid or incomplete) preview without a success state.
+- Trial brief round-trip flow: Download or Copy a contract-valid brief, Reset to empty baseline, Import that JSON, and confirm form values and a fresh preview reconstruct to match; then Undo restores the empty baseline.
 </user_flows>
 
 <edge_cases>
-- Pressing Escape while the Solutions menu is closed does nothing: no error, no visual change, and focus stays where it was.
+- Pressing Escape while the Solutions menu is closed and the command palette is closed does nothing: no error, no visual change, and focus stays where it was.
 - The slideshow wraps seamlessly: advancing past the sixth frame returns to the first with the same opacity treatment (active 1.0, neighbors 0.35) and no blank or double-active frame across the wrap.
 - Clicks pass through the custom cursor: clicking any link or button while the cursor image overlaps it activates the element beneath, never the cursor layer.
 - On coarse-pointer devices the custom cursor is absent and the system cursor is fully visible; the system pointer is never hidden without a visible replacement.
-- Reloading the page returns it to its initial state: menus closed, the slideshow back on its first frame, and scroll-reveal sections unrevealed until scrolled into view.
+- Reloading the page returns it to its initial state: menus closed, command palette closed, the slideshow back on its first frame, scroll-reveal sections unrevealed until scrolled into view, and the trial brief at the empty baseline preview (product Canvasly, empty name/email/plan/team_size strings, interests [], fresh generated_at) with empty undo/redo stacks.
+- A name shorter than 2 characters after trim, a name longer than 80 characters, a malformed email (missing @, missing domain dot, or more than one @), a missing plan, or a missing team_size shows inline messages naming the offending field, keeps Submit trial brief disabled or unsuccessful, shows no Trial brief ready message, and does not clear valid fields; Download JSON and Copy brief still emit the current invalid preview with all seven required keys present.
+- Choosing plan Free trial while team_size is 2-10, 11-50, or 51+ — or plan Team while team_size is 1 — or plan Pro or Team with zero interests — keeps Submit trial brief disabled, shows an inline message naming the conflicting field (team_size or interests), and never shows Trial brief ready until the cross-field rule is satisfied.
+- Undo with an empty undo stack and Redo with an empty redo stack are disabled; activating them does nothing and produces no console errors.
+- Importing a JSON file that fails the trial-signup field contract (missing required keys, product not Canvasly, name outside 2–80, malformed email, plan or team_size outside closed enums, interests with unknown or duplicate labels, or a cross-field violation) shows a visible import error naming the problem and leaves the current brief unchanged.
+- After a valid Submit shows Trial brief ready (or after named field/import errors are visible), activating Reset clears those messages along with returning the form and preview to the empty baseline.
+- Opening the command palette while the Solutions menu is open closes Solutions first; Escape closes the palette without also toggling Solutions open.
 </edge_cases>
 
 <visual_design>
@@ -76,16 +90,18 @@ End-to-end flows with tracked state (every step names its visible evidence):
 - Support orb: an orange orb follows path('M 0 0 C 120 80, 240 -40, 480 60 S 820 20, 960 80'), traveling 1561px of offset-distance over 18 seconds linearly.
 - Slideshow: the six-image project slideshow advances every 2200ms; the active slide is opacity 1.0, its neighbors are 0.35, and the change animates with opacity 0.35s ease-in-out. This must advance on its own timer (letting it run advances it), not only on a manual control.
 - Hover feedback (required): buttons lift by 1 to 2px and shift their background from #282828 to orange on hover; the use-case tiles rotate -2deg and scale to 1.02 on hover; nav and footer links shift their underline/opacity on hover; the header wordmark swaps to its hover mark. These hover states must be reachable by hovering the real control.
-- The Solutions menu panel and the mobile menu panel each enter with a short fade-and-settle transition and leave cleanly; opening and closing never snaps content elsewhere on the page.
+- The Solutions menu panel, the mobile menu panel, and the command palette each enter with a short fade-and-settle transition and leave cleanly; opening and closing never snaps content elsewhere on the page.
+- Trial brief feedback: the live preview text updates immediately as fields change; the Copy brief confirmation (Copied) fades in and reverts after about 1.5 seconds; interest chips toggle with a short selected-state transition rather than snapping only.
 - Custom cursor: the 43px cursor follows fine pointers, swaps to its hover image over interactive elements, and uses pointer-events: none.
-- Reduced motion: under prefers-reduced-motion: reduce, all offset-path travel, tilt, and reveal animation stops, every section shows in its final resting state (fully visible and correctly placed), and the system cursor is restored (the custom cursor is disabled).
+- Reduced motion: under prefers-reduced-motion: reduce, all offset-path travel, tilt, and reveal animation stops, every section shows in its final resting state (fully visible and correctly placed), and the system cursor is restored (the custom cursor is disabled); palette and menu enter transitions may shorten or skip while remaining operable.
 </motion>
 
 <responsiveness>
 - Zoom-to-fit is the responsive model: the homepage is a 1024px-wide design artboard that scales down to the viewport instead of cropping. At 1440px the artboard's computed transform is none (scale 1); at 390px the measured transform is matrix(0.380859, 0, 0, 0.380859, 0, 0) (390/1024); the scaled layers stay unclipped so the entire design width is visible at 768px and at 390px, and no unintended horizontal scrollbar appears at any width.
 - On viewports 768px and narrower the desktop navigation and the account "Log in" link are hidden and a compact "Menu" button appears in the header; activating it opens a mobile menu panel listing the navigation and account links.
-- At 768px and below the floating hero media card is hidden, the feature cards stack in one column, the use-case tiles form two columns, and the footer collapses to two columns, with the header and CTA controls remaining usable without horizontal scrolling.
+- At 768px and below the floating hero media card is hidden, the feature cards stack in one column, the use-case tiles form two columns, and the footer collapses to two columns, with the header, CTA, trial brief panel, and command palette remaining usable without horizontal scrolling.
 - At coarse-pointer sizes the system cursor is used (the custom cursor is disabled) and the system pointer is never hidden.
+- The trial brief panel stacks fields above the preview at 768px and below; Download JSON, Copy brief, Import brief, Reset, Undo, and Redo remain visible and tappable without clipping.
 </responsiveness>
 
 <accessibility>
@@ -94,31 +110,37 @@ End-to-end flows with tracked state (every step names its visible evidence):
 - Every interactive item is a real link or button with a visible keyboard focus indicator and a useful accessible name; the slideshow region carries an accessible label.
 - The floating hero art, the path-traveling orb, the marquee decoration, and the custom cursor are marked aria-hidden, and the cursor keeps pointer-events: none.
 - Text meets WCAG AA contrast on the white canvas and on the dark support-band and footer surfaces, including the orange emphasis text.
+- The command palette uses role dialog with aria-modal true, traps focus while open, closes on Escape, and returns focus to the control that opened it; the search input has an accessible name such as Search commands.
+- Trial brief fields use explicit labels for Name, Email, Plan, Team size, and Interests; Reset, Download JSON, Copy brief, Import brief, and Submit trial brief are real buttons with accessible names; validation errors and the Trial brief ready message are announced through a polite live region as well as shown visually; Undo and Redo expose disabled state to assistive technology when their stacks are empty.
 </accessibility>
 
 <performance>
 - The page is interactive within 2 seconds of a local cold load; media regions hold their space from first paint so no visible layout shift occurs as fonts, images, or the media card finish loading.
-- No console errors or warnings appear on load or during a full scroll-through, menu exercise, and slideshow observation; the console stays free of hydration errors, and loading the homepage directly shows no post-hydration content flash.
+- No console errors or warnings appear on load or during a full scroll-through, menu exercise, command-palette exercise, trial-brief edit/export, and slideshow observation; the console stays free of hydration errors, and loading the homepage directly shows no post-hydration content flash.
 - Continuous scrolling from top to bottom holds a smooth frame rate through the marquee rows, tilt accents, orb travel, and reveals.
+- Rapid trial-brief edits, undo/redo, and command-palette open/filter/close never freeze the page or drop pointer/keyboard input.
 - The page issues zero outbound network requests at any point: every font, image, video, style, and script resolves from the local origin.
 </performance>
 
 <writing>
-- All mandated copy strings (the hero headline and subtitle, the four card titles and bodies, the section headings, the support sentence, the tile and marquee labels, the footer link labels, the copyright line, and the support email) render exactly as specified and free of typos; no lorem ipsum, TODO, or template placeholder text appears anywhere on the page.
-- Headings, links, and buttons keep the reference copy's casing and phrasing consistently across sections.
+- All mandated copy strings (the hero headline and subtitle, the four card titles and bodies, the section headings, the support sentence, the tile and marquee labels, the footer link labels, the copyright line, the support email, and the trial brief panel heading Build your Canvasly trial brief) render exactly as specified and free of typos; no lorem ipsum, TODO, or template placeholder text appears anywhere on the page.
+- Headings, links, and buttons keep the reference copy's casing and phrasing consistently across sections; trial brief action labels stay specific (Download JSON, Copy brief, Import brief, Submit trial brief, Load sample brief, Reset, Undo, Redo) rather than generic Submit/OK alone.
+- Trial brief validation messages name the field and the fix (for example Email must be a valid address, Name must be at least 2 characters, Team size must be 1 for Free trial, Interests required for Pro); the success line reads Trial brief ready — download or copy your JSON above.
 - The placeholder wordmark, hover mark, cursor art, and placeholder thumbnails and clip use invented identities and do not reference real third-party brands, sites, or agencies.
 </writing>
 
 <requirements>
 - Copyright and rights-clearance prohibition: apart from required npm dependency code and explicitly specified open-license fonts or generic utility icons used under their licenses, every creative asset and every piece of visible editorial copy must be newly authored or generated specifically for this fictional build. Do not use scraped, stock, press, social-media, portfolio, source-site, screenshot-derived, copyrighted, trademarked, or otherwise third-party-controlled creative material, and do not make a trace, near-copy, style-identical imitation, or recognizable derivative of it. This applies to raster pixels, individual video frames and audio, SVG paths, canvas/WebGL/Rive artboards and textures, 3D geometry/materials/HDR environments, PDFs, icon/mark silhouettes, metadata, filenames, alt text, and hidden/preloaded assets. If provenance is uncertain, create a fresh fictional replacement.
-- Stack mandate: build the homepage with Astro 7, Tailwind CSS 4.3.2 through @tailwindcss/vite with the page's three-tier design tokens declared in @theme (primitive colors, semantic type/spacing, component radii/shadows/easings), and React 19 islands for the interactive chrome (header menus, mobile menu, slideshow, scroll reveals, custom cursor); shared island state (menu open state, slideshow index, reveal state, artboard scale) lives in Nanostores as one store, and every view of that state derives from it. Radix UI primitives inside the React islands implement the Solutions menu and the mobile menu panel. GSAP and Motion are allowed for intro timeline orchestration and scroll-linked reveals, alongside CSS keyframes, transitions, and offset-path/offset-distance; scrolling itself stays native document scroll (no scroll-jacking library required). No other animation libraries. Icons and cursor art are bundled original SVGs (or the Iconify Tailwind plugin); no icon font or icon CDN. All libraries are installed via npm and bundled locally; no CDN imports.
+- Stack mandate: build the homepage with Astro 7, Tailwind CSS 4.3.2 through @tailwindcss/vite with the page's three-tier design tokens declared in @theme (primitive colors, semantic type/spacing, component radii/shadows/easings), and React 19 islands for the interactive chrome (header menus, mobile menu, slideshow, scroll reveals, custom cursor, command palette, and trial brief builder); shared island state (menu open state, slideshow index, reveal state, artboard scale, command palette open/query, trial brief fields, live export preview text, undo/redo stacks) lives in Nanostores as one store, and every view of that state derives from it. Radix UI primitives inside the React islands implement the Solutions menu, the mobile menu panel, and the command palette dialog. GSAP and Motion are allowed for intro timeline orchestration and scroll-linked reveals, alongside CSS keyframes, transitions, and offset-path/offset-distance; scrolling itself stays native document scroll (no scroll-jacking library required). No other animation libraries. Icons and cursor art are bundled original SVGs (or the Iconify Tailwind plugin); no icon font or icon CDN. All libraries are installed via npm and bundled locally; no CDN imports.
 - Delivery mode: build as a static Astro site whose interactivity lives entirely in client state after load; loading the homepage URL directly renders the same complete page as any in-page navigation, with no hydration errors in the console.
 - Homepage-only scope: only route "/" is implemented. Do not build Pricing, Examples, Templates, Learn, Join, Login, About, or catalog pages. Header, footer, CTA, tile, and menu chrome must keep the user on the homepage (same-page hashes to section ids are preferred) and must never navigate to a missing page.
 - Scratch-build and asset-originality rule: author or generate every wordmark, project thumbnail, illustration, cursor, photograph, video/poster, social image, and decorative file as a new Canvasly replacement inside /app. Match the reference's dimensions, aspect ratios, placements, density, and layer counts, but do not copy, derive, trace, recolor, rename, transcode, or redistribute a source-site, screenshot, or external reference-bundle file. Missing a surface is not an acceptable debranding strategy. Self-host a bundled open-license grotesque display face of similar width and weight character plus Inter from local font files; no licensed source font may ship.
 - Fully offline is a hard requirement: load the display face and Inter from local font files, and resolve all imagery, cursor art, video, poster, CSS, and scripts from same-origin paths. Analytics, consent, maps, telemetry, and account integrations must be absent or inert. The page must issue zero remote font, image, video, script, analytics, consent, or telemetry requests and must render completely with external networking unavailable.
 - Responsive zoom-to-fit contract: treat the homepage as a 1024px design (the page artboard computes width 1024px, transform-origin 0 0) that zooms down to the viewport rather than cropping at the desktop width. Compute scale = min(1, viewportWidth / 1024) and apply it as a top-left-origin transform, and set the scroll-wrapper height to the scaled document height (offsetHeight multiplied by scale; the design figure is 3690px at scale 1). The artboard and scroll-wrapper layers must remain unclipped while scaled; never leave a horizontally cut-off 1024px canvas, and keep the page free of an unintended horizontal scrollbar at every width.
-- Behavioral state contracts (in-memory client state only): the Solutions menu and mobile menu track their open state; the slideshow tracks its active index on a timer and wraps past the last frame; scroll-reveal state initializes unrevealed on every fresh load; the artboard scale derives from the viewport width; none of these state changes reloads the document, and a reload returns the page to its initial state.
-- Do not use localStorage, sessionStorage, or any other browser storage API.
+- Behavioral state contracts (in-memory client state only): the Solutions menu and mobile menu track their open state; the slideshow tracks its active index on a timer and wraps past the last frame; scroll-reveal state initializes unrevealed on every fresh load; the artboard scale derives from the viewport width; the trial brief draft, live preview, undo/redo stacks, and command palette open state live in the same in-memory store; none of these state changes reloads the document, and a reload returns the page to its initial state (empty brief baseline, menus closed, slideshow on first frame, reveals unrevealed, palette closed).
+- Do not use localStorage, sessionStorage, or any other browser storage API. Session brief work survives through Download JSON / Copy brief / Import and through the WebMCP artifact and form surfaces.
+- Forms and field contracts: the trial brief form and Import surface are driven by a form library with a schema validator (Zod) that mirrors the API-shaped trial-signup request-body field contract above; the schema defines the rules, the form surfaces inline named field errors before submit, a successful submit record IS the would-be request body, and Download/Copy/Import validate through the same schema.
+- End-state contract: Download JSON and Copy brief MUST emit the session's actual trial brief under the trial-signup request-body field contract — when the draft is valid that text MUST be a schema-conforming trial-signup request body; an export that omits session work or that a valid draft fails to match the field contract is invalid; Import of a previously exported conforming brief MUST restore the same visible form and preview (round-trip); Import MUST reject non-conforming JSON without mutating the current brief; Reset MUST return the form and preview to the empty baseline without a reload.
 - SEO and metadata: set the document language, the title "Canvasly – the design tool for outstanding websites", the description "Design, prototype, collaborate, publish.", matching social title/description, a large local social image made for Canvasly, a summary_large_image card, and a favicon; decorative media must not create duplicate announcements.
 </requirements>
 
@@ -137,6 +159,8 @@ Contract version: zto-webmcp-v1
 Modules:
 - browse-query-v1
 - command-session-v1
+- form-workflow-v1
+- artifact-transfer-v1
 
 Module specs:
 <module_spec id="browse-query-v1">
@@ -179,10 +203,56 @@ Module specs:
 }
 </module_spec>
 
+<module_spec id="form-workflow-v1">
+{
+  "id": "form-workflow-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Form workflow",
+  "purpose": "Forms, setup flows, authentication shells, and multi-step workflows.",
+  "permitted_operations": ["validate", "submit", "cancel", "reset", "advance", "return"],
+  "binding_keys": {
+    "required_any_of": [["form_fields"], ["form_operations"]],
+    "optional": ["workflow_steps", "value_bounds", "visible_postconditions"]
+  },
+  "restrictions": [
+    "Declared fields only.",
+    "Normal validation and visible errors remain active.",
+    "Cannot manufacture authentication or bypass guarded routes.",
+    "Backend-free apps must surface honest unavailable state through product handlers."
+  ],
+  "tool_name_prefix": "form"
+}
+</module_spec>
+
+<module_spec id="artifact-transfer-v1">
+{
+  "id": "artifact-transfer-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Artifact transfer",
+  "purpose": "Import, export, copy, print, and conversion workflows.",
+  "permitted_operations": ["import", "export", "copy", "print_preview", "convert"],
+  "binding_keys": {
+    "required_any_of": [["artifact_operations"]],
+    "optional": ["import_modes", "export_formats", "conversion_modes", "visible_postconditions"]
+  },
+  "restrictions": [
+    "No raw files, filesystem paths, blobs, base64, or artifact contents in WebMCP arguments or results.",
+    "File picker interaction, clipboard contents, and downloaded artifacts remain Playwright responsibilities."
+  ],
+  "tool_name_prefix": "artifact"
+}
+</module_spec>
+
 Bindings:
-- Destinations: hero; workflow; teams; support; closing
+- Destinations: hero; workflow; teams; support; closing; trial-brief
 - Session operations: advance
 - Demos: solutions-menu
+- Form fields: name; email; plan; team_size; interests
+- Form operations: validate; submit; reset
+- Value bounds: {"plan":["Free trial","Pro","Team"],"team_size":["1","2-10","11-50","51+"],"interests":["Portfolios","Presentations","Editorials","Companies","Freelancers","Students"]}
+- Artifact operations: export; copy; import
+- Export formats: json
+- Import modes: replace
 
 Mechanics exclusions:
 - Offset-path gallery marquees stay Playwright-observed
@@ -191,6 +261,8 @@ Mechanics exclusions:
 - Slideshow 2200ms timing stays Playwright-observed
 - Reveal-on-scroll (feature cards) stays Playwright-observed
 - Custom cursor follow / hover-swap stays Playwright-observed
+- Command-palette open/close and fuzzy filter stay Playwright-observed
+- File-picker Import stays Playwright-only per artifact-transfer no-raw-file-contents restriction; webmcp only drives Load sample brief and its confirm dialog
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

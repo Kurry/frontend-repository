@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -138,6 +138,28 @@ description = "An animation traps input, obscures terminal controls after comple
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "4.12"
+name = "palette_and_export_motion"
+description = "Via the real UI path, the command palette opens/closes with a brief opacity or scale transition, and Export Copy shows a short confirmation transition before resetting."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "archive_board_row_exit"
+description = "Archiving a selected project through the visible bulk or per-project control animates its card/row out of the Projects Board rather than snapping it away with no transition."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n2"
+name = "palette_or_export_snaps"
+description = "The command palette or export confirmation snaps with no perceptible transition when opened or confirmed via the real UI path."
+type = "binary"
+negate = true
+weight = 1.0
 
 [[criterion]]
 id = "4.catchall"

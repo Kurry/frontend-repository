@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -165,9 +165,38 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "4.15"
+name = "session_json_import_schema_validated"
+description = "Importing malformed session JSON or a document whose schemaVersion is not feltrun-session-v1 shows an inline error naming the import field, leaves stacks and stats unchanged, and does not clear hand history"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "mid_hand_persists_across_reload"
+description = "After saving an in-progress post-flop hand and performing a full page reload, the table restores the same board, pot, stacks, street, side to act, blind level, stats, hand history, badges, and difficulty"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.17"
+name = "export_compiled_live_from_store"
+description = "Completing a hand updates the Export panel preview without a full page reload so handHistory and session stats match the visible panels"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n_import_accepts_invalid"
+name = "import_accepts_invalid_schema"
+description = "Importing a document with the wrong schemaVersion or missing required keys silently mutates the table or clears history instead of showing an inline import-field error and leaving state unchanged"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "4.catchall"
 name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect (console, network, storage, state coherence, stability, or accessibility) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, or page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable technical defect (console, network, storage, state coherence, stability, export/import schema, or accessibility) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, or page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

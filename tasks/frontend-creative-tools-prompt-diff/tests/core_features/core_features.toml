@@ -1,0 +1,318 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "prompt_picker_search_filters"
+description = "Typing in the prompt search input filters the prompt list incrementally to matching entries, selecting a prompt loads its full version history into both pickers, and clearing the field restores the full prompt list exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "seeded_version_chains"
+description = "At least 4 seeded prompts each carry 4 to 6 versions, and every version shows its version number, a fictional author, a timestamp, and a change note in the picker options and the history list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "pickers_rerender_without_reload"
+description = "The header holds base (left) and compare (right) version pickers listing all versions by number and relative timestamp, and switching either picker immediately re-renders the diff panel without a full page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "split_pane_aligned_lines"
+description = "The split view shows the base version left and compare version right with numbered lines aligned so corresponding lines sit at the same height in both panes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "line_diff_coloring_gutter"
+description = "Added lines carry a green success-background treatment and removed lines a red error-background treatment, unchanged lines are unstyled, and each changed line's gutter shows a plus or minus symbol in the matching color"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "word_level_highlighting_exact"
+description = "Within changed lines, word-level highlighting marks exactly the differing words with a visibly stronger shade than the line background, leaving unchanged words inside changed lines unmarked"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "unified_toggle_context_lines"
+description = "The unified-diff toggle collapses the split into a single column showing only changed blocks with three lines of unchanged context above and below each change, and toggling back restores the split view at the same scroll region"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "summary_counters_recompute"
+description = "The change summary strip shows lines added, lines removed, and a positive-or-negative net token delta between the two selected versions, and the counters recompute whenever either picker changes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "counter_click_scrolls_to_change"
+description = "Clicking a summary counter scrolls the diff panel to the first change of that type and pulses the target block's background before settling"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "three_way_conflict_highlighting"
+description = "Compare Branches presents the base and two branch versions in three labeled panes, rendering regions changed by only one branch in that branch's accent and regions changed differently by both branches as numbered conflict regions with a distinct conflict treatment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "merge_region_choices"
+description = "The merge flow offers Choose left, Choose right, and Edit manually (a prefilled inline text area) per conflict region, shows resolved-out-of-total progress, and keeps Complete merge disabled until every region is resolved"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "bulk_resolution_controls"
+description = "Bulk controls resolve all remaining regions to the left or right side in one action, and each affected region's chip updates to show its resolution"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "merge_result_reflects_choices"
+description = "Completing a merge creates a new head version whose text reflects exactly the per-region choices made — each region matching the chosen side or the manually edited text — with a change note naming the two merged branches and a success toast"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "blame_attribution_gutter"
+description = "The Blame tab renders the selected version's text with a per-line gutter showing the version number and author that last changed each line, and hovering an attribution with the real pointer shows that version's change note and timestamp"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "blame_click_selects_version"
+description = "Clicking a blame attribution selects that version into the compare picker so the diff shows the change that introduced the line"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "version_graph_topology"
+description = "The Graph tab renders the version topology as connected nodes — the main chain in a column, branch nodes offset, and merge nodes joined to two parents with visible edges — each node showing its version number and author initials"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "graph_node_click_and_marking"
+description = "Clicking a graph node loads that version into the base picker and highlights the node, and the currently compared pair is visually marked on the graph"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "graph_gains_merge_node"
+description = "After completing a merge, the graph gains a new merge node connected to both parent branches without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "restore_creates_new_head"
+description = "Restore to Base and Restore to Compare open a confirmation naming the version; confirming creates a new head version whose text equals the restored version with a change note naming the restore source and shows a success toast"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "history_never_rewritten"
+description = "Restoring and merging never rewrite or delete existing versions: the history list and graph keep every prior version and gain exactly one new head entry per operation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "annotation_composer_markdown"
+description = "Selecting a line range offers an Annotate control opening a thread composer anchored to that range, supporting markdown with code highlighting and checklists rendered in a live preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "annotation_threads_replies_resolve"
+description = "Posting an annotation shows a marker on the annotated lines; clicking it opens the thread with the formatted note, author, and timestamp, supports replies, and a resolved toggle collapses the thread with a resolved treatment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "annotation_anchors_survive_mode_switch"
+description = "Annotation threads keep their line anchors when switching between split and unified modes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "global_search_across_versions"
+description = "The global search input searches the text of every version of every prompt, lists results with prompt, version number, and a highlighted snippet, and clicking a result loads that prompt and version into the base picker"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "undo_redo_version_operations"
+description = "Undo and Redo revert and reapply posted annotations, merge resolution choices, restores, and completed merges — undoing a merge or restore removes the created head version from the history and graph, redo re-adds it identically, and the controls disable when there is nothing to undo or redo"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "history_report_live_derived"
+description = "Export offers a version history report with the chain's numbers, authors, timestamps, and change notes, the current counters, and any completed merge with its per-region resolutions, and the preview updates when a new version is created before exporting"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "multi_select_serialized_package"
+description = "Multi-selecting two or more versions in the history list exports a single serialized package containing exactly the selected versions' full texts and metadata"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "merged_text_export_identical"
+description = "After a merge, the export offers the merged prompt text and the exported text is identical to the merge result shown in the app"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "self_compare_and_alignment_edges"
+description = "Comparing a version with itself shows an explicit no-differences state with zero counters, and comparing the shortest and longest versions keeps line numbering aligned with filler alignment in the shorter pane"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "duplicate_action_and_thread_guards"
+description = "Double-activating Complete merge or a Restore confirmation creates exactly one new version, and annotating a range that already carries a thread adds to the existing thread rather than stacking a second marker"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "search_and_note_edge_handling"
+description = "The version search matches case-insensitively, an empty query shows no result list, a no-match search shows an empty state naming the query, and a change note longer than 80 characters truncates with an ellipsis in the picker option while showing in full in the history list"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.n1"
+name = "merge_ignores_region_choice"
+description = "The completed merge version's text contradicts a per-region choice the user made — a region shows the unchosen side's content or drops a manual edit"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n2"
+name = "word_highlight_misses_changes"
+description = "The diff's word-level highlighting misses a changed word, marks an unchanged word as changed, or a changed line renders with no highlighting at all"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n3"
+name = "history_rewritten_or_lost"
+description = "A restore, merge, or undo operation deletes or rewrites a pre-existing version in the history list or graph rather than only adding or removing the operation's own head version"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n4"
+name = "counters_disagree_with_diff"
+description = "The change summary counters disagree with the visible diff — the added or removed counts do not match the highlighted lines, or the counters fail to change when the pickers select a different pair"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

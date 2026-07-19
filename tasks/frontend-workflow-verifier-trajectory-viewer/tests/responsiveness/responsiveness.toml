@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -60,80 +60,81 @@ allowed_tools = [
 [scoring]
 aggregation = "weighted_mean"
 
+
 [[criterion]]
 id = "7.1"
 name = "layout_adapts_desktop_to_mobile"
-description = "Layout adapts gracefully from 1440px desktop to 375px mobile."
+description = "At 1440px the trajectories can show side by side; at 1024px and below the workspace collapses to one pane with the pane switcher visible; at 375px the layout remains usable"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
 name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+description = "Adjudicate, Export, Import, flips filter, and pane switcher controls remain usable tap targets on a 375px viewport"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
 name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+description = "Page titles, section headings, and verdict table text remain readable from 1440px to 375px"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
 name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+description = "At 375px, no content clips or overflows the viewport and no page-level horizontal scrolling appears; verdict table, code blocks, terminal, and export drawer scroll within their containers"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
 name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+description = "Pane switcher, bulk bar, and export/import surfaces adapt for smaller screens without disappearing off-canvas permanently"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.6"
 name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+description = "When panes collapse below 1024px, agent/judge switching and the verdict table reflow logically without covering each other"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.7"
-name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+name = "selections_persist_across_pane_switch"
+description = "At narrow widths, criterion selection and active steps persist when switching between agent and scorer panes"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.8"
 name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+description = "At 375px width the page has no horizontal scrolling"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.9"
-name = "media_and_canvases_resize"
-description = "Images, grids, and canvases size responsively to fit the layout."
+name = "export_drawer_usable_narrow"
+description = "The export drawer including format tabs, Copy, and Download stays fully visible and operable at 375px"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.10"
 name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
+description = "Pane switcher, Undo/Redo, and Export controls remain accessible at desktop and mobile widths"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.n1"
 name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+description = "Layout breaks or overflows at 1440px, 1024px, or 375px"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +142,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n2"
 name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+description = "Export, Adjudicate, or pane switcher controls are too small or misaligned on mobile"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +150,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n3"
 name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+description = "Verdict table or export preview text is too small to read at 375px"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,15 +158,15 @@ weight = 1.0
 [[criterion]]
 id = "7.n4"
 name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+description = "Verdict table, trajectories, or export drawer are cropped or force page-level horizontal scrollbars at 375px"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n5"
-name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
+name = "pane_switcher_missing_narrow"
+description = "The pane switcher is missing or unusable at widths of 1024px and below"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +174,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n6"
 name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
+description = "Fixed chrome obscures the verdict table or export controls at some viewport size"
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,23 +182,23 @@ weight = 1.0
 [[criterion]]
 id = "7.n7"
 name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
+description = "Trajectory panes, verdict table, or export drawer overlap illegibly at some viewport size"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n8"
-name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
+name = "export_unusable_on_mobile"
+description = "Export or import controls are unavailable on mobile where the spec requires them"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n9"
-name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
+name = "code_blocks_overflow_page"
+description = "Code blocks or terminal output use a static width and overflow the viewport at 375px"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +206,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n10"
 name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
+description = "Undo, Redo, Export, or flips filter controls disappear at specific sizes"
 type = "binary"
 negate = true
 weight = 1.0

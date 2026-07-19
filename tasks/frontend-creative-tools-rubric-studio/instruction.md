@@ -205,16 +205,20 @@ Bindings:
 - Editor modes: criteria; tune; preview
 - Value bounds: weight 0.5-5; likert min < max; version must satisfy pending patch/minor/major bump; judge-model in {quartz-arbiter-2, sable-jury-9, cinder-panel-1}; aggregation-mode in {weighted-mean, required-pass, all-pass}
 - Browsable entity: rubrics
-- Destinations: response-quality; code-review-depth; safety-screening; summarization-fidelity; version-history; diff-view; tune-view; preview-panel; export
-- Artifact operations: export; copy
-- Export formats: structured-text
+- Destinations: response-quality; code-review-depth; safety-screening; summarization-fidelity; version-history; diff-view; tune-view; preview-panel; export; export-center
+- Artifact operations: export; import; copy
+- Export formats: structured-text; rubric-json; package-json
+- Import modes: package-json
 - Workflow completion: rail version badge and history entry update after a version-gated save
 - Workflow completion: header rollup (criteria count, load-bearing count, weight sum) recomputes after add/delete
+- Workflow completion: export package-json and rubric-json previews reflect session mutations after add or version-gated save
 
 Mechanics exclusions:
 - Accordion / Grading-notes height transition and chevron rotation timing stay Playwright-observed
 - Tune bar width-easing and aggregate count-up animations stay Playwright-observed
 - Row animate-in/animate-out on add/delete stays Playwright-observed
+- Undo/Redo keyboard shortcuts and undo-history strip stay Playwright-observed
+- Native download and file-picker import stay Playwright-observed; WebMCP must not return raw file/blob/base64 contents
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

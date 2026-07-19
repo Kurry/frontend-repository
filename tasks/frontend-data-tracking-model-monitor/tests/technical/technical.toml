@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -70,21 +70,21 @@ weight = 1.0
 [[criterion]]
 id = "4.2"
 name = "console_clean_full_exercise"
-description = "No console errors, warnings, or unhandled promise rejections appear on load or during a full exercise of the app, including a running simulation and repeated refreshes"
+description = "No console errors, warnings, or unhandled promise rejections appear on load or during a full exercise of the app, including a running simulation, export regeneration, and import"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
 name = "state_coherence_across_surfaces"
-description = "A single simulated usage event updates the event feed, the affected model's sidebar row, the session totals, and the pie chart in the same interaction; no surface shows a stale value another surface already updated"
+description = "A single simulated or manually logged usage event updates the event feed, the affected model's sidebar row, the session totals, the pie chart, and the remaining-budget readout in the same interaction; no surface shows a stale value another surface already updated"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
 name = "reload_restores_seeded_baseline"
-description = "After exercising the app (simulation events, a refresh, filters, alert changes), a page reload returns it to the seeded baseline: the seeded catalog and session usage, alerts off, and the simulation paused"
+description = "After exercising the app (simulation events, a refresh, filters, alert changes, budget edit, pin toggle, manual log), a page reload returns it to the seeded baseline: the seeded catalog and session usage, alerts off, default session budget, simulation paused, and empty undo/redo stacks"
 type = "binary"
 weight = 1.0
 
@@ -98,7 +98,7 @@ weight = 1.0
 [[criterion]]
 id = "4.6"
 name = "responsive_under_rapid_input"
-description = "Rapid repeated filtering, chip clicks, and selection changes while the simulation is running cause no hangs, dropped interactions, or desynced counts"
+description = "Rapid repeated filtering, chip clicks, selection changes, and export reopen while the simulation is running cause no hangs, dropped interactions, or desynced counts"
 type = "binary"
 weight = 1.0
 
@@ -121,10 +121,17 @@ negate = true
 [[criterion]]
 id = "4.9"
 name = "runtime_exceptions_on_interaction"
-description = "Specific interactions (refresh, compare, legend toggle, disclosure, simulation controls) throw runtime exceptions visible in the console, even if the UI appears to continue"
+description = "Specific interactions (refresh, compare, legend toggle, disclosure, simulation controls, log usage, export, import) throw runtime exceptions visible in the console, even if the UI appears to continue"
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "4.10"
+name = "export_import_schemas_coherent"
+description = "Exported Session JSON field names and enums (pricing_tier free|paid, usage event keys, alert_config, session_budget_usd) match the same contracts the Log usage and alert forms enforce, so a valid export can round-trip through Import"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "4.catchall"
@@ -133,3 +140,4 @@ description = "The app exhibits a significant, browser-observable technical defe
 type = "binary"
 weight = 1.0
 negate = true
+

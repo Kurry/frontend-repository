@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,150 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "7.1"
-name = "layout_adapts_desktop_to_mobile"
-description = "Layout adapts gracefully from 1440px desktop to 375px mobile."
+name = "three_regions_visible_at_1440"
+description = "At 1440px wide, the fixed left nav rail, central multi-day board, and fixed right calendar rail are all visible at once"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
-name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+name = "board_scrolls_inside_region"
+description = "The board scrolls horizontally inside its own region; the page body never scrolls horizontally at desktop widths"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
-name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+name = "narrow_desktop_board_shrinks"
+description = "At narrower desktop widths around 1024px, the central board region shrinks while remaining horizontally scrollable and the nav and calendar rails never overlap board content"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
-name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+name = "no_clipping_at_desktop_widths"
+description = "At 1440 and 1024, no board column headers, task cards, or calendar hour labels clip outside the viewport"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
-name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+name = "export_canvas_usable_at_1440_and_1024"
+description = "The export canvas and bulk tray remain fully usable at 1440 and at 1024 without clipping their primary Download, Copy, or bulk action controls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.6"
-name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+name = "rails_stay_readable_when_board_shrinks"
+description = "When the board region shrinks, the left nav labels and right calendar panel stay readable and operable"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.7"
-name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+name = "day_columns_keep_equal_structure"
+description = "Across supported desktop widths, day columns keep header, task area, Add task, and footer structure without collapsing into an unusable single strip"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "7.8"
-name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+name = "utility_strip_stays_accessible"
+description = "The right utility strip buttons remain visible and clickable at 1440 and 1024"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "7.9"
-name = "media_and_canvases_resize"
-description = "Images, grids, and canvases size responsively to fit the layout."
+name = "filter_popover_fits_viewport"
+description = "Opening Filter at 1024 keeps channel chips and the search field inside the viewport without horizontal page scroll"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "7.10"
-name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
+name = "header_controls_remain_reachable"
+description = "Today, Filter, Board, Export, Undo, and Redo remain reachable at supported desktop widths"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.n1"
-name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+name = "layout_breaks_at_desktop_breakpoints"
+description = "At 1440 or 1024 the three-region layout breaks, overflows, or stacks incorrectly for this desktop planner"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n2"
-name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+name = "rails_overlap_board_content"
+description = "The nav rail or calendar rail overlaps board content at a supported desktop width"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n3"
-name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+name = "body_horizontal_scroll_at_desktop"
+description = "The page body scrolls horizontally at 1440 or 1024"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n4"
-name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+name = "export_controls_clipped"
+description = "Export Download or Copy controls are cropped or unreachable at 1440 or 1024"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n5"
-name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
+name = "sidebar_missing_at_width"
+description = "The left nav rail or right calendar rail is missing or unusable at a supported desktop width"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n6"
-name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
+name = "fixed_rails_obscure_tasks"
+description = "Fixed nav or calendar positioning obscures task cards or Add task controls"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n7"
-name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
+name = "columns_overlap_each_other"
+description = "Day columns overlap each other or the calendar rail at some desktop viewport size"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n8"
-name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
+name = "bulk_tray_unusable_at_1024"
+description = "The bulk tray actions are not usable at 1024px width"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n9"
-name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
+name = "calendar_hour_grid_overflows"
+description = "The calendar hour ruler or day panel overflows and cannot be used at a supported width"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n10"
-name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
+name = "header_controls_disappear"
+description = "Export, Undo, Redo, or Filter disappear at a supported desktop width"
 type = "binary"
 negate = true
 weight = 1.0

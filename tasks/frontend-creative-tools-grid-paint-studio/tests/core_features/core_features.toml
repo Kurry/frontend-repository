@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,21 +63,21 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "paint_stage_first_load"
-description = "On first load the app opens directly to Paint mode with the <GRID PAINT STUDIO> title, angle-bracketed typewriter tagline, floating dark toolbar, large centered canvas, QR Brush active, black active swatch, and no login or splash screen"
+description = "On first load the app opens directly to Paint mode with the <GRID PAINT STUDIO> title, angle-bracketed typewriter tagline, floating dark toolbar, large centered canvas, QR Brush active, black active swatch, Mirror Off, Vision Off, and no login or splash screen"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
 name = "seeded_gallery_boards"
-description = "Opening Gallery on first load shows at least four seeded saved boards, each with a name, cell-snapshot thumbnail, and tag"
+description = "Opening Gallery on first load shows at least four seeded saved boards, each with a name, cell-snapshot thumbnail, and a closed-enum tag from pattern, portrait, abstract, logo, study, or signal"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
 name = "save_board_create"
-description = "After painting a recognizable pattern and saving it as 'Harbor Signal', the gallery count increases by exactly one and a 'Harbor Signal' entry shows a matching cell-snapshot thumbnail and tag"
+description = "After painting a recognizable pattern and saving it as 'Harbor Signal' with a valid closed-enum tag, the gallery count increases by exactly one and a 'Harbor Signal' entry shows a matching cell-snapshot thumbnail and that tag"
 type = "binary"
 weight = 1.0
 
@@ -132,8 +132,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "paint_gallery_mode_switch"
-description = "After switching between Paint and Gallery modes, the main canvas shows the other mode without full page navigation"
+name = "paint_gallery_export_mode_switch"
+description = "After switching among Paint, Gallery, and Export center modes, the main surface shows the chosen mode without full page navigation"
 type = "binary"
 weight = 1.0
 
@@ -161,7 +161,7 @@ weight = 1.0
 [[criterion]]
 id = "1.15"
 name = "toolbar_tool_and_grid_controls"
-description = "QR Brush, Color Brush, and Eraser each become the sole active tool when clicked, and clicking the grid button alternates its label between Grid On and Grid Off while the hairline cell overlay visibly shows and hides"
+description = "QR Brush, Color Brush, Flood Fill, and Eraser each become the sole active tool when clicked, and clicking the grid button alternates its label between Grid On and Grid Off while the hairline cell overlay visibly shows and hides"
 type = "binary"
 weight = 1.0
 
@@ -183,7 +183,7 @@ negate = true
 [[criterion]]
 id = "1.18"
 name = "tool_writes_wrong_cell_type"
-description = "A real Color Brush stroke writes QR glyph masks, an Eraser stroke leaves painted content, or a QR Brush stroke writes only a solid whole-cell fill, showing that the active tool does not determine the cell result"
+description = "A real Color Brush stroke writes QR glyph masks, an Eraser stroke leaves painted content, or a QR Brush stroke writes only a flat whole-cell fill, showing that the active tool fails to determine the cell result"
 type = "binary"
 weight = 1.0
 negate = true
@@ -191,7 +191,7 @@ negate = true
 [[criterion]]
 id = "1.20"
 name = "exact_seven_color_palette"
-description = "Exactly seven square palette swatches (black, white, red, yellow, green, blue, pink) select the active color, the active swatch is visibly ringed, and the choice tints both solid fills and QR cells"
+description = "Exactly seven square palette swatches (black, white, red, yellow, green, blue, pink) select the active color, the active swatch is visibly ringed, and the choice tints both Color Brush fills and QR cells"
 type = "binary"
 weight = 1.0
 
@@ -213,14 +213,14 @@ negate = true
 [[criterion]]
 id = "1.23"
 name = "keyboard_shortcut_parity"
-description = "Keyboard shortcuts drive the tools: Q/B/E switch to QR/Color/Eraser, G toggles the grid overlay, Backspace undoes, and number keys 1-7 pick the matching palette swatch"
+description = "Keyboard shortcuts drive the tools: Q/B/F/E switch to QR/Color/Flood Fill/Eraser, G toggles the grid overlay, M cycles Mirror, Backspace undoes, Ctrl/Cmd+Z undoes, Ctrl/Cmd+Shift+Z redoes, and number keys 1-7 pick the matching palette swatch"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.24"
 name = "download_branded_png"
-description = "Download produces grid_paint.png from the current board with no hairline grid overlay and with a black footer strip captioned '/MADE WITH GRID PAINT STUDIO' on the left and '<GRIDPAINT.STUDIO>' on the right"
+description = "Download PNG produces grid_paint.png from the current board with no hairline grid overlay and with a black footer strip captioned '/MADE WITH GRID PAINT STUDIO' on the left and '<GRIDPAINT.STUDIO>' on the right"
 type = "binary"
 weight = 1.0
 
@@ -297,7 +297,7 @@ weight = 1.0
 [[criterion]]
 id = "1.35"
 name = "undo_noop_without_history"
-description = "Pressing Undo (or Backspace) on a fresh blank board with no strokes recorded changes nothing on the canvas or toolbar and produces no visible error"
+description = "On a fresh blank board with no strokes recorded, Undo and Redo controls are disabled; activating them changes nothing on the canvas or toolbar and produces no visible error"
 type = "binary"
 weight = 1.0
 
@@ -316,9 +316,140 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "1.38"
+name = "flood_fill_contiguous_region"
+description = "With Flood Fill active, clicking a cell replaces every contiguous cell matching that cell's current value with a flat whole-cell fill of the active swatch in one update, and Undo restores the entire filled region"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "mirror_horizontal_paints_pair"
+description = "With Mirror set to Horizontal, a real Color Brush stroke that paints one cell also paints its horizontal mirror in the same step, and one Undo clears both cells together"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "redo_restores_undone_stroke"
+description = "After painting one stroke and undoing it, Redo (or Ctrl/Cmd+Shift+Z) restores that stroke; painting a new stroke after an undo clears the redo stack and disables Redo"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "live_histogram_tracks_cells"
+description = "The live color histogram shows bars for the seven palette colors plus blank; after painting red cells then erasing some, the red and blank bars change heights to match the board without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "vision_preview_does_not_mutate"
+description = "Cycling Vision preview to Protanopia, Deuteranopia, or Tritanopia visibly filters the paint stage; toggling Vision Off restores the original swatch appearance of every painted cell without rewriting stored colors"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "snap_version_and_compare"
+description = "Snap version with a valid name adds a Versions list entry with a thumbnail; selecting that version and the live board and activating Compare shows a labeled before/after split; exiting Compare restores the live editable board unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "export_center_live_project_json"
+description = "After painting a recognizable pattern and saving a named board with a closed-enum tag, Export center Project JSON contains that cell pattern and the new board name under ProjectDocument field names, and the CSS palette block lists custom properties for all seven swatches"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "export_copy_and_download_project"
+description = "Copy on the Project JSON artifact shows a visible confirmation, and Download Project produces a .json file of the current Project JSON text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "import_project_round_trip"
+description = "Importing a previously exported Project JSON reconstructs the board cells, cell size lock when non-blank, gallery boards, and versions from that payload so the canvas and gallery match the export"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "bulk_gallery_favorite_and_delete"
+description = "Selecting three gallery boards and choosing Favorite selected marks all three; Delete selected after a confirmation naming the count removes exactly those three and decreases the gallery count by three"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "command_palette_loads_board"
+description = "Pressing Ctrl+K or Cmd+K opens the command palette; typing part of a seeded board name and pressing Enter on that result loads the board onto the canvas in Paint mode"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "project_document_field_contract"
+description = "With painted cells and at least one saved board, Export center Project JSON visible text includes required ProjectDocument keys cellSize, tool (qr|color|fill|erase), swatch (one of the seven palette hexes), mirror (off|horizontal|vertical|both), vision (off|protanopia|deuteranopia|tritanopia), gridVisible, cells, boards, and versions; boards entries show SavedBoard keys name, tag, favorite, cellSize, and cells; cells dimensions match floor(1024 / cellSize)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "saved_board_field_contract_on_create"
+description = "Save board create submits a SavedBoard request-body payload: unique trimmed name (max 40) and a tag from pattern|portrait|abstract|logo|study|signal; after a valid save, the new gallery card and the Project JSON boards entry both show that name and tag under the same field names, with favorite false until toggled"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "import_rejects_invalid_project_document"
+description = "Import Project with JSON missing a required ProjectDocument key, using tool/swatch/mirror/vision outside their closed enums, cells dimensions that disagree with cellSize, a QR cell missing kind or color, or a boards/versions entry that violates SavedBoard / VersionSnapshot rules (invalid tag, overlong name, non-boolean favorite, or cells/cellSize mismatch) shows a visible error naming the offending field and leaves board and gallery unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n2"
+name = "export_omits_session_mutations"
+description = "After painting cells and saving a board, Export center Project JSON omits the painted pattern or the new board name, leaving an export that ignores the session's actual work"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n3"
+name = "import_ignores_payload"
+description = "Import Project with a valid exported Project JSON leaves the board and gallery unchanged as if no import occurred"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n4"
+name = "histogram_ignores_board_changes"
+description = "Painting or clearing cells leaves every histogram bar height identical, showing the histogram is not derived from the live board"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n5"
+name = "project_json_missing_contract_fields"
+description = "Export center Project JSON is missing required ProjectDocument fields (cellSize, tool, swatch, mirror, vision, gridVisible, cells, boards, or versions), shows tool/swatch/mirror/vision values outside their closed enums, or boards entries omit SavedBoard keys name/tag/favorite/cellSize/cells"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in a specified core behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence (control, gesture sequence, canvas result, downloaded artifact, or resulting page state) that demonstrates it. If the defect is already covered—even partially—by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0
+

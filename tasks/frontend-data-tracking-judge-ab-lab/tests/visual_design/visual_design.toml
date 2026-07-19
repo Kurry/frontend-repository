@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "3.1"
 name = "dense_analytics_shell"
-description = "The app renders a persistent header with the app name, Experiments / Compare / Cost navigation, the rescore control, and a theme toggle, and each view's main canvas shows dense analytics surfaces — tables, summary strips, and charts — on card surfaces with hairline borders and regular spacing"
+description = "The app renders a persistent header with the app name, Experiments / Compare / Cost navigation, the rescore control, Export lab results, Undo and Redo, and a theme toggle, and each view's main canvas shows dense analytics surfaces — tables, summary strips, and charts — on card surfaces with hairline borders and regular spacing"
 type = "binary"
 weight = 1.0
 

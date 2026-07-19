@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,78 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_findings_and_filter_states"
+description = "A submission with zero findings shows a designed empty state in its findings region naming what belongs there and offering Add finding; a zero-match filter combination shows a designed empty state with a clear-filters control"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
 name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+description = "Add finding, Request revision, and Override show inline validation naming the offending fields before submit; category is constrained to the six allowed values; description under 10 characters, revision summary under 20, and override justification under 10 are rejected with no state change"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
 name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+description = "Validation and gate messages name the problem and the fix (field name and minimum length, or open blocker / wrong stage) rather than only saying Invalid"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
 name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+description = "Success feedback appears after add finding, request revision, approve, override, bulk actions, and copy export (toast or equivalent)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
 name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+description = "Run re-check shows a visible loading affordance and per-step progress while the simulated run is in progress"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "undo_cancel_on_destructive_paths"
+description = "Undo restores the prior state after mutating actions; review forms expose cancel/close that discards an unfinished draft without changing the submission"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "approve_wrong_stage_explanation"
+description = "Approve remains disabled on submitted, needs-revision, and approved stages even with zero blockers, with the wrong-stage explanation visible"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "double_submit_adds_one_finding"
+description = "Double-activating the Add finding submit control appends exactly one finding"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
 name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+description = "Review action dialogs and the command palette close via explicit close/cancel and Escape; the contributor drawer also closes on outside click"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "bulk_skips_non_submitted_and_export_baseline"
+description = "Bulk Move to in-review leaves non-submitted stages in the selection unchanged; Export before any mutation still shows a complete seeded package, and after mutations the preview differs in the mutated fields"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
 name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+description = "An empty findings region or zero-match filter shows nothing and provides no UI feedback"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n2"
 name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+description = "Validation or gate errors are surfaced only in the browser console"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n3"
 name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+description = "Triage actions lack visible feedback and silently succeed or fail"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +157,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n4"
 name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+description = "Bulk Hold payout or override applies with no visible confirmation or resulting state change the user can observe"
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +165,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n5"
 name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+description = "Non-semantic div or span tags wrap interactive elements such that they are not operable as controls"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n6"
 name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+description = "Review overlays or the command palette cannot be dismissed via keyboard"
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +181,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n7"
 name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+description = "Validation feedback is missing or delayed with no UI indication when required fields are invalid"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n8"
 name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+description = "Primary action labels are ambiguous or missing on Add finding, Request revision, Approve, Override, Export, or Undo"
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +197,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n9"
 name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+description = "Gate-failed and approve-disabled states provide no in-app explanation of why the action is blocked"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n10"
 name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+description = "Queue checkboxes, bulk bar, export controls, or undo/redo are visually hidden or inaccessible when their flows should be available"
 type = "binary"
 negate = true
 weight = 1.0

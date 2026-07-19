@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,110 +62,102 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "9.1"
-name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+name = "cold_start_interactive_under_2s"
+description = "Every route is interactive within roughly 2 seconds of a local cold load."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
-name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+name = "console_clean_all_ten_routes"
+description = "No console errors, warnings, or hydration mismatch messages appear on any of the ten routes, on first load or after in-app navigation."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
-name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "9.4"
-name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "9.5"
-name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+name = "chrome_responds_without_multi_second_lag"
+description = "Header, architect tags, and case chrome respond without multi-second lag after first paint."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.6"
-name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+name = "interactive_during_folder_and_nav"
+description = "The UI remains interactive during folder open/close and sibling/case navigation (controls stay clickable after transitions settle)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
-name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+name = "scroll_and_folder_hold_frame_rate"
+description = "Continuous scrolling and the folder open and close transitions hold a smooth frame rate with no visible hitching or dropped frames."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.8"
-name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+name = "rapid_case_navigation_stays_responsive"
+description = "Rapid repeated navigation between cases stays responsive with no hangs and no stuck transition states."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+name = "extended_archive_session_stable"
+description = "After an extended session of case navigation, scrapbook dragging, and media popup open/close, the page remains responsive without runaway resource use that freezes interaction."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "9.a1"
+name = "scroll_linked_overscroll_frame_rate"
+description = "Scroll-linked overscroll lift and continuous home/case scrolling hold a smooth frame rate through the interaction on a 1440-wide viewport with no visible hitching."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+id = "9.a2"
+name = "smooth_scroll_inertia_settles"
+description = "On desktop, smooth-scroll inertia settles naturally without lag between wheel or trackpad movement and the page response."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.a4"
+name = "layout_stable_after_load"
+description = "After first paint, no visible layout jumps occur as fonts, portraits, or scrapbook media finish loading — folder and media regions reserve their space from the start; after server-rendered content appears there is no post-hydration content flash that reflows text, folders, or media."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.n1"
-name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+name = "cold_load_exceeds_two_seconds"
+description = "More than 2 seconds pass before a route is interactive on a local cold load."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n2"
-name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+name = "console_or_hydration_errors"
+description = "Console errors, warnings, or hydration mismatch messages appear on first load or after in-app navigation across the ten routes."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.a3"
+name = "heavy_assets_collapse_frame_rate"
+description = "Heavy visual assets (portraits, WebM posters, scrapbook media) or folder transitions cause frame-rate collapse, delayed first render, or input latency during signature interactions."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n3"
-name = "transitions_block_or_lag"
-description = "Transitions block or lag."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n4"
-name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n5"
-name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+name = "folder_or_scroll_transitions_block"
+description = "Folder open/close or smooth-scroll transitions block interaction for multiple seconds."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,39 +165,38 @@ weight = 1.0
 [[criterion]]
 id = "9.n6"
 name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
+description = "During folder open or hero reveal, primary controls (tags, About, close) become unresponsive."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n7"
-name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n8"
-name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n9"
-name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
+name = "hydration_flash_or_blank_load"
+description = "After server-rendered content appears, text, folders, or media visibly flash/reflow as the client takes over, or the UI blocks with a blank page while resources load instead of reserved-space layout."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n10"
-name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+name = "rapid_nav_crashes_or_sticks"
+description = "Rapid case navigation crashes the page or leaves a permanently stuck transition state."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.40"
+name = "palette_filter_dossier_stay_responsive"
+description = "Opening the command palette, filtering the home stack, compiling the dossier preview after pin and note changes, and undoing a scrapbook drag stay responsive with no multi-second freezes."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.n40"
+name = "dossier_compile_or_palette_hangs"
+description = "Opening Export dossier after pin/note changes, or opening the command palette, hangs the UI for multiple seconds or leaves the archive unresponsive."
 type = "binary"
 negate = true
 weight = 1.0

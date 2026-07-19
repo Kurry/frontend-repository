@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -99,8 +99,8 @@ negate = true
 
 [[criterion]]
 id = "2.6"
-name = "2_6"
-description = "An external UI component library beyond the Qwik and Tailwind stack is used for the core interface"
+name = "cdn_or_outbound_assets_required"
+description = "The app requires an outbound CDN or other external origin to obtain styling, icons, fonts, scripts, or product content, causing a missing or degraded interface when that request is blocked"
 type = "binary"
 weight = 0.5
 negate = true

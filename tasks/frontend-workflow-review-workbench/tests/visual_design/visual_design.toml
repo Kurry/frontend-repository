@@ -1,0 +1,163 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "portfolio_and_workspace_composition"
+description = "The portfolio composes as a full-width bundle table under a rollup strip and calibration strip, and the bundle workspace composes as a persistent header (bundle slug, hero banner, current recommendation, breadcrumb), a left-rail 5-step stepper, and a main area whose content follows the active step"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "hero_state_treatments_fixed"
+description = "The three verdict hero states use three fixed, distinct treatments — green success for READY FOR THE BENCHMARK, amber caution for NOT READY — BUT FIXABLE, red alarm for AT RISK — MAY NEED A RESTART — applied identically on portfolio rows, workspace headers, and the summary document"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "gate_status_chip_palette"
+description = "Gate status chips use five distinct treatments (pass green, fail red, errored purple, inconclusive amber, missing gray) that are identical between portfolio rows, gate cards, the summary's gates table, and timeline entries"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "category_and_check_chip_treatments"
+description = "Fix-list category tags use four distinct treatments for RERUN, FIX, REDESIGN, and TALK-TO-LEAD consistent between the fix list and the summary, and check outcome chips use distinct pass, fail, and not-applicable treatments with the trial valid/invalid badges reusing the pass/fail pair"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "threshold_markers_read_at_a_glance"
+description = "The 0.80 difficulty bar and 0.90 oracle bar render as reference markers beside their measured values with a visible met-or-missed relationship readable at a glance"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "typography_hierarchy"
+description = "Typography shows a clear hierarchy — app title larger than view titles, larger than card headings, larger than table body and label text — consistent across the portfolio and workspace"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "spacing_rhythm_consistent"
+description = "Gaps between the rollup strip, calibration strip, table, gate cards, inspector panes, and stepper are visually regular with no crowded or orphaned regions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "control_states_distinct"
+description = "Buttons, inputs, checkboxes, toggles, and segmented controls show distinct default, hover, focus (visible ring), disabled, and error treatments, and disabled recommendations are visibly distinct from enabled ones beyond color alone"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "single_icon_set"
+description = "One consistent icon set is used across the toolbar, gate cards, stepper, fix list, timeline, and badges, with no mixed icon styles"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "inspector_three_column_composition"
+description = "At desktop width the trial inspector holds a stable three-column composition with the criterion list narrower than the reasoning pane and visibly separated pane boundaries"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "status_treatment_inconsistency"
+description = "The same hero state, gate status, category tag, or check outcome renders with different color or badge treatments in different views"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.12"
+name = "overlapping_clipped_text"
+description = "At 1440 pixel width, any heading, table cell, badge, chip, breadcrumb segment, or timeline text overlaps another element or is clipped by its container"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.13"
+name = "default_template_register"
+description = "The interface reads as an unthemed component-library default — stock palette, default radii and shadows, and no distinct visual identity for the review domain"
+type = "binary"
+weight = 0.5
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

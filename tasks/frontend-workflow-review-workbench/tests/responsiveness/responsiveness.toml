@@ -1,0 +1,212 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "7.1"
+name = "layout_adapts_desktop_to_mobile"
+description = "The portfolio and bundle workspace adapt gracefully from 1440px desktop to 375px mobile with all content and controls still reachable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.2"
+name = "inspector_stacks_below_1024"
+description = "At widths of 1024 pixels and below, the trial inspector's three panes reflow to a stacked arrangement, and selecting a criterion still scrolls and highlights the other panes (pane linkage intact)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.3"
+name = "stepper_and_table_reflow_at_768"
+description = "At widths of 768 pixels and below, the left-rail stepper collapses to a horizontal compact stepper above the main area, and the portfolio table condenses to per-bundle cards carrying the same hero state, gate chips, and progress indicator"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.4"
+name = "no_viewport_overflow_at_375"
+description = "At 375 pixel width no content clips or overflows the viewport and no page-level horizontal scrolling appears; wide tables (gates table, diff table) scroll within their own containers"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.5"
+name = "mobile_tap_targets_are_large_enough"
+description = "Interactive controls — gate chips, resolve checkboxes, stepper controls, breadcrumb segments — are tap targets of at least 44px on mobile widths"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.6"
+name = "typography_resizes_across_breakpoints"
+description = "Typography remains readable and hierarchy is preserved at both desktop and mobile widths, with no unreadably small labels on chips or badges"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.7"
+name = "stacking_reflows_logically"
+description = "Stacking order at narrow widths follows the reading order — header, stepper, main content, then supporting panels — with no orphaned or out-of-context regions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.8"
+name = "fixed_controls_remain_accessible"
+description = "Persistent chrome (the portfolio return control, the breadcrumb, the workspace header) remains visible or reachable at every width without obscuring content"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.9"
+name = "resize_preserves_state"
+description = "Resizing between 1440px and 375px mid-session preserves the current selection, notes, filters, and re-run progress — reflow never resets state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.n1"
+name = "layout_breaks_at_breakpoints"
+description = "The layout breaks or overflows at 1440, 1024, 768, or 375 pixel widths"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.n2"
+name = "mobile_controls_too_small_or_misaligned"
+description = "Controls are too small or misaligned to operate on mobile widths"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.n3"
+name = "text_too_small_on_devices"
+description = "Text becomes too small to read at some supported width"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.n4"
+name = "content_cropped_or_unnecessary_scrollbars"
+description = "Content is cropped or unnecessary scrollbars appear at some width"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.n5"
+name = "stepper_or_panes_break_by_width"
+description = "The stepper, inspector panes, or portfolio cards are unresponsive, missing, or non-functional at some widths"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.n6"
+name = "fixed_positions_obscure_content"
+description = "Fixed or sticky chrome obscures content at some width"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.n7"
+name = "elements_overlap_at_some_size"
+description = "Elements stack on or overlap one another at some viewport size"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.n8"
+name = "pane_linkage_lost_when_stacked"
+description = "In the stacked inspector arrangement, selecting a criterion no longer highlights or scrolls the other panes"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.n9"
+name = "fixed_size_media_overflows"
+description = "A table, strip, or pane uses a static size and overflows the viewport at narrow widths"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.n10"
+name = "controls_disappear_at_sizes"
+description = "Required controls (re-run, resolve, recommendation, bundling) disappear at specific sizes with no alternative access"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "responsiveness.catchall"
+name = "responsiveness_catchall"
+description = "The app exhibits a significant, browser-observable responsive-layout failure that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (viewport width, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

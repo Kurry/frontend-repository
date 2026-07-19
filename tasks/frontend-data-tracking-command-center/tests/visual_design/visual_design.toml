@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -131,6 +131,14 @@ description = "Controls, dialogs, or tables render as unstyled browser defaults 
 type = "binary"
 weight = 1.0
 negate = true
+
+
+[[criterion]]
+id = "2.9"
+name = "export_drawer_and_palette_anatomy"
+description = "The export drawer shows format tabs, a monospaced preview block, and Copy / Download actions; the command palette reads as a centered overlay list with a filter field"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "2.catchall"

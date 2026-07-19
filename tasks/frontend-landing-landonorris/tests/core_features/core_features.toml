@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -77,7 +77,7 @@ weight = 1.0
 [[criterion]]
 id = "1.3"
 name = "fixed_nav_contents"
-description = "A fixed nav stays pinned to the top over all sections and shows, left to right, a stacked AVERY VALE text wordmark (AVERY above VALE), a centered original AV monogram, a lime STORE button, and a square hamburger button"
+description = "A fixed nav stays pinned to the top over all sections and shows, left to right, a stacked AVERY VALE text wordmark (AVERY above VALE), a centered original AV monogram, a lime STORE button, a PRESS KIT control, and a square hamburger button"
 type = "binary"
 weight = 1.0
 
@@ -238,7 +238,7 @@ optional = true
 [[criterion]]
 id = "1.34"
 name = "subscribe_disabled_until_valid"
-description = "The newsletter form has one email field and a Subscribe control, and the Subscribe control stays disabled while the field is empty or holds an invalidly formatted email, becoming enabled only once the value is a validly formatted email address"
+description = "The newsletter form has one email field and a Subscribe control; Subscribe stays disabled while email is empty or fails the subscribe field contract (exactly one @, non-empty local part, domain segment containing a dot), and enables only once the value satisfies that contract"
 type = "binary"
 weight = 1.0
 
@@ -252,7 +252,7 @@ weight = 1.0
 [[criterion]]
 id = "1.36"
 name = "newsletter_flow_probe"
-description = "Scripted newsletter flow: type an invalid email and confirm Subscribe stays disabled with an inline error naming the email field; correct it to a valid email and confirm the error clears and Subscribe enables; submit and confirm an inline confirmation message appears in the footer and the field empties; confirm no navigation or document reload occurred at any step"
+description = "Scripted newsletter flow: type an invalid email (e.g. missing @ or domain without a dot) and confirm Subscribe stays disabled with an inline error naming the email field; correct it to fan@averyvale.example and confirm the error clears and Subscribe enables; submit and confirm an inline confirmation appears, the field empties, and press-kit JSON newsletter equals that email; confirm no navigation or document reload occurred at any step"
 type = "binary"
 weight = 1.0
 
@@ -266,7 +266,7 @@ weight = 1.0
 [[criterion]]
 id = "1.38"
 name = "reload_baseline_probe"
-description = "Scripted reload baseline: open the menu, close it, submit the newsletter with a valid email, then reload the document; confirm the preloader plays again, the menu is closed, the newsletter field is empty with no confirmation shown, and no state from the previous visit persists"
+description = "Scripted reload baseline: open the menu, select a race, shortlist a helmet, open PRESS KIT, submit the newsletter with a valid email, then reload; confirm the preloader plays again, menu/press kit/palette are closed, race selections and shortlist are empty, the newsletter field is empty with no confirmation, and no prior visit state persists"
 type = "binary"
 weight = 1.0
 
@@ -309,7 +309,7 @@ weight = 1.0
 [[criterion]]
 id = "1.44"
 name = "menu_items_scroll_in_page"
-description = "With the menu open, activating HOME, ON TRACK, OFF TRACK, or CALENDAR scrolls within the same homepage document to the hero, horizontal media strip, social video section, or helmet grid respectively, closes the overlay, and does not load another route or origin"
+description = "With the menu open, activating HOME, ON TRACK, OFF TRACK, or CALENDAR scrolls within the same homepage document to the hero, horizontal media strip, social video section, or race calendar respectively, closes the overlay, and does not load another route or origin"
 type = "binary"
 weight = 1.0
 
@@ -318,6 +318,160 @@ id = "1.45"
 name = "authored_asset_surface_inventory"
 description = "Across the rendered page, every major reference media surface is populated: the layered hero portrait, six distinct horizontal-strip images, at least four separate menu photos, three two-state helmet designs, five fictional partner marks, the social poster and changing-frame video, and original monogram/circuit/laurel/telemetry/icon artwork are all visible in their intended sections"
 type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "race_calendar_six_seeded_races"
+description = "The race calendar section lists exactly six seeded fictional races in order with circuit, ISO date, and status: Alpine GP 2025-03-16 Upcoming; Bayfront Circuit 2025-04-06 Upcoming; Ridgeway GP 2025-05-04 Completed; Solstice GP 2025-06-15 Upcoming; Meridian Night Run 2025-07-20 Upcoming; Cascade Finale 2025-09-07 Upcoming"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "race_select_updates_count"
+description = "Clicking a race row toggles a visible lime selected treatment and the Selected races N readout updates immediately to match the count of selected rows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "race_status_filter"
+description = "The race calendar status filter options All, Upcoming, and Completed filter visible rows; selecting Completed shows Ridgeway GP and hides Upcoming rows without navigating away"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "media_and_helmet_shortlist"
+description = "Each horizontal editorial card and each helmet card exposes a Shortlist control; toggling it adds or removes that asset from the media shortlist and updates a visible shortlist count in the chrome"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "press_kit_live_preview_formats"
+description = "Activating PRESS KIT opens a press-kit drawer with JSON, Markdown, and ICS tabs whose live preview includes Avery Vale / Nova Racing, selected race circuits and YYYY-MM-DD dates, shortlisted asset labels/indexes, and newsletter email or the exact marker none"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "press_kit_copy_and_download"
+description = "Inside the press kit, Copy copies the active format preview and shows a brief copied confirmation, and Download offers avery-vale-press-kit.json, .md, or .ics matching the active tab"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.52"
+name = "ics_matches_selected_races"
+description = "With three races selected, the ICS preview is a VCALENDAR (VERSION:2.0, PRODID:-//Avery Vale//Press Kit//EN) with exactly three VEVENT blocks each carrying UID equal to that race's uid from the JSON races array, DTSTART;VALUE=DATE as YYYYMMDD, SUMMARY equal to circuit, and STATUS CONFIRMED or CANCELLED matching Upcoming/Completed; with zero selected, it has zero VEVENT entries"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.53"
+name = "command_palette_opens_and_navigates"
+description = "Pressing Meta+K or Control+K opens a command palette listing Go HOME, Go ON TRACK, Go OFF TRACK, Go CALENDAR, Open press kit, Undo, and Redo; activating Go CALENDAR closes the palette and scrolls within / to the race calendar"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.54"
+name = "undo_redo_shortlist_and_races"
+description = "After shortlisting an asset or selecting a race, Undo reverses that mutation (count and selected treatment restore); Redo reapplies it; the stack covers at least twenty such mutations"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n46"
+name = "press_kit_omits_session_mutations"
+description = "After selecting races and shortlisting assets, the press-kit JSON/Markdown/ICS preview omits those session mutations (static kit text identical to the empty baseline)"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n47"
+name = "calendar_or_shortlist_missing"
+description = "The race calendar with six seeded races is absent, or shortlist controls are missing from helmet and editorial cards"
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "1.55"
+name = "race_record_field_contract_visible"
+description = "Each of the six seeded race rows shows circuit, a YYYY-MM-DD date, and a status chip that is exactly Upcoming or Completed; Selected races N matches the count of lime-selected rows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.56"
+name = "race_status_editor_enum"
+description = "Opening Edit status on a race and submitting Upcoming or Completed updates that row's chip immediately; submitting a value outside that closed enum shows an inline error naming status and leaves the chip unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.57"
+name = "press_kit_json_field_contract"
+description = "The press-kit JSON preview includes required keys schemaVersion (integer 1), driver Avery Vale, team Nova Racing, season 2025, newsletter (contract-valid email or none), races (selected race records only, each showing id, circuit, date, status, selected true, and uid), shortlist (each entry kind helmet or editorial, non-empty label <= 60 chars, index >= 1), and generatedAt ending in Z"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.58"
+name = "press_kit_import_restores_session"
+description = "After clearing selections, Import of a previously exported valid press-kit JSON restores Selected races N, shortlist count, selected treatments, and JSON/ICS previews to match that payload without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n49"
+name = "press_kit_json_missing_required_keys"
+description = "The press-kit JSON preview omits schemaVersion, races, shortlist, or newsletter, shows race dates that are not YYYY-MM-DD, or omits id/uid/selected from a selected race record in races"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n50"
+name = "invalid_import_mutates_session"
+description = "Importing malformed or schema-invalid press-kit JSON changes race selections or shortlist membership instead of showing a named import error and leaving state unchanged"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n48"
+name = "undo_does_not_restore_shortlist"
+description = "After shortlisting an asset, Undo leaves the shortlist count and membership unchanged"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.59"
+name = "shortlist_asset_field_contract"
+description = "After shortlisting one helmet and one editorial card, the press-kit JSON shortlist array contains exactly two entries whose kind values are helmet and editorial, each with a non-empty label of at most 60 characters and an index integer >= 1"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.60"
+name = "newsletter_subscribe_field_contract"
+description = "A successful Subscribe with fan@averyvale.example records that email as the session subscriber; the press-kit JSON newsletter field equals fan@averyvale.example; an address missing @ or whose domain has no dot keeps Subscribe disabled with an inline error naming email"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n51"
+name = "shortlist_entries_violate_asset_contract"
+description = "Press-kit shortlist entries omit kind, use a kind outside helmet/editorial, omit label, or show index less than 1 after shortlisting assets"
+type = "binary"
+negate = true
 weight = 1.0
 
 [[criterion]]

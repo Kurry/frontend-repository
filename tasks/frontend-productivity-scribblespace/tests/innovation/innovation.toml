@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -63,157 +63,96 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+name = "snap_guides_beyond_spec"
+description = "Beyond required drag behavior, optional snap guides or alignment cues appear while dragging objects and remain browser-observable (bonus)."
 type = "binary"
-weight = 1.0
+optional = true
+weight = 0.5
 
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "richer_keyboard_map_beyond_spec"
+description = "Beyond required Ctrl+K / Undo shortcuts, an optional denser keyboard map for object creation or board switching is documented in-UI and works (bonus)."
 type = "binary"
-weight = 1.0
+optional = true
+weight = 0.5
 
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+name = "archive_review_rhythm_beyond_spec"
+description = "Beyond required Archive Restore/Purge, an optional clearer archive review rhythm (for example bulk restore or dated groups) is visible (bonus)."
 type = "binary"
-weight = 1.0
+optional = true
+weight = 0.5
 
 [[criterion]]
 id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+name = "connector_label_or_style_polish"
+description = "Beyond required connectors, optional connector labels or style variants add clarity without breaking the field contract (bonus)."
 type = "binary"
-weight = 1.0
+optional = true
+weight = 0.5
 
 [[criterion]]
 id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+name = "minimap_interaction_polish"
+description = "Beyond required mini-map recenter, optional viewport drag-on-minimap or zoom-from-minimap polish is observable (bonus)."
 type = "binary"
-weight = 1.0
+optional = true
+weight = 0.5
 
 [[criterion]]
 id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+name = "export_preview_diff_hint"
+description = "Beyond required export tabs, an optional hint showing what changed since last export/copy is visible in-session (bonus)."
 type = "binary"
-weight = 1.0
+optional = true
+weight = 0.5
 
 [[criterion]]
 id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+name = "branded_canvas_chrome_polish"
+description = "Toolbar, board tabs, and empty-state composition read as a cohesive branded canvas tool rather than generic unstyled controls (bonus execution quality)."
 type = "binary"
-weight = 1.0
+optional = true
+weight = 0.5
 
 [[criterion]]
 id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+name = "outline_density_affordances"
+description = "Beyond required Outline rows, optional density affordances such as type filters or compact rows improve scanning (bonus)."
 type = "binary"
-weight = 1.0
+optional = true
+weight = 0.5
 
 [[criterion]]
 id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+name = "local_offline_shell_quality"
+description = "A genre-appropriate local enhancement (smooth offline shell, high-quality local fonts already allowed) is visible without CDN dependence (bonus)."
 type = "binary"
-weight = 1.0
+optional = true
+weight = 0.5
 
 [[criterion]]
 id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+name = "competition_grade_canvas_feel"
+description = "Overall canvas, multi-board, connector, undo, archive, and export polish read as a professional freeform-notes instrument rather than a wired demo (bonus)."
 type = "binary"
-weight = 1.0
+optional = true
+weight = 0.5
 
 [[criterion]]
 id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+name = "bonus_breaks_required_contracts"
+description = "An optional polish feature contradicts required in-memory, field-contract, or export/import behavior — for example writing boards to localStorage, or a bonus export format that replaces rather than supplements Workspace JSON."
 type = "binary"
 negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
-type = "binary"
-negate = true
-weight = 1.0
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
-description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app includes a significant, browser-observable innovation beyond the specification that is NOT covered by any other criterion in this file and does not contradict required behaviors. If present, name it and cite concrete evidence. If nothing qualifies, answer no."
 type = "binary"
 weight = 1.0

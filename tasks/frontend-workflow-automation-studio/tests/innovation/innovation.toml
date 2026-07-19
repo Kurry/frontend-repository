@@ -1,0 +1,141 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+weight = 0.25
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "11.1"
+name = "delightful_microinteractions"
+description = "Unique, delightful microinteractions beyond the required set (for example a satisfying run-complete moment or tactile drag feel)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.2"
+name = "advanced_motion_mechanics"
+description = "Advanced animation or transition mechanics beyond the specified transitions, executed smoothly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.3"
+name = "guided_onboarding"
+description = "A narrative or guided onboarding flow that orients a first-time user through building and running a script"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.4"
+name = "extra_data_visualization"
+description = "Data visualizations beyond the spec (for example per-script pass-rate sparklines or run duration trends) with real usability"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.5"
+name = "keyboard_first_editing"
+description = "Keyboard-driven step editing beyond the required palette (add, reorder, and retype steps without the pointer)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.6"
+name = "personalization_touches"
+description = "Personalization features such as density or theme preferences held in shared state beyond the console themes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.7"
+name = "polished_narrative"
+description = "Polished product storytelling or coherent fictional branding carried through the UI"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.8"
+name = "celebration_moments"
+description = "A tasteful celebration when a previously failing script completes fully green, reserved for the payoff moment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.n1"
+name = "purely_minimal_build"
+description = "The build is purely spec-minimal with no polish, guidance, or delight beyond the letter of the requirements"
+type = "binary"
+negate = true
+weight = 0.5
+
+[[criterion]]
+id = "11.n2"
+name = "generic_template_feel"
+description = "Interactions and visuals read as a generic template with no identity"
+type = "binary"
+negate = true
+weight = 0.5
+
+[[criterion]]
+id = "innovation.catchall"
+name = "innovation_catchall"
+description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0

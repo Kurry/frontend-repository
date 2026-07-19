@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -112,7 +112,7 @@ weight = 1.0
 [[criterion]]
 id = "1.8"
 name = "empty_name_submit_blocked"
-description = "After submitting create with an empty required stop name, no stop is added, the visible stops count is unchanged, and validation feedback naming the name field is visible"
+description = "After submitting create with an empty required stop title, no stop is added, the visible stops count is unchanged, and validation feedback naming the title field is visible"
 type = "binary"
 weight = 1.0
 
@@ -255,7 +255,7 @@ weight = 1.0
 [[criterion]]
 id = "1.33"
 name = "inline_validation_disables_submit"
-description = "In the stop create or edit form, an empty required name shows an inline error message naming the name field next to it before submit, and the submit control stays disabled until every required field is valid"
+description = "In the stop create or edit form, an empty required title shows an inline error message naming the title field next to it before submit, and the submit control stays disabled until every required field is valid"
 type = "binary"
 weight = 1.0
 
@@ -293,6 +293,277 @@ name = "map_pane_static_snapshot_affordances"
 description = "The map pane renders as a static snapshot with visible Export, Optimize, and layers affordances, and activating Optimize route or layers shows a demo toast rather than driving a live tile map or navigating away"
 type = "binary"
 weight = 0.5
+
+[[criterion]]
+id = "1.39"
+name = "ledger_grid_seeded_multi_currency"
+description = "The Budget / Ledger view shows an expense grid with at least 10 seeded expenses spanning Lodging, Food, Transit, and Activities in at least 3 currencies, and each row shows a description, amount, an inline currency dropdown, day, category, payer, and a split-mode control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "fx_table_and_live_eur_conversion"
+description = "A visible mock FX table lists rates for at least USD, GBP, and CHF against EUR; each expense row shows a converted EUR amount, and changing a row's currency through its inline dropdown immediately updates that row's EUR amount and the ledger grand total consistently with the FX table, without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "split_mode_toggle_changes_balances"
+description = "Toggling an expense between per-capita and weighted split changes the per-traveler balances for Ava, Ben, Chloe, and Dan: per-capita divides the EUR amount equally by 4, while weighted exposes per-traveler weight inputs and divides proportionally, with the balances updating immediately on toggle"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "debt_visualizer_minimum_transactions"
+description = "A who-owes-whom matrix or network visualizer shows the settle-up transactions with a stated transaction count, and the set is minimal for the current balances (e.g. four travelers where one owes and one is owed nets to fewer pairwise transfers than the naive per-expense pairing)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "settlement_checklist_updates_balances"
+description = "The payment settlement checklist lists each computed transaction with a Mark as settled control; marking one settled visibly checks it off and updates the outstanding balances and the debt visualizer to exclude it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "burn_rate_chart_ceiling_and_projection"
+description = "The burn-rate chart plots cumulative spend per day for 7/5-7/11 against a visible 4500 EUR ceiling line, includes a projected end-of-trip total fed by the reserved lodging and flight expenses, and visibly highlights the projected-overage region when the projection crosses the ceiling"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "category_pie_redraws_on_change"
+description = "The cost-allocation pie shows the EUR share of Lodging, Food, Transit, and Activities and redraws when an expense's category, amount, or currency is changed through the UI"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "paste_parser_highlights_and_drafts"
+description = "Pasting raw confirmation text into the parsing sandbox visibly highlights recognized dates and booking codes inside the pasted text and lists extracted draft items that can each be accepted into the ledger or itinerary or discarded"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "csv_wizard_mapping_and_diagnostics"
+description = "Dropping or picking a CSV opens a schema-mapping wizard with per-column field dropdowns followed by a row-level diagnostic screen where rows with invalid cells are listed and each offending cell can be fixed inline before commit"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "template_injector_seeds_sample_trip"
+description = "The template injector control, after a confirmation, seeds a complete sample trip (stops plus expenses) in one action and the new data is visible across the plan list, ledger, and charts"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "receipt_scanner_draft_expense"
+description = "Dropping an image placeholder on the mock receipt-scanner canvas renders a bounding-box overlay and extracts a cost and a date into a draft expense that the user confirms or edits before it joins the ledger"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "spreadsheet_keyboard_matrix_inline_edit"
+description = "In the spreadsheet view, arrow keys move a visibly indicated active cell, Enter or double-click starts inline editing, Escape cancels, and a committed cell edit updates the shared data everywhere that datum appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "formula_bar_sum_and_average"
+description = "The formula bar computes =SUM and =AVERAGE over a selected column range, shows the result, and the two functions over the same range give correctly related results (average equals sum divided by the row count)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.52"
+name = "pivot_category_by_day_summaries"
+description = "The pivot-style grouping renders category by day summaries (a row per category, a column per day, EUR cell totals), and switching the grouping recomputes the summary from live data"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.53"
+name = "display_currency_toggle_non_mutating"
+description = "The display-currency toggle switches every displayed amount to the selected display currency, and toggling back to EUR restores the exact original values, proving the stored base data never mutated"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.54"
+name = "bulk_mutation_tray_applies_to_selection"
+description = "Selecting 2 or more rows reveals the bulk mutation tray, and batch recategorize, batch day reassignment, and batch delete each apply to exactly the selected rows and no others"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.55"
+name = "threshold_caps_flag_rows"
+description = "Setting a per-category cap below that category's current EUR total flags the category's rows with a warning treatment that includes an icon or text (not color alone), and the flags update as expenses or caps change"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.56"
+name = "markdown_notes_render_and_toggle"
+description = "Typing markdown in a stop or expense note block renders headers, bullet lists, and checkboxes, and clicking a rendered checkbox toggles its state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.57"
+name = "packing_list_progress_updates"
+description = "The packing list sub-tab shows categorized items with per-category progress in the form 4/12 packed, and checking an item updates the count and progress bar immediately"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.58"
+name = "gallery_drawer_reorder_and_captions"
+description = "The image gallery drawer for a stop supports reordering its placeholder images and editing captions, with both changes persisting in-session"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.59"
+name = "link_preview_cards_in_notes"
+description = "A URL typed in a note renders as a hyperlink preview card (title, domain, thumbnail placeholder) inside the note, and activating the card never navigates away from the app"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.60"
+name = "custom_field_builder_appears_everywhere"
+description = "Defining a custom field (name plus text, number, or rating type) makes it immediately appear as an editable input on every stop and expense card and as a column in the spreadsheet matrix"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.61"
+name = "undo_redo_structural_changes"
+description = "Undo and redo controls step backward and forward through structural changes (create, edit, delete, import commit, bulk mutation), each undo visibly reverting the most recent change across every affected pane"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.62"
+name = "factory_reset_confirm_and_cancel"
+description = "The factory reset control asks for confirmation; confirming restores the seeded baseline data across all panes while cancelling leaves all current data untouched"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.63"
+name = "theme_toggle_restyles_all_panes"
+description = "The light/dark theme toggle switches the whole workspace without a reload and every pane, chart, and overlay restyles coherently"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.64"
+name = "settlement_report_live_copy"
+description = "The settlement report surface shows live text with per-traveler balances, the minimum settle-up transactions, and which are settled; the Copy control shows a visible confirmation, and the report content matches the session's current ledger state at open time"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.65"
+name = "budget_summary_live_copy"
+description = "The budget summary surface shows live text with per-category EUR totals, burn-rate versus the 4500 EUR ceiling, and the projected end-of-trip total with any overage, offers Copy with a visible confirmation, and reflects the session's actual edits"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n40"
+name = "grand_total_or_chart_stale_after_fx_change"
+description = "After changing an expense's currency or amount, at least one derived money surface (ledger grand total, pie, burn-rate chart, or pivot cell) keeps its old value while the row itself updates"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n41"
+name = "ledger_features_render_but_compute_nothing"
+description = "A financial surface (debt visualizer, formula bar, pivot, or burn-rate projection) renders as static decoration: its displayed numbers stay identical after the expense data that should drive them changes"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n42"
+name = "import_or_scanner_bypasses_review"
+description = "The CSV wizard, paste parser, or receipt scanner commits rows or drafts directly into the ledger with no review, diagnostics, or confirm step, or the commit silently adds rows the user excluded"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.66"
+name = "stop_field_contract_enforced"
+description = "Stop create/edit enforces the Stop field contract in the UI: empty title, title over 80 characters, day or category outside the closed enums, or endTime not strictly after startTime each show an inline error naming that field, and the submit control stays disabled until every required field is valid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.67"
+name = "expense_field_contract_enforced"
+description = "Expense create/edit enforces the Expense field contract in the UI: empty description, non-positive amount, or out-of-enum currency/day/category/payer/splitMode each show an inline error naming that field, and weighted split with invalid weights is rejected with a named error"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.68"
+name = "ics_payload_valid_structure"
+description = "The ICS export preview renders a payload that begins with BEGIN:VCALENDAR, contains exactly one VEVENT block per scheduled stop with a DTSTART and a SUMMARY equal to the stop title, optional DTEND when endTime is set, optional LOCATION when location is present, and ends with END:VCALENDAR"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.69"
+name = "trip_json_schema_and_live_compile"
+description = "The trip JSON export preview is a top-level object with schemaVersion equal to the string 1, a trip object (title, dateStart 2025-07-05, dateEnd 2025-07-11, budgetCeilingEur 4500), a stops array whose elements match the Stop field contract, and an expenses array whose elements match the Expense field contract; after creating or renaming a stop and creating an expense, those mutations appear in the regenerated JSON before download or copy"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.70"
+name = "markdown_export_live_day_headings"
+description = "The markdown itinerary export shows a heading per day in date order with time-ordered stop lines, and reopening or regenerating it after a stop create or rename shows the updated document"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.71"
+name = "download_and_copy_trip_artifacts"
+description = "Download trip JSON and Download ICS start real downloads of those artifacts, and Copy for markdown, ICS, or JSON places the exact visible preview text on the clipboard and shows a brief copied confirmation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n43"
+name = "export_omits_session_mutations"
+description = "After a visible stop or expense mutation, the ICS, trip JSON, or markdown export preview still shows the pre-mutation session state — an export that omits the session's actual work"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n44"
+name = "ics_or_json_schema_broken"
+description = "The ICS preview is missing BEGIN:VCALENDAR / END:VCALENDAR or VEVENT blocks for scheduled stops, or the trip JSON preview is missing schemaVersion, trip, stops, or expenses, or stop/expense objects omit required field-contract keys"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.catchall"

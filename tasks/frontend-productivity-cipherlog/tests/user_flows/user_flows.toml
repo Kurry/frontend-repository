@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "6.2"
 name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+description = "Create flow: submitting a blank title or other field-contract violation triggers immediate inline validation naming the offending field and adds no memo."
 type = "binary"
 weight = 1.0
 
@@ -206,6 +206,28 @@ weight = 1.0
 id = "6.n10"
 name = "navigation_dead_end_requires_reload"
 description = "Navigation dead ends or requires reload for recovery."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "session_archive_export_flow"
+description = "Session archive export flow: after creating channel Ops, memo Nightfall Relay on Ops at priority high, and Theme Core Blood Red, Export session JSON shows version 1, themeCore blood-red, channels Ops, and memos Nightfall Relay with priority high; Download JSON and Copy JSON succeed with Copied confirmation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "session_archive_import_round_trip_flow"
+description = "Session archive import round-trip: export session JSON after mutations, clear or purge state, Import the same JSON, and confirm sidebar, memo list, Theme Core, and a subsequent export preview match the imported archive."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "import_mutates_on_invalid_payload"
+description = "Importing a contract-invalid session JSON still changes visible collections or Theme Core."
 type = "binary"
 negate = true
 weight = 1.0

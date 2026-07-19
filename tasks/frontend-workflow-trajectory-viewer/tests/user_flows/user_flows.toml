@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,86 +62,86 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "open_trial_end_to_end"
+description = "Comparing and opening a trial end to end: open a task from the catalog, sort its trial table by reward descending, click the top row, watch the ingest checklist complete, and land in the viewer with step 1 active and the header showing that trial's model, reward, outcome, and duration"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "scrub_inspect_files_flow"
+description = "Scrubbing and inspecting files: drag the scrubber to a mid-trial step, confirm the file tree badges reflect only changes up to that step, select a badged code file and see it rendered with coloring and a working copy control, then advance one step and see any new change badge appear"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "annotate_and_return_flow"
+description = "Annotating and returning: activate a late step, attach a note to it, navigate back to an early step, then click the note in the annotations list and land back on the annotated step with all three panes in sync"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "classify_failure_flow"
+description = "Classifying a failure: submit the classification form with fields missing and see per-field messages, correct every field using the declared enum values, submit, and see the report card with implicated-step links that jump the viewer when clicked"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "timeline_filter_flow"
+description = "Filtering the timeline: choose the tool-call step-type filter, confirm only tool-call steps remain, activate one, then clear the filter and confirm the full ordered timeline returns with the same step still active when it is still in range"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "command_palette_jump_flow"
+description = "Command palette jump: press Ctrl+K or Cmd+K, type part of a step summary, activate the match, and land on that step with timeline, workspace, and detail in sync"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "export_closes_the_loop"
+description = "Export closes the loop: after annotating at least one step and submitting a valid classification, open the Export panel, confirm the Review JSON carries the exact values just entered, copy it with visible confirmation, then Undo the classification and confirm the preview's failure_report becomes null while annotations remain until undone"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "import_round_trip_flow"
+description = "Import round trip: export Review JSON for a trial with annotations and a report, clear the annotations and report, import that JSON, and confirm the annotations list and report card match the imported values"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "reload_returns_seeded_state"
+description = "A page reload returns the app to its seeded state: the task catalog with 3 tasks, no annotations, no classification reports, empty undo history, and a default export preview with empty annotations and a null failure_report"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "invalid_create_shows_inline_validation"
+description = "Invalid note or classification submission triggers immediate inline validation naming the offending fields and changes no review state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
 name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+description = "Annotate, classify, export, import, undo, or command-palette jump flows are not enabled from the UI"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "new_annotations_missing_or_duplicated"
+description = "New annotations fail to show up, duplicate on single submit, or classification creates multiple report cards"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n3"
 name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+description = "Annotation, classification, filter, or export state changes are not synced across the annotations list, report card, timeline, and export preview"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +157,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n4"
 name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+description = "Switching tasks, trials, export tabs, or timeline filter breaks layout or loses the active step selection incorrectly"
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,23 +165,23 @@ weight = 1.0
 [[criterion]]
 id = "6.n5"
 name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+description = "Emptying annotations or applying a filter with no matches produces broken or missing UI instead of the designed empty states"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "export_import_disagree"
+description = "Imported review package values disagree with the exported JSON that produced them, or export text disagrees with the visible annotations list and report card"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "palette_or_export_cannot_reopen"
+description = "The command palette or Export panel cannot be re-opened after being closed once"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n8"
 name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+description = "The command palette or note form blocks navigation with no Escape or close path"
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +197,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n9"
 name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+description = "A failed note, classification, or import provides no user feedback"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n10"
 name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+description = "Navigation dead ends or requires reload for recovery after opening a trial, palette, or export panel"
 type = "binary"
 negate = true
 weight = 1.0

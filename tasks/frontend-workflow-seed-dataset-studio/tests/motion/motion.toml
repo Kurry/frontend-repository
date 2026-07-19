@@ -1,0 +1,147 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "triage_badge_transition_and_stagger"
+description = "Triaged through the real controls, a seed's status chip transitions with a short color-and-scale change rather than snapping, and batch-rejected rows update with a brief stagger rather than all simultaneously"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "list_add_remove_animates"
+description = "Adding a rubric criterion or foil through the real editor eases the new row in, and deleting one collapses the row out rather than the list jumping instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "gate_banner_condition_motion"
+description = "When a gate condition is satisfied through the real editing path, that condition fades or slides out of the unmet list, and the all-clear state eases in rather than flashing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "harvest_step_motion"
+description = "During a harvest started from the real Run harvest control, the running step shows a continuous activity indicator, a completing step's status transitions with a short fade rather than snapping, and the retry backoff countdown ticks visibly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "hover_animations_required"
+description = "Buttons ease background and shadow with a slight press effect on hover; queue rows, rollup cells, chips, and timeline entries take a full-width or full-cell hover wash; and form controls show focus rings"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "dialog_transitions_timed"
+description = "The reject form and confirmation dialogs enter with a short opacity-plus-scale transition of roughly 200 to 300 milliseconds and exit the same way"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "view_switch_transition"
+description = "Switching between Queue and Workbench transitions with a brief crossfade or slide rather than an instant swap, and no full page reload occurs"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "copy_feedback_animates"
+description = "Copy confirmations for the commit hash, manifest, and snapshot animate in (icon swap or toast), remain readable long enough to scan, and auto-dismiss with a fade"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "chip_click_attention_cue"
+description = "Clicking a foil's expects-fail chip animates attention to the linked criterion — a highlight pulse or smooth scroll — rather than teleporting silently"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.10"
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion set, list, banner, badge, and view transitions apply instantly and the harvest indicators change state without animation, while every flow remains fully usable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n1"
+name = "animation_jank_blocks_input"
+description = "Animations cause visible layout jank or flicker, or block user input, during batch triage updates, harvest step progression, or view switches"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction performed, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

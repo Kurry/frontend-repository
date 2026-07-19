@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,63 +63,63 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "14.1"
 name = "multi_facet_round_trip"
-description = "Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline — never a mix."
+description = "Multi-facet round-trip: create a stop, switch to Map mode, set the role to Viewer then back to Owner, toggle dark theme, and apply a day filter, then reload. All facets coherently reset to the seeded baseline (seeded stops, Overview/Plan List, Owner, light theme, no day filter) — never a mix where some facets survive"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.2"
 name = "sort_reversal_proves_live_data"
-description = "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders."
+description = "Day-order proof: with multi-day stops visible, note the Overview day-section order Sun 7/5 through Sat 7/11; after reordering stops within a day by start time, that day's section and polyline order reverse relative to the prior order, proving order is derived from live stop times rather than a hardcoded list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.3"
 name = "derived_view_responds_to_input"
-description = "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input."
+description = "Derived-view sensitivity: apply a category filter that excludes at least one seeded stop, confirm the plan list and map pins narrow; clear filters and confirm the full plan returns — the derived surfaces change with the filter rather than redrawing identically"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.4"
 name = "cross_view_echo_without_reload"
-description = "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list ↔ detail, board ↔ stats) without reload."
+description = "Cross-view echo: rename a stop in Plan List edit and confirm the new title appears in the open place-detail card, the map popup, the kanban card, and the trip JSON preview without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.5"
 name = "count_delta_is_exact"
-description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+description = "Count-delta integrity: note the visible stop count and the number of VEVENT blocks in the ICS preview, create one valid scheduled stop, and confirm both counts increase by exactly one with no lag"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.6"
 name = "different_inputs_change_outcomes"
-description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+description = "Input-dependent output: create two stops with different titles and startTimes on the same day; the day section shows both titles in start-time order, and the ICS payload contains two VEVENT blocks whose SUMMARY and DTSTART differ accordingly"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.7"
 name = "interleaved_flows_preserve_state"
-description = "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state."
+description = "Interleaved-flow integrity: start creating stop A, switch to Map mode and open the export canvas, finish creating stop B, then return to the form — stop B is present in list/map/exports and the incomplete A form was not silently submitted"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.8"
 name = "empty_to_repopulated_round_trip"
-description = "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions."
+description = "Edge-state round-trip: delete every stop and confirm the empty list state, zero map pins, zero ICS VEVENTs, and an empty trip JSON stops array; then create one valid stop and confirm list, map, ICS, and trip JSON all track back to that single stop"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.n1"
 name = "partial_persistence_is_incoherent"
-description = "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence."
+description = "After reload, a facet of session state silently survives (a created stop, dark theme, or day filter) while others reset, producing incoherent partial persistence instead of a full seeded baseline reset"
 type = "binary"
 negate = true
 weight = 1.0
@@ -127,7 +127,7 @@ weight = 1.0
 [[criterion]]
 id = "14.n2"
 name = "derived_surface_ignores_inputs"
-description = "A derived surface renders identically regardless of its inputs."
+description = "The plan list, map pins, or export previews render identically after applying a day or category filter that should hide stops"
 type = "binary"
 negate = true
 weight = 1.0
@@ -135,7 +135,7 @@ weight = 1.0
 [[criterion]]
 id = "14.n3"
 name = "different_inputs_produce_identical_output"
-description = "Repeating an action with different inputs yields byte-identical output."
+description = "Creating two stops with different titles yields identical ICS SUMMARY lines or identical trip JSON title fields for both"
 type = "binary"
 negate = true
 weight = 1.0
@@ -143,10 +143,85 @@ weight = 1.0
 [[criterion]]
 id = "14.n4"
 name = "cross_view_state_is_stale"
-description = "State changes appear in one view but not another until reload."
+description = "A rename or status change appears in Plan List but not in kanban, map popup, or trip JSON until reload"
 type = "binary"
 negate = true
 weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "vote_to_export_chain"
+description = "Chained probe: note a bucket item's name, start its poll and vote it to the winning threshold, confirm it appears as a scheduled stop on a day timeline and as a pin on the map, then open the markdown export and trip JSON and confirm both contain that item's name under the correct day (markdown heading / JSON day field)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "merge_content_everywhere_chain"
+description = "Chained probe: open an edit on a block, trigger the simulated peer edit on the same block, choose Merge in the conflict modal, and confirm the merged content is identical in the block's list row, its open detail card, and the freshly reopened markdown export"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.11"
+name = "undo_round_trip_multi_surface"
+description = "Chained probe: drag a stop to a different day, note the changed polyline distance labels, press Undo and confirm the stop returns to its original day with the original distance labels and the map pin back in the original day color, then press Redo and confirm the move reapplies"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.12"
+name = "exports_recompile_from_live_state"
+description = "Input-dependent export: rename a stop and change its start time, then reopen the export surfaces; the markdown contains the new name, the ICS payload's VEVENT for that stop reflects the new DTSTART, and the trip JSON entry shows the new title and startTime — proving all three are recompiled from live state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "ics_omits_scheduled_blocks"
+description = "The ICS payload contains fewer VEVENT blocks than there are scheduled stops, or a newly created scheduled stop is absent from the regenerated payload"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "14.n6"
+name = "export_markdown_is_static"
+description = "The markdown export renders identical text before and after a mutation that should change it (a rename, a delete, or a promotion) — the document is a hardcoded string rather than compiled from state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "14.n7"
+name = "undo_desyncs_surfaces"
+description = "Undo restores a change on one surface but not another — for example the list row returns while the map pin, kanban card, or distance labels keep the undone state"
+type = "binary"
+weight = 1.0
+negate = true
+
+
+[[criterion]]
+id = "14.13"
+name = "trip_json_export_import_round_trip"
+description = "Chained probe: rename a seeded stop and change its startTime, create one new valid stop, Copy or Download the trip JSON, reload to the seeded baseline, Import that JSON, and confirm the renamed title and startTime, the new stop, list rows, map pins, markdown, ICS, and trip JSON all match the pre-export mutated state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.14"
+name = "field_contract_gates_create_and_export"
+description = "Chained probe: attempt to create a stop with endTime before startTime and confirm no row is added and endTime is named in the error; then create a valid stop and confirm the trip JSON stops entry and ICS VEVENT for that stop carry the submitted title, day, and startTime"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n8"
+name = "round_trip_import_drops_fields"
+description = "After exporting then re-importing trip JSON, visible stop fields (title, day, startTime, status, category, or costTier) differ from the pre-export state — the round-trip drops or rewrites contracted fields"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "behavioral.catchall"

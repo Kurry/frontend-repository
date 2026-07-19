@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -107,7 +107,7 @@ weight = 1.0
 [[criterion]]
 id = "4.7"
 name = "toast_enter_hold_exit_cycle"
-description = "A demo toast enters from below with a short ease, holds briefly (roughly 1.5s), then exits; toasts fire both on chart-tab switches and on clicking inert chrome actions"
+description = "A demo toast enters from below with a short ease, holds briefly (roughly 1.5s), then exits; toasts fire both on chart-tab switches and on clicking inert chrome actions; Copied confirmation follows the same toast language"
 type = "binary"
 weight = 1.0
 
@@ -125,6 +125,20 @@ description = "Row insertions, deletions, or bulk removals snap instantly with n
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "4.10"
+name = "export_drawer_and_palette_animate_in"
+description = "Opening the export drawer or command palette through the real UI control uses a short opacity/slide enter transition rather than snapping fully open"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "reduced_motion_disables_entry_exits"
+description = "With prefers-reduced-motion set, entry/exit animations are removed and state changes apply instantly while export, import, and CRUD remain reachable"
+type = "binary"
+weight = 0.5
 
 [[criterion]]
 id = "4.catchall"

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,22 +62,22 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "three_distinct_empty_states"
+description = "On a first visit with nothing created, the Channels sidebar, the memo list, and the Decommissioned view each show their own distinct friendly empty-state message rather than a blank area or one shared placeholder."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "forms_validate_inline_before_submit"
+description = "Transmission editor, Add New Channel, passcode prompt, and Import session show inline per-field validation naming the offending field before submit."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "errors_name_field_and_fix"
+description = "Error messages name the problem and the fix (blank title, duplicate channel, wrong or wrong-length passcode, contract-invalid import) rather than only saying Invalid."
 type = "binary"
 weight = 1.0
 
@@ -206,6 +206,36 @@ weight = 1.0
 id = "4.n10"
 name = "affordances_hidden_or_inaccessible"
 description = "Interactive affordances are visually hidden or inaccessible."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "title_over_120_chars_rejected"
+description = "Submitting a New Transmission with a title longer than 120 characters is blocked with an inline error naming the Title field and adds no memo."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "channel_name_over_40_chars_rejected"
+description = "Add New Channel with a name longer than 40 characters is rejected with an inline error naming the name field and adds no channel."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.13"
+name = "empty_session_export_still_schema_valid"
+description = "With empty collections, Export session still produces JSON with version 1, the current themeCore, empty channels/memos/decommissioned arrays, and an exportedAt timestamp; Copy JSON still shows Copied."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "contract_invalid_import_applies_partial_state"
+description = "Importing a session JSON that violates the field contract still mutates channels, memos, decommissioned, or Theme Core, or shows no named-field import error."
 type = "binary"
 negate = true
 weight = 1.0

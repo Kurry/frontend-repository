@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -70,21 +70,21 @@ weight = 1.0
 [[criterion]]
 id = "5.2"
 name = "console_clean_full_exercise"
-description = "No console errors, warnings, or unhandled promise rejections appear on load or during a full exercise of the app, including a complete 10-run re-run, a stop mid-run, reason changes, and the export copy"
+description = "No console errors, warnings, or unhandled promise rejections appear on load or during a full exercise of the app, including a complete 10-run re-run, a stop mid-run, reason changes, export copy, and an invalid import attempt"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "5.3"
 name = "reload_returns_seeded_state"
-description = "After re-runs, reason changes, filters, and a theme toggle, a page reload returns the app to its seeded baseline: the seeded suites, matrices, verdicts, and reasons, the default view, and the default theme, with none of those changes surviving"
+description = "After re-runs, reason changes, filters, a theme toggle, and an export or import surface open, a page reload returns the app to its seeded baseline: the seeded suites, matrices, verdicts, and reasons, the default view, and the default theme, with none of those changes surviving"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "5.4"
 name = "cross_view_state_coherence"
-description = "A change made in one surface is immediately reflected in every other surface that shows the same data without a reload: a re-run's results appear together in the queue row, detail panel, quarantine map, and export block, and a reason change appears in both the row and the timeline"
+description = "A change made in one surface is immediately reflected in every other surface that shows the same data without a reload: a re-run's results appear together in the queue row, detail panel, quarantine map, and Triage report JSON preview, and a reason change appears in the row, the timeline, and the export JSON"
 type = "binary"
 weight = 1.0
 
@@ -92,6 +92,13 @@ weight = 1.0
 id = "5.5"
 name = "stable_under_rapid_input"
 description = "Rapidly switching suites, toggling filters, opening details, and starting or stopping re-runs causes no hangs, dropped interactions, or desynced surfaces, and double-activating the re-run submit starts exactly one re-run"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.6"
+name = "api_shaped_schemas_drive_forms"
+description = "Reason update, re-run submit, and Import triage report validate through client-side schemas: invalid runCount or invalid import JSON shows named field or import errors before commit, and valid commits update the same store the queue and export previews read"
 type = "binary"
 weight = 1.0
 
@@ -107,6 +114,14 @@ negate = true
 id = "5.n2"
 name = "outbound_network_requests"
 description = "The network log shows outbound requests to external origins (CDN scripts, fonts, icons, or analytics) during load or use, or app chrome navigates away from the app's origin"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "5.n3"
+name = "export_import_schema_divergence"
+description = "A Triage report JSON export that the UI just produced fails the same Import validation path, or Import accepts payloads whose reason or verdict enums the queue UI itself rejects"
 type = "binary"
 weight = 1.0
 negate = true

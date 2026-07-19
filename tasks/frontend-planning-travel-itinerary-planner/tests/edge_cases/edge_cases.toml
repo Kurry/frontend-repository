@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -210,6 +210,94 @@ type = "binary"
 negate = true
 weight = 1.0
 
+[[criterion]]
+id = "4.11"
+name = "collision_flags_and_clears"
+description = "Editing a block's times to overlap another block flags both amber immediately, and editing them apart clears both warnings"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "empty_bucket_state"
+description = "Emptying the ideas bucket shows a bucket empty state message with no orphaned poll widgets remaining"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "viewer_blocked_action_feedback"
+description = "In the Viewer role, activating a mutating control changes nothing and a read-only notice explains that Viewers cannot edit the plan"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "empty_undo_history_safe"
+description = "With an empty undo history the Undo control is disabled or inert, and activating it produces no state change and no console error"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "recurring_duplicate_guard"
+description = "Running the repeat-daily generator a second time for the same title and time warns about the duplicates and adds no additional blocks"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "conflict_modal_dead_end"
+description = "The conflict-resolution modal can reach a state with no operable choice or dismiss path, blocking further interaction with the plan behind it"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.n12"
+name = "bulk_action_partial_apply"
+description = "A bulk Move to day, Mass tag, or Delete applies to only some of the selected stops while the bar reported the full selection, with no feedback about the skipped items"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.n13"
+name = "copy_confirmation_without_clipboard"
+description = "The export Copy control shows its confirmation toast while the clipboard is left empty or holding text that differs from the displayed markdown"
+type = "binary"
+weight = 1.0
+negate = true
+
+
+[[criterion]]
+id = "4.16"
+name = "end_before_start_rejected"
+description = "Submitting a stop with endTime not strictly after startTime adds no stop and shows an inline error naming endTime"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.17"
+name = "out_of_enum_rejected"
+description = "Submitting a stop with a category, costTier, status, or day outside the closed enums adds no stop and shows an inline error naming that field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.18"
+name = "malformed_import_rejected"
+description = "Importing malformed trip JSON shows a visible error naming the import problem, leaves stops unchanged, and produces no console errors"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n14"
+name = "empty_plan_exports_stale_events"
+description = "After deleting all stops, the ICS preview still contains VEVENT blocks or the trip JSON stops array is non-empty"
+type = "binary"
+weight = 1.0
+negate = true
 [[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"

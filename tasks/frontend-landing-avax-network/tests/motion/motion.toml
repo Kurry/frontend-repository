@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -213,6 +213,19 @@ type = "binary"
 weight = 0.5
 negate = true
 optional = true
+
+
+
+
+
+[[criterion]]
+id = "8.a6"
+name = "kinetic_effects_decorative_jank"
+description = "Kinetic text-splitting animations stutter, reflow mid-animation, or leave characters misaligned after settling."
+type = "binary"
+negate = true
+weight = 1.0
+
 
 [[criterion]]
 id = "4.catchall"

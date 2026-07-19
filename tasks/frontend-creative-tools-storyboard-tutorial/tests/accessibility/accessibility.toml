@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,86 +62,86 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "keyboard_operable_storyboard_controls"
+description = "Every interactive control — header tools, Tile/List/Slide toggles, scene actions, Add Scene create form, and slide previous/next — is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space), each showing a visible focus indicator when focused."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "create_form_focus_management"
+description = "When the Add Scene create form opens as a dialog or overlay, focus moves into the form; closing it returns focus to a sensible origin control such as Add Scene."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "scene_thumbnails_have_alt_text"
+description = "Every scene thumbnail image carries descriptive alternative text."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "create_validation_announced_live"
+description = "Create-form validation messages are announced via an aria-live polite region as well as shown inline under the field."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+name = "create_fields_explicitly_labeled"
+description = "The Add Scene title and description fields use explicit label elements associated with those controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
 name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+description = "Workspace headings (for example the storyboard title 1. Getting Started and section labels) follow a logical order with no skipped levels."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "workspace_landmarks_present"
+description = "The app exposes semantic landmarks (for example header/nav for chrome and main for the scene board) so assistive technology can navigate the tool."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
 name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+description = "Header titles, scene description text, view toggles, and primary buttons meet sufficient contrast against their surfaces on the light workspace."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "active_view_toggle_exposed_to_at"
+description = "The active Tile, List, or Slide toggle exposes its pressed state to assistive technology (for example aria-pressed or an equivalent selected state), not only a visual highlight."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion set, scene entrance staggers and Tile/List/Slide layout animations are removed and state changes apply instantly while every feature — create, edit, delete, and slide navigation — stays usable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
-name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+name = "storyboard_controls_unreachable_by_keyboard"
+description = "A header tool, view toggle, scene action, Add Scene form control, or slide previous/next control cannot be reached or activated via keyboard alone."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n2"
-name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+name = "focus_indicators_missing_on_controls"
+description = "Focused view toggles, Add Scene, slide controls, or create-form fields show no visible focus indicator or the indicator is obscured."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,55 +149,55 @@ weight = 1.0
 [[criterion]]
 id = "1.n3"
 name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+description = "View toggles, scene action menus, or slide controls use non-semantic tags without ARIA roles or accessible names."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+name = "active_mode_or_error_color_only"
+description = "The active view mode or a create-form error state is conveyed by color alone with no text, pressed state, or other non-color cue."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "create_form_no_focus_trap"
+description = "With the Add Scene create form open as an overlay, Tab moves focus to controls behind the overlay without keeping focus in the form."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+name = "unreadable_contrast_on_board"
+description = "Header titles, scene descriptions, or primary button labels are unreadable due to poor contrast against their background."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+name = "validation_errors_visual_only"
+description = "Create-form validation feedback is visual only with no aria-live polite announcement or equivalent assistive-technology exposure."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+name = "scene_thumbnails_missing_alt"
+description = "One or more scene thumbnail images are missing descriptive alternative text."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+name = "heading_order_skipped"
+description = "Workspace headings skip levels (for example jumping H1 to H3) or have no coherent order."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n10"
 name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+description = "With prefers-reduced-motion set, scene entrance staggers or Tile/List/Slide layout animations still run fully."
 type = "binary"
 negate = true
 weight = 1.0

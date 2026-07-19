@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,85 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "interactive_controls_keyboard_operable"
+description = "Every interactive control — theme toggle, hamburger, mega-menu links, Events Manager filters, form fields, and CTAs — is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space), each with a visible focus indicator."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "mega_menu_traps_focus_and_returns"
+description = "Opening the mega-menu drawer traps keyboard focus while open, closes on Escape, and returns focus to the hamburger control on close."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "placeholder_media_have_accessible_names"
+description = "Partner marks, trust-strip logos, and other imagery carry descriptive alt text or accessible names; purely decorative marks are hidden from the accessibility tree."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "form_validation_uses_live_regions"
+description = "Event-create and contact-form validation messages are announced via an aria-live polite region as well as shown visually."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+name = "form_fields_have_explicit_labels"
+description = "Event Manager create/edit fields and contact/email form fields use explicit label associations (or equivalent accessible names) for every required field."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+name = "headings_logical_order"
+description = "Section headings through the Ridge landing chapters follow a logical order with no skipped levels that break the outline (for example H1 jumping straight to H3)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "landmarks_nav_main_footer"
+description = "The document exposes HTML-first landmarks: a navigation region for sticky chrome / mega-menu, a main content landmark wrapping the landing chapters, and a contentinfo/footer landmark."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+name = "contrast_light_and_dark_themes"
+description = "Body text meets at least 4.5:1 contrast against its surface and UI controls meet at least 3:1 in both light and dark themes, including text on black-void modules and over the hero visual plane."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "semantic_interactive_chrome"
+description = "Theme toggle, hamburger, mega-menu CTAs, manager filters, and form controls use real button/link/input semantics rather than unlabeled non-interactive shells."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "reduced_motion_skips_signature_motion"
+description = "With prefers-reduced-motion emulated on a fresh load, the page-load entrance, Why Ridge sticky pile motion, Get started rise, RIDGE GLOBAL EVENTS character-decode, and desktop smooth-scroll are suppressed while the page remains fully scrollable and operable with settled content."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.a1"
+name = "global_events_heading_accessible_name"
+description = "After the RIDGE GLOBAL EVENTS character-decode runs via real enter-view scroll on a fresh load, the heading container exposes the final phrase RIDGE GLOBAL EVENTS as its accessible name while individual animated character spans are aria-hidden from the accessibility tree."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
 name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+description = "A primary interactive control (theme toggle, hamburger, mega-menu link, Events Manager filter, form field, or CTA) cannot be reached or activated via keyboard."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +148,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n2"
 name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+description = "Focused interactive controls show no visible focus indicator or the indicator is fully obscured by chrome or overlays."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,47 +156,47 @@ weight = 1.0
 [[criterion]]
 id = "1.n3"
 name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+description = "Custom interactive chrome (theme toggle, hamburger, mega-menu drawer, manager filters) uses non-semantic tags without ARIA roles or accessible names."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+name = "errors_conveyed_by_color_only"
+description = "Event-create or contact-form validation errors are indicated only by color with no text message naming the field."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "mega_menu_fails_to_trap_focus"
+description = "The open mega-menu drawer leaves keyboard focus free to escape into the page behind it, or Escape leaves the drawer open with focus away from the hamburger."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+name = "poor_contrast_unreadable_text"
+description = "Body or UI text is unreadable due to contrast below the mandated floors in light or dark theme."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+name = "form_feedback_visual_only"
+description = "Form validation messages appear visually only with no polite live-region exposure."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+name = "media_missing_alt_or_labels"
+description = "Partner marks, trust-strip logos, or other imagery lack descriptive alt text or accessible names."
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +204,15 @@ weight = 1.0
 [[criterion]]
 id = "1.n9"
 name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+description = "Headings skip levels or are unordered across landing chapters (for example jumping from H1 to H3)."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.a4"
+name = "global_events_heading_character_soup"
+description = "The RIDGE GLOBAL EVENTS kinetic headline is exposed to the accessibility tree as character soup — no accessible name for the full phrase on the container and the split character spans are not aria-hidden."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +220,44 @@ weight = 1.0
 [[criterion]]
 id = "1.n10"
 name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+description = "With prefers-reduced-motion set on a fresh load, the page-load entrance, sticky pile motion, Get started rise, character-decode, or desktop smooth-scroll continues to run."
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "1.b1"
+name = "command_palette_focus_trap"
+description = "The open command palette traps keyboard focus while open, closes on Escape, and returns focus to the control that opened it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.b2"
+name = "export_import_status_live_region"
+description = "Export Copy confirmation, Session leads Copied confirmation, and import error/success messages are announced via an aria-live polite region as well as shown visually"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.b3"
+name = "manager_selection_and_undo_keyboard"
+description = "Events Manager selection checkboxes, bulk actions, sort controls, and undo/redo controls are reachable and operable with the keyboard alone with visible focus indicators"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.b4"
+name = "session_leads_controls_keyboard_operable"
+description = "Session leads Undo last lead, Download leads JSON, and Copy leads JSON controls are reachable and operable with the keyboard alone and show a visible focus indicator"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n11"
+name = "palette_focus_escapes"
+description = "With the command palette open, keyboard focus escapes into the page behind it, or Escape leaves the palette open"
 type = "binary"
 negate = true
 weight = 1.0

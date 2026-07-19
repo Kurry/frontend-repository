@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,201 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "For fidelity tasks, evaluate whether the app matches the reference's UX affordances. Empty state UI is present and renders when a collection is empty."
+name = "chrome_links_stay_on_homepage"
+description = "All homepage chrome links (numbered nav items, the English control, footer links, social icons) either scroll within this document or are non-navigating stubs; Book your Studio opens the in-page inquiry overlay; no interaction leads to an application-error or Not-found page and no request leaves the origin."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "rapid_carousel_next_stays_in_bounds"
+description = "Rapidly clicking the living carousel next control repeatedly never blanks the carousel or skips past its bounds; at the last slide a further next click leaves a valid slide fully visible (either stopping at the last slide or looping to the first)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "menu_open_resize_to_desktop_usable"
+description = "Opening the menu overlay at 390px and then resizing the viewport to 1440px leaves the page fully usable: the desktop sidebar is shown and no scroll lock or leftover overlay blocks interaction."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "consent_dismiss_reappears_after_reload"
+description = "Dismissing the consent banner and then reloading shows the banner again; no browser storage is read or written at any point during dismiss or reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "scroll_reveals_do_not_retrigger"
+description = "Scrolling the full page to the footer and back does not re-trigger already-played one-time scroll reveals, and no section is left stuck invisible."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "consent_action_gives_visible_feedback"
+description = "Clicking Αποδοχή or Απόρριψη immediately removes the consent banner from view (visible confirmation of the action) rather than leaving it stuck on screen."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "carousel_controls_stay_labeled"
+description = "Living carousel next/previous controls remain identifiable as interactive controls with readable affordances after rapid clicking and after a reload back to slide one."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "menu_and_consent_use_semantic_controls"
+description = "The hamburger, menu close control, and consent Αποδοχή / Απόρριψη buttons use semantic button (or equivalent) controls rather than unlabeled div shells."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "menu_overlay_dismissible"
+description = "At 390px the open full-screen menu overlay can be dismissed via its close control, restoring page scrolling without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "english_control_is_inert_stub"
+description = "Activating the English language control performs a no-op or in-page stub on this homepage-only build — it never navigates away or opens an external locale URL."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "chrome_leads_to_error_or_external"
+description = "A nav item, Book CTA, footer link, social icon, English control, or wordmark leads to an application-error/Not-found page or a request that leaves the origin (Book CTA leaving the document counts)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "carousel_blanks_or_skips_bounds"
+description = "Rapid next clicks blank the living carousel or leave no valid slide fully visible past its bounds."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "resize_leaves_scroll_lock_or_overlay"
+description = "After opening the menu at 390px and resizing to 1440px, a scroll lock or leftover overlay still blocks desktop interaction."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "consent_persists_via_browser_storage"
+description = "After dismissing consent and reloading, the banner stays gone because localStorage, sessionStorage, or another browser storage API retained the dismissal."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "section_stuck_invisible_after_scroll"
+description = "After scrolling to the footer and back, a section that should be visible remains stuck invisible or a one-time scroll reveal re-fires incorrectly leaving broken layout."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "menu_not_keyboard_dismissible"
+description = "At 390px the open menu overlay cannot be dismissed via keyboard (focusable close control or equivalent) when keyboard navigation is used."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "consent_click_silent_no_removal"
+description = "Clicking Αποδοχή or Απόρριψη produces no visible change — the consent banner remains on screen with no feedback."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "primary_controls_labels_ambiguous"
+description = "Hamburger, menu close, carousel next/previous, or consent buttons lack readable labels or use ambiguous blank text."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "carousel_controls_become_inoperable"
+description = "After rapid next clicking, the living carousel next or previous control becomes permanently inoperable or invisible."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "interactive_affordances_hidden"
+description = "Required interactive affordances (hamburger below 1024px, carousel arrows, consent buttons) are visually hidden or inaccessible when their viewport context requires them."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "inquiry_invalid_submit_inline_errors"
+description = "Submitting the booking inquiry with any field-contract violation — empty full_name, email without a domain dot, phone with fewer than ten digits, move_in_month not YYYY-MM, message over 500 characters, or unchecked privacy_consent — keeps the overlay open, shows inline errors naming each offending field and the fix, and never shows Inquiry ready — export your packet or export controls."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "rapid_shortlist_toggle_stays_coherent"
+description = "Toggling the same studio tier on and off rapidly never leaves the badge count, drawer rows, and Monthly estimate disagreeing with each other."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "undo_empty_history_noop"
+description = "Undo when the shortlist history is empty leaves the shortlist unchanged (no negative count, no blank drawer crash); Redo when nothing was undone is a no-op."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "malformed_import_shows_error"
+description = "Importing a malformed JSON, a non-inquiry object, or a packet missing required inquiry keys / using studio_tier outside Kick/Boost/Flex / carrying a shortlist rent that does not match Kick 640 / Boost 690 / Flex 740 shows a visible import error and does not wipe a valid shortlist already on screen."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "past_or_invalid_move_in_month_rejected"
+description = "Submitting with move_in_month set to a past month or a non YYYY-MM value (for example 13/2026) keeps the overlay open, shows an inline error naming move_in_month, and never reveals export controls."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "invalid_inquiry_shows_success_or_export"
+description = "An invalid booking inquiry submit shows Inquiry ready — export your packet or reveals export controls despite a field-contract violation (missing required fields, malformed email/phone/month, or unchecked privacy consent)."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n12"
+name = "malformed_import_wipes_shortlist"
+description = "Importing malformed or schema-invalid JSON silently clears a valid shortlist without a visible import error."
 type = "binary"
 negate = true
 weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,132 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "spacing_and_sizing_follow_scale"
-description = "Spacing and sizing follow the design system's scale, with no arbitrary one-off values visible in computed styles."
+name = "centered_column_matches_reference"
+description = "At desktop width, the layout matches /reference-screenshots/ overview and segment screenshots within small tolerance: a single centered column roughly 600px wide holding the compact header, progress bar, and active step body — text wins if screenshot and instruction conflict."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "typography_matches_spec"
-description = "Typography matches the spec for all headings and body copy."
+name = "header_badge_title_caption"
+description = "The compact header shows a squared EuroScope badge, the title Custom EuroScope, and a theme-and-icon-patcher caption, matching the reference header anatomy."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "layout_matches_reference"
-description = "Layout matches reference screenshots to within a small tolerance at all specified breakpoints; fidelity tasks achieve near pixel-parity."
+name = "progress_circles_match_spec"
+description = "The progress bar uses numbered circles with the active stage fully labelled, completed stages showing a check mark, and upcoming stages showing a muted number, matching the specified wizard chrome."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.4"
-name = "specified_state_changes_animate"
-description = "Transitions or animations are applied to the state changes the spec calls out, such as add, delete, filter, or view switch."
+name = "light_neutral_blue_accent_wash"
+description = "Light neutral surfaces use a single blue accent for the active progress step and primary buttons, plus a soft radial accent wash behind the content, matching the specified palette."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "responsive_behavior_matches_reference"
-description = "Responsive behavior matches reference patterns."
+name = "bordered_control_clusters"
+description = "Control clusters sit in bordered white boxes with hairline borders and a subtle shadow on hover, matching the reference grouping treatment."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.6"
-name = "control_styling_matches_spec"
-description = "Button and form radii, padding, and shadows conform to the spec."
+name = "preview_panels_side_by_side"
+description = "On the theme-colours step, the colour Preview renders two side-by-side panels labelled Primary and Secondary, tinted from the working swatches, as in the reference."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.7"
-name = "typography_has_clear_hierarchy"
-description = "Typography has a clear hierarchy that distinguishes section and body text."
+name = "alert_blocks_colour_coded"
+description = "Information, Caution, and Warning alert blocks are colour-coded blue, amber, and red with a leading icon and bold heading, matching the specified guidance chrome."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.8"
 name = "component_states_match_spec"
-description = "Component states (default, hover, active, disabled) match the spec where specified."
+description = "Buttons and form controls show distinct default, hover, focus (visible ring), and disabled treatments matching the specified component states."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.9"
-name = "surface_treatments_match_spec"
-description = "Color, depth, and border treatments are precise per the design."
+name = "swatch_row_anatomy_matches"
+description = "Each of the six swatch rows shows the role name, a colour picker, and a hex text field in a consistent row anatomy matching the reference theme step."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.10"
-name = "microinteractions_match_spec"
-description = "Microinteraction feedback for hover and press follows the spec in duration and motion."
+name = "bitmap_grid_matches_reference"
+description = "The embedded-bitmaps step shows a preview grid of at least ten tiles that recolour under Vector and appear as muted placeholders under None, matching the reference grid treatment."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.n1"
-name = "sizing_or_spacing_contradicts_scale"
-description = "Visible sizing or spacing values contradict the specified scale."
+name = "composition_deviates_from_reference"
+description = "Section order or structure visibly deviates from the reference: missing centered patcher column, missing progress bar, or a generic equal-weight dashboard of cards instead of the step-based wizard focus."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n2"
-name = "colors_fall_outside_palette"
-description = "Colors appear outside the specified palette."
+name = "colors_outside_specified_palette"
+description = "Primary accents fall outside the specified light-neutral-plus-blue system, or alert blocks use arbitrary unrelated hues instead of blue/amber/red coding."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n3"
-name = "sizing_mismatches_spec"
-description = "Sizing mismatches the spec."
+name = "browser_default_controls"
+description = "Primary buttons, selects, or swatch fields use unstyled browser defaults when the spec and reference show styled bordered clusters and blue-accent primary actions."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n4"
-name = "required_animations_missing_or_wrong"
-description = "Animations are missing or incorrect where the spec requires them."
+name = "elements_clipped_vs_reference"
+description = "At the desktop reference width, key wizard elements render clipped, off-screen, or overlapping in ways that contradict the reference screenshots."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n5"
-name = "specified_controls_use_browser_defaults"
-description = "Form or button controls use browser default styles when the spec styles them."
+name = "type_hierarchy_collapsed"
+description = "Heading and body text collapse into one size and weight: the Custom EuroScope title matches helper text, or stage labels use the same size/weight as muted caption copy."
 type = "binary"
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "undo_export_chrome_matches_spec"
+description = "Undo/Redo chrome and the step-four export center appear in the wizard composition described by the instruction; where screenshots omit later hardened surfaces, the instruction text wins."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.12"
+name = "contrast_matrix_placement_matches_spec"
+description = "On the theme-colours step, the contrast matrix and colour-blindness control sit with the swatch/Preview cluster as specified rather than as a disconnected orphan panel."
+type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.n6"
-name = "layout_misaligned_at_breakpoints"
-description = "The grid or layout is misaligned at reference breakpoints."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n7"
-name = "elements_are_clipped_or_offscreen"
-description = "Elements render off-screen or clipped."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n8"
-name = "structure_deviates_from_reference"
-description = "Section order, content, or structure deviates from the reference on fidelity tasks."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n9"
-name = "heading_and_body_text_undifferentiated"
-description = "Heading and body text have no distinction."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n10"
-name = "microinteractions_deviate_from_reference"
-description = "Microinteractions are missing or deviate from the provided reference."
+name = "hardened_surfaces_missing_vs_spec"
+description = "Instruction-mandated hardened surfaces (contrast matrix, export center tabs, or command palette) are absent while the rest of the wizard roughly matches the reference screenshots."
 type = "binary"
 negate = true
 weight = 1.0
@@ -213,7 +195,7 @@ weight = 1.0
 [[criterion]]
 id = "design_fidelity.catchall"
 name = "design_fidelity_catchall"
-description = "The app exhibits a significant, browser-observable defect in fidelity to the spec or reference that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in fidelity to the spec or reference screenshots that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

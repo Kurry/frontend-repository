@@ -1,0 +1,203 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "7.1"
+name = "layout_adapts_desktop_to_mobile"
+description = "The layout adapts gracefully from 1440 pixel desktop to 375 pixel mobile: toolbar, facet rail, grid, and views reflow without breakage"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.2"
+name = "grid_column_steps"
+description = "The card grid steps from 3 columns at desktop to 2 at medium widths and 1 at 375 pixels"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.3"
+name = "facet_rail_collapses"
+description = "At widths of 768 pixels and below the facet rail collapses behind a filter toggle that reopens it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.4"
+name = "content_avoids_clipping_and_overflow"
+description = "At 375 pixel width no content clips or overflows the viewport and no page-level horizontal scrolling appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.5"
+name = "comparison_stacks_at_narrow"
+description = "The comparison's two persona columns stack vertically at narrow widths with the trait readout and chart still legible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.6"
+name = "stacking_reflows_logically"
+description = "At narrow widths the toolbar, grid, bench, and overlays stack in a logical order with primary content reachable first"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.7"
+name = "mobile_tap_targets_are_large_enough"
+description = "Card actions, sliders, facet entries, and tray controls present tap targets of at least 44 pixels at mobile widths"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "7.8"
+name = "overlays_fit_small_screens"
+description = "The editor modal, poll overlay, and drawers fit within a 375 pixel viewport with their controls reachable and usable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.9"
+name = "charts_resize"
+description = "The radar charts resize to their containers rather than overflowing at any width"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.10"
+name = "fixed_controls_remain_accessible"
+description = "The bulk tray and toolbar remain visible and operable at every width without covering the content they act on"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.n1"
+name = "layout_breaks_at_breakpoints"
+description = "The layout breaks or overflows at 1440, 768, or 375 pixel widths"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.n2"
+name = "mobile_controls_too_small_or_misaligned"
+description = "Controls are too small to activate or visibly misaligned at mobile widths"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.n3"
+name = "text_too_small_on_devices"
+description = "Card or panel text becomes unreadably small at some width"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.n4"
+name = "page_level_horizontal_scroll"
+description = "Page-level horizontal scrolling appears at 375 pixel width because the grid, comparison, or a chart widens the page"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.n5"
+name = "rail_missing_at_some_widths"
+description = "The facet rail or its toggle is unreachable at some width, leaving filters unusable"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.n6"
+name = "fixed_positions_obscure_content"
+description = "The bulk tray, toolbar, or an overlay permanently obscures card or bench content at some width"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.n7"
+name = "elements_overlap_at_some_size"
+description = "Cards, badges, charts, or overlays overlap each other at some viewport size"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.n8"
+name = "controls_disappear_at_sizes"
+description = "Search, filters, undo/redo, export, or card actions disappear entirely at specific sizes with no alternative access"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "responsiveness.catchall"
+name = "responsiveness_catchall"
+description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

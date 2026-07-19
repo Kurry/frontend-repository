@@ -1,0 +1,163 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "8.1"
+name = "card_entrance_scale_fade"
+description = "New and cloned cards scale from roughly 0.85 to 1.0 and fade in over roughly 200 milliseconds, driven by the real create and clone controls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.2"
+name = "flip_rotation_with_midpoint_swap"
+description = "The card flip animates as a 3D rotation over roughly 350 milliseconds with a midpoint visibility swap between front and back, triggered by really clicking the card"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.3"
+name = "radar_animates_between_shapes"
+description = "The radar chart animates between trait shapes while a slider is scrubbed rather than snapping between states"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.4"
+name = "streaming_text_affordance"
+description = "Streamed test-bench text appears incrementally with a subtle caret or pulse affordance while the streaming status is active"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.5"
+name = "votes_and_badge_animate"
+description = "Simulated votes in the poll overlay arrive one by one with a short entrance transition, and the promoted badge animates in on the winner"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.6"
+name = "modal_drawer_tray_transitions"
+description = "Modals enter and exit with a 200 to 300 millisecond opacity and scale transition, the export and attacher drawers slide in from the side, and the bulk tray slides up on first selection and away when it clears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.7"
+name = "drag_ghost_and_drop_target"
+description = "Dragging a persona from the attacher drawer shows a drag ghost, and the bench slot's drop target visibly highlights while the drag hovers it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.8"
+name = "hover_system"
+description = "While actually hovering: buttons ease background and shadow with a slight press effect, cards lift with a shadow ease, facet entries and history rows take a full-width hover wash, and form controls show focus rings (verify via computed style while the pointer is over the element)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.9"
+name = "toast_lifecycle"
+description = "Toasts after create, clone, attach, bulk apply, and copy slide in, remain readable, and auto-dismiss with a fade"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.10"
+name = "reduced_motion_swaps"
+description = "With prefers-reduced-motion set, the flip becomes an instant content swap, cards appear without animation, streamed text may arrive in larger chunks without the pulse, and every transition applies instantly while all features stay usable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.n1"
+name = "no_hover_or_press_feedback"
+description = "Buttons, cards, or facet entries show no hover, focus, or press feedback beyond browser defaults when exercised with the real pointer"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "8.n2"
+name = "animation_blocks_or_janks"
+description = "An animation visibly janks the layout, blocks input while running, or leaves elements misaligned after settling (for example the flip clipping neighbors or the tray trapping clicks mid-slide)"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "8.n3"
+name = "state_snap_shortcut"
+description = "A specified transition (card entrance, flip, radar morph, vote arrival, drawer slide) is absent when driven through the real UI control path — the state simply snaps"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "motion.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

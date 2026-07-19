@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,126 +62,126 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "author_connect_run_updates_artifacts"
+description = "Author then run: drag a Prompt node from the palette, connect it with a compatible edge, press Run — the new node advances pending→running→complete in topological order, the rollup counts it, and both Workflow Definition JSON and Mermaid previews include the new node and edge"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "seeded_agent_retry_recovers"
+description = "Watch a failure recover: press Run and observe the seeded Agent node retry with attempt counter and backoff countdown, succeed on the third attempt; the timeline shows retry-scheduled entries and the run finishes complete"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "retry_from_failed_preserves_upstream"
+description = "After driving a run to a failed state (exhausted retries), Retry from failed node resumes at that node while upstream nodes keep frozen outputs, timestamps, and complete badges"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "pause_resume_mid_run"
+description = "Pause mid-run freezes progression and the rollup; Resume continues from exactly the next node with completed nodes untouched"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "save_load_reload_round_trip"
+description = "Save the canvas under a new name, load a different saved workflow through confirmation, then load the first back — canvas nodes/edges and artifact previews match the saved graph each time"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "export_import_round_trip_flow"
+description = "Configure a distinctive node title and Agent timeout_seconds, export Workflow Definition JSON, alter the canvas, Import the JSON — canvas, badges, validity badge, and both artifact formats reconstruct the exported graph without reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "undo_redo_flow"
+description = "After a delete or configuration save that changes the artifact preview, Undo restores prior canvas and both preview texts together; Redo reapplies across those surfaces"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "bulk_delete_then_undo_flow"
+description = "Multi-select two nodes, Delete selected (both nodes and edges gone; JSON omits them), Undo once — both nodes and edges return together"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "reload_returns_seeded_baseline_flow"
+description = "A page reload returns seeded example workflow, empty timeline, no saved-run state, empty undo/redo stacks, and artifact previews matching the seeded graph"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "artifact_panel_toggle_preserves_canvas"
+description = "Opening and closing the Artifact panel via the toolbar toggle keeps the canvas graph and run state intact; format tab switches between JSON and Mermaid without losing preview content"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "primary_authoring_flows_unavailable"
+description = "Palette drop, edge connect, Run, Save/load, or Artifact export/import are not enabled from the UI"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "new_nodes_missing_from_export"
+description = "A newly authored node appears on the canvas but is missing from the Workflow Definition JSON and Mermaid previews"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "run_and_artifact_desync"
+description = "After a run or configuration save, canvas badges, rollup, and artifact previews disagree about the same graph state"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "import_fails_silently"
+description = "Import of valid Workflow Definition JSON leaves the canvas unchanged with no success feedback and no validation message"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_canvas_breaks_artifact_ui"
+description = "Clearing every node leaves the Artifact panel crashed, blank without an empty-state explanation, or throwing console errors"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "undo_breaks_subsequent_run"
+description = "After Undo restores a deleted node, pressing Run fails to execute or leaves badges stuck"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "collapsed_panels_cannot_reopen"
+description = "Collapsed Saved Workflows or Artifact chrome cannot be re-opened from the toolbar toggle"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,23 +189,23 @@ weight = 1.0
 [[criterion]]
 id = "6.n8"
 name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+description = "Configuration, save, confirmation, or import overlays block the canvas with no Escape/close exit"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "failed_run_lacks_feedback"
+description = "A failed run (exhausted retries) provides no failed badge, no rollup failure count change, and no timeline failure entry"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "export_import_dead_end"
+description = "Export/import round-trip requires a full page reload to see reconstructed nodes, or leaves the user with no recovery path after a failed import"
 type = "binary"
 negate = true
 weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,150 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "spacing_and_sizing_follow_scale"
-description = "For games, evaluate spec fidelity of the HUD and screens rather than pixel-parity. Spacing and sizing follow the design system's scale, with no arbitrary one-off values visible in computed styles."
+name = "spacing_follows_4px_scale"
+description = "HUD panels, tabs, and chrome spacing follow the 4px base unit and ~6px panel/card radius from the visual spec — evaluate HUD/screen fidelity, not canvas pixel-parity."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "typography_matches_spec"
-description = "Typography matches the spec for all headings and body copy."
+name = "typography_matches_letterdrop_spec"
+description = "Typography matches the spec: Arial-based stack; H1 near 34px (LetterDrop title), H2 near 17px, body near 17px on chrome surfaces."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "layout_matches_reference"
-description = "Layout matches reference screenshots to within a small tolerance at all specified breakpoints; fidelity tasks achieve near pixel-parity."
+name = "hud_layout_matches_reference_screens"
+description = "At desktop width, HUD + tabs + board chrome composition matches /reference-screenshots/ overview and segment panels within a small tolerance (spec text wins on conflict) — not pixel-perfect canvas tiles."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.4"
-name = "specified_state_changes_animate"
-description = "Transitions or animations are applied to the state changes the spec calls out, such as add, delete, filter, or view switch."
+name = "specified_game_state_motions_present"
+description = "Spec-required motion states are present via the real UI path: tile fall, streak meter fill/reset, invalid-tray shake, pause dim + Paused overlay, toast fades, Board Cleared!/achievement particle bursts."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "responsive_behavior_matches_reference"
-description = "Responsive behavior matches reference patterns."
+name = "responsive_hud_matches_spec"
+description = "Responsive behavior matches the spec: at ~375px the board and HUD scale without horizontal scroll; at 1440px and 375px tabs/HUD/settings remain usable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.6"
-name = "control_styling_matches_spec"
-description = "Button and form radii, padding, and shadows conform to the spec."
+name = "pill_buttons_match_spec"
+description = "Primary buttons (Submit Word, Pause, Export Run, Save Progress) use #007AFF / #FEFEFE full-pill (radius ~1000px) with no shadow; secondary (Undo Last Tile, Resume, Resume Saved Run, Copy, Import, Export History) use #E6EEF7 / #007AFF full-pill with no shadow — not browser-default buttons."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.7"
-name = "typography_has_clear_hierarchy"
-description = "Typography has a clear hierarchy that distinguishes section and body text."
+name = "title_vs_body_hierarchy"
+description = "Typography hierarchy clearly distinguishes the LetterDrop H1 title from 17px body/HUD labels."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.8"
-name = "component_states_match_spec"
-description = "Component states (default, hover, active, disabled) match the spec where specified."
+name = "control_states_match_spec"
+description = "Button hover states are visible on Submit Word, Undo Last Tile, Pause, Resume, Save, Save Progress, Export Run, and Play again; Settings Save stays disabled until the form is valid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.9"
-name = "surface_treatments_match_spec"
-description = "Color, depth, and border treatments are precise per the design."
+name = "palette_and_hazard_treatments"
+description = "Chrome uses #F5F5F7 background with #007AFF accent for primary CTA, streak badge, and tier readout; the danger line reads as a warning-toned hazard distinct from the board; locked achievements use muted/grayscale vs full color when unlocked."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.10"
-name = "microinteractions_match_spec"
-description = "Microinteraction feedback for hover and press follows the spec in duration and motion."
+name = "microinteractions_match_spec_path"
+description = "Hover/focus-visible transitions on real chrome controls and settings open/close short transition match the motion/visual spec when exercised through the UI (not a state shortcut)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.n1"
-name = "sizing_or_spacing_contradicts_scale"
-description = "Visible sizing or spacing values contradict the specified scale."
+name = "spacing_contradicts_4px_scale"
+description = "Visible major HUD gaps use arbitrary odd-pixel spacing that contradicts the 4px baseline scale."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n2"
-name = "colors_fall_outside_palette"
-description = "Colors appear outside the specified palette."
+name = "colors_outside_letterdrop_palette"
+description = "Chrome surfaces or accents use colors outside the specified tokens (#F5F5F7, #E6EEF7, #54C3FA, #007AFF, #1D1D1E) as the dominant system (e.g. arbitrary purple theme wash)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n3"
-name = "sizing_mismatches_spec"
-description = "Sizing mismatches the spec."
+name = "type_sizing_mismatches_spec"
+description = "LetterDrop H1 or body chrome type is grossly mismatched versus the ~34px / ~17px spec metrics."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n4"
-name = "required_animations_missing_or_wrong"
-description = "Animations are missing or incorrect where the spec requires them."
+name = "required_game_motions_missing"
+description = "Required animations are missing: no continuous tile fall, no invalid-tray shake, no Paused overlay dim, or no toast feedback on score/power/unlock."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n5"
-name = "specified_controls_use_browser_defaults"
-description = "Form or button controls use browser default styles when the spec styles them."
+name = "controls_use_browser_defaults"
+description = "Submit Word, Pause, Resume, or Undo Last Tile use unstyled browser-default button appearance when the spec requires pill token styling."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n6"
-name = "layout_misaligned_at_breakpoints"
-description = "The grid or layout is misaligned at reference breakpoints."
+name = "hud_layout_misaligned_vs_screenshots"
+description = "At desktop width the HUD/tabs/board chrome composition is grossly misaligned versus /reference-screenshots/ segment panels."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n7"
-name = "elements_are_clipped_or_offscreen"
-description = "Elements render off-screen or clipped."
+name = "chrome_elements_clipped_or_offscreen"
+description = "HUD panels, view tabs, word tray, or settings form render off-screen or clipped at 1440px or 375px."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n8"
-name = "structure_deviates_from_reference"
-description = "Section order, content, or structure deviates from the reference on fidelity tasks."
+name = "chrome_structure_deviates"
+description = "Chrome structure omits LetterDrop title, HUD, Game/History/Achievements tabs, or the canvas board region shown in the reference screenshots."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n9"
-name = "heading_and_body_text_undifferentiated"
-description = "Heading and body text have no distinction."
+name = "heading_body_undifferentiated"
+description = "Title and body/HUD text have no visual distinction (same size/weight throughout the chrome)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n10"
-name = "microinteractions_deviate_from_reference"
-description = "Microinteractions are missing or deviate from the provided reference."
+name = "microinteractions_deviate_from_spec"
+description = "Hover states on primary/secondary pills or settings open/close transitions are missing or clearly deviate from the specified language."
 type = "binary"
 negate = true
 weight = 1.0
@@ -213,7 +213,7 @@ weight = 1.0
 [[criterion]]
 id = "design_fidelity.catchall"
 name = "design_fidelity_catchall"
-description = "The app exhibits a significant, browser-observable defect in fidelity to the spec or reference that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in fidelity to the LetterDrop HUD/screen spec or reference that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

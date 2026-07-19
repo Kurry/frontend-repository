@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -64,156 +64,84 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "11.1"
 name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+description = "Optional polish beyond the spec: note/folder microinteractions feel deliberate (e.g. refined pin or color feedback) without harming core flows."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.2"
 name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+description = "Optional: motion beyond the required list/toast/drawer transitions adds clarity (e.g. batch tray enter) while respecting reduced motion."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.3"
 name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+description = "Optional: a dismissible coachmark tour highlights the folder tree, Export Nest, and command palette on first visit."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.4"
 name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+description = "Optional: richer visual treatment of the nested tree or export preview that aids scanning without clutter."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.5"
 name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+description = "Optional: additional keyboard shortcuts beyond Ctrl+K / undo that speed navigation without breaking required shortcuts."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.6"
 name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+description = "Optional: session-scoped chrome density or theme preference that does not use forbidden browser storage."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.7"
 name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+description = "Optional: NoteNest brand voice in empty states and export hints feels product-quality rather than generic scaffold copy."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.8"
 name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+description = "Optional: an extra session theme accent that stays coherent across sidebar, list, and Export Nest."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+name = "search_syntax_chips"
+description = "Optional: search syntax chips such as color:blue or pinned:true filter the note list when typed into the search box."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+name = "printable_markdown_vault"
+description = "Optional: a printable Markdown vault preview mode with print-optimized page breaks."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n1"
 name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+description = "The experience stops at a bare MVP with no optional polish: no coachmarks, search syntax chips, printable vault mode, or other beyond-spec enhancements that would aid a real NoteNest operator."
 type = "binary"
 negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
-type = "binary"
-negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
-description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The build includes a significant, browser-observable enhancement beyond the specification that improves NoteNest usefulness or clarity and is not covered by any other criterion in this file. Name the enhancement and cite concrete evidence."
 type = "binary"
-weight = 1.0
+weight = 0.5

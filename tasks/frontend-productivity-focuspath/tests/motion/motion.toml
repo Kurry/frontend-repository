@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,14 +62,14 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
-description = "Completing a milestone's final step by clicking its real checkbox animates the node filling in as it transitions to the completed solid state."
+name = "milestone_node_fill_animates"
+description = "Completing a milestone's final step by clicking its real checkbox animates the node filling in as it transitions to the completed filled state."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "4_2"
+name = "overview_detail_transition_smooth"
 description = "Navigating between the overview and a goal's detail view by clicking the real controls transitions smoothly rather than cutting abruptly."
 type = "binary"
 weight = 0.5
@@ -77,14 +77,14 @@ optional = true
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
+name = "hover_and_focus_washes"
 description = "Milestone nodes, checklist rows, and Focus Today toggles show a visible hover state and a visible keyboard focus outline when hovered/focused via the real controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "4_5"
+name = "no_hover_or_focus_affordance"
 description = "Milestone nodes, step rows, and toggles present no hover or keyboard-focus affordance, appearing visually inert to pointer and keyboard interaction."
 type = "binary"
 weight = 1.0
@@ -114,14 +114,30 @@ weight = 1.0
 [[criterion]]
 id = "4.9"
 name = "reduced_motion_respected"
-description = "With prefers-reduced-motion enabled, animations are removed or reduced to near-instant while every state change (step toggles, milestone completion, view switches) still lands correctly."
+description = "With prefers-reduced-motion enabled, animations are removed or reduced to near-instant while every state change (step toggles, milestone completion, view switches, Export open) still lands correctly."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.catchall"
+id = "4.10"
+name = "export_and_palette_enter_exit"
+description = "The Export drawer or modal and the command palette enter and exit with a brief opacity and scale transition when opened and closed via the real controls; Copy and Download show a short confirmation before resetting."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.n1"
+name = "milestone_complete_snaps_without_animation"
+description = "Completing a milestone's final step via its real checkbox snaps the node to the filled state with no fill-in animation."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "motion.catchall"
 name = "motion_catchall"
 description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true
+

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,182 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "For fidelity tasks, evaluate the reference's flows. Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "mobile_menu_opens_with_four_nav_links"
+description = "At 390px width: tapping the hamburger opens the full-screen menu overlay with all four numbered nav links visible (01 Student Homes, 02 Our way of living, 03 Community, 04 Επικοινωνία) and the body gains its menu-open state while the page behind stops scrolling."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "mobile_menu_close_restores_scroll_position"
+description = "At 390px width with the menu open: activating the close control fades the overlay out, removes the menu-open state, and the underlying scroll position is exactly where it was — all without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "carousel_next_advances_one_slide"
+description = "On the living section: clicking the next control once advances the carousel by exactly one slide — the visible slide title changes from Community living spaces to Ασφάλεια and its amenity list swaps accordingly."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "carousel_previous_returns_first_slide"
+description = "After advancing one slide on the living carousel: clicking the previous control returns to the first slide with title Community living spaces and its original amenity list intact."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "carousel_resets_to_first_on_reload"
+description = "After advancing the living carousel away from slide one, a full page reload returns the carousel to its first slide (Community living spaces), proving carousel position was session state only."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "consent_banner_appears_after_load"
+description = "Shortly after a fresh load the cookie consent banner is visible with copy Χρησιμοποιούμε cookies and Αποδοχή / Απόρριψη buttons."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "consent_dismiss_preserves_page_state"
+description = "After scrolling and advancing the living carousel one slide: clicking Αποδοχή (or Απόρριψη) removes the consent banner while scroll position and the open carousel slide remain unchanged."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "consent_reappears_after_reload"
+description = "After dismissing the consent banner, a full page reload returns the app to its seeded baseline: the intro plays again, the carousel shows slide one, and the consent banner reappears because dismissal was held only in memory."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "sidebar_nav_scrolls_in_page"
+description = "At 1440px: activating a numbered sidebar nav item (e.g. 01 Student Homes or 03 Community) smoothly scrolls within the same homepage document to the matching section without leaving the root route."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "book_cta_scrolls_or_noops_on_homepage"
+description = "Activating a Book your Studio CTA from the sidebar or hero opens the booking inquiry overlay on this homepage — it never navigates to another route or external origin."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "menu_carousel_or_consent_flow_unavailable"
+description = "The mobile menu cannot open/close from the hamburger, the living carousel cannot advance via next/previous, or the consent banner cannot be dismissed from Αποδοχή / Απόρριψη."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "carousel_title_and_amenities_desync"
+description = "After clicking next or previous on the living carousel, the visible slide title and amenity list disagree (title advances while amenities stay on the prior slide, or the reverse)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "menu_overlay_blocks_with_no_exit"
+description = "At 390px the full-screen menu overlay opens but cannot be closed, leaving navigation blocked with no exit path."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "chrome_navigates_off_homepage"
+description = "Activating a numbered nav item, Book CTA, footer link, social icon, English control, or wordmark navigates to another route, opens an external origin, or leaves the homepage."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "flow_dead_end_requires_reload"
+description = "After opening the menu, advancing the carousel, or dismissing consent, recovering normal homepage interaction requires a full page reload."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
+id = "6.11"
+name = "shortlist_flow_count_and_estimate"
+description = "Shortlist flow: toggle Kick then Boost onto the shortlist; badge count becomes 2, the drawer lists both tiers with exact rents, and Monthly estimate reads 1330€."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "shortlist_undo_then_redo"
+description = "After Kick and Boost are shortlisted, Undo once drops Boost and the estimate to 640€; Redo restores Boost and 1330€ without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "booking_submit_export_flow"
+description = "Booking and export flow: open Book your Studio, submit a valid create-inquiry body (full_name ≥2 chars, valid email, phone ≥10 digits, studio_tier Flex, move_in_month YYYY-MM current-or-future, privacy_consent checked); success shows Inquiry ready — export your packet; Export JSON has inquiry.studio_tier Flex, matching inquiry.full_name, and monthly_estimate_eur consistent with the shortlist; Copy packet shows a Copied confirmation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "import_round_trip_restores_session"
+description = "Import round-trip: with a non-empty shortlist and filled inquiry, Export JSON, clear shortlist and reset the form, then Import packet; shortlist selections, Monthly estimate, and inquiry fields match the exported session again."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "faq_accordion_exclusive_expand"
+description = "FAQ flow: open Τι περιλαμβάνει το ενοίκιο; then open Πότε μπορώ να κλείσω studio; — the first collapses and the second expands."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.16"
+name = "command_palette_flow"
+description = "Command palette flow: press Cmd+K or Ctrl+K, choose typical-unit, confirm scroll to typical-studio and palette close; open again and Escape dismisses without navigation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.17"
+name = "schema_rejection_flow_per_field"
+description = "Schema rejection flow: submit once with empty full_name, once with email not-an-email, once with phone 123, once with move_in_month 13/2026, and once with privacy unchecked — each attempt keeps the overlay open, shows an inline error naming that field, and never shows Inquiry ready — export your packet or export controls."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.18"
+name = "schema_invalid_import_rejected_flow"
+description = "After a valid session exists, importing a JSON object that drops email or sets studio_tier to Ultra shows a visible import error and leaves the prior shortlist and inquiry fields unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "booking_export_flow_unavailable"
+description = "After activating Book your Studio and submitting a valid create-inquiry body, the overlay stays without the success copy Inquiry ready — export your packet and without Export JSON, Export Markdown, and Copy packet controls, or Book your Studio navigates off the homepage."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "shortlist_undo_does_not_restore"
+description = "After adding Kick then Boost, Undo leaves Boost still shortlisted at the prior Monthly estimate, or after that Undo, Redo leaves Boost absent from the shortlist."
 type = "binary"
 negate = true
 weight = 1.0

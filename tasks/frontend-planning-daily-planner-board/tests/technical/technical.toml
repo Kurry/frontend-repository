@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -153,6 +153,28 @@ description = "Devtools shows network requests to external origins (CDN scripts,
 type = "binary"
 weight = 1.0
 negate = true
+
+
+[[criterion]]
+id = "2.14"
+name = "in_memory_persistence_via_export_artifacts"
+description = "After mutations, localStorage and sessionStorage remain empty, and the session's durable end state is the Export canvas ICS and planner JSON artifacts plus the MCP query surface rather than browser storage"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.15"
+name = "api_shaped_field_contract_enforced_in_ui"
+description = "Add task and edit forms enforce the Task field contract with named inline errors for title, day, channel, plannedTime, and startTime bounds, and a successfully created task's fields match what a subsequent planner JSON export entry shows for that task"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.16"
+name = "export_import_share_same_store"
+description = "Importing planner JSON updates the same tasks collection the board, calendar panel, column footers, undo history, and export previews read — not a disconnected copy"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "2.catchall"

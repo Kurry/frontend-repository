@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,77 +63,77 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "9.1"
 name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+description = "The app is interactive within 2 seconds of a local cold load"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
 name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+description = "No console errors appear during a full exercise including create, edit, delete, filters, search, chart tabs, bulk actions, burn rate, command palette, export, and import"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
 name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+description = "Chart tab switches, filter changes, and export drawer opens apply without a perceptible multi-second freeze"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.4"
 name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+description = "Import commit or export compile shows a busy indicator when work is not instantaneous"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "9.5"
 name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+description = "After importing or creating enough rows to roughly double the seed set, the table and charts remain scrollable and interactive"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.6"
 name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+description = "Rapid create/delete and filter toggles keep the UI responsive with no hung controls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
 name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+description = "Row enter/exit and toast animations do not visibly stutter the rest of the reports chrome"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "9.8"
 name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+description = "Rapid repeated input on filters, search, and chart tabs does not freeze or drop interactions"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.9"
 name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+description = "After an extended session of creates, exports, and chart switches, the page remains usable without progressive slowdown suggesting resource runaway"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "9.10"
 name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+description = "When charts fail to render data (empty filtered set), an empty-chart or empty-list message appears rather than a blank hung region"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.n1"
 name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+description = "Local cold load remains non-interactive for more than 2 seconds"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n2"
 name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+description = "Console errors appear during create, export, import, or chart tab flows"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n3"
 name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+description = "Chart tab switches or export drawer opens block the UI for a multi-second lag"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +157,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n4"
 name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
+description = "Import or export leaves the UI hung with no feedback"
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +165,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n5"
 name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+description = "Doubling the seed collection makes scrolling or chart redraws unusably janky"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n6"
 name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
+description = "Row or toast animations block pointer/keyboard input until they finish"
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +181,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n7"
 name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
+description = "Chart or icon resource loading blocks first interactive render beyond the 2 second budget"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n8"
 name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
+description = "Extended use of export/import and chart switches causes progressive memory or CPU runaway that freezes the tab"
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +197,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n9"
 name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
+description = "During slower import/export work the control region goes blank with no loading affordance"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n10"
 name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+description = "Rapid filter/search/chart switching or empty-collection export crashes the page"
 type = "binary"
 negate = true
 weight = 1.0
@@ -213,7 +213,7 @@ weight = 1.0
 [[criterion]]
 id = "performance.catchall"
 name = "performance_catchall"
-description = "The app exhibits a significant, browser-observable defect in performance or stability that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable performance defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,176 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "For fidelity tasks, evaluate the reference's flows. Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "home_tag_opens_case_without_reload"
+description = "Starting on home: clicking an architect tag (e.g. Julian Kade) swaps to that case without a full page reload; the fixed home header hides, a case sub-header appears with a home link and the category name, the document title becomes exactly Julian Kade—Field Notes Archive, and the case shows the architect name, category-colored folder, portrait sheet, sibling tags, and scrapbook."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "case_sub_header_home_returns_stack"
+description = "From an open case: clicking the sub-header home link returns to the home route without a full page reload; all four category groups (Organic & Early Modernism, Expressive, Monumental Modernism, Place / culture continuity) and their eight architect tags are still present."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "sibling_tag_swaps_case_surfaces"
+description = "From the Julian Kade case: clicking the Imani Vale sibling tag swaps to the Imani Vale case without a full page reload; the largest heading, folder color, and document title all update to Imani Vale's values, and the sibling region recomputes to link Julian Kade and Pavel Rowan."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "overscroll_advances_next_case"
+description = "On a case route: triggering the bottom overscroll affordance labelled to open the next case swaps to the next architect in sequence without a full page reload; the sub-header category name, largest heading, folder color, and document title all update to the new architect."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "media_popup_play_and_close_round_trip"
+description = "On a video case (e.g. Mara Voss): clicking the video-poster scrapbook item opens a popup that dims the page and disables background scroll; pressing play shows a visible playing state; closing via the red circular close button or the dimmed backdrop stops media, restores background scroll, and leaves the case beneath unchanged."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "deep_link_parity_ten_routes"
+description = "Loading any of the ten routes directly by URL (home, about, and the eight cases ada-mercer through mae-calder) renders the same view, header or sub-header state, and exact document title as reaching that route through in-app navigation."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "scrapbook_drag_resets_on_reload"
+description = "On a case: drag one or more scrapbook items to new positions within the scrapbook region, then reload that case URL; every scrapbook item returns to its seeded position (in-memory client state, no persistence)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "about_close_returns_home"
+description = "On the about route: the red circular close button returns to home; the fixed home header is forced hidden while on about and is available again on home."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "category_unfold_reveals_footer"
+description = "On home: clicking a category cover header unfolds that group; unfolding the fourth category (Place / culture continuity) reveals the footer content (wind roses, scale, signature mask, studio credit)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "case_navigation_recovers_without_reload"
+description = "After opening a case, navigating via sibling tags or overscroll, and returning home via the sub-header link, the archive remains fully operable without requiring a full page reload to recover."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "primary_archive_flows_unavailable"
+description = "Architect tags on the home stack cannot open cases, sibling tags cannot swap cases, or the overscroll affordance cannot advance to the next case from the visible UI."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "case_surfaces_fail_to_update"
+description = "After clicking a home tag or sibling tag, the largest heading, folder color, or document title stays on the previous architect's values."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "header_subheader_desync_on_case"
+description = "After opening a case, the fixed home header remains visible alongside the case sub-header, or the sub-header category name disagrees with the active case's category."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "media_popup_blocks_with_no_exit"
+description = "A media popup opens but neither the red circular close button nor the dimmed backdrop closes it, leaving navigation blocked."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "deep_link_or_return_dead_end"
+description = "Loading a case URL directly, or returning from a case to home, leaves a blank/broken view or requires a full page reload to reach a usable archive state."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
+id = "6.11"
+name = "pin_note_dossier_pipeline"
+description = "On Julian Kade: pin the case, commit a field note containing kade-note-alpha, open Export dossier, and confirm the Dossier JSON preview contains schemaVersion exactly field-notes-archive.dossier.v1, julian-kade inside pins, and kade-note-alpha under notes; unpinning removes that architect from the reading list and from the next compiled preview."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "scrapbook_undo_redo_flow"
+description = "On a case: drag a scrapbook item to a new position, press Undo or Ctrl+Z so it returns to its prior position, then press Redo or Ctrl+Shift+Z so it returns to the dragged position."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "palette_navigates_to_case"
+description = "Press Ctrl+K, type enough of Imani Vale to highlight that case result, press Enter; the app swaps to the Imani Vale case without a full page reload and the palette closes."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "category_filter_then_all"
+description = "On home: choose Monumental Modernism so only that group's three tags remain operable, then choose All so all four groups and eight tags return."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "dossier_export_import_round_trip"
+description = "Pin two architects with distinct field notes, export Dossier JSON that satisfies the field contract, reload to clear session state, import that JSON, and confirm the reading list shows both pins with the same note bodies."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.16"
+name = "invalid_dossier_import_keeps_prior_pins"
+description = "With at least one pin already present, import a dossier payload with wrong schemaVersion or an unknown architect slug; visible validation names the problem, the existing pin set stays unchanged, and the reading list still shows the prior pin."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "dossier_pipeline_dead_end"
+description = "After pin and note changes, Export dossier still shows an empty or pre-session preview, omits schemaVersion field-notes-archive.dossier.v1, or Import dossier after reload leaves the reading list missing the previously exported pins and notes."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "palette_or_filter_flow_broken"
+description = "Pressing Ctrl+K leaves no command palette overlay, or choosing a category filter then All leaves the home stack stuck narrowed with missing tags."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "invalid_import_wipes_prior_session"
+description = "Importing a schema-invalid dossier clears or replaces an already-present pin set instead of rejecting the payload."
 type = "binary"
 negate = true
 weight = 1.0

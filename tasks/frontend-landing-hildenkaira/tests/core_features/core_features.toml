@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -119,21 +119,21 @@ weight = 1.0
 [[criterion]]
 id = "1.9"
 name = "contact_form_success_state"
-description = "When choosing \"We'll call you\" and submitting the contact form with a valid email and the Privacy Policy agreement checkbox ticked, the form's success state \"Thanks for your submission!\" replaces the fields; the popup contains an email field, an optional phone field, and the agreement checkbox"
+description = "When choosing \"We'll call you\" and submitting a contact payload that passes the field contract (valid email, terms true, optional phone within bounds), the form's success state \"Thanks for your submission!\" replaces the fields; the popup contains email, optional phone, and the Privacy Policy agreement checkbox"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
 name = "contact_form_inline_validation"
-description = "When submitting the contact form with an empty or invalid email, or with the agreement checkbox unchecked, the success state does not appear, the popup stays open, and an inline per-field error marks and names the offending field before submit succeeds"
+description = "When submitting the contact form with an empty or invalid email, with the agreement checkbox unchecked, or with a phone value outside the phone field contract, the success state does not appear, the popup stays open, and an inline per-field error marks and names the offending field before submit succeeds"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
 name = "cookie_banner_categories_accept"
-description = "Shortly after load a cookie banner appears with an Accept action and a preferences path exposing four categories — Essential (required), Marketing, Analytics, and Personalization — and clicking Accept dismisses the banner"
+description = "Shortly after load a cookie banner appears with an Accept action and a preferences path exposing four categories — Essential (required/locked), Marketing, Analytics, and Personalization — and clicking Accept dismisses the banner while writing cookieCategories with essential, marketing, analytics, and personalization all true"
 type = "binary"
 weight = 1.0
 
@@ -272,6 +272,115 @@ id = "1.40"
 name = "about_self_esteem_band_present"
 description = "The about/self-esteem band appears after testimonials and before the CTA block, showing the H2 \"Does your brand have self-esteem issues?\" with supporting copy and two call-to-action controls over a dark media band"
 type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "client_shortlist_toggles_and_nav_count"
+description = "Each of the five client cards exposes a Shortlist control; shortlisting Loom House then Second Circle raises the fixed-nav shortlist count from 0 to 1 to 2, marks those controls active, and the Shortlist panel lists both titles; removing Loom House from the panel drops the count to 1 and clears only Loom House's control."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "discovery_brief_json_keys_live"
+description = "Opening Export brief shows a JSON tab whose live object satisfies the Discovery brief JSON field contract: schemaVersion 1, brand Cinder & Bloom, shortlistedClients, activeClient, flickIndexByClient, locale (en or fi), cookieCategories matching the cookie consent request body (essential/marketing/analytics/personalization booleans), contactSubmitted, contactEmail (null when not submitted; equal to the contact lead email when submitted), activeOrganicViews, activeLikes, and testimonialIndex; a Markdown tab is headed Discovery brief — Cinder & Bloom."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "discovery_brief_reflects_session_mutations"
+description = "After shortlisting Loom House and Second Circle, setting locale to FI, toggling Marketing off via a valid cookie preferences save, advancing the carousel and active flick deck, and completing a valid contact submit under the contact field contract, the Export brief JSON contains schemaVersion 1, those two titles in shortlistedClients, locale fi, cookieCategories.marketing false with essential true, the new activeClient and flick indices, contactSubmitted true with contactEmail equal to the submitted lead email, and updated counter strings."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "discovery_brief_download_and_copy"
+description = "In the discovery brief panel, Download offers the live JSON file and Copy writes the exact visible tab text with a brief copied confirmation that reverts after a moment."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "discovery_brief_import_round_trip"
+description = "After exporting a brief with a non-empty shortlist, clearing the shortlist, then Importing that JSON restores shortlistedClients, locale, cookie toggles (essential stays on), centered activeClient, and flickIndexByClient so nav count, Shortlist controls, locale label, cookie preferences, carousel, and front cards match the imported brief."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "command_palette_ctrl_k_commands"
+description = "Pressing Ctrl+K (Cmd+K) opens a command palette with a focused search input; choosing Export brief opens the discovery brief panel; choosing Jump to services scrolls to the services trio without leaving /; Escape or backdrop click closes the palette."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "undo_redo_shortlist_and_cookie"
+description = "Shortlisting Loom House then Undo returns the nav count to 0 and clears that Shortlist control; Redo restores it; toggling Marketing off then Undo restores Marketing on without changing the shortlist."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n41"
+name = "export_omits_session_mutations"
+description = "After shortlisting clients and mutating locale/cookies/contact, the Export brief JSON omits those mutations (empty shortlistedClients, wrong locale, contactSubmitted false, or stale counters) despite the visible UI showing them."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n42"
+name = "undo_does_not_restore_shortlist"
+description = "After shortlisting a client, activating Undo leaves the nav shortlist count elevated and that client's Shortlist control still active."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "contact_lead_request_body_contract"
+description = "The contact popup validates an API-shaped lead payload whose successful submit IS the request body: email (required, at most 254 chars, local@domain.tld), phone (optional; null/empty or at most 40 chars of digits/spaces/+/-/()), and terms (boolean true); only a valid payload reveals Thanks for your submission! and posts to the local contact endpoint."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "cookie_consent_request_body_contract"
+description = "Cookie preferences expose Essential (locked on), Marketing, Analytics, and Personalization; Accept writes cookieCategories with exactly the four required booleans essential/marketing/analytics/personalization all true; a valid preferences save writes those exact four booleans; essential false or a missing/non-boolean key is rejected with named field errors and no banner dismiss."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "discovery_brief_keys_align_form_contracts"
+description = "After a valid contact submit and a cookie Accept or preferences save, Export brief JSON shows schemaVersion 1, contactSubmitted true with contactEmail equal to the submitted contact email, and cookieCategories matching the cookie consent request-body keys essential/marketing/analytics/personalization with essential true."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n43"
+name = "brief_contact_or_cookie_keys_diverge_contracts"
+description = "After a valid contact submit or cookie Accept/preferences save, the discovery-brief JSON omits schemaVersion / contactEmail / cookieCategories or shows values that disagree with the contact lead email or the four-boolean cookie consent payload just applied."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "discovery_brief_field_contract_complete"
+description = "A live Export brief JSON includes every required Discovery brief field-contract key (schemaVersion 1, brand, shortlistedClients, activeClient, flickIndexByClient with all five client titles, locale en or fi, cookieCategories, contactSubmitted, contactEmail, activeOrganicViews, activeLikes, testimonialIndex) and satisfies the contactSubmitted/contactEmail and cookieCategories.essential cross-field rules."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n44"
+name = "discovery_brief_missing_required_keys"
+description = "Export brief JSON is missing schemaVersion 1 or another required Discovery brief field-contract key, uses a locale outside en/fi, or breaks the contactSubmitted/contactEmail or cookieCategories.essential cross-field rules."
+type = "binary"
+negate = true
 weight = 1.0
 
 [[criterion]]

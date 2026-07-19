@@ -1,0 +1,162 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "shared_state_coherence"
+description = "All surfaces derive from one shared state: switching a picker recomputes the diff, counters, and highlights together; completing a merge or restore updates the history list, pickers, graph, search index, and export together; and annotations and resolutions appear everywhere they are shown, all without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "no_storage_reload_seeded"
+description = "No browser storage is used: localStorage and sessionStorage remain empty after comparing, merging, restoring, annotating, undoing, and exporting, and a page reload returns the app to its seeded state (seeded prompts and version chains, no unseeded annotations, merges, or restores)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "storage_persistence_used"
+description = "localStorage or sessionStorage holds prompts, versions, annotations, merge state, or UI state after exercising the app"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.4"
+name = "external_network_requests"
+description = "The devtools network log shows requests to external origins or third-party CDNs (scripts, styles, fonts, icons, or data) during load or a full exercise of the app"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.5"
+name = "console_clean"
+description = "The console is free of errors and warnings on first load and stays clean while comparing versions, toggling modes, merging, restoring, annotating, searching, undoing, and exporting"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "cold_load_interactive_2s"
+description = "The app is interactive (prompt list and pickers respond) within 2 seconds of a local cold load"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "rapid_input_no_stale_renders"
+description = "Rapid repeated picker switches, mode toggles, and searches cause no hangs, dropped interactions, or stale renders showing a previous selection's diff or counters"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "new_versions_immediately_searchable"
+description = "A version created by merge or restore is immediately findable through the global version search without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "keyboard_operability_focus"
+description = "Every interactive control — pickers, tabs, counters, merge choices, bulk resolution, graph nodes, thread markers, undo/redo, and export — is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space), with a visible focus indicator at each stop"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "modal_focus_trap_escape"
+description = "The restore and merge confirmation dialogs trap keyboard focus while open, close on the Escape key, and return focus to the control that opened them"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "diff_not_color_only"
+description = "Added and removed lines are distinguishable by the gutter plus and minus symbols and accessible line annotations in addition to color"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.12"
+name = "aria_live_announcements"
+description = "Completing a merge, completing a restore, and posting an annotation are announced through an aria-live region in addition to their visual indication"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.13"
+name = "fictional_names_only"
+description = "Every author name and any model reference rendered in the UI is fictional; no real people, AI providers, or model brand names appear"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

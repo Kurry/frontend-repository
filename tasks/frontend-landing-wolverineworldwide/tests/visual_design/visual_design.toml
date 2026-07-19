@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -214,6 +214,29 @@ description = "A required Northstar surface is omitted, empty, broken, reused wh
 type = "binary"
 weight = 1.0
 negate = true
+
+
+[[criterion]]
+id = "2.22"
+name = "briefing_preview_token_system"
+description = "The Investor briefing JSON tab uses a monospaced block and the Markdown tab uses editorial body type, both sharing the page's monochrome token system rather than an unrelated palette."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.23"
+name = "palette_rows_show_kind_labels"
+description = "Command palette result rows show a kind label (Section, News, or Action) so result kinds are distinguishable."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.n22"
+name = "briefing_chrome_breaks_monochrome_system"
+description = "The Investor briefing or command palette introduces a saturated accent color on chrome that breaks the specified monochrome editorial system."
+type = "binary"
+negate = true
+weight = 1.0
 
 [[criterion]]
 id = "2.catchall"

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,216 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_saved_themes_after_delete_all"
+description = "After deleting every saved theme, Saved Themes shows an empty state with a message and a way to create a new theme."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "empty_name_inline_validation_blocks_submit"
+description = "Submitting the theme create or rename form with an empty name shows a visible inline validation message naming the name field, the submit control stays disabled or rejects the submit, and the saved-themes card count is unchanged."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "validation_names_field_and_fix"
+description = "Theme-name validation copy names the name field and the fix rather than only saying 'Invalid'."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "copy_save_snippet_toasts_confirm"
+description = "Copy theme code, Save, and applying a Snippets preset each show a visible confirmation toast that slides in, remains readable, and auto-dismisses."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "invalid_source_keeps_last_valid_preview"
+description = "Editing the theme source into invalid options surfaces an invalid-options status, applies nothing, and the preview keeps rendering the last valid theme."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "roboto_protected_from_removal"
+description = "The base Roboto family cannot be removed: its remove control is absent or disabled, and the fonts list always contains Roboto."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "duplicate_font_rejected_with_feedback"
+description = "Adding a font whose family name is already loaded is rejected with visible feedback and does not add a duplicate entry to the fonts list."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "theme_controls_use_semantic_tags"
+description = "Theme create/rename fields, New Theme, Load/Delete on cards, Copy/Undo/Redo/Save, and Palette accordion controls use semantic button/input/label elements rather than unlabeled decorative wrappers."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "tutorial_and_theme_form_close_paths"
+description = "The Tutorial modal and theme create/rename overlays close via an explicit close control and Escape, returning to the workspace without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "font_size_out_of_range_rejected_or_clamped"
+description = "A typography.fontSize outside 8 through 24, or a shape.borderRadius outside 0 through 24, is rejected or clamped with visible feedback naming the fontSize or borderRadius field instead of being applied verbatim."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_saved_themes_shows_nothing"
+description = "After the saved-themes collection is empty, Saved Themes shows nothing — no empty-state message or create affordance."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "validation_errors_only_in_console"
+description = "Invalid empty-name create/rename failures surface only in the browser console with no visible inline field feedback."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "palette_or_save_actions_silent"
+description = "Changing a Palette color, toggling Light/Dark Type, or activating Save produces no visible change to preview, editor, or save-status text (silent failure)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "delete_theme_no_destructive_affordance"
+description = "Deleting a saved theme proceeds with no visible destructive affordance (no Delete labeling or confirmation) distinguishing it from a non-destructive action."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "interactive_controls_are_nonsemantic"
+description = "Primary interactive controls (tabs, device toggles, accordion rows, New Theme, Load/Delete) are non-semantic div/span click targets without button/role semantics."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "dialogs_not_keyboard_dismissible"
+description = "With the Tutorial modal or a theme create/rename form open, keyboard users cannot dismiss it (no Escape path and no focusable Close control)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "empty_name_still_creates_or_renames"
+description = "Submitting create/rename with an empty name still adds or changes a saved theme or changes the card count."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "ambiguous_or_missing_action_labels"
+description = "Primary actions show blank, placeholder, or ambiguous labels such as 'Submit', 'OK', or 'Button' instead of specific labels like New Theme, Save, Copy theme code, Load, or Delete."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "search_no_match_leaves_broken_ui"
+description = "A search query that matches no theme names leaves a broken or blank Saved Themes region with no empty-result state, or clearing the query fails to restore all cards."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "invalid_source_corrupts_preview"
+description = "Invalid theme source is applied anyway, leaving the preview broken or blank instead of keeping the last valid theme with an invalid-options status."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "malformed_import_keeps_theme"
+description = "Importing ThemeOptions JSON that omits a required intent channel, sets palette.type outside light|dark, uses fontSize outside 8 through 24, uses borderRadius outside 0 through 24, or breaks the Type↔palette.type cross-field rule shows a visible error naming the offending field, changes no editor/preview/Export state, and leaves the saved-themes card count unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "empty_version_name_rejected"
+description = "Saving a version with an empty name adds no snapshot, leaves the Versions count unchanged, and shows an inline validation message naming the name field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "double_copy_export_single_confirmation"
+description = "Double-activating Copy export or Download produces exactly one clipboard write or download with a single confirmation — not a stuck or duplicated toast storm."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "duplicate_theme_name_rejected"
+description = "Submitting create or rename with a name that already exists on another saved theme (after trim) leaves the collection unchanged and shows an inline validation message naming the name field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "non_hex_intent_channel_rejected"
+description = "Entering a non-#RRGGBB value into an intent color channel (e.g. primary.main), or a shape.borderRadius outside 0 through 24, shows an inline error naming that field path and does not update editor source, preview, or Export text."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "unparseable_import_payload_rejected"
+description = "Importing unparseable JSON (not an object) shows a visible payload error and leaves editor, tools, preview, save status, and Export text unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "malformed_import_corrupts_theme"
+description = "Importing malformed ThemeOptions JSON still mutates editor/preview into a broken or blank theme state."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n12"
+name = "empty_version_name_still_adds_snapshot"
+description = "Saving a version with an empty name still adds a snapshot to the Versions list."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n14"
+name = "import_field_error_unnamed"
+description = "A rejected ThemeOptions import (field-contract or cross-field failure) shows only a bare rejection with no message naming the offending field or payload problem."
 type = "binary"
 negate = true
 weight = 1.0

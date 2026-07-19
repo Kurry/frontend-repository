@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "empty_first_load_state"
-description = "On load with empty storage, the app opens at the canvas with one board tab named Board 1, a centered 'This board is empty' / 'Add a note, flashcard or shape to get started' hint, and a footer reading '0 objects'."
+description = "On first load the app opens at the canvas with one board tab named Board 1, a centered 'This board is empty' / 'Add a note, flashcard or shape to get started' hint, and a footer reading '0 objects'."
 type = "binary"
 weight = 1.0
 
@@ -105,7 +105,7 @@ weight = 1.0
 [[criterion]]
 id = "1.7"
 name = "shift_multi_select_delete"
-description = "After selecting one note then shift-clicking a second, both show the selection outline and a 'N selected' count with Delete Selected and Clear selection controls appears; Delete Selected, confirmed once, removes both notes."
+description = "After selecting one note then shift-clicking a second, both show the selection outline and a 'N selected' count with Delete Selected, Duplicate Selected, Archive Selected, and Clear selection controls appears; Delete Selected, confirmed once, removes both notes from the board and moves them into the Archive vault."
 type = "binary"
 weight = 1.0
 
@@ -118,8 +118,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "reload_restores_object_state"
-description = "After placing at least one object and performing a full page reload, the object reappears with its position, size, text/color, and flashcard flip state preserved exactly."
+name = "reload_resets_to_seeded_baseline"
+description = "After placing at least one object and performing a full page reload, the app returns to the seeded baseline — one Board 1, zero objects, empty archive — with no prior session objects restored from browser storage."
 type = "binary"
 weight = 1.0
 
@@ -139,8 +139,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "export_text_full_listing"
-description = "When Export as Text is opened with a note, a flashcard, and a shape present, a read-only copyable textarea lists the board name, the object count, every object numbered with its type label (Note, Flashcard, or Shape) including the note body and the flashcard front/back with its side shown, plus a connectors listing, and a Copy text control is present."
+name = "export_workspace_three_formats"
+description = "Opening Export workspace shows Workspace JSON, Markdown outline, and Plain text tabs regenerated live; with a note, flashcard, and shape present, Workspace JSON preview includes schemaVersion scribblespace-workspace-v1 and those objects, Markdown lists them under the board heading, Plain text lists type labels with note body and flashcard front/back plus connectors, and Copy and Download controls are present on each tab."
 type = "binary"
 weight = 1.0
 
@@ -198,17 +198,17 @@ id = "1.30"
 name = "delete_bypasses_confirmation"
 description = "Delete Selected removes objects with no confirmation dialog at all, or objects are removed even after the confirmation dialog is canceled."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "1.31"
 name = "duplicate_connector_stacked"
 description = "Requesting a connector between two already-connected objects stacks a duplicate line instead of being a no-op with a visible message explaining the duplicate was ignored."
 type = "binary"
-weight = 0.5
 negate = true
 optional = true
+weight = 0.5
 
 [[criterion]]
 id = "1.32"
@@ -241,7 +241,7 @@ weight = 1.0
 [[criterion]]
 id = "1.36"
 name = "corner_resize_min_size"
-description = "A singly selected object shows four corner handles; dragging a handle resizes the object, notes and flashcards stop at a minimum size, and the new size persists after deselecting."
+description = "A singly selected object shows four corner handles; dragging a handle resizes the object, notes and flashcards stop at a minimum size, and the new size persists after deselecting within the session."
 type = "binary"
 weight = 1.0
 
@@ -250,8 +250,8 @@ id = "1.37"
 name = "nudge_move_grow_controls"
 description = "A singly selected object exposes on-screen Move (left/up/down/right) and Grow / Shrink controls, and activating them nudges its position by 24px and its size by 24px as a non-drag alternative."
 type = "binary"
-weight = 0.5
 optional = true
+weight = 0.5
 
 [[criterion]]
 id = "1.38"
@@ -265,8 +265,8 @@ id = "1.39"
 name = "connect_mode_helper_banner"
 description = "Activating the Connect tool switches the canvas to a crosshair cursor and shows a helper banner reading 'Click an object to start a connector'."
 type = "binary"
-weight = 0.5
 optional = true
+weight = 0.5
 
 [[criterion]]
 id = "1.40"
@@ -301,48 +301,91 @@ id = "1.44"
 name = "occupied_position_offset"
 description = "Creating a second object of the same type without moving the first places it offset by about 28px from the occupied default position, so both objects remain individually visible and selectable."
 type = "binary"
-weight = 0.5
 optional = true
+weight = 0.5
 
 [[criterion]]
 id = "1.45"
-name = "flow_note_create_multi_surface"
-description = "Starting from an empty board, clicking New Note raises the footer object count by exactly one (measured immediately around the click), removes the empty-canvas hint, and switching to the Outline view shows the same note as a row with its color name without a reload; after a full page reload the note is still present at the same position with the same text and color."
+name = "flow_note_create_export_json"
+description = "Starting from an empty board, clicking New Note raises the footer object count by exactly one, removes the empty-canvas hint, shows the note in Outline without a reload, and Export workspace Workspace JSON preview includes schemaVersion scribblespace-workspace-v1 and an objects entry with type note."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.46"
-name = "flow_second_board_rename_reload"
-description = "Creating a second board via New Board switches to an empty canvas showing the empty hint and a '0 objects' count while the first board keeps every object; renaming the new board updates its tab label immediately and the Export as Text modal shows the new name; after a full page reload both boards, their names, and the active board selection are restored."
+name = "flow_second_board_export_name"
+description = "Creating a second board via New Board switches to an empty canvas showing the empty hint and a '0 objects' count while the first board keeps every object; renaming the new board updates its tab label immediately and every Export format preview shows the new name."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.47"
-name = "flow_delete_cascades_everywhere"
-description = "After connecting two notes, deleting one via Delete Selected (confirmed once) removes that note, every connector touching it, and its Outline row in the same action, and the footer object count decreases by exactly one; after a full page reload neither the deleted note nor its connector reappears."
+name = "flow_delete_archives_cascades"
+description = "After connecting two notes, deleting one via Delete Selected (confirmed once) removes that note, every connector touching it, and its Outline row, moves the note into the Archive vault, and decreases the footer object count by exactly one."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.48"
 name = "flow_stream_counts_in_lockstep"
-description = "Starting the live event stream raises the applied-events readout and the footer object count together, one note per applied event, and each added note also appears as a row in the Outline view; Pause halts both counts at the same value, and after a full page reload every applied note is still present exactly once."
+description = "Starting the live event stream raises the applied-events readout and the footer object count together, one note per applied event, and each added note also appears as a row in the Outline view; Pause halts both counts at the same value."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.49"
-name = "flow_session_reload_exact"
-description = "After one uninterrupted session of creating, editing, recoloring, reordering, connecting, and deleting objects and switching between the canvas and Outline views, a full page reload restores every committed change exactly, with no deleted object revived."
+name = "flow_export_import_round_trip"
+description = "After creating notes on two boards, Download Workspace JSON, then create more objects that change the workspace, Import the downloaded file, and confirm both boards and the original objects are restored while the post-download additions are gone."
 type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "canvas_undo_redo_board_mutations"
+description = "After placing a note then a flashcard, canvas-level Undo removes the flashcard from canvas, Outline, and footer count and enables Redo; Redo restores it; placing another object after undo disables Redo."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "duplicate_selected_offsets"
+description = "With one note selected, Duplicate Selected increases the footer object count by exactly one, places a clone offset by about 28px with independent identity, and editing the clone's text does not change the original."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.52"
+name = "archive_restore_purge"
+description = "Archive Selected moves the selection into the Archive panel and off the canvas; Restore returns it to the board and Outline; Purge permanently removes that archive row."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.53"
+name = "command_palette_new_note"
+description = "Opening the Command palette via Ctrl+K (or Cmd+K), filtering to New Note, and pressing Enter places a note the same way the toolbar New Note control does and closes the palette."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.54"
+name = "import_rejects_bad_schema"
+description = "Importing Workspace JSON with wrong schemaVersion or missing boards/activeBoardId shows an inline error naming the problem and leaves the current boards and objects unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.55"
+name = "export_omits_session_work"
+description = "After creating a note with distinctive text, Export workspace Workspace JSON or Plain text preview omits that note or shows a payload identical to the pre-create empty board."
+type = "binary"
+negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, resulting state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

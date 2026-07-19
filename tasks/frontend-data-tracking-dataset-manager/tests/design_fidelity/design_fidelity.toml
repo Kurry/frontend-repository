@@ -1,0 +1,180 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "spacing_and_sizing_follow_scale"
+description = "Spacing and sizing across the sidebar, toolbar, grid, and panels follow a consistent scale, with no arbitrary one-off values visible in computed styles"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "specified_quantities_match"
+description = "Specified quantities are implemented as written: at least 3 seeded datasets, a flagship of at least 500 rows with at least 2 duplicate groups, at least 2 sample CSV fixtures, at least 1 seeded snapshot and threshold rule, and at least 3 eval suites"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "layout_matches_spec"
+description = "The realized layout matches the specified composition: dataset list above the instrumentation panel on the left, toolbar above the grid, and thresholds, splits, and snapshots as side panels"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "specified_state_changes_animate"
+description = "The state changes the spec calls out animate as specified: import batches of 10 at roughly 100 milliseconds each, single-row slide-in at roughly 200 milliseconds, and modal transitions at roughly 200 to 300 milliseconds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "responsive_behavior_matches_spec"
+description = "Responsive behavior matches the spec: sidebar collapses behind a toggle at 768 pixels and below, and the grid, mapping table, and diff scroll in their own containers at 375 pixels"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "control_styling_is_consistent"
+description = "Button and form radii, padding, and shadows are consistent across the toolbar, wizard, panels, and tray"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "typography_has_clear_hierarchy"
+description = "The specified type hierarchy is realized: app title above panel headings above grid body and label text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "component_states_match_spec"
+description = "Default, hover, focus, disabled, and error component states are all present as specified, including disabled Submit, Continue, Commit, Apply, Undo, and Redo controls in their gated states"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "semantic_color_treatments_match"
+description = "The specified color treatments are realized: success-color checkmarks, secondary-color dashes, warning-tinted flags, error-colored diagnostics, and green/red diff tints"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.n1"
+name = "sizing_or_spacing_contradicts_scale"
+description = "Visible sizing or spacing values contradict the app's own scale, producing uneven gutters or misaligned panels"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n2"
+name = "seed_quantities_wrong"
+description = "Seeded quantities fall short of the spec (fewer than 3 datasets, a flagship under 500 rows, missing duplicate groups, fixtures, snapshot, rule, or suites)"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n3"
+name = "required_animations_missing_or_wrong"
+description = "A specified animation (import batches, row slide-in, modal transition, drawer slide) is missing or grossly off its specified timing when driven through the real control"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n4"
+name = "specified_controls_use_browser_defaults"
+description = "Form or button controls render with browser default styles where the spec styles them"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n5"
+name = "elements_are_clipped_or_offscreen"
+description = "Grid, panel, or drawer elements render off-screen or clipped at the specified breakpoints"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n6"
+name = "structure_deviates_from_spec"
+description = "The realized structure deviates from the spec — missing columns (expected output, verified, split), missing wizard steps, or panels absent from the toolbar"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "design_fidelity.catchall"
+name = "design_fidelity_catchall"
+description = "The app exhibits a significant, browser-observable deviation from the spec that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the deviation and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the deviation is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

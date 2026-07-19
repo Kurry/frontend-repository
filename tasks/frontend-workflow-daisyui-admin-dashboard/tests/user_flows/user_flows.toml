@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -60,152 +60,143 @@ allowed_tools = [
 [scoring]
 aggregation = "weighted_mean"
 
+
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "create_user_updates_list_kpis_logs_export"
+description = "Create flow: submit Add User with a valid API-shaped payload — All Users gains exactly one row, Total KPI increases by one, User Logs gains a create entry for that email, and both Directory JSON and Users CSV previews include the new user without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "invalid_create_shows_field_named_errors"
+description = "Create flow: submitting with empty required fields or contract violations (bad email, short temporaryPassword, overlong firstName/notes) shows field-named inline validation and adds no row."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "edit_role_echoes_filters_logs_export"
+description = "Edit flow: saving a role change updates the row badge, role-filter membership, User Logs, and Directory JSON role for that user without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "archive_delete_updates_all_surfaces"
+description = "Archive flow: Delete removes the user from All Users and KPIs, clears selection membership, lists the record in Archive, and moves it from Directory JSON users into archive."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "view_switch_retains_directory_state"
+description = "View switch: moving between Operations Overview, All Users, User Logs, Archive, and Add User keeps the same users/archive/log store — returning to All Users shows prior mutations without reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "archive_all_reveals_empty_state"
+description = "Edge: after archiving every active user, All Users shows an empty state, Archive lists the archived records, and export previews still compile."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "status_filter_and_kpi_surfaces_agree"
+description = "Filter flow: Active→Suspended updates Active/Suspended KPIs, status badge, Active/Suspended filter membership, logs, and Directory JSON status together."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "command_palette_preserves_workflow"
+description = "Command palette: open with Control+K/Meta+K, navigate to Archive or Export directory, and continue the workflow — palette closes and the target surface is usable without reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "export_drawer_and_restore_overlays"
+description = "Overlays: export drawer opens with Directory JSON/Users CSV tabs; Archive Restore and popovers/command palette behave as specified for confirmations and navigation."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "duplicate_and_restore_recover_without_reload"
+description = "Recovery: Duplicate then submit with a new email, and separately Restore an archived user — both succeed without reload and leave All Users, Archive, logs, and exports coherent."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "export_import_round_trip_flow"
+description = "After create/edit plus at least one archive, Copy or Download Directory JSON then Import it — All Users, Archive, KPIs, and both export previews match the pre-export mutated state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "sort_name_az_highest_spend_round_trip"
+description = "Sort flow: Name A-Z orders alphabetically; Highest spend reorders by payments descending; switching back restores Name A-Z order without changing the visible count."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "primary_directory_flows_unavailable"
+description = "Create, edit, archive, restore, export, or import flows are not enabled from the UI."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "new_users_missing_or_duplicated"
+description = "New users fail to show up after valid create, or a single submit duplicates rows."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "archive_and_exports_desync"
+description = "After Delete/Restore or create, All Users, Archive, User Logs, and Directory JSON/Users CSV disagree about membership or fields without a reload."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "command_palette_or_view_switch_breaks"
+description = "Command palette navigation or sidebar view switching breaks layout or loses the directory collection."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_active_collection_breaks_ui"
+description = "Archiving all users or filtering to zero matches produces a broken All Users region with no empty state."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "export_import_round_trip_breaks"
+description = "After export-then-import of Directory JSON following session mutations, All Users/Archive/KPIs diverge from the pre-export mutated state."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "field_contract_accepted_invalid_payload"
+description = "Add User accepts payloads that violate the field contract (overlong names, email without domain dot, short temporaryPassword) and still creates a row."
 type = "binary"
 negate = true
 weight = 1.0
@@ -213,7 +204,7 @@ weight = 1.0
 [[criterion]]
 id = "user_flows.catchall"
 name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

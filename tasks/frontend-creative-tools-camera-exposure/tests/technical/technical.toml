@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -61,76 +61,83 @@ allowed_tools = [
 aggregation = "weighted_mean"
 
 [[criterion]]
+id = "2.1"
+name = "serves_via_npm_start_on_3000"
+description = "The app serves and runs via its documented start path (npm start on port 3000) and renders the simulator lab with no blank/broken page."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "2.2"
-name = "2_2"
-description = "Dial changes from any control (steppers, preset apply, reset) update one shared state: the preview, exposure meter, and dial readouts never disagree with each other"
+name = "shared_state_coherence_dials_preview_meter"
+description = "Dial, slider, look-pack, snapshot, and preset changes from any control update one shared state: preview, meter, histogram, EV, and export artifacts never disagree with each other."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
-name = "2_3"
-description = "Uses localStorage or sessionStorage to persist presets or dial state"
+name = "localstorage_or_sessionstorage_used"
+description = "After exercising dials, presets, favorites, exports, and mode switches, localStorage or sessionStorage is non-empty — browser storage APIs were used despite the in-memory-only requirement."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "2.4"
 name = "reload_resets_all_facets_to_seed"
-description = "After changing several independent facets (step two dials off default, create a valid preset, mark one favorite, open Presets/Compare), a page reload returns the app coherently to its seeded state: default dials (f/16, 1/60, ISO 100), centered meter, and exactly the seeded presets — never a mix of reverted and surviving facets"
+description = "After changing several independent facets (step two dials, move a light slider, create a preset, save a snapshot, apply a look pack), a page reload returns the app coherently to its seeded state."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.5"
 name = "keyboard_reachable_with_focus_ring"
-description = "Every stepper, mode switch, help trigger, reset, and preset control is reachable and operable with the keyboard alone (Tab/Shift+Tab plus Enter/Space), each showing a visible focus indicator when focused"
+description = "Every stepper, mode switch, help trigger, reset, light slider, look pack, Before/After, snapshot, undo/redo, export/import, and preset control is reachable and operable with the keyboard alone, each showing a visible focus indicator."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.6"
 name = "help_panel_dialog_focus_management"
-description = "The help panel is exposed as a dialog or complementary region in the accessibility tree; opening it moves keyboard focus into the panel and closing it returns focus to the trigger"
+description = "The help panel is exposed as a dialog or complementary region; opening it moves keyboard focus into the panel and closing it returns focus to the trigger."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.7"
 name = "dial_readouts_are_real_text"
-description = "Each dial's current value (f/16, 1/60, 100 at defaults) is rendered as real DOM text readable by assistive technology, not baked into an image or canvas"
+description = "Each dial's current value and each light-slider readout is rendered as real DOM text readable by assistive technology."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.8"
 name = "validation_messages_programmatically_associated"
-description = "Preset form validation messages are shown visually and are programmatically associated with their fields (e.g. described-by or live-region wiring observable in the accessibility tree) so assistive technology announces them"
+description = "Preset, snapshot, and import validation messages are shown visually and are programmatically associated with their fields so assistive technology announces them."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.9"
 name = "interactive_within_two_seconds"
-description = "On a local cold load the app renders and responds to a first dial press within 2 seconds"
+description = "On a local cold load the app renders and responds to a first dial press within 2 seconds."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.10"
 name = "rapid_stepper_presses_stay_coherent"
-description = "Rapid repeated stepper presses stay responsive: every press lands, the readouts never desynchronize from the preview and meter, and the UI never hangs or freezes"
+description = "Rapid repeated stepper presses stay responsive: every press lands, the readouts never desynchronize from the preview and meter, and the UI never hangs."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.11"
 name = "external_network_requests_for_assets"
-description = "Devtools network activity shows outbound requests to other origins (CDN scripts, remote fonts, or remote imagery) — the depth plate, motion frames, noise texture, fonts, and libraries must all load from local assets"
+description = "Devtools network activity shows outbound requests to other origins (CDN scripts, remote fonts, or remote imagery) — depth plate, motion frames, noise texture, fonts, and libraries must all load from local assets."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "2.12"
@@ -142,15 +149,68 @@ weight = 0.5
 [[criterion]]
 id = "2.13"
 name = "console_errors_or_warnings_during_full_exercise"
-description = "Console errors, warnings, or unhandled promise rejections appear in the browser log during a full exercise of the dials, help panel, mode switches, and preset create/edit/delete/apply flows"
+description = "Console errors, warnings, or unhandled promise rejections appear during a full exercise of dials, sliders, look packs, presets, snapshots, undo/redo, pixel export, and edit-stack import/export."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.14"
+name = "both_modes_reachable_without_reload"
+description = "Meter/Lab and Presets/Compare are both reachable from the UI and render their regions without a full page reload."
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "2.15"
+name = "views_stay_coherent_under_rapid_mode_switch"
+description = "Rapidly switching between Meter/Lab and Presets/Compare while changing dials keeps a single coherent state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.16"
+name = "debug_artifacts_visible_in_ui"
+description = "Visible debug artifacts appear in the running app (console.log spam overlays, leftover placeholder scaffolding, or debug panels meant for development)."
+type = "binary"
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.17"
+name = "outbound_anchor_navigates_away"
+description = "An external anchor control in the lab chrome navigates the browser away from the app origin."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.18"
+name = "reload_state_violates_in_memory_rule"
+description = "After reload, user-created presets or off-default dial values survive in a way that contradicts the in-memory seeded baseline."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.19"
+name = "nondeterministic_seed_on_reload"
+description = "Two cold loads of the same app show different seeded preset sets or different default dial values when the spec requires a deterministic seeded baseline."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.20"
+name = "pixel_export_stays_responsive"
+description = "Download PNG or Download JPEG completes without freezing the UI for more than a brief moment; the lab remains operable after the download."
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect (console health, state coherence, storage rule, load stability) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, console line, network entry, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable technical defect not covered by any other criterion in this file. If present, name the defect and cite concrete evidence. If already covered — even partially — answer no."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0

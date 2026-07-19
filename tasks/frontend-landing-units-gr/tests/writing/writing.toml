@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.5
@@ -63,91 +63,119 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "15.1"
-name = "headings_use_consistent_capitalization"
-description = "For fidelity tasks, rendered copy must match the reference. Where the app renders headings and section titles, they use consistent capitalization (one convention — title case or sentence case — throughout)."
+name = "headings_consistent_capitalization"
+description = "Where the app renders headings and section titles, they keep one consistent capitalization convention throughout the page."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.2"
-name = "actions_use_specific_labels"
-description = "Where the app renders button or action labels, they are specific verbs ('Add expense', 'Start session'), not generic ('Submit', 'OK') when a specific label is possible."
-type = "binary"
-weight = 0.5
-
-[[criterion]]
-id = "15.3"
-name = "errors_name_problem_and_fix"
-description = "Where the app renders error messages, they name the problem and the fix ('Amount must be a positive number'), not just a rejection ('Invalid')."
-type = "binary"
-weight = 0.5
-
-[[criterion]]
-id = "15.4"
-name = "empty_states_explain_next_step"
-description = "Where the app renders empty states, the copy explains what belongs there and how to add it."
+name = "cta_labels_specific"
+description = "Where the app renders primary action labels, they use the specific PRD strings (Book your Studio, Γνώρισε τα Studios, Μπες στο Community, Αποδοχή, Απόρριψη, Add to shortlist / Remove from shortlist, Export JSON, Export Markdown, Copy packet) rather than generic Submit/OK alone."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.5"
-name = "body_copy_is_well_written"
-description = "Where the app renders body or marketing copy, rate how free it is of spelling and grammatical errors."
+name = "marketing_copy_spelling_grammar"
+description = "Where the app renders body or marketing copy (hero supporting line, section paragraphs, amenity lists), rate how free it is of spelling and grammatical errors, including intact Greek diacritics."
 type = "likert"
 points = 5
 weight = 0.5
 
 [[criterion]]
 id = "15.6"
-name = "terminology_is_consistent"
-description = "Where the app renders labels for the same concept in multiple places, terminology is consistent (not 'task' here and 'todo' there)."
+name = "noma_terminology_consistent"
+description = "Where the app renders the product name and studio labels, terminology stays consistent as Noma / Noma Parkside and the Kick/Boost/Flex Studio tier names (not mixed with leftover source-site naming)."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.7"
-name = "numbers_dates_and_units_are_consistent"
-description = "Where the app renders numbers, dates, and units, formatting is consistent (same date format, same decimal precision, units labeled)."
+name = "pricing_tiers_exact_formatting"
+description = "Where the app renders pricing, the tiers appear exactly as Kick Studio 640€/μήνα, Boost Studio 690€/μήνα, and Flex Studio 740€/μήνα."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.8"
-name = "success_messages_are_specific"
-description = "Where the app renders confirmation and success messages, they state what happened ('Entry saved'), not vague affirmations."
+name = "hero_and_nav_copy_exact"
+description = "Where the app renders the hero and nav, copy matches exactly: headline Home of the uniquely awesome.; supporting line All-inclusive φοιτητική διαμονή με όλα όσα χρειάζεσαι για να ζεις, να σπουδάζεις και να συνδέεσαι.; nav labels 01 Student Homes, 02 Our way of living, 03 Community, 04 Επικοινωνία; tagline Unique student homes."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.9"
+name = "marquee_phrases_exact"
+description = "Where the app renders marquee bands, the red band loops exactly Social areas / Private kitchen & bathroom / 24/7 Security / Fast and reliable maintenance / Smart living and the blue band loops exactly Super-fast WiFi / 24/7 Hot water / Electric bike stations / Elevator access."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.10"
+name = "footer_address_block_exact"
+description = "Where the app renders the footer address block, it shows exactly Noma Parkside, Σειρήνων 47, 16121 Καισαριανή, Αθήνα, hello@noma.example, and (+30) 6940006565, plus links Our way of living / FAQs / Book your Studio and policies Πολιτική Απορρήτου / Πολιτική Cookies / Όροι Χρήσης."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.11"
+name = "bilingual_register_preserved"
+description = "Where the app renders bilingual copy, Greek body copy and labels sit alongside English display slogans with no machine-garbled diacritics or mojibake anywhere."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.12"
+name = "amenity_slide_titles_exact"
+description = "Where the app renders living carousel slide titles, they match Community living spaces, Ασφάλεια, Υποστήριξη, and Smart Living in order."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.n1"
-name = "placeholder_copy_is_visible"
-description = "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI."
+name = "placeholder_copy_visible"
+description = "Lorem ipsum or placeholder text (TODO, Lorem, asdf, or template variables like {{title}}) is visible anywhere in the shipped UI."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n2"
-name = "prominent_copy_has_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as headings, hero text, or primary buttons."
+name = "prominent_copy_has_typos"
+description = "Spelling or grammatical errors appear in prominent copy such as Home of the uniquely awesome., Book your Studio, or nav labels."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n3"
-name = "concept_names_are_inconsistent"
-description = "The same concept is named inconsistently across surfaces."
+name = "source_brand_names_in_copy"
+description = "Rendered copy still names a source-site brand, domain, email, or distinctive source copy instead of the fictional Noma system (e.g. non-noma.example contact addresses)."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n4"
-name = "copy_is_truncated_or_overflowing"
-description = "Truncated or overflowing text renders copy unreadable."
+name = "copy_truncated_or_overflowing"
+description = "Truncated or overflowing text renders mandated headings, marquee phrases, pricing tiers, or footer address copy unreadable at 1440 or 390."
 type = "binary"
 negate = true
+weight = 0.5
+
+[[criterion]]
+id = "15.13"
+name = "inquiry_and_shortlist_copy_exact"
+description = "Where the app renders shortlist/inquiry chrome, the empty state No studios shortlisted yet, success Inquiry ready — export your packet, Copied confirmation, privacy label Συμφωνώ με την Πολιτική Απορρήτου, and the three FAQ questions appear exactly."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.14"
+name = "inquiry_validation_names_fields"
+description = "Where the app renders inquiry validation errors, they name the problem and the fix in field-contract terms (for example that email must be a valid address, phone needs at least ten digits, move_in_month must be YYYY-MM, or privacy consent must be checked), not only Invalid."
+type = "binary"
 weight = 0.5
 
 [[criterion]]

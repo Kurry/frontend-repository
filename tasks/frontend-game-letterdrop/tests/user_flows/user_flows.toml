@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,188 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "For games, evaluate the start → play → pause → end → restart flow. Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "full_run_round_trip"
+description = "Without a page reload until the final step: press Start game, submit one valid word and confirm the HUD score rises and the streak meter increments; let a tile cross the danger line and confirm Game Over shows that run's final score; switch to History and confirm exactly one new top game-result with the same score, tilesCleared, durationSec, playerName, tierReached, and endedAt; if the final score beat the previous best, Best Score shows the new value; after a full page reload the History entry and Best Score remain."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "achievement_echo_flow"
+description = "Fully clear the board during a run and confirm Board Cleared! plus an unlock toast at the clear; switch to Achievements and confirm Clean Sweep flipped from locked to unlocked in full color without a reload; after a full page reload Clean Sweep remains unlocked."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "streak_build_and_reset_flow"
+description = "Three consecutive valid submissions show the streak meter at 3 and a multiplier badge next to the score; one invalid submission then resets the meter to zero and removes the badge; the next valid word scores without the streak multiplier."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "settings_name_history_round_trip"
+description = "With at least one prior History entry recorded, save a new playerName in Settings, finish a run, and open History: the new game-result carries the new playerName while earlier entries keep their original playerName values."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "pause_integrity_flow"
+description = "Pausing mid-run freezes the timer value and all tile positions with a Paused overlay; resuming continues the timer from the frozen value and tiles from the frozen positions; the score is unchanged by the pause itself."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "start_play_gameover_restart_loop"
+description = "Start → play → Game Over → Play again (or Start game again) begins a fresh run: the board returns to an active falling-tile state, the run score resets for the new run, and prior History entries remain listed."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "tab_switch_retains_run_state"
+description = "During an active run, switching from Game to History or Achievements and back to Game retains the same score, streak, and board state without ending the run or requiring a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "settings_overlay_round_trip"
+description = "Opening Settings, entering a one-character name (inline validation appears), correcting it to a valid 2–20 character name, and saving closes the form and returns to the game chrome without a page reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "game_over_play_again_recovery"
+description = "From the Game Over screen, activating Play again recovers into a playable run without a full page reload and without a navigation dead end."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "invalid_word_keeps_run_alive"
+description = "Submitting a non-dictionary word shakes the tray and shows a Not a word style message, resets the streak to zero, and leaves the run active so further tile taps and Submit Word remain available without reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "primary_game_flows_unavailable"
+description = "Start game, Pause/Resume, Submit Word, or Play again after Game Over is missing or non-functional from the visible UI."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "history_entry_missing_or_duplicated"
+description = "Finishing a run fails to add a History entry, or produces a duplicate top entry for a single finished run."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "score_desyncs_across_surfaces"
+description = "After Game Over, the final score shown on the Game Over screen disagrees with the score on the new History entry or the Best Score update without a reload intervening."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "tab_switch_ends_or_corrupts_run"
+description = "Switching between Game, History, and Achievements during a run ends the run, resets the score, or corrupts the board state."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_history_ui_broken"
+description = "Before any run has finished, the History tab is a blank region with no friendly empty-state message."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "pause_leaks_motion_or_timer"
+description = "While Paused, tiles continue falling or the run timer keeps advancing."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "settings_cannot_reopen_after_close"
+description = "After closing Settings, the Settings control cannot reopen the form."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "paused_or_gameover_overlay_traps"
+description = "The Paused overlay or Game Over screen blocks returning to play with no Resume or Play again exit."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "failed_submit_lacks_feedback"
+description = "An invalid word submission or empty-tray Submit Word leaves the tray and streak unchanged with neither an on-screen rejection message nor a disabled Submit Word control."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "restart_requires_full_reload"
+description = "Recovering from Game Over into a new run requires a full page reload."
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "6.11"
+name = "export_after_play_flow"
+description = "Finish a run that scored at least one valid word, open Export Run from Game Over or that History entry, and confirm the preview JSON contains format letterdrop-game-v1, schemaVersion 1, that final score, and each submitted word with its points; Export History then lists that same run under format letterdrop-history-v1."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "save_resume_across_reload_flow"
+description = "Start a run, submit at least one valid word, press Save Progress, fully reload, then press Resume Saved Run and confirm score, tray, streak, tier, and tile layout match the checkpoint."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "import_run_json_round_trip_flow"
+description = "Export a finished run as run-json, import that file, and confirm a History game-result appears with the same score, tilesCleared, durationSec, playerName, tierReached, endedAt, and words as the export."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "export_flow_dead_end"
+description = "After Game Over, Export Run is missing or produces no downloadable/copyable artifact containing format letterdrop-game-v1 with the finished run's score and words."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n12"
+name = "save_resume_flow_broken"
+description = "After Save Progress mid-run and a full page reload, Resume Saved Run leaves the live score, tray, streak, tier, or board empty instead of the saved checkpoint."
 type = "binary"
 negate = true
 weight = 1.0
@@ -217,3 +255,4 @@ description = "The app exhibits a significant, browser-observable defect in crit
 type = "binary"
 negate = true
 weight = 1.0
+

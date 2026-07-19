@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -93,7 +93,7 @@ weight = 1.0
 [[criterion]]
 id = "4.5"
 name = "random_and_copy_feedback"
-description = "Clicking Random through its real button shows a brief animated confirmation toast, and clicking Copy in the export modal shows a short copied confirmation that resets rather than remaining permanently"
+description = "Clicking Random through its real button shows a brief animated confirmation toast, and clicking Copy or Download in the Export modal shows a short confirmation that resets rather than remaining permanently"
 type = "binary"
 weight = 1.0
 
@@ -115,16 +115,23 @@ weight = 1.0
 [[criterion]]
 id = "4.8"
 name = "export_modal_enter_exit_transition"
-description = "Opening the CSS-export modal through its real control and dismissing it each show a brief opacity/scale transition rather than the dialog appearing and disappearing in a single frame"
+description = "Opening the Export modal through its real control and dismissing it each show a brief opacity/scale transition rather than the dialog appearing and disappearing in a single frame"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "4.9"
 name = "reduced_motion_flows_completable"
-description = "With prefers-reduced-motion enabled on a fresh load, animations are removed or reduced to instant state changes while every flow—including hold-to-add, Random, export, and remove—remains completable through the same controls"
+description = "With prefers-reduced-motion enabled on a fresh load, animations are removed or reduced to instant state changes while every flow—including hold-to-add, Random, undo/redo, export, import, and remove—remains completable through the same controls"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "before_after_and_vision_ease"
+description = "Through real controls, Before / After toggles and vision-mode changes ease the preview recolor rather than hard-cutting when motion is allowed"
+type = "binary"
+weight = 0.5
 
 [[criterion]]
 id = "4.catchall"

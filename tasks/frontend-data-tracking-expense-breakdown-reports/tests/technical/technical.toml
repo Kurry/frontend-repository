@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,14 +63,14 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.2"
 name = "no_browser_storage_seeded_reload"
-description = "No browser storage is used for persistence: localStorage and sessionStorage remain empty after a full exercise of the app, and a reload returns the seeded state"
+description = "No browser storage is used for persistence: localStorage and sessionStorage remain empty after a full exercise of the app including export and import, and a reload returns the seeded state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
 name = "storage_apis_persist_state"
-description = "Uses localStorage or sessionStorage to persist transactions or filters"
+description = "Uses localStorage or sessionStorage to persist transactions, filters, burn-rate ceiling, or export drafts"
 type = "binary"
 weight = 1.0
 negate = true
@@ -78,14 +78,14 @@ negate = true
 [[criterion]]
 id = "2.4"
 name = "console_clean_during_full_exercise"
-description = "No console errors or unhandled promise rejections appear during a full exercise of the app (create, edit, delete, filters, chart tab switches, bulk actions)"
+description = "No console errors or unhandled promise rejections appear during a full exercise of the app (create, edit, delete, filters, search, chart tab switches, bulk actions, burn rate, command palette, export, import)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.5"
 name = "keyboard_operable_with_visible_focus"
-description = "Every interactive control (sidebar items, chrome actions, chart tabs, table controls, form fields) is reachable and operable with the keyboard alone, and the focused control shows a visible focus indicator (e.g. a focus-visible ring)"
+description = "Every interactive control (sidebar items, chrome actions, chart tabs, table controls, form fields, Export report, Import CSV, Burn rate ceiling, command palette) is reachable and operable with the keyboard alone, and the focused control shows a visible focus indicator"
 type = "binary"
 weight = 1.0
 
@@ -99,7 +99,7 @@ weight = 1.0
 [[criterion]]
 id = "2.7"
 name = "validation_announced_via_live_region"
-description = "Form validation messages are exposed through a polite live region (e.g. aria-live=\"polite\" or role=\"status\") in addition to being shown visually"
+description = "Form validation messages are exposed through a polite live region in addition to being shown visually"
 type = "binary"
 weight = 1.0
 
@@ -120,14 +120,14 @@ weight = 1.0
 [[criterion]]
 id = "2.10"
 name = "in_place_redraws_without_jank"
-description = "Chart redraws and tab switches apply in place without a full page reload and without visible jank, and the UI stays responsive under rapid repeated input with no hangs or dropped interactions"
+description = "Chart redraws, tab switches, export drawer opens, and burn-rate edits apply in place without a full page reload and without visible jank"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.11"
 name = "document_title_ledger_reports"
-description = "The document title is exactly 'Ledger | Reports'"
+description = "The document title is exactly Ledger | Reports"
 type = "binary"
 weight = 1.0
 
@@ -141,17 +141,31 @@ weight = 1.0
 [[criterion]]
 id = "2.13"
 name = "multi_facet_reload_resets_coherently"
-description = "Configure several independent facets — create a transaction, switch the chart tab to Trends, and apply a category filter — then reload the page. All facets coherently reset to the seeded baseline (the seeded transactions, the default chart tab, and cleared filters), never a mix of reverted and surviving facets"
+description = "Configure several independent facets — create a transaction, switch the chart tab to Trends, apply a category filter, and change the burn-rate ceiling — then reload. All facets coherently reset to the seeded baseline, never a mix of reverted and surviving facets"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.14"
 name = "views_desync_on_shared_datum"
-description = "The same datum shows different values in two places at once (e.g. the table reflects an edit or delete while a KPI card, chart legend, or the summary strip still shows the stale value until a reload)"
+description = "The same datum shows different values in two places at once (table vs KPI vs chart legend vs export totals) until a reload"
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "2.15"
+name = "export_drawer_and_palette_trap_focus"
+description = "The export drawer and command palette trap focus while open, close on Escape, and return focus to the invoking control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.16"
+name = "field_contract_enforced_on_create"
+description = "A create that violates the transaction field contract (zero amount, non-ISO date, or Salary with negative amount) is rejected with visible field errors and does not increase the collection count"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "2.catchall"

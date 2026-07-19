@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,96 +62,142 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "14.1"
-name = "multi_facet_round_trip"
-description = "Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline — never a mix."
+name = "multi_facet_persistence_round_trip"
+description = "Starting from the seeded overview: add a valid holding, apply a class filter, sort by market value, and select a row. Reload the page. Confirm the holdings collection, activities collection, and updated net-worth total survive from client storage (persistence genre). Filter and sort UI may reset, but holdings and activities must not partially revert to a mixed seed-plus-orphan state."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.2"
-name = "sort_reversal_proves_live_data"
-description = "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders."
+name = "market_value_sort_reversal"
+description = "Starting from the full holdings list: sort by market value ascending and record the exact row order of symbols, then sort descending. Confirm the order reverses relative to ascending, proving sort is derived from live market values rather than two hardcoded orders."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.3"
-name = "derived_view_responds_to_input"
-description = "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input."
+name = "filter_changes_derived_allocation"
+description = "Apply the asset-class filter to one class, then to another class (or clear). Confirm the holdings table, net-worth total, meta line, and allocation percentages all change meaningfully with the filter — not an identical redraw regardless of class."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.4"
-name = "cross_view_echo_without_reload"
-description = "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list ↔ detail, board ↔ stats) without reload."
+name = "edit_echoes_table_and_detail"
+description = "Select a holding, edit its quantity through the form, and save. Without reload, confirm the table row market value and the detail panel market value both equal new quantity times unit price, and the net-worth total reflects the delta."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.5"
-name = "count_delta_is_exact"
-description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+name = "add_count_delta_exact"
+description = "Record the holdings table row count and meta-line holding count, then save one new valid holding. Immediately after saving, both counts increase by exactly one and the net-worth total increases by exactly that holding's market value."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.6"
-name = "different_inputs_change_outcomes"
-description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+name = "different_inputs_different_holdings"
+description = "Add two holdings through the form with different name/symbol/quantity/unit-price inputs. Confirm the two resulting rows and their market values differ in the ways the inputs dictate (not byte-identical hardcoded rows)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.7"
-name = "interleaved_flows_preserve_state"
-description = "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state."
+name = "interleaved_filter_and_add"
+description = "Start adding a holding in the form, switch the class filter to another class mid-flow, finish saving a valid holding in a class different from the active filter, then clear the filter. Confirm both prior holdings and the new holding appear exactly once with coherent totals."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.8"
-name = "empty_to_repopulated_round_trip"
-description = "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions."
+name = "empty_then_repopulate_derived"
+description = "Delete holdings until the table empty state appears with net worth zero and no allocation entries, then add a valid holding. Confirm the empty state clears, the new row appears, net worth equals that holding's market value, and allocation shows that class at 100 percent."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.n1"
-name = "partial_persistence_is_incoherent"
-description = "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence."
+name = "partial_persistence_incoherent"
+description = "After adding a holding and reloading, some holdings survive while the newly added holding or updated net-worth total silently reverts, producing incoherent partial persistence."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n2"
-name = "derived_surface_ignores_inputs"
-description = "A derived surface renders identically regardless of its inputs."
+name = "allocation_ignores_filter_inputs"
+description = "Changing the asset-class filter leaves the allocation percentages and net-worth total identical to the unfiltered view even when the visible holdings set changed."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n3"
-name = "different_inputs_produce_identical_output"
-description = "Repeating an action with different inputs yields byte-identical output."
+name = "different_inputs_identical_output"
+description = "Repeating Add holding with different name/symbol/quantity/unit-price inputs yields byte-identical rows or identical market values that ignore the inputs."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "State changes appear in one view but not another until reload."
+name = "cross_view_stale_until_reload"
+description = "After editing quantity or deleting a holding, the table updates but the detail panel, net-worth total, or allocation stays stale until a full page reload."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
+id = "14.9"
+name = "mutate_then_export_contains_work"
+description = "Add a valid holding with a distinctive symbol, then open Export portfolio. Confirm Portfolio JSON holdings and Holdings CSV both contain that symbol and its quantity/unitPrice/marketValue, proving export is compiled live from the session store."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "export_import_round_trip_probe"
+description = "Mutate holdings or activities, export Portfolio JSON, clear or further mutate state if needed, then import that JSON. Confirm holdings names/quantities, activity symbols/types, and net worth match the exported mutated state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.11"
+name = "invalid_holding_payload_rejected"
+description = "Attempt to save a holding with an invalid enum or broken cross-field rule. Confirm an inline field error appears, row count is unchanged, and export previews do not gain a new holding."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "export_ignores_session_work"
+description = "After adding or editing a holding, Export portfolio JSON/CSV still omits the mutation or shows identical content to a pre-mutation export."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n6"
+name = "import_round_trip_incoherent"
+description = "A valid export-then-import round-trip leaves the table, net worth, or allocation incoherent with the exported document."
+type = "binary"
+negate = true
+weight = 1.0
+
+
+
+[[criterion]]
+id = "14.12"
+name = "buy_then_export_activity_present"
+description = "Save a valid BUY activity, then confirm Activities CSV and Portfolio JSON activities array include that symbol, type BUY, quantity, and unitPrice matching the form inputs."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "behavioral.catchall"
 name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling in the portfolio dashboard that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot). If already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

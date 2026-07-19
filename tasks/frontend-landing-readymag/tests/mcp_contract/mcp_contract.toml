@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,94 +62,94 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "12.1"
-name = "mandated_modules_are_bound"
-description = "All contract-mandated modules are initialized and bound."
+name = "four_modules_bound"
+description = "Contract modules browse-query-v1, command-session-v1, form-workflow-v1, and artifact-transfer-v1 are initialized and bound (webmcp_session_info / webmcp_list_tools show tools for browse, session, form, and artifact prefixes)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.2"
-name = "handlers_match_visible_ui_logic"
-description = "Exposed tool handlers match visible UI command logic."
+name = "handlers_match_visible_ui"
+description = "Exposed browse, session, form, and artifact tool handlers drive the same visible UI logic as on-page controls (section destinations, Solutions menu demo, slideshow advance, trial brief fields/submit/reset, and export/copy/import)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.3"
-name = "only_documented_operations_exist"
-description = "Only documented operations and routes are available."
+name = "only_documented_ops_available"
+description = "Only documented browse, session, form (validate, submit, cancel, reset, advance, return), and artifact (import, export, copy, print_preview, convert) permitted operations are available — no undeclared routes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.4"
-name = "contract_is_automation_exercisable"
-description = "The contract can be fully exercised via automation."
+name = "contract_exercisable_via_automation"
+description = "The contract can be fully exercised via webmcp_invoke_tool for browse open, session advance / trigger_demo, form validate/submit/reset, and artifact export/copy against the declared bindings."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.5"
-name = "declared_entity_operations_work"
-description = "Entity operations declared in the contract, including create, update, delete, and reorder, all work."
+name = "browse_destinations_include_trial_brief"
+description = "Browse open works for declared destinations: hero, workflow, teams, support, closing, and trial-brief."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.6"
-name = "form_flow_operations_are_bound"
-description = "Form submission validation, error, and cancel operations are clearly bound."
+name = "session_advance_and_solutions_demo"
+description = "Session operation advance advances the slideshow via the same logic as the idle timer path; demo solutions-menu via trigger_demo opens or toggles the Solutions panel with the same six labels and expanded state as the UI trigger."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.7"
-name = "queries_match_allowed_spec"
-description = "Query destinations and filters match the allowed specification."
+name = "form_fields_and_ops_bound"
+description = "Form fields name, email, plan, team_size, and interests plus form operations validate, submit, and reset are bound; invoking them updates the visible trial brief form and live preview through the same handlers as the UI; validate/submit reject drafts that fail the trial-signup field contract (formats, enums, bounds, or Free-trial/Team/Pro cross-field rules) with the same named field errors as the UI; form reset returns the empty baseline preview (product Canvasly, empty-string scalars, [] interests) like the Reset control."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.8"
-name = "capabilities_stay_declared"
-description = "No extra or undeclared module routes or capabilities are exposed."
+name = "artifact_export_copy_import_bound"
+description = "Artifact operations export, copy, and import are bound with export format json and import mode replace; export/copy reflect the session's current trial brief preview (Playwright observes download/clipboard contents)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.9"
-name = "session_tool_and_invoke_apis_work"
-description = "Session info, tool list, and invocation are correctly surfaced."
+name = "session_list_invoke_apis_work"
+description = "window.webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool correctly surface session info, the tool list, and invocation results without errors."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.10"
-name = "mcp_initializes_without_harness_edits"
-description = "MCP initialization works without manual editing or test harness changes."
+name = "mcp_init_without_harness_edits"
+description = "MCP tools register from the app's own module_spec + Bindings implementation without requiring manual edits to the verifier harness."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.n1"
 name = "mcp_tools_missing_or_noop"
-description = "MCP tooling is unbound, missing, or a no-op."
+description = "Browse, session, form, or artifact MCP tooling is unbound, missing, or a no-op when invoked."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n2"
-name = "handlers_diverge_from_ui_logic"
-description = "Handlers do not match UI logic because actions mismatch or state does not sync."
+name = "handlers_diverge_from_ui"
+description = "A browse open, session advance, form submit/reset, or artifact export/copy invocation updates MCP-reported state without matching the visible section scroll, slideshow frame, Solutions panel, or trial brief preview (or the reverse)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n3"
-name = "undeclared_capabilities_exposed"
-description = "Undeclared destinations or entity operations are exposed."
+name = "undeclared_destinations_or_ops_exposed"
+description = "Undeclared destinations or operations outside the Bindings/permitted_operations lists are exposed via webmcp_list_tools."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,15 +157,15 @@ weight = 1.0
 [[criterion]]
 id = "12.n4"
 name = "automation_cannot_exercise_contract"
-description = "The contract cannot be exercised from automation."
+description = "webmcp_invoke_tool cannot exercise browse open, session advance/trigger_demo, form validate/submit/reset, or artifact export/copy against the declared bindings."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n5"
-name = "validation_bypass_desyncs_state"
-description = "Validation bypasses lead to inconsistent MCP and UI state."
+name = "artifact_export_omits_session_brief"
+description = "Invoking artifact export or copy reports success while the visible trial brief preview still shows session mutations that the exported/copied text omits."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n6"
 name = "session_or_tool_api_errors"
-description = "The session or tool API returns errors or incomplete data."
+description = "webmcp_session_info or webmcp_list_tools returns errors or incomplete module/tool data for the declared contract."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,31 +181,39 @@ weight = 1.0
 [[criterion]]
 id = "12.n7"
 name = "mcp_relies_on_undocumented_hacks"
-description = "MCP relies on manual or undocumented test hacks."
+description = "MCP only works after undocumented manual harness hacks or console stubs rather than app-registered handlers."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n8"
-name = "required_contract_module_missing"
-description = "No module contract is implemented where one is declared required."
+name = "required_modules_missing"
+description = "browse-query-v1, command-session-v1, form-workflow-v1, or artifact-transfer-v1 is not implemented despite being declared required in the contract."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n9"
-name = "mcp_is_stubbed_or_commented_out"
-description = "The MCP interface is commented out or only stubbed."
+name = "mcp_stubbed_or_commented_out"
+description = "The MCP interface is commented out or only stubbed so list/invoke cannot reach real handlers."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n10"
-name = "automated_contract_validation_fails"
-description = "The project fails automated MCP contract validation."
+name = "bindings_incomplete"
+description = "Declared destinations (including trial-brief), session advance, demo solutions-menu, form fields/ops, or artifact export/copy/import are missing from the bound tool surface."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "12.n11"
+name = "form_submit_bypasses_trial_signup_schema"
+description = "Invoking form validate or submit via MCP bypasses the trial-signup field contract and leaves UI/MCP state inconsistent with a manual invalid draft (e.g. success without named field errors when Free trial is paired with team_size 11-50, or Pro with zero interests)."
 type = "binary"
 negate = true
 weight = 1.0

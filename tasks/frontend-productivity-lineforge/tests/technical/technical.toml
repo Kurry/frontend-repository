@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -66,56 +66,48 @@ name = "loads_interactive_ui"
 description = "Loading / reaches an interactive UI showing the Opening Library and board, not a blank page, framework error overlay, or noscript fallback"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "ti-2"
 name = "console_clean_full_exercise"
-description = "No console errors, warnings, or unhandled promise rejections are logged during initial load or while driving the core workflow"
+description = "No console errors, warnings, or unhandled promise rejections are logged during initial load or while driving the core workflow including Export center and import"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "ti-4"
 name = "board_is_dom_grid_not_canvas"
 description = "The exploration board and its squares are real DOM elements (div/grid nodes) with no canvas element used for the board"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "ti-5"
-name = "persistence_all_facets_restore"
-description = "After favoriting an opening, saving a line, choosing a non-default board theme, and opening a specific opening, a full page refresh restores all four exactly"
+name = "in_memory_reload_resets_session"
+description = "After favoriting an opening, saving a line, choosing a non-default board theme, and opening a specific opening, a full page refresh returns the seeded baseline with empty Favorites, empty My Saved Lines, and Classic theme rather than restoring those session mutations"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "ti-6"
 name = "keyboard_only_operability"
-description = "Every interactive control is reachable and operable with the keyboard alone"
+description = "Every interactive control including Export center, command palette, Undo/Redo, and bulk actions is reachable and operable with the keyboard alone"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "ti-7"
 name = "form_dialogs_manage_focus"
-description = "The save and rename forms trap focus while open and return focus to the control that opened them when closed"
+description = "The save and rename forms, Export center dialogs, import confirmation, bulk delete confirmation, and command palette trap focus while open and return focus to the control that opened them when closed"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "ti-8"
 name = "feedback_announced_via_aria_live"
-description = "Practice feedback (Correct! and Try again) and inline form validation messages are exposed through an aria-live polite region as well as shown visually"
+description = "Practice feedback (Correct! and Try again), inline form validation messages, import errors, and Copy confirmation are exposed through an aria-live polite region as well as shown visually"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "ti-9"
 name = "interactive_within_two_seconds"
 description = "The app is interactive within 2 seconds of a local cold load"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "ti-10"
 name = "rapid_scrubbing_stays_responsive"
@@ -123,7 +115,6 @@ description = "Rapidly stepping through a line with the Previous move / Next mov
 type = "binary"
 weight = 0.5
 optional = true
-
 [[criterion]]
 id = "ti-11"
 name = "theme_switch_instant_no_shift"
@@ -131,81 +122,83 @@ description = "Switching board themes applies instantly with no page reload and 
 type = "binary"
 weight = 0.5
 optional = true
-
 [[criterion]]
 id = "ti-12"
 name = "fresh_load_starts_unseeded"
-description = "On a first load with cleared storage, Favorites and My Saved Lines start empty with no pre-seeded entries"
+description = "On a first load, Favorites and My Saved Lines start empty with no pre-seeded user entries"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "ti-13"
 name = "cross_view_state_coherence"
-description = "A change made in one surface is immediately reflected in every other surface showing that datum without a reload: starring an opening updates both the library star and the Favorites Only filter, and saving a line updates both the header saved-line count and the My Saved Lines list"
+description = "A change made in one surface is immediately reflected in every other surface showing that datum without a reload: starring an opening updates both the library star and the Favorites Only filter, saving a line updates both the header saved-line count and the My Saved Lines list, and both appear in the Study pack JSON"
 type = "binary"
 weight = 1.0
-
+[[criterion]]
+id = "ti-14"
+name = "export_previews_stay_responsive"
+description = "Opening Export center or regenerating Study pack JSON and PGN previews after mutations stays responsive with no hangs"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "ti-15"
+name = "no_browser_storage_apis"
+description = "During a full exercise that saves lines, favorites openings, changes theme, exports, and imports, the app does not read or write localStorage or sessionStorage for app state"
+type = "binary"
+weight = 1.0
 [[criterion]]
 id = "ti-neg-1"
 name = "hidden_ground_truth_exposed"
 description = "A hidden element, attribute, or window global not mandated by the PRD exposes internal ground-truth state (the expected practice move, computed answers) a real user could not reach through visible interaction"
 type = "binary"
-weight = 1.0
 negate = true
-
+weight = 1.0
 [[criterion]]
 id = "ti-neg-2"
 name = "grader_addressed_text_present"
 description = "A judge-visible surface (rendered text, DOM comment, alt text, title, console) contains language addressed to a grader rather than a user or developer"
 type = "binary"
-weight = 1.0
 negate = true
-
+weight = 1.0
 [[criterion]]
 id = "ti-neg-3"
 name = "fabricated_success_state"
-description = "A workflow shows a success state without the action occurring — a saved line or favorite is absent after reload, or an output is a hardcoded constant regardless of input"
+description = "A workflow shows a success state without the action occurring — a saved line or favorite is absent from My Saved Lines/Export after a claimed save, or an export is a hardcoded constant regardless of input"
 type = "binary"
-weight = 1.0
 negate = true
-
+weight = 1.0
 [[criterion]]
 id = "ti-neg-4"
 name = "automation_keyed_behavior"
 description = "The app renders or behaves differently when driven by automation (behavior keyed on navigator.webdriver or automation-specific signals)"
 type = "binary"
-weight = 1.0
 negate = true
-
+weight = 1.0
 [[criterion]]
 id = "ti-neg-5"
-name = "persistence_lost_on_refresh"
-description = "Favorites, saved lines, board theme, or last-opened opening are lost after a full page refresh (persistence does not survive reload)"
+name = "session_mutations_survive_reload"
+description = "Favorites, saved lines, or a non-default board theme still appear after a full page refresh even though this good-app task is in-memory only"
 type = "binary"
-weight = 1.0
 negate = true
-
+weight = 1.0
 [[criterion]]
 id = "ti-neg-6"
 name = "session_only_state_persists"
 description = "After a full page refresh, the session-only Your Line deviation branch, the practice streak or accuracy, or a notable-game replay position is still present instead of having been reset"
 type = "binary"
-weight = 1.0
 negate = true
-
+weight = 1.0
 [[criterion]]
 id = "ti-neg-7"
 name = "outbound_requests_or_navigation"
 description = "The running app issues outbound network requests to external origins (CDN scripts, fonts, icons, or APIs), or activating app chrome navigates the browser away from the app's origin"
 type = "binary"
-weight = 1.0
 negate = true
-
+weight = 1.0
 [[criterion]]
 id = "ti.catchall"
 name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect (console health, persistence coherence, performance, accessibility) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, console output, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable technical defect (console health, in-memory coherence, performance, accessibility) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, console output, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0

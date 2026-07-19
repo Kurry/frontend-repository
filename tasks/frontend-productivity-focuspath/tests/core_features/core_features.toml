@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,92 +62,92 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
+name = "empty_overview_first_goal_cta"
 description = "On load with no data, the overview shows \"Set your first goal to start building a path\" and a \"+ New Goal\" call to action."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
-description = "When \"+ New Goal\" is clicked, an inline form opens offering a required title, optional target date, exactly 8 fixed accent-color swatches (not a free-form picker), and a \"Why this matters\" note; submitting a goal titled \"Learn Piano\" adds a card showing its accent color and a 0% progress bar."
+name = "new_goal_form_eight_swatches"
+description = "When \"+ New Goal\" is clicked, an inline form opens offering a required title, optional target date, exactly these 8 fixed accent-color swatches (#2b6f6e, #c98a3d, #3f9d6b, #4a6fa5, #8b5a8c, #c1483f, #6b7268, #d9a441) rather than a free-form picker, and a \"Why this matters\" note; submitting a goal titled \"Learn Piano\" with one of those swatches adds a card showing that accent color and a 0% progress bar."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
+name = "goals_sorted_by_nearest_target_date"
 description = "After creating three goals with target dates next month, next week, and none, the overview lists them nearest-target-date first with the no-date goal sorted last."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
+name = "milestone_path_numbered_nodes"
 description = "After opening a goal and adding three milestones with \"+ Add Milestone\", they render as numbered nodes connected by a line in order, with the first as the highlighted active node and the others as outlined/dashed upcoming nodes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
-description = "When every action step of the first milestone is checked, the milestone auto-completes the instant the last step is checked, its node/connector become solid, and the second milestone becomes the highlighted active one."
+name = "milestone_autocompletes_on_last_step"
+description = "When every action step of the first milestone is checked, the milestone auto-completes the instant the last step is checked, its node/connector become filled, and the second milestone becomes the highlighted active one."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
+name = "reorder_disabled_when_complete"
 description = "After a milestone completes, its up/down reorder controls are disabled and an inline note reads \"Reordering disabled — an earlier milestone is complete\" (or \"— this milestone is complete\"); reordering two still-incomplete milestones with the buttons swaps their order."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
+name = "zero_step_milestone_guidance"
 description = "On a milestone with zero steps, \"Add a step to make progress\" is shown and no control marks it complete; adding two steps and checking both auto-completes it."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
+name = "aggregated_completion_percent_live"
 description = "On a goal with 4 steps across two milestones, completing 2 shows 50% and completing a 3rd live-updates to 75% as both a number and a matching progress-bar fill in the detail header, aggregating across milestones."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
+name = "todays_focus_cap_three"
 description = "After toggling \"Focus Today\" on 4 steps across two goals, the Today's Focus panel lists only the first 3 with quick-complete checkboxes and the 4th toggle shows an inline message to complete or unfocus one first."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
-description = "When the app's stored focus-date is changed to a non-today value via browser_evaluate and the page is reloaded, the Today's Focus panel is empty while the underlying steps' complete/incomplete state is unchanged."
+name = "stale_focus_date_clears_panel"
+description = "After Importing a Path Pack whose todaysFocus.focusDate is yesterday (or otherwise setting the store focusDate to a non-today value) while steps remain incomplete, the Today's Focus panel is empty while the underlying steps' complete/incomplete state is unchanged."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
-description = "When a goal is seeded (matching the created localStorage schema) with an incomplete milestone whose latest step-completion/creation date is more than 7 days ago, both its overview card and detail view show a \"Needs Attention\" badge, which clears after completing a fresh step dated today."
+name = "needs_attention_badge_and_clear"
+description = "When a goal has an incomplete milestone whose latest step lastCompletedAt or createdAt is more than 7 days in the past (set via entity update of those date fields or an imported Path Pack), both its overview card and detail view show a \"Needs Attention\" badge, which clears after completing a fresh step dated today."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
-description = "\"Mark Goal Complete\" is absent below 100% and appears only at 100%; confirming it moves the goal into a toggle-visible \"Completed Goals\" section with a recorded date and a read-only path whose steps cannot be toggled."
+name = "mark_goal_complete_moves_readonly"
+description = "\"Mark Goal Complete\" is absent below 100% and appears only at 100%; confirming it moves the goal into a toggle-visible \"Completed Goals\" section with a recorded completionDate and a read-only path whose steps cannot be toggled."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "1_13"
-description = "After creating a goal with milestones, completed/incomplete steps, and a Today's Focus selection, a full page refresh restores the exact state; a deleted goal, milestone, or step is not revived after refresh."
+name = "reload_clears_in_memory_session"
+description = "After creating a goal with milestones, completed/incomplete steps, and a Today's Focus selection, a full page refresh returns an empty overview with no revived goals, milestones, steps, or focus selections (in-memory session); deleted items likewise do not revive."
 type = "binary"
 weight = 1.0
 
@@ -161,20 +161,20 @@ weight = 1.0
 [[criterion]]
 id = "1.18"
 name = "milestone_reverts_on_uncheck"
-description = "After a milestone has auto-completed, unchecking one of its steps via its real checkbox reverts the milestone to incomplete: its node loses the solid completed fill, it becomes the highlighted active milestone again, and the goal's percentage drops accordingly."
+description = "After a milestone has auto-completed, unchecking one of its steps via its real checkbox reverts the milestone to incomplete: its node loses the filled completed appearance, it becomes the highlighted active milestone again, and the goal's percentage drops accordingly."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.24"
-name = "1_24"
+name = "inline_edits_reflect_immediately"
 description = "Goal title, target date, and motivation, and milestone and step titles, are all editable inline and reflect immediately."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.25"
-name = "1_25"
+name = "delete_cascades_nested_records"
 description = "Deleting a goal or milestone through its inline confirm step also removes its nested milestones and steps from the path."
 type = "binary"
 weight = 1.0
@@ -197,7 +197,7 @@ negate = true
 
 [[criterion]]
 id = "1.29"
-name = "1_29"
+name = "reorder_stays_enabled_when_complete"
 description = "Reorder up/down controls stay enabled on a milestone when it or an earlier milestone is already complete, letting completed order be shuffled."
 type = "binary"
 weight = 1.0
@@ -205,7 +205,7 @@ negate = true
 
 [[criterion]]
 id = "1.30"
-name = "1_30"
+name = "percent_ignores_other_milestones"
 description = "A goal's completion percentage reflects only a single milestone's steps rather than aggregating across all its milestones."
 type = "binary"
 weight = 1.0
@@ -214,49 +214,49 @@ negate = true
 [[criterion]]
 id = "1.31"
 name = "submit_disabled_until_title_valid"
-description = "The New Goal form's submit control is disabled while the title field is empty and becomes enabled as soon as a non-empty title is typed."
+description = "The New Goal form's submit control is disabled while the title field is empty and becomes enabled as soon as a non-empty title within 1 to 80 characters is typed."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.32"
 name = "all_forms_inline_field_errors"
-description = "Each form in the app (goal create and edit, milestone add, step add and edit) validates before submit and shows an inline per-field error message that names the field, rendered next to the offending field rather than as a browser alert."
+description = "Each form in the app (goal create and edit, milestone add, step add and edit, Import) validates before submit and shows an inline per-field error message that names the field, rendered next to the offending field rather than as a browser alert."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.33"
-name = "flow_create_goal_roundtrip"
-description = "Starting from an overview with at least two dated goals, create a goal whose target date falls between theirs: exactly one new card appears in the correct sort position, opening it shows the same title, target date, motivation note, and accent color, and after a full page refresh the same goal reappears with identical fields."
+name = "flow_create_goal_sort_position"
+description = "Starting from an overview with at least two dated goals, create a goal whose target date falls between theirs: exactly one new card appears in the correct sort position, and opening it shows the same title, target date, motivation note, and accent color; a full page refresh then shows the empty overview with none of those goals revived."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.34"
-name = "flow_steps_progress_cross_view"
-description = "Add a milestone with two steps and check both in the detail view: the milestone's node fills solid and the detail progress bar and percentage rise; returning to the overview shows the same raised percentage and steps-completed count on that goal's card without a reload; reloading the page restores the same checked steps, node fill, and percentages exactly."
+name = "flow_steps_progress_cross_view_export"
+description = "Add a milestone with two steps and check both in the detail view: the milestone's node fills completely and the detail progress bar and percentage rise; returning to the overview shows the same raised percentage and steps-completed count on that goal's card without a reload; opening Export Path Pack JSON shows that goal with both steps completed and a matching completionPercent."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.35"
-name = "flow_focus_quick_complete_roundtrip"
-description = "Toggle three steps from two different goals into Today's Focus so all three appear in the panel; ticking one focused step's quick-complete checkbox marks the same step complete in its milestone checklist and updates that goal's percentage on both the detail view and its overview card without a reload; after a refresh, the remaining focus selections and the completed step are all restored."
+name = "flow_focus_quick_complete_export"
+description = "Toggle three steps from two different goals into Today's Focus so all three appear in the panel and Daily Velocity updates; ticking one focused step's quick-complete checkbox marks the same step complete in its milestone checklist and updates that goal's percentage on both the detail view and its overview card without a reload; Path Pack todaysFocus.stepIds and the Markdown report reflect the remaining focus selections and the completed step."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.36"
-name = "flow_goal_completion_chain"
-description = "Count the active goal cards, then check the final remaining step of a goal's last incomplete milestone: the milestone auto-completes, the goal reads 100%, and \"Mark Goal Complete\" appears; confirming it decreases the active-goal card count by exactly one (measured immediately around the action), shows the goal inside the toggle-visible Completed Goals section with a recorded completion date and a read-only path, and a refresh keeps the goal in Completed Goals without reviving it in the active list."
+name = "flow_goal_completion_undo"
+description = "Count the active goal cards, then check the final remaining step of a goal's last incomplete milestone: the milestone auto-completes, the goal reads 100%, and \"Mark Goal Complete\" appears; confirming it decreases the active-goal card count by exactly one (measured immediately around the action), shows the goal inside the toggle-visible Completed Goals section with a recorded completionDate and a read-only path; Undo restores the goal to the active list at 100% with Mark Goal Complete available again."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.37"
-name = "flow_delete_goal_cascades"
-description = "With one of a goal's steps toggled into Today's Focus, delete that goal through its inline confirm step: its card leaves the overview and its step leaves the Today's Focus panel immediately, and a subsequent refresh revives neither the goal nor any of its milestones or steps."
+name = "flow_delete_goal_cascades_focus"
+description = "With one of a goal's steps toggled into Today's Focus, delete that goal through its inline confirm step: its card leaves the overview and its step leaves the Today's Focus panel immediately; Undo brings the goal and its focus selection back; a subsequent page refresh leaves the overview empty with no revived data."
 type = "binary"
 weight = 1.0
 
@@ -270,7 +270,7 @@ weight = 1.0
 [[criterion]]
 id = "1.39"
 name = "invalid_input_preserves_state"
-description = "Submitting invalid or extreme input (a blank required title, an out-of-range date, or absurdly long text) is rejected with a specific inline message naming the field, and the previously committed data is left untouched."
+description = "Submitting invalid or extreme input (a blank required title, a title over 80 characters, a targetDate not YYYY-MM-DD, or motivation over 280 characters) is rejected with a specific inline message naming the field, and the previously committed data is left untouched."
 type = "binary"
 weight = 1.0
 
@@ -282,9 +282,68 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "1.41"
+name = "path_pack_export_contains_session_work"
+description = "After creating a uniquely titled goal, adding a milestone and step, and checking the step, open Export: Path Pack JSON preview includes format focuspath-path-pack-v1, that goal title, the step with completed true, and a matching completionPercent; the Markdown report also names that goal and shows the step checked."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "path_pack_import_round_trip"
+description = "Download Path Pack JSON for a session with at least one goal, milestone, step, and Focus Today selection; delete the goal so the overview is empty; Import that file and confirm; the overview, detail path, Today's Focus, Daily Velocity, and a fresh Export all reconstruct to match the pack."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "undo_redo_goal_mutation"
+description = "Create a goal, confirm it appears on the overview, activate Undo: the card disappears and Redo becomes enabled; activating Redo restores the same goal card with the same title and accent."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "command_palette_opens_goal_detail"
+description = "With at least two goals that have milestones, open the command palette via its trigger or Ctrl+K/Cmd+K, type part of a milestone title, and choose it: the detail view for that goal opens with that milestone visible; Escape closes the palette."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "daily_velocity_tracks_focus_completions"
+description = "With three steps in Today's Focus and zero completed, Daily Velocity reads 0 of 3; quick-completing one focused step updates it to 1 of 3 without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "goal_field_contract_rejects_bad_accent_and_date"
+description = "On New Goal, choosing no accent from the 8 swatches (or attempting a value outside them) and/or entering a target date that is not YYYY-MM-DD keeps submit disabled or shows an inline message naming accent color or target date; no goal is added."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "export_omits_session_mutations"
+description = "After creating a uniquely titled goal and completing a step, the Path Pack JSON and Markdown export previews omit that goal title or still show the step unchecked — an export missing the session's actual work."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.48"
+name = "undo_does_not_restore_goal"
+description = "After creating a goal and activating Undo, the goal card remains on the overview (Undo is a no-op or only changes unrelated chrome)."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true
+

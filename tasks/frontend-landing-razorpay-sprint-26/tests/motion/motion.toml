@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -184,6 +184,14 @@ negate = true
 id = "3.17"
 name = "reduced_motion_settled_and_operable"
 description = "With prefers-reduced-motion enabled, the preloader clears immediately, smooth scrolling and parallax/pinning stop, the 3D hero presents a static composition, and split/reveal/vector timelines settle while all controls and sections remain visible and operable"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "3.20"
+name = "palette_and_brief_open_transition"
+description = "Via the real UI path, command palette and Sprint launch brief panel open and close with a short ~0.2s opacity/translate transition using inertial easing; pin/unpin updates the Shortlist tray count without a full-page reload flash; Copied confirmation fades in and out on the brief Copy control."
 type = "binary"
 weight = 1.0
 

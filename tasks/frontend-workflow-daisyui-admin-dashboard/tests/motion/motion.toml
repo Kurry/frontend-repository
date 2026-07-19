@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -114,7 +114,7 @@ weight = 1.0
 [[criterion]]
 id = "4.8"
 name = "chart_hover_and_trend_redraw"
-description = "Overview chart cards show hover/tooltip feedback on their seeded series, KPI inline trend charts redraw when their numbers change (e.g. after adding or deleting a user through the UI), security-watch status dots show a ping animation, and the notification bell keeps a static error indicator"
+description = "Overview chart cards show hover/tooltip feedback on their seeded series, KPI inline trend charts redraw when their numbers change (e.g. after adding or archiving a user through the UI), security-watch status dots show a ping animation, and the notification bell keeps a static error indicator"
 type = "binary"
 weight = 0.5
 
@@ -124,6 +124,22 @@ name = "breadcrumb_underline_and_focus_rings"
 description = "Breadcrumb links underline on hover and form controls show visible focus rings when focused"
 type = "binary"
 weight = 0.5
+
+
+[[criterion]]
+id = "4.20"
+name = "export_drawer_and_palette_motion"
+description = "Verified through real UI controls: the export drawer slides in from the side rather than snapping open; the command palette enters with short opacity/scale; newly created or restored rows animate into All Users and archived rows animate out on the real table path"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.21"
+name = "export_or_palette_snaps_without_motion"
+description = "The export drawer or command palette appears or disappears with a hard snap and no enter/exit opacity/scale or slide when opened via the real UI controls"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.catchall"

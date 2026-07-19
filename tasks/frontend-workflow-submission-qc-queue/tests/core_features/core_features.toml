@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -105,7 +105,7 @@ weight = 1.0
 [[criterion]]
 id = "1.7"
 name = "add_finding_validated_count_delta"
-description = "The Add finding form requires tier, category, and a description of at least 10 characters, showing inline messages naming invalid fields with submit disabled until valid; submitting a valid form appends exactly one finding to the detail list and updates the queue row's tier chips, measured immediately before and after"
+description = "The Add finding form requires tier (exactly blocker, major, or minor), category (exactly one of correctness, instruction-clarity, rubric-alignment, environment, scoring, or tooling), and a description of at least 10 characters, with optional evidence; invalid fields show inline messages naming them with submit disabled until valid; submitting a valid form appends exactly one finding to the detail list and updates the queue row's tier chips, measured immediately before and after"
 type = "binary"
 weight = 1.0
 
@@ -159,6 +159,34 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "1.15"
+name = "bulk_queue_actions"
+description = "Selecting one or more queue row checkboxes reveals a bulk action bar with the live selected count; Move to in-review sets every selected submitted-stage row to in-review; Hold payout sets selected non-released rows to held; both update affected queue rows and any open detail view immediately; Clear selection hides the bar again"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "command_palette_navigation"
+description = "Pressing Ctrl+K (Cmd+K on macOS) opens a command palette with search focused; typing fuzzy-matches submission titles, contributor names, and view names; Enter on a submission opens its detail, on a contributor opens its drawer, and on a view switches to that view; Escape closes the palette; a no-match query shows an empty-state line"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "undo_redo_restores_mutations"
+description = "Scripted probe: add a finding (or perform a bulk payout hold), confirm the mutation is visible in detail/queue and in the Export preview, activate Undo, and confirm stages, findings, gate banner, queue chips, and export preview restore to the prior state; Redo reapplies the mutation; empty undo/redo stacks disable their controls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "qc_package_export_live"
+description = "The Export view shows a monospaced preview switchable between QC package JSON and QC report markdown; the JSON exposes package fields exported_at, queue_summary, and submissions with id, title, contributor_name, stage, payout_state, gate_status, open_finding_counts, findings (tier, category, description, evidence, status open|overridden, override_justification), and history; mutating findings, stages, or payouts changes the preview without a reload; Copy puts the exact preview text on the clipboard with visible confirmation; Download offers a file matching the preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.n1"
 name = "approve_bypasses_gate"
 description = "A submission can be approved while it still has an open blocker finding, or from a stage other than in-review — the Approve control activates, or the stage lands on approved, despite the gate condition"
@@ -169,10 +197,19 @@ negate = true
 [[criterion]]
 id = "1.n2"
 name = "derived_surfaces_static"
-description = "The gate banner, queue tier chips, or failure-profile bars render identical output regardless of finding changes, overrides, or date-range input, indicating hardcoded rather than derived state"
+description = "The gate banner, queue tier chips, failure-profile bars, or export preview render identical output regardless of finding changes, overrides, date-range input, or stage/payout mutations, indicating hardcoded rather than derived state"
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "1.n3"
+name = "export_omits_session_mutations"
+description = "After adding a finding, overriding, approving, or bulk-holding payout, the Export preview JSON or markdown still shows the pre-mutation values for that submission's findings, stage, payout_state, or gate_status — the session mutation is absent from the artifact"
+type = "binary"
+weight = 1.0
+negate = true
+
 
 [[criterion]]
 id = "1.catchall"

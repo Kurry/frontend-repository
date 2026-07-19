@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -221,6 +221,35 @@ description = "The folder-open cover rotation or the hero split reveal uses pure
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "8.40"
+name = "palette_and_dossier_enter_motion"
+description = "Via the real UI path on a fresh load where needed: the command palette and dossier export panel enter with a short opacity and translate rise using inertial easing cubic-bezier(0.33, 1, 0.68, 1) or equally springy motion, not an instant full-opacity pop."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.41"
+name = "reading_list_drawer_slides_in"
+description = "Opening the reading list via the real Reading list control slides the drawer in from the side rather than popping in fully opaque with no motion."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.42"
+name = "pin_and_undo_press_feedback"
+description = "Pinning a case briefly scales the Pin control; activating Undo or Redo from the visible controls shows a short pressed-state flash."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "8.n40"
+name = "palette_dossier_instant_pop"
+description = "Command palette or dossier export panel appears with an instant full-opacity pop and no enter opacity/translate motion when opened via the real UI path."
+type = "binary"
+negate = true
+weight = 1.0
 
 [[criterion]]
 id = "4.catchall"

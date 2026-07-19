@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,195 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_regions_show_hints"
+description = "On first load and whenever projects, testimonials, skills, or drafts are empty, those regions show an explicit empty-state hint rather than a blank area; the preview invites the user to start building."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "add_project_title_inline_validation"
+description = "Attempting to submit the Add Project form with an empty Title shows an inline error message naming the Title field next to that field, the submit control stays disabled while required fields are invalid, and no project card is appended."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "validation_names_field_and_fix"
+description = "Add Project Title validation and case-insensitive duplicate-skill rejection copy name the field/problem and the fix rather than only saying 'Invalid'."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "draft_save_shows_confirmation"
+description = "Saving a draft via Save As Draft adds the new entry to the drafts list immediately and gives transient confirmation that the save succeeded (new draft appears right away, or a brief confirmation message appears)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "duplicate_skill_rejected_inline"
+description = "Attempting to add a skill that duplicates an existing one ignoring letter case is rejected with a visible inline message and creates no second chip."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "undo_available_after_content_changes"
+description = "After adding, editing, or deleting a project, testimonial, or skill, or editing a Profile Header field, Undo is enabled and reverts the most recent content change; Undo is disabled when there is nothing to undo."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "move_controls_disabled_at_ends"
+description = "Move Up is disabled for the first visible section and Move Down for the last, and the disabled controls read as non-interactive."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "builder_controls_use_semantic_tags"
+description = "Add Project/Testimonial submits, Skills Add, section toggles, Move Up/Down, theme swatches, Density, drafts controls, and Undo/Redo use semantic button/input/label elements rather than unlabeled decorative wrappers."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "deleted_draft_stays_gone_after_reload"
+description = "Deleting a draft removes it from the drafts list immediately, and a full page reload does not revive a draft that was deleted before the reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "rapid_duplicate_submit_creates_one"
+description = "Rapid duplicate submissions of the Add Project or Add Testimonial form create exactly one record, not two."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_collection_shows_blank_area"
+description = "After deleting the last project, testimonial, or skill, that region of the preview is a blank area with no empty-state hint."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "validation_errors_only_in_console"
+description = "Empty Title submit or duplicate-skill rejection failures surface only in the browser console with no visible inline field feedback."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "draft_save_or_theme_change_silent"
+description = "Saving a draft or selecting a theme produces no visible change to the drafts list or preview accents (silent failure)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "undo_enabled_with_empty_history"
+description = "On a fresh empty session with no content edits yet, Undo remains enabled/clickable as if history existed."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "interactive_controls_are_nonsemantic"
+description = "Primary interactive controls (Add Project submit, section toggles, theme swatches, Move Up/Down, Save As Draft) are non-semantic div/span click targets without button/role semantics."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "move_up_down_active_at_ends"
+description = "Move Up remains interactive for the first visible section or Move Down remains interactive for the last visible section."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "duplicate_skill_still_adds_chip"
+description = "Adding a skill that case-insensitively duplicates an existing one still creates a second chip or shows no visible rejection message."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "ambiguous_or_missing_action_labels"
+description = "Primary actions show blank, placeholder, or ambiguous labels such as 'Submit', 'OK', or 'Button' instead of specific labels like Add Project, Save As Draft, Download PDF, Undo, or Redo."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "deleted_draft_revives_after_reload"
+description = "After deleting a draft, a full page reload brings that draft back into the drafts list."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "rapid_submit_creates_duplicates"
+description = "Rapid duplicate submissions of Add Project or Add Testimonial create two or more records from one intended create."
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "4.11"
+name = "malformed_import_shows_error"
+description = "Importing a malformed Portfolio JSON shows a visible error naming that the package could not be read and leaves Name, projects, theme, and density unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "bulk_bar_hidden_when_none_selected"
+description = "With no projects checked, the bulk actions bar is hidden or Delete selected is disabled and produces no change to the project list."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "second_featured_pin_leaves_one"
+description = "Pinning a second featured project leaves exactly one Featured treatment visible; the previous featured project loses the treatment immediately."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "palette_empty_query_shows_hint"
+description = "A command palette query with no matches shows an empty-state line inside the palette rather than a blank overlay."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "malformed_import_silently_applies"
+description = "A malformed Portfolio JSON import applies partial or corrupted state with no visible error."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n12"
+name = "multiple_featured_treatments"
+description = "After pinning featured on two different projects, more than one Featured treatment remains visible at once."
 type = "binary"
 negate = true
 weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -63,150 +63,78 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+name = "delightful_path_microinteractions"
+description = "Beyond the required node fill-in, the milestone path or Today's Focus offers an extra delightful microinteraction that makes progress feel tangible."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "advanced_progress_visualization"
+description = "The app adds an advanced progress visualization beyond the required percentage bar and path nodes (for example a richer velocity gauge treatment)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+name = "guided_first_goal_coaching"
+description = "The app offers optional guided coaching or coachmarks that help a new user build their first milestone path without blocking the empty-state CTA."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+name = "enriched_export_preview"
+description = "Export goes beyond bare JSON/Markdown with an enhanced preview affordance (syntax highlighting, section jump, or print-friendly framing) while still shipping the required formats."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+name = "keyboard_power_user_extras"
+description = "Beyond required Ctrl/Cmd+K and undo shortcuts, the app adds extra keyboard power-user shortcuts that speed roadmap editing."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.6"
 name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+description = "The app provides optional personalization (for example density or path orientation preference) beyond the required features."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+name = "polished_focus_narrative"
+description = "The app presents a polished productivity narrative or motivational framing around Why this matters that feels authored rather than generic."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+name = "theme_or_accent_personalization"
+description = "Beyond the required 8 goal accent swatches, the app offers an optional chrome personalization that stays within the calm palette."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+name = "offline_friendly_extras"
+description = "Where appropriate for an in-memory app, the app adds offline-friendly extras (for example a visible session summary) without using forbidden browser storage."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+name = "competition_level_roadmap_craft"
+description = "Competition-level craft is visible: the path, focus, velocity, and export surfaces feel like a tool an operator would adopt, not a thin demo."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
+name = "bare_spec_thin_demo"
+description = "The shipped app is a thin CRUD demo with no extra craft beyond the minimum required controls — path, focus, export, and velocity feel unfinished or placeholder-like."
 type = "binary"
 negate = true
 weight = 1.0
@@ -214,6 +142,7 @@ weight = 1.0
 [[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
-description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable innovation or craft excellence beyond the specification that is NOT covered by any other criterion in this file. If present, name it and cite concrete evidence. If nothing beyond other criteria qualifies, answer no."
 type = "binary"
 weight = 1.0
+

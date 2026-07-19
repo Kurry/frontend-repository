@@ -62,86 +62,100 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "12.1"
-name = "mandated_modules_are_bound"
-description = "All contract-mandated modules are initialized and bound."
+name = "three_mandated_modules_bound"
+description = "All three contract-mandated modules are initialized and bound: artifact-transfer-v1, entity-collection-v1, and command-session-v1 (tools discoverable via webmcp_list_tools with artifact_*, entity_*, and session_* prefixes)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.2"
-name = "handlers_match_visible_ui_logic"
-description = "Exposed tool handlers match visible UI command logic."
+name = "handlers_match_visible_converter_ui"
+description = "Exposed tool handlers call the same application logic as the visible UI: artifact/entity/session operations change the same conversion queue, per-file targets/status/selection, presets, convert/cancel/download state, and session-export previews the drop zone, Convert, Cancel, Download, batch tray, and Session export controls use."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.3"
-name = "only_documented_operations_exist"
-description = "Only documented operations and routes are available."
+name = "only_declared_ops_and_bindings"
+description = "Only documented operations from the bindings are available: artifact import/convert/export/copy with conversion modes (png-to-jpeg, png-to-webp, jpeg-to-png, jpeg-to-webp, webp-to-png, webp-to-jpeg, gif-to-png, bmp-to-png, svg-to-png), export formats png/jpeg/jpg/webp/session-json/conversion-report, and import mode conversion-session; entity create/select/update/delete/toggle on file (fields name, from, to, status, selected); session start/stop — no invented destinations."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.4"
-name = "contract_is_automation_exercisable"
-description = "The contract can be fully exercised via automation."
+name = "contract_exercisable_via_webmcp"
+description = "The contract can be fully exercised via automation: webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool succeed for the bound artifact, entity, and session tools."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.5"
-name = "declared_entity_operations_work"
-description = "Entity operations declared in the contract, including create, update, delete, and reorder, all work."
+name = "entity_file_create_select_update_delete_toggle"
+description = "Entity operations declared for entity file work: create, select, update, delete (delete requires confirm=true), and toggle update the visible conversion queue rows, selection checkboxes, and counts."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.6"
-name = "form_flow_operations_are_bound"
-description = "Form submission validation, error, and cancel operations are clearly bound."
+name = "session_start_stop_bound"
+description = "Session operations start and stop are bound and invoke the same convert-run / cancel logic as the visible Convert and Cancel controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.7"
-name = "queries_match_allowed_spec"
-description = "Query destinations and filters match the allowed specification."
+name = "artifact_import_convert_export_copy_bound"
+description = "Artifact operations import, convert, export, and copy with the declared conversion modes, export formats (including session-json and conversion-report), and import mode conversion-session are bound and invoke without throwing when called through WebMCP (file picker interaction and downloaded bytes remain Playwright responsibilities)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.8"
-name = "capabilities_stay_declared"
-description = "No extra or undeclared module routes or capabilities are exposed."
+name = "no_undeclared_modules_or_ops"
+description = "No extra modules beyond artifact-transfer-v1, entity-collection-v1, and command-session-v1, and no undeclared operations beyond the Bindings list (including no queue reorder), are exposed on the WebMCP surface."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.9"
-name = "session_tool_and_invoke_apis_work"
-description = "Session info, tool list, and invocation are correctly surfaced."
+name = "session_info_list_tools_invoke_work"
+description = "window.webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool are correctly surfaced and return coherent session/tool data for this app."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.10"
-name = "mcp_initializes_without_harness_edits"
-description = "MCP initialization works without manual editing or test harness changes."
+name = "mcp_init_without_harness_edits"
+description = "MCP initialization works from the app's own registration without requiring manual edits to /tests harness files."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.11"
+name = "visible_postconditions_session_export"
+description = "After WebMCP artifact export of session-json or conversion-report (or equivalent store mutation), the visible Session export previews reflect queue, settings, and preset mutations — matching the workflow-completion binding."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.12"
+name = "visible_postconditions_batch_set_format"
+description = "A WebMCP-driven or UI-equivalent batch set format updates selected rows' to field and resets Done to Ready, matching the workflow-completion binding and the visible queue."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.n1"
 name = "mcp_tools_missing_or_noop"
-description = "MCP tooling is unbound, missing, or a no-op."
+description = "WebMCP tooling for artifact-transfer-v1, entity-collection-v1, or command-session-v1 is unbound, missing, or a no-op when invoked."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n2"
-name = "handlers_diverge_from_ui_logic"
-description = "Handlers do not match UI logic because actions mismatch or state does not sync."
+name = "handlers_diverge_from_ui_state"
+description = "Invoking a bound artifact/entity/session tool leaves the conversion queue, per-file status/selection, presets, or session-export preview diverging from what the equivalent visible UI control would produce."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +163,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n3"
 name = "undeclared_capabilities_exposed"
-description = "Undeclared destinations or entity operations are exposed."
+description = "Undeclared modules, destinations, or operations beyond the Bindings (artifact import/convert/export/copy; entity create/select/update/delete/toggle; session start/stop) are exposed — including a queue reorder operation."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,15 +171,15 @@ weight = 1.0
 [[criterion]]
 id = "12.n4"
 name = "automation_cannot_exercise_contract"
-description = "The contract cannot be exercised from automation."
+description = "webmcp_list_tools / webmcp_invoke_tool cannot exercise the declared artifact, entity, and session bindings."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n5"
-name = "validation_bypass_desyncs_state"
-description = "Validation bypasses lead to inconsistent MCP and UI state."
+name = "mcp_update_bypasses_shared_state"
+description = "An entity update/toggle or artifact convert/export invocation updates a parallel copy of state, leaving visible queue rows/counts or session-export previews showing stale values that disagree with the MCP result (MCP/UI desync)."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +187,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n6"
 name = "session_or_tool_api_errors"
-description = "The session or tool API returns errors or incomplete data."
+description = "webmcp_session_info or webmcp_list_tools returns errors or incomplete data for the mandated modules."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,31 +195,39 @@ weight = 1.0
 [[criterion]]
 id = "12.n7"
 name = "mcp_relies_on_undocumented_hacks"
-description = "MCP relies on manual or undocumented test hacks."
+description = "MCP only works after undocumented manual harness hacks or console-only stubs rather than app-registered tools."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n8"
-name = "required_contract_module_missing"
-description = "No module contract is implemented where one is declared required."
+name = "required_modules_not_implemented"
+description = "One or more of artifact-transfer-v1, entity-collection-v1, or command-session-v1 is not implemented despite being declared required in the contract."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n9"
-name = "mcp_is_stubbed_or_commented_out"
-description = "The MCP interface is commented out or only stubbed."
+name = "mcp_stubbed_or_commented_out"
+description = "The WebMCP interface is commented out or only stubbed so tools list as present but leave queue/convert/export state unchanged when invoked."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n10"
-name = "automated_contract_validation_fails"
-description = "The project fails automated MCP contract validation."
+name = "mechanics_exclusion_faked_via_mcp"
+description = "Raw file paths, blobs, base64, or artifact contents appear in WebMCP arguments or results, violating the mechanics exclusion that file picker interaction and downloaded artifacts remain Playwright responsibilities."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "12.n11"
+name = "missing_conversion_report_or_toggle"
+description = "Export formats omit conversion-report, entity operations omit toggle, or entity fields omit selected despite those bindings being declared."
 type = "binary"
 negate = true
 weight = 1.0
@@ -213,7 +235,7 @@ weight = 1.0
 [[criterion]]
 id = "mcp_contract.catchall"
 name = "mcp_contract_catchall"
-description = "The app exhibits a significant, browser-observable defect in the declared MCP contract that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The MCP contract deviates from its declaration in a way not covered by any other criterion in this file. 'Significant' means a real automation/contract break, not a nitpick. If present, name the defect and cite the concrete evidence. If already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

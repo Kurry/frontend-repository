@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -147,13 +147,13 @@ weight = 1.0
 [[criterion]]
 id = "1.13"
 name = "blank_title_rejected_root_and_child"
-description = "Submitting the New Root Task input with a blank title is rejected with a visible inline error or shake hint and no blank-titled root is added; submitting Add Child with a blank title is rejected the same way and adds nothing"
+description = "Submitting the New Root Task input with a blank or whitespace-only title is rejected with a visible inline error naming the title field and no blank-titled root is added; submitting Add Child with a blank title is rejected the same way and adds nothing"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.25"
-name = "1_25"
+name = "export_as_text_indented_outline"
 description = "Export as Text downloads that node's branch as an indented plain-text outline, one line per node with deeper children indented further"
 type = "binary"
 weight = 0.5
@@ -161,7 +161,7 @@ optional = true
 
 [[criterion]]
 id = "1.26"
-name = "1_26"
+name = "parent_manual_complete_while_incomplete_leaf"
 description = "A parent's completion checkbox can be manually toggled complete while it still has an incomplete descendant leaf"
 type = "binary"
 weight = 1.0
@@ -169,7 +169,7 @@ negate = true
 
 [[criterion]]
 id = "1.27"
-name = "1_27"
+name = "archive_shown_on_incomplete_branch"
 description = "An Archive control appears on a branch that still has an incomplete descendant leaf"
 type = "binary"
 weight = 1.0
@@ -178,7 +178,7 @@ negate = true
 [[criterion]]
 id = "1.28"
 name = "create_children_complete_chain_flow"
-description = "Starting from an empty tree: create a root task via the footer input and confirm exactly one new tree appears, the empty-state message disappears, and a confirmation toast shows; add two children via Add Child and confirm both render indented beneath the root and the root grows a progress ring at 0 percent; toggle both children complete and confirm the ring rises live through the intermediate percentage to the 100 percent checkmark treatment and the parent is marked complete automatically, all without any page reload"
+description = "Starting from an empty tree: create a root task via the footer input with a valid title and confirm exactly one new tree appears, the empty-state message disappears, a confirmation toast shows, and the Export grove JSON preview includes that task's title; add two children via Add Child and confirm both render indented beneath the root and the root grows a progress ring at 0 percent; toggle both children complete and confirm the ring rises live through the intermediate percentage to the 100 percent checkmark treatment and the parent is marked complete automatically, all without any page reload"
 type = "binary"
 weight = 1.0
 
@@ -192,7 +192,7 @@ weight = 1.0
 [[criterion]]
 id = "1.30"
 name = "tag_lifecycle_filter_refresh_chain_flow"
-description = "Create a tag in the Tag manager and confirm one chip appears in the manager's list and one matching filter chip appears in the toolbar row; attach it to a node and confirm the node's row shows the chip in the same color; toggle the toolbar filter chip on and confirm the tree narrows to branches containing that node with ancestors auto-expanded, then toggle it off and confirm the full tree returns; after a full page refresh the tag still exists in the manager, on the node's row, and in the filter row with the same color"
+description = "Create a tag in the Tag manager with a valid name and a closed-enum hex color and confirm one chip appears in the manager's list and one matching filter chip appears in the toolbar row; attach it to a node and confirm the node's row shows the chip in the same color; toggle the toolbar filter chip on and confirm the tree narrows to branches containing that node with ancestors auto-expanded, then toggle it off and confirm the full tree returns; after a full page refresh the tag still exists in the manager, on the node's row, and in the filter row with the same color; the Export grove JSON preview includes that tag's name and color"
 type = "binary"
 weight = 1.0
 
@@ -212,8 +212,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.33"
-name = "tag_manager_blank_name_validation"
-description = "In the Tag manager's tag-creation form, a blank tag name shows an inline error message naming the name field before submit, the submit control stays inactive until the name is non-blank, and no blank-named tag is added"
+name = "tag_manager_field_contract_validation"
+description = "In the Tag manager's tag-creation form, a blank tag name shows an inline error naming the name field before submit, the submit control stays inactive until name and color are valid per the Tag create field contract, and no blank-named tag is added"
 type = "binary"
 weight = 1.0
 
@@ -237,6 +237,35 @@ name = "filter_search_no_results_messages"
 description = "When active tag filters match no branch, the tree area shows an explicit no-results message instead of a blank area; a search query matching nothing also shows an explicit no-results message while branches stay dimmed on the page rather than removed"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "grove_package_api_shaped_field_contract"
+description = "After creating at least one task and one tag and switching theme, the Export grove JSON preview is a single object whose visible text includes the required Grove package field contract: schemaVersion 1; theme exactly light, dark, or forest; a tags array entry with name and a closed-enum hex color; and a tasks array entry with title, completed, collapsed, tags, and children keys"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "grove_export_import_round_trip"
+description = "After mutating tasks, a tag, and theme, Download or Copy the Grove package JSON then Import that same document and confirm the main tree titles, Tag manager chip, Archive panel, theme, and Export grove preview match the pre-export session"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "task_create_overlength_title_rejected"
+description = "Submitting New root task or Add Child with a title longer than 120 characters is rejected with an inline error naming the title field and adds no task"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "export_omits_session_mutations"
+description = "After creating a task and a tag and changing theme, the Export grove JSON preview omits the new task title, the new tag name or color, or the chosen theme"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.catchall"

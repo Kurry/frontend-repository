@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -264,6 +264,100 @@ name = "hero_gallery_three_marquee_rows"
 description = "On load the hero shows three distinct animated gallery rows of original placeholder project thumbnails traveling continuously across the top of the hero"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "trial_brief_builder_fields_and_preview"
+description = "The closing section embeds a trial brief panel headed Build your Canvasly trial brief with Name, Email, Plan (Free trial / Pro / Team), Team size (1 / 2-10 / 11-50 / 51+), multi-select interest chips (Portfolios, Presentations, Editorials, Companies, Freelancers, Students), and a Reset control; a monospaced live preview shows pretty-printed JSON with top-level keys product, name, email, plan, team_size, interests, and generated_at (product always Canvasly; empty baseline uses \"\" scalars and []), and editing any field rewrites the preview without reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "trial_brief_download_and_copy"
+description = "Download JSON offers canvasly-trial-brief.json whose text matches the visible preview; Copy brief writes that exact preview text to the clipboard and shows a Copied confirmation that reverts after about 1.5 seconds; when the draft is valid that artifact text is a schema-conforming trial-signup request body."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "trial_brief_import_and_sample"
+description = "Import brief restores form fields and preview from a previously exported schema-conforming JSON file; Load sample brief (after confirm) loads name Avery Lane, email avery@studio.example, plan Pro, team_size 2-10, and interests Portfolios and Editorials into the form and preview."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "trial_brief_undo_redo"
+description = "Undo and Redo in the trial brief panel (and Ctrl/Cmd+Z / Ctrl/Cmd+Shift+Z) reverse and reapply the most recent brief mutation across form values and preview together; both controls are disabled when their stacks are empty."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "command_palette_opens_and_jumps"
+description = "Pressing Ctrl/Cmd+K opens a command palette with a focused search input; choosing Jump to trial brief scrolls the trial brief panel into view and closes the palette; Escape or backdrop click closes the palette."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "command_palette_advance_slideshow"
+description = "From the command palette, choosing Advance slideshow advances the six-frame slideshow one step with the same active/neighbor opacity treatment as the idle timer path."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "trial_signup_field_contract_formats_enums_bounds"
+description = "Every live preview exposes exactly the seven required top-level keys product, name, email, plan, team_size, interests, and generated_at (no extras): product exactly Canvasly; name trimmed length 2–80 when valid else \"\"; email with exactly one @ and a dotted domain segment when valid else \"\"; plan exactly Free trial, Pro, or Team when valid else \"\"; team_size exactly 1, 2-10, 11-50, or 51+ when valid else \"\"; interests an array of unique closed-list labels in chip order (or []); generated_at an ISO-8601 timestamp that updates on mutation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "trial_signup_cross_field_rules"
+description = "Cross-field rules hold on every valid payload: Free trial requires team_size exactly 1 (interests may be empty); Team requires team_size one of 2-10, 11-50, or 51+; Pro or Team requires at least one interest label — Submit trial brief stays disabled and named inline errors appear while those rules fail."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "trial_brief_submit_validates_schema"
+description = "A contract-valid Submit trial brief shows Trial brief ready — download or copy your JSON above via a polite live region without navigating away; Submit stays disabled on invalid drafts; invalid drafts show inline messages naming the field and the fix with no success state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "trial_brief_reset_to_empty_baseline"
+description = "A Reset control in the trial brief panel returns the form and preview to the empty baseline (empty name/email strings, no plan, no team_size, empty interests, product Canvasly, fresh generated_at, Submit disabled) and clears Trial brief ready / field / import errors; Reset is one undoable mutation so Undo restores the pre-Reset brief."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n5"
+name = "export_omits_session_brief_mutations"
+description = "After filling name, email, plan, team size, and interests, the Download JSON or Copy brief artifact still contains only default or empty brief values while the live preview shows the session's filled fields (export text disagrees with the preview)."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n6"
+name = "valid_brief_export_fails_field_contract"
+description = "After filling a contract-valid brief (e.g. Pro, team_size 11-50, at least one interest, name 2–80, dotted-domain email), the Download JSON or Copy brief text is missing required keys, uses plan/team_size/interests outside the closed enums, or violates a Free-trial/Team/Pro cross-field rule."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n7"
+name = "reset_leaves_filled_brief_in_place"
+description = "After filling a brief, activating Reset leaves name, email, plan, team_size, or interests filled in the form or preview (or leaves Trial brief ready visible) instead of returning to the empty baseline."
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.catchall"

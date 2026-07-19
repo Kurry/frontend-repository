@@ -1,0 +1,219 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "6.1"
+name = "demo_pipeline_flow_ends_at_bundle"
+description = "Full demo flow with no credentials entered: filter driftline's PR list to bounds 3 to 10 with linked issues required, accept a PR on the triage board, run its pipeline through Fetch, Evaluate, Generate, and Package while the assessment and instruction text stream, then download the bundle — the downloaded JSON contains the same instruction text that streamed during Generate and metadata naming that repository and PR number"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.2"
+name = "invalid_inputs_validated_inline_in_flows"
+description = "Mid-flow invalid input triggers immediate inline validation: a malformed Add repository value shows an error naming the repository field, and a reject attempt without a chosen reason is blocked with an inline message before the card moves"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.3"
+name = "filter_changes_update_related_displays"
+description = "Changing the source-file bounds or the require-linked-issue toggle updates the PR list, the active filter chips, and the loaded-versus-total count together, and removing a chip restores exactly the state that chip represented"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.4"
+name = "package_delete_flow_updates_all_surfaces"
+description = "Deleting a library package after its confirmation removes it from the library list, from active filter results, and from command-palette search results without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.5"
+name = "view_switches_retain_state"
+description = "Switching between Candidates, Triage, Runs, and Library and back retains the selected repository, the PR detail selection, active filters, and any in-progress run exactly as they were"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.6"
+name = "emptied_library_shows_empty_state"
+description = "After deleting the last library package, the Library shows a clear empty state explaining what belongs there instead of a blank region, and producing a new package replaces the empty state with the entry"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.7"
+name = "filters_agree_across_surfaces"
+description = "Library filters by repository, difficulty, and language narrow the list consistently: the visible entries, the entry count, and the removable chips agree, and a combination matching nothing shows the empty state naming the active filters with a working clear-filters control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.8"
+name = "collapsible_chrome_preserves_workflow"
+description = "At 768 pixels and below the navigation rail collapses behind a toggle and reopens as an overlay, and the Connections slide-over can be closed and reopened, all without losing the active view, selections, or a running pipeline"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.9"
+name = "overlays_support_expected_flows"
+description = "The Connections slide-over, the reject-reason chooser, the delete confirmation, and the command palette each open, complete their action or cancel, and close as expected, returning the user to the surface they started from"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.10"
+name = "failures_recover_without_reload"
+description = "Recovery paths need no reload: a failed Generate stage recovers through its Retry control, a failed credential check leaves every demo flow usable, and closing any overlay returns to a working screen — no dead ends"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n1"
+name = "primary_flows_unavailable_from_ui"
+description = "A primary flow — triaging a PR, running the pipeline, downloading a package, or importing a bundle — is not reachable through the visible UI"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n2"
+name = "produced_packages_missing_or_duplicated"
+description = "A completed run's package fails to appear in the library, or a single run or single batch item produces duplicate library entries"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n3"
+name = "state_changes_desync_displays"
+description = "A triage action, run completion, or deletion is reflected in one surface but not another that shows the same data"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n4"
+name = "view_switch_breaks_or_loses_selection"
+description = "Switching views breaks the layout, drops the selected repository or PR, resets filters, or aborts an in-progress run"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n5"
+name = "empty_library_breaks_ui"
+description = "Emptying the library produces a broken, blank, or erroring region instead of the designed empty state"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n6"
+name = "filtered_views_disagree"
+description = "Two filtered surfaces disagree about what is visible — for example the PR list shows a PR whose displayed source-file count is outside the active bounds, or the library count contradicts the visible entries"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n7"
+name = "collapsed_chrome_cannot_reopen"
+description = "The collapsed navigation rail or a closed slide-over cannot be reopened from the visible UI"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n8"
+name = "overlay_blocks_navigation"
+description = "An overlay — the palette, slide-over, reject chooser, or confirmation — blocks the app with no visible exit option"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n9"
+name = "failed_flow_lacks_feedback"
+description = "A failed flow gives no user feedback — a stage fails with no visible error, or a rejected import shows no message"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n10"
+name = "navigation_dead_end_requires_reload"
+description = "The app reaches a state that can only be corrected by reloading the page"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "user_flows.catchall"
+name = "user_flows_catchall"
+description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

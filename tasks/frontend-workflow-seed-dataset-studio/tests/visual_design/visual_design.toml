@@ -1,0 +1,169 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "studio_shell_and_queue_composition"
+description = "The app composes as a full-height studio shell with a compact top bar carrying the app name, a Queue/Workbench view switcher, and global actions; the queue view places the stats rollup panel on top or at the left, the saved-chip and filter row beneath it, and the seed table filling the remaining space"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "workbench_composition"
+description = "The workbench composes as a header strip with the seed identity and gate banner, and a multi-pane body with the question and rubric panes beside the foils and golden panes at desktop width"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "status_color_mapping_fixed"
+description = "Status badges use one fixed color mapping everywhere they appear — draft in neutral slate, authored in green, rejected in red, harvest-pending in amber — and the same colors carry into the rollup panel and timeline entries"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "difficulty_badge_treatments"
+description = "The hard difficulty badge uses a distinct violet treatment, and unset difficulty renders as a muted outline badge rather than rendering nothing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "monospace_for_data_identity"
+description = "Seed ids, commit hashes, and the manifest and snapshot text render in a monospaced face visually distinct from the interface sans-serif, and the sans-serif text shows a clear hierarchy of app title above pane headings above table body and label text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "locked_criterion_visual_state"
+description = "The locked rubric criterion 1.4 row carries a visible lock icon and a subtly different background from unlocked rows so its protected state reads at a glance"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "warning_vs_danger_distinct"
+description = "Foil dangling-reference warnings use the same amber warning treatment as harvest-pending, visually distinct from the red rejection treatment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "gate_banner_two_states"
+description = "The gate banner renders unmet conditions as individual labeled items with an unmet indicator and switches to a distinct all-clear treatment when every condition passes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "spacing_rhythm_consistent"
+description = "Spacing follows a consistent rhythm: table rows share one height, pane paddings are visually regular, and the gaps between the rollup, filter row, and table are even with no crowded or orphaned regions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "component_state_treatments"
+description = "Buttons, inputs, selects, checkboxes, and chips show distinct default, hover, focus (visible ring), disabled, and error treatments"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "single_icon_set"
+description = "One consistent icon set is used throughout the top bar, status badges, triage actions, harvest steps, and timeline entries, with no mixed icon styles"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.12"
+name = "responsive_recomposition"
+description = "At 1024 pixels and below the workbench panes stack vertically in the order question, rubric, foils, golden with full controls; at 768 pixels and below the rollup collapses to a horizontally scrollable strip and the queue hides the deference and commit columns while keeping id, title, status, and difficulty; at 375 pixels no content clips and the table and manifest text scroll within their own containers"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.n1"
+name = "overlapping_clipped_text"
+description = "At 1440 pixel width, any badge, table cell, pane heading, gate banner item, manifest text, or timeline entry overlaps another element or is clipped by its container"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.n2"
+name = "browser_default_controls"
+description = "Selects, checkboxes, dialogs, or buttons render with unstyled browser-default appearance that clashes with the studio's visual language"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

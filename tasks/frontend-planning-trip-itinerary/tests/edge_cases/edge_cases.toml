@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -206,6 +206,79 @@ weight = 1.0
 id = "4.n10"
 name = "affordances_hidden_or_inaccessible"
 description = "Interactive affordances are visually hidden or inaccessible."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "invalid_csv_cell_blocks_commit"
+description = "A CSV row with a non-numeric amount or unparseable date cannot be committed until the cell is fixed inline or the row is excluded, and the diagnostic screen names the offending cell and the problem."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "formula_error_over_invalid_range"
+description = "Entering a formula over an empty or invalid range shows an inline formula error message naming the problem instead of a numeric result."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "all_settled_zeroes_balances"
+description = "Marking every settlement transaction settled brings all outstanding balances to zero and the debt visualizer shows an all-settled state with zero remaining transactions."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "expense_delete_purges_derived_surfaces"
+description = "Deleting an expense removes its contribution from the per-traveler balances, the debt visualizer, the pie, and the burn-rate chart in the same interaction."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "raising_cap_clears_flags"
+description = "Raising a category cap above that category's current total clears the threshold flags from its rows immediately, and pasting text with no recognizable tokens into the parsing sandbox shows a no-matches message with no draft items created."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "nan_or_infinity_in_money_values"
+description = "NaN, undefined, Infinity, or another non-numeric artifact appears in any rendered money value, balance, formula result, or chart label at any point during the session."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n12"
+name = "destructive_bulk_or_reset_without_confirm"
+description = "Factory reset or a bulk delete executes with no confirmation step, or cancelling the confirmation still mutates data."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "malformed_trip_json_import_rejected"
+description = "Importing malformed or undecodable trip JSON, or JSON whose stops or expenses violate their field contracts, shows a visible error naming the import problem, leaves stop and expense counts unchanged, and produces no console errors."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.17"
+name = "empty_stops_clears_ics_events"
+description = "After deleting all stops, the plan list shows an empty state, the ICS payload has zero VEVENT blocks, and the trip JSON stops array is empty."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n13"
+name = "invalid_import_mutates_session"
+description = "A rejected trip JSON import still mutates stops, expenses, or export previews, or clears the session without a successful import."
 type = "binary"
 negate = true
 weight = 1.0

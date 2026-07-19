@@ -15,8 +15,8 @@ wins. Do not copy the images into /app or ship them as app assets.
 Core features (each line is an observable behavior the finished app must exhibit):
 - Direct entry: the app opens at / into a setup screen titled MineClash with a difficulty selector and a Start match control — no login, no admin gate, no routing shell
 - Difficulty selector on setup offers exactly three choices: Easy (8x8 grid, 10 mines), Medium (10x10 grid, 16 mines), and Hard (12x12 grid, 24 mines); the chosen difficulty is highlighted and applies to every round of the match that is started
-- The setup screen is a validating form: Start match stays disabled until a difficulty is selected, and attempting to start without a selection shows an inline message that names the difficulty field rather than starting a match
-- Starting a match resets both sides to score 0 and 0 strikes, builds a fresh board at the selected difficulty, and opens Round 1 of a best-of-3 match in the playing phase
+- The setup screen is a validating form whose schema models a match-setup request body with exactly two required fields: playerName (string, length 2 to 20 inclusive) and difficulty (enum whose only legal values are easy, medium, and hard). The started match carries that request body. Start match stays disabled until both fields are valid. An empty or one-character playerName shows an inline message that names the field playerName and the 2-to-20 length rule; missing difficulty shows an inline message that names the difficulty field; neither invalid submit starts a match
+- Starting a match resets both sides to score 0 and 0 strikes, builds a fresh board at the selected difficulty, records the playerName on the live match, and opens Round 1 of a best-of-3 match in the playing phase
 - Shared board: one grid of covered tiles is shared by both sides; hidden mines and per-tile ore values sit under the tiles; the Player and the Rival AI alternate turns and the current turn is always shown unambiguously (a "Your turn" indicator when it is the Player's turn, a "Rival's turn" / "Rival is thinking" indicator during the Rival's turn)
 - Reveal mechanic: on the Player's turn the Player reveals exactly one covered tile; a safe tile shows a mined ore icon with an ore value of 1, 2, or 3 and that value is added directly to the revealing side's score, and the tile also shows its count of adjacent mines (standard minesweeper adjacency, 0 through 8) when that count is greater than 0
 - Mine hit: revealing a mine ends the revealing side's turn immediately, subtracts 5 points from that side's score with a floor of 0 (the score never goes negative), adds one Strike to that side, and the mine tile is marked with a distinct mine icon and stays revealed for both sides for the rest of the round (it never reverts to covered)
@@ -32,15 +32,28 @@ Core features (each line is an observable behavior the finished app must exhibit
 - Stats view: a Stats view shows, broken down by each of the three difficulties, the matches played, matches won (with win rate), total ore mined, and best single-round score; all four figures persist across sessions
 - Sound toggle: a Sound on/off control (default on) mutes and unmutes the synthesized reveal, mine-hit, and round-end tones; the setting persists across sessions
 - Branching move history: during a round a history panel exposes Undo and Redo controls and a visible list of history states; a normal visible "Apply Scenario Change" action re-applies a selected history state; a region labelled "History state" shows the snapshot (both sides' score and strikes and whose turn it is) for the selected node; undoing and then making a different change creates a new selectable branch rather than silently flattening or corrupting history; invalid transitions are disabled (Undo is disabled at the root, Redo is disabled with no child, Apply is disabled when the selected node is already current); selecting a branch node and applying it restores the exact prior visible board and score state
+Feature: Match log records (API-shaped match payload) —
+- When a match completes, the app appends one match-result record that mirrors a real match-result API payload. Required fields on every record, with names visible in the Match log row and in any export preview text: playerName (2 to 20 characters), difficulty (easy, medium, or hard), playerRoundWins (non-negative integer), rivalRoundWins (non-negative integer), playerTotalOre (non-negative integer sum of ore scored across the match), rivalTotalOre (non-negative integer), winner (exactly one of player, rival, or draw), rounds (array of round summaries; each round object requires roundNumber as a positive integer, playerScore, rivalScore, playerStrikes, rivalStrikes as non-negative integers, and outcomeReason as a non-empty string), and endedAt (an ISO-8601 timestamp string, or an equivalent observable timestamp format such as YYYY-MM-DDTHH:mm:ss.sssZ)
+- The Match log list is most-recent-first; the top entry after Match Complete shows the same playerName, difficulty, winner, round-win counts, and total ore values that the export of that match contains
+Feature: Match export and import (useful end state) —
+- From Match Complete or a Match log entry, Export Match produces a downloadable and copyable single-match JSON whose top-level object is that match-result record. Copy shows a brief Copied confirmation. The JSON is compiled live from the finished match, not a blank stub or hardcoded sample
+- Export Archive produces a downloadable and copyable match-archive JSON: a top-level object with a matches array whose every element is a match-result record conforming to the same field contract. With at least one finished match, the archive includes that match's actual playerName, difficulty, winner, round wins, totals, rounds, and endedAt
+- Import accepts a previously exported single-match JSON or a match-archive JSON. A valid single-match import appends one Match log entry whose visible fields match the imported record. A valid archive import reconstructs the Match log from the matches array so exported-then-reimported records reappear with the same playerName, difficulty, winner, round wins, totals, and endedAt. Malformed JSON or a payload missing required fields shows a visible rejection naming that the file is invalid and changes nothing
+Feature: Save and resume in-progress match —
+- During an active or paused round after at least one reveal has occurred, Save Progress shows a Saved confirmation and writes a schema-shaped checkpoint payload that includes at least playerName, difficulty, roundNumber, playerScore, rivalScore, playerStrikes, rivalStrikes, sideToMove, hintsRemaining, playerRoundWins, rivalRoundWins, and a board snapshot of covered, revealed, and flagged tiles — the same field names appear in any checkpoint preview or resume confirmation surface
+- After a full page reload, Resume Saved Match restores the checkpoint so scores, strikes, turn, hints remaining, round wins, and the visible board match what was saved. Save Progress is unavailable or clearly disabled when no match is in progress; Resume Saved Match is unavailable when no checkpoint exists
 </core_features>
 
 <user_flows>
 End-to-end flows the finished app must support, with state tracked across surfaces at every step:
 - Safe-reveal flow: on the Player's turn, revealing a safe tile increases the You score in the score panel by exactly the ore value shown on the tile, the turn banner hands over to the Rival without a reload, and the history panel appends a new selectable state whose "History state" snapshot shows the updated score and the Rival as the side to move
 - Mine-hit flow: revealing a mine drops the revealing side's score by 5 (never below 0) in that side's score panel, fills exactly one more Strike icon in that side's strike row, passes the turn banner to the other side, and the newest history snapshot shows the increased strike count — all without a reload
-- Match-completion flow: winning 2 rounds opens the Match Complete screen with the round-by-round scores and overall winner; opening the Stats view afterwards shows matches played for the played difficulty increased by exactly one, total ore mined increased by the ore earned in that match, and best single-round score updated when it was beaten — all reflecting the match just played without a reload
-- Persistence round-trip: after completing at least one match, changing the Sound setting, and selecting a difficulty, a full page refresh restores the exact previously committed Stats figures for every difficulty, the same Sound on/off state, and the remembered difficulty selection on the setup screen; figures that were never earned do not appear after the refresh
+- Match-completion flow: winning 2 rounds opens the Match Complete screen with the round-by-round scores and overall winner; opening the Match log afterwards shows a new top match-result entry with the same playerName, difficulty, winner, and round-win counts; opening the Stats view shows matches played for the played difficulty increased by exactly one, total ore mined increased by the ore earned in that match, and best single-round score updated when it was beaten — all reflecting the match just played without a reload
+- Persistence round-trip: after completing at least one match, changing the Sound setting, and selecting a difficulty, a full page refresh restores the exact previously committed Stats figures for every difficulty, the Match log entries, the same Sound on/off state, and the remembered difficulty and playerName on the setup screen; figures that were never earned do not appear after the refresh
 - Undo-and-branch flow: revealing a tile, using Undo, and then revealing a different tile creates a new branch in the history panel; selecting the earlier branch node and using Apply Scenario Change restores the exact prior visible board, both scores, both strike rows, and the turn indicator to that snapshot
+- Export after play: finishing a match, opening Export Match from Match Complete or that Match log entry, and confirming the downloaded or copied JSON contains that match's playerName, difficulty, winner, playerRoundWins, rivalRoundWins, playerTotalOre, rivalTotalOre, rounds, and endedAt; Export Archive then lists that same match among the matches array entries
+- Save and resume across reload: starting a match, revealing at least one tile, pressing Save Progress, fully reloading, then pressing Resume Saved Match restores scores, strikes, turn, hints remaining, round wins, and the visible board to the checkpoint
+- Import round-trip: exporting a finished match as single-match JSON, importing that file, and confirming a Match log entry appears with the same playerName, difficulty, winner, round wins, totals, and endedAt as the export
 </user_flows>
 
 <edge_cases>
@@ -50,7 +63,9 @@ End-to-end flows the finished app must support, with state tracked across surfac
 - When every non-mine tile has been revealed with both sides on an equal score, the Round Result overlay declares a draw rather than naming a winner
 - While paused, the board accepts no reveals, flags, or hints and the Rival does not act; Resume returns play exactly where it left off
 - Stale input from an earlier phase or round (for example a Rival move scheduled before a pause, undo, or round end) never mutates the current round's state
-- Before any match has been played the Stats view shows a friendly "No matches played yet" message rather than blank or zero rows
+- Before any match has been played the Stats view and the Match log show friendly empty-state messages ("No matches played yet" for Stats) rather than blank or zero rows
+- Save Progress is unavailable or clearly disabled when no match is in progress; Resume Saved Match is unavailable when no checkpoint exists
+- Import of malformed JSON or a payload missing required match-result fields shows a visible rejection naming that the file is invalid and leaves the Match log unchanged
 </edge_cases>
 
 <visual_design>
@@ -59,12 +74,14 @@ End-to-end flows the finished app must support, with state tracked across surfac
 - Success green (#4ADE80) marks safe hints and round wins, warning yellow (#FACC15) marks the 2-strike near-loss state and mine hints, and error red (#EF4444) marks mine hits and round losses
 - Headings use a Segoe UI / Arial sans-serif stack (h1 about 30px, h2 about 22px); body text is the same stack at 16px; grid numbers, coordinates, and scores use a Courier New monospace stack
 - Grid tiles use a small 4px radius for a sharp mine-grid feel, buttons use an 8px radius, and panels use a 12px radius; base spacing is a 4px unit
-- Primary buttons (Start match, Rematch, Apply Scenario Change) have an amber background, near-black text, 8px radius, and a soft drop shadow; secondary buttons (Flag mode, Hint, Pause, New match) are transparent with an amber border and amber text and no shadow
+- Primary buttons (Start match, Rematch, Apply Scenario Change, Export Match, Save Progress) have an amber background, near-black text, 8px radius, and a soft drop shadow; secondary buttons (Flag mode, Hint, Pause, New match, Export Archive, Import, Resume Saved Match) are transparent with an amber border and amber text and no shadow
 - The two score panels (You and Rival) each show the side label, the live score against the target, and a row of 3 Strike icons; the active side's panel is outlined and softly glows in that side's identity color
 - Icons across the app (ore, mine, flag, strike, sound, and empty-state icons) come from one consistent icon set with a uniform stroke and weight — no mismatched glyph styles
 - Whose turn it is is unmistakable at all times via a dedicated turn banner; the Rival's thinking state shows an animated thinking indicator rather than an instant silent jump
 - A revealed mine tile is visibly marked with a distinct mine icon and a red-tinted background for the rest of the round; Flag Mode being active changes the tile cursor so it is never confused with normal reveal mode
 - The Stats empty state shows an icon plus the heading "No matches played yet" and an explanatory line, not blank zero rows
+- The Match log empty state shows a friendly heading and explanatory line rather than a blank region; Match log rows show playerName, difficulty, winner, and round-win counts at a glance
+- Copying an export shows a brief Copied confirmation; saving a checkpoint shows a brief Saved confirmation; both are transient and do not block play
 </visual_design>
 
 <motion>
@@ -82,39 +99,40 @@ End-to-end flows the finished app must support, with state tracked across surfac
 
 <responsiveness>
 - At a narrow viewport around 375px wide the grid scales down (smaller tiles, roughly a 28px minimum) and stays tappable without horizontal scrolling, with the score and strike panels stacking above the grid
-- No content clips or overflows the viewport at 375px width: the setup screen, HUD, history panel, overlays, and Stats view all reflow to a single column without horizontal scrolling
+- No content clips or overflows the viewport at 375px width: the setup screen, HUD, history panel, overlays, Match log, export controls, and Stats view all reflow to a single column without horizontal scrolling
 </responsiveness>
 
 <accessibility>
-- Every button and toggle (Start match, Flag Mode, Hint, Pause/Resume, Sound, Undo, Redo, Apply Scenario Change, Rematch, New match) is reachable and operable with the keyboard alone, with a visible focus indicator on every focused control
+- Every button and toggle (Start match, Flag Mode, Hint, Pause/Resume, Sound, Undo, Redo, Apply Scenario Change, Rematch, New match, Export Match, Export Archive, Import, Save Progress, Resume Saved Match) is reachable and operable with the keyboard alone, with a visible focus indicator on every focused control
 - The Round Result overlay and Match Complete screen present as dialogs: they take focus when they open and return focus to the game controls when play continues
 - Turn changes are announced through a polite live region so the active side is conveyed without relying on color alone; strike counts are also exposed as text, not only as filled icons
-- The "History state" region exposes its snapshot as readable text, and disabled controls (Undo at the root, Redo with no child, a spent Hint) are exposed as disabled rather than silently ignoring activation
+- The "History state" region exposes its snapshot as readable text, and disabled controls (Undo at the root, Redo with no child, a spent Hint, Save Progress with no match, Resume Saved Match with no checkpoint) are exposed as disabled rather than silently ignoring activation
+- The setup form fields playerName and difficulty have visible labels, and inline validation messages are associated with the fields they name
 </accessibility>
 
 <performance>
 - The app is interactive within 2 seconds of a local cold load, opening directly into the setup screen
-- No console errors or uncaught exceptions appear during a full exercise of the app: setup, several rounds, pause/resume, hints, flags, undo/redo, match completion, and the Stats view
+- No console errors or uncaught exceptions appear during a full exercise of the app: setup, several rounds, pause/resume, hints, flags, undo/redo, match completion, export/import, save/resume, the Match log, and the Stats view
 - The game withstands at least 25 rapid deterministic reveal/turn repetitions through the normal controls with an exact final visible state, responsive controls, and no blank screen, uncaught error, or sustained freeze
 - The board, score panels, and history panel stay responsive during the Rival's thinking delay; queued Player input never fires during the Rival's turn
 </performance>
 
 <writing>
-- Control labels use one consistent capitalization convention and specific verbs (Start match, Apply Scenario Change, Rematch) rather than generic labels
-- Rejection messages for illegal actions name what was attempted and why it is unavailable; the Round Result overlay states the winner and the reason in plain language
-- The Stats empty state explains that no matches have been played yet and how to start one; no placeholder or lorem text appears anywhere in the shipped UI
+- Control labels use one consistent capitalization convention and specific verbs (Start match, Apply Scenario Change, Rematch, Export Match, Save Progress, Resume Saved Match) rather than generic labels
+- Rejection messages for illegal actions name what was attempted and why it is unavailable; the Round Result overlay states the winner and the reason in plain language; import rejections name that the file is invalid
+- The Stats and Match log empty states explain that no matches have been played yet and how to start one; no placeholder or lorem text appears anywhere in the shipped UI
 </writing>
 
 <requirements>
 - Stack: Qwik (client-rendered Vite SPA, resumable event handlers) with shared app state held in Qwik stores, styled with Tailwind CSS 4.3.2 (pinned) with design tokens defined in the Tailwind theme; Node 20 runtime. The state-machine library xstate 5.32.4 is available if used for lifecycle logic. Do not add a separate state-management library, an AI or game-engine library, or an audio-asset library.
-- Component library: DaisyUI provides the game chrome — the setup panel and difficulty form, the HUD score panels, the Flag Mode / Sound / Pause toggles, the Round Result and Match Complete overlays, the history panel, and the Stats view. The play grid itself is custom-built. No other component library.
+- Component library: DaisyUI provides the game chrome — the setup panel and difficulty form, the HUD score panels, the Flag Mode / Sound / Pause toggles, the Round Result and Match Complete overlays, the history panel, the Match log, export/import controls, and the Stats view. The play grid itself is custom-built. No other component library.
 - Animation: AutoAnimate and canvas-confetti are the only animation libraries allowed (AutoAnimate for list and panel microinteractions, canvas-confetti for the match-win celebration); CSS transitions may supplement; no other animation libraries.
 - Icons: one Iconify icon set delivered through the @iconify/tailwind4 plugin only — no raw copy-pasted SVGs, no other icon packages, no icon CDN.
-- Forms: every form validates through a schema — the setup form is driven by Modular Forms for Qwik with a Valibot schema that requires a difficulty selection, surfacing inline per-field errors before submit and keeping Start match disabled until the form is valid.
+- Forms: every form validates through a schema — the setup form is driven by Modular Forms for Qwik with a Valibot schema that models the match-setup request body (required playerName length 2 to 20, required difficulty enum easy|medium|hard), surfacing inline per-field errors before submit and keeping Start match disabled until the form is valid. Match-result and checkpoint payloads conform to the same field contracts described in core features; import validates against those contracts before mutating the Match log.
 - All libraries are installed via npm and bundled locally; no CDN imports of any script, style, font, or icon asset.
 - The Rival AI turn-taking heuristic must be hand-written in TypeScript (no AI or game-engine library) and paced with setTimeout or requestAnimationFrame for its thinking delay.
 - Reveal, mine-hit, and round-end feedback tones must be produced with the Web Audio API (an AudioContext oscillator), not external audio files; guard AudioContext creation so the build does not crash where it is unavailable.
-- Persistence uses localStorage and must be guarded so the production build does not crash when storage is unavailable. The following must all survive a full page refresh: the per-difficulty match win/loss record (matches played and matches won per difficulty), the total ore mined per difficulty, the best single-round score per difficulty, the Sound on/off setting, and the remembered Difficulty selection for the next match. After a refresh the Stats view must show the exact previously committed figures, and stats that were never earned must not appear. All other game state (the live board, scores, strikes, history) lives in the shared client-side stores.
+- Persistence uses localStorage and must be guarded so the production build does not crash when storage is unavailable. The following must all survive a full page refresh: the per-difficulty match win/loss record (matches played and matches won per difficulty), the total ore mined per difficulty, the best single-round score per difficulty, the Match log of match-result records, any saved match checkpoint, the Sound on/off setting, and the remembered playerName and Difficulty selection for the next match. After a refresh the Stats view and Match log must show the exact previously committed figures, and stats that were never earned must not appear. Live board state outside an explicit checkpoint lives in the shared client-side stores only.
 - Difficulty applies to every round of a match: Easy is an 8x8 grid with 10 mines, Medium a 10x10 grid with 16 mines, Hard a 12x12 grid with 24 mines.
 - Exact scoring and lifecycle constants: safe tiles are worth ore of 1, 2, or 3 added to the revealing side's score; a mine hit subtracts 5 points floored at 0 and adds 1 Strike; 3 Strikes ends the round as a loss for that side; the Target Score is 50 ore; a Hint costs 3 points floored at 0 and is limited to 2 uses per round.
 - Turn discipline: only the side whose turn it is may act; the Player cannot reveal, flag, or hint during the Rival's turn or thinking delay or while paused; a covered flagged tile cannot be revealed by a normal reveal click until unflagged; starting a new match always resets both sides' score and strikes to 0 for Round 1; only one match is active at a time.
@@ -137,6 +155,7 @@ Contract version: zto-webmcp-v1
 Modules:
 - command-session-v1
 - browse-query-v1
+- artifact-transfer-v1
 
 Module specs:
 <module_spec id="command-session-v1">
@@ -179,10 +198,32 @@ Module specs:
 }
 </module_spec>
 
+<module_spec id="artifact-transfer-v1">
+{
+  "id": "artifact-transfer-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Artifact transfer",
+  "purpose": "Import, export, copy, print, and conversion workflows.",
+  "permitted_operations": ["import", "export", "copy", "print_preview", "convert"],
+  "binding_keys": {
+    "required_any_of": [["artifact_operations"]],
+    "optional": ["import_modes", "export_formats", "conversion_modes", "visible_postconditions"]
+  },
+  "restrictions": [
+    "No raw files, filesystem paths, blobs, base64, or artifact contents in WebMCP arguments or results.",
+    "File picker interaction, clipboard contents, and downloaded artifacts remain Playwright responsibilities."
+  ],
+  "tool_name_prefix": "artifact"
+}
+</module_spec>
+
 Bindings:
 - Session operations: start; pause; resume; restart; stop
-- Destinations: game-board; stats
+- Destinations: game-board; stats; match-log; export-center
 - Filters: difficulty
+- Artifact operations: export; import; copy
+- Export formats: match-json; match-archive-json
+- Import modes: match-json; match-archive-json
 
 Mechanics exclusions:
 - Tile reveal click + adjacency/ore reveal stays Playwright-observed
@@ -190,6 +231,7 @@ Mechanics exclusions:
 - Rival AI thinking-delay animation + heuristic timing stays Playwright-observed
 - Hint reveal, Strike-icon fill animation, and Web Audio tones stay Playwright-observed
 - Narrow-viewport grid scaling stays Playwright-observed
+- Raw file paths/blobs forbidden in WebMCP args
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

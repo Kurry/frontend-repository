@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -184,6 +184,20 @@ name = "score_panels_show_label_target_strikes"
 description = "During a round each of the two score panels (You and Rival) shows the side label, the live score displayed against the Target Score, and a row of 3 Strike icons"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "3.18"
+name = "match_log_and_empty_state_chrome"
+description = "The Match log shows playerName, difficulty, winner, and round-win counts on rows; its empty state shows a friendly heading and explanatory line rather than a blank region"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.19"
+name = "copied_and_saved_confirmations"
+description = "Copying an export shows a brief Copied confirmation and saving a checkpoint shows a brief Saved confirmation; both are visible and do not permanently block the board"
+type = "binary"
+weight = 0.5
 
 [[criterion]]
 id = "3.catchall"

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,86 +62,86 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "keyboard_operable_studio_controls"
+description = "Every interactive control — toolbar tools (Shapes, Effects, Style, Presets), header actions (edit/preview, Reset workspace, theme toggle, Undo, Redo, Compare, Save snapshot, Export PNG, Export project JSON, Import project, Copy project JSON), Copy/Paste style, color swatches, Layers row Delete/up/down, History entries, Versions Restore/Delete, Saved projects controls, and Collaboration Keep local / Keep remote / Merge both — is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space), each showing a focus outline distinct from rest and hover."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "conflict_choice_keyboard_operable"
+description = "When a Collaboration conflict surfaces Keep local / Keep remote / Merge both, the three choices are operable entirely from the keyboard (focusable and activatable with Enter/Space) without requiring a pointer."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "icon_only_controls_have_accessible_names"
+description = "Icon-only toolbar tools and header actions expose accessible names so each tool and action is identifiable without relying on the icon alone."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "validation_and_conflict_announced"
+description = "Saved-projects name validation messages and Collaboration conflict prompts are conveyed visually and associated for assistive technology (for example via described-by or an ARIA live region)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+name = "project_name_field_explicitly_labeled"
+description = "The Saved projects name field uses an explicit label element associated with the control."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+name = "active_tool_and_swatch_expose_selected"
+description = "The active tool and the selected color swatch expose their selected state to assistive technology (for example aria-pressed, aria-checked, or selected), not only through color."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "workspace_landmarks_present"
+description = "The app exposes semantic landmarks (for example main for the annotation workspace, and nav or complementary regions for the tool rail / Layers panel) so assistive technology can navigate the studio."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+name = "chrome_and_panel_contrast"
+description = "Header labels, tool-rail section labels (Shapes, Effects, Style), Layers heading, and primary controls meet sufficient contrast against their dark (#1F242E / #2A303B) or light-theme surfaces after theme toggle."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "semantic_buttons_for_tools_and_actions"
+description = "Toolbar tools, header actions, Layers Delete/up/down, and Saved projects Open/Update/Delete use button (or equivalent role) semantics rather than unlabeled clickable divs."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "reduced_motion_respected_for_lists"
+description = "With prefers-reduced-motion set, Layers row enter/exit, Saved projects row enter, and Collaboration Syncing pulse animations are removed while every state change (add, delete, save, reconnect) still applies instantly and completely."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
-name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+name = "studio_controls_unreachable_by_keyboard"
+description = "A toolbar tool, header action, swatch, Layers row control, Saved projects control, or conflict resolution choice cannot be reached or activated via keyboard alone."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n2"
-name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+name = "focus_indicators_missing_on_studio_controls"
+description = "Focused toolbar tools, header actions, swatches, Layers controls, or the project name field show no visible focus outline or the outline is obscured."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,55 +149,55 @@ weight = 1.0
 [[criterion]]
 id = "1.n3"
 name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+description = "Toolbar tools, Layers row controls, or Collaboration conflict choices use non-semantic tags without ARIA roles or accessible names."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+name = "active_tool_or_error_color_only"
+description = "Active-tool state, selected swatch, or project-name validation error is conveyed by color alone with no text, check mark, selected attribute, or other non-color cue."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "conflict_choice_not_keyboard_operable"
+description = "With Keep local / Keep remote / Merge both visible, keyboard users cannot activate any of the three conflict resolution choices."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+name = "unreadable_contrast_on_chrome_or_panels"
+description = "Header labels, tool-rail section labels, Layers heading, or primary button labels are unreadable due to poor contrast against their background in dark or light theme."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+name = "validation_errors_visual_only"
+description = "Saved-projects name validation feedback is visual only and is not associated for assistive technology (no described-by, label wiring, or live region)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+name = "icon_only_controls_missing_names"
+description = "Icon-only toolbar or header controls that convey actions are missing an accessible name."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+name = "heading_order_skipped_in_workspace"
+description = "Workspace headings (MarkupFlow title, Layers, Saved projects, Collaboration scenario, or tool-rail section labels exposed as headings) skip levels or have no coherent order."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,31 @@ weight = 1.0
 [[criterion]]
 id = "1.n10"
 name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+description = "With prefers-reduced-motion set, Layers row enter/exit, Saved projects row enter, or Collaboration Syncing pulse still animate fully."
+type = "binary"
+negate = true
+weight = 1.0
+
+# HARDEN_MARKUPFLOW_V1
+
+[[criterion]]
+id = "1.11"
+name = "export_import_history_keyboard_reachable"
+description = "Export project JSON, Import project, Copy project JSON, History entries, Versions Restore/Delete, preset controls, Copy style, Paste style, Save snapshot, and Compare are reachable and operable with the keyboard alone with a clear focus outline"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "compare_pressed_state_exposed"
+description = "When Compare is active, the control exposes pressed/selected state to assistive technology (for example aria-pressed), not only through color"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n11"
+name = "new_export_controls_keyboard_trapped_out"
+description = "Export project JSON, Import project, History entries, or preset controls cannot be reached or activated via keyboard alone"
 type = "binary"
 negate = true
 weight = 1.0

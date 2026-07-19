@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -60,6 +60,7 @@ allowed_tools = [
 [scoring]
 aggregation = "weighted_mean"
 
+
 [[criterion]]
 id = "4.1"
 name = "hover_washes_required"
@@ -70,7 +71,7 @@ weight = 1.0
 [[criterion]]
 id = "4.2"
 name = "linked_highlight_eases_in"
-description = "Selecting a criterion through the real verdict-table controls scrolls each trajectory smoothly to its linked step and fades the outline in rather than snapping, and switching between the agent and judge panes transitions with a short slide or cross-fade"
+description = "Selecting a criterion through the real verdict-table controls scrolls each trajectory smoothly to its linked step and fades the outline in rather than snapping, and switching between the agent and scorer panes transitions with a short slide or cross-fade"
 type = "binary"
 weight = 1.0
 
@@ -98,7 +99,7 @@ weight = 1.0
 [[criterion]]
 id = "4.6"
 name = "adjudication_mark_emphasis"
-description = "Submitting a valid adjudication through the real form animates the classification mark onto the criterion row and the summary panel count updates with a brief emphasis transition rather than changing silently"
+description = "Submitting a valid adjudication through the real form animates the classification mark onto the criterion row and the summary panel count updates with a brief emphasis transition rather than changing silently; bulk apply similarly animates marks onto every selected flipped row"
 type = "binary"
 weight = 1.0
 
@@ -113,7 +114,14 @@ negate = true
 [[criterion]]
 id = "4.8"
 name = "reduced_motion_respected"
-description = "With prefers-reduced-motion set, animations are removed and state changes apply instantly, while every flow (criterion selection, label switching, filtering, adjudication) remains complete and usable"
+description = "With prefers-reduced-motion set, animations are removed and state changes apply instantly, while every flow (criterion selection, label switching, filtering, adjudication, bulk apply, undo/redo, export, and import) remains complete and usable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "export_drawer_and_copy_motion"
+description = "Opening Export review package through the real control enters the drawer with a brief opacity or scale transition, and Copy shows a short confirmation before resetting — verified via the real UI path, not a WebMCP shortcut"
 type = "binary"
 weight = 1.0
 

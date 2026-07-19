@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,21 +63,21 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "4.1"
 name = "shared_state_coherence"
-description = "All surfaces derive from one shared collection: a finding change, stage change, or override made in the detail view is immediately reflected in the queue row's tags and chips, the gate banner, the contributor drawer, and the timeline without a reload, and no surface shows stale data another surface already updated"
+description = "All surfaces derive from one shared collection: a finding change, stage change, override, bulk payout/stage change, or undo made in one place is immediately reflected in the queue row's tags and chips, the gate banner, the contributor drawer, the timeline, and the Export preview without a reload, and no surface shows stale data another surface already updated"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
 name = "no_storage_reload_seeded"
-description = "localStorage and sessionStorage remain empty after adding findings, changing stages, overriding, filtering, sorting, running re-checks, and opening drawers, and a page reload returns the app to its seeded baseline (seeded submissions, stages, findings, payout states, no active filters)"
+description = "localStorage and sessionStorage remain empty after adding findings, changing stages, overriding, bulk actions, filtering, sorting, running re-checks, undo/redo, opening drawers, and exporting, and a page reload returns the app to its seeded baseline (seeded submissions, stages, findings, payout states, no active filters, empty undo history)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
 name = "browser_storage_used"
-description = "localStorage, sessionStorage, or another browser storage API holds submission, finding, filter, or chrome state after exercising the app"
+description = "localStorage, sessionStorage, or another browser storage API holds submission, finding, filter, selection, undo, export, or chrome state after exercising the app"
 type = "binary"
 weight = 1.0
 negate = true
@@ -93,7 +93,7 @@ negate = true
 [[criterion]]
 id = "4.3"
 name = "console_clean_full_exercise"
-description = "The console is free of errors, warnings, and unhandled promise rejections on load and stays clean through filtering, sorting, triage actions, overrides, drawer use, date-range changes, and a full re-check run"
+description = "The console is free of errors, warnings, and unhandled promise rejections on load and stays clean through filtering, sorting, triage actions, overrides, bulk actions, undo/redo, drawer use, date-range changes, export copy, and a full re-check run"
 type = "binary"
 weight = 1.0
 
@@ -107,21 +107,28 @@ weight = 1.0
 [[criterion]]
 id = "4.5"
 name = "rapid_input_stability"
-description = "Under rapid repeated input (fast filter toggling, quick row switching, rapid disclosure clicks), the UI stays responsive with no hangs, derived surfaces settle to values consistent with the final input state, and rapidly double-activating the Add finding submit control appends exactly one finding"
+description = "Under rapid repeated input (fast filter toggling, quick row switching, rapid disclosure clicks, rapid undo/redo), the UI stays responsive with no hangs, derived surfaces settle to values consistent with the final input state, and rapidly double-activating the Add finding submit control appends exactly one finding"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
 name = "keyboard_operability_focus"
-description = "Every interactive control — queue rows, filters, sort, review action controls, finding disclosures, drawer, date-range control, re-check control — is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space), showing a visible focus indicator at each stop"
+description = "Every interactive control — queue rows, row checkboxes, filters, sort, bulk actions, review action controls, finding disclosures, drawer, date-range control, re-check control, undo/redo, export controls, and command palette — is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space), showing a visible focus indicator at each stop"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
 name = "drawer_focus_and_semantics"
-description = "The contributor drawer traps focus while open, closes on the Escape key, and returns keyboard focus to the control that opened it; evidence disclosures expose an expanded or collapsed state attribute to the accessibility tree; every form field has a visible label and each validation message names its field and is programmatically associated with it"
+description = "The contributor drawer and command palette trap focus while open, close on Escape, and return keyboard focus to the control that opened them; evidence disclosures expose an expanded or collapsed state attribute to the accessibility tree; every form field has a visible label and each validation message names its field and is programmatically associated with it; copy/bulk confirmations use an aria-live region"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "api_shaped_field_contracts"
+description = "Form validation enforces the API-shaped contracts observably: tier enum blocker|major|minor, category enum correctness|instruction-clarity|rubric-alignment|environment|scoring|tooling, description at least 10 characters, revision summary at least 20, override justification at least 10; accepted finding fields appear under the same names in the QC package JSON preview"
 type = "binary"
 weight = 1.0
 

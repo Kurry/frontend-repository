@@ -1,0 +1,171 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "14.1"
+name = "multi_facet_seeded_reset"
+description = "Multi-facet round-trip: create a job, reorder its queue, set a schedule, and apply a timeline filter, then reload; every facet coherently resets to the seeded baseline (seeded jobs and history, no schedules, default filter) — never a mix of kept and reset state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.2"
+name = "queue_order_round_trip"
+description = "Queue-order proof: move a pending item down two slots and then back up two; the queue returns to its exact original order, and the launch order follows whichever order is current, proving order derives from live state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.3"
+name = "rollups_track_step_states"
+description = "Derived-view sensitivity: as items fail, retry, and complete during a run, the failure rate, n of m, and accumulated cost in the rollup strip change accordingly — never an identical redraw regardless of item states"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.4"
+name = "cross_view_echo_retry"
+description = "Cross-view echo: resolving a failed item via Retry failed items updates the grid row, the event timeline, the run history's outcome counts, and the open inspector without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.5"
+name = "count_delta_exact"
+description = "Count-delta integrity: composing a job increases the sidebar job count by exactly one, and each launch adds exactly one run history entry, measured immediately before and after"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.6"
+name = "two_launches_differ_deterministically"
+description = "Input-dependent output with deterministic failures: two launches of the same job produce different simulated outputs and latencies, while the set of first-attempt-failing items is identical both times"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.7"
+name = "interleaved_flows_intact"
+description = "Interleaved-flow integrity: begin composing a new job, switch to a running job and pause it, return and finish composing; the new job appears correctly and the paused run's checkpoint is intact"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.8"
+name = "empty_to_repopulated_round_trip"
+description = "Edge-state round-trip: delete every job to reach the empty state, then compose a new job; the sidebar, main panel, and count all track through both transitions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "durability_export_pipeline"
+description = "Full pipeline probe: launch the large job, let failures retry, retry the exhausted item, pause and resume, then export; the report's per-item statuses, attempt counts, costs, and rollups match the on-screen grid and rollup strip exactly, including every session mutation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "stop_all_export_truthful"
+description = "Macro truthfulness: after Stop All, the grid marks pending and running items stopped, completed outputs are retained, and an export taken then records stopped items as stopped — not complete"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n1"
+name = "partial_reset_incoherent"
+description = "After a reload, one facet of state (a schedule, a queue order, a filter) survives while others reset, producing incoherent partial persistence"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n2"
+name = "rollups_ignore_grid"
+description = "The rollup strip renders identical values regardless of the item states in the grid"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n3"
+name = "identical_outputs_across_launches"
+description = "Two launches of the same job yield byte-identical outputs and latencies for every item, indicating hardcoded results"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n4"
+name = "stale_cross_view_state"
+description = "A retry, pause, or reorder appears in one surface but not another until a reload"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "behavioral.catchall"
+name = "behavioral_catchall"
+description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

@@ -32,6 +32,7 @@ Feature: Embedded bitmaps step —
 Feature: Download step —
 - Choosing a replacement colour set and then advancing through the steps to the final stage generates the patched result: step four (Download new executable) shows a Patched result generated confirmation plus a summary of the chosen replacements (the selected colour set name, a swatch strip, a live preview, and the selected icon set with its replaced count). The current wizard step and the chosen visual replacements together make completion apparent
 - A Download control writes an EuroScope.exe file and its label reflects that the download occurred
+- Patch-recipe request-body field contract (Copy recipe / Download patch-recipe.json / Import recipe share this schema — the generated recipe IS the would-be request body describing the patch): required schemaVersion (number exactly 1), required baseTheme (exactly one of EuroScope, Grey, Primer, Ayu, Solarised), required swatches (object with exactly the six keys Backdrop darkest, Backdrop darker, Backdrop main, Backdrop lighter, Backdrop lightest, Foreground secondary, each a #RRGGBB hex string), required iconSet (exactly None or Vector), required replacedBitmapCount (integer 0 when iconSet is None, else equal to the seeded bitmap count ≥ 10), required generatedAt (ISO-8601 datetime ending in Z). Cross-field: every swatch value must match ^#[0-9A-Fa-f]{6}$; invalid hex keeps Continue/Generate from applying that colour and shows a named swatch error. Download patch-recipe.json and Copy recipe emit JSON matching the session's current theme, swatches, and icon set; Download theme.css emits CSS custom properties for those six swatches. An export that omits a session swatch or icon-set mutation is invalid. Import recipe accepts a conforming recipe and restores baseTheme, swatches, and iconSet so step four regenerates to match; malformed payloads show a visible error and change nothing.
 
 Feature: Frontend-only operation —
 - The whole flow is frontend-only: no backend, no authentication wall, and no outbound navigation. Every control drives shared client state in place
@@ -44,6 +45,8 @@ Feature: Frontend-only operation —
 - Moving backward one step shows the earlier replacement choice still selected exactly as it was left; moving backward and forward through the wizard repeatedly shows each step exactly once with its own choices retained
 - Revising an earlier choice is supported: after generating the patched result the user can return to an earlier step, pick a different colour set or icon set, and the revised choice replaces the earlier preview at that step and in the final summary
 - Reloading the page restores the exact wizard step and all chosen replacements: the progress bar highlights the same stage, the base theme control shows the same selection, all six swatches hold their edited values, and the icon set choice and replaced count match their pre-reload state
+- Recipe export flow: edit at least one swatch and set iconSet to Vector, advance to step four, confirm Download patch-recipe.json / Copy recipe include those six hex values and replacedBitmapCount ≥ 10, and confirm Download theme.css lists the same hex values
+- Recipe import round-trip: export a recipe after edits, change a swatch so the preview diverges, Import the recipe JSON, and confirm swatches and a fresh recipe export reconstruct to match
 </user_flows>
 
 <edge_cases>
@@ -105,7 +108,7 @@ Feature: Frontend-only operation —
 - Kobalte components for the base theme and icon set select controls, the progress indicator, alerts, and any dialogs or tooltips; no other external component libraries.
 - Motion (the vanilla motion.dev library) allowed for animation; no other animation libraries.
 - Tabler icons only, via the @tabler/icons-solidjs package.
-- All forms validate through a schema: the swatch hex fields and the file input are driven by a form library (Felte) paired with a Zod schema that defines the colour-value rules, and inline per-field errors naming the field appear before submit.
+- All forms validate through a schema: the swatch hex fields, the file input, and Import recipe are driven by a form library (Felte) paired with a Zod schema that mirrors the API-shaped patch-recipe request-body field contract above (colour-value rules, closed baseTheme/iconSet enums, replacedBitmapCount cross-field); inline per-field errors naming the field appear before submit; a generated recipe IS the would-be request body; Download/Copy/Import validate through the same schema. End-state contract: Download EuroScope.exe, Download patch-recipe.json, Download theme.css, and Copy recipe MUST reflect the session's actual replacements — an export that omits session work is invalid; Import MUST restore the same visible wizard choices (round-trip).
 - All libraries installed via npm and bundled locally; no CDN imports of any library, font, or icon set.
 - Shared application state (the current wizard step, the loaded file name, the selected base colour set, the six working swatch colours, the selected icon set, per-bitmap overrides, and whether the patched result has been generated) must live in a Solid store as the single reactive source of truth; every view derives from that one store and WebMCP tool handlers invoke the same store commands as the visible controls.
 - Persist relevant state in localStorage (or equivalent client storage) so a full reload restores the exact wizard step and all chosen replacements. This persistence is required for this task.
@@ -204,16 +207,18 @@ Module specs:
 
 Bindings:
 - Workflow steps: upload-euroscope-executable; update-theme-colours; update-embedded-bitmaps; download-new-executable
-- Form operations: advance; return
-- Editor object types: base-theme; base-icon-set
-- Editor operations: select; update_property; switch_mode; preview
-- Editor properties: backdrop-darkest; backdrop-darker; backdrop-main; backdrop-lighter; backdrop-lightest; foreground-secondary
-- Editor modes: theme-colours; embedded-bitmaps
-- Artifact operations: export
-- Export formats: patched-executable
+- Form operations: advance; return; reset
+- Editor object types: base-theme; base-icon-set; palette-snapshot; bitmap-tile
+- Editor operations: select; update_property; switch_mode; preview; add; delete
+- Editor properties: backdrop-darkest; backdrop-darker; backdrop-main; backdrop-lighter; backdrop-lightest; foreground-secondary; keep-original; colour-blindness; compare-mode
+- Editor modes: theme-colours; embedded-bitmaps; export-center
+- Artifact operations: export; import; copy
+- Export formats: patched-executable; patch-recipe-json; theme-css
+- Import modes: patch-recipe
 
 Mechanics exclusions:
 - Native file-picker / download interaction stays Playwright-driven
+- Command-palette open gesture and keyboard navigation stay Playwright-observed when mechanism matters
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

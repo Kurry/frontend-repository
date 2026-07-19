@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -125,6 +125,56 @@ description = "Place-detail tab switches swap panels in place with the detail ca
 type = "binary"
 weight = 1.0
 
+[[criterion]]
+id = "4.10"
+name = "drag_lift_and_settle"
+description = "A dragged stop card visibly lifts (elevation or scale) while dragging and settles into its drop slot with a brief ease rather than teleporting, and the vacated and receiving day sections animate their reflow — verified through a real pointer drag"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "peer_carets_drift_smoothly"
+description = "The colored peer carets or card outlines drift with smooth continuous easing between positions rather than teleporting in discrete jumps"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "coachmark_step_transitions"
+description = "Advancing the onboarding coachmarks with the real Next control transitions between steps with a short fade or slide rather than an instant swap — verified on a fresh load"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "accordion_height_animates"
+description = "Collapsing and expanding a day accordion through its real header control animates the height change rather than snapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "promotion_animates_bucket_to_day"
+description = "A winning poll animates its item out of the bucket and into the day section rather than swapping both surfaces in a single instant frame — verified by running the real vote flow"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "ambient_motion_obstructs_content"
+description = "The continuous presence or caret animation makes plan content unreadable, covers interactive controls, or intercepts pointer input so that stops become hard to read or click while it runs"
+type = "binary"
+weight = 1.0
+negate = true
+
+
+[[criterion]]
+id = "4.16"
+name = "export_import_notice_motion"
+description = "Export copy confirmation and import success or error notices appear with a short enter/exit transition rather than popping with no motion (unless prefers-reduced-motion is set)"
+type = "binary"
+weight = 0.5
 [[criterion]]
 id = "4.catchall"
 name = "motion_catchall"

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,158 +62,133 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "For games, evaluate onboarding and controls guidance plus pause and restart affordances. Empty state UI is present and renders when a collection is empty."
+name = "history_empty_state_before_logs"
+description = "Before any set is logged, the History tab shows a placeholder message explaining what will appear there instead of an empty list"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "log_reps_invalid_inline_errors"
+description = "Empty, zero, negative, non-integer, or out-of-range reps show a visible inline error naming the reps field and do not change today's total, lifetime reps, or character position"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "note_over_120_rejected"
+description = "A note longer than 120 characters shows an inline error naming the note field and does not create a History entry"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "zone_unlock_and_boss_defeat_feedback"
+description = "Zone unlock and boss defeat each show a transient confirmation banner in addition to the map palette or marker change"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "challenge_idle_log_rejected"
+description = "Logging reps while a challenge run is not active shows visible feedback and does not advance the run"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "reset_cancel_leaves_state"
+description = "Canceling the Reset Quest confirmation dialog leaves lifetime reps, History, gear, and checkpoint untouched"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "undo_redo_disabled_when_empty"
+description = "Undo and Redo controls are disabled, not merely ignored, when there is nothing to undo or redo"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "weekly_chart_zero_day_ticks"
+description = "Days with zero reps in the weekly summary chart still render a visible zero-height tick, never a blank chart area"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "reset_dialog_escape_and_confirm"
+description = "The Reset Quest confirmation dialog closes on Escape or Cancel without wiping state, and Confirm performs the wipe"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "challenge_lifecycle_progress_feedback"
+description = "Challenge run status (idle, active, paused, Victory, Defeat) is always visible so the player knows which lifecycle step is current"
 type = "binary"
 weight = 1.0
-
+[[criterion]]
+id = "4.11"
+name = "malformed_import_rejected"
+description = "Importing a malformed Quest Log JSON leaves lifetime reps, History, gear, and settings unchanged and shows a visible invalid-file rejection"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.12"
+name = "empty_export_still_valid_json"
+description = "Export Quest Log with zero logged sets still downloads a valid JSON document whose sets array is empty and lifetimeReps is 0, without a crash"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.13"
+name = "save_resume_controls_gated"
+description = "Resume Saved Run is disabled when no checkpoint exists; Save Progress is disabled when the challenge run is idle or already ended"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.14"
+name = "difficulty_locked_during_active_run"
+description = "Changing difficulty while a run is active is disabled or rejected with visible feedback and does not alter the in-progress target mid-run"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "4.15"
+name = "rapid_25_logs_integrity"
+description = "Logging 25 rep sets back to back leaves lifetime reps, today's total, and History exactly matching the sum entered with no frozen or blank screen"
+type = "binary"
+weight = 1.0
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_history_has_no_feedback"
+description = "An empty History collection shows nothing and provides no UI feedback"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n2"
 name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+description = "Validation or import errors are surfaced only in the browser console"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n3"
 name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+description = "Log Reps, gear unlock, export, import, or challenge end lack visible feedback and silently succeed or fail"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n4"
 name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+description = "Reset Quest runs with no confirmation warning"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "malformed_import_mutates_state"
+description = "A malformed Quest Log import still mutates lifetime reps, History, or gear"
 type = "binary"
 negate = true
 weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
-type = "binary"
-negate = true
-weight = 1.0
-
 [[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. If present, name the defect and cite concrete evidence. If already covered, answer no here."
 type = "binary"
 negate = true
 weight = 1.0

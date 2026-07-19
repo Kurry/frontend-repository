@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,77 +63,77 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "7.1"
 name = "layout_adapts_desktop_to_mobile"
-description = "Layout adapts gracefully from 1440px desktop to 375px mobile."
+description = "At 1024px and above the heatmap and side panels share the canvas; below 1024px panels stack vertically and the drawer becomes full-width"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
 name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+description = "Classify, Re-run, filter, Export, Import, and threshold controls remain usable tap targets on a 375px viewport"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
 name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+description = "Heatmap scores, variance row text, and panel titles remain legible at both desktop and 375px widths"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
 name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+description = "At 375px no content clips or overflows the viewport and no page-level horizontal scrolling appears; the heatmap may scroll horizontally inside its own container"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
 name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+description = "Export drawer, triage summary, and side panels adapt for narrower widths rather than staying a fixed desktop multi-column chrome"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.6"
 name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+description = "Below 1024px the heatmap, variance, chart, and timeline stack in a usable order rather than overlapping"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.7"
 name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+description = "On a 375px viewport, tapping heatmap cells, filters, and Export controls activates the same flows as pointer clicks"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.8"
 name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+description = "At 375px the page itself does not require horizontal scrolling; only the heatmap grid may scroll inside its container"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.9"
 name = "media_and_canvases_resize"
-description = "Images, grids, and canvases size responsively to fit the layout."
+description = "The heatmap grid, distribution chart, and score-by-harness chart resize to fit the available layout width"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.10"
 name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
+description = "Undo, Redo, Export, and Import remain reachable at 375px rather than rendering off-screen"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.n1"
 name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+description = "Layout breaks or overflows at 1024px or 375px so heatmap or export chrome is unusable"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n2"
 name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+description = "Classify, Export, filter chips, or the threshold slider are too small or misaligned to operate at 375px"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n3"
 name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+description = "Heatmap scores or variance chip labels become unreadably small at 375px"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +157,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n4"
 name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+description = "Heatmap model names, triage summary, or export drawer content is cropped or forces unnecessary page-level horizontal scrollbars at 375px"
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +165,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n5"
 name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
+description = "Side panels or the export drawer break the layout at narrow widths and cannot be used"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n6"
 name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
+description = "Fixed toolbar or export chrome permanently obscures the heatmap or variance rows at 375px"
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +181,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n7"
 name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
+description = "Heatmap cells, chips, or export tabs overlap illegibly at some common width"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n8"
 name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
+description = "Required tap activation of cells, Classify, or Export is missing on a narrow viewport"
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +197,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n9"
 name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
+description = "The heatmap grid or charts keep a fixed desktop width that overflows the 375px viewport"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "7.n10"
 name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
+description = "Undo, Redo, Export, or Import controls disappear at 375px"
 type = "binary"
 negate = true
 weight = 1.0

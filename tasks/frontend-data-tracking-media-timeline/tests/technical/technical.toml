@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "2.2"
 name = "reload_returns_seeded_in_memory_baseline"
-description = "A page reload returns the app to its seeded in-memory baseline — seeded corpus, default year window, all categories enabled, no user-created events — and browser storage (localStorage, sessionStorage, IndexedDB) stays empty after a full exercise of the app"
+description = "A page reload returns the app to its seeded in-memory baseline — seeded corpus, default year window, all categories enabled, empty undo/redo stacks, no selection, no user-created events — and browser storage (localStorage, sessionStorage, IndexedDB) stays empty after a full exercise of create, filter, export, import, and undo"
 type = "binary"
 weight = 1.0
 
@@ -93,14 +93,14 @@ negate = true
 [[criterion]]
 id = "2.5"
 name = "keyboard_operable_with_visible_focus"
-description = "Every interactive control (mode switch, scrubber thumbs, year inputs, filters, pins or their list equivalents, detail navigation) is reachable and operable with the keyboard alone, with a visible focus ring on the focused control"
+description = "Every interactive control (mode switch, scrubber thumbs, year inputs, filters, pins or list equivalents, detail navigation, undo/redo, export drawer controls, selection checkboxes, bulk actions) is reachable and operable with the keyboard alone, with a visible focus ring"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.6"
 name = "dialogs_close_on_escape_and_return_focus"
-description = "The event detail panel/popup and the About overlay behave as dialogs: Escape closes them and keyboard focus returns to the control that opened them"
+description = "The event detail panel/popup, About overlay, export drawer, and batch-delete confirmation behave as dialogs: Escape closes them and keyboard focus returns to the control that opened them; the export drawer traps focus while open"
 type = "binary"
 weight = 1.0
 
@@ -121,7 +121,7 @@ weight = 1.0
 [[criterion]]
 id = "2.9"
 name = "console_clean_during_full_exercise"
-description = "No console errors or unhandled promise rejections appear during load or a full exercise of scrubbing, zooming, filtering, creating, editing, and deleting"
+description = "No console errors or unhandled promise rejections appear during load or a full exercise of scrubbing, zooming, filtering, creating, editing, deleting, bulk actions, undo/redo, exporting, and importing"
 type = "binary"
 weight = 1.0
 
@@ -146,6 +146,20 @@ name = "document_title_reflects_mediatimeline"
 description = "The browser document title reflects MediaTimeline"
 type = "binary"
 weight = 0.5
+
+[[criterion]]
+id = "2.13"
+name = "export_previews_live_from_shared_state"
+description = "Timeline JSON, Events CSV, and Window Markdown export previews recompute from the same shared events collection and window/filters as the stage and library; a create or delete changes the preview text without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.14"
+name = "undo_redo_share_store_history"
+description = "Undo and Redo reverse and reapply the same create/edit/delete/batch/import mutations the visible controls write, restoring list, pins, counts, and export previews together"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "2.catchall"

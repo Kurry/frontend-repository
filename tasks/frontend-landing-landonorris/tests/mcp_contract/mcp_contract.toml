@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,94 +62,94 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "12.1"
-name = "mandated_modules_are_bound"
-description = "All contract-mandated modules are initialized and bound."
+name = "browse_and_session_modules_bound"
+description = "Contract modules browse-query-v1, command-session-v1, entity-collection-v1, and artifact-transfer-v1 are initialized and bound (webmcp_session_info / webmcp_list_tools show browse, session, entity, and artifact tool prefixes)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.2"
-name = "handlers_match_visible_ui_logic"
-description = "Exposed tool handlers match visible UI command logic."
+name = "handlers_match_visible_ui"
+description = "Exposed browse, session, entity, and artifact tool handlers drive the same visible UI logic as on-page controls (section/press-kit destinations, race toggle/select, video start/pause/restart, press-kit export/copy)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.3"
-name = "only_documented_operations_exist"
-description = "Only documented operations and routes are available."
+name = "only_documented_ops_available"
+description = "Only documented browse, session, entity (create/select/update/delete/toggle/quantity/reorder), and artifact (import/export/copy/print_preview/convert) permitted operations are available — no undeclared routes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.4"
-name = "contract_is_automation_exercisable"
-description = "The contract can be fully exercised via automation."
+name = "contract_exercisable_via_automation"
+description = "The contract can be fully exercised via webmcp_invoke_tool for browse open against bound destinations, session start/pause/restart, entity race select/toggle/update, and artifact import/export/copy."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.5"
-name = "declared_entity_operations_work"
-description = "Entity operations declared in the contract, including create, update, delete, and reorder, all work."
+name = "browse_destinations_open"
+description = "Browse open works for declared destinations: hero, horizontal-media, helmet-grid, race-calendar, collabs, social-stream, footer, menu, and press-kit."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.6"
-name = "form_flow_operations_are_bound"
-description = "Form submission validation, error, and cancel operations are clearly bound."
+name = "session_start_pause_restart_bound"
+description = "Session operations start, pause, and restart are bound and surface the same video play/pause/restart UI state as manual hover/control use where the UI exposes those states."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.7"
-name = "queries_match_allowed_spec"
-description = "Query destinations and filters match the allowed specification."
+name = "destinations_match_bindings"
+description = "Browse destinations exposed via tools match the Bindings block exactly: hero; horizontal-media; helmet-grid; race-calendar; collabs; social-stream; footer; menu; press-kit."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.8"
-name = "capabilities_stay_declared"
-description = "No extra or undeclared module routes or capabilities are exposed."
+name = "no_extra_undeclared_modules"
+description = "No extra modules, destinations, or operations beyond browse-query-v1 / command-session-v1 / entity-collection-v1 / artifact-transfer-v1 and the declared Bindings are exposed."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.9"
-name = "session_tool_and_invoke_apis_work"
-description = "Session info, tool list, and invocation are correctly surfaced."
+name = "session_list_invoke_apis_work"
+description = "window.webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool correctly surface session info, the tool list, and invocation results without errors."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.10"
-name = "mcp_initializes_without_harness_edits"
-description = "MCP initialization works without manual editing or test harness changes."
+name = "mcp_init_without_harness_edits"
+description = "MCP tools register from the app's own module_spec + Bindings implementation without requiring manual edits to the verifier harness."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.n1"
 name = "mcp_tools_missing_or_noop"
-description = "MCP tooling is unbound, missing, or a no-op."
+description = "Browse or session MCP tooling is unbound, missing, or a no-op when invoked."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n2"
-name = "handlers_diverge_from_ui_logic"
-description = "Handlers do not match UI logic because actions mismatch or state does not sync."
+name = "handlers_diverge_from_ui"
+description = "A browse open or session start/pause tool invocation updates MCP-reported state without matching the visible scroll position or video UI (or the reverse)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n3"
-name = "undeclared_capabilities_exposed"
-description = "Undeclared destinations or entity operations are exposed."
+name = "undeclared_destinations_or_ops_exposed"
+description = "Undeclared destinations or operations outside the Bindings/permitted_operations lists are exposed via webmcp_list_tools."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,15 +157,15 @@ weight = 1.0
 [[criterion]]
 id = "12.n4"
 name = "automation_cannot_exercise_contract"
-description = "The contract cannot be exercised from automation."
+description = "webmcp_invoke_tool cannot exercise browse open or session start/pause/restart against the declared bindings."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n5"
-name = "validation_bypass_desyncs_state"
-description = "Validation bypasses lead to inconsistent MCP and UI state."
+name = "mechanics_exclusions_faked_via_mcp"
+description = "MCP handlers fabricate success for Playwright-excluded mechanics (menu overlay open/close animation, horizontal-track/helmet scroll motion, social hover-to-play fade, or WebGL/Rive rendering) without the visible UI performing those behaviors."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n6"
 name = "session_or_tool_api_errors"
-description = "The session or tool API returns errors or incomplete data."
+description = "webmcp_session_info or webmcp_list_tools returns errors or incomplete module/tool data for the declared contract."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,31 +181,61 @@ weight = 1.0
 [[criterion]]
 id = "12.n7"
 name = "mcp_relies_on_undocumented_hacks"
-description = "MCP relies on manual or undocumented test hacks."
+description = "MCP only works after undocumented manual harness hacks or console stubs rather than app-registered handlers."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n8"
-name = "required_contract_module_missing"
-description = "No module contract is implemented where one is declared required."
+name = "required_modules_missing"
+description = "browse-query-v1, command-session-v1, entity-collection-v1, or artifact-transfer-v1 is not implemented despite being declared required in the contract."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n9"
-name = "mcp_is_stubbed_or_commented_out"
-description = "The MCP interface is commented out or only stubbed."
+name = "mcp_stubbed_or_commented_out"
+description = "The MCP interface is commented out or only stubbed so list/invoke cannot reach real handlers."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n10"
-name = "automated_contract_validation_fails"
-description = "The project fails automated MCP contract validation."
+name = "session_ops_bindings_incomplete"
+description = "Declared session operations start, pause, and restart are missing from the bound command-session surface."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "12.11"
+name = "entity_race_select_toggle_bound"
+description = "Entity race operations select, toggle, and update are bound and change the same visible race selected treatment and Selected races N readout as clicking a race row."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.12"
+name = "artifact_import_export_copy_bound"
+description = "Artifact operations import, export, and copy are bound (import modes paste/file; export formats json, markdown, ics) and drive the same press-kit preview/import surface as the PRESS KIT UI (file picker, clipboard, and download contents remain Playwright-observed)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.n11"
+name = "entity_or_artifact_missing"
+description = "Declared entity race operations or artifact import/export/copy formats are missing from the bound tool surface."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "12.n12"
+name = "artifact_export_diverges_from_ui_kit"
+description = "Invoking artifact export/copy updates MCP-reported success without the press-kit preview reflecting the current race selections and shortlist (or the reverse)."
 type = "binary"
 negate = true
 weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -268,14 +268,14 @@ weight = 1.0
 [[criterion]]
 id = "1.32"
 name = "contact_form_invalid_blocked"
-description = "Submitting a contact/email form with a malformed email or without privacy consent shows inline errors naming the offending field and the success state does not appear"
+description = "Submitting a contact/email form with a malformed email, without privacy consent, name shorter than 2 characters, missing interest, or a provided message shorter than 10 characters shows inline errors naming the offending field, the success state does not appear, and no Session lead is appended"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.33"
 name = "contact_submit_gated_then_succeeds"
-description = "The contact form's submit control stays disabled until every required field (including email format and privacy consent) is valid, and a valid submit then shows an in-page success state with no page navigation and no outbound form POST in the network log"
+description = "The contact form's submit control stays disabled until every required field (name ≥2, email format, interest enum, privacy consent) is valid, and a valid submit then shows an in-page success state, appends one Session lead, with no page navigation and no outbound form POST in the network log"
 type = "binary"
 weight = 1.0
 
@@ -299,6 +299,136 @@ name = "bento_clock_shows_live_time"
 description = "The hero bento clock shows the current local time and updates while the page is open"
 type = "binary"
 weight = 0.5
+
+
+[[criterion]]
+id = "1.37"
+name = "status_rollup_counts_live"
+description = "Events Manager shows a live status rollup strip with exact counts for upcoming, featured, and past; creating a valid upcoming event increments the upcoming count by exactly one without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "sort_by_date_or_title_reorders"
+description = "In Events Manager, sorting by date or title reorders the visible rows from the same shared collection, and toggling the active sort direction reverses that order"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "bulk_delete_selected_removes_all"
+description = "Selecting at least two events and activating Delete selected removes every selected row in one operation; the manager count drops by the selected count and those titles vanish from matching landing listings without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "export_json_contains_session_mutations"
+description = "After creating an event titled Harbor Builder Summit and submitting one valid contact lead, opening Export catalog shows a JSON preview with top-level version, theme, events, leads, and counts keys whose events array includes Harbor Builder Summit with date, city, category, status, and featured fields and whose leads array includes that contact payload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "export_ics_has_vevent_per_event"
+description = "Opening Export catalog ICS preview shows a payload beginning with BEGIN:VCALENDAR, containing exactly one VEVENT per current event with a DTSTART and a SUMMARY naming the event title, and ending with END:VCALENDAR"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "export_copy_confirms"
+description = "Activating Copy on the Export JSON (or ICS) preview shows a brief copied confirmation while the copied text matches the visible preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "import_declared_catalog_restores"
+description = "After exporting the catalog to JSON, deleting an event so the manager count drops, then importing that exported JSON via Load catalog / declared-catalog, the prior event titles and count reappear in Events Manager and matching landing listings without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "undo_restores_deleted_event"
+description = "Deleting an event and activating Undo restores that event to the manager list, status rollups, and landing listings together; Redo removes it again from all three"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "command_palette_navigates_in_page"
+description = "Opening the command palette with Ctrl+K or Cmd+K (or the chrome Command control), choosing Events Manager, then choosing Export catalog navigates between those in-page surfaces without leaving the site; Escape closes the palette"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "session_leads_panel_live_count"
+description = "Near the footer, a Session leads panel shows a live total count starting at 0 with empty-state copy; after a successful contact submit the total increments by exactly one and a newest-first lead row (kind contact, email, name/interest label) appears without reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "download_ridge_session_leads_json"
+description = "After at least one successful contact submit, activating Download leads JSON triggers a real download named ridge-session-leads.json whose body is live-compiled JSON with version 1, theme, counts.total, and a leads array entry containing id, kind contact, submittedAt, and the contact payload fields"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "copy_leads_json_shows_copied"
+description = "Activating Copy leads JSON copies the same ridge-session-leads.json text and shows a visible Copied confirmation that clears within a few seconds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "undo_last_lead_decrements"
+description = "With two or more leads present, Undo last lead removes only the newest row, decrements the Session leads total by exactly one, and leaves older leads visible; a subsequent Download leads JSON omits the undone entry"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "contact_lead_field_contract"
+description = "A valid contact submit requires name at least 2 characters, email with @ and domain, interest one of Build/Solutions/Community/Enterprise, and privacy_consent true; optional company may be present; optional message when provided is at least 10 characters; the success state's lead payload matches those fields"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "event_field_contract_enums_and_featured"
+description = "Creating or editing an event enforces title and city at least 2 characters, date as YYYY-MM-DD, category one of Summit/Meetup/Workshop/Hackathon/Webinar, status one of upcoming/featured/past, and the featured/status cross-field rule (featured true iff status is featured); invalid values show inline field errors and do not add or corrupt the row"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n11"
+name = "export_omits_session_mutations"
+description = "After creating or editing an event or appending a contact lead in the session, the Export JSON/ICS preview or ridge-session-leads.json omits that mutation and still shows only the original seed catalog or an empty leads array"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n12"
+name = "undo_does_not_restore_collection"
+description = "After deleting an event, activating Undo leaves the event absent from the manager list, rollups, or landing listings"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n13"
+name = "success_without_passing_field_contract"
+description = "Contact success state appears, or an event is added, after a submit whose payload fails the declared contact or event field contract (missing required fields, invalid email, out-of-enum values, or featured/status mismatch)"
+type = "binary"
+negate = true
+weight = 1.0
 
 [[criterion]]
 id = "1.catchall"

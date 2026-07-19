@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,77 +63,77 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "9.1"
 name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+description = "The app is interactive within 2 seconds of a local cold load with heatmap cells and filters responding"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
 name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+description = "No console errors or warnings appear on load or during a full exercise including re-run, triage, rapid slider movement, Export, and Import"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
-name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+name = "transitions_respond_promptly"
+description = "View switches, filter toggles, and export tab switches respond promptly without multi-second stalls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.4"
 name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+description = "A running re-run shows in-progress and per-trial progress indicators rather than a frozen UI with no feedback"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.5"
-name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+name = "heatmap_variance_render_without_lag"
+description = "The seeded heatmap and variance rows render without perceptible lag on first interactive paint"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.6"
 name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+description = "The UI stays responsive during a running re-run and while moving the threshold slider"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
 name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+description = "Drawer slide, chip crossfade, and chart bar transitions remain smooth enough to follow during real UI use"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.8"
 name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+description = "Rapid threshold slider movement and repeated filter changes do not hang or freeze the UI"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.9"
 name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+description = "An extended session of re-runs, triage, and opening Export does not visibly degrade responsiveness"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+name = "export_preview_regenerates_without_freeze"
+description = "Opening Export and switching between JSON and CSV regenerates the preview without freezing the UI"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.n1"
 name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+description = "More than 2 seconds pass before heatmap cells and filters become interactive on local render"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n2"
 name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+description = "Console errors appear during re-run, triage, Export, or Import flows"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n3"
 name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+description = "View switch or export drawer open blocks interaction for a prolonged lag"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +157,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n4"
 name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
+description = "A running re-run or Import parse hangs the UI with no progress feedback"
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +165,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n5"
 name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+description = "Interacting with the seeded heatmap and variance table drops responsiveness to an unusable level"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n6"
 name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
+description = "Drawer or chip animations block further input until they finish"
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +181,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n7"
 name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
+description = "Font, chart, or icon loading blocks first interactive paint of the heatmap beyond two seconds"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n8"
 name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
+description = "Repeated re-runs visibly accumulate runaway resource use that degrades the session"
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +197,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n9"
 name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
+description = "During a re-run the affected cell and dependent surfaces go blank with no loading affordance"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n10"
 name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+description = "Rapid slider movement or repeated Export tab switching crashes or hard-locks the app"
 type = "binary"
 negate = true
 weight = 1.0

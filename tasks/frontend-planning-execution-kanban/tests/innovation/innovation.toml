@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -63,154 +63,134 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+name = "polished_drag_microinteractions"
+description = "Card drag/drop or keyboard move includes polish beyond bare relocation — for example coordinated settle of neighbors and a clear insertion ghost that feels intentional"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "execution_timeline_clarity"
+description = "Card execution presents a clear, watchable progression (status chip, per-item states, progress n of m) that reads as a designed run timeline rather than a bare checkbox flip"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+name = "wip_breach_affordance"
+description = "WIP breach uses a distinctive amber treatment and breach label that makes capacity problems obvious at a glance"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+name = "export_as_centerpiece"
+description = "The Export drawer feels like a first-class product surface — live preview, format tabs, copy confirmation — not a hidden dump"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+name = "bulk_bar_ergonomics"
+description = "Multi-select and the bulk action bar make batch moves feel intentional and low-friction"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+name = "undo_confidence"
+description = "Undo/redo affordances make destructive board edits feel safe and reversible"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+name = "prompt_panel_readability"
+description = "The prompt side panel presents full prompt text in a readable, focused reading surface"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+name = "status_chip_craft"
+description = "Status chips and progress indicators are visually refined and consistent across card and detail views"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+name = "empty_state_craft"
+description = "Empty column and empty filter states are designed, helpful, and on-brand rather than blank gaps"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+name = "keyboard_parity_delight"
+description = "Keyboard move controls feel as capable as drag, making the board fully operable without a pointer"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+name = "stale_demo_interactions"
+description = "Interactions that should feel polished (drag settle, export open, run progression) feel unfinished or broken in a way that undercuts the board as a usable tool"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
+name = "export_feels_bolted_on"
+description = "Export preview stays identical after visible board mutations, or Export controls are buried under secondary chrome so the drawer is hard to discover"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
+name = "wip_or_bulk_feel_decorative"
+description = "WIP limit labels and bulk-select checkboxes render while columns past 3 cards keep a normal background and bulk Move leaves selected cards in their original columns"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
+name = "motion_is_noisy_not_helpful"
+description = "Motion distracts from board work (constant bouncing, blocking animations) rather than clarifying hierarchy"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
+name = "inconsistent_visual_language"
+description = "Icons, chips, and toolbar treatments mix conflicting visual languages that make the board feel uncrafted"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
+name = "detail_panel_clutter"
+description = "Card detail or prompt panel is cluttered to the point that primary actions are hard to find"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
+name = "toast_spam_blocks_work"
+description = "Feedback toasts stack or persist in a way that blocks board interaction"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
+name = "selection_model_confusing"
+description = "Multi-select checkboxes and bulk actions fight with drag/open gestures so selection is unreliable"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
+name = "undo_unexpected_scope"
+description = "Undo reverses unrelated UI chrome instead of the last board mutation, surprising the user"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
+name = "run_feedback_unclear"
+description = "During a run it is unclear which sub-item is active or whether the card is still executing"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"

@@ -1,0 +1,164 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "14.1"
+name = "multi_facet_reset_round_trip"
+description = "Multi-facet reload round-trip: apply a language filter, save a named filter chip, reject one draft seed with the class trivial-fix, and edit an open seed's question text, then reload the page. All facets coherently reset to the seeded baseline — the original statuses and rollup counts return, the saved chip is gone, the filter clears, and the question edit is gone — never a mix where some facets survive"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.2"
+name = "sort_reversal_proves_live_data"
+description = "Sort-reversal proof: sort the queue by title ascending, note the first and last visible titles, then sort descending; the order reverses correctly relative to ascending, proving sort derives from live data rather than two hardcoded orders"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.3"
+name = "rollup_and_snapshot_track_inputs"
+description = "Derived-view sensitivity: reject one quartz-orm draft with class ambiguous-report and observe the rejected count, the quartz-orm repository figure, and the ambiguous-report breakdown each change while unrelated cells (for example copperline) stay fixed; a dataset snapshot generated afterwards reflects the new figures"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.4"
+name = "cross_view_echo_without_reload"
+description = "Cross-view echo: edit a seed's title in the workbench and save, then confirm the queue row shows the new title; triage a different seed in the queue and confirm its detail surface and timeline show the new status — both directions without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.5"
+name = "batch_count_delta_is_exact"
+description = "Count-delta integrity: note the draft and rejected rollup counts, batch reject exactly 3 selected draft seeds, and immediately confirm draft decreased by exactly 3 and rejected increased by exactly 3, with the matching-seeds count agreeing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.6"
+name = "different_authoring_different_manifests"
+description = "Input-dependent output: author two different seeds with different question texts and foil caps, export each, and confirm the two manifests differ exactly where the authored values differ; running the harvest twice on comparable seeds produces different generated drafts and step timings, not identical output"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.7"
+name = "interleaved_flows_preserve_state"
+description = "Interleaved-flow integrity: start editing seed A's question in the workbench, switch to the queue, batch reject two other seeds, return to seed A, and confirm A's unsaved pane state or saved edits are intact while the rejected seeds show their new status and the rollups reflect both flows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.8"
+name = "empty_to_restored_round_trip"
+description = "Edge-state round-trip: filter to one repository's draft seeds, reject them all so the filtered queue shows its empty state and that repository's draft figure reads zero, then Undo the last batch; the rows, rollup figures, and reject-class breakdown all return to their prior values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "full_pipeline_traceability"
+description = "Full-pipeline probe: take one draft seed through accept, authoring (question, rubric with locked 1.4, 3 resolving foils, golden via harvest or justified pending), gate all-clear, Mark authored, and Export. The same seed id then traces coherently through every surface: the queue badge reads authored, the draft and authored rollups changed by exactly one each, the timeline lists the transition, save, harvest, and export events in order, and the export manifest carries the exact question, criterion, and foil values just authored"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n1"
+name = "partial_reset_is_incoherent"
+description = "After a reload, some session facets reset to the seeded baseline while others survive — for example statuses reset but a saved chip or authored edit persists — producing incoherent partial state"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n2"
+name = "derived_surface_ignores_inputs"
+description = "The rollup panel, gate banner, or dataset snapshot renders identical figures or conditions regardless of the triage and authoring actions performed"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n3"
+name = "different_inputs_identical_output"
+description = "Two exports of differently authored seeds, or two harvest runs, yield byte-identical output text"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n4"
+name = "surfaces_stale_until_reload"
+description = "A status or authoring change appears in one surface (queue, rollup, timeline, or manifest) but not another until a reload"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "behavioral.catchall"
+name = "behavioral_catchall"
+description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

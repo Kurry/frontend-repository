@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -177,14 +177,14 @@ negate = true
 [[criterion]]
 id = "1.29"
 name = "add_site_inline_validation_gates_submit"
-description = "In the Add site form, an empty site name or an empty/malformed domain shows an inline validation message naming that specific field before any submit, and the submit control stays disabled until both fields are valid"
+description = "In the Add site form, an empty site name, empty/malformed domain, or missing timezone shows an inline validation message naming that specific field before any submit, and the submit control stays disabled until name, domain, and timezone are all valid"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.30"
 name = "add_site_flow_new_site_dashboard"
-description = "Starting from the dashboard: open Add site, fill a valid name and domain, and submit — the form closes, the site selector's entry count increases by exactly one, and selecting the new site immediately shows that site's own dashboard (for an unseeded site: zero-value metric tiles and empty breakdown panels with an explanatory message), not the previously selected site's numbers"
+description = "Starting from the dashboard: open Add site, fill a valid name, domain, and timezone, and submit — the form closes, the site selector's entry count increases by exactly one, selecting the new site shows that site's own dashboard (for an unseeded site: zero-value metric tiles and empty breakdown panels with an explanatory message), and Stats JSON export includes that site's domain, name, and timezone"
 type = "binary"
 weight = 1.0
 
@@ -220,7 +220,7 @@ weight = 1.0
 [[criterion]]
 id = "1.35"
 name = "multi_facet_reload_round_trip"
-description = "After selecting a non-default site, a non-default date range, and a non-default sort, applying a segment filter, and switching the theme, a full page reload restores the same site, range, sort, theme, and filter pill together with the same recomputed numbers on the tiles, chart, and panels — all facets coherently, never a mix of restored and reverted facets"
+description = "After selecting a non-default site, date range, and sort, applying a segment filter, switching the theme, setting a non-default bounce-rate ceiling, and turning compare previous on, a full page reload restores the same site, range, sort, theme, filter pill, ceiling, compare chips, and recomputed numbers — all facets coherently, never a mix of restored and reverted facets"
 type = "binary"
 weight = 1.0
 
@@ -237,6 +237,106 @@ name = "range_change_clears_active_filter_chain"
 description = "Scripted with the Source: Google filter active on example.com: changing the date range to a different range recomputes the metric tiles, trend chart, and all three breakdown panels together for the new range, clears the segment filter and its pill, and leaves no rows from the previous selection in any panel"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "sites_api_field_contract_rejects_protocol_domain"
+description = "Entering a domain that includes a protocol such as https://, a path, a port, uppercase letters, or whitespace shows an inline validation message naming the domain field, keeps submit disabled or rejects submit, and does not add a site to the selector"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "timezone_enum_required_on_add_site"
+description = "The Add site form requires timezone to be one of UTC, America/New_York, Europe/London, or Asia/Tokyo; leaving it unset shows an inline message naming the timezone field and adds no site"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "compare_previous_shows_percent_chips"
+description = "Turning Compare previous on shows a signed percent-change chip on each of the four metric tiles; turning it off removes every chip"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "compare_chips_change_with_period"
+description = "With Compare previous on, switching from one date range to another changes at least one percent-change chip value"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "bounce_ceiling_toggles_high_bounce_label"
+description = "On example.com Last 30 days (bounce rate 44%), setting the bounce-rate ceiling to 40 shows a High bounce text label on the bounce-rate tile; setting the ceiling back to 60 removes that label"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "bounce_ceiling_out_of_bounds_rejected"
+description = "Entering a bounce-rate ceiling below 0 or above 100 shows an inline validation message naming the bounce-rate ceiling field and does not change the High bounce label state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "undo_redo_add_site_round_trip"
+description = "After adding a site, Undo restores the prior site-selector count and removes the new domain; Redo re-adds it; Undo and Redo show enabled/disabled states matching whether a step is available"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "export_drawer_stats_json_schema"
+description = "Opening Export report shows Stats JSON and Breakdown CSV tabs; the Stats JSON preview includes schema_version exactly plausible-stats-v1 plus site, period, filters, compare_previous, bounce_rate_ceiling, results, timeseries, breakdowns, and sites keys, with results values matching the four metric tiles"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "breakdown_csv_header_and_rows"
+description = "The Breakdown CSV preview starts with the header line dimension,name,visitors and includes one data line per currently shown Top Sources, Top Pages, and Countries row using dimension values source, page, and country"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "export_reflects_session_filter_mutation"
+description = "After applying the Google source filter, the Stats JSON preview's filters array and results values match the filtered metric tiles before any copy or download; clearing the filter updates the preview back to the unfiltered values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "export_copy_and_download_controls"
+description = "In the export drawer, Copy writes the visible preview text to the clipboard and shows a brief copied confirmation, and Download starts a file download of that same preview text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "import_stats_json_round_trip"
+description = "After mutating the dashboard (add a site or apply a filter), exporting Stats JSON and importing that same JSON restores the site list, selected site, filter pill, metric tiles, ceiling, compare mode, and both export previews to the pre-export mutated state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "export_omits_session_mutations"
+description = "After applying a segment filter or adding a site, the Stats JSON or Breakdown CSV preview still shows the pre-mutation unfiltered default numbers, or the new site is absent from the sites array, so the export text fails to include the session's visible work"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.51"
+name = "malformed_import_mutates_dashboard"
+description = "Importing malformed Stats JSON or JSON missing schema_version, results, or sites changes the site count or filter state as if the import succeeded, or clears undo history without showing an inline error naming the import field"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.catchall"

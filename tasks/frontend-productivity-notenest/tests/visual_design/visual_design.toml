@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -151,6 +151,29 @@ weight = 0.5
 id = "2.13"
 name = "placeholder_text_visible"
 description = "Placeholder or scaffold text (such as 'Lorem ipsum', 'TODO', 'asdf', or template variable names like {{title}}) is visible somewhere in the shipped UI."
+type = "binary"
+weight = 1.0
+negate = true
+
+
+[[criterion]]
+id = "2.14"
+name = "export_nest_drawer_anatomy"
+description = "Export Nest appears as a drawer or modal with Nest JSON / Markdown vault tabs, a scrollable monospaced preview, and Copy and Download affordances."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.15"
+name = "selection_tray_and_command_palette_chrome"
+description = "When notes are multi-selected, a compact selection tray offers Batch Move, Batch Color, and Batch Trash; the command palette is a centered overlay with a search field and result list."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.16"
+name = "export_drawer_missing_or_unreadable"
+description = "Export Nest preview text is missing, not monospaced/readable, or lacks distinct Nest JSON vs Markdown vault tabs."
 type = "binary"
 weight = 1.0
 negate = true

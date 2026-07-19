@@ -1,0 +1,325 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_dataset_sidebar"
+description = "On load, the left sidebar lists at least 3 seeded datasets, each entry showing a dataset name, a row count, and a created date; clicking an entry loads that dataset's rows into the main grid and the entry shows a visibly selected treatment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "create_dataset_flow"
+description = "New Dataset opens a modal with a required name, optional description, and a repeating schema-field editor (field name, a type select offering text, number, and category, and a required allowed-values list when category is chosen); Submit stays disabled until the name and at least one complete schema field are present, and a valid submit adds exactly one sidebar entry with row count 0 and selects it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "invalid_create_validation"
+description = "Submitting New Dataset with an empty name shows an inline validation message naming the name field and adds no sidebar entry"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "virtualized_grid_500_rows"
+description = "The flagship seeded dataset holds at least 500 rows, the DOM contains only a window of row elements at any time (verifiably fewer than the full row count), and scrolling from the first to the last row is smooth with no blank flashes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "grid_column_anatomy"
+description = "The grid shows one labeled column per schema field plus expected output, verified, and split columns under a fixed header row"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "inline_cell_edit_commit_cancel"
+description = "Double-clicking a cell opens an in-place editor; Enter commits the value and the change propagates to dependent surfaces, while Escape cancels and restores the prior value; committing a value that violates the record contract (non-numeric text in a number field, a value outside a category field's allowed list) is rejected with an inline error naming the field and the violated rule and the prior value stays in place"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "add_edit_delete_row_flows"
+description = "Add Row opens a modal with one input per schema field plus an expected output textarea and appends exactly one row incrementing the sidebar count; Edit opens the same modal pre-filled and saves in place; Delete asks for confirmation, removes the row, and decrements the sidebar count, while cancel leaves it intact"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "import_sources_offered"
+description = "The Import CSV wizard offers a .csv file picker, a drag-and-drop dropzone with a visible drag-over treatment, a paste-CSV-text tab, and at least 2 seeded sample fixtures selectable inside the wizard"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "mapping_step_with_preassignment"
+description = "The mapping step lists one row per detected CSV column with its header, a preview of first values, and a select targeting a schema field, the expected output, or Ignore; columns whose header matches a schema field arrive pre-assigned, and Continue stays disabled with an explanatory message until at least one column is assigned"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "diagnostic_cell_fixes"
+description = "The diagnostic step highlights individual cells that violate the record contract — wrong type for a number field, a value outside a category field's allowed list, or an empty required cell — with a message naming the field and the violated rule; editing a flagged cell in place clears its highlight immediately and the ready-versus-issues summary counts update"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "exclude_and_gated_commit"
+description = "Diagnostic rows have an Exclude toggle that removes them from the commit and updates the ready count; Commit stays disabled while any included row has an unresolved issue, and committing imports every included row, raises the sidebar count by exactly that number, shows the rows in the grid, and raises a toast stating how many rows were imported"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "verified_toggle_and_badge"
+description = "Each row's Verified toggle switches between a checkmark icon and a dash icon in the verified column, and the panel-header Verified count badge updates immediately on every toggle"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "unverified_filter_round_trip"
+description = "Show unverified only hides verified rows, and turning it off restores exactly the full row set"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "formula_bar_functions"
+description = "The formula bar evaluates =SUM, =AVERAGE, =MIN, =MAX, and =COUNT over a named numeric column, supports an optional row range such as =SUM(score, 1:100), and shows the computed result next to the input"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "formula_recomputes_on_edit"
+description = "With a formula result displayed, editing a cell inside the evaluated column changes the displayed result without re-entering the formula"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "formula_error_messages"
+description = "Submitting a formula with an unknown function, an unknown column, or a numeric function over a non-numeric column shows an inline error naming the problem and no result value"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "threshold_rules_flag_rows"
+description = "A threshold rule (numeric column, above/below comparator, cap value — all required with inline validation) flags breaching rows with a treatment on the offending cell and a row flag icon, and a Flagged count badge shows how many rows breach any rule"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "flags_track_edits_and_rule_delete"
+description = "Editing a cell across a rule's cap adds or clears that row's flag immediately, and deleting a rule clears every flag it caused"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "dedup_scan_stages"
+description = "Scan for duplicates runs a visible staged scan (scanning rows, grouping matches, done) whose stage statuses advance from pending through running to complete with an overall progress indicator, and on the seeded flagship dataset the result lists at least 2 duplicate groups with member rows shown side by side"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "merge_flow_and_dismiss"
+description = "A group's Merge flow lets the user pick the surviving value per differing column; confirming merges the group into one row, decreases the dataset row count by the group size minus one, and removes the group from the results, while Not duplicates dismisses a group without changing rows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "pivot_buckets_and_nesting"
+description = "The pivot view offers draggable column chips and Rows, Columns, and Values buckets with a count/sum/average aggregation select; dropping or removing a chip recomputes the pivot immediately, and two chips in the Rows bucket produce nested row summaries grouped by the first field then the second"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "pivot_tracks_data_edits"
+description = "After editing a grid cell that feeds the pivot, reopening the pivot shows changed summary values reflecting the edit"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "snapshots_and_row_diff"
+description = "Save Snapshot captures the rows under a required name with a timestamp, the snapshot list shows saved snapshots, and diffing two snapshots marks added rows, removed rows, and changed cells with old and new values; a snapshot-edit-snapshot sequence diffs to exactly the one changed cell"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "split_apply_and_stratification"
+description = "Split percentages that sum to 100 enable Apply, which labels every row in the grid's split column; the segmented proportion bar shows the assigned distribution, and the stratification readout shows per-split verified and unverified counts that update when rows change"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "bulk_tray_actions"
+description = "Selecting rows via checkboxes (including select-all-visible) raises a bulk tray with the live selected count offering Mark verified, Mark unverified, Assign split, and Delete with confirmation; applying updates every selected row and all derived counts, then clears the selection"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "undo_redo_coverage"
+description = "Undo and Redo toolbar controls plus Ctrl+Z and Ctrl+Shift+Z step through cell edits, row additions and deletions, merges, bulk actions, and committed imports; undo restores exact prior values including derived counts, and both controls disable when their stack is empty"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "export_tabs_live_derived"
+description = "The export drawer's Rows tab shows CSV-shaped text of the currently visible rows honoring the active filter, and the Dataset card tab summarizes name, description, the record contract (each field with type and category allowed values), total/verified/flagged counts, per-numeric-column min, max, and mean, split distribution, and snapshot count; editing a cell or toggling a filter and reopening changes the exported text, and Copy places the text on the clipboard with visible confirmation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "capacity_gauge_updates"
+description = "The instrumentation panel shows a workspace capacity gauge with total rows and estimated size against a displayed mock capacity plus a per-dataset breakdown, and importing, adding, or deleting rows updates the gauge and breakdown immediately"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "eval_suite_attach_detach"
+description = "Use in Eval Suite opens a select modal listing at least 3 seeded suites; confirming shows a success toast naming the suite and renders an attached-suite chip on the dataset header whose remove affordance detaches it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "empty_and_no_match_states"
+description = "Deleting every row shows an empty state naming the dataset with Add Row and Import CSV controls; enabling the unverified-only filter when all rows are verified shows an empty-filter message with a control that clears the filter; a duplicate scan with no duplicates completes its stages and shows an empty result message"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "double_activation_single_effect"
+description = "Rapidly double-activating Add Row's Submit appends exactly one row, and rapidly double-activating the import wizard's Commit imports the rows exactly once"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "long_value_truncation"
+description = "A cell value longer than 80 characters renders truncated with an ellipsis in the grid and is shown in full in the inline editor and the row Edit modal"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.n1"
+name = "fabricated_import_success"
+description = "The import wizard reports a success toast while the grid, the sidebar row count, or the capacity gauge remain unchanged from before the commit"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n2"
+name = "static_derived_surfaces"
+description = "The formula result, pivot summaries, threshold flags, or export text remain identical after an edit to the data they claim to derive from"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n3"
+name = "filter_mutates_data"
+description = "Toggling Show unverified only on and off, or switching to the pivot view and back, loses rows, reorders values, or otherwise mutates the underlying dataset"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n4"
+name = "contract_violations_accepted"
+description = "Some row entry path (Add Row, Edit Row, inline cell editing, or the import diagnostics) accepts a value that violates the dataset's record contract — wrong type or outside a category field's allowed list — without an error naming the field and rule"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "core_features.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

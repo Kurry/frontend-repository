@@ -1,0 +1,160 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "8.1"
+name = "card_advance_transition"
+description = "Driven by the real Submit & Next control, the outgoing card transitions out upward and the next card enters from below over roughly 250 milliseconds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.2"
+name = "rating_fill_animation"
+description = "Selecting a binary rating animates the button background with a roughly 150 millisecond fill rather than snapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.3"
+name = "queue_list_animations"
+description = "Queue entries animate their changes: a submitted entry animates out, a skipped entry animates to the end of the list, and bulk-skipped entries animate as a group rather than snapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.4"
+name = "assist_step_status_motion"
+description = "Assist step status changes animate: the running indicator shows continuous activity, a completing step fades to its new status rather than snapping, and the retry countdown ticks visibly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.5"
+name = "region_box_motion"
+description = "A newly drawn region box appears with a brief scale-settle animation and a deleted box fades out"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.6"
+name = "state_chip_color_transition"
+description = "Review-state chips animate their color change on a state transition rather than swapping instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.7"
+name = "hover_system"
+description = "Hover feedback is present throughout: buttons ease background and shadow with a slight press effect, queue entries, table rows, and timeline entries take a full-width hover wash, and form controls show focus rings"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.8"
+name = "copy_confirmation_transition"
+description = "The Copy export confirmation swaps its icon with a brief transition and reverts after a moment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.9"
+name = "toasts_slide_and_dismiss"
+description = "Feedback toasts after bulk actions, dispute resolution, and export copy slide in, remain readable, and auto-dismiss with a fade"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.10"
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion set, card transitions, button fills, list animations, and chip transitions apply instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.n1"
+name = "no_hover_or_press_feedback"
+description = "Buttons, queue entries, or table rows show no hover, focus, or press feedback beyond browser defaults"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.n2"
+name = "transitions_snap_or_jank"
+description = "The card advance, dialogs, or the export confirmation snap with no transition, or animations cause visible layout jank or flicker during a run"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.n3"
+name = "reduced_motion_ignored"
+description = "With prefers-reduced-motion set, the card transition, list animations, or chip transitions still animate"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "motion.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion and microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

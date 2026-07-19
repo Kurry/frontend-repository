@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -118,15 +118,15 @@ weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "connect_agent_form_validation"
-description = "The Connect agent control opens a dialog with agent name (required), model select (required), and description (optional); the submit control stays disabled until required fields are valid, and each invalid field shows an inline message naming that field before submit"
+name = "connect_agent_field_contract_validation"
+description = "The Connect agent dialog validates the agent record contract: name required trimmed 1 to 80 characters, model required from gpt-4.1 / claude-sonnet-4 / o3-mini / gemini-2.5-pro, description optional at most 280 characters; submit stays disabled until valid, and each invalid field shows an inline message naming that field and the violated rule before submit"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
 name = "connect_agent_creates_exactly_one"
-description = "Submitting a valid Connect agent form closes the dialog, adds exactly one new row to the agent panel (row count delta measured immediately around the action is one, even when the submit control is double-activated), and appends an agent-connected event to the feed"
+description = "Submitting a valid Connect agent form closes the dialog, adds exactly one new idle row whose name, model, and description match the submitted values (row count delta measured immediately around the action is one even when double-activated), and appends an agent-connected event to the feed"
 type = "binary"
 weight = 1.0
 
@@ -196,7 +196,7 @@ weight = 0.5
 [[criterion]]
 id = "1.n1"
 name = "static_feed_or_fabricated_actions"
-description = "The activity feed is static or fabricated: connecting an agent, retrying an errored agent, or activating Simulate activity produces no new feed event, or repeated actions yield byte-identical feed content regardless of input"
+description = "The activity feed is static or fabricated: connecting an agent, retrying an errored agent, or activating Simulate activity produces no new feed event, or export previews omit a connect/rename/disconnect that is visible in the UI"
 type = "binary"
 weight = 1.0
 negate = true
@@ -205,6 +205,65 @@ negate = true
 id = "1.n2"
 name = "missing_empty_states"
 description = "Filtering the feed to zero matches or disconnecting every agent leaves a blank region with no empty-state message or recovery control"
+type = "binary"
+weight = 1.0
+negate = true
+
+
+[[criterion]]
+id = "1.20"
+name = "bulk_disconnect_selected_agents"
+description = "Each agent row has a selection checkbox; confirming Disconnect selected with two checked agents removes exactly those two rows, updates the active agents KPI for any that were running, and appends one disconnected event per removed agent"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "command_palette_runs_named_commands"
+description = "Opening the command palette (modifier+K or header control) lists at least Connect agent, Simulate activity, Export session, Clear filters, and each KPI detail destination; activating Export session opens the export drawer and activating Clear filters restores the full feed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "undo_redo_agent_mutations"
+description = "Header Undo reverses the most recent connect, rename, disconnect, bulk disconnect, retry, night-schedule save, or successful import and restores prior agents, feed, active-agents KPI, schedule, and theme; Redo reapplies it; a new mutation after Undo disables Redo"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "session_export_json_and_agents_csv"
+description = "Export session opens a drawer with Session JSON and Agents CSV tabs compiled live from the store: Session JSON includes agents (name, model, description, state, last-active), feed events, KPI values and series, night schedule, theme, active view, and feed filters; Agents CSV has a header naming name, model, description, state, last-active and one line per agent"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "export_reflects_session_mutations"
+description = "After connecting or renaming an agent, both export previews contain the mutated agent name/model before Copy or Download; after disconnecting that agent, both previews no longer list it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "export_copy_download_and_import_roundtrip"
+description = "Copy writes the visible export preview to the clipboard with a brief copied confirmation and Download starts a file download of that same text; importing a previously exported Session JSON restores agents, feed, KPIs, night badge/theme, and both export previews to the pre-export mutated state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n3"
+name = "export_omits_session_work"
+description = "Export Session JSON or Agents CSV omits a connect, rename, disconnect, bulk disconnect, retry, or night-schedule change that is already visible in the UI, or Import of valid Session JSON fails to restore the exported session"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n4"
+name = "field_contract_not_enforced"
+description = "Connect agent accepts an empty name, a name longer than 80 characters, a missing model, or a description longer than 280 characters and still adds a row, or night schedule saves with enable on and invalid HH:MM times"
 type = "binary"
 weight = 1.0
 negate = true

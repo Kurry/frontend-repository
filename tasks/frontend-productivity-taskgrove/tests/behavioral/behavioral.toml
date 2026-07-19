@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,88 +62,110 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "14.1"
-name = "multi_facet_round_trip"
-description = "Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline — never a mix."
+name = "multi_facet_persistence_round_trip"
+description = "Multi-facet round-trip: create a root with a child, attach a tag, collapse a node, archive a fully-complete sibling branch, switch theme to Forest, then reload; the tree structure, tag chips, collapsed state, Archive panel entry, and Forest theme all survive together — never a mix of preserved and lost facets."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.2"
-name = "sort_reversal_proves_live_data"
-description = "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders."
+name = "sibling_reorder_proves_live_tree"
+description = "Sibling-order proof: with three siblings, Move Down on the first then Move Up on the new second; the order changes relative to the starting order and stays stable across re-renders, proving reorder is derived from live tree data."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.3"
-name = "derived_view_responds_to_input"
-description = "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input."
+name = "progress_ring_tracks_leaf_toggles"
+description = "Derived-view sensitivity: with a parent of four leaves, toggle leaves complete one by one and confirm the progress ring fill changes at each step rather than staying identical regardless of completion count."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.4"
-name = "cross_view_echo_without_reload"
-description = "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list ↔ detail, board ↔ stats) without reload."
+name = "tag_echo_across_manager_row_and_export"
+description = "Cross-view echo: create a tag and attach it to a node; confirm the same name and color appear on the node row, in the Tag manager list, on the toolbar filter chip, and in the Export grove JSON tags array without reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.5"
-name = "count_delta_is_exact"
-description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+name = "root_create_count_delta_is_exact"
+description = "Count-delta integrity: measure visible root-task count immediately before and after submitting a valid New root task; the count increases by exactly one."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.6"
-name = "different_inputs_change_outcomes"
-description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+name = "different_titles_change_export_json"
+description = "Input-dependent output: create two roots with different titles and confirm the Export grove JSON preview contains both distinct titles rather than identical payloads."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.7"
-name = "interleaved_flows_preserve_state"
-description = "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state."
+name = "interleaved_zoom_and_tag_flows"
+description = "Interleaved-flow integrity: start Add Child on a zoomed node, open Tag manager and create a tag, return and finish the child create; confirm the new child remains under the zoomed node and the new tag exists without corrupting either flow."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.8"
-name = "empty_to_repopulated_round_trip"
-description = "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions."
+name = "empty_to_repopulated_export_tracks"
+description = "Edge-state round-trip: from a populated tree, archive or remove until the main tree is empty and the empty-state message returns, then create a new root; the empty-state disappears and the Export grove JSON tasks array tracks through both transitions."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "grove_export_import_preserves_session"
+description = "Mutate → export → import: create a root with one child, create and attach one tag, switch theme away from Light; confirm Export grove JSON shows schemaVersion 1, the theme, tag name/color, and both titles; Download or Copy; mutate away; Import that JSON; confirm tree, tags, theme, and Export grove preview match the pre-export session."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "schema_invalid_import_leaves_state"
+description = "Starting from a known tree and theme, attempt Import of parseable JSON with theme outside light|dark|forest or a tag color outside the closed hex enum; confirm tree titles, tag chips, archive, and theme stay unchanged and validation names the offending field."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.n1"
 name = "partial_persistence_is_incoherent"
-description = "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence."
+description = "After reload, the tree structure survives but tags, collapsed state, archive, or theme silently reverts, producing incoherent partial persistence."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n2"
-name = "derived_surface_ignores_inputs"
-description = "A derived surface renders identically regardless of its inputs."
+name = "progress_ring_ignores_leaf_toggles"
+description = "A parent's progress ring renders identically regardless of how many descendant leaves are complete."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n3"
-name = "different_inputs_produce_identical_output"
-description = "Repeating an action with different inputs yields byte-identical output."
+name = "different_titles_produce_identical_export"
+description = "Creating roots with different titles yields Export grove JSON that is identical aside from incidental whitespace."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "State changes appear in one view but not another until reload."
+name = "tag_or_export_state_is_stale"
+description = "A newly created tag or task title appears on the node row but not in the Tag manager, toolbar filter row, or Export grove JSON until reload."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "schema_invalid_import_mutates_session"
+description = "Importing Grove package JSON that fails the field contract still mutates the tree, tags, archive, or theme."
 type = "binary"
 negate = true
 weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,8 +62,8 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "material_mobile_workspace_layout"
-description = "The layout reads as a Material mobile-app workspace: a solid-color top bar, a scrollable content area, and a fixed bottom navigation, all using real Angular Material components (cards, table, progress bar, dialog, tabs) rather than plain unstyled HTML"
+name = "mobile_workspace_layout"
+description = "The layout reads as a mobile-app workspace: a filled single-color top bar, a scrollable content area, and a fixed bottom navigation, with elevated cards, a dense data table, progress bars, a modal dialog, and tabbed Settings rather than a plain unstyled HTML dump"
 type = "binary"
 weight = 1.0
 
@@ -84,8 +84,8 @@ optional = true
 
 [[criterion]]
 id = "3.4"
-name = "material_form_fields_and_expansion_panels"
-description = "The add/edit expense dialog and the Settings category rows use Material form fields, selects, and expansion panels with legible labels and inline error text for invalid fields"
+name = "form_fields_and_expansion_panels"
+description = "The add/edit expense dialog and the Settings category rows use labeled form fields, selects, and expandable rows with legible labels and inline error text for invalid fields"
 type = "binary"
 weight = 0.5
 optional = true
@@ -146,7 +146,7 @@ weight = 0.5
 [[criterion]]
 id = "3.12"
 name = "validation_copy_names_field_and_fix"
-description = "Inline validation messages in the add/edit expense dialog name the offending field and the problem (e.g. that the amount must be a positive number) rather than a bare 'Invalid' or generic rejection"
+description = "Inline validation messages in the add/edit expense dialog name the offending field and the field-contract problem (e.g. that the amount must be a positive number, or the date must be YYYY-MM-DD) rather than a bare 'Invalid' or generic rejection"
 type = "binary"
 weight = 0.5
 

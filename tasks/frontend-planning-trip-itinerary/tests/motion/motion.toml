@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -118,6 +118,28 @@ name = "reduced_motion_instant_and_usable"
 description = "With prefers-reduced-motion set on a fresh load, toast, list, and control transitions are removed and state changes apply instantly while every feature stays usable"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "tray_drawer_report_enter_transitions"
+description = "Using the real UI controls: selecting 2 or more rows slides the bulk mutation tray in and clearing the selection slides it out, and the gallery drawer and settlement report surface open with a short enter transition rather than snapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "charts_and_checklists_animate_updates"
+description = "Driven through real UI edits (never a state shortcut): pie slices and the burn-rate line transition to their new values when an expense changes, marking a settlement settled animates the checklist row into its settled state, and checking a packing item animates its progress bar"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.n11"
+name = "grid_interactions_cause_jank"
+description = "Spreadsheet cell navigation, inline editing, bulk tray actions, or chart updates cause visible layout jank, flicker, or elements jumping out of place"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.catchall"

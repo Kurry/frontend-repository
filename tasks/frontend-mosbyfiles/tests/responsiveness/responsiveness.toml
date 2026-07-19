@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,164 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "7.1"
-name = "layout_adapts_desktop_to_mobile"
-description = "Evaluate only the breakpoints the reference actually supports. Layout adapts gracefully from 1440px desktop to 375px mobile."
+name = "root_font_scales_across_breakpoints"
+description = "Root font size scales by viewport as specified: 12px at or below 320, 13px through 768 (measured 13px at 390 with ~18px container offset), 14px through 1024, 15px above 1024, 16px at or above 1440 (measured 16px with ~34px container offset), and 18px at or above 1920."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
-name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+name = "narrow_tap_targets_operable"
+description = "At 390px width, architect tags, sibling tags, close buttons, and the About/home controls remain operable tap targets rather than unusable micro-hits."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
-name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+name = "fluid_type_between_breakpoints"
+description = "Between the mandated breakpoints (320, 480, 768, 900, 1024/1025, 1440, 1920), display and body type continue to scale through fluid clamp values rather than locking to a single fixed pixel size until the next breakpoint."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
-name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+name = "no_clip_or_overflow_at_key_widths"
+description = "On any of the ten routes, content never clips or overflows the viewport at 320, 390, 768, 1024, 1440, or 1920 pixel widths."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
-name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+name = "about_collapses_to_single_column"
+description = "On narrow viewports the about route collapses from its desktop two-column layout to a single column with the essay above the gallery, both fully readable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.6"
-name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+name = "case_broken_grid_recomposes_narrow"
+description = "At narrow widths the case broken-grid recomposes: the oversized architect name scales down but keeps its layered relationship with the folder sheet, sibling tags remain operable, and scrapbook items stay inside the viewport rather than collapsing into a plain static stack that loses the filing-cabinet metaphor."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.7"
-name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+name = "native_touch_scroll_on_narrow"
+description = "On narrow viewports, native touch scrolling physics stay intact (smooth-scroll hijack does not fight touch scroll)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.8"
-name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+name = "no_horizontal_scroll_key_widths"
+description = "No horizontal scroll bar appears at 320, 390, 768, 1024, 1440, or 1920 pixel widths on any of the ten routes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.9"
-name = "media_and_canvases_resize"
-description = "Images, grids, and canvases size responsively to fit the layout."
+name = "stack_heights_and_tag_sizes_adapt"
+description = "On tablet/mobile widths home stack category group heights reduce to ~20vh and ~15vh respectively; architect tags render at 1.625rem on desktop, 1.25rem at or below 1024, and 15px at or below 480; at 390 the hero paragraph drops to a 16px override."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.10"
-name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
+name = "fixed_header_accessible_across_widths"
+description = "The fixed home header (wordmark + About) and case sub-header remain reachable and usable across the specified widths without obscuring primary content permanently."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.n1"
-name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+name = "layout_breaks_at_specified_breakpoints"
+description = "Layout breaks or overflows at one of the specified widths (320, 390, 768, 1024, 1440, or 1920) on home, about, or a case route."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n2"
-name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+name = "narrow_controls_too_small"
+description = "At 390px, architect tags, close buttons, or About/home controls are too small or misaligned to operate reliably."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n3"
-name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+name = "type_jumps_only_at_breakpoints"
+description = "Display or body type locks to a single fixed pixel size between breakpoints with abrupt jumps only when a breakpoint fires, ignoring fluid clamp scaling."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n4"
-name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+name = "horizontal_scroll_or_cropping"
+description = "A horizontal scrollbar appears or content is cropped at 320, 390, 768, 1024, 1440, or 1920 on any route."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n5"
-name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
+name = "about_two_column_stuck_on_narrow"
+description = "On a narrow viewport the about route stays stuck in an unreadable two-column layout with essay and gallery colliding or clipped."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n6"
-name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
+name = "fixed_header_obscures_content"
+description = "The fixed header or case sub-header permanently obscures primary case or home content with no way to reach it."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n7"
-name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n8"
-name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
+name = "case_grid_collapses_to_static_stack"
+description = "At narrow widths the case layout collapses into a plain static stack that loses the layered filing-cabinet relationship between architect name, folder sheet, sibling tags, and scrapbook."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n9"
-name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
+name = "scrapbook_or_media_overflows_viewport"
+description = "Scrapbook items, portraits, or about-gallery images use static sizes that overflow the viewport at a specified width."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n10"
-name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
+name = "tags_or_close_disappear_at_width"
+description = "Architect tags, sibling tags, or red circular close buttons disappear at a specific viewport width."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.40"
+name = "narrow_panels_operable_at_390"
+description = "At a 390 pixel width the reading-list drawer, command palette, and dossier export panel remain fully operable inside the viewport without horizontal page scroll."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.41"
+name = "filter_search_wrap_at_390"
+description = "At a 390 pixel width the home category filter and search field wrap or stack rather than overflowing the viewport."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.n40"
+name = "panels_force_horizontal_scroll_390"
+description = "At 390 pixel width, opening the reading list, command palette, or dossier export introduces a page-level horizontal scrollbar or clips primary controls off-screen."
 type = "binary"
 negate = true
 weight = 1.0

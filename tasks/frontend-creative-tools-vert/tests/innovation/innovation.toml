@@ -63,150 +63,97 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+name = "dropzone_delight_beyond_minimum"
+description = "Beyond the required dragover highlight, the drop zone includes an extra delightful microinteraction on add or drop (for example a richer press pop or success flash) that remains browser-observable (bonus)."
 type = "binary"
-weight = 1.0
+optional = true
+weight = 0.5
 
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "status_transition_polish_beyond_swap"
+description = "Status pills offer an advanced transition beat beyond a hard label swap — for example a brief glyph morph or count-line choreography — verified through a real Convert run (bonus)."
 type = "binary"
-weight = 1.0
+optional = true
+weight = 0.5
 
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+name = "guided_first_run_for_converter"
+description = "A brief guided first-run or coachmark introduces the drop zone, sample affordances, and Convert without blocking the tool (bonus beyond required empty-state copy)."
 type = "binary"
-weight = 1.0
+optional = true
+weight = 0.5
 
 [[criterion]]
 id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+name = "format_catalog_extra_usability"
+description = "An interactive catalog aid beyond the required four category cards — for example a searchable format list or hover format tip — adds usability while staying local (bonus)."
 type = "binary"
-weight = 1.0
+optional = true
+weight = 0.5
 
 [[criterion]]
 id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+name = "power_user_queue_shortcuts_beyond_batch"
+description = "Beyond the required batch tray and Undo/Redo, the queue offers an extra power-user path such as select-all, keyboard multi-retarget of focused rows, or sticky last-used batch format (bonus)."
 type = "binary"
-weight = 1.0
+optional = true
+weight = 0.5
 
 [[criterion]]
 id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+name = "session_personalization_beyond_required"
+description = "Within allowed client storage, the app offers a small personalization beyond the required theme/category/quality/default-target/presets persistence (for example remembering last Session export format tab) (bonus)."
 type = "binary"
-weight = 1.0
+optional = true
+weight = 0.5
 
 [[criterion]]
 id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+name = "branded_vert_narrative_polish"
+description = "The VERT pill brand, hero line, and magenta-to-blush converter surface read as a cohesive branded tool narrative rather than generic unstyled controls (bonus execution quality)."
 type = "binary"
-weight = 1.0
+optional = true
+weight = 0.5
 
 [[criterion]]
 id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+name = "theme_craft_beyond_bare_toggle"
+description = "Light/dark theming craft goes beyond a bare toggle — cohesive tokenized accents across navbar, drop zone, queue pills, batch tray, and catalog without inventing a conflicting second product (bonus)."
 type = "binary"
-weight = 1.0
+optional = true
+weight = 0.5
 
 [[criterion]]
 id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+name = "local_offline_enhancement"
+description = "A genre-appropriate local enhancement (for example high-quality bundled type or a clearly offline-capable shell with no CDN) is visible without network dependence (bonus)."
 type = "binary"
-weight = 1.0
+optional = true
+weight = 0.5
 
 [[criterion]]
 id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+name = "competition_level_converter_feel"
+description = "The overall tool feels competition-grade: sample-to-download speed, real codec conversion feedback, live session export, and queue density read as a professional local converter rather than a wired demo (bonus)."
 type = "binary"
-weight = 1.0
+optional = true
+weight = 0.5
+
 
 [[criterion]]
 id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+name = "barebones_unstyled_form_only"
+description = "The shipped UI is a bare unstyled form or plain file input with no pill navbar, hero, drop-zone card, queue worklist, batch tray, or format catalog immersion."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
+name = "generic_dashboard_template_look"
+description = "The experience is a generic dashboard/card-grid template that ignores the specified single-product converter composition (gradient page, pill navbar, hero + dominant drop zone)."
 type = "binary"
 negate = true
 weight = 1.0

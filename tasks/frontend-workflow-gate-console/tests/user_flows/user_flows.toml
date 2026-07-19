@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,94 +62,94 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "rejection_investigation_whatif_flow"
+description = "Investigating a rejection end to end: select a run with a rejected stage, open it, read the banner naming the failing hard gate, expand that gate's evidence, enter what-if and flip that gate to pass so the suite outcome and stage status flip to passed, then revert and confirm the recorded rejection returns exactly, all without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "invalid_note_shows_inline_validation"
+description = "Annotate flow: submitting Add note with empty text, text longer than 200 characters, or no category shows immediate inline validation naming the invalid fields and attaches nothing."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "annotate_then_export_flow"
+description = "Annotate then export: submit a valid note whose text includes note-alpha-17 and category observation, open Export acceptance package, and confirm Acceptance Package JSON shows schemaVersion gate-console.acceptance-package.v1 and that note under the gate's notes array with matching category."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "rerun_updates_strip_chain_timeline"
+description = "Re-running a stage: start a re-run on a rejected stage, watch gates tick through running to results with the progress indicator advancing, and when it completes see the stage strip color, chain visualization, and event timeline reflect the new outcome in the same session."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "registry_filter_and_selection_flow"
+description = "Browsing the registry: filter to S1 gates, select one so its description appears and only containing stages highlight, then clear the filter and confirm the full gate list returns exactly."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "timeline_empty_state_for_filtered_type"
+description = "Filtering the event timeline to a type with no entries shows a clear empty state message rather than a blank region."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "severity_and_timeline_filters_agree"
+description = "Severity filter on the registry and timeline-entry-type filter each narrow only their own lists; clearing either restores that list fully without desyncing the other surface."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "export_drawer_preserves_run_selection"
+description = "Opening and closing the Export acceptance package drawer keeps the selected run highlighted and the detail canvas on that run without losing workflow continuity."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "certificate_copy_and_export_overlays"
+description = "Certificate fingerprint copy confirmation and the export drawer Copy confirmation both appear and dismiss as expected; Escape closes the note form and export/import drawers and returns focus."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "export_import_round_trip_flow"
+description = "Export then import round-trip: after attaching at least one note, Copy or Download Acceptance Package JSON, clear those notes, Import the same JSON, and confirm evidence notes, timeline entries, and the next Export preview match the pre-export package without requiring a full page reload to recover."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
 name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+description = "Add note, Export acceptance package, Import acceptance package, what-if, or stage re-run controls are missing or non-operable from the UI."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "new_notes_missing_or_duplicated"
+description = "A valid GateNote submit fails to appear in evidence or timeline, or creates duplicate note entries for one submit."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "rerun_or_note_desyncs_surfaces"
+description = "After a re-run or note attach, the stage strip, chain, suite outcome, timeline, or export preview disagree about the same run until reload."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,15 +157,15 @@ weight = 1.0
 [[criterion]]
 id = "6.n4"
 name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+description = "Switching between run-list, registry, certificate, export, or timeline views breaks layout or loses the selected run."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_timeline_or_registry_breaks_ui"
+description = "A filtered-empty timeline or registry produces broken or missing UI rather than the designed empty state."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,15 +173,15 @@ weight = 1.0
 [[criterion]]
 id = "6.n6"
 name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+description = "Registry severity filter and the unfiltered gate suite disagree about whether a gate exists after clearing filters."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "export_drawer_cannot_reopen"
+description = "After closing Export acceptance package, the Export control cannot reopen the drawer with a live preview."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,15 +189,15 @@ weight = 1.0
 [[criterion]]
 id = "6.n8"
 name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+description = "The note form, export drawer, or import drawer blocks navigation with no Escape or close exit."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "failed_note_or_import_lacks_feedback"
+description = "An invalid note submit or invalid Acceptance Package import provides no visible field-named feedback."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n10"
 name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+description = "After what-if, re-run, export, or import, recovering to another run or the registry requires a full page reload."
 type = "binary"
 negate = true
 weight = 1.0

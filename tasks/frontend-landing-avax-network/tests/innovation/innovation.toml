@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -63,157 +63,73 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "11.1"
-name = "delightful_microinteractions"
-description = "For fidelity tasks, score execution quality rather than invention beyond the reference. The app has unique, delightful microinteractions."
+name = "execution_quality_of_signature_interactions"
+description = "Score execution quality of the reference experience (not invention beyond it): theme cross-fade, mega-menu hover panels, and marquee pause-on-hover feel polished and coherent rather than unfinished stubs."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.2"
-name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+name = "scroll_storytelling_execution"
+description = "On a fresh load, scroll-triggered section storytelling (split-line rises and heading glyph flashes) executes smoothly as a choreographed sequence rather than a janky or missing recreation of the reference motion."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.3"
-name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+name = "hero_layered_intro_execution"
+description = "The hero clipped-panel entrance and layered placeholder video cycle (nine desktop / five below 1025px) plus HUD fade-ins execute as a finished sequence matching the reference ambition."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "11.4"
-name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "11.5"
-name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "11.6"
-name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
-type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.7"
-name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+name = "astra_brand_narrative_arc"
+description = "The long-form page reads as one Astra Network narrative arc from hero through Why Astra, Network In Action, News, Solutions, Community, and builder CTAs rather than disconnected template blocks."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
-id = "11.8"
-name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+id = "11.a1"
+name = "designed_experience_narrative_arc"
+description = "The page reads as a designed experience with a narrative arc — sections build on each other visually and the signature scroll interaction is memorable as faithful reference execution, not a template with effects sprinkled on."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
-id = "11.9"
-name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+id = "11.a2"
+name = "showcase_rechoreographed_at_narrow_widths"
+description = "Impeccable execution across breakpoints: at 390 the showcase composition is re-choreographed (stacked hero, drawer nav, mobile spacing) rather than a broken shrink of the desktop layout."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "11.10"
-name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
-type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+name = "signature_motion_absent_or_stubbed"
+description = "Signature reference motions are absent or stubbed: no scroll reveals, no theme cross-fade, and no hero intro sequence on a fresh load via the real UI path."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
+name = "recreation_feels_generic_template"
+description = "The recreation reads as a generic marketing template with default type/spacing and none of the reference's cut-corner, sticky-chapter, or kinetic-type execution quality."
 type = "binary"
 negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
-type = "binary"
-negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
+name = "page_flat_static_no_immersion"
+description = "The page is flat and static with no scroll storytelling, no theme transition, and no marquee/hover language despite the reference requiring them."
 type = "binary"
 negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
-type = "binary"
-negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
-description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app demonstrates a noteworthy, browser-observable execution-quality enhancement of the reference experience that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick, and must not invent design beyond the reference. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,157 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "For games, evaluate onboarding and controls guidance plus pause and restart affordances. Empty state UI is present and renders when a collection is empty."
+name = "deal_prompt_and_empty_history"
+description = "Before the first hand the table shows the \"Deal first hand\" prompt rather than an empty board, and Hand history shows \"No hands played yet\""
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "raise_bounds_inline_before_confirm"
+description = "Out-of-range raise amounts show inline validation naming the violated limit before confirm, and confirm stays disabled until legal"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "illegal_action_feedback_specific"
+description = "Acting when it is not the human's turn or reusing stale raise input from a resolved hand is rejected with specific visible feedback rather than only a generic Invalid message"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "hand_end_announces_result"
+description = "When a hand resolves by fold or showdown, the table shows a visible winner announcement rather than leaving the pot contested with no result"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "double_deal_starts_one_hand"
+description = "Rapidly double-activating \"Deal next hand\" starts exactly one new hand, and hands-played increases by exactly one when it completes"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "new_session_cancel_preserves"
+description = "Cancelling the Start new session confirmation leaves table, stacks, stats, history, and badges unchanged"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "undo_disabled_states"
+description = "Undo last action is unavailable before the human has acted on the current street and after the street advances; activating it when disabled does not change the pot or stacks"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "semantic_betting_controls"
+description = "Betting controls, Save table, Undo last action, and Export actions use button or other semantic interactive elements rather than click-only plain text"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "session_modal_dismiss_paths"
+description = "The Start new session confirmation can be dismissed via an explicit cancel control as well as completing confirm"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "malformed_import_rejected"
+description = "Importing malformed session JSON or a non-feltrun-session-v1 schemaVersion shows an inline error naming the import field and leaves stacks, stats, and hand history unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "save_before_deal_restores_prompt"
+description = "Save table with no prior deal still produces a restorable checkpoint that reloads to the pre-deal \"Deal first hand\" prompt rather than inventing a mid-hand board"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_history_no_feedback"
+description = "An empty Hand history shows nothing and provides no \"No hands played yet\" empty-state copy"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "errors_only_in_console"
+description = "Illegal raise or import failures surface only in the browser console with no on-page feedback"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "actions_silent_no_feedback"
+description = "Deal, raise, rebuy, export copy, or save actions lack visible feedback and silently succeed or fail"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "new_session_no_warning"
+description = "Start new session resets the table with no confirmation warning"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "controls_nonsemantic_only"
+description = "Primary betting or export controls are only non-semantic div or span click targets with no button or input semantics"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "session_modal_not_dismissible"
+description = "The Start new session confirmation cannot be dismissed without confirming the reset"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "validation_missing_or_delayed"
+description = "Raise-amount or import validation feedback is missing or delayed with no UI indication while confirm stays enabled"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "ambiguous_control_labels"
+description = "Betting, export, or session controls use ambiguous or missing labels such as unlabeled icons only for Deal, Raise, Export, or Save"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "no_guidance_before_first_hand"
+description = "Before the first hand there is no Deal first hand prompt or other in-app guidance on how to start"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "undo_or_save_inaccessible"
+description = "Undo last action or Save table controls are visually hidden or inaccessible when the instruction requires them"
 type = "binary"
 negate = true
 weight = 1.0

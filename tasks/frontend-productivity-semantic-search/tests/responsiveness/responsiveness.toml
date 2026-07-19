@@ -1,0 +1,219 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "7.1"
+name = "layout_adapts_desktop_to_mobile"
+description = "The three-region layout adapts gracefully from 1440px desktop (rail, results, panel) to 375px mobile without breaking any of the search, index, or compare surfaces"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.2"
+name = "mobile_tap_targets_are_large_enough"
+description = "At mobile width, chips, feedback controls, checkboxes, and card actions are tap targets of at least 44px"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.3"
+name = "typography_resizes_across_breakpoints"
+description = "Card titles, badges, and body text resize appropriately between desktop and mobile and remain readable at both"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.4"
+name = "content_avoids_clipping_and_overflow"
+description = "No result card, chip row, status bar, or panel content clips or overflows the viewport at any width between 1440px and 375px"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.5"
+name = "rail_and_panel_adapt_below_768"
+description = "At widths of 768 pixels and below the left rail collapses behind a toggle that opens it as an overlay and the detail panel becomes a full-width overlay; at desktop widths both are docked and the rail is open by default"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.6"
+name = "stacking_reflows_logically"
+description = "At narrow widths the regions stack in a logical order — query controls first, then results, with secondary sections reachable — rather than interleaving arbitrarily"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.7"
+name = "chips_wrap_or_scroll_contained"
+description = "Overflowing chip rows and the history list wrap or scroll within their own containers at narrow widths instead of stretching the page"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.8"
+name = "small_screens_avoid_horizontal_scroll"
+description = "At 375px width there is no page-level horizontal scrolling anywhere in the app"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.9"
+name = "long_lists_scroll_contained"
+description = "The result list, index document list, and event timeline scroll within the layout at every width without pushing fixed chrome off screen"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.10"
+name = "fixed_controls_remain_accessible"
+description = "The search input, status bar, and undo/redo controls remain reachable at every viewport size"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.n1"
+name = "layout_breaks_at_breakpoints"
+description = "The layout breaks or overflows at a common breakpoint (1440, 1024, 768, or 375 pixels)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "7.n2"
+name = "mobile_controls_too_small_or_misaligned"
+description = "Controls are too small to tap or visibly misaligned at mobile width"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "7.n3"
+name = "text_too_small_on_devices"
+description = "Body, badge, or metadata text becomes too small to read at some viewport size"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "7.n4"
+name = "content_cropped_or_unnecessary_scrollbars"
+description = "Content is cropped or unnecessary scrollbars appear at some width"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "7.n5"
+name = "rail_or_panel_breaks_by_width"
+description = "The collapsed rail toggle or the overlay detail panel is missing or nonfunctional at some width"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "7.n6"
+name = "fixed_positions_obscure_content"
+description = "A fixed element (status bar, action bar, toasts) obscures results or controls at some viewport size"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "7.n7"
+name = "elements_overlap_at_some_size"
+description = "Cards, chips, badges, or panels overlap each other at some viewport size"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "7.n8"
+name = "overlay_unusable_on_mobile"
+description = "The palette, modal, or overlay panel cannot be operated or dismissed at mobile width"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "7.n9"
+name = "fixed_size_media_overflows"
+description = "A fixed-size list, chart-like bar, or panel overflows the viewport instead of sizing responsively"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "7.n10"
+name = "controls_disappear_at_sizes"
+description = "A specified control (threshold slider, feedback controls, bulk action bar, Index Now) disappears entirely at some viewport size with no alternative access"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "responsiveness.catchall"
+name = "responsiveness_catchall"
+description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

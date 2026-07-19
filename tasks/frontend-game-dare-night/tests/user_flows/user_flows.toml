@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,158 +62,138 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "For games, evaluate the start → play → pause → end → restart flow. Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "setup_play_done_updates_surfaces"
+description = "Completing setup with 3 players, Start game, Draw card, and Done updates scoreboard points (+1), turn indicator, and standings order without a page reload."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "invalid_setup_shows_inline_errors"
+description = "Attempting Start game with fewer than 2 valid names or zero categories shows inline errors naming what to fix; Start game stays disabled until valid."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "category_filter_flow_round_trip"
+description = "Playing with a single selected category then returning to setup and selecting a different single category yields only that new category's cards on the next game."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "custom_card_delete_updates_list"
+description = "Adding a custom card then confirming Delete removes it from the list and from the drawable deck after refresh."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "view_scores_retains_live_totals"
+description = "Opening View scores during play shows current points/forfeits; resolving another turn updates the same scoreboard without reload."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "empty_custom_list_after_last_delete"
+description = "After deleting the last custom card, the friendly empty-state message is visible again."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "intensity_and_category_affect_deck"
+description = "Changing intensity and category selection before Start game changes which cards appear during play rather than leaving draws cosmetic."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "live_feed_controls_preserve_play"
+description = "Starting, pausing, and reconnecting the live event feed during play leaves the current turn and scores intact while bonus totals update per the feed rules."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "new_game_dialog_and_winner_flow"
+description = "Driving a player to 10 points shows Winner; confirming Start new game returns to clean setup with Export/Import still available and no Winner banner."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "export_import_flow_without_reload_corruption"
+description = "Export Session after play, Import Session that JSON, and continue or inspect scores without needing a full page reload to see restored state."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "primary_play_controls_missing"
+description = "Draw card, Done, Skip, Start game, Export Session, or Save Progress are unavailable from the UI when the instruction requires them."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "done_duplicates_or_drops_points"
+description = "A single Done press duplicates a point award or fails to advance the turn when it should."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "scoreboard_desyncs_from_turn"
+description = "Scoreboard points disagree with the sequence of Done/Skip outcomes shown in the turn indicator flow."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "start_new_game_loses_record"
+description = "A confirmed Start new game clears the Dare Night record along with players/scores."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_custom_list_breaks_setup"
+description = "The empty custom-card state blanks the setup screen or blocks Start game incorrectly."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "category_filter_disagrees_across_draws"
+description = "During a single-category game, some drawn cards show a different category label than the selected filter."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "winner_flow_dead_ends"
+description = "After Winner is shown there is no way to confirm Start new game and return to setup."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "export_dialog_blocks_navigation"
+description = "Export or Import UI traps the user with no way to dismiss and continue playing or returning to setup."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "failed_import_lacks_feedback"
+description = "Importing invalid JSON changes nothing and shows no visible rejection naming that the file is invalid."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "resume_requires_manual_rebuild"
+description = "After Save Progress and reload, the only recovery path is manually re-entering players rather than Resume Saved Session."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "user_flows.catchall"
 name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

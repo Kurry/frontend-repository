@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -178,6 +178,30 @@ name = "placeholder_text_in_shipped_ui"
 description = "Placeholder or scaffold text (Lorem ipsum, TODO, asdf, template variable names like {{title}}) is visible anywhere in the shipped UI"
 type = "binary"
 weight = 1.0
+negate = true
+
+# HARDEN_MARKUPFLOW_V1
+
+[[criterion]]
+id = "VD-14"
+name = "presets_and_history_panel_chrome"
+description = "The left tool rail includes a Presets group with the four named recipes, and the right column shows History and Versions panels with headings larger/bolder than muted uppercase tool-rail section labels"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "VD-15"
+name = "project_json_preview_monospace_surface"
+description = "The project JSON preview renders as monospace text on a recessed surface visually distinct from the Layers list rows"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "VD-N4"
+name = "compare_active_without_visual_treatment"
+description = "Compare is active (annotations hidden) but the Compare control shows no visible active/pressed treatment distinguishing it from rest"
+type = "binary"
+weight = 0.5
 negate = true
 
 [[criterion]]

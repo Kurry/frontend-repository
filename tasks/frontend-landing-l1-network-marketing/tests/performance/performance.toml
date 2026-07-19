@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,110 +62,123 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "9.1"
-name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+name = "cold_start_interactive_under_2s"
+description = "The page is interactive within 2 seconds of a local cold load."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
-name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+name = "console_and_hydration_clean"
+description = "Loading and exercising the page (scroll-through, theme toggle, mega-menu, Events Manager create/filter, contact submit, session-lead export/copy, Export catalog) produces no console errors, no hydration mismatch errors or warnings, and no unhandled rejections; interactive regions become usable without a visible content flash or layout swap."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
-name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+name = "chrome_interactions_stay_responsive"
+description = "Theme toggle, hamburger, and Events Manager mode switch respond without multi-second lag after first paint."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.4"
-name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+name = "contact_success_does_not_hang_ui"
+description = "A valid contact submit shows its success state with an animated transition rather than hanging the UI with no feedback."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.5"
-name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+name = "long_page_scroll_without_lag"
+description = "Scrolling the full long-form Ridge homepage through every chapter remains usable without perceived multi-second freezes between sections."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.6"
-name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+name = "interactive_during_manager_and_theme"
+description = "The UI remains interactive during theme toggles and Events Manager create/delete row updates (controls stay clickable)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
-name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+name = "animated_chapters_hold_frame_rate"
+description = "Continuous scrolling from top to bottom holds a smooth frame rate through every animated chapter (Why Ridge pile, Get started rise, Global Events decode)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.8"
-name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+name = "rapid_theme_toggle_never_freezes"
+description = "Rapidly toggling the theme several times never freezes the page."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+name = "extended_scroll_session_stable"
+description = "After an extended scroll-through with theme toggles, mega-menu open/close, and Events Manager filtering, the page remains responsive without runaway resource use that freezes interaction."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "9.10"
+name = "hero_space_reserved_from_first_paint"
+description = "After first paint, no visible layout jumps occur as fonts or media finish loading; the hero visual plane holds its reserved space from the start."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+id = "9.a1"
+name = "scroll_linked_animation_frame_rate"
+description = "Scroll-linked chapter motion (Why Ridge sticky pile at ≥768px, Global Events enter-view decode, Get started rise below 1024px) holds a smooth frame rate through the full page length on a 1440-wide viewport with no visible hitching during continuous scroll."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.a2"
+name = "desktop_smooth_scroll_feels_continuous"
+description = "At desktop widths, eased inertial smooth scrolling feels continuous and settles naturally without lag between input and motion, while position:sticky Why Ridge behavior stays intact."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.a4"
+name = "layout_stable_after_load"
+description = "Layout is stable after load: no visible reflow jumps as fonts or media finish loading — the hero plane and chapter media regions reserve their space from first paint."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.n1"
-name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+name = "cold_load_exceeds_two_seconds"
+description = "More than 2 seconds pass before the page is interactive on a local cold load."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n2"
-name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+name = "console_or_hydration_errors_during_flows"
+description = "Console errors, hydration mismatch warnings, or unhandled rejections appear during load, scroll-through, theme toggle, Events Manager exercise, or contact submit."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n3"
-name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+name = "scroll_or_theme_transitions_block"
+description = "Scroll-driven chapter motion or theme transitions block interaction for multiple seconds."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
-id = "9.n4"
-name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n5"
-name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+id = "9.a3"
+name = "heavy_assets_collapse_frame_rate"
+description = "Heavy visual assets or scroll choreography cause frame-rate collapse, delayed first render, or input latency during signature scroll/hover interactions."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +186,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n6"
 name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
+description = "During the page-load entrance or chapter reveals, primary controls (theme toggle, hamburger) become unresponsive."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,31 +194,31 @@ weight = 1.0
 [[criterion]]
 id = "9.n7"
 name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n8"
-name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n9"
-name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
+description = "The UI blocks rendering with a blank page while fonts or media load instead of showing a reserved-space layout."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n10"
-name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+name = "rapid_use_crashes_page"
+description = "Rapid theme toggling, fast continuous scrolling, or repeated Events Manager filter changes crashes the page or leaves it permanently unresponsive."
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "9.20"
+name = "rapid_undo_export_responsive"
+description = "Rapid undo/redo, bulk selection changes, filter/sort toggles, opening Export catalog, and Session leads Download/Copy keep the UI responsive with no hang or dropped interaction"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.n8"
+name = "undo_or_export_hangs_ui"
+description = "Rapid undo/redo, opening Export catalog, or Session leads Download/Copy freezes the page or drops subsequent clicks for a noticeable period"
 type = "binary"
 negate = true
 weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,94 +62,87 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "12.1"
-name = "mandated_modules_are_bound"
-description = "All contract-mandated modules are initialized and bound."
+name = "browse_query_module_bound"
+description = "Contract modules browse-query-v1, entity-collection-v1, form-workflow-v1, and artifact-transfer-v1 are initialized and bound (webmcp_list_tools shows tools with browse, entity, form, and artifact prefixes)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.2"
-name = "handlers_match_visible_ui_logic"
-description = "Exposed tool handlers match visible UI command logic."
+name = "handlers_match_visible_ui"
+description = "Exposed browse/entity/form/artifact tool handlers drive the same visible UI logic as the on-page controls (section destinations, shortlist toggles, inquiry validate/submit, and export/import/copy)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.3"
-name = "only_documented_operations_exist"
-description = "Only documented operations and routes are available."
+name = "only_documented_browse_operations"
+description = "Only documented operations for the four bound modules are available — no undeclared routes, entities, form fields, or artifact formats."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.4"
-name = "contract_is_automation_exercisable"
-description = "The contract can be fully exercised via automation."
+name = "contract_exercisable_via_automation"
+description = "The contract can be fully exercised via webmcp_invoke_tool for browse open, entity toggle/select, form validate/submit, and artifact export/import/copy against the bound values."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.5"
-name = "declared_entity_operations_work"
-description = "Entity operations declared in the contract, including create, update, delete, and reorder, all work."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "12.6"
-name = "form_flow_operations_are_bound"
-description = "Form submission validation, error, and cancel operations are clearly bound."
+name = "browse_destinations_open"
+description = "Browse open works for declared destinations: home-hero, locations, living, typical-unit, community, what-we-stand-for, insta-feed, book-cta, faq, shortlist, book-inquiry, and menu."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.7"
-name = "queries_match_allowed_spec"
-description = "Query destinations and filters match the allowed specification."
+name = "destinations_match_bindings"
+description = "Bindings match the contract: browsable entity sections; destinations including faq/shortlist/book-inquiry; entity shortlist-studio with toggle/select/delete; form fields full_name through privacy_consent; artifact export/import/copy for json and markdown."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.8"
-name = "capabilities_stay_declared"
-description = "No extra or undeclared module routes or capabilities are exposed."
+name = "no_extra_undeclared_modules"
+description = "No extra modules, destinations, or operations beyond browse-query-v1, entity-collection-v1, form-workflow-v1, artifact-transfer-v1 and the declared Bindings are exposed."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.9"
-name = "session_tool_and_invoke_apis_work"
-description = "Session info, tool list, and invocation are correctly surfaced."
+name = "session_list_invoke_apis_work"
+description = "window.webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool correctly surface session info, the tool list, and invocation results without errors."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.10"
-name = "mcp_initializes_without_harness_edits"
-description = "MCP initialization works without manual editing or test harness changes."
+name = "mcp_init_without_harness_edits"
+description = "MCP tools register from the app's own module_spec + Bindings implementation without requiring manual edits to the verifier harness."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.n1"
 name = "mcp_tools_missing_or_noop"
-description = "MCP tooling is unbound, missing, or a no-op."
+description = "Browse, entity, form, or artifact MCP tooling is unbound, missing, or a no-op when invoked."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n2"
-name = "handlers_diverge_from_ui_logic"
-description = "Handlers do not match UI logic because actions mismatch or state does not sync."
+name = "handlers_diverge_from_ui"
+description = "A browse/entity/form/artifact tool invocation updates MCP-reported state without matching the visible UI (or the reverse)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n3"
-name = "undeclared_capabilities_exposed"
-description = "Undeclared destinations or entity operations are exposed."
+name = "undeclared_destinations_or_ops_exposed"
+description = "Undeclared destinations or operations outside the Bindings/permitted_operations lists are exposed via webmcp_list_tools."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,15 +150,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n4"
 name = "automation_cannot_exercise_contract"
-description = "The contract cannot be exercised from automation."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n5"
-name = "validation_bypass_desyncs_state"
-description = "Validation bypasses lead to inconsistent MCP and UI state."
+description = "webmcp_invoke_tool cannot exercise browse open, entity toggle, form submit, or artifact export against the declared bindings."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +158,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n6"
 name = "session_or_tool_api_errors"
-description = "The session or tool API returns errors or incomplete data."
+description = "webmcp_session_info or webmcp_list_tools returns errors or incomplete module/tool data for the declared four-module contract."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,31 +166,60 @@ weight = 1.0
 [[criterion]]
 id = "12.n7"
 name = "mcp_relies_on_undocumented_hacks"
-description = "MCP relies on manual or undocumented test hacks."
+description = "MCP only works after undocumented manual harness hacks or console stubs rather than app-registered handlers."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n8"
-name = "required_contract_module_missing"
-description = "No module contract is implemented where one is declared required."
+name = "required_module_missing"
+description = "browse-query-v1, entity-collection-v1, form-workflow-v1, or artifact-transfer-v1 is not implemented despite being declared required in the contract."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n9"
-name = "mcp_is_stubbed_or_commented_out"
-description = "The MCP interface is commented out or only stubbed."
+name = "mcp_stubbed_or_commented_out"
+description = "The MCP interface is commented out or only stubbed so list/invoke cannot reach real handlers."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n10"
-name = "automated_contract_validation_fails"
-description = "The project fails automated MCP contract validation."
+name = "mechanics_exclusions_faked_via_mcp"
+description = "Custom cursor press/scale, shape-overlay path morph, home skeleton intro, marquee loop, Swiper slide transition, command-palette animation, or inquiry overlay fade are stubbed as fake MCP success paths instead of remaining Playwright-observed UI mechanics."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "12.11"
+name = "entity_shortlist_toggle_bound"
+description = "Entity-collection tools for shortlist-studio toggle/select/delete drive the same shortlist badge, drawer rows, and Monthly estimate as the visible Add/Remove toggles."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.12"
+name = "form_inquiry_validate_submit_bound"
+description = "Form-workflow validate/submit/cancel/reset for the declared inquiry fields match the visible booking inquiry overlay behavior, including create-inquiry field-contract validation (formats, enums, privacy_consent) on invalid submit."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.13"
+name = "artifact_export_import_copy_bound"
+description = "Artifact-transfer export/import/copy for json and markdown inquiry-packet formats are bound; export reflects live shortlist and inquiry store state under the create-inquiry schema keys (file/clipboard contents remain Playwright-observed)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.n11"
+name = "artifact_export_ignores_store"
+description = "An artifact export tool succeeds while the resulting packet (observed via UI download/copy surface) omits the session's current shortlist or inquiry fields or invents keys outside the create-inquiry contract."
 type = "binary"
 negate = true
 weight = 1.0

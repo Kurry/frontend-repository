@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,64 +62,64 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "14.1"
-name = "multi_facet_round_trip"
-description = "Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline — never a mix."
+name = "multi_facet_reload_resets_seeded_baseline"
+description = "Multi-facet round-trip: create a task on July 21, complete Work, set channel filter to personal, then reload — the app coherently returns to the seeded baseline (exactly four seeded tasks, July 18 total 0:20, July 20 total 1:00, filter cleared) with no mix of stale and seeded state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.2"
-name = "sort_reversal_proves_live_data"
-description = "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders."
+name = "channel_filter_reversal_proves_live_data"
+description = "Sort-reversal equivalent: set channel filter to work and note only #work tasks; switch to personal and confirm seeded #work tasks hide; clear the filter and confirm all four seeded tasks return in their original columns — proving visibility is derived from live channel data"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.3"
-name = "derived_view_responds_to_input"
-description = "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input."
+name = "footer_and_export_respond_to_planned_time"
+description = "Derived-view sensitivity: edit Work's plannedTime from 1:00 to 1:30 and confirm the July 20 footer changes and the planner JSON entry for Work shows plannedTime 1:30 rather than redrawing identically"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.4"
-name = "cross_view_echo_without_reload"
-description = "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list ↔ detail, board ↔ stats) without reload."
+name = "board_calendar_export_cross_view_echo"
+description = "Cross-view echo: rename Daily planning to Plan the week on the board and confirm the same title appears in the July 19 calendar day when scheduled or in the planner JSON and ICS SUMMARY without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.5"
-name = "count_delta_is_exact"
-description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+name = "add_task_count_and_vevent_delta"
+description = "Count-delta integrity: note the July 19 card count and the number of VEVENT blocks in the ICS preview, create one valid scheduled task on July 19, and confirm both counts increase by exactly one with no lag"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.6"
-name = "different_inputs_change_outcomes"
-description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+name = "different_titles_yield_different_exports"
+description = "Input-dependent output: create two tasks with different titles and startTimes on July 21; the column shows both titles, and the ICS payload contains two VEVENT blocks whose SUMMARY and DTSTART differ accordingly"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.7"
-name = "interleaved_flows_preserve_state"
-description = "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state."
+name = "interleaved_create_and_export_preserve_state"
+description = "Interleaved-flow integrity: start creating task A on July 21, open Export and switch to the ICS tab, finish creating task B, then return — task B is present on the board and in both export previews, and the incomplete A form was not silently submitted"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.8"
-name = "empty_to_repopulated_round_trip"
-description = "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions."
+name = "empty_board_to_repopulated_exports"
+description = "Edge-state round-trip: delete every task and confirm empty columns at 0:00, zero ICS VEVENT blocks, and an empty planner JSON tasks array; then create one valid task and confirm board, footer, ICS, and planner JSON all track back to that single task"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.n1"
 name = "partial_persistence_is_incoherent"
-description = "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence."
+description = "After reload, some facets show seeded state while others keep session mutations, producing incoherent partial persistence"
 type = "binary"
 negate = true
 weight = 1.0
@@ -127,7 +127,7 @@ weight = 1.0
 [[criterion]]
 id = "14.n2"
 name = "derived_surface_ignores_inputs"
-description = "A derived surface renders identically regardless of its inputs."
+description = "Column footers or export previews render identically after a plannedTime or title change that should alter them"
 type = "binary"
 negate = true
 weight = 1.0
@@ -135,7 +135,7 @@ weight = 1.0
 [[criterion]]
 id = "14.n3"
 name = "different_inputs_produce_identical_output"
-description = "Repeating an action with different inputs yields byte-identical output."
+description = "Creating two tasks with different titles yields identical ICS SUMMARY lines or identical planner JSON title fields for both"
 type = "binary"
 negate = true
 weight = 1.0
@@ -143,7 +143,74 @@ weight = 1.0
 [[criterion]]
 id = "14.n4"
 name = "cross_view_state_is_stale"
-description = "State changes appear in one view but not another until reload."
+description = "A rename or complete toggle appears on the board but not in the calendar panel or export previews until reload"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "undo_round_trip_multi_surface"
+description = "Chained probe: delete Work, confirm it is gone from the July 20 column, the calendar hour grid, the July 20 footer, and both export previews; press Undo and confirm it returns on all of those surfaces; press Redo and confirm it is removed again from all of them"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "exports_recompile_from_live_state"
+description = "Input-dependent export: rename a seeded task and change its startTime via the edit form, then reopen Export; the ICS VEVENT SUMMARY and DTSTART and the planner JSON title and startTime all reflect the new values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.11"
+name = "planner_json_export_import_round_trip"
+description = "Chained probe: rename Work to Deep work, set plannedTime to 1:30, create one new valid task on July 21, Copy or Download the planner JSON, reload to the seeded baseline, Import that JSON, and confirm board cards, footers, calendar blocks, ICS, and planner JSON match the pre-export mutated state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.12"
+name = "field_contract_gates_create_and_export"
+description = "Chained probe: attempt to create a task with plannedTime 13:00 and confirm no card is added and plannedTime is named in the error; then create a valid scheduled task and confirm the planner JSON entry and ICS VEVENT carry the submitted title, day, and startTime"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.13"
+name = "rollover_then_export_chain"
+description = "Chained probe: add incomplete Carry me on July 17, activate Rollover incomplete, confirm it sits on July 18, then open planner JSON and confirm that task's day is 2026-07-18"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "ics_omits_scheduled_tasks"
+description = "The ICS payload contains fewer VEVENT blocks than there are tasks on the board, or a newly created task is absent from the regenerated payload"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n6"
+name = "export_json_is_static"
+description = "The planner JSON export renders identical text before and after a mutation that should change it (a rename, a delete, or a create) — the document is a hardcoded string rather than compiled from state"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n7"
+name = "undo_desyncs_surfaces"
+description = "Undo restores a change on one surface but not another — for example the board card returns while the calendar block, footer total, or export preview keeps the undone state"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n8"
+name = "round_trip_import_drops_fields"
+description = "After exporting then re-importing planner JSON, visible task fields (title, day, plannedTime, startTime, channel, or done) differ from the pre-export state — the round-trip drops or rewrites contracted fields"
 type = "binary"
 negate = true
 weight = 1.0

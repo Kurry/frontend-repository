@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,78 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "7.1"
-name = "layout_adapts_desktop_to_mobile"
-description = "Evaluate only the breakpoints the reference actually supports. Layout adapts gracefully from 1440px desktop to 375px mobile."
+name = "desktop_nav_single_row_above_992"
+description = "At desktop widths at or above 992px the nav is a single row about 100px tall with the AVERY VALE wordmark left, the AV monogram centered, and STORE, PRESS KIT, and hamburger right."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
-name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+name = "mobile_tap_targets_adequate"
+description = "At 390px, primary interactive controls (hamburger, menu close, STORE, Subscribe) present tap targets at least about 44px in height or width."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
-name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+name = "fluid_type_across_breakpoints"
+description = "Between 1440 and 390 widths, display and body type use fluid clamp()/vw scaling so sizes change continuously rather than jumping between adjacent widths at the 992, 991, 767, and 479 breakpoints."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
-name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+name = "no_clip_or_overflow_at_key_widths"
+description = "At 1440 and 390 widths, content never clips or overflows the viewport."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
-name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+name = "mobile_nav_wraps_at_390"
+description = "At 390px the nav wraps to about 140px tall, the AV monogram and a centered AVERY VALE wordmark (about 24px) with the NOVA RACING SINCE 2019 sub-line become visible and stacked, and the menu photo grid is hidden."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.6"
-name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+name = "helmet_grid_single_column_at_390"
+description = "At 390px the helmet grid collapses to a single column (card about 326 by 435) and the impact heading drops to about 48px."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.7"
-name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+name = "mobile_hamburger_opens_menu"
+description = "At 390px, tapping the hamburger opens the full-screen menu overlay and the overlay remains operable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.8"
-name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+name = "no_horizontal_scrollbar_at_390"
+description = "At 390px width no horizontal scrollbar appears and content does not force horizontal page scroll."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.9"
-name = "media_and_canvases_resize"
-description = "Images, grids, and canvases size responsively to fit the layout."
+name = "media_and_hero_resize"
+description = "Hero artwork, horizontal media cards, helmet cards, and the social video card size responsively to fit the layout at 1440 and 390 without fixed-size overflow."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.10"
-name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
+name = "fixed_nav_accessible_all_widths"
+description = "The fixed navigation remains reachable and operable at 1440 and 390 after scrolling through sections."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.n1"
-name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+name = "layout_breaks_at_product_breakpoints"
+description = "At 1440 or 390 the layout breaks, overflows, or loses required chrome (single-row desktop nav vs wrapped mobile nav) for that width."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,71 +141,93 @@ weight = 1.0
 [[criterion]]
 id = "7.n2"
 name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+description = "At 390px primary controls are too small to tap reliably or visibly misaligned."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n3"
-name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+name = "type_unreadable_at_390"
+description = "At 390 width body or display text is too small to read or collapses illegibly."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n4"
-name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+name = "content_cropped_or_spurious_scrollbars"
+description = "At 1440 or 390 content is cropped or unnecessary scrollbars appear."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n5"
-name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
+name = "mobile_nav_missing_or_unresponsive"
+description = "At 390px the hamburger is absent from the nav chrome, or tapping it leaves the menu overlay closed."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n6"
-name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
+name = "fixed_nav_obscures_content"
+description = "The fixed navigation permanently obscures hero or section content with no recoverable scroll offset."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n7"
-name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
+name = "overlap_or_stacking_failure"
+description = "At 1440 or 390 elements overlap incorrectly or stacking order breaks the hero widget, helmet cards, or footer form."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n8"
-name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
+name = "desktop_nav_shown_wrong_at_390"
+description = "At 390px the nav remains a single ~100px desktop row with no wrapped mobile chrome, or at ≥992px the only nav is the 140px stacked mobile layout."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n9"
-name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
+name = "media_static_size_overflows"
+description = "Hero, media-strip, helmet, or video media use a static size that overflows the viewport at 390."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n10"
-name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
+name = "store_or_hamburger_disappears"
+description = "The STORE button or hamburger disappears at 390 or 1440 while remaining required chrome."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.a1"
+name = "showcase_composition_reflow_at_390"
+description = "At 390 the asymmetric hero (silhouette, NEXT RACE widget, fixed nav) and helmet grid are re-choreographed into a stacked mobile composition that preserves hierarchy rather than a flat equal-column dump of the desktop grid."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "7.11"
+name = "calendar_and_press_kit_at_390"
+description = "At 390px the race calendar rows stack date/status chips without horizontal overflow, the press-kit drawer uses the full viewport width, and the command palette search field and results stay inside the viewport."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.n11"
+name = "press_kit_or_palette_unusable_at_390"
+description = "At 390px the press-kit drawer or command palette clips off-screen or cannot be operated."
 type = "binary"
 negate = true
 weight = 1.0

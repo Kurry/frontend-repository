@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -112,7 +112,7 @@ weight = 1.0
 [[criterion]]
 id = "2.8"
 name = "copy_conventions_consistent"
-description = "Headings and action labels use one consistent capitalization convention, action labels are specific verbs (such as Start re-run, Copy fingerprint, Add note), and no placeholder or lorem-ipsum text appears anywhere in the shipped UI"
+description = "Headings and action labels use one consistent capitalization convention, action labels are specific verbs (such as Start re-run, Copy fingerprint, Add note, Export acceptance package, Import acceptance package), the export drawer shows format tabs labelled Acceptance Package JSON and Certificate Chain Markdown with a monospaced preview, and no placeholder or lorem-ipsum text appears anywhere in the shipped UI"
 type = "binary"
 weight = 0.5
 

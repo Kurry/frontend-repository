@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,148 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "registration_updates_all_surfaces"
+description = "Registration flow: submitting a valid create-agent payload adds exactly one idle row, increases the rollup total by one, shows the submitted configuration in the detail panel, and includes the agent in the Export fleet JSON agents array — all without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "invalid_register_inline_validation"
+description = "Registration flow: submitting empty required fields or a payload that breaks the field contract (name length/uniqueness, access-key length/charset, missing enums) shows inline errors naming each field and creates no row"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "edit_updates_row_panel_export"
+description = "Edit flow: saving a valid edit updates the registry row, the open detail panel, and the next Export fleet preview for that agent's name/type/editorIntegration without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "remove_updates_rollup_and_export"
+description = "Remove flow: confirming Remove deletes the row, decreases rollup counts, and drops the agent from the next Export fleet agents array"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "run_flow_to_idle_with_timeline"
+description = "Run flow: starting a run on an idle agent flips the badge to running, advances at least two steps with n of m updating, returns to idle on completion with a duration, and appends matching timeline entries"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "failure_recovery_manual_retry"
+description = "Failure and recovery flow: on the seeded failure scenario, a step enters retrying with attempt counter and backoff countdown, exhausts retries to failed, and manual retry resumes from that step with earlier step timestamps unchanged"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "pause_resume_checkpoint_flow"
+description = "Pause flow: pausing a running agent freezes the step list with a visible checkpoint and paused badge; resuming continues from that step without re-running completed steps"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "bulk_pause_resume_flow"
+description = "Bulk flow: selecting three agents including running ones, Pause All flips every selected running agent to paused and shifts rollup counts in one action; Resume All returns them to running"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "mutation_to_export_flow"
+description = "Mutation-to-export: after registering a valid agent, Export fleet preview contains that agent's name and rollup.total matches the on-screen total, with Copy and Download available"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "undo_after_remove_flow"
+description = "Undo after remove: removing an agent updates the row and rollup, then Undo once restores the agent row, rollup counts, and Export preview to the prior state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "export_import_round_trip_flow"
+description = "Export then import round-trip: after a registry mutation, importing the exported fleet JSON reconstructs the same visible names, statuses, and rollup counts, and the next Export preview matches again"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "command_palette_jump_flow"
+description = "Command palette jump: opening with Ctrl+K or Cmd+K and choosing a Jump to agent entry opens that agent's detail panel"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "primary_flows_unavailable"
+description = "Register, Export fleet, Import fleet, run start, or pause/resume controls are missing or non-functional from the UI"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "register_duplicates_or_missing"
+description = "A valid register creates zero rows, or rapidly double-submitting creates more than one identical agent"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "run_or_status_desyncs_surfaces"
+description = "During run, pause, bulk, or edit flows, the row badge, rollup strip, detail panel, and timeline disagree about the agent's status until a reload"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "export_flow_dead_end"
+description = "Export fleet opens but provides no usable preview text, or Copy/Download are absent so the operator cannot leave with the snapshot"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_registry_breaks_console"
+description = "Removing the last agent or filtering to zero matches leaves a broken table with no empty state and no clear-filter or register path"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "import_round_trip_corrupts_registry"
+description = "After export-then-import of a valid snapshot, visible names, statuses, or rollup counts disagree with the pre-export mutated state"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "undo_does_not_restore_remove"
+description = "After a confirmed remove, Undo leaves the agent missing or rollup counts wrong"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "palette_or_modal_traps_without_exit"
+description = "The command palette, export drawer, import surface, or register modal blocks further work with no Escape or dismiss path"
 type = "binary"
 negate = true
 weight = 1.0

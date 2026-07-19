@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -60,152 +60,233 @@ allowed_tools = [
 [scoring]
 aggregation = "weighted_mean"
 
+
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_projects_state_with_create_hint"
+description = "After deleting every active project, Projects Board and /work output both render an empty-projects state that hints how to create one."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "create_form_inline_validation_before_submit"
+description = "On the project create form or command path, invalid project field-contract values (empty name, illegal slug, status outside shipped|wip|archived, tags outside 1–8, year outside 1990–2100) show inline per-field error messages naming the offending field before submit; submit stays disabled or rejects while any field fails the contract."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "validation_errors_name_field_and_fix"
+description = "Project create/edit validation messages name the problem and the fix (for example which field is empty) rather than only saying Invalid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "unknown_command_points_to_help"
+description = "Typing an unrecognized command echoes the input and prints a command-not-found style message pointing at /help, without throwing or clearing existing output."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "cli_thinking_indicator_before_output"
+description = "Running a section command such as /about shows a CLI thinking indicator before the staggered output block appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "exit_overlay_offers_reopen"
+description = "Closing via the red titlebar control opens the exit overlay with a visible Reopen terminal path that restores the window without requiring a page reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "help_lists_grouped_commands"
+description = "/help lists available commands grouped by category so a new user can discover section, project, theme, export, archive, undo, and utility commands."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "interactive_controls_use_real_buttons_inputs"
+description = "Command input, autocomplete rows, board filters, checkboxes, bulk actions, banner Accept/Decline, titlebar dots, palette rows, and overlay CTAs use real button/input controls rather than inert non-interactive text alone."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "exit_overlay_dismissible_paths"
+description = "While the exit overlay is open, Reopen (and keyboard dismissal if offered) closes it and restores the terminal; the overlay is not stuck permanently after red close."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "sudo_hire_progress_feedback"
+description = "Running the command sudo hire designer advances a fake-contract progress bar to 100% with visible progress feedback rather than an instantaneous silent jump with no intermediate state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "double_submit_creates_exactly_one"
+description = "Double-activating the project create submit adds exactly one project: the board card count increases by one and exactly one new /work entry appears."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "clear_keeps_prompt_history_and_seed"
+description = "/clear wipes prior output but leaves the prompt, up-arrow command history recall, and the seeded project collection intact for a subsequent /work."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "empty_undo_redo_disabled"
+description = "Undo with an empty history and Redo with an empty redo stack are disabled controls; activating them does nothing and produces no console errors."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "malformed_import_rejected"
+description = "Importing a malformed Portfolio JSON payload shows a visible validation message naming the problem, changes no projects, and leaves /work and the board unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.18"
+name = "schema_invalid_portfolio_json_import_rejected"
+description = "Importing parseable JSON that fails the Portfolio JSON field contract — missing required version/theme/consent/projects keys, version not exactly \"1.0\", theme outside dark|light|retro|glass, consent outside accepted|declined|not-set, or a project entry that breaks the project field contract — leaves the collection unchanged and shows validation naming the offending field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "empty_filter_results_state"
+description = "A syntax query or filter that matches nothing shows an empty-results state on the board with a clear way to clear the query; clearing restores the full set."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "empty_archive_after_last_restore"
+description = "Restoring the last archived project leaves /archive showing an empty-vault hint while the restored project appears on the board."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.17"
+name = "copy_export_uses_visible_preview"
+description = "Copying the export while the preview is mid-update copies exactly the text currently visible in the preview block."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_projects_show_nothing"
+description = "After deleting every active project, Projects Board or /work shows nothing — no empty-state copy and no create hint."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "validation_errors_only_in_console"
+description = "An empty-name create failure surfaces only in the browser console with no in-terminal or form validation message."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "unknown_command_silent"
+description = "An unrecognized command produces no visible command-not-found feedback in the terminal output."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "delete_all_lacks_empty_guidance"
+description = "Deleting the last active project leaves the board or /work without an empty-state warning or create guidance."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "titlebar_dots_not_activatable"
+description = "Titlebar traffic-light controls are non-semantic decorative spans that cannot be activated as buttons."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "exit_overlay_not_keyboard_dismissible"
+description = "The exit overlay cannot be dismissed via keyboard and leaves focus stranded with no keyboard path to Reopen."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "empty_name_create_no_ui_validation"
+description = "Submitting create with an empty project name leaves the count unchanged but shows no visible validation feedback naming the field."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "banner_buttons_ambiguous"
+description = "Cookie-consent Accept or Decline controls lack readable action labels."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "no_help_or_navigation_guidance"
+description = "After boot, the welcome Navigation list and /help provide no usable command guidance at all."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "autocomplete_or_filters_inaccessible"
+description = "Autocomplete suggestions, command palette rows, or Projects Board filter/bulk controls are visually present but cannot be activated."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "malformed_import_mutates_collection"
+description = "A malformed import payload still mutates the projects collection or clears the board without a validation message."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n13"
+name = "schema_invalid_import_mutates_projects"
+description = "A parseable Portfolio JSON document that violates the field contract (missing required keys, out-of-enum theme/consent, or illegal project fields) still mutates the projects collection."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n12"
+name = "empty_undo_still_mutates"
+description = "Activating Undo or Redo while its stack is empty still mutates projects, stats, or export content."
 type = "binary"
 negate = true
 weight = 1.0

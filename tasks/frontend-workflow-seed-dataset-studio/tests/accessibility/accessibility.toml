@@ -1,0 +1,219 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "full_keyboard_operability"
+description = "Every interactive control — queue rows and their checkboxes, column headers, filter and chip controls, triage and batch actions, workbench fields, harvest controls, copy controls, and timeline filters — is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter, Space)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "dialogs_manage_focus"
+description = "The reject form and confirmation dialogs trap focus while open, close on Escape, and return focus to the control that opened them"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "icons_have_accessible_names"
+description = "Icon-only controls (copy, lock, chip remove, timeline filters) and status icons carry descriptive accessible names or alt text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "state_changes_announced_live"
+description = "Triage status changes, the gate reaching all-clear, harvest completion, and a harvest step entering the failed state are announced through an aria-live region as well as shown visually"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "forms_have_explicit_labels"
+description = "Fields in the reject form, workbench editors, and harvest-pending justification have visible explicit labels, and validation messages are programmatically associated with their fields"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "headings_follow_logical_order"
+description = "The studio's headings (app title, pane headings, section titles) follow a logical order with no skipped levels"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "landmark_navigation_is_present"
+description = "Skip-to-content or landmark navigation (nav, main, complementary regions for the rollup and timeline) is present"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "badges_and_text_have_contrast"
+description = "All text and controls have sufficient color contrast, including the slate, green, red, amber, and violet badge treatments and the monospaced ids and manifest text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "meaning_not_color_alone_lock_exposed"
+description = "Status and difficulty badges convey their meaning with text rather than color alone, and the locked state of rubric criterion 1.4 is exposed to assistive technology rather than only as an icon"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "reduced_motion_is_respected"
+description = "With prefers-reduced-motion set, list, banner, badge, and view animations are removed while every flow remains complete and usable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n1"
+name = "controls_unreachable_by_keyboard"
+description = "A triage, authoring, harvest, copy, or filter control cannot be reached or activated via keyboard"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n2"
+name = "focus_indicators_missing_or_obscured"
+description = "Focus indicators are missing or visually obscured on queue rows, chips, or workbench fields"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n3"
+name = "custom_controls_lack_semantics"
+description = "Custom controls such as chips, badges acting as buttons, or the multi-select checkboxes use non-semantic tags without ARIA roles or labels"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n4"
+name = "state_uses_color_only"
+description = "Seed status, difficulty, foil warnings, or gate condition state is distinguished by color alone"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n5"
+name = "dialogs_fail_to_trap_focus"
+description = "The reject form or a confirmation dialog leaves keyboard focus able to escape into the background page"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n6"
+name = "poor_contrast_makes_text_unreadable"
+description = "Badge text, monospaced ids, or manifest text is unreadable due to poor contrast"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n7"
+name = "feedback_is_visual_only"
+description = "Validation errors, gate changes, or harvest failures are conveyed visually only, with nothing exposed to screen readers"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n8"
+name = "icon_controls_unnamed"
+description = "Icon-only controls or status icons lack any accessible name"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n9"
+name = "heading_order_is_skipped"
+description = "Heading levels are skipped or unordered across the studio's views and panes"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n10"
+name = "animations_ignore_reduced_motion"
+description = "Animations continue to play with prefers-reduced-motion set"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "accessibility.catchall"
+name = "accessibility_catchall"
+description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

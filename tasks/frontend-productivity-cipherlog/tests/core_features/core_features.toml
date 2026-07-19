@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -132,8 +132,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
-description = "When submitting a New Transmission with a blank title, the save is blocked with a visible inline error or shake hint and no blank-titled memo is added"
+name = "blank_title_rejected_with_inline_error"
+description = "When submitting a New Transmission with a blank title, the save is blocked with a visible inline error naming the Title field plus a shake hint and no blank-titled memo is added"
 type = "binary"
 weight = 1.0
 
@@ -189,7 +189,7 @@ optional = true
 
 [[criterion]]
 id = "1.24"
-name = "1_24"
+name = "per_memo_txt_md_export"
 description = "An open memo offers Export as .txt and Export as .md controls that each trigger a download containing the memo title and body"
 type = "binary"
 weight = 0.5
@@ -311,6 +311,42 @@ weight = 1.0
 id = "1.40"
 name = "pre_seeded_demo_data_shipped"
 description = "On a first visit with cleared browser storage, the app ships with pre-seeded demo memos or channels already present instead of opening blank with the three empty states"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.41"
+name = "valid_create_matches_transmission_field_contract"
+description = "After Create New Transmission with title Nightfall Relay, a non-empty body, priority High, and an existing channel, the memo list shows that title with a High badge and the assigned channel, and opening Export session shows a memos entry whose title is Nightfall Relay, priority is high, channel matches, locked is false, and firstTransmitted/lastModified are ISO-8601 timestamps"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "session_archive_export_contains_session_mutations"
+description = "After creating channel Ops, creating memo Nightfall Relay on Ops at priority high, and switching Theme Core to Blood Red, Export session JSON preview includes version 1, themeCore blood-red, a channels entry named Ops, and a memos entry with title Nightfall Relay and priority high; Download JSON offers cipherlog-session.json and Copy JSON shows Copied"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "session_archive_import_round_trip"
+description = "After mutating the session and exporting session JSON, clearing or purging state, then Importing that same JSON restores the channel sidebar, memo list titles/priorities, Theme Core, and a subsequent export preview matching the imported archive"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "invalid_import_rejected_no_partial_state"
+description = "Importing malformed JSON or a session payload that breaks the field contract (for example priority outside high/standard/low, or a locked memo without a 4-character passcode) leaves channels, memos, decommissioned, and Theme Core unchanged and shows an inline import error naming the offending field or rule"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "session_export_omits_session_mutations"
+description = "After creating a uniquely titled memo and switching Theme Core, the Export session JSON preview omits that memo title or reports a themeCore that does not match the selected core"
 type = "binary"
 weight = 1.0
 negate = true

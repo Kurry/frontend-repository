@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -60,169 +60,272 @@ allowed_tools = [
 [scoring]
 aggregation = "weighted_mean"
 
+
 [[criterion]]
 id = "1.1"
-name = "1_1"
+name = "dashboard_shows_active_identity_keys"
 description = "On load, the dashboard view shows an active identity nickname, a public key rendered as an npub1-prefixed string, and a masked private key surface (no raw dashboard/starter placeholder content)"
 type = "binary"
 weight = 1.0
 
+
 [[criterion]]
 id = "1.2"
-name = "1_2"
+name = "seeded_identities_distinct_npubs"
 description = "On load, the Identities view lists at least 2 seeded identity cards, each with a distinct npub"
 type = "binary"
 weight = 1.0
 
+
 [[criterion]]
 id = "1.3"
-name = "identity_state_persisted_to_client_storage"
-description = "After exercising the app (create, select, toggle, theme switch), localStorage (or equivalent client storage) holds persisted identity, active-identity, permission-grant, and theme state, and a reload restores all of it"
+name = "reload_resets_to_seeded_in_memory_baseline"
+description = "After creating an identity, toggling a permission, and switching theme, a full page reload returns the app to the seeded baseline (seeded identities, original active identity, original grants, seeded theme) rather than keeping session mutations"
 type = "binary"
 weight = 1.0
+
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
-description = "When the create-identity form is submitted with a label, a new identity card appears, the identity count increases by 1, and the new identity's npub differs from every existing identity's npub"
+name = "valid_create_adds_distinct_identity"
+description = "When the create-identity form is submitted with a valid label (trimmed, 1 to 40 characters), a new identity card appears, the identity count increases by 1, and the new identity's npub differs from every existing identity's npub"
 type = "binary"
 weight = 1.0
+
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
-description = "When the create-identity form is submitted with an empty label, a visible validation message appears and the identity count does not increase"
+name = "empty_label_rejected_inline"
+description = "When the create-identity form is submitted with an empty or whitespace-only label, a visible validation message naming the label field appears and the identity count does not increase"
 type = "binary"
 weight = 1.0
 
+
 [[criterion]]
 id = "1.6"
-name = "1_6"
+name = "cancel_create_leaves_collection_unchanged"
 description = "When the create-identity form is cancelled, no new identity is added and the form closes"
 type = "binary"
 weight = 1.0
 
+
 [[criterion]]
 id = "1.7"
-name = "1_7"
+name = "created_identity_becomes_active"
 description = "After a newly created identity is added, it becomes the active identity and its data appears on the dashboard"
 type = "binary"
 weight = 1.0
 
+
 [[criterion]]
 id = "1.8"
-name = "1_8"
+name = "permission_toggle_scoped_to_active_identity"
 description = "When an application's permission toggle is switched for the active identity, only that application's grant for that identity changes; the other three applications' grants for the same identity remain as they were"
 type = "binary"
 weight = 1.0
 
+
 [[criterion]]
 id = "1.9"
-name = "1_9"
+name = "select_updates_dashboard_npub"
 description = "After switching the active identity to a second seeded identity, the dashboard's displayed npub changes to the second identity's own key"
 type = "binary"
 weight = 1.0
 
+
 [[criterion]]
 id = "1.10"
-name = "1_10"
+name = "permissions_view_follows_active_identity"
 description = "After switching identities, the Permissions view shows the second identity's own grants, not the grants that were toggled while the first identity was active"
 type = "binary"
 weight = 1.0
 
+
 [[criterion]]
 id = "1.11"
-name = "1_11"
+name = "reveal_toggles_nsec_mask"
 description = "When the reveal-key control is clicked, the masked nsec surface is replaced by a real nsec1-prefixed string for the active identity; clicking it again re-masks it"
 type = "binary"
 weight = 1.0
 
+
 [[criterion]]
 id = "1.12"
-name = "1_12"
+name = "audit_log_records_actions_newest_first"
 description = "The Audit log view lists at least one seeded entry on load and gains a new entry, shown first, after creating an identity, switching identities, or toggling a permission"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.13"
-name = "1_13"
-description = "After reloading the page, the same identities (same npubs), the same active identity, and the same permission grants are restored"
-type = "binary"
-weight = 1.0
 
 [[criterion]]
-id = "1.14"
-name = "1_14"
+id = "1.13"
+name = "theme_switch_without_reload"
 description = "When the theme control in Settings is clicked, the app surface switches between light and dark without a full page reload"
 type = "binary"
 weight = 1.0
 
+
 [[criterion]]
-id = "1.15"
-name = "1_15"
+id = "1.14"
+name = "hover_feedback_on_interactive_chrome"
 description = "Hovering interactive chrome (nav items, buttons, identity cards, permission toggle) shows a visible hover feedback wash"
 type = "binary"
 weight = 1.0
 
+
 [[criterion]]
-id = "1.16"
-name = "1_16"
-description = "Calling window.webmcp_list_tools() returns registered tools including an identity-create tool, an identity-select tool, and an application-permission toggle tool; invoking the toggle tool for the active identity and one named app changes that same toggle's visible state in the Permissions view"
+id = "1.15"
+name = "webmcp_identity_tools_drive_ui"
+description = "Calling window.webmcp_list_tools() returns registered tools including identity create, select, update, delete, and toggle tools plus artifact export/import/copy tools; invoking the permission toggle tool for the active identity and one named app changes that same toggle's visible state in the Permissions view"
 type = "binary"
 weight = 1.0
 
+
+[[criterion]]
+id = "1.16"
+name = "label_over_40_chars_rejected"
+description = "Submitting create or rename with a label longer than 40 characters shows an inline validation message naming the label field and does not change the identity collection"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "1.17"
+name = "rename_updates_card_dashboard_and_export"
+description = "Renaming an identity with a valid label updates that identity's card nickname, the dashboard nickname when it is active, and the matching label in the Export vault JSON preview"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "1.18"
+name = "delete_with_confirm_removes_identity"
+description = "Confirming Delete on a non-sole identity removes exactly that card, decreases the identity-count stat tile by exactly one, and removes that identity from the Export vault JSON preview; cancelling leaves the collection unchanged"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "1.19"
+name = "cannot_delete_last_identity"
+description = "When only one identity remains, Delete is blocked (disabled control or visible message) and the identity count does not change"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "1.20"
+name = "new_identity_grants_all_false"
+description = "A newly created identity shows all four application grants as Revoked (false) on the dashboard pills and in the Export vault JSON grants object"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "1.21"
+name = "search_filters_identity_cards"
+description = "Typing in the Identities search field narrows the card grid to identities whose nickname or npub contains the query; clearing the field restores every identity card exactly"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "1.22"
+name = "sort_label_reverses_card_order"
+description = "Switching Identities sort from Label A–Z to Label Z–A reverses the visible card order relative to the prior sort"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "1.23"
+name = "undo_redo_restore_mutations"
+description = "After creating an identity, Undo removes it and restores the prior count and export preview; Redo re-applies the create; after a new mutation following undo, Redo is disabled"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "1.24"
+name = "export_vault_json_live_from_store"
+description = "Opening Export vault shows a monospaced JSON preview with version exactly nostrpass-vault-v1, activeLabel, theme light or dark, and an identities array whose entries include label, npub1-prefixed npub, nsec1-prefixed nsec, and grants with damus/snort/coracle/iris booleans; after creating an identity or toggling a grant, reopening or refreshing the preview includes that session mutation"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "1.25"
+name = "export_copy_and_download_controls"
+description = "Export vault offers Copy and Download controls; activating Copy shows a brief copied confirmation"
+type = "binary"
+weight = 1.0
+
+
 [[criterion]]
 id = "1.26"
-name = "1_26"
-description = "The Audit log view records identity creation, identity selection, and permission toggle actions with the newest entry listed first"
+name = "import_round_trip_restores_vault"
+description = "After mutating the vault, importing the exported vault JSON (after confirmation) restores identities, active identity, grants, and theme so dashboard, Identities, Permissions, and the export preview match the pre-export mutated state"
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
+
 
 [[criterion]]
 id = "1.27"
-name = "1_27"
+name = "no_outbound_navigation"
 description = "No control anywhere in the app performs outbound navigation (no working external links, no window navigation away from the app)"
 type = "binary"
 weight = 1.0
 
+
 [[criterion]]
-id = "1.29"
-name = "1_29"
-description = "The app is a static list of identity names with no working create/select/permission-toggle behavior (a non-interactive mock)"
+id = "1.28"
+name = "copy_npub_shows_confirmation"
+description = "Activating Copy npub on the dashboard shows a brief copied confirmation"
 type = "binary"
 weight = 1.0
+
+
+[[criterion]]
+id = "1.29"
+name = "static_noninteractive_mock"
+description = "The app is a static list of identity names with no working create/select/permission-toggle behavior (a non-interactive mock)"
+type = "binary"
 negate = true
+weight = 1.0
+
 
 [[criterion]]
 id = "1.30"
-name = "1_30"
+name = "cancel_create_still_mutates"
 description = "Cancelling the create-identity form still adds an identity, or leaves the collection changed"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
+
 
 [[criterion]]
 id = "1.31"
-name = "create_and_persist_flow_chain"
-description = "Scripted flow: note the identity-count stat tile and Identities card count, submit the create-identity form with a valid label, and confirm — without any reload — that exactly one new card appears, the identity-count stat tile increased by exactly one, the dashboard shows the new identity's nickname and a freshly generated npub as active, and a creation entry sits at the top of the Audit log; then reload the page and confirm the new identity is still present with the same npub, is still the active identity, and the count still reflects it"
+name = "create_and_export_flow_chain"
+description = "Scripted flow: note the identity-count stat tile and Identities card count, submit the create-identity form with a valid label, and confirm — without any reload — that exactly one new card appears, the identity-count stat tile increased by exactly one, the dashboard shows the new identity's nickname and a freshly generated npub as active, a creation entry sits at the top of the Audit log, and the Export vault JSON preview includes that identity's label, npub, nsec, and all-false grants"
 type = "binary"
 weight = 1.0
+
 
 [[criterion]]
 id = "1.32"
 name = "permission_toggle_flow_chain"
-description = "Scripted flow: in the Permissions view toggle one application's grant for the active identity, then confirm — without a reload — that the dashboard's pill badge for that app flipped between Granted and Revoked, the connected-app stat tile changed by exactly one in the matching direction, and a grant/revoke entry sits at the top of the Audit log; then select a different identity and confirm its own grants are shown unmodified; finally reload the page and confirm the toggled grant on the first identity is restored exactly as set"
+description = "Scripted flow: in the Permissions view toggle one application's grant for the active identity, then confirm — without a reload — that the dashboard's pill badge for that app flipped between Granted and Revoked, the connected-app stat tile changed by exactly one in the matching direction, a grant/revoke entry sits at the top of the Audit log, and the Export vault JSON preview's grants for that identity reflect the new boolean"
 type = "binary"
 weight = 1.0
+
 
 [[criterion]]
 id = "1.33"
 name = "identity_switch_flow_chain"
-description = "Scripted flow: from the Identities view select a second seeded identity and confirm — without a reload — that the dashboard's nickname, npub, and per-application pill badges all show that identity's own data, the Permissions view shows that identity's own grants rather than the previously active identity's, and a selection entry sits at the top of the Audit log; then reload the page and confirm the same identity is still active with the same npub"
+description = "Scripted flow: from the Identities view select a second seeded identity and confirm — without a reload — that the dashboard's nickname, npub, and per-application pill badges all show that identity's own data, the Permissions view shows that identity's own grants rather than the previously active identity's, a selection entry sits at the top of the Audit log, and Export vault activeLabel matches that identity's label"
 type = "binary"
 weight = 1.0
+
 
 [[criterion]]
 id = "1.34"
@@ -231,6 +334,7 @@ description = "Rapidly double-activating the create-identity submit control crea
 type = "binary"
 weight = 1.0
 
+
 [[criterion]]
 id = "1.35"
 name = "reveal_state_not_carried_across_identities"
@@ -238,12 +342,14 @@ description = "Revealing one identity's nsec does not reveal any other identity'
 type = "binary"
 weight = 1.0
 
+
 [[criterion]]
 id = "1.36"
 name = "long_label_contained_in_card"
-description = "Creating an identity with a label over 40 characters keeps the card layout intact: the label truncates or wraps within its card without overlapping the npub text or neighbouring cards"
+description = "Creating an identity with a label of exactly 40 characters keeps the card layout intact: the label truncates or wraps within its card without overlapping the npub text or neighbouring cards"
 type = "binary"
 weight = 0.5
+
 
 [[criterion]]
 id = "1.37"
@@ -252,10 +358,37 @@ description = "While the create-identity label field is empty or whitespace-only
 type = "binary"
 weight = 1.0
 
+
+[[criterion]]
+id = "1.38"
+name = "import_rejects_nonconforming_vault"
+description = "Importing malformed vault JSON or a vault missing required fields (wrong version, empty identities, invalid label bounds, npub/nsec prefix, grants keys, or theme enum) shows an inline error naming the import field and leaves identity count and labels unchanged"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "1.39"
+name = "export_omits_session_mutations"
+description = "After creating an identity or toggling a grant, the Export vault JSON preview omits that session mutation (missing the new identity or still showing the prior grant boolean)"
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "1.40"
+name = "undo_fails_to_restore_prior_state"
+description = "After a create or delete, Undo leaves the identity count, cards, or export preview different from the pre-action state"
+type = "binary"
+negate = true
+weight = 1.0
+
+
 [[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0

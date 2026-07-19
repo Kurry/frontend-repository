@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,158 +62,173 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "7.1"
-name = "layout_adapts_desktop_to_mobile"
-description = "Layout adapts gracefully from 1440px desktop to 375px mobile."
+name = "desktop_two_pane_composition"
+description = "At desktop widths (~1440px) the sidebar, settings form, and generated-config panel are visible together as the two-pane composition with the sidebar alongside."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
-name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+name = "mobile_tap_targets_adequate"
+description = "At about 375px width, sidebar categories, setting controls, and export actions present tap targets at least 44px in at least one dimension."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
-name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+name = "typography_readable_both_widths"
+description = "Section titles, setting labels, and generated-config text remain legible at both 1440px and about 375px — type scales or reflows without becoming unreadably small on mobile."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
-name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+name = "no_clip_or_overflow_at_375"
+description = "At about 375px width the stacked panes and controls do not clip content or overflow the viewport."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
-name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+name = "sidebar_adapts_at_narrow_width"
+description = "At about 375px width the category sidebar adapts (stacks, collapses, or otherwise reflows) so categories remain reachable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.6"
-name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+name = "narrow_width_stacks_panes_logically"
+description = "At about 375px width the layout reflows: panes stack in a logical order while controls stay operable and product identity remains."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.7"
-name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+name = "narrow_controls_tappable"
+description = "At about 375px width, tap/click activation works on sidebar categories, primary setting controls, and export actions."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.8"
-name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+name = "no_horizontal_scroll_at_375"
+description = "At about 375px width the page does not produce horizontal scrolling."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.9"
-name = "media_and_canvases_resize"
-description = "Images, grids, and canvases size responsively to fit the layout."
+name = "preview_and_config_scale_with_viewport"
+description = "The live terminal preview and generated-config panel size responsively with the viewport rather than staying a fixed overflowing size."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.10"
-name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
+name = "export_actions_remain_reachable"
+description = "Copy, Download, and Reset all remain reachable at both 1440px and about 375px — fixed positioning does not push them off-screen."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.n1"
-name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+name = "layout_breaks_at_375_or_1440"
+description = "At about 375px or 1440px the editor layout breaks: overlapping panes, overflow, or unusable stacking."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n2"
-name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+name = "mobile_controls_too_small"
+description = "At about 375px width, sidebar categories, setting controls, or export actions are too small or misaligned to operate reliably."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n3"
-name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+name = "text_unreadable_on_mobile"
+description = "At about 375px width, setting labels or generated-config text are too small to read."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n4"
-name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+name = "content_cropped_with_spurious_scrollbars"
+description = "At about 375px or 1440px, editor content is cropped or unnecessary scrollbars appear for content that should fit the viewport."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n5"
-name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
+name = "sidebar_missing_at_some_width"
+description = "At some required width the category sidebar is unresponsive or missing so categories cannot be reached."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n6"
-name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
+name = "fixed_chrome_obscures_controls"
+description = "Fixed-position chrome (dock preview, export bar, or overlays) obscures setting controls so they cannot be used."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n7"
-name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
+name = "overlap_at_narrow_width"
+description = "At about 375px width, sidebar, settings form, and generated-config panel overlap into an unusable stack."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n8"
-name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
+name = "narrow_export_actions_not_activatable"
+description = "At about 375px width, Copy, Download, or Reset all cannot be activated by tap/click when overrides exist."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n9"
-name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
+name = "preview_or_config_static_overflow"
+description = "The terminal preview or generated-config panel uses a static size that overflows the viewport at about 375px."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "7.n10"
-name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
+name = "panes_or_exports_disappear_at_width"
+description = "At about 375px or 1440px, required panes (sidebar, settings form, generated-config) or export actions disappear from the layout."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
+
+[[criterion]]
+id = "7.11"
+name = "overlays_operable_at_375"
+description = "At about 375px width, the command palette, Diff panel, Import surface, and Profiles panel remain fully visible and operable rather than rendering off-screen."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.n11"
+name = "overlays_offscreen_at_375"
+description = "At about 375px width, the command palette, Diff, Import, or Profiles surface renders off-screen or cannot be completed."
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "responsiveness.catchall"
 name = "responsiveness_catchall"
 description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true

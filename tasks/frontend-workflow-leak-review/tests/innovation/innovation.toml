@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -64,35 +64,35 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "11.1"
 name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+description = "Optional: beyond the required decision/export toasts and disclosure motion, the app adds a delightful microinteraction that does not replace any required behavior."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.2"
 name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+description = "Optional: beyond required motion, the app adds advanced transition mechanics that do not replace required pair-stepping, disclosure, or toast behaviors."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.3"
 name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+description = "Optional: the app includes a guided triage onboarding or coachmark flow that does not block required queue or decision paths."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.4"
 name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+description = "Optional: beyond required score bands and rollups, the app adds an interactive similarity or canary visualization that does not replace required surfaces."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.5"
 name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+description = "Optional: the app supports an alternative input path such as keyboard triage chords beyond the required keyboard operability."
 type = "binary"
 weight = 1.0
 

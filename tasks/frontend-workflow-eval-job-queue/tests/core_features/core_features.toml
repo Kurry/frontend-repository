@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -125,29 +125,29 @@ weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "submit_form_bounds_validation"
-description = "The submit-job form offers dataset, agent, and model selects and a trial count field accepting only whole numbers from 1 to 10; a value of 0, 11, or non-numeric shows an inline message naming the trial count field and its allowed range while the submit control stays disabled, and missing selects show messages naming each missing field with no job created"
+name = "submit_form_field_contract"
+description = "The submit-job form's create-job payload enforces the field contract with inline errors naming each offending field and submit disabled until valid: dataset required from orchard-qa/ledgerline-suite, agent required from scouthand/forgeline, model required from cobalt-4/meridian-xl/willow-mini, trialCount required as a whole number from 1 to 10, and optional sweepModel from the same model set and required to differ from model; missing selects, trialCount of 0/11/non-numeric, or sweepModel equal to model create no job"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
 name = "valid_submit_enqueues_job"
-description = "Submitting the form with valid values creates exactly one new job that appears with status queued in both the jobs table and the chosen model's provider lane, without a reload"
+description = "Submitting the form with values that satisfy the create-job field contract creates exactly one new job that appears with status queued in both the jobs table and the chosen model's provider lane, without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
 name = "sweep_creates_job_per_model"
-description = "Submitting once with a sweep model also chosen creates one job per selected model, each appearing in its own model's lane, and the jobs table row count increases by exactly the number of models chosen"
+description = "Submitting once with a valid sweepModel that differs from model creates one job per selected model, each appearing in its own model's lane, and the jobs table row count increases by exactly the number of models chosen"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.13"
 name = "config_preview_derives_live"
-description = "The configuration preview panel renders a structured, YAML-like text block that updates immediately when any form field changes, and its copy control places the exact preview text on the clipboard with visible confirmation"
+description = "The configuration preview panel renders a structured, YAML-like text block that uses the create-payload field names dataset, agent, model, trialCount, and sweepModel when set, updates immediately when any form field changes, and its copy control places the exact preview text on the clipboard with visible confirmation"
 type = "binary"
 weight = 1.0
 
@@ -191,6 +191,35 @@ negate = true
 id = "1.20"
 name = "aggregates_hardcoded"
 description = "Aggregate surfaces are hardcoded: the mean-reward bars, total cost figure, or lane queue depths render exactly the same values after new jobs are submitted and trials complete as before"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.21"
+name = "queue_snapshot_export_field_contract"
+description = "Export queue opens a live JSON preview whose text shows schemaVersion exactly eval-queue-v1, exportedAt as an ISO-8601 string, and required keys jobs, providers, aggregates, and timeline; each job entry includes create-payload fields dataset, agent, model, and trialCount plus id, status, progressComplete, progressTotal, submittedAt, and trials; Copy and Download are available"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "export_reflects_session_mutations"
+description = "After submitting or cancelling a job, reopening Export queue shows that mutation in the jobs array (and related providers/timeline content) rather than a stale pre-mutation snapshot"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "queue_snapshot_import_round_trip"
+description = "Import queue accepts pasted Queue Snapshot JSON matching the export field contract; a valid import reconstructs jobs, lanes, aggregates, and timeline so the next Export preview matches, and malformed or contract-breaking JSON shows an inline import error and leaves the queue unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "export_omits_session_work"
+description = "After a visible submit or cancel, the Export queue JSON preview still shows the pre-mutation jobs array, omitting the session's actual submit or cancel from the compiled snapshot"
 type = "binary"
 weight = 1.0
 negate = true

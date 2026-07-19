@@ -1,0 +1,157 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "14.1"
+name = "multi_facet_reload_round_trip"
+description = "In demo mode: set the source-file bounds to 4 and 9, reject one PR with the docs-only reason, run one clean seeded PR to a completed package, and dismiss one coachmark, then reload the page. The bounds, the triage placement with its reason badge, the produced package with its content, and the coachmark dismissal all survive the reload, while both credential rows show Disconnected and the mode indicator reads Demo data — never a mix of kept and reverted facets among the persisted set"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.2"
+name = "filter_bounds_derive_from_live_data"
+description = "Note the PRs visible for driftline at the default bounds 3 to 10, tighten the source-file bounds to 5 and 7 and confirm the visible list shrinks to exactly the PRs whose displayed non-test source-file counts fall between 5 and 7, then restore 3 and 10 and confirm the original list returns exactly — proving the filter recomputes from live data rather than swapping hardcoded lists"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.3"
+name = "triage_breakdown_tracks_reasons"
+description = "Reject one PR with the docs-only reason and another PR with the no-linked-issue reason: the per-reason breakdown increments exactly the docs-only row after the first action and exactly the no-linked-issue row after the second, while the other reason rows stay unchanged — the breakdown is sensitive to which reason was chosen"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.4"
+name = "run_echoes_into_library_and_palette"
+description = "Complete a pipeline run for an accepted PR, then without reloading open the Library and the command palette: the new package appears as a library entry with matching repository and PR number, and searching the palette by that PR number surfaces the package result"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.5"
+name = "count_deltas_are_exact"
+description = "Measure the accepted count immediately before and immediately after accepting one PR (delta exactly plus one), and the library entry count immediately before and immediately after deleting one package (delta exactly minus one); the header stats and the list contents agree at both measurement points with no off-by-one or lagging counter"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.6"
+name = "different_prs_produce_different_packages"
+description = "Run the pipeline on two different seeded PRs from different repositories: the two packages differ in the ways the inputs dictate — different PR numbers, base SHAs, and source-file lists in the metadata and patch note, and instruction text reflecting each PR's own linked issue or title rather than shared boilerplate"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.7"
+name = "interleaved_run_and_triage_stay_coherent"
+description = "Start a pipeline run, switch to the Triage view while Evaluate is still streaming and reject one PR with a reason, then return to the Runs view: the run's stages and streamed output are intact and progressing (or paused exactly where left), and the triage placement and stats change made mid-run is retained — neither flow corrupted the other"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.8"
+name = "library_empty_then_repopulated"
+description = "Delete every library package (including the seeded examples) and confirm the library shows its empty state with the entry count at zero, then complete a new pipeline run and confirm the library repopulates with exactly the new package, its filters and counts tracking the transition in both directions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n1"
+name = "partial_persistence_is_incoherent"
+description = "After a reload, one persisted facet silently reverts while others survive — for example triage placements are kept but a produced package is gone, or the source-file bounds reset while coachmark dismissals persist"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n2"
+name = "derived_surface_ignores_inputs"
+description = "A derived surface renders identically regardless of its inputs — the triage stats or per-reason breakdown stay unchanged after triage actions, or the batch run report shows the same bucket counts regardless of the queued PRs' actual verdicts and outcomes"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n3"
+name = "different_inputs_produce_identical_output"
+description = "Running the pipeline on two different PRs yields byte-identical instruction text, or the two packages carry identical metadata (same PR number, base SHA, or file list)"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n4"
+name = "cross_view_state_is_stale"
+description = "A state change appears in one view but not another until reload — a completed run's package missing from the Library or the palette, or a triage action absent from the header stats or the runner's accepted set"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "behavioral.catchall"
+name = "behavioral_catchall"
+description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

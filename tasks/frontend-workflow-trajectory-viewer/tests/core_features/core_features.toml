@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -112,7 +112,7 @@ weight = 1.0
 [[criterion]]
 id = "1.8"
 name = "keyboard_and_scrubber_navigation"
-description = "With the timeline focused, pressing the arrow keys moves the active step to the previous or next step with the newly active entry scrolled into view and the other panes following; dragging the scrubber updates the active step continuously while the handle moves, not only on release"
+description = "With the timeline focused, pressing the arrow keys moves the active step to the previous or next visible step with the newly active entry scrolled into view and the other panes following; dragging the scrubber updates the active step continuously while the handle moves, not only on release"
 type = "binary"
 weight = 1.0
 
@@ -147,14 +147,14 @@ weight = 1.0
 [[criterion]]
 id = "1.13"
 name = "forms_inline_validation"
-description = "Submitting the note form with an empty note shows an inline message naming the note field and attaches nothing; submitting the classification form with any select unset or evidence text shorter than 20 characters shows inline per-field messages naming each invalid field and creates no report card"
+description = "Submitting the note form with empty note_text or text longer than 500 characters shows an inline message naming note_text and attaches nothing; submitting the classification form with any select unset, evidence outside 20–2000 characters, or no implicated steps shows inline per-field messages naming each invalid field and creates no report card"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.14"
 name = "classification_report_links_jump"
-description = "Submitting a valid failure classification renders a report card showing all four chosen classifications (stage, root cause, behavior, impact), the evidence text, and one link per implicated step; clicking an implicated-step link jumps the viewer to that step, and re-submitting the form updates the existing card in place"
+description = "Submitting a valid failure classification using the declared enums (stage in planning/tool-use/verification/recovery; root_cause in wrong-tool/missing-context/hallucinated-path/timeout; behavior in loops/abandons/invents-files/ignores-errors; impact in score-zero/partial-credit/flaky-pass/false-pass) renders a report card showing all four chosen classifications, the evidence text, and one link per implicated step; clicking an implicated-step link jumps the viewer to that step, and re-submitting the form updates the existing card in place"
 type = "binary"
 weight = 1.0
 
@@ -177,6 +177,56 @@ negate = true
 id = "1.18"
 name = "double_submit_duplicates_report"
 description = "Rapidly double-activating the classification submit control produces two or more report cards on the trial"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.19"
+name = "step_type_filter_narrows_timeline"
+description = "The step-type filter above the timeline offers All plus reasoning, tool-call, observation, terminal, and screenshot; activating tool-call narrows the visible timeline to tool-call steps only, and choosing All restores the full ordered list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "command_palette_jumps_to_step"
+description = "Pressing Ctrl+K or Cmd+K opens a command palette with search focused; typing part of a step summary on the open trial narrows results, and activating a step result makes that step active with timeline, workspace, and detail in sync; Escape closes the palette"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "undo_redo_review_edits"
+description = "After adding an annotation and submitting a classification, Undo restores the prior report and annotation state across the annotations list, report card, and export preview; Redo reapplies them; Undo and Redo disable when their stacks are empty"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "review_package_export_reflects_session"
+description = "After annotating at least one step and submitting a valid classification, the Export panel Review JSON preview contains the exact note_text, step_index, stage, root_cause, behavior, impact, evidence, and implicated_steps just entered under the required keys trial_id, task_id, model, reward, outcome, duration, step_count, annotations, and failure_report; Copy export puts that exact preview text on the clipboard with visible confirmation, and Download export yields a file matching the preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "review_package_import_round_trip"
+description = "Exporting Review JSON for a trial with annotations and a report, clearing those session edits, then importing that JSON via Import review package reconstructs the annotations list and report card to match the imported payload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "annotation_edit_updates_in_place"
+description = "Editing an existing annotation's note_text through its edit control updates that entry in place in the annotations list and in the export preview, leaving other notes unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "export_omits_session_mutations"
+description = "After adding an annotation or submitting a classification, the Export panel Review JSON still shows empty annotations and a null failure_report, or otherwise omits the session's actual note_text/classification values"
 type = "binary"
 weight = 1.0
 negate = true

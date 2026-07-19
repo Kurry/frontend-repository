@@ -138,6 +138,7 @@ Modules:
 - browse-query-v1
 - form-workflow-v1
 - entity-collection-v1
+- artifact-transfer-v1
 
 Module specs:
 <module_spec id="browse-query-v1">
@@ -204,18 +205,43 @@ Module specs:
 }
 </module_spec>
 
+<module_spec id="artifact-transfer-v1">
+{
+  "id": "artifact-transfer-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Artifact transfer",
+  "purpose": "Import, export, copy, print, and conversion workflows.",
+  "permitted_operations": ["import", "export", "copy", "print_preview", "convert"],
+  "binding_keys": {
+    "required_any_of": [["artifact_operations"]],
+    "optional": ["import_modes", "export_formats", "conversion_modes", "visible_postconditions"]
+  },
+  "restrictions": [
+    "No raw files, filesystem paths, blobs, base64, or artifact contents in WebMCP arguments or results.",
+    "File picker interaction, clipboard contents, and downloaded artifacts remain Playwright responsibilities."
+  ],
+  "tool_name_prefix": "artifact"
+}
+</module_spec>
+
 Bindings:
 - Browsable entity: scenes
-- Destinations: scene-list; scene-detail; tutorial-steps
+- Destinations: scene-list; scene-detail; tutorial-steps; export-drawer; command-palette
+- Filters: status; search
 - Entity: scene
-- Entity operations: create; select; update; delete; reorder
-- Entity fields: title; body; order
-- Form fields: title; body
+- Entity operations: create; select; update; delete; toggle; reorder
+- Entity fields: title; body; cameraNote; status; order
+- Form fields: title; body; cameraNote; status
 - Form operations: validate; submit; cancel; advance; return
 - Workflow steps: intro; edit; review
+- Artifact operations: export; import; copy
+- Export formats: markdown; json; outline
+- Import modes: storyboard-json
 
 Mechanics exclusions:
-- None
+- Scene drag-reorder gesture geometry stays Playwright-observed
+- Command-palette keyboard shortcut chord stays Playwright-observed
+- Raw file paths/blobs forbidden in WebMCP args
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

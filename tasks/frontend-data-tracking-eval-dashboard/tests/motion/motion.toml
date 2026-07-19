@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -123,6 +123,13 @@ description = "Animations cause visible layout jank or flicker, or block user in
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "4.10"
+name = "export_drawer_slide"
+description = "Driven by the real Export results control, the export drawer slides in from the side rather than snapping open, and exits the same way"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "4.catchall"

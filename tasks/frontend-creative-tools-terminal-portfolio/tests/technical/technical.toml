@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -82,6 +82,57 @@ description = "Running a section command updates the document title without a fu
 type = "binary"
 weight = 0.5
 optional = true
+
+[[criterion]]
+id = "2.5"
+name = "reload_resets_to_seeded_baseline"
+description = "After creating a project, changing theme, featuring a pin, and editing identity, a plain reload returns the app to its seeded projects, skills, theme, and identity with empty undo stacks — no browser storage persistence."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "export_import_round_trip_technical"
+description = "Exporting Portfolio JSON then re-importing that same document reconstructs the same visible project names, statuses, tags, years, featured flags, skills, and identity fields without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "api_shaped_validation_blocks_invalid_payload"
+description = "Invalid API-shaped payloads are rejected observably: empty name, uppercase slug, status outside shipped/wip/archived, year outside 2000 to 2100, skill proficiency outside 0 to 100, and featured count above 3 each show field-named validation and mutate no collection."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "shared_state_across_modes_and_export"
+description = "Projects Board, /work, Config Studio, and Export Center all read the same live collections: a create or identity save updates every surface without requiring a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "consent_reflected_in_privacy_and_export"
+description = "Cookie-consent Accept or Decline updates /privacy output and the Portfolio JSON consent field to accepted or declined; before any choice both read not_set."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n1"
+name = "storage_apis_used_for_session"
+description = "After exercising create, theme, featured, identity, and export flows, localStorage or sessionStorage holds persisted app state keys (violating the in-memory-only good-app rule)."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.n2"
+name = "export_stale_relative_to_board"
+description = "After a visible board or Config Studio mutation, Export Center previews still show the prior seed-only artifact text."
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "2.catchall"

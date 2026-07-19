@@ -126,6 +126,7 @@ Contract version: zto-webmcp-v1
 Modules:
 - browse-query-v1
 - entity-collection-v1
+- artifact-transfer-v1
 
 Module specs:
 <module_spec id="browse-query-v1">
@@ -171,17 +172,43 @@ Module specs:
 }
 </module_spec>
 
+<module_spec id="artifact-transfer-v1">
+{
+  "id": "artifact-transfer-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Artifact transfer",
+  "purpose": "Import, export, copy, print, and conversion workflows.",
+  "permitted_operations": ["import", "export", "copy", "print_preview", "convert"],
+  "binding_keys": {
+    "required_any_of": [["artifact_operations"]],
+    "optional": ["import_modes", "export_formats", "conversion_modes", "visible_postconditions"]
+  },
+  "restrictions": [
+    "No raw files, filesystem paths, blobs, base64, or artifact contents in WebMCP arguments or results.",
+    "File picker interaction, clipboard contents, and downloaded artifacts remain Playwright responsibilities."
+  ],
+  "tool_name_prefix": "artifact"
+}
+</module_spec>
+
 Bindings:
 - Browsable entity: expenses
-- Destinations: reports-overview; category-breakdown; transaction-list
-- Filters: category; range
+- Destinations: reports-overview; category-breakdown; transaction-list; export-drawer; thresholds
+- Filters: category; range; currency
 - Sorts: amount; date
 - Entity: expense
 - Entity operations: create; select; update; delete
-- Entity fields: label; amount; category; date
+- Entity fields: label; amount; category; date; account; status
+- Artifact operations: export; import; copy
+- Export formats: csv; json
+- Import modes: ledger-json
+- Workflow completion: export drawer preview updates after create/edit/delete and matches live totals.count
+- Workflow completion: importing ledger-json replaces table rows, thresholds, and summary cards to match the imported document
 
 Mechanics exclusions:
 - Chart geometry / pie segment hover stays Playwright-observed
+- File-picker Import and Blob download stay Playwright-observed; WebMCP must not return raw file/blob/base64 contents
+- Clipboard contents of Copy are verified via Playwright, never returned in WebMCP results
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

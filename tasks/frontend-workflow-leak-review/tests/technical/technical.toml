@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,14 +63,14 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.1"
 name = "shared_state_coherence"
-description = "All views derive from one shared collection: a decision submitted in the evidence view is immediately reflected in the queue chip, the triggered filter, the rollup strip, and the audit timeline without a reload, and a threshold change re-derives bands, chips, and counts everywhere at once"
+description = "All views derive from one shared collection: a decision submitted in the evidence view is immediately reflected in the queue chip, the triggered filter, the rollup strip, the audit timeline, and the Review report JSON export preview without a reload, and a threshold change re-derives bands, chips, and counts everywhere at once"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
 name = "no_storage_reload_seeded"
-description = "No browser storage is used: localStorage and sessionStorage remain empty after moving the threshold, recording decisions, and toggling mutation tests, and a page reload returns the app to its seeded state (threshold 0.75, seeded submission states, empty decision timeline)"
+description = "No browser storage is used: localStorage and sessionStorage remain empty after moving the threshold, recording decisions, toggling mutation tests, and exporting; a page reload without Import returns the app to its seeded state (threshold 0.75, seeded submission states, empty decision timeline)"
 type = "binary"
 weight = 1.0
 
@@ -125,6 +125,20 @@ description = "Seeded content references real products, companies, or people —
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "2.10"
+name = "api_shaped_validation_surfaces_inline"
+description = "Decision create and Review report Import validate against the declared field contracts with inline per-field messages naming the offending field before any state change; a valid decision record matches the would-be request body (verdict confirm-clean|confirm-leak and rationale 20 to 2000 characters)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "export_import_same_schema"
+description = "Review report JSON export and a successful Import conform to the same field contract (schemaVersion leak-review.report.v1 with threshold, rollup, submissions, decisions, and mutationSuites); invalid payloads are rejected without mutating state"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "2.catchall"

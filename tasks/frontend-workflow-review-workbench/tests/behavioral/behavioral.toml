@@ -1,0 +1,171 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "14.1"
+name = "multi_facet_reload_resets_seeds"
+description = "Multi-facet round-trip: resolve a fix item on one bundle, record a recommendation on it, write a step note, mark a step done, and apply a portfolio filter, then reload the page. All facets coherently reset to the seeded baseline — 12 seeded bundles with seeded gate results, unset recommendations, empty notes, no done steps, no active filters — never a mix of surviving and reset facets"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.2"
+name = "timeline_filter_derives_live"
+description = "Derived-filter proof: filter a bundle's event timeline to one event kind and note the visible entries, then switch to a different kind; the visible set changes to exactly the entries of the new kind, and clearing the filter restores the full ordered timeline — proving the filtered views derive from one live log rather than hardcoded lists"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.3"
+name = "rerun_full_pipeline_recompute"
+description = "Full-pipeline probe: on ember-relay-router, record the hero banner, the Difficulty — Quartz-Mini chip on the portfolio row, the allowed recommendation set, and the constraint explanation; run Re-run gate on that gate to completion through the real control. Confirm the gate leaves inconclusive AND the hero banner, the portfolio row's chip and hero state, the rollup counts, the allowed recommendation set, and the constraint explanation all recompute to values consistent with the new gate status, without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.4"
+name = "cross_view_echo_fix_resolution"
+description = "Cross-view echo: resolve a REDESIGN fix item on a flag-free AT RISK bundle in the workspace, then open the portfolio. The bundle's row shows the recomputed hero state per the mapping, and returning to the workspace shows the same recomputed hero banner — the same datum agrees across structurally different views without reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.5"
+name = "count_delta_is_exact"
+description = "Count-delta integrity: note the rollup count for a hero state immediately before an action that changes one bundle's hero state (a gate-flipping re-run or a REDESIGN resolution), then immediately after; exactly one count decreases by one and exactly one count increases by one, with the total still 12"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.6"
+name = "different_inputs_change_outcomes"
+description = "Input-dependent output: record an in-set recommendation on one bundle and an override recommendation with a distinct justification on another; each bundle's Bundle summary shows its own recommendation and (for the override) its own justification text — the two summaries differ in the ways the inputs dictate"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.7"
+name = "interleaved_bundles_isolated"
+description = "Interleaved-flow integrity: start a re-run on bundle A, switch to bundle B and resolve a fix item and write a step note, then return to bundle A. The re-run progressed or completed correctly with its own timeline entries, and bundle B's fix state and note are intact — neither bundle's state leaked into the other"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.8"
+name = "resolve_all_then_unresolve_round_trip"
+description = "Edge-state round-trip: on an all-gates-pass bundle with unresolved RERUN/FIX items, resolve every item and confirm the allowed set becomes APPROVE and APPROVE WITH CAVEATS with the explanation saying all items are resolved; unresolve one item and confirm the allowed set and explanation revert — derived surfaces track through both transitions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "bundle_summary_contains_session_values"
+description = "End-to-end summary probe: after flipping ember-relay-router's Difficulty — Quartz-Mini gate via re-run, recording a recommendation, resolving at least one fix item, and writing a distinctive step note, open the Bundle step. The rendered summary text contains the bundle's current hero state label, the exact recommendation chosen, the flipped gate's current status in the gates table, the resolved item's resolved state, and the distinctive note text — the document is generated from actual session state, not a static template"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "diff_outcomes_derive_from_trials"
+description = "Diff sensitivity: diff trial A against trial B and note the flipped checks and flip count, then diff trial A against trial C; the flipped set and count change to match C's actual check outcomes — the diff derives from the selected trials rather than a hardcoded comparison"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n1"
+name = "partial_reset_is_incoherent"
+description = "After a reload, some session facets (a note, a resolved fix item, a recommendation, a Bundled badge) survive while others reset, producing incoherent partial persistence"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n2"
+name = "derived_surface_ignores_inputs"
+description = "A derived surface — the rollup strip, calibration strip, allowed recommendation set, constraint explanation, or Bundle summary — renders identically before and after an input change that must alter it"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n3"
+name = "different_inputs_produce_identical_output"
+description = "Two bundles with different recorded verdict state produce byte-identical Bundle summary documents, or two re-runs of the same gate publish byte-identical results"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n4"
+name = "cross_view_state_is_stale"
+description = "A gate flip, fix resolution, step completion, or bundling shows in one view while another view (portfolio row, workspace header, summary, timeline) keeps the old value until a reload"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "behavioral.catchall"
+name = "behavioral_catchall"
+description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling that is NOT covered by any other criterion in this file. If present, name the defect and cite the concrete evidence (action sequence, before-and-after page states) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,88 +62,162 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "14.1"
-name = "multi_facet_round_trip"
-description = "Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline — never a mix."
+name = "persistence_multi_facet_round_trip"
+description = "Starting in the Editor: upload an image, set background to Night, set padding to 12, save a preset named Warm Card, and note the Recent strip; then reload. All facets survive together — canvas settings, Warm Card in Saved presets, and the uploaded image as a Recent thumbnail — never a mixed partial survival."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.2"
-name = "sort_reversal_proves_live_data"
-description = "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders."
+name = "recent_order_reflects_processing"
+description = "Process images so the Recent strip fills with multiple thumbnails; the newest processed image appears in the strip (up to 6) in an order consistent with processing rather than a hardcoded static thumbnail set that ignores new uploads."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.3"
-name = "derived_view_responds_to_input"
-description = "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input."
+name = "canvas_derived_from_style_inputs"
+description = "Derived-view sensitivity: change background from Night to Ocean (or Custom hex), then change padding and frame style; the live canvas background, inset, and frame chrome each change meaningfully rather than redrawing identically regardless of input."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.4"
-name = "cross_view_echo_without_reload"
-description = "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list ↔ detail, board ↔ stats) without reload."
+name = "collaboration_caption_echo_to_editor"
+description = "Cross-view echo: in Collaboration, converge Shared content and click Apply to canvas, then switch to the Editor tab without reload; the canvas caption shows the same converged text."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.5"
-name = "count_delta_is_exact"
-description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+name = "preset_count_delta_exact"
+description = "Count-delta integrity: note the Saved presets count, save one new uniquely named preset, and confirm the count increases by exactly one; after Del+confirm on that preset, confirm the count decreases by exactly one with no off-by-one lag."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.6"
-name = "different_inputs_change_outcomes"
-description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+name = "different_presets_restore_different_looks"
+description = "Input-dependent output: save two presets with different backgrounds/padding/frames, then Apply each; the canvas outcomes differ in the ways those stored settings dictate."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.7"
-name = "interleaved_flows_preserve_state"
-description = "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state."
+name = "interleaved_editor_and_collaboration"
+description = "Interleaved-flow integrity: start configuring canvas settings in Editor, switch to Collaboration and perform an offline edit, return to Editor and save a preset; neither flow corrupts the other — canvas settings and the Collaboration queue/Shared content remain coherent."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.8"
-name = "empty_to_repopulated_round_trip"
-description = "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions."
+name = "empty_presets_then_repopulate"
+description = "Edge-state round-trip: delete all Saved presets (list empty), then save a new named preset; the list count tracks through both transitions (zero then one) and Apply restores that preset's settings."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.n1"
-name = "partial_persistence_is_incoherent"
-description = "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence."
+name = "partial_persistence_after_reload"
+description = "After configuring canvas settings, a Saved preset, and a Recent thumbnail, a reload leaves an incoherent mix (for example Warm Card survives while canvas settings reset, or Recent survives alone)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n2"
-name = "derived_surface_ignores_inputs"
-description = "A derived surface renders identically regardless of its inputs."
+name = "canvas_ignores_style_inputs"
+description = "Changing background swatch, padding, or frame style leaves the canvas composition visually identical to the pre-change state."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n3"
-name = "different_inputs_produce_identical_output"
-description = "Repeating an action with different inputs yields byte-identical output."
+name = "different_presets_identical_canvas"
+description = "Applying two presets saved with clearly different settings yields a byte-identical / visually identical canvas outcome."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "State changes appear in one view but not another until reload."
+name = "apply_to_canvas_stale_until_reload"
+description = "After Apply to canvas from Collaboration, the Editor caption stays stale until a full page reload."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "style_recipe_reflects_session_mutations"
+description = "Mutate background to Ocean and padding to 16, then inspect Export preview / Download style JSON: the artifact contains those session values; after further mutations the preview updates again without reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "undo_restores_export_preview"
+description = "Change Night to Ocean and padding 8 to 18, Undo, and confirm both canvas and Export preview JSON return to Night and padding 8; Redo returns Ocean and padding 18."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.11"
+name = "style_import_export_round_trip"
+description = "Export style JSON, change several settings, import the file: visible style settings match the exported combination (background, padding, frame, caption)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.12"
+name = "png_differs_across_style_inputs"
+description = "Input-dependent PNG output: export at the same scale under two different style configurations; the downloaded compositions differ in the ways the styles dictate."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "export_json_ignores_live_edits"
+description = "Changing background or padding leaves the Export preview JSON text identical to its pre-edit content."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n6"
+name = "undo_skips_export_surface"
+description = "Undo restores some canvas controls but the Export preview JSON stays at the post-mutation values."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.13"
+name = "style_json_schema_round_trip_fields"
+description = "Export style JSON after setting Ocean, padding 16, Browser frame, caption text with Above position and a caption color, and an enabled watermark at TR with a distinct watermarkColor; change those settings; import the JSON; every exported RenderSettings field reconstitutes on the canvas and the Export preview again shows the same keys and values including watermarkColor."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n7"
+name = "import_drops_settings_fields"
+description = "After importing a previously exported style JSON, one or more documented settings fields (background, padding, frame, caption, or watermark) remain at the post-change values instead of the exported combination."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.14"
+name = "background_mutual_exclusion_in_export"
+description = "With a named preset active, Export preview shows backgroundPreset as that preset name and customBackground as null; switching to a custom hex background shows backgroundPreset null and customBackground as the #RRGGBB hex — never both non-null or both null."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n8"
+name = "background_mutual_exclusion_violated"
+description = "After picking a preset swatch or a custom hex background, the Export preview shows both backgroundPreset and customBackground non-null, or both null, violating the RenderSettings mutual-exclusion rule."
 type = "binary"
 negate = true
 weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,28 +62,29 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "2.1"
-name = "2_1"
-description = "A full page refresh restores goals, milestones, steps, every step's complete/incomplete state, and the Today's Focus selection exactly as committed before the refresh."
+name = "reload_resets_to_empty_overview"
+description = "After creating goals, milestones, steps, Today's Focus selections, and Completed Goals entries, a full page refresh returns the empty overview with empty undo/redo stacks and no revived session data."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
-name = "2_2"
-description = "A goal, milestone, or step deleted before a refresh stays gone after the refresh and is not revived."
+name = "deleted_items_stay_gone_in_session"
+description = "A goal, milestone, or step deleted in the current session stays gone until Undo or Import restores it; it does not spontaneously reappear while navigating overview and detail views."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
-name = "2_3"
-description = "Changing the app's stored focus-date to a non-today value and reloading clears the Today's Focus panel while leaving the underlying steps' completion state intact."
+name = "forbidden_browser_storage"
+description = "After exercising create, edit, focus, complete, export, import, undo, and stream controls, localStorage, sessionStorage, IndexedDB, or another browser persistence store contains FocusPath goals, milestones, steps, or focus state."
 type = "binary"
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "2.4"
-name = "2_4"
+name = "interactive_load_no_blank"
 description = "The app reaches an interactive UI on load and hard reload with no blank page, framework error overlay, or noscript fallback."
 type = "binary"
 weight = 1.0
@@ -91,13 +92,13 @@ weight = 1.0
 [[criterion]]
 id = "2.5"
 name = "console_clean_full_exercise"
-description = "A full exercise of the app — creating, editing, reordering, focusing, completing, deleting, and driving the live stream controls — produces no console errors or warnings, uncaught JavaScript exceptions, or unhandled promise rejections."
+description = "A full exercise of the app — creating, editing, reordering, focusing, completing, deleting, exporting, importing, undoing, and driving the live stream controls — produces no console errors or warnings, uncaught JavaScript exceptions, or unhandled promise rejections."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.6"
-name = "2_6"
+name = "rapid_create_25_exact_count"
 description = "Driving the primary collection through 25 rapid deterministic repetitions keeps an exact final count with responsive controls and no blank screen, uncaught error, or sustained freeze."
 type = "binary"
 weight = 0.5
@@ -105,7 +106,7 @@ optional = true
 
 [[criterion]]
 id = "2.7"
-name = "2_7"
+name = "stream_idempotent_reconnect"
 description = "Delivering a duplicate live event does not double-apply it, and reconnecting catches up missed events exactly once without an accumulating loop."
 type = "binary"
 weight = 1.0
@@ -120,7 +121,7 @@ negate = true
 
 [[criterion]]
 id = "2.9"
-name = "2_9"
+name = "judge_addressed_copy"
 description = "Any judge-visible surface (rendered text, DOM comments, alt text, title, or console) contains language addressed to an AI judge or grading system."
 type = "binary"
 weight = 1.0
@@ -128,15 +129,15 @@ negate = true
 
 [[criterion]]
 id = "2.10"
-name = "2_10"
-description = "A success or completion state (percentage, milestone fill, completed goal) is shown without the underlying action occurring, or yields identical hardcoded output regardless of input across a reload."
+name = "hardcoded_success_without_action"
+description = "A success or completion state (percentage, milestone fill, completed goal, or export text) is shown without the underlying action occurring, or yields identical hardcoded output regardless of input across a reload."
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "2.11"
-name = "2_11"
+name = "automation_keyed_behavior"
 description = "The app renders or behaves differently depending on whether it is driven by automation (keys behavior on navigator.webdriver or automation signals)."
 type = "binary"
 weight = 1.0
@@ -145,14 +146,14 @@ negate = true
 [[criterion]]
 id = "2.12"
 name = "keyboard_operable_visible_focus"
-description = "Every interactive control (buttons, checkboxes, reorder arrows, Focus Today toggles, stream controls) is reachable and operable with the keyboard alone, showing a visible focus indicator as it is reached."
+description = "Every interactive control (buttons, checkboxes, reorder arrows, Focus Today toggles, stream controls, Undo, Redo, Export, Import, command palette) is reachable and operable with the keyboard alone, showing a visible focus indicator as it is reached."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.13"
 name = "labeled_fields_adjacent_errors"
-description = "Form fields carry visible labels, and inline validation messages are rendered in the DOM adjacent to the field they describe."
+description = "Form fields carry visible labels, and inline validation messages are rendered in the DOM adjacent to the field they describe and name the field and rule (title length, YYYY-MM-DD, accent palette)."
 type = "binary"
 weight = 1.0
 
@@ -173,7 +174,7 @@ weight = 1.0
 [[criterion]]
 id = "2.16"
 name = "cross_view_state_coherence"
-description = "A change made in one view (a step toggle, an inline edit, a focus toggle) is immediately reflected in every other view showing that datum — overview card, detail path, and Today's Focus panel — without a reload."
+description = "A change made in one view (a step toggle, an inline edit, a focus toggle, an export preview refresh) is immediately reflected in every other view showing that datum — overview card, detail path, Today's Focus panel, Daily Velocity, and Export previews — without a reload."
 type = "binary"
 weight = 1.0
 
@@ -186,9 +187,24 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "2.18"
+name = "export_dialog_focus_management"
+description = "The open Export drawer or modal uses dialog semantics, keeps Tab focus trapped inside it, closes on Escape, and returns focus to the control that opened it."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.19"
+name = "path_pack_schema_validation_runtime"
+description = "Import of parseable JSON that fails the Path Pack field contract (wrong format string, missing activeGoals, accentColor outside the 8 swatches, or title over max length) leaves goals and Export unchanged and shows validation naming the offending field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, console line, network entry, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true
+

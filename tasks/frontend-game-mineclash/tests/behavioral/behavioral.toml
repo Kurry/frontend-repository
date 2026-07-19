@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,96 +62,140 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "14.1"
-name = "multi_facet_round_trip"
-description = "Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline — never a mix."
+name = "persistence_multi_facet_reload"
+description = "After completing a match, changing Sound, and setting playerName plus difficulty on setup, a full page refresh restores Stats figures, Match log entries, Sound state, and the remembered playerName and difficulty together — never a mix where some facets persist and others silently reset."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.2"
-name = "sort_reversal_proves_live_data"
-description = "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders."
+name = "match_log_order_proves_live_matches"
+description = "Finish two matches with observably different winners or round-win counts. Open Match log and confirm both entries appear most-recent-first with distinct winner/round-win fields matching each match — not a single hardcoded row."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.3"
-name = "derived_view_responds_to_input"
-description = "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input."
+name = "score_and_strikes_derived_from_play"
+description = "During a round, reveal a safe tile then a mine (or force mine via play). Confirm the You/Rival scores and strike icons change with those reveals — not an identical static HUD redraw regardless of play."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.4"
-name = "cross_view_echo_without_reload"
-description = "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list ↔ detail, board ↔ stats) without reload."
+name = "match_complete_echoes_log_and_stats"
+description = "Win a match (2 round wins). Without reload, confirm Match Complete, the new Match log top entry, and Stats for that difficulty all reflect the same match outcome and ore totals."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.5"
-name = "count_delta_is_exact"
-description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+name = "score_and_strike_count_delta"
+description = "Note the You score and filled strike count, then reveal one safe tile and (separately) one mine when available. Immediately after each action the score rises by the tile ore or drops by 5 (floored at 0) and strikes increase by exactly one on a mine — no off-by-one."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.6"
-name = "different_inputs_change_outcomes"
-description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+name = "different_matches_different_exports"
+description = "Complete two matches with different difficulties or different round outcomes and Export Match for each. Confirm the two JSON artifacts differ in difficulty, winner, or round wins in the ways the play dictates."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.7"
-name = "interleaved_flows_preserve_state"
-description = "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state."
+name = "pause_stats_interleave_preserves_round"
+description = "Start a match, Pause mid-round (note scores and turn), open Stats then Match log then return to the board, and Resume. Confirm neither view switches nor the pause corrupted the frozen scores/turn; resume continues the same round."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.8"
-name = "empty_to_repopulated_round_trip"
-description = "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions."
+name = "empty_log_then_repopulate"
+description = "With no prior matches, Match log and Stats show empty-state messaging; finish one match, then confirm Match log gains a top entry, Stats updates, and the empty state is gone."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.n1"
-name = "partial_persistence_is_incoherent"
-description = "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence."
+name = "partial_persistence_incoherent"
+description = "After finishing a match and reloading, Stats survive but Match log, Sound, or remembered playerName/difficulty silently revert (or the reverse), producing incoherent partial persistence."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "14.n2"
-name = "derived_surface_ignores_inputs"
-description = "A derived surface renders identically regardless of its inputs."
+name = "hud_ignores_reveal_inputs"
+description = "Revealing safe tiles or mines leaves scores, strikes, and the turn banner identical regardless of those actions."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "14.n3"
-name = "different_inputs_produce_identical_output"
-description = "Repeating an action with different inputs yields byte-identical output."
+name = "different_matches_identical_exports"
+description = "Repeating two finished matches with observably different outcomes yields byte-identical Export Match JSON that ignores the play."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "State changes appear in one view but not another until reload."
+name = "cross_view_stale_until_reload"
+description = "After Match Complete, Match log or Stats stay stale until a full page reload rather than reflecting the new match immediately."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
+
+[[criterion]]
+id = "14.9"
+name = "export_reflects_different_play"
+description = "Finish two matches with different play outcomes and export each via Export Match. Confirm the two JSON artifacts differ in winner, round wins, or totals in the ways the play dictates."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "save_resume_reload_round_trip"
+description = "During a round after at least one reveal, Save Progress, reload, Resume Saved Match: scores, strikes, turn, hints remaining, and board match the pre-reload checkpoint while committed Stats and Match log facets also remain coherent."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.11"
+name = "import_export_match_round_trip"
+description = "Export a finished match, note its playerName/difficulty/winner/round wins, import the match-json, and confirm Match log shows an entry matching those fields without inventing extra fabricated matches."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.12"
+name = "rematch_resets_live_keeps_meta"
+description = "From Match Complete, Rematch resets both sides to score 0 and 0 strikes for Round 1 at the same difficulty while prior Match log entries and Stats from earlier matches remain."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "export_identical_across_different_play"
+description = "Export Match produces byte-identical JSON for two finished matches that had observably different winners, difficulties, or round-win counts."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "14.n6"
+name = "rematch_leaks_prior_scores"
+description = "After Rematch from Match Complete, Round 1 still shows the previous match's live scores or strikes instead of resetting to 0."
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "behavioral.catchall"
 name = "behavioral_catchall"
 description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true

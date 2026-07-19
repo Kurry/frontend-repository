@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,152 +62,218 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "iso_step_updates_three_surfaces"
+description = "Stepping ISO up one stop updates three surfaces at once without a reload: the ISO dial label shows the next stop in the list, the tiled noise overlay on the preview becomes visibly more opaque, the exposure meter dot moves up the vertical track, and both the EV number and the histogram shape change."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "create_preset_count_filter_and_mode_roundtrip"
+description = "After creating a valid preset in Presets/Compare mode with a lookTag from the closed enum, the visible preset count increases by exactly one, the new row appears with its name and stop readout, applying its lookTag filter still shows the new row, the Export panel JSON presets array includes that name and lookTag, and switching to Meter/Lab and back shows the same new preset without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "apply_preset_writes_shared_dials"
+description = "Applying a preset writes its stops into the shared dial state: the three dial labels change to the preset's aperture, shutter, and ISO; the preview brightness, blur, motion frame, and noise re-render to match; and the meter dot moves to the position those stops imply — without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "edit_preset_updates_everywhere"
+description = "Editing a preset's name and stops updates that same record everywhere it appears — the list row, any compare panel showing it, the Export panel JSON, and the dials after re-applying it — without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "favorite_filter_then_delete_count_delta"
+description = "Marking a preset as favorite shows its favorite badge immediately, and switching the filter to favorites recomputes the visible list to include it; deleting that preset removes it from the list, any selection or compare slot, and the favorites filter results, and the visible preset count decreases by exactly one."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "reload_returns_seeded_state"
+description = "Reloading the page returns the app to its seeded state: default stops f/16, 1/60, ISO 100 on the dials, only the seeded presets and seeded snapshots in their collections, and empty undo/redo stacks."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "favorites_and_tag_filters_recompute_list"
+description = "With mixed presets present: mark one favorite and switch to favorites-only — only favorites remain visible; switch to a lookTag filter — only matching lookTags remain; clearing filters restores the full collection; the Export panel favorite boolean matches the badge for the toggled preset."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "help_panel_open_close_keeps_workflow"
+description = "Open the in-page help panel, read an explainer, then close it: Meter/Lab or Presets/Compare workflow continues with the same dial and preset state — no navigation away and no reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "invalid_create_keeps_count_with_inline_error"
+description = "Submitting the preset form with an empty name adds no row: the visible preset count stays the same and an inline validation message naming the name field appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "mode_switch_preserves_dials_and_presets"
+description = "After changing dials in Meter/Lab and/or creating a preset in Presets/Compare, switching modes swaps the region without a full page reload and retains the current dial values and the same preset collection."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "preset_crud_unavailable_from_ui"
+description = "Preset create, edit, or delete cannot be completed from the visible UI controls."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "create_fails_to_appear_or_duplicates"
+description = "Creating a valid preset either fails to add a visible row or adds duplicate rows for a single submit."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "apply_look_desyncs_meter_lab"
+description = "After applying a preset, Meter/Lab dial readouts, preview stack, and exposure meter disagree with each other or with the preset's saved stops."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "mode_switch_loses_selection_or_breaks_layout"
+description = "Switching between Meter/Lab and Presets/Compare breaks the layout or loses the current preset selection / dial values."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_presets_region_broken"
+description = "After deleting all presets, the presets list region is blank or broken with no empty-state guidance."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "filter_views_disagree"
+description = "Favorites-only and lookTag filtered lists disagree about which presets are visible for the same underlying collection state."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "help_panel_cannot_reopen_or_close"
+description = "After opening or closing help, the help trigger cannot reopen or close the panel again."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "help_overlay_blocks_with_no_exit"
+description = "The help panel blocks the lab with no working close control (no close affordance, Escape, or equivalent exit)."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "failed_preset_create_silent"
+description = "An invalid preset create attempt provides no visible validation feedback and leaves the user without an explanation."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "mode_or_help_dead_end_requires_reload"
+description = "Recovering from a mode switch or help overlay requires a full page reload — the UI reaches a dead end."
 type = "binary"
+weight = 1.0
 negate = true
+
+
+[[criterion]]
+id = "6.11"
+name = "before_hold_then_release_restores"
+description = "With dials off defaults: holding Before shows default preview/meter/EV/histogram; releasing restores the off-default dials and derived surfaces exactly — without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "snapshot_save_restore_round_trip"
+description = "Saving a named snapshot increases the snapshot count by one; stepping dials away and restoring that snapshot returns dial labels, preview, meter, EV, and histogram to the saved stops."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "copy_stops_updates_list_and_export"
+description = "Select a preset whose stops differ from the dials, activate Copy stops, and confirm that preset's stop readout matches the current dials in the list and in the Export panel JSON."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "batch_delete_then_undo_restores"
+description = "Select three presets, choose Delete selected, confirm the count drops by exactly three and the Export panel loses those three names; press Undo and confirm the three presets and Export panel text return."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "export_import_round_trip_restores_session"
+description = "Mutate dials, create one valid preset with a lookTag from the closed enum, and save one valid snapshot; copy or download the lab package; reload to seed; import that package and confirm dials, the new preset (name, stops, lookTag), the new snapshot, EV, histogram, and Export panel text all match the pre-export session."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "export_import_fails_to_reconstruct"
+description = "After a valid export then import of a mutated lab package, dials, presets, or snapshots diverge from the exported session."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "6.n12"
+name = "batch_delete_leaves_selected_rows"
+description = "After Delete selected on multiple checked presets, one or more of those presets remain visible in the list."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "6.16"
+name = "create_preset_export_shows_looktag_fields"
+description = "After creating a valid preset, the Export panel JSON presets array entry for that preset visibly includes name and lookTag field names with the submitted values, matching the form payload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.17"
+name = "snapshot_appears_in_export_snapshots_array"
+description = "After saving a valid named snapshot, the Export panel JSON snapshots array gains an object with name, aperture, shutter, and iso matching the saved stops."
+type = "binary"
 weight = 1.0
 
 [[criterion]]
@@ -215,5 +281,5 @@ id = "user_flows.catchall"
 name = "user_flows_catchall"
 description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,94 +62,94 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "12.1"
-name = "mandated_modules_are_bound"
-description = "All contract-mandated modules are initialized and bound."
+name = "session_browse_artifact_modules_bound"
+description = "Contract modules command-session-v1, browse-query-v1, and artifact-transfer-v1 are initialized and bound so webmcp_list_tools surfaces session_*, browse_*, and artifact_* tools for this app."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.2"
-name = "handlers_match_visible_ui_logic"
-description = "Exposed tool handlers match visible UI command logic."
+name = "session_handlers_match_ui_controls"
+description = "Invoking session start/pause/resume/restart produces the same visible run-state changes as pressing Start game, Pause, Resume, and Play again/restart in the UI (same store commands)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.3"
-name = "only_documented_operations_exist"
-description = "Only documented operations and routes are available."
+name = "only_declared_ops_destinations_artifacts"
+description = "Exposed tools stay within declared session operations (start, pause, resume, restart), browse destinations (game-board, match-history, achievements), and artifact operations/formats (export, import, copy; run-json, history-json) — no invented modules or undeclared routes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.4"
-name = "contract_is_automation_exercisable"
-description = "The contract can be fully exercised via automation."
+name = "contract_exercisable_via_automation"
+description = "webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool can exercise the bound session operations, browse destinations, and artifact export/import/copy triggers without manual harness edits."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.5"
-name = "declared_entity_operations_work"
-description = "Entity operations declared in the contract, including create, update, delete, and reorder, all work."
+name = "session_operations_all_work"
+description = "Session operations start, pause, resume, and restart each change the visible run appropriately (run begins; board dims/freezes; motion continues; run resets) when invoked through WebMCP."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.6"
-name = "form_flow_operations_are_bound"
-description = "Form submission validation, error, and cancel operations are clearly bound."
+name = "browse_destinations_switch_panels"
+description = "Browse open (or equivalent) to destinations game-board, match-history, and achievements switches the visible panel the same way as the Game, History, and Achievements tabs."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.7"
-name = "queries_match_allowed_spec"
-description = "Query destinations and filters match the allowed specification."
+name = "destinations_match_bindings"
+description = "Browse destinations match the Bindings list exactly: game-board, match-history, achievements — not arbitrary URLs or undeclared panels."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.8"
-name = "capabilities_stay_declared"
-description = "No extra or undeclared module routes or capabilities are exposed."
+name = "artifact_export_import_copy_bound"
+description = "Artifact tools for export, import, and copy are bound to run-json and history-json formats/modes and drive the same Export Run / Export History / Import / Copy UI paths (without returning raw file or clipboard contents in tool results)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.9"
-name = "session_tool_and_invoke_apis_work"
-description = "Session info, tool list, and invocation are correctly surfaced."
+name = "session_list_invoke_surface_ok"
+description = "webmcp_session_info returns usable session metadata, webmcp_list_tools lists the bound tools, and webmcp_invoke_tool returns structured results without errors for declared operations."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.10"
-name = "mcp_initializes_without_harness_edits"
-description = "MCP initialization works without manual editing or test harness changes."
+name = "mcp_init_without_harness_edits"
+description = "MCP tools register from the app's own implementation of the module_spec + Bindings without requiring edits to /tests or the verifier harness."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.n1"
 name = "mcp_tools_missing_or_noop"
-description = "MCP tooling is unbound, missing, or a no-op."
+description = "WebMCP session/browse/artifact tools are missing, unbound, or invoke as no-ops that leave the visible run/panel/export state unchanged."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n2"
-name = "handlers_diverge_from_ui_logic"
-description = "Handlers do not match UI logic because actions mismatch or state does not sync."
+name = "handlers_diverge_from_ui"
+description = "A WebMCP session, browse, or artifact invoke updates tool output as success while the visible UI stays on a mismatched run state, panel, or export surface."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n3"
-name = "undeclared_capabilities_exposed"
-description = "Undeclared destinations or entity operations are exposed."
+name = "undeclared_destinations_or_ops"
+description = "Tools expose undeclared destinations, session operations, or artifact formats beyond start/pause/resume/restart, game-board/match-history/achievements, and run-json/history-json export/import/copy."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,15 +157,15 @@ weight = 1.0
 [[criterion]]
 id = "12.n4"
 name = "automation_cannot_exercise_contract"
-description = "The contract cannot be exercised from automation."
+description = "webmcp_list_tools / webmcp_invoke_tool cannot exercise the declared session operations, browse destinations, or artifact export/import/copy triggers."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n5"
-name = "validation_bypass_desyncs_state"
-description = "Validation bypasses lead to inconsistent MCP and UI state."
+name = "mcp_ui_state_desync"
+description = "Contract-driven navigation, session, or artifact commands leave MCP-reported state and the rendered tabs/run/export controls permanently desynced."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,39 +173,39 @@ weight = 1.0
 [[criterion]]
 id = "12.n6"
 name = "session_or_tool_api_errors"
-description = "The session or tool API returns errors or incomplete data."
+description = "webmcp_session_info, webmcp_list_tools, or webmcp_invoke_tool returns errors or incomplete tool metadata for the declared bindings."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n7"
-name = "mcp_relies_on_undocumented_hacks"
-description = "MCP relies on manual or undocumented test hacks."
+name = "mcp_relies_on_test_hacks"
+description = "MCP only works after manual/undocumented test harness hacks rather than app-registered tools."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n8"
-name = "required_contract_module_missing"
-description = "No module contract is implemented where one is declared required."
+name = "required_modules_missing"
+description = "webmcp_list_tools omits command-session-v1, browse-query-v1, or artifact-transfer-v1 bindings despite those modules being declared required in the contract."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n9"
-name = "mcp_is_stubbed_or_commented_out"
-description = "The MCP interface is commented out or only stubbed."
+name = "mcp_stubbed_only"
+description = "MCP interfaces are commented out or stubbed-only, and invokes leave the shared store and visible controls unchanged."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n10"
-name = "automated_contract_validation_fails"
-description = "The project fails automated MCP contract validation."
+name = "fake_success_without_ui_change"
+description = "A session/browse/artifact tool reports success while the UI shows no corresponding start/pause/resume/restart, panel change, or export/import/copy surface update (fake success path)."
 type = "binary"
 negate = true
 weight = 1.0
@@ -213,7 +213,7 @@ weight = 1.0
 [[criterion]]
 id = "mcp_contract.catchall"
 name = "mcp_contract_catchall"
-description = "The app exhibits a significant, browser-observable defect in the declared MCP contract that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The MCP contract deviates from its declaration in a way not covered by any other criterion in this file. If present, name the defect and cite concrete browser/tool evidence. If already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

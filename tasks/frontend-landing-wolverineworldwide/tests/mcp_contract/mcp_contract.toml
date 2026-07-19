@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,94 +62,94 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "12.1"
-name = "mandated_modules_are_bound"
-description = "All contract-mandated modules are initialized and bound."
+name = "all_four_modules_bound"
+description = "Contract modules browse-query-v1, entity-collection-v1, form-workflow-v1, and artifact-transfer-v1 are initialized and bound (webmcp_session_info / webmcp_list_tools show tools with browse, entity, form, and artifact prefixes)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.2"
-name = "handlers_match_visible_ui_logic"
-description = "Exposed tool handlers match visible UI command logic."
+name = "handlers_match_visible_ui"
+description = "Exposed tool handlers drive the same visible UI logic as on-page controls for section destinations, news-pin toggles, cookie consent form submit/cancel, and briefing export/copy."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.3"
-name = "only_documented_operations_exist"
-description = "Only documented operations and routes are available."
+name = "only_documented_operations"
+description = "Only documented operations for the four modules are available — no undeclared routes, arbitrary URL/selector tools, or extra modules beyond Bindings."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.4"
-name = "contract_is_automation_exercisable"
-description = "The contract can be fully exercised via automation."
+name = "contract_exercisable_via_automation"
+description = "The contract can be fully exercised via webmcp_invoke_tool for browse open, entity toggle/create on news-pin, form submit on consent fields, and artifact import/export/copy for json and markdown (import modes paste/file)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.5"
-name = "declared_entity_operations_work"
-description = "Entity operations declared in the contract, including create, update, delete, and reorder, all work."
+name = "browse_destinations_include_briefing_palette"
+description = "Browse open works for declared destinations including investor-briefing and command-palette as well as hero; brand-portfolio; annual-report; culture-statement; market-snapshot; latest-news; culture-stats; awards; careers-cta; mobile-menu; responsibility-dropdown."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.6"
-name = "form_flow_operations_are_bound"
-description = "Form submission validation, error, and cancel operations are clearly bound."
+name = "entity_news_pin_matches_ui"
+description = "Entity operations on news-pin (create/select/delete/toggle with fields title and pinned) update the same shortlist and pinned-card UI as the Pin to briefing controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.7"
-name = "queries_match_allowed_spec"
-description = "Query destinations and filters match the allowed specification."
+name = "form_consent_fields_match_bindings"
+description = "Form fields necessary, analytics, marketing, and functional with operations validate/submit/cancel/reset match the cookie preferences modal and apply the same visible consent state as Manage preferences → Save; validate/submit reject invalid drafts (necessary false or incomplete booleans) with the same named field errors as the UI."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.8"
-name = "capabilities_stay_declared"
-description = "No extra or undeclared module routes or capabilities are exposed."
+name = "artifact_import_export_formats_json_markdown"
+description = "Artifact operations import, export, and copy are bound (import modes paste/file; export formats json and markdown) and trigger the same Investor briefing Import/download/copy paths as the visible controls (without returning raw file bytes in tool results; file picker and clipboard remain Playwright-observed)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.9"
-name = "session_tool_and_invoke_apis_work"
-description = "Session info, tool list, and invocation are correctly surfaced."
+name = "session_list_invoke_apis_work"
+description = "window.webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool correctly surface session info, the tool list for all four modules, and invocation results without errors."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.10"
-name = "mcp_initializes_without_harness_edits"
-description = "MCP initialization works without manual editing or test harness changes."
+name = "mcp_init_without_harness_edits"
+description = "MCP tools register from the app's own module_spec + Bindings implementation without requiring manual edits to the verifier harness."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.n1"
 name = "mcp_tools_missing_or_noop"
-description = "MCP tooling is unbound, missing, or a no-op."
+description = "Browse, entity, form, or artifact MCP tooling is unbound, missing, or a no-op when invoked."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n2"
-name = "handlers_diverge_from_ui_logic"
-description = "Handlers do not match UI logic because actions mismatch or state does not sync."
+name = "handlers_diverge_from_ui"
+description = "A tool invocation for browse open, news-pin toggle, consent form submit, or artifact import/export updates MCP-reported state without matching the visible UI (or the reverse)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n3"
-name = "undeclared_capabilities_exposed"
-description = "Undeclared destinations or entity operations are exposed."
+name = "undeclared_destinations_or_ops_exposed"
+description = "Undeclared destinations, entity fields, form fields, export formats, import modes, or operations outside the Bindings/permitted_operations lists are exposed via webmcp_list_tools."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,55 +157,55 @@ weight = 1.0
 [[criterion]]
 id = "12.n4"
 name = "automation_cannot_exercise_contract"
-description = "The contract cannot be exercised from automation."
+description = "webmcp_invoke_tool cannot exercise browse open, entity news-pin, form consent submit, or artifact import/export against the declared bindings."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n5"
-name = "validation_bypass_desyncs_state"
-description = "Validation bypasses lead to inconsistent MCP and UI state."
+name = "entity_pin_desyncs_shortlist"
+description = "Invoking entity toggle/create for news-pin leaves MCP and the visible shortlist/pin marks inconsistent with a manual Pin to briefing activation."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n6"
-name = "session_or_tool_api_errors"
-description = "The session or tool API returns errors or incomplete data."
+name = "form_submit_desyncs_consent_briefing"
+description = "Invoking form submit for consent fields leaves the cookie banner/modal or briefing consent object inconsistent with saving preferences in the UI."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n7"
-name = "mcp_relies_on_undocumented_hacks"
-description = "MCP relies on manual or undocumented test hacks."
+name = "artifact_export_bypasses_ui_preview"
+description = "Artifact import/export/copy reports success while the visible Investor briefing preview still shows stale pins or consent values that disagree with the session (or only works via undocumented harness stubs)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n8"
-name = "required_contract_module_missing"
-description = "No module contract is implemented where one is declared required."
+name = "required_modules_missing"
+description = "One or more of browse-query-v1, entity-collection-v1, form-workflow-v1, or artifact-transfer-v1 is not implemented despite being declared required in the contract."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n9"
-name = "mcp_is_stubbed_or_commented_out"
-description = "The MCP interface is commented out or only stubbed."
+name = "mcp_stubbed_or_commented_out"
+description = "The MCP interface is commented out or only stubbed so list/invoke cannot reach real handlers."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n10"
-name = "automated_contract_validation_fails"
-description = "The project fails automated MCP contract validation."
+name = "destination_or_export_bindings_incomplete"
+description = "One or more declared destinations (including investor-briefing and command-palette), news-pin entity bindings, consent form fields, import modes paste/file, or json/markdown export formats are missing from the bound surface."
 type = "binary"
 negate = true
 weight = 1.0

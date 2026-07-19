@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -146,8 +146,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "full_state_survives_reload"
-description = "After creating, formatting, pinning, tagging, archiving, attaching a file to, and marking notes done, a full page refresh restores every note with its text and bold/italic formatting, tags, TODO designation, done state, pin state, archive state, and attachment name/size chip exactly as before"
+name = "reload_resets_to_empty_baseline"
+description = "After creating notes, pinning, tagging, and opening Export, a full page refresh returns the app to the empty seeded baseline: empty timeline with the first-note empty-state prompt, empty tag rail, and no active filters — never a mix of surviving notes with reset chrome"
 type = "binary"
 weight = 1.0
 
@@ -196,7 +196,7 @@ weight = 1.0
 [[criterion]]
 id = "1.30"
 name = "note_controls_are_inert_stubs"
-description = "The note list is static or read-only markup: Send, Edit, Pin, Archive, or Delete controls do not actually mutate the collection"
+description = "The note list is static or read-only markup: Send, Edit, Pin, Archive, or Delete controls are inert stubs that leave the collection unchanged when activated"
 type = "binary"
 weight = 1.0
 negate = true
@@ -212,7 +212,7 @@ negate = true
 [[criterion]]
 id = "1.32"
 name = "single_page_shell_layout"
-description = "The app opens at / into a single-column shell showing a sticky top bar titled TagNote with Calendar, Archived, History, Apply Scenario Change, Undo, and Redo controls, a search field, a horizontal tag rail, the note timeline, and a composer pinned to the bottom, and exercising these controls never navigates away from the page"
+description = "The app opens at / into a single-column shell showing a sticky top bar titled TagNote with Calendar, Archived, History, Export, Import, Apply Scenario Change, Undo, and Redo controls, a search field, a horizontal tag rail, the note timeline, and a composer pinned to the bottom, and exercising these controls never navigates away from the page"
 type = "binary"
 weight = 1.0
 
@@ -253,15 +253,15 @@ weight = 1.0
 
 [[criterion]]
 id = "1.38"
-name = "send_flow_rail_counts_reload_chain"
-description = "Starting from a loaded timeline, type call mom #family #todo and send: exactly one new bubble appears under the Today header, the visible note count measured immediately before and after differs by exactly one, the tag rail's family and todo chips each increase their usage count by one (appearing with count 1 when new), and a full page reload restores the note, its two chips, and the same rail counts exactly"
+name = "send_flow_rail_counts_chain"
+description = "Starting from a loaded timeline, type call mom #family #todo and send: exactly one new bubble appears under the Today header, the visible note count measured immediately before and after differs by exactly one, and the tag rail family and todo chips each increase their usage count by one (appearing with count 1 when new), all without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.39"
-name = "bold_format_edit_reload_chain"
-description = "Bold a word in the composer and send, confirm the sent bubble renders the word bold, then edit that note, toggle the bold off, and save, confirming the saved bubble renders it plain; a page reload after each of the two steps shows the same rendered formatting state as before the reload"
+name = "bold_format_edit_export_marks_chain"
+description = "Bold a word in the composer and send, confirm the sent bubble renders the word bold, then edit that note, toggle the bold off, and save, confirming the saved bubble renders it plain; opening Export after each of the two steps shows Session JSON marks that match the visible formatting state"
 type = "binary"
 weight = 1.0
 
@@ -274,10 +274,82 @@ weight = 1.0
 
 [[criterion]]
 id = "1.41"
-name = "todo_done_split_reload_chain"
-description = "Marking work as a TODO tag adds a checkbox to every timeline note carrying work; checking one of those notes inside the work filtered view moves it from the Open section to the Done section immediately, and after a full page reload the tag's TODO designation and that note's Done placement are restored exactly"
+name = "todo_done_split_export_chain"
+description = "Marking work as a TODO tag adds a checkbox to every timeline note carrying work; checking one of those notes inside the work filtered view moves it from the Open section to the Done section immediately, and Session JSON lists work under todoTags with that note done true"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "note_text_field_contract_blank_and_length"
+description = "Sending blank/whitespace-only composer text or text longer than 2000 characters appends no note and shows an inline validation message naming the text field; the last valid timeline stays intact"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "search_syntax_chips_filter"
+description = "Clicking the tag:family search syntax chip fills the search field with tag:family and narrows the visible list to family-tagged notes; clearing the field restores the prior unfiltered list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "bulk_archive_selected_updates_surfaces"
+description = "Selecting 2 notes and activating Archive selected moves both into the Archived view, decreases the main timeline visible count by exactly 2, updates tag rail counts, and clears the selection"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "export_session_json_field_contract"
+description = "Opening Export shows a Session JSON preview whose visible text includes schemaVersion equal to tagnote-session/v1, exportedAt, todoTags, and notes keys; after sending a distinctive note with #family and pinning it, the preview contains that note text and family tag with pinned true"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "export_timeline_markdown_reflects_session"
+description = "After sending a distinctive note, the Timeline Markdown export tab preview contains that note text and its tags as hash-words under a date grouping matching the timeline"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "export_copy_and_download_controls"
+description = "On an Export format tab, Copy places the preview text on the clipboard with a visible confirmation, and Download triggers a real file download whose contents match the previewed text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "import_session_json_round_trip"
+description = "After exporting a Session JSON document that includes at least one distinctive pinned note, clearing the session via reload, and Importing that JSON, the timeline shows the same bubble text, pin state, and matching tag rail counts"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "import_invalid_field_contract_rejected"
+description = "Importing JSON with wrong schemaVersion or a mark style outside bold|italic leaves notes and rail counts unchanged and shows visible validation naming the offending field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "export_omits_session_mutations"
+description = "After sending a distinctive note and pinning it, the Session JSON or Timeline Markdown export preview omits that note text or pin state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.51"
+name = "bulk_actions_are_inert"
+description = "Selecting notes and activating Archive selected or Pin selected leaves the timeline and Archived view unchanged"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.catchall"

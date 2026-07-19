@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,217 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "For fidelity tasks, evaluate whether the app matches the reference's UX affordances. Empty state UI is present and renders when a collection is empty."
+name = "rapid_hamburger_x_settles_open_or_closed"
+description = "Rapidly clicking the hamburger and the X control in succession never leaves the menu overlay stuck half-open or the page inert; the menu always settles fully open or fully closed."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "escape_while_menu_closed_noop"
+description = "Pressing Escape while the menu is closed and no other overlay is open changes nothing on the page (overlay stays closed; scroll and chrome unchanged)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "empty_newsletter_submit_blocked"
+description = "Submitting the newsletter form with an empty email field is blocked: an inline message names the email field and no confirmation appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "double_subscribe_one_confirmation"
+description = "Double-activating the Subscribe control on one valid email shows exactly one confirmation message."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "video_leave_mid_fade_restores_placeholder"
+description = "Moving the pointer off the social video card mid-fade restores the placeholder image to fully opaque and pauses the video."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "webgl_unavailable_static_hero_usable"
+description = "If WebGL rendering is unavailable, the hero shows a static composition of the same artwork and every section, control, and flow (menu, newsletter, video hover, race calendar, shortlist, press kit, palette) remains present and usable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "newsletter_errors_name_email_field"
+description = "Newsletter validation errors name the email field with actionable text rather than only saying Invalid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "newsletter_controls_semantic"
+description = "The newsletter email field and Subscribe control use semantic input/button elements with visible labels (or accessible name equivalents) rather than unlabeled div shells."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "menu_close_paths_work"
+description = "The open menu overlay closes via the X control and via Escape, restoring an interactive homepage under the fixed nav."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "subscribe_disabled_until_valid_email"
+description = "The Subscribe control stays disabled until the newsletter field holds a contract-valid email (exactly one @, non-empty local part, domain segment containing a dot)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "menu_stuck_half_open"
+description = "After rapid hamburger/X clicks, the menu overlay remains stuck half-open or the page is left inert."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "newsletter_errors_only_in_console"
+description = "Submitting an empty or invalid newsletter email surfaces errors only in the browser console with no inline message naming the email field."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "newsletter_or_video_silent_feedback"
+description = "A valid newsletter submit or a video hover/leave cycle produces no visible feedback (no confirmation, no playback/placeholder change)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "empty_submit_shows_confirmation"
+description = "Submitting the newsletter with an empty field shows a confirmation message."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "menu_interactive_chrome_nonsemantic"
+description = "The hamburger, menu close control, or Subscribe control are non-semantic div/span shells without button semantics or accessible names."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "menu_not_keyboard_dismissible"
+description = "The open menu overlay cannot be dismissed via Escape or a focusable close control."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "newsletter_validation_feedback_missing"
+description = "An empty or invalid newsletter submit shows no inline validation indication naming the email field."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "store_or_subscribe_labels_missing"
+description = "The STORE button or Subscribe control lacks readable labels or uses blank/ambiguous text."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "video_stuck_mid_fade"
+description = "Leaving the social video card mid-fade leaves the placeholder partially transparent or the video stuck playing."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "webgl_failure_breaks_homepage"
+description = "When WebGL is unavailable, the hero is blank/broken or menu, newsletter, or video flows become unusable."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "escape_closes_press_kit_or_palette"
+description = "Pressing Escape while the press kit or command palette is open closes that overlay and returns focus to the control that opened it."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "filter_preserves_hidden_selections"
+description = "Filtering the race calendar to Completed then back to All keeps previously selected Upcoming races selected; the Selected races count does not drop solely because a filter hid rows."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "empty_press_kit_valid_previews"
+description = "Opening the press kit with zero selected races and zero shortlisted assets shows valid empty-state previews (JSON with schemaVersion 1, empty races/shortlist, newsletter none, ICS with zero VEVENT entries) rather than an error blank."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "empty_undo_redo_noop"
+description = "Undo when the undo stack is empty is a no-op that does not clear unrelated UI; Redo when the redo stack is empty is likewise a no-op."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "filter_clears_hidden_race_selections"
+description = "Switching the race status filter clears selections on races that were only temporarily hidden by the filter."
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "4.20"
+name = "out_of_enum_status_rejected"
+description = "Submitting the race status editor with a value outside Upcoming or Completed is blocked with an inline error naming status and the race chip does not change."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.21"
+name = "malformed_import_keeps_state"
+description = "Importing malformed or undecodable press-kit JSON, or JSON that violates the field contract (wrong schemaVersion, missing races, non-YYYY-MM-DD date, status outside Upcoming/Completed, shortlist kind outside helmet/editorial, empty or over-length shortlist label, shortlist index < 1, newsletter neither none nor a contract-valid email), shows a visible error naming the import problem, leaves selections and shortlist unchanged, and produces no console errors."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n20"
+name = "malformed_import_corrupts_state"
+description = "Importing schema-invalid press-kit JSON mutates Selected races or shortlist without a visible named import error."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n12"
+name = "empty_press_kit_errors_or_blank"
+description = "Opening PRESS KIT with no selections shows a blank/error drawer instead of valid empty JSON/ICS previews."
 type = "binary"
 negate = true
 weight = 1.0

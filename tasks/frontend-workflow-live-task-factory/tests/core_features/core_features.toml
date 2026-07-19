@@ -1,0 +1,263 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "5.1"
+name = "demo_mode_default_populated"
+description = "On first load with no credentials entered, a clearly visible mode indicator in the top bar reads Demo data, and the Candidates view lists the 3 seeded repositories (nimbusworks/driftline, cobalt-labs/loomdb, fernfield/petrel) each showing its name, primary language, and merged-PR count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.2"
+name = "connections_panel_masked_credentials"
+description = "The Connections control opens a slide-over panel containing a GitHub token field, an AI base URL field prefilled with https://api.openai.com, and an AI API key field; both key fields are masked by default and each has a show/hide toggle that reveals the value only while active"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.3"
+name = "credential_connect_lifecycle"
+description = "Entering a GitHub token (any value works for this probe) and activating Connect triggers a visible checking status on that credential row, followed by either Connected with an account login or a visible error carrying the failure status or message with the row remaining Disconnected; after a failed check the fixture repositories, PRs, and packages remain in place and every demo flow still works"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.4"
+name = "pr_list_columns_and_paging"
+description = "Selecting a seeded repository lists its merged pull requests (at least 8 exist per seeded repo) showing per PR the number, title, merged date, a linked-issue indicator, the changed-file count, and a non-test source-file count; the list loads in pages of 5 with a visible control to load the next page and a running count of loaded versus total PRs"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.5"
+name = "source_file_filter_and_issue_toggle"
+description = "The source-file filter with minimum and maximum bounds (defaults 3 and 10) narrows the PR list to PRs whose non-test source-file count is inside the bounds, and the require-linked-issue toggle further narrows to PRs with a linked issue; active filters render as removable chips and clearing them restores the full list exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.6"
+name = "pr_detail_changed_files_test_exclusion"
+description = "Opening a PR's detail shows the full title, body text, the linked issue with number and title (or an explicit No linked issue notice), and a changed-files table listing each filename with its additions and deletions; files in test directories or with test-style filenames are visibly tagged as test files and are excluded from the PR's source-file count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.7"
+name = "triage_columns_and_reject_taxonomy"
+description = "The Triage view shows Inbox, Accepted, and Rejected columns; Accept moves a card to Accepted, Reject requires choosing exactly one reason from too-few-files, too-many-files, docs-only, and no-linked-issue before completing, the rejected card shows its reason as a labeled badge, and the Rejected column can be filtered by reason"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.8"
+name = "triage_stats_derive_live"
+description = "The triage header stats (total candidates, accepted count, rejected count, and the per-reason rejected breakdown) update immediately after each accept or reject action without a reload, and the displayed counts match the actual cards in each column"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.9"
+name = "triage_undo_reverts_exactly"
+description = "After an accept or reject, an Undo affordance (toast or inline control) is available for at least the most recent action; activating it returns the card to its previous column and reverts the header stats to their prior values exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.10"
+name = "pipeline_four_stages_with_statuses"
+description = "Starting Run pipeline from an accepted PR shows four stages in order — Fetch, Evaluate, Generate, Package — each advancing visibly through pending, running, and complete or failed; a retrying stage shows a retrying status with an attempt counter such as attempt 2 of 3"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.11"
+name = "evaluate_streams_and_ends_with_verdict"
+description = "The Evaluate stage streams its assessment text progressively (text appears incrementally, not all at once) and ends with a visible verdict of substantial or trivial plus a one-line reason citing the PR's non-test source-file count against the 3-to-10 window"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.12"
+name = "generate_streams_instruction_text"
+description = "The Generate stage streams the task instruction text as it is produced, the text references the selected PR's linked issue or title content, and the final streamed text is what appears as the package's instruction document"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.13"
+name = "stage_retry_resumes_from_failure"
+description = "A failed stage surfaces its error inline with a status code and message plus a Retry control, and activating Retry resumes the run from that stage: fernfield/petrel PR 31 fails Generate across 3 attempts with visible backoff, is marked failed with an inline error summary, and completes after a manual Retry with the Fetch and Evaluate outputs and timestamps unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.14"
+name = "rate_limit_countdown_auto_retry"
+description = "Running nimbusworks/driftline PR 58 in demo mode hits a simulated rate limit on Evaluate's first attempt showing a 429 status and a visible reset countdown that ticks down; when the countdown reaches zero the stage retries automatically, the attempt counter increments, and the run succeeds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.15"
+name = "pause_resume_and_event_timeline"
+description = "A running pipeline can be paused (stage progression freezes) and resumed (it continues from exactly the same stage with earlier outputs unchanged), and the run's event timeline lists stage transitions in order with timestamps, supports filtering by status, and selecting a timeline entry highlights the corresponding stage"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.16"
+name = "trivial_verdict_ends_run_without_package"
+description = "Running a PR whose Evaluate verdict is trivial (for example the seeded docs-only PR) ends the run after Evaluate with a visible trivial outcome naming the reason, and no package is produced for that run"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.17"
+name = "package_four_parts_and_difficulty"
+description = "A completed run's package viewer shows four parts — the instruction document, a TOML-shaped task config, a metadata summary with repository, PR number, base commit SHA, language, and difficulty, and a bug-patch placeholder note naming the PR's non-test source files — and the difficulty matches the source-file count mapping (3 to 4 easy, 5 to 7 medium, 8 to 10 hard) with the count shown"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.18"
+name = "package_copy_and_downloads_work"
+description = "The package viewer offers per-part copy controls that give a visible copied confirmation, individual file downloads for the instruction document and the task config, and a Download bundle control that downloads one JSON file containing all parts and the metadata"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.19"
+name = "batch_run_and_bucketed_report"
+description = "The batch composer queues 2 or more accepted PRs and runs them sequentially with per-item stage progression under an n-of-m progress indicator; the finished batch shows a run report placing every queued PR in exactly one bucket among packaged, trivial, failed, and skipped, with per-bucket counts summing to the batch total, and the report downloads as a JSON file"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.20"
+name = "library_listing_filters_and_reexport"
+description = "The Library lists every produced package plus at least 2 seeded example packages showing repository, PR number, difficulty, language, and created date; filters by repository, difficulty, and language combine as removable chips; opening an entry reopens the full package viewer with working copy and download controls; deleting asks for confirmation and removes exactly that entry; re-export downloads the stored bundle content"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.21"
+name = "import_bundle_validated_per_field"
+description = "The Import bundle control adds a valid package bundle JSON to the library, while an invalid bundle (missing required fields or violating field formats) is rejected with per-field errors naming each offending field and adds nothing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.22"
+name = "command_palette_and_coachmarks"
+description = "Pressing Cmd+K or Ctrl+K opens a command palette searching repositories, PRs by number or title, and library packages with results grouped by kind; selecting a result navigates to it and Escape closes the palette; on first run dismissible coachmark tips point out the Connections panel, the Triage board, and the pipeline runner, each dismissing individually, and a Reset tips control in the Connections panel restores them"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.n1"
+name = "package_content_mismatches_run"
+description = "The package viewer, the copied text, or a downloaded file contains instruction text different from what streamed during that run's Generate stage, or the package metadata names a repository or PR number other than the one the run was started from"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "5.n2"
+name = "retry_reruns_completed_stages"
+description = "Activating a failed stage's Retry control restarts the run from Fetch or re-executes already-completed stages, observable as changed outputs or timestamps on stages that had completed before the retry"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "5.n3"
+name = "oversized_pr_run_not_blocked"
+description = "Starting Run pipeline on the seeded loomdb PR whose non-test source-file count exceeds 10 begins a run instead of being blocked with a visible message naming the count and the bound"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "5.n4"
+name = "duplicate_run_from_double_activation"
+description = "Double-activating the Run pipeline control starts more than one run for the same PR: duplicated stage sequences, duplicated timeline entries, or more than one package produced from the two activations"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "5.n5"
+name = "reject_completes_without_reason"
+description = "A card can be moved to Rejected without a reject reason being chosen, or the reject flow completes silently when no reason is selected instead of blocking with an inline message naming the missing reason"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "5.catchall"
+name = "core_features_catchall"
+description = "A specified core behavior is broken or missing in a way NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

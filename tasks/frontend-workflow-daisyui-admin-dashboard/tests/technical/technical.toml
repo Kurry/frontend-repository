@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -136,6 +136,21 @@ weight = 1.0
 id = "2.14"
 name = "reload_seeded_reset_multi_facet"
 description = "After changing the theme, applying a filter and a sort, selecting rows, and creating a user, a page reload returns the app coherently to its seeded baseline — the seeded users, the default view, cleared filters and selection, and the default theme — with every facet reset together, never a mix of survived and reset state"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "2.15"
+name = "export_and_import_share_store"
+description = "Directory JSON and Users CSV compile from the same in-memory store the UI renders: after create and archive, opening the export drawer shows those mutations, and a successful Directory JSON import updates All Users, Archive, KPIs, and both previews together"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.16"
+name = "field_contract_enforced_before_store_write"
+description = "Invalid API-shaped payloads (overlong firstName, email without domain dot, temporaryPassword under 8 on create) never increase the users count; valid submits write the composed display name and enum badges from those fields"
 type = "binary"
 weight = 1.0
 

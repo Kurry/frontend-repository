@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -124,6 +124,22 @@ name = "mobile_folder_panel_slides"
 description = "At approximately 375px wide, activating the Folders button slides the folder panel in and out over or beside the content rather than instantly reflowing the whole page."
 type = "binary"
 weight = 0.5
+
+
+[[criterion]]
+id = "3.10"
+name = "export_and_palette_enter_exit"
+description = "Export Nest Copy shows a short confirmation before resetting; the export drawer and command palette enter and exit with a brief opacity/scale transition (or instant under prefers-reduced-motion)."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.11"
+name = "export_drawer_snaps_without_transition"
+description = "Export Nest drawer and command palette hard-cut open/closed with no enter/exit transition when reduced motion is not preferred, and Copy never shows confirmation feedback."
+type = "binary"
+weight = 0.5
+negate = true
 
 [[criterion]]
 id = "4.catchall"

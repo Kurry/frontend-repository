@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -86,7 +86,7 @@ negate = true
 [[criterion]]
 id = "4.4"
 name = "tab_indicator_slides"
-description = "The primary-colored main tab indicator slides when switching between Preview, Components, and Saved Themes"
+description = "The primary-colored main tab indicator slides when switching between Preview, Components, Saved Themes, and Export"
 type = "binary"
 weight = 1.0
 
@@ -108,14 +108,14 @@ weight = 1.0
 [[criterion]]
 id = "4.7"
 name = "modal_scale_fade_transition"
-description = "The Tutorial and theme-form modals enter with a short opacity and scale transition of roughly 200 to 300 milliseconds and exit the same way"
+description = "The Tutorial, theme-form, and command-palette overlays enter with a short opacity and scale transition of roughly 200 to 300 milliseconds and exit the same way"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
 name = "toast_slide_and_fade"
-description = "Action toasts (copy, save, snippet applied) slide in, remain readable, and auto-dismiss with a fade"
+description = "Action toasts (copy, save, snippet applied, export copied) slide in, remain readable, and auto-dismiss with a fade"
 type = "binary"
 weight = 1.0
 
@@ -125,6 +125,21 @@ name = "reduced_motion_flows_completable"
 description = "With prefers-reduced-motion set, animations are removed and state changes apply instantly while every flow stays completable"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "preview_filter_and_compare_ease"
+description = "Driven through real Preview chrome controls, color-blindness filter application and Before/After swaps ease the framed sample without a hard cut"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.n10"
+name = "command_palette_snaps_with_no_transition"
+description = "The command palette appears and disappears with a hard cut and no opacity/scale transition when prefers-reduced-motion is not set"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.catchall"

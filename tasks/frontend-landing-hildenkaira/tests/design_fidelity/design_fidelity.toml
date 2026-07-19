@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,142 +62,142 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "spacing_and_sizing_follow_scale"
-description = "Spacing and sizing follow the design system's scale, with no arbitrary one-off values visible in computed styles."
+name = "spacing_matches_fluid_em_baseline"
+description = "At 1440 width, section paddings, gaps, and major offsets follow the fluid em baseline (multiples of 0.5em / 1em / 2em / 8em tracking the root size, equivalent to a 4/8px discipline) rather than arbitrary odd-pixel one-offs."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "typography_matches_spec"
-description = "Typography matches the spec for all headings and body copy."
+name = "typography_matches_reference_metrics"
+description = "At 1440 typography matches the spec: hero H1 about 62.8px with ~0.9em line-height and negative letter-spacing; statement/about H2 about 57.6px–84px; paragraph-m about 15.7px; nav links about 13.1px; editorial display at weight 400 and grotesque at weight 500 from self-hosted files."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "layout_matches_reference"
-description = "Layout matches reference screenshots to within a small tolerance at all specified breakpoints; fidelity tasks achieve near pixel-parity."
+name = "layout_pixel_match_reference_screenshots"
+description = "At 1440 desktop width, composition matches /reference-screenshots/ overview and segment panels to near pixel-parity for the broken-grid hero, client deck density, pinned services trio, about flanking images, and full-height footer proportions — using fictional Cinder & Bloom assets, not source pixels."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.4"
-name = "specified_state_changes_animate"
-description = "Transitions or animations are applied to the state changes the spec calls out, such as add, delete, filter, or view switch."
+name = "specified_motion_states_present"
+description = "Reference-required motion states are present: lime veil + lettermark intro on fresh load, line-mask reveals, pinned services throw, flick-deck elastic settle (~0.6s), and client-carousel scale(1)/scale(0.94) over ~600ms — verified via the real UI/scroll path."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "responsive_behavior_matches_reference"
-description = "Responsive behavior matches reference patterns."
+name = "responsive_patterns_match_reference"
+description = "Responsive behavior matches the reference patterns: hamburger only at about 479 and below; smooth scroll at 768 and up; hero re-composition at narrow width rather than a mere shrink."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.6"
-name = "control_styling_matches_spec"
-description = "Button and form radii, padding, and shadows conform to the spec."
+name = "controls_match_token_styled_chrome"
+description = "Primary buttons, contact chrome-metallic popup fields, and cookie dark banner match the reference styling (token-driven fills, floating labels) rather than unstyled browser defaults."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.7"
-name = "typography_has_clear_hierarchy"
-description = "Typography has a clear hierarchy that distinguishes section and body text."
+name = "display_vs_body_hierarchy"
+description = "Typography hierarchy clearly distinguishes oversized editorial display headings from grotesque body/eyebrow/nav text across the homepage."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.8"
-name = "component_states_match_spec"
-description = "Component states (default, hover, active, disabled) match the spec where specified."
+name = "component_states_match_reference"
+description = "Default/hover/active states match the reference where specified: nav link red-dot scale, primary-button hover wipe with turquoise fill, flick active vs neighbor card scales, and video player chrome fade while playing."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.9"
-name = "surface_treatments_match_spec"
-description = "Color, depth, and border treatments are precise per the design."
+name = "palette_surfaces_exact_theme_colors"
+description = "Color treatments match exactly: off-white #eae9e6 body, near-black #181818 text, lime #ecfdad, turquoise #3fae86, red #ff4545 nav dot, dark-grey #2b2b2b footer; theme-media bands black with lime headings; chrome reserved for Likes tile, contact popup, and footer theme."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.10"
-name = "microinteractions_match_spec"
-description = "Microinteraction feedback for hover and press follows the spec in duration and motion."
+name = "microinteractions_match_reference_timing"
+description = "Hover/press microinteractions follow the reference language with primary-motion easing cubic-bezier(0.625, 0.05, 0, 1) over 0.525s on buttons and nav-dot back ease cubic-bezier(0.175, 0.885, 0.32, 1.275) over 0.525s."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.n1"
-name = "sizing_or_spacing_contradicts_scale"
-description = "Visible sizing or spacing values contradict the specified scale."
+name = "spacing_contradicts_baseline"
+description = "Visible major section gaps use arbitrary odd-pixel spacing that contradicts the fluid em / 4/8px-equivalent baseline."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n2"
-name = "colors_fall_outside_palette"
-description = "Colors appear outside the specified palette."
+name = "colors_outside_specified_palette"
+description = "Surfaces or accents use colors outside the specified lime/turquoise/red/near-black/off-white/dark-grey/chrome system (e.g. arbitrary purple theme wash or lime used everywhere)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n3"
-name = "sizing_mismatches_spec"
-description = "Sizing mismatches the spec."
+name = "type_sizing_mismatches_spec"
+description = "At 1440 the hero H1 or statement/about H2 sizes are grossly mismatched versus the ~62.8px / ~57.6–84px reference metrics."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n4"
-name = "required_animations_missing_or_wrong"
-description = "Animations are missing or incorrect where the spec requires them."
+name = "required_reference_motion_missing"
+description = "Required reference animations are missing: no lime veil/lettermark intro, no pinned services throw, or no flick-deck elastic reshuffle on the real UI path."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n5"
-name = "specified_controls_use_browser_defaults"
-description = "Form or button controls use browser default styles when the spec styles them."
+name = "controls_use_browser_defaults"
+description = "Primary CTAs, contact fields, or cookie controls use unstyled browser default appearance when the reference uses token-styled chrome."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n6"
-name = "layout_misaligned_at_breakpoints"
-description = "The grid or layout is misaligned at reference breakpoints."
+name = "layout_misaligned_vs_screenshots"
+description = "At 1440 the hero/client-deck/services/about/footer composition is grossly misaligned versus /reference-screenshots/ segment panels."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n7"
-name = "elements_are_clipped_or_offscreen"
-description = "Elements render off-screen or clipped."
+name = "elements_clipped_or_offscreen"
+description = "Key reference regions (hero lettermark/thumbnails, client deck, pinned services cards, about flanking images, full-height footer) render off-screen or clipped at 1440."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n8"
-name = "structure_deviates_from_reference"
-description = "Section order, content, or structure deviates from the reference on fidelity tasks."
+name = "section_order_or_structure_deviates"
+description = "Section order, content, or structure deviates from the mandated homepage order (hero → statement → client deck → services → testimonials → about/self-esteem → CTA → footer) or omits a required section."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n9"
-name = "heading_and_body_text_undifferentiated"
-description = "Heading and body text have no distinction."
+name = "heading_body_undifferentiated"
+description = "Heading and body text have no visual distinction (same size/family/weight throughout)."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,22 @@ weight = 1.0
 [[criterion]]
 id = "3.n10"
 name = "microinteractions_deviate_from_reference"
-description = "Microinteractions are missing or deviate from the provided reference."
+description = "Hover language or deck/carousel microinteractions are missing or clearly deviate from the reference (instant snaps, no button wipe, no flick elastic settle)."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.b1"
+name = "operator_chrome_does_not_displace_sections"
+description = "Shortlist, command palette, and discovery brief controls layer as overlays/chrome without displacing the mandated section order (hero → statement → client → services → testimonials → about → CTA → footer) or removing reference-required surfaces at 1440."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.n11"
+name = "operator_chrome_removes_reference_sections"
+description = "Adding Shortlist/Export/palette chrome removes or reorders a mandated reference section (e.g. missing services trio or about/self-esteem band) at desktop width."
 type = "binary"
 negate = true
 weight = 1.0

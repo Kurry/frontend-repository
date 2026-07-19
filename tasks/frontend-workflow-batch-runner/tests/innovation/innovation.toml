@@ -1,0 +1,219 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+weight = 0.25
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "11.1"
+name = "delightful_microinteractions"
+description = "The app layers unique, delightful microinteractions beyond the specified motion — for example celebratory feedback when a fully-failed run is nursed to green via retries"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.2"
+name = "advanced_motion_mechanics"
+description = "Advanced animation mechanics appear beyond the spec — coordinated grid choreography, animated flip markers in the comparison view, or a live-drawing timeline"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.3"
+name = "guided_onboarding"
+description = "A narrative or guided onboarding introduces the composer, macros, and durability concepts (retries, checkpoints)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.4"
+name = "enhanced_visualizations"
+description = "Extra visualizations add usability — for example a throughput sparkline, a per-model cost breakdown, or an attempt-distribution mini chart"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.5"
+name = "alternative_input_support"
+description = "Useful keyboard shortcuts or another alternative input path (for example a command palette) operate the runner"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.6"
+name = "preference_personalization"
+description = "User preferences beyond the spec — density toggles, column visibility, default concurrency — are available"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.7"
+name = "polished_product_narrative"
+description = "The app presents a polished product identity and narrative rather than an anonymous admin shell"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.8"
+name = "dynamic_theming"
+description = "A dynamic theme or color mode beyond requirements is offered and consistently applied"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.9"
+name = "platform_features_where_apt"
+description = "Web platform features are used where the genre allows — for example the clipboard confirmation for the ICS block done exceptionally well or printable run reports"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.10"
+name = "competition_level_polish"
+description = "Overall execution reaches competition-level polish visible to users"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.n1"
+name = "bare_spec_only"
+description = "The build is purely spec-compliant with no enhancement anywhere"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "11.n2"
+name = "generic_or_copied_feel"
+description = "Interactions and visuals feel generic, templated, or copied"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "11.n3"
+name = "no_polish_guidance_story"
+description = "The app offers no polish, guidance, or story beyond raw controls"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "11.n4"
+name = "no_extra_interactive_polish"
+description = "No extra visual or interactive polish exists beyond the minimum"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "11.n5"
+name = "flat_static_ui"
+description = "The UI is flat and static with no immersion beyond required motion"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "11.n6"
+name = "platform_capabilities_ignored"
+description = "Modern platform capabilities are ignored where they would clearly help"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "11.n7"
+name = "personalization_impossible"
+description = "Personalization is impossible anywhere in the app"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "11.n8"
+name = "no_delightful_moments"
+description = "The app has no new or delightful user moments"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "11.n9"
+name = "no_design_twist"
+description = "The design repeats well-trod admin patterns without any twist"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "11.n10"
+name = "effort_stops_at_mvp"
+description = "The build shows minimal effort beyond the MVP deliverable"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "innovation.catchall"
+name = "innovation_catchall"
+description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.5
@@ -63,64 +63,78 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "15.1"
-name = "headings_use_consistent_capitalization"
-description = "Where the app renders headings and section titles, they use consistent capitalization (one convention — title case or sentence case — throughout)."
+name = "consistent_capitalization_chrome_and_tools"
+description = "Where the app renders header title, tab labels (Preview, Components, Saved Themes, Export), and tool-panel titles (Palette, Fonts, Typography, Snippets), they use one consistent capitalization convention throughout."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.2"
-name = "actions_use_specific_labels"
-description = "Where the app renders button or action labels, they are specific verbs ('Add expense', 'Start session'), not generic ('Submit', 'OK') when a specific label is possible."
+name = "specific_verbs_on_actions"
+description = "Where the app renders button or action labels, they use specific labels such as New Theme, Save, Copy theme code, Download JSON, Download CSS, Import ThemeOptions, Save version, Restore, Undo, Redo, Load, and Delete rather than generic Submit/OK when a specific label is possible."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.3"
-name = "errors_name_problem_and_fix"
-description = "Where the app renders error messages, they name the problem and the fix ('Amount must be a positive number'), not just a rejection ('Invalid')."
+name = "validation_names_problem_and_fix"
+description = "Where the app renders theme-name validation messages, they name the name field and the fix, not only a bare rejection like 'Invalid'."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.4"
-name = "empty_states_explain_next_step"
-description = "Where the app renders empty states, the copy explains what belongs there and how to add it."
+name = "empty_saved_themes_explains_next_step"
+description = "Where the app renders the Saved Themes empty state, the copy explains that no themes are saved yet and how to create one."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.5"
-name = "body_copy_is_well_written"
-description = "Where the app renders body or marketing copy, rate how free it is of spelling and grammatical errors."
+name = "studio_and_sample_copy_polished"
+description = "Where the app renders sample-site copy, component-demo labels, and chrome/tool labels, rate how free the text is of spelling and grammatical errors."
 type = "likert"
 points = 5
 weight = 0.5
 
 [[criterion]]
 id = "15.6"
-name = "terminology_is_consistent"
-description = "Where the app renders labels for the same concept in multiple places, terminology is consistent (not 'task' here and 'todo' there)."
+name = "terminology_consistent_across_surfaces"
+description = "Where the app renders labels for the same concept in multiple places (saved theme vs theme, primary in Palette vs editor ThemeOptions, Light/Dark Type), terminology stays consistent rather than inventing conflicting names."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.7"
-name = "numbers_dates_and_units_are_consistent"
-description = "Where the app renders numbers, dates, and units, formatting is consistent (same date format, same decimal precision, units labeled)."
+name = "hex_and_status_formatting_consistent"
+description = "Where the app renders hex color values and save-status text (saved / unsaved / editing), formatting is consistent for the same value across Palette fields, editor source, and status row."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.8"
 name = "success_messages_are_specific"
-description = "Where the app renders confirmation and success messages, they state what happened ('Entry saved'), not vague affirmations."
+description = "Where the app renders confirmation feedback (copy toast, save toast, snippet-applied toast, export copied toast), the copy states what happened rather than a vague affirmation alone."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.9"
+name = "wcag_labels_use_exact_tokens"
+description = "Where the app renders WCAG contrast readout labels, they use the exact tokens Pass AA, Pass AAA, or Fail so the status is unambiguous."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.10"
+name = "export_import_errors_explain_failure"
+description = "Where the app renders Export or import error copy, the message names the offending field (e.g. name, primary.main, fontSize, palette.type, borderRadius) or the payload/cross-field problem rather than a bare rejection."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.n1"
-name = "placeholder_copy_is_visible"
+name = "placeholder_copy_visible"
 description = "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI."
 type = "binary"
 negate = true
@@ -128,24 +142,24 @@ weight = 0.5
 
 [[criterion]]
 id = "15.n2"
-name = "prominent_copy_has_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as headings, hero text, or primary buttons."
+name = "prominent_copy_has_spelling_errors"
+description = "Spelling or grammatical errors appear in prominent copy such as Material-UI Theme Creator, Preview/Components/Saved Themes, New Theme, Save, or Copy theme code."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n3"
-name = "concept_names_are_inconsistent"
-description = "The same concept is named inconsistently across surfaces."
+name = "inconsistent_concept_naming"
+description = "The same theme or palette concept is named inconsistently across tabs, Palette tool, editor, and Saved Themes in a way that would confuse a user."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n4"
-name = "copy_is_truncated_or_overflowing"
-description = "Truncated or overflowing text renders copy unreadable."
+name = "truncated_or_overflowing_labels"
+description = "Tab labels, validation messages, or button labels are truncated or overflowing so the copy is unreadable."
 type = "binary"
 negate = true
 weight = 0.5
@@ -153,7 +167,7 @@ weight = 0.5
 [[criterion]]
 id = "writing.catchall"
 name = "writing_catchall"
-description = "The app exhibits a significant, browser-observable defect in rendered copy quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app's rendered text exhibits a significant copy-quality defect not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

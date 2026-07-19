@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,21 +62,21 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "2.1"
-name = "2_1"
+name = "cyan_white_nearblack_tokens"
 description = "The app applies its color tokens consistently: a bright cyan #34CDE3 background, white #FFFFFF card and panel surfaces, near-black #010101 accent for primary buttons and headings, and light cyan #AEEBF4 secondary text."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
-name = "2_2"
+name = "poppins_type_scale"
 description = "Typography uses the Poppins family with h1 at 32px bold, h2 at 20px semibold, body at 14px, and card prompt text at least 18px and centered."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
-name = "2_3"
+name = "ten_px_spacing_and_pills"
 description = "Paddings and margins follow a 10px base unit, cards and panels use a 10px corner radius, and every button is a fully rounded pill with a radius of at least 24px."
 type = "binary"
 weight = 0.5
@@ -84,7 +84,7 @@ optional = true
 
 [[criterion]]
 id = "2.4"
-name = "2_4"
+name = "primary_secondary_pill_buttons"
 description = "Primary buttons use a near-black background with white text, a pill shape and a drop shadow, while secondary buttons and unselected chips use a white background with black text and a black border."
 type = "binary"
 weight = 1.0
@@ -98,21 +98,21 @@ weight = 1.0
 
 [[criterion]]
 id = "2.6"
-name = "2_6"
-description = "Attempting to start with fewer than 2 players, a duplicate name, or zero categories shows a visible inline error next to the offending control, not merely a disabled button."
+name = "inline_errors_visible_treatment"
+description = "Attempting to start with fewer than 2 players, a duplicate name, a name longer than 20 characters, or zero categories shows a visible inline error next to the offending control, not merely a disabled button."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.7"
-name = "2_7"
-description = "At about 375px wide the app renders without horizontal scrolling and the card, scoreboard, setup form, and live event feed stay legible and usable."
+name = "narrow_viewport_legible"
+description = "At about 375px wide the app renders without horizontal scrolling and the card, scoreboard, setup form, export controls, and live event feed stay legible and usable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.8"
-name = "2_8"
+name = "live_feed_status_pill_states"
 description = "The live event feed shows a status treatment whose idle, active, paused, disconnected, and caught-up states are visibly distinguishable."
 type = "binary"
 weight = 0.5
@@ -120,7 +120,7 @@ optional = true
 
 [[criterion]]
 id = "2.9"
-name = "2_9"
+name = "missing_category_color_coding"
 description = "Category chips and intensity badges render with no distinguishing color coding, or drawn-card surfaces render on the cyan background instead of white so the intended palette is absent."
 type = "binary"
 weight = 1.0
@@ -128,7 +128,7 @@ negate = true
 
 [[criterion]]
 id = "2.10"
-name = "2_10"
+name = "non_pill_button_corners"
 description = "Buttons render with square corners or an inconsistent mix of pill and square shapes rather than the required fully-rounded pills."
 type = "binary"
 weight = 0.5
@@ -162,7 +162,7 @@ optional = true
 [[criterion]]
 id = "2.14"
 name = "writing_conventions_consistent"
-description = "Headings and buttons follow one consistent capitalization convention, action labels are specific verbs such as Draw card, Start game and Undo last turn, error messages name the problem and the fix, and empty states explain what belongs there and how to add it."
+description = "Headings and buttons follow one consistent capitalization convention, action labels are specific verbs such as Draw card, Start game, Undo last turn, Export Session and Save Progress, error messages name the problem and the fix, and empty states explain what belongs there and how to add it."
 type = "binary"
 weight = 1.0
 
@@ -173,6 +173,22 @@ description = "Placeholder or template filler text such as lorem ipsum or TODO a
 type = "binary"
 negate = true
 weight = 1.0
+
+
+[[criterion]]
+id = "2.16"
+name = "winner_banner_and_win_target_visible"
+description = "The First to 10 win-target readout is visible on setup and during play, and a Winner announcement banner naming the winning player is visually distinct from ordinary toasts with a highlighted scoreboard winner row."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.17"
+name = "export_import_button_treatments"
+description = "Export Session and Save Progress use the primary near-black pill treatment, while Import Session, Copy Session JSON and Resume Saved Session use the secondary white outlined pill treatment."
+type = "binary"
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "2.catchall"

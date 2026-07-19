@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,165 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "create_pane_wizard_persists_across_tabs_and_reload"
+description = "Starting from the visible pane count on the active page, completing the Create Pane wizard adds exactly one pane rendering the chosen source's data: the count increases by exactly one immediately, switching to another page tab and back still shows the new pane, and a full page reload restores it with the same type, source, metric, dimension, size, and grid position."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "invalid_wizard_step_inline_validation"
+description = "Create flow: advancing or submitting the Create Pane wizard with an incomplete step shows immediate inline validation naming the invalid field, and the pane count does not increase."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "edit_pane_updates_in_place"
+description = "Edit flow: editing a pane's source, type, metric, dimension, size, or refresh interval applies changes in place without deleting the pane or losing its grid position, and the updated configuration is visible immediately."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "delete_pane_persists_removal"
+description = "Delete flow: deleting a pane after confirmation decreases the active page's pane count by exactly one, the pane no longer appears after switching tabs and back, and a full reload does not resurrect it."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "page_tab_independence_with_facets"
+description = "After creating a new page, renaming it, adding a pane, moving that pane, resizing it to Large, and setting refresh to Every 30s, switching between page tabs shows each page's own independent panes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "last_pane_delete_shows_empty_state"
+description = "Edge: after deleting the last pane on a page (with confirmation), the empty-state message Create your first pane to build this page is clear and visible."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "shared_date_range_recomputes_all_panes"
+description = "With at least two time-series panes on the current page, switching the shared date range from Last 30 Days to Today Only recomputes every affected pane at once with visibly different marks or values, and switching back to Last 30 Days restores the wider rendering without recreating any pane."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "saved_analysis_views_and_controls"
+description = "Creating a valid named saved analysis increases the count by exactly one and the same item appears in both Overview cards and Table without reload; Search, Source filter, Sort, drill-down, and Clear controls restore a coherent unfiltered list."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "share_and_confirmation_overlays"
+description = "Share opens the mock-link panel with Public/Private and Copy Link; pane/page confirmation dialogs cancel or confirm as expected and return to the workspace without trapping the user."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "collaboration_offline_merge_converges"
+description = "In the Collaboration Scenario, going offline, queueing one non-conflicting change from Author A and one from Author B, then reconnecting merges both into Shared content; Apply A then B and Apply B then A converge to the same visible result, and replaying an already-applied operation is ignored."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "primary_pane_flows_unavailable"
+description = "Create Pane, Edit pane, or Delete pane (with confirmation) cannot be completed from the visible UI controls."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "create_pane_missing_or_duplicated"
+description = "Completing the Create Pane wizard either fails to add a visible pane or adds duplicate panes for a single completion."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "page_or_pane_state_desyncs"
+description = "After adding or editing a pane on one page, switching tabs shows the wrong panes or a different page's configuration."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "page_tab_switch_breaks_or_loses_panes"
+description = "Switching page tabs breaks the layout or loses panes that were present on a page before the switch."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_page_ui_broken"
+description = "After removing all panes from a page, the page region is blank or broken with no Create your first pane to build this page message."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "date_range_views_disagree"
+description = "After changing the shared date range, two time-series panes on the same page disagree about whether they recomputed, or one stays on the previous window's marks."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "saved_analysis_views_disagree"
+description = "A created or edited saved analysis appears in Overview but not Table (or vice versa), or Clear fails to restore the unfiltered list."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "overlay_blocks_with_no_exit"
+description = "The preview modal, pane wizard, Share panel, Collaboration Scenario, or a confirmation dialog blocks the workspace with no working exit."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "failed_create_or_merge_silent"
+description = "A failed wizard step, duplicate saved-analysis name, or collaboration conflict provides no visible user feedback."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "reload_partial_mix_of_facets"
+description = "After configuring pages and panes then reloading, some facets survive while others reset — an incoherent partial mix rather than restoring page list, active tab, and every pane facet together."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "artifact_export_import_end_state"
+description = "Artifact flow: after mutating a page, pane, date range, and saved analysis, open Export — Workspace JSON shows schemaVersion panecraft-workspace-v1 and those values; Markdown report names the same entities; Copy confirms; Download then Import of Workspace JSON reconstructs the same visible workspace."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "export_missing_field_contract_keys"
+description = "After a session mutation, the Workspace JSON export preview is missing schemaVersion panecraft-workspace-v1 or other required WorkspaceDocument keys, or the Markdown report omits the mutated page/pane/saved-analysis names."
 type = "binary"
 negate = true
 weight = 1.0

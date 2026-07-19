@@ -1,0 +1,157 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "14.1"
+name = "multi_facet_reload_reset"
+description = "Multi-facet round-trip: set a search query, a role filter, fill a comparison slot, and create a persona, then reload the page. All facets coherently reset to the seeded baseline — the seeded personas and iterations, empty comparison slots, default view, empty undo history — never a mix of surviving and reset state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.2"
+name = "trait_pipeline_full_track"
+description = "Full trait pipeline probe: note a persona's radar shape, a comparison delta involving it, and its trait values in the Persona pack export; raise its formality slider substantially and save; the radar, the comparison readout and delta highlight, the test bench response style for that persona, and the export text all change to match the new value"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.3"
+name = "different_traits_different_output"
+description = "Input-dependent output: run the same seeded scenario with a high-formality persona and a low-formality persona; the two transcripts differ in salutation, contraction use, and length as the traits dictate"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.4"
+name = "blend_bounds_and_midpoint"
+description = "Blend integrity: a 0 percent blend matches the first persona's traits exactly, 100 percent matches the second, and 50 percent produces values between the sources; the saved blend's card traits match the preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.5"
+name = "poll_and_diff_derive_from_edits"
+description = "Iteration integrity: edit a persona twice creating two iterations; diffing them shows exactly the edited fields; a poll's winner gains the promoted badge and a second poll can move it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.6"
+name = "bulk_count_delta_exact"
+description = "Count-delta integrity: note a tag's facet count, bulk-apply Add tag to 3 selected personas, and confirm the facet count rose by exactly 3; a single Undo restores the count and all 3 cards"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.7"
+name = "interleaved_flows_preserve_state"
+description = "Interleaved-flow integrity: start editing persona A, switch to the Test Bench and run persona B, then return and save A; both the run history and A's edit land correctly with neither flow corrupting the other"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.8"
+name = "empty_to_repopulated_round_trip"
+description = "Edge-state round-trip: archive or delete personas until the active grid is empty (facet counts track to zero and the empty state shows), then restore or create; the grid, facets, and export track back up"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n1"
+name = "test_bench_output_identical_across_traits"
+description = "The test bench produces identical output text across personas with clearly different trait settings, indicating a canned response rather than trait-driven generation"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n2"
+name = "radar_or_comparison_ignores_inputs"
+description = "The radar chart or comparison deltas render identically after a trait value changes"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n3"
+name = "export_missing_session_edits"
+description = "The Persona pack or Comparison report omits personas, traits, or edits made during the session — the exported text reflects seeded data rather than live state"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n4"
+name = "cross_view_state_is_stale"
+description = "A persona change appears in one view but a second view (card, comparison, bench, facet counts) stays stale until reload"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "behavioral.catchall"
+name = "behavioral_catchall"
+description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

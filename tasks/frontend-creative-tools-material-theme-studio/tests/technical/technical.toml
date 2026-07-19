@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -78,7 +78,7 @@ negate = true
 [[criterion]]
 id = "2.4"
 name = "console_clean_full_exercise"
-description = "The browser console stays free of errors and warnings during a full exercise of the app (tab switches, palette edits, source edits, theme create/rename/delete, font add/remove)"
+description = "The browser console stays free of errors and warnings during a full exercise of the app (tab switches, palette edits, source edits, theme create/rename/delete, font add/remove, export/import, command palette)"
 type = "binary"
 weight = 1.0
 
@@ -106,7 +106,7 @@ weight = 1.0
 [[criterion]]
 id = "2.8"
 name = "status_messages_aria_live"
-description = "Validation and status messages (invalid name, invalid options, save status) are announced via an aria-live polite region as well as shown visually"
+description = "Validation and status messages (invalid name, duplicate name, invalid #RRGGBB field paths, fontSize/borderRadius bounds, Type↔palette.type cross-field errors, invalid options, save status, import field errors) are announced via an aria-live polite region as well as shown visually"
 type = "binary"
 weight = 1.0
 
@@ -131,6 +131,43 @@ name = "document_title_matches"
 description = "After load and settle, the browser document title reads 'Material UI Theme Creator'"
 type = "binary"
 weight = 0.5
+
+[[criterion]]
+id = "2.12"
+name = "export_derived_from_shared_options"
+description = "After a Palette or Light/Dark edit, the Export JSON and CSS text update from the same shared ThemeOptions the editor and preview show — not a disconnected static string"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.13"
+name = "import_replaces_shared_theme_state"
+description = "A successful Import ThemeOptions replaces the shared editor/preview/tool state so Monaco source, Palette fields, and Export text all agree without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.14"
+name = "export_import_share_themeoptions_schema"
+description = "After a valid Import of ThemeOptions JSON, the Export JSON preview re-enumerates the same ThemeOptions field contract (name, palette.type, intent #RRGGBB channels, typography.fontFamily, typography.fontSize, shape.borderRadius, Type↔palette.type cross-field) with the imported values — form, export, and import share one schema"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n12"
+name = "versions_use_disconnected_parallel_store"
+description = "Restoring a theme version updates a parallel copy while editor/preview keep showing the pre-restore options until reload"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.n14"
+name = "import_accepts_schema_violations"
+description = "Import accepts ThemeOptions JSON that violates the field contract (invalid palette.type, non-#RRGGBB intent channel, fontSize outside 8-24, borderRadius outside 0-24, or Type↔palette.type disagreement) and mutates editor/preview anyway"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "2.catchall"

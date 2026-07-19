@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.5
@@ -63,44 +63,43 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "15.1"
-name = "headings_use_consistent_capitalization"
-description = "Where the app renders headings and section titles, they use consistent capitalization (one convention — title case or sentence case — throughout)."
+name = "consistent_capitalization"
+description = "Headings, buttons, chips, and toasts use one consistent capitalization convention throughout"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.2"
-name = "actions_use_specific_labels"
-description = "Where the app renders button or action labels, they are specific verbs ('Add expense', 'Start session'), not generic ('Submit', 'OK') when a specific label is possible."
+name = "specific_action_labels"
+description = "Action labels use specific verbs such as Send, Export, Import, Copy, Download, Archive selected, Pin selected, and Delete selected rather than generic OK or Go"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.3"
-name = "errors_name_problem_and_fix"
-description = "Where the app renders error messages, they name the problem and the fix ('Amount must be a positive number'), not just a rejection ('Invalid')."
+name = "empty_states_explain_region"
+description = "Empty states explain what belongs in the timeline, filter results, and Archived view and how to add content"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.4"
-name = "empty_states_explain_next_step"
-description = "Where the app renders empty states, the copy explains what belongs there and how to add it."
+name = "errors_name_problem_and_fix"
+description = "Validation messages name the problem and the fix for blank text, over-length text, and invalid Import payloads"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.5"
-name = "body_copy_is_well_written"
-description = "Where the app renders body or marketing copy, rate how free it is of spelling and grammatical errors."
-type = "likert"
-points = 5
+name = "no_placeholder_lorem"
+description = "No placeholder or lorem text appears anywhere in the shipped UI"
+type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.6"
-name = "terminology_is_consistent"
-description = "Where the app renders labels for the same concept in multiple places, terminology is consistent (not 'task' here and 'todo' there)."
+name = "toast_copy_names_action"
+description = "Toasts name the action they confirm (sent, archived, copied) rather than generic Success"
 type = "binary"
 weight = 0.5
 
@@ -120,35 +119,35 @@ weight = 0.5
 
 [[criterion]]
 id = "15.n1"
-name = "placeholder_copy_is_visible"
-description = "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI."
+name = "inconsistent_capitalization"
+description = "Capitalization conventions clash across top bar, chips, and toasts"
 type = "binary"
-negate = true
 weight = 0.5
+negate = true
 
 [[criterion]]
 id = "15.n2"
-name = "prominent_copy_has_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as headings, hero text, or primary buttons."
+name = "generic_button_labels"
+description = "Primary actions use only generic labels like OK or Submit where specific verbs are specified"
 type = "binary"
-negate = true
 weight = 0.5
+negate = true
 
 [[criterion]]
 id = "15.n3"
-name = "concept_names_are_inconsistent"
-description = "The same concept is named inconsistently across surfaces."
+name = "empty_states_are_blank_or_lorem"
+description = "Empty states are blank or use lorem/placeholder copy"
 type = "binary"
-negate = true
 weight = 0.5
+negate = true
 
 [[criterion]]
 id = "15.n4"
-name = "copy_is_truncated_or_overflowing"
-description = "Truncated or overflowing text renders copy unreadable."
+name = "errors_are_unspecific"
+description = "Validation messages only say Invalid without naming the field"
 type = "binary"
-negate = true
 weight = 0.5
+negate = true
 
 [[criterion]]
 id = "writing.catchall"

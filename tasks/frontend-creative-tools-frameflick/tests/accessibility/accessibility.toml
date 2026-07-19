@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,92 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "editor_controls_keyboard_operable"
+description = "Every interactive Editor control (Editor/Collaboration tabs, upload zone Choose image path, background swatches, Custom toggle, Padding/Corner radius/Shadow/caption-size/watermark-opacity/Zoom sliders, Frame style and Canvas size options, Caption and Watermark fields, move buttons, Reset position, Export scale, Download PNG, Copy image, Download style JSON, Import style JSON, Copy style JSON, Undo, Redo, Before/After, Reset style, Copy settings, Paste settings, Save preset/snapshot, Apply, and Del) is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space), with a visible focus indicator."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "preset_delete_dialog_focus_trap"
+description = "Opening a Saved preset Del confirm dialog uses role dialog, traps keyboard focus while open, closes on Escape without deleting, and returns focus to the Del control that opened it."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "icons_and_thumbnails_accessible_names"
+description = "Panel section header icons, move controls, export buttons, connection controls, and Recent strip thumbnails expose descriptive accessible names (alt text or aria-label equivalents) rather than unlabeled icon-only chrome."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "validation_announced_via_aria_live"
+description = "Validation and rejection messages (unsupported upload type, invalid caption/watermark hex, empty or duplicate preset name) are announced through an aria-live polite region as well as shown visually."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
 name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+description = "Preset save name, Caption, Watermark text, Collaboration Shared editor, and color hex inputs use explicit label associations (or equivalent accessible names)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
 name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+description = "Workspace headings (FrameFlick branding and panel section headers such as Background, Caption, Watermark, Saved presets) follow a logical heading order with no skipped levels."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "landmark_regions_present"
+description = "The editor workspace exposes landmark navigation (for example main for the canvas stage and complementary/nav regions for tool panels or header tabs) so keyboard users can jump between major regions."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+name = "amber_brown_text_contrast"
+description = "Deep-brown (#713F12) text on cream/off-white panels and yellow (#FDE047) primary-button text on deep-brown or yellow fills meet sufficient contrast for readable text and controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "semantic_tabs_buttons_and_sliders"
+description = "Editor/Collaboration tabs, primary actions (Download PNG, Copy image, Save preset, Apply, Del, Go offline, Go online, Apply to canvas), and range sliders use semantic interactive roles rather than unlabeled div shells."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "sliders_arrow_keys_and_reduced_motion"
+description = "Focused Padding, Corner radius, Shadow, caption font-size, watermark opacity, and Zoom sliders adjust with arrow keys and update their displayed values; with prefers-reduced-motion set, list/feedback animations are removed while every feature stays usable."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "pointerless_screenshot_reposition"
+description = "With an image loaded, arrow-key nudges and the on-screen move buttons (up, left, right, down) reposition the screenshot the same way dragging would, and Reset position is keyboard-operable."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "collaboration_scenario_keyboard_operable"
+description = "The entire Collaboration scenario — Go offline, Go online, Shared editor, conflict choices (Use mine, Use theirs, Merge), and Apply to canvas — is keyboard-operable end to end."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
-name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+name = "primary_controls_unreachable_by_keyboard"
+description = "A primary Editor or Collaboration control (tabs, sliders, Save preset, Del, Go offline/Go online, or Apply to canvas) cannot be reached or activated via keyboard."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +155,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n2"
 name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+description = "Keyboard focus moves among FrameFlick controls but the focused control has no visible focus indicator or the indicator is obscured."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +163,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n3"
 name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+description = "Background swatches, Frame style options, Canvas size options, or move controls are plain non-semantic elements without button/radio roles or accessible names."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,55 +171,70 @@ weight = 1.0
 [[criterion]]
 id = "1.n4"
 name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+description = "Selected background swatch, active frame option, or active tab is indicated by color alone with no check mark, accent ring, text state, or other non-color cue."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "delete_dialog_focus_escapes"
+description = "While the preset delete confirm dialog is open, Tab focus leaves the dialog into background Editor controls."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+name = "poor_contrast_on_panels"
+description = "Panel labels or primary button text in the amber-and-brown theme are unreadable due to poor contrast against their backgrounds."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+name = "errors_visual_only_no_live_region"
+description = "An unsupported-file, invalid-hex, or empty-preset-name rejection appears only visually with no aria-live announcement."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+name = "media_missing_accessible_name"
+description = "A Recent thumbnail, panel icon, or export/connection icon is present without an accessible name."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+name = "heading_order_skipped"
+description = "Workspace headings jump levels (for example H1 FrameFlick branding directly to H3 panel titles) with a skipped heading level."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n10"
-name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+name = "reduced_motion_ignored_on_list_feedback"
+description = "With prefers-reduced-motion enabled, Saved presets list entry animations, Recent thumbnail entry animations, or Copied! / validation transitions still run instead of applying state instantly."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "paste_and_snapshot_dialogs_focus_trap"
+description = "The paste-settings dialog and snapshot delete confirm trap focus while open, close on Escape without applying/deleting, and return focus to the control that opened them."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n11"
+name = "undo_export_controls_keyboard_inaccessible"
+description = "Undo, Redo, Download style JSON, Import style JSON, Before/After, or Paste settings cannot be reached or activated via keyboard."
 type = "binary"
 negate = true
 weight = 1.0

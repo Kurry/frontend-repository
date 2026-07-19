@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,152 +62,209 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "paint_and_save_increments_gallery"
+description = "Paint-and-save flow: paint at least 3 cells with Color Brush, switch to Gallery mode, and save the board with a valid unique name and closed-enum tag — the gallery count increases by exactly one, the new card shows the entered name, that tag, and a thumbnail matching the painted cells, Project JSON boards includes that SavedBoard, and returning to Paint mode shows the same painted board untouched, all without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "empty_save_name_shows_inline_validation"
+description = "Create flow: attempting Save board with an empty or invalid name, duplicate name, or invalid tag triggers immediate inline validation naming the offending field, keeps the submit control disabled until every required field is valid, and does not increase the gallery count."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "rename_updates_card_in_place"
+description = "Rename flow: renaming a board in Gallery updates that same card's name in place; the gallery count stays the same, no duplicate card appears, and Project JSON boards reflect the new name."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "delete_removes_card_keeps_canvas"
+description = "Delete flow: deleting a board removes its card, decreases the gallery count by exactly one, and if that board's cells were loaded on the canvas the canvas keeps its current pixels — only the collection changes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "load_board_returns_to_paint"
+description = "Load-and-verify flow: loading a saved board from Gallery writes its cells back onto the paint canvas, returns to Paint mode with the loaded artwork visible, locks the Cell control because the board now holds art, and reopening Gallery still lists that same board unchanged."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "last_delete_reveals_empty_gallery"
+description = "After deleting every board, Gallery shows a clear empty-gallery state in the list region that explains the gallery is empty and how to save a board."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "filter_echo_keeps_favorite_marker"
+description = "Filter echo flow: favoriting a board and then filtering the gallery by its tag shows the board with its favorite marker intact; toggling the favorite while the filter is active updates the same visible card without a reload, and clearing the filter restores the full list exactly."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "toolbar_drag_preserves_paint_state"
+description = "On desktop, dragging the floating toolbar by its /GRID PAINT TOOLS header repositions the panel within the stage; the current tool, palette, grid state, mirror mode, and painted board all survive the drag with workflow continuity."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "camera_overlay_cancel_leaves_board"
+description = "Camera overlay flow: opening Camera shows the in-toolbar live-feed overlay; Cancel closes the overlay without painting and leaves the board exactly as it was."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "reload_returns_seeded_baseline"
+description = "A page reload returns the app to its seeded state: the 4 seeded boards in Gallery, a blank canvas at cell size 40, QR Brush active, black swatch selected, Mirror Off, Vision Off, empty undo/redo — recoverable without stuck navigation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "export_pipeline_contains_session_work"
+description = "Export pipeline: paint a recognizable multicolor pattern, save the board with a valid name and closed-enum tag, snap a named version, open Export center — Project JSON shows ProjectDocument keys (cellSize, tool, swatch, mirror, vision, gridVisible, cells, boards, versions) with the painted cells, the new board name and tag, and the version name; CSS palette lists seven swatch custom properties; Download PNG yields branded grid_paint.png matching the board."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "import_round_trip_restores_session"
+description = "Import round-trip: export Project JSON from a session with painted cells and a saved board, Clear and alter gallery if needed, then Import Project that JSON — canvas, cell lock, tool/swatch/mirror/vision, gallery cards, versions, and histogram bars reconstruct to match the export."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "undo_redo_with_histogram"
+description = "Undo/redo flow: paint a stroke, flood-fill a region, undo twice, redo once — only the first action returns; histogram bars track each step; a new paint after undo disables Redo."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "bulk_gallery_favorite_delete_flow"
+description = "Bulk gallery flow: select three boards, Favorite selected (all three show markers), then Delete selected after confirmation — exactly those three disappear and the gallery count decreases by three."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "symmetry_paint_undo_pair"
+description = "Symmetry paint flow: set Mirror to Horizontal, paint one edge cell with Color Brush — the mirrored cell paints in the same stroke; one Undo clears both cells together."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.16"
+name = "command_palette_board_and_export"
+description = "Command palette flow: open with Ctrl+K or Cmd+K, type part of a seeded board name, Enter loads it in Paint mode; reopen and choose Export center to switch to that panel."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "gallery_crud_unavailable_from_ui"
+description = "Save board, rename, or delete are not enabled from the Gallery UI."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "saved_board_missing_or_duplicated"
+description = "After a valid Save board, the new board fails to show up, or a duplicate card appears for a single save."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "paint_and_gallery_desync"
+description = "Painted cells, loaded boards, or favorite/filter state change in one mode but stay stale in the other until reload."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "mode_switch_breaks_or_loses_board"
+description = "Switching among Paint, Gallery, and Export center breaks the layout or loses the painted board / gallery selection."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_gallery_breaks_ui"
+description = "After deleting every board, Gallery produces broken or missing UI with no empty-state explanation."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "filter_and_full_list_disagree"
+description = "The filtered gallery list and the cleared/full gallery list disagree about which boards exist or whether a favorite marker is present."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "toolbar_drag_corrupts_state"
+description = "After dragging the floating toolbar, the active tool, palette, grid overlay, mirror mode, or painted board silently resets or becomes unreachable."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "camera_overlay_blocks_exit"
+description = "The Camera overlay blocks navigation with no Cancel or other exit option."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "invalid_save_lacks_feedback"
+description = "Submitting Save board or rename with an empty/invalid name, duplicate name, or invalid tag provides no visible validation feedback naming the offending field and appears to succeed or fail silently."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "load_or_mode_switch_dead_end"
+description = "Loading a board or switching Paint/Gallery/Export leaves a navigation dead end that requires a full page reload to recover."
 type = "binary"
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "export_pipeline_dead_end"
+description = "Export center Project JSON or Download PNG fails to reflect the painted session, or Copy provides no confirmation, leaving the export flow incomplete."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.17"
+name = "schema_validation_then_valid_save"
+description = "Schema validation flow: attempting Save board with a duplicate seeded name, an empty/invalid tag, or a name over 40 characters leaves the gallery count unchanged with inline errors naming the offending field (SavedBoard contract); then submitting a unique valid name with a closed-enum tag increases the count by exactly one and Project JSON boards includes that request-body-shaped record."
+type = "binary"
 weight = 1.0
 
 [[criterion]]
@@ -217,3 +274,4 @@ description = "The app exhibits a significant, browser-observable defect in crit
 type = "binary"
 negate = true
 weight = 1.0
+

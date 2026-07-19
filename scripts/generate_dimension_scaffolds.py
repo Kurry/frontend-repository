@@ -412,7 +412,7 @@ CANONICAL_JUDGE_HEADER = """[judge]
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 

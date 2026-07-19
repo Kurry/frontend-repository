@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,99 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_period_shows_empty_state"
+description = "Navigating to a reporting period with no expenses shows a zeroed Total expenses figure, empty progress bars, and an empty Expenses table with a visible empty-state message rather than a blank area"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "expense_form_validates_field_contract"
+description = "Submitting the add/edit expense dialog with an empty or non-positive amount, a missing or non-YYYY-MM-DD date, or no category shows inline validation naming each invalid field before commit and adds or changes no row"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "errors_name_field_and_fix"
+description = "Validation and import errors name the offending field and the problem rather than only saying Invalid"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "snackbar_confirms_mutations"
+description = "Snackbar confirmations appear after add, update, delete, bulk actions, export copy, and import"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "empty_filter_shows_empty_state"
+description = "Selecting a category filter that matches no expenses in the current period shows an empty-state message in the table region, and clearing the filter restores the full row set"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "undo_available_after_destructive"
+description = "After a destructive expense delete or bulk delete, Undo is enabled and can restore the prior Expenses rows and Dashboard totals"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "chart_tooltip_names_category"
+description = "Hovering a spending-breakdown chart segment shows a tooltip naming the category and its amount"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "4.8"
 name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+description = "Bottom-nav items, dialog actions, table actions, and form fields use semantic interactive elements (buttons, inputs, labels) rather than clickable bare divs"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "dialogs_support_close_paths"
+description = "The add/edit expense dialog and export drawer support Cancel/Close controls and Escape (and backdrop where applicable) to dismiss without applying a pending create"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "double_submit_and_empty_bulk_safe"
+description = "Double-activating the dialog confirm creates or applies exactly one change; Bulk delete with no rows selected is unavailable (tray hidden or actions disabled)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "import_malformed_json_rejected"
+description = "Importing malformed or empty JSON shows an inline error naming the problem and leaves the current expenses, categories, and totals unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "import_contract_invalid_rejected"
+description = "Importing parseable JSON that fails the BudgetDocument field contract — missing displayName, activePeriod, categories, or expenses; activePeriod.month outside 1–12; expense value not greater than 0 or datetime not YYYY-MM-DD; period/datetime mismatch; or unknown categoryId — shows an inline error naming the offending field and leaves expenses, categories, and totals unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "category_name_contract_rejected"
+description = "Adding or renaming a category with an empty, whitespace-only, over-40-character, or duplicate name shows validation naming the name field and does not change the Categories list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
 name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+description = "An empty Expenses period or empty filter result shows nothing and provides no empty-state UI feedback"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +162,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n2"
 name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+description = "Validation or import failures are surfaced only in the browser console with no inline UI error"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,15 +170,15 @@ weight = 1.0
 [[criterion]]
 id = "4.n3"
 name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+description = "Add, delete, copy, or import actions lack visible feedback and silently succeed or fail"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "import_mutates_on_invalid_contract"
+description = "Importing JSON that fails the BudgetDocument field contract still mutates expenses, categories, display name, or totals"
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +186,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n5"
 name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+description = "Non-semantic div or span tags wrap primary interactive controls (nav, dialog actions, table actions) without button/input roles"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +194,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n6"
 name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+description = "The add/edit expense dialog or export drawer cannot be dismissed via Escape"
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +202,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n7"
 name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+description = "Expense field-contract validation feedback is missing or delayed with no UI indication naming the invalid field"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,15 +210,15 @@ weight = 1.0
 [[criterion]]
 id = "4.n8"
 name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+description = "Primary actions use ambiguous or missing labels instead of specific verbs such as Add expense, Bulk delete, Export, or Import JSON"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "undo_empty_stack_corrupts_state"
+description = "Undo at an empty undo stack or Redo at an empty redo stack changes the Expenses table or Dashboard totals"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +226,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n10"
 name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+description = "Export, Import JSON, Undo/Redo, or bulk action affordances are visually hidden or inaccessible when their preconditions are met"
 type = "binary"
 negate = true
 weight = 1.0

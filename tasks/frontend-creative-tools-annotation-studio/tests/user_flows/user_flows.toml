@@ -1,0 +1,219 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "6.1"
+name = "annotate_end_to_end_flow"
+description = "Selecting a suite, choosing thumbs-up, moving all three sliders, typing a comment, and pressing Submit & Next decrements that suite queue badge by exactly one, adds the item to the History tab, advances the card to the next item, and increases the Labels JSON preview annotation count by exactly one, all without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.2"
+name = "invalid_forms_block_inline"
+description = "Submitting the taxonomy class form or the metadata field form with missing or invalid required fields triggers immediate inline validation naming the field and changes no collection"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.3"
+name = "taxonomy_edit_flows_through_labels"
+description = "Creating a class with shortcut 7 and an icon makes it appear in the class picker; pressing 7 on an image item and dragging draws a box in its color, the box appears in the region list, and the Labels JSON preview then contains the class name in both the taxonomy definition and that item region entry"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.4"
+name = "assist_run_recovery_flow"
+description = "Running Assist advances steps while the rollup counts up; a step that exhausts retries raises the failure count, its Retry control resumes from that step, pause then resume freezes and continues at the same step, the event timeline records the pause and resume in order, and accepting a Suggested rating fills the card so submitting decrements the queue like a manual annotation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.5"
+name = "dispute_round_trip_flow"
+description = "Flagging a disagreement row in the Agreement view moves that item to the top of the Review queue Disputed tier and increments the tier count by one; resolving it returns it to the Reviewed tier and the Stats summary disputed count and agreement figures update to match both views"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.6"
+name = "bulk_undo_flow"
+description = "Selecting three queue items and choosing Skip selected moves all three to the end and raises the skipped badge by three; Ctrl+Z restores all three positions, returns the badge to its prior value, and leaves the export preview counts exactly as before the bulk skip"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.7"
+name = "palette_navigation_flow"
+description = "Opening the command palette with Ctrl+K, typing part of a queue item title, and pressing Enter opens exactly that item in the annotation card; reopening the palette and choosing the Agreement view entry switches to the Agreement view"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.8"
+name = "sidebar_collapse_continuity"
+description = "At a narrow width the queue sidebar collapses behind a toggle and reopens as an overlay with the same suites, counts, and selection state, preserving workflow continuity"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.9"
+name = "overlays_dismiss_cleanly"
+description = "The class form, confirmation dialogs, the dispute reason form, and the palette all close via their cancel control and Escape, returning to the prior view state with no lost work outside the dismissed overlay"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.10"
+name = "flows_recover_without_reload"
+description = "Every flow dead end is recoverable in-app: after deleting a class, emptying a suite, or closing the export view, the user can continue annotating without a page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n1"
+name = "primary_flows_unreachable"
+description = "Annotating, taxonomy editing, disputing, or exporting cannot be completed from the UI alone"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n2"
+name = "submission_lost_or_duplicated"
+description = "A submitted annotation fails to appear in history or appears twice"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n3"
+name = "flow_state_desyncs_views"
+description = "Completing a flow leaves two surfaces disagreeing — for example the review queue tier counts contradict the queue chips"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n4"
+name = "view_switch_loses_selection"
+description = "Switching between card, Taxonomy, Review queue, Agreement, and Export views loses the selected suite or breaks layout"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n5"
+name = "emptied_suite_breaks_ui"
+description = "Annotating every item in a suite produces a broken or blank main panel instead of the completion empty state"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n6"
+name = "tiers_disagree_with_chips"
+description = "The Review queue tiers disagree with the review-state chips shown in the sidebar for the same items"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n7"
+name = "collapsed_sidebar_stuck"
+description = "The collapsed queue sidebar cannot be reopened"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n8"
+name = "overlay_traps_user"
+description = "A dialog or the palette blocks interaction with no keyboard or click path to dismiss it"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n9"
+name = "failed_action_silent"
+description = "A failed or rejected action (invalid form, undo with empty stack, assist on a fully annotated suite) gives no visible feedback"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n10"
+name = "dead_end_requires_reload"
+description = "Some navigation state can only be corrected by reloading the page"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "user_flows.catchall"
+name = "user_flows_catchall"
+description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

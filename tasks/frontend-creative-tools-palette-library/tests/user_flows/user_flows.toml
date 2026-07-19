@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,110 +62,110 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "create_palette_updates_all_surfaces"
+description = "Create flow: submitting a valid new palette from the editor increases the palette collection count by exactly one, the new palette appears as a card in Palette view and its swatches join the Nomenclature rows (hue-ordered, hex-deduped) without a reload, and selecting the new palette's period keeps it visible while All Periods shows it alongside the seeds."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
 name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+description = "Create flow: submitting with an empty name or fewer than the required swatches triggers immediate inline validation naming the offending field and leaves the collection count unchanged."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "edit_name_and_period_update_all_surfaces"
+description = "Edit flow: renaming a palette and changing its period in Detail/Editor updates that palette's name on its Palette-view card and in Detail without a reload, and the period change is reflected by the filter — the old period no longer shows the palette and the new period does."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "delete_palette_updates_all_surfaces"
+description = "Delete flow: deleting a palette decreases the collection count by exactly one, removes its card from Palette view and its swatches from Nomenclature and Swatch views, clears it from any active selection, and the period filter recomputes so the deleted palette matches nothing."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "browse_view_switch_retains_filter"
+description = "View/mode switch: switching among Nomenclature, Palette, and Swatch shows exactly one library layout at a time without reload and keeps the active period filter applied across the switch."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
 name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+description = "Edge: after deleting every user-manageable palette, the library region shows a clear empty state explaining how to create a palette or clear the filter."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "period_filter_hides_across_views"
+description = "Filter flow: selecting a named period hides nonmatching items in Nomenclature, Palette, and Swatch; choosing All Periods restores the full set in all three."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "favorite_toggle_cross_view"
+description = "Favorite flow: toggling the favorite/featured flag on a palette in one view shows the same flag state when the same palette is viewed in another view or opened in Detail, without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "detail_editor_overlay_open_and_close"
+description = "Detail/Editor overlay: opening a palette enters the focused editor for name/period/swatches; closing returns to Browse with prior view and filter intact and no dead end."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "reload_returns_seeded_baseline"
+description = "Recovery/reload: after creating, filtering, and selecting a palette, a page reload returns the app to its seeded state — seeded palettes, Nomenclature view default, All Periods, and no selection — with no dead end requiring a second reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "palette_crud_unavailable_from_ui"
+description = "Palette create, edit, or delete cannot be completed from the visible UI controls."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "create_fails_to_appear_or_duplicates"
+description = "Submitting a valid new palette either fails to add a visible Palette-view card or adds duplicate cards for a single create."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "edits_desync_surfaces"
+description = "After renaming a palette or changing its period, Palette-view card, Detail, and filtered Browse disagree about the same record's name or period."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "view_switch_breaks_or_loses_filter"
+description = "Switching among Nomenclature, Palette, and Swatch breaks the layout or loses the active period filter / selection."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_library_region_broken"
+description = "After deleting all user palettes or filtering to zero matches, the library region is blank or broken with no empty-state message."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,39 +173,39 @@ weight = 1.0
 [[criterion]]
 id = "6.n6"
 name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+description = "With a period filter active, Nomenclature, Palette, and Swatch disagree about which items are visible."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "detail_editor_cannot_reopen"
+description = "After closing Detail/Editor, the same palette cannot be reopened into the editor from Browse."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "overlay_blocks_with_no_exit"
+description = "The cart drawer, subscribe popup, or Detail/Editor overlay blocks the library with no working exit."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "failed_create_validation_silent"
+description = "An empty-name or underswatched create attempt provides no visible validation feedback naming the offending field."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "reload_or_mode_switch_dead_end"
+description = "Recovering from Detail/Editor or after a failed create requires a full page reload — the UI reaches a dead end."
 type = "binary"
 negate = true
 weight = 1.0

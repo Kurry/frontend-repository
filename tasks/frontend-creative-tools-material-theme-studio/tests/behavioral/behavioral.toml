@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,96 +62,140 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "14.1"
-name = "multi_facet_round_trip"
-description = "Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline — never a mix."
+name = "multi_facet_reload_resets_to_seed"
+description = "Starting from seed: create a new saved theme, edit primary main to a distinct hex, switch the main tab to Components, and toggle Type to Dark; then reload. Confirm every facet coherently resets to the seeded baseline — at least three seeded themes, default theme active, Preview tab, light type, and no unsaved edits — never a mix of surviving and reverted facets."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.2"
-name = "sort_reversal_proves_live_data"
-description = "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders."
+name = "light_dark_reversal_proves_live_state"
+description = "Type-toggle reversal proof (genre stand-in for sort reversal): toggle Type to Dark and note preview background/paper/text/divider plus editor source, toggle back to Light and note the different surfaces/source, then toggle Dark again. Confirm Dark's surfaces return identically — proving preview and editor are derived from live theme options, not two hardcoded snapshots."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.3"
-name = "derived_view_responds_to_input"
-description = "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input."
+name = "palette_edit_derived_preview_sensitivity"
+description = "Derived-view sensitivity: change primary main to a clearly different hex, then change secondary main. Confirm the framed sample site and editor ThemeOptions source change meaningfully for each input rather than redrawing an identical surface regardless of edits."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.4"
-name = "cross_view_echo_without_reload"
-description = "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list ↔ detail, board ↔ stats) without reload."
+name = "palette_edit_echoes_in_editor_and_saved_card"
+description = "Cross-view echo: edit primary main in the Palette tool; without reload confirm the editor source hex, the framed sample site's primary surfaces, the Export JSON/CSS text, and — after Save — the active Saved Themes card swatch all reflect the new color."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.5"
-name = "count_delta_is_exact"
-description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+name = "create_theme_count_delta_exact"
+description = "Count-delta integrity: measure the Saved Themes card count, create one valid new theme via New Theme, and re-measure immediately — the count increases by exactly one (no off-by-one, no lagging counter)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.6"
-name = "different_inputs_change_outcomes"
-description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+name = "different_palette_edits_different_outcomes"
+description = "Input-dependent output: set primary main to color A and note preview/editor; then set primary main to a clearly different color B. Confirm the two outcomes differ in the ways the inputs dictate (not byte-identical preview/editor states)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.7"
-name = "interleaved_flows_preserve_state"
-description = "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state."
+name = "interleaved_create_and_tab_flows"
+description = "Interleaved-flow integrity: open New Theme and enter a name without submitting, switch the main tab to Components, then return and submit a different valid name to finish creating one theme; confirm exactly one new Saved Themes card appears, the tab switch persisted, and neither flow corrupted the other's state."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.8"
-name = "empty_to_repopulated_round_trip"
-description = "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions."
+name = "empty_then_repopulate_saved_themes"
+description = "Edge-state round-trip: delete every saved theme (empty-state message visible), then create two new themes; confirm the empty state clears, both new cards appear, and editor/preview track the loaded active theme."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.n1"
-name = "partial_persistence_is_incoherent"
-description = "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence."
+name = "partial_persistence_after_reload"
+description = "After configuring a new theme, palette edit, tab selection, and Dark type then reloading, some user-configured facets survive while others reset — incoherent partial persistence instead of a full return to the seeded baseline."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n2"
-name = "derived_surface_ignores_inputs"
-description = "A derived surface renders identically regardless of its inputs."
+name = "preview_identical_across_different_palette"
+description = "Changing primary main, secondary main, or Light/Dark Type leaves the framed sample site and editor source visually identical — a derived surface ignoring its inputs."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n3"
-name = "different_inputs_produce_identical_output"
-description = "Repeating an action with different inputs yields byte-identical output."
+name = "different_saved_themes_apply_identical_options"
+description = "Loading two seeded saved themes that declare different palette options yields identical editor source and preview colors."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "State changes appear in one view but not another until reload."
+name = "cross_surface_state_stale_until_reload"
+description = "After editing Palette colors or saving a theme, the editor source, framed sample site, Export preview, or Saved Themes swatch still shows stale values until a full page reload."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
+id = "14.9"
+name = "export_contains_session_hex_after_edit"
+description = "Input-dependent export artifact: set primary main to color A and note the Export JSON text, then set primary main to a clearly different color B. Confirm the two Export JSON (and CSS) previews differ by carrying each session's hex — not an identical static artifact."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "import_export_round_trip_restores_state"
+description = "Round-trip probe: edit primary main to a distinct #RRGGBB hex and shape.borderRadius to a distinct in-range value, note palette.type plus typography.fontSize in the Export JSON, copy that JSON text, change the color, radius, and fontSize away, then Import the JSON. Confirm editor fields, Type toggle, preview surfaces, and Export text all restore the imported hex, type, fontSize, and borderRadius without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.11"
+name = "undo_restores_export_text"
+description = "Undo artifact coherence: after a Palette edit that changes Export text, Undo restores the previous Export preview text together with tool field, editor source, and preview."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "export_identical_after_different_edits"
+description = "Two different primary main edits leave the Export JSON or CSS preview byte-identical — an export surface ignoring its inputs."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n6"
+name = "import_does_not_restore_exported_hex"
+description = "Importing a ThemeOptions JSON that was just exported after a palette edit fails to restore that hex in editor, preview, or Export text."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.12"
+name = "export_json_fields_track_font_size_edit"
+description = "Input-dependent schema fields: change typography.fontSize within 8–24 and shape.borderRadius within 0–24 to different values and confirm the Export ThemeOptions JSON preview's fontSize and borderRadius values update to match without a reload, with palette.type still agreeing with the Type toggle."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "behavioral.catchall"
 name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

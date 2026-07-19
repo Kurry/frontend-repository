@@ -127,6 +127,7 @@ Modules:
 - structured-editor-v1
 - entity-collection-v1
 - command-session-v1
+- artifact-transfer-v1
 
 Module specs:
 <module_spec id="structured-editor-v1">
@@ -191,6 +192,25 @@ Module specs:
 }
 </module_spec>
 
+<module_spec id="artifact-transfer-v1">
+{
+  "id": "artifact-transfer-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Artifact transfer",
+  "purpose": "Import, export, copy, print, and conversion workflows.",
+  "permitted_operations": ["import", "export", "copy", "print_preview", "convert"],
+  "binding_keys": {
+    "required_any_of": [["artifact_operations"]],
+    "optional": ["import_modes", "export_formats", "conversion_modes", "visible_postconditions"]
+  },
+  "restrictions": [
+    "No raw files, filesystem paths, blobs, base64, or artifact contents in WebMCP arguments or results.",
+    "File picker interaction, clipboard contents, and downloaded artifacts remain Playwright responsibilities."
+  ],
+  "tool_name_prefix": "artifact"
+}
+</module_spec>
+
 Bindings:
 - Editor object types: note; flashcard; shape
 - Editor operations: add; select; delete; update_property; set_content; switch_mode; preview
@@ -198,14 +218,19 @@ Bindings:
 - Editor modes: select; connect
 - Entity: board
 - Entity operations: create; select; update; delete
+- Entity fields: name
 - Session operations: start; pause; connect; disconnect; advance
 - Demos: deliver-out-of-order; reconnect
+- Artifact operations: export; import; copy
+- Export formats: json; markdown; text
+- Import modes: workspace-json
 
 Mechanics exclusions:
 - Canvas pan/zoom and object drag/resize stay Playwright-driven
 - Connect click-sequence stays Playwright-driven
 - Mini-map click and search pan stay Playwright-observed
 - Live-tick timing stays Playwright-observed
+- Raw file paths/blobs forbidden in WebMCP args
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

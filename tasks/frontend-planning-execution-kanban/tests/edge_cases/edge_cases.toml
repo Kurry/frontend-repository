@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,154 +62,134 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_column_state_designed"
+description = "When a column has zero visible cards (after move or filter), it shows a designed empty message rather than a bare gap, and still offers Add Card for that column"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "create_and_import_validate_inline"
+description = "Add Card and board import show inline validation naming the offending field before any board mutation; whitespace-only titles and titles over 120 characters are rejected"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "validation_errors_name_fields"
+description = "Create and import errors name the field and the problem (for example title or import) rather than only saying Invalid"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "copy_export_and_save_confirm"
+description = "Copy export shows a brief confirmation, and successful create/save/import show visible feedback (toast or equivalent)"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "run_shows_progressive_status"
+description = "While a card is running, sub-items visibly progress through pending/running/complete (or retrying) rather than jumping straight to a final state with no intermediate UI"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "undo_after_move_or_import"
+description = "After a card move or successful import, Undo restores the prior board; a failed import is not treated as an undoable success"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "drop_back_to_origin_noop"
+description = "Dragging a card and dropping it back in its original position leaves the board and all counts unchanged"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "long_title_truncates_on_card"
+description = "A card title longer than 80 characters is truncated with an ellipsis on the board card and shown in full in the detail view and export preview"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "run_disabled_while_running"
+description = "The Run control on a card that is already running is disabled or absent until the run finishes or fails"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "wip_breach_and_bulk_empty"
+description = "Filling In Progress past WIP limit 3 shows amber breach immediately; bulk move with zero selected cards does nothing and the bulk bar stays hidden"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_column_is_blank_gap"
+description = "An emptied column is a blank gap with no empty-state message and no Add Card control"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "invalid_create_mutates_board"
+description = "An invalid create (empty/whitespace/overlong title) still adds a card or changes a column count"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "errors_are_generic_only"
+description = "Create or import validation shows only a generic Invalid message with no field name"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "destructive_move_has_no_undo"
+description = "After a bulk move or import, there is no working Undo that restores the prior board state"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "run_jumps_with_no_progress_ui"
+description = "Pressing Run completes all sub-items in one jump with no visible sequential progression or status chip change to running"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "failed_import_mutates_board"
+description = "Importing malformed board JSON changes column counts or titles despite an error, or succeeds silently"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "drop_origin_still_reorders"
+description = "Dropping a card back on its original position still changes order or counts"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "long_title_breaks_layout"
+description = "A title longer than 80 characters overflows its card, overlaps neighbors, or is missing from the detail view"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "second_run_starts_while_running"
+description = "A second Run can be started on a card that is already running"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "wip_breach_never_appears"
+description = "In Progress or Review can exceed 3 visible cards with no amber breach state and no breach label"
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"

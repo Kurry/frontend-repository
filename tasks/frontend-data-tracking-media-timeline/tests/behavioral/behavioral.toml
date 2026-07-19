@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,63 +63,84 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "14.1"
 name = "multi_facet_round_trip"
-description = "Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline — never a mix."
+description = "Configure several facets (create a user-managed event, disable a category, narrow the year window, select a library row), then reload: every facet coherently resets to the seeded baseline together — seeded corpus, default window, all categories, empty undo/redo, no selection, no user-created events — never a partial mix"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.2"
 name = "sort_reversal_proves_live_data"
-description = "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders."
+description = "Sort the library Year ascending, note the first and last visible titles, then switch to Year descending; the order reverses relative to ascending, proving sort is derived from the live collection"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.3"
 name = "derived_view_responds_to_input"
-description = "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input."
+description = "Narrow the year window or disable a category and confirm N events in view, the density strip counts, and Window Markdown export preview change meaningfully rather than redrawing identically"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.4"
 name = "cross_view_echo_without_reload"
-description = "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list ↔ detail, board ↔ stats) without reload."
+description = "Create or edit an event in Library/Filter and confirm the same title/year appear on the Scrub/Explore pin or detail and in the Timeline JSON export preview without reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.5"
 name = "count_delta_is_exact"
-description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+description = "Measure Showing N of M immediately before and after a valid create; the catalogued count increases by exactly one with no off-by-one or lag"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.6"
 name = "different_inputs_change_outcomes"
-description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+description = "Create two events with different titles and years; the library shows both distinct titles, pins sit at different year positions when both are in window, and Timeline JSON contains both titles"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.7"
 name = "interleaved_flows_preserve_state"
-description = "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state."
+description = "Start creating event A, switch to Scrub/Explore and adjust the year window, return and finish creating event B; both the window change and event B persist without corrupting each other"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.8"
 name = "empty_to_repopulated_round_trip"
-description = "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions."
+description = "Delete all user-managed events until the empty state shows, then create one valid event; list, density, counts, and export previews track through both transitions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "mutate_density_export_pipeline"
+description = "Create a user-managed event in an enabled category inside the current window: density for that category increments by one, N events in view increments when applicable, and Timeline JSON / Events CSV previews include the new title — all in one pipeline without reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "undo_round_trip_after_batch_delete"
+description = "Batch delete two selected user-managed events, confirm both are gone from list and Timeline JSON, Undo restores both and the prior count, then Redo removes both again"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.11"
+name = "export_import_round_trip_probe"
+description = "After a create or edit, export Timeline JSON, clear user-managed events or otherwise diverge, then import that JSON; visible titles, years, window, enabled categories, and a fresh export match the exported package"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.n1"
 name = "partial_persistence_is_incoherent"
-description = "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence."
+description = "After reload, some session facets survive (for example a user-created event) while others reset, producing incoherent partial persistence in this in-memory genre"
 type = "binary"
 negate = true
 weight = 1.0
@@ -127,7 +148,7 @@ weight = 1.0
 [[criterion]]
 id = "14.n2"
 name = "derived_surface_ignores_inputs"
-description = "A derived surface renders identically regardless of its inputs."
+description = "Density strip counts, N events in view, or Window Markdown stay identical after a year-window or category-filter change that should alter them"
 type = "binary"
 negate = true
 weight = 1.0
@@ -135,7 +156,7 @@ weight = 1.0
 [[criterion]]
 id = "14.n3"
 name = "different_inputs_produce_identical_output"
-description = "Repeating an action with different inputs yields byte-identical output."
+description = "Creating two events with different titles yields export previews or library rows that do not distinguish those titles"
 type = "binary"
 negate = true
 weight = 1.0
@@ -143,7 +164,15 @@ weight = 1.0
 [[criterion]]
 id = "14.n4"
 name = "cross_view_state_is_stale"
-description = "State changes appear in one view but not another until reload."
+description = "A create or edit appears in the library but not on the stage pin, detail, density strip, or export preview until reload"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "export_omits_pipeline_mutations"
+description = "After the mutate → density → export pipeline, the Timeline JSON preview omits the session's newly created or edited title"
 type = "binary"
 negate = true
 weight = 1.0

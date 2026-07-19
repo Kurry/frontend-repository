@@ -62,142 +62,149 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "7.1"
-name = "layout_adapts_desktop_to_mobile"
-description = "Layout adapts gracefully from 1440px desktop to 375px mobile."
+name = "layout_adapts_1440_to_375"
+description = "Layout adapts gracefully from 1440px desktop to 375px mobile: the pill navbar, hero, drop zone, queue, batch tray, and catalog remain usable without a broken composition."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
-name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+name = "mobile_tap_targets_large_enough"
+description = "At 375px, primary controls (Convert, Download, Remove, sample affordances, theme toggle, navbar items, batch actions, Undo/Redo) are tap targets at least 44px."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
 name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+description = "Hero and body typography resize appropriately between 1440px and 375px so the headline and helper text remain readable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
-name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+name = "content_avoids_clipping"
+description = "At 375px and 1440px, navbar, drop zone, queue rows, batch tray, Session export panel, and catalog cards never clip or overflow the viewport in a way that hides primary controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
-name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+name = "navbar_adapts_on_narrow"
+description = "At narrow widths the centered pill navbar adapts so VERT brand, Convert/Settings/About, and the theme toggle remain reachable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.6"
-name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+name = "narrow_stacking_reflows"
+description = "At narrow widths the hero stacks, the catalog collapses to one column, and file rows stack in a logical top-to-bottom order."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.7"
-name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+name = "primary_controls_operable_on_narrow"
+description = "Down to 320px width, primary controls (drop zone / sample add, Convert, Download after Done) stay operable with pointer/tap."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.8"
-name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+name = "no_horizontal_page_scroll_to_320"
+description = "From 1440px down to 320px there is no horizontal page scrolling caused by the converter layout."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.9"
-name = "media_and_canvases_resize"
-description = "Images, grids, and canvases size responsively to fit the layout."
+name = "catalog_and_queue_resize"
+description = "The four-up catalog grid and queue rows size responsively to fit the layout rather than overflowing at narrow widths."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.10"
-name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
+name = "fixed_chrome_remains_accessible"
+description = "Any sticky or floating chrome (pill navbar, theme toggle) remains accessible and does not permanently obscure Convert or Download at 375px."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.11"
+name = "batch_undo_export_presets_reachable_at_375"
+description = "At 375px width the batch tray, Undo/Redo, Session export panel, and preset controls remain reachable without permanently covering Convert or Download."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.n1"
 name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+description = "At 375px or 320px the layout breaks or overflows so the drop zone, queue, or catalog is unusable."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n2"
-name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+name = "mobile_controls_too_small"
+description = "At 375px Convert, Download, Remove, batch actions, or navbar controls are too small or misaligned for reliable tap use."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n3"
-name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+name = "text_too_small_on_mobile"
+description = "At 375px hero, queue filename, or helper text is too small to read."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n4"
-name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+name = "content_cropped_unnecessarily"
+description = "At narrow widths content is cropped or unnecessary horizontal scrollbars appear on the page."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n5"
-name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
+name = "navbar_missing_at_narrow"
+description = "At some narrow width the pill navbar or theme toggle is missing or unreachable."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n6"
-name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
+name = "fixed_chrome_obscures_controls"
+description = "Fixed or floating chrome permanently obscures Convert, Download, or the drop zone at 375px."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n7"
-name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
+name = "overlap_at_narrow_width"
+description = "At 375px or 320px queue rows, catalog cards, batch tray, or navbar items overlap so controls cannot be used."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n8"
-name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
+name = "catalog_stays_four_column_on_narrow"
+description = "At narrow widths the \"VERT supports...\" catalog remains a four-column grid that overflows instead of collapsing to one column."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n9"
-name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
+name = "queue_rows_overflow_viewport"
+description = "Queue rows or the drop-zone card use a static width that overflows the viewport at 375px."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +212,15 @@ weight = 1.0
 [[criterion]]
 id = "7.n10"
 name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
+description = "Convert, Download, sample affordances, batch tray, Undo/Redo, Session export, or the theme toggle disappear at a specific viewport size."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.n11"
+name = "batch_or_export_covers_convert_at_375"
+description = "At 375px the batch tray or Session export panel permanently covers Convert or Download so those controls cannot be used."
 type = "binary"
 negate = true
 weight = 1.0

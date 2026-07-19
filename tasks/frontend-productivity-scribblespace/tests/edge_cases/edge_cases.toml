@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,113 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_board_hint_present"
+description = "On a brand-new or emptied board the centered empty-canvas hint is present rather than a blank canvas."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "board_rename_validates_inline"
+description = "Empty and over-60-character board names show inline validation naming the board-name field before any rename commits."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "errors_name_field_and_fix"
+description = "Board-rename and Import errors name the offending field and the fix rather than only saying Invalid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "delete_shows_confirmation"
+description = "Delete Selected and board delete show a confirmation dialog before destructive removal."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "stream_status_visible_while_running"
+description = "While the live event stream is Active or Replaying, the status badge and 'N of 12 events applied' readout remain visible."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "delete_cancel_and_undo_available"
+description = "Delete Selected can be canceled in the confirmation dialog, and canvas-level Undo can reverse a prior create; Archive offers Restore."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "connect_helper_banner_guidance"
+description = "Connect mode shows the helper banner 'Click an object to start a connector' so the two-click flow is guided."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
 name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+description = "Toolbar buttons, board tabs, search input, and dialog actions use semantic interactive elements rather than clickable bare divs for primary actions."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
 name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+description = "Export, Import, delete confirmation, and Command palette close via explicit close/cancel and Escape."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "stream_progress_readout"
+description = "The live stream's 'N of 12 events applied' readout updates as events apply so long-running catch-up has visible progress."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "import_malformed_leaves_workspace"
+description = "Importing malformed JSON or a payload that fails the field contract leaves boards and objects unchanged and shows an inline error."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "undo_disabled_on_empty_board"
+description = "With an empty board and no prior mutations, Undo and Redo are both disabled and Ctrl+Z changes nothing on the canvas."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "occupied_position_offset_edge"
+description = "A second object of the same type placed without moving the first is offset by about 28px so both remain selectable."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "duplicate_connector_idempotent"
+description = "Requesting a connector between already-connected objects draws no second line and shows a visible message that the duplicate was ignored."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "archive_empty_state"
+description = "With zero archive rows the Archive panel shows an explicit empty-state message explaining that deleted or archived objects appear there."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
 name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+description = "An empty board or empty Archive shows nothing and provides no UI feedback."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +176,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n2"
 name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+description = "Board-rename or Import failures only appear in the console with no visible inline feedback."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,63 +184,63 @@ weight = 1.0
 [[criterion]]
 id = "4.n3"
 name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+description = "Create, delete, archive, or copy actions complete with no visible change or confirmation."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "destructive_without_cancel_path"
+description = "Delete Selected or board delete has no cancel path and cannot be aborted."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "invalid_import_mutates_workspace"
+description = "A non-conforming Import still mutates boards or objects."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "reload_restores_from_storage"
+description = "After a full page reload, prior in-session objects reappear from browser storage instead of the seeded baseline."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "rapid_create_loses_count"
+description = "Twenty-five rapid New Note activations produce a wrong final count, freeze, blank screen, or uncaught error."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "last_board_delete_strands_user"
+description = "Deleting the last board leaves the user on a missing/blank board with no default Board created."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "undo_enabled_with_empty_stacks"
+description = "Undo or Redo appear enabled and claim to act when their stacks are empty."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "connector_duplicate_silently_stacks"
+description = "A duplicate connector request silently stacks a second line with no message."
 type = "binary"
 negate = true
 weight = 1.0
@@ -213,7 +248,7 @@ weight = 1.0
 [[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in edge-case handling that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

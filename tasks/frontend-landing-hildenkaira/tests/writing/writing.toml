@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.5
@@ -63,89 +63,119 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "15.1"
-name = "headings_use_consistent_capitalization"
-description = "For fidelity tasks, rendered copy must match the reference. Where the app renders headings and section titles, they use consistent capitalization (one convention — title case or sentence case — throughout)."
+name = "headings_match_mandated_casing"
+description = "Where the app renders headings and section titles, they keep the mandated casing and wording consistently, including the hero H1 If you can't reach a million people with 0€ ad spend, your branding sucks., the statement H2 Content only you can post because it's built around your people., Does your brand have self-esteem issues?, and Ready to work with us?."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.2"
-name = "actions_use_specific_labels"
-description = "Where the app renders button or action labels, they are specific verbs ('Add expense', 'Start session'), not generic ('Submit', 'OK') when a specific label is possible."
+name = "cta_labels_specific"
+description = "Where the app renders primary action labels, they use the specific PRD verbs (We'll call you, Contact us, Show case, Accept, Organic content / Ads for social / Training CTAs) rather than generic Submit/OK alone when a specific label is specified."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.3"
-name = "errors_name_problem_and_fix"
-description = "Where the app renders error messages, they name the problem and the fix ('Amount must be a positive number'), not just a rejection ('Invalid')."
+name = "contact_errors_name_fields"
+description = "Where the app renders contact validation errors, they name the offending field (email, phone, or Privacy Policy/terms) and the broken rule rather than only saying Invalid."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.4"
-name = "empty_states_explain_next_step"
-description = "Where the app renders empty states, the copy explains what belongs there and how to add it."
+name = "cookie_and_form_empty_guidance"
+description = "Where the app renders the cookie preferences and contact popup empty/unchecked states, the copy still explains the categories (Essential, Marketing, Analytics, Personalization) and agreement requirement rather than a blank broken stub."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.5"
-name = "body_copy_is_well_written"
-description = "Where the app renders body or marketing copy, rate how free it is of spelling and grammatical errors."
+name = "marketing_copy_spelling_grammar"
+description = "Where the app renders body or marketing copy (hero lead We will 10x your social presence or work for free until it's done., statement, services, about, testimonials), rate how free it is of spelling and grammatical errors."
 type = "likert"
 points = 5
 weight = 0.5
 
 [[criterion]]
 id = "15.6"
-name = "terminology_is_consistent"
-description = "Where the app renders labels for the same concept in multiple places, terminology is consistent (not 'task' here and 'todo' there)."
+name = "cinder_bloom_terminology_consistent"
+description = "Where the app renders the agency name and client identities, terminology stays consistent as Cinder & Bloom and the five fictional clients (Loom House, Second Circle, New Current, Roadkind, Motive Lab) — not mixed with leftover source-agency naming."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.7"
-name = "numbers_dates_and_units_are_consistent"
-description = "Where the app renders numbers, dates, and units, formatting is consistent (same date format, same decimal precision, units labeled)."
+name = "stat_numbers_space_thousands"
+description = "Where the app renders Organic views and Likes counters, large numbers use a space as the thousands separator (for example 2 148 665) consistently."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.8"
-name = "success_messages_are_specific"
-description = "Where the app renders confirmation and success messages, they state what happened ('Entry saved'), not vague affirmations."
+name = "success_message_exact_copy"
+description = "Where the app renders the contact confirmation, it states the mandated outcome exactly: Thanks for your submission!."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.n1"
-name = "placeholder_copy_is_visible"
-description = "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI."
+name = "placeholder_copy_visible"
+description = "Lorem ipsum or placeholder text (TODO, Lorem, asdf, or template variables like {{title}}) is visible anywhere in the shipped UI."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n2"
-name = "prominent_copy_has_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as headings, hero text, or primary buttons."
+name = "prominent_copy_has_typos"
+description = "Spelling or grammatical errors appear in prominent copy such as the hero H1, hero lead, Does your brand have self-esteem issues?, Ready to work with us?, or primary CTA labels."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n3"
-name = "concept_names_are_inconsistent"
-description = "The same concept is named inconsistently across surfaces."
+name = "source_brand_or_real_designer_in_copy"
+description = "Rendered copy still names a source agency/client, real third-party logos as client marks, or the reference site's real designer instead of Cinder & Bloom and invented credits."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n4"
-name = "copy_is_truncated_or_overflowing"
-description = "Truncated or overflowing text renders copy unreadable."
+name = "copy_truncated_or_overflowing"
+description = "Truncated or overflowing text renders mandated headings, hero lead, stat labels, or form messages unreadable at 1440 or 479."
+type = "binary"
+negate = true
+weight = 0.5
+
+[[criterion]]
+id = "15.9"
+name = "shortlist_export_palette_labels_specific"
+description = "Where the app renders shortlist, export, palette, and undo chrome, labels stay specific (Shortlist, Export brief, Download, Copy, Import, Undo, Redo, Discovery brief) rather than generic Submit/OK alone."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.n5"
+name = "brief_markdown_heading_wrong"
+description = "Where the Markdown discovery brief tab renders a heading, it is missing Discovery brief — Cinder & Bloom or substitutes placeholder/lorem copy."
+type = "binary"
+negate = true
+weight = 0.5
+
+[[criterion]]
+id = "15.10"
+name = "contact_cookie_validation_errors_name_fields"
+description = "Where the app renders contact or cookie preference validation errors, they name the problem field (email, phone, terms/Privacy Policy, essential, marketing, analytics, or personalization) and the rule rather than only saying Invalid."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.n6"
+name = "form_errors_generic_invalid_only"
+description = "Where contact or cookie validation fails, the only visible message is a generic Invalid (or equivalent) with no field name."
 type = "binary"
 negate = true
 weight = 0.5

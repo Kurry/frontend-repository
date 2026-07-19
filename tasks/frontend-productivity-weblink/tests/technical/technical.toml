@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "4.1"
 name = "console_clean_full_exercise"
-description = "The app loads and is driven through the full join, chat, file-queue, leave, theme-toggle, and reload workflow with zero console errors or warnings and zero uncaught page errors"
+description = "The app loads and is driven through the full join, chat, file-queue, export, import, leave, theme-toggle, and reload workflow with zero console errors or warnings and zero uncaught page errors"
 type = "binary"
 weight = 1.0
 
@@ -139,7 +139,7 @@ optional = true
 [[criterion]]
 id = "4.11"
 name = "keyboard_operable_with_visible_focus"
-description = "Every interactive control (name field, identifier field, Join Room, Leave Room, theme toggle, chat composer, choose-file) is reachable and operable with the keyboard alone, each showing a visible focus indicator when focused"
+description = "Every interactive control (name field, identifier field, Join Room, Leave Room, theme toggle, chat composer, choose-file, Export Session, Import Session, Copy, Download) is reachable and operable with the keyboard alone, each showing a visible focus indicator when focused"
 type = "binary"
 weight = 1.0
 
@@ -177,6 +177,29 @@ name = "rapid_input_no_hangs_or_duplicates"
 description = "Rapid repeated input (fast typing in the composer, quick Join/Leave toggling) causes no hangs, duplicated transcript lines, or dropped interactions"
 type = "binary"
 weight = 1.0
+
+
+[[criterion]]
+id = "4.17"
+name = "zod_field_contracts_drive_forms"
+description = "PeerIdentity, JoinSession, ChatMessage, and Import Session reject invalid payloads with inline per-field errors matching the declared field contracts (displayName 1–40, roomId character class and length, text 1–2000, Session Pack schemaVersion weblink-session-v1 and enums) before any join, send, or import proceeds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.18"
+name = "webmcp_export_opens_session_pack"
+description = "Invoking the artifact-export WebMCP tool opens or refreshes the same Session Pack export surface the Export Session control drives, without returning raw file contents, blobs, or base64 in the tool result"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.19"
+name = "session_pack_never_serializes_connected_peer"
+description = "The app fails this criterion if Session Pack JSON or any WebMCP tool result claims a peer connected/online or serializes connection state as connecting or waiting"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.catchall"

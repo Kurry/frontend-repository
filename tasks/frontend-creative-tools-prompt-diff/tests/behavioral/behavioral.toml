@@ -1,0 +1,157 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "14.1"
+name = "multi_facet_reload_resets_seeded"
+description = "Multi-facet round-trip: switch the compare picker to a non-default version, post an annotation, toggle unified mode, and complete a restore, then reload the page. All four facets coherently reset to the seeded baseline (seeded prompts and chains, default pickers and mode, no unseeded annotations or restore versions) — never a mix of surviving and reset facets."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.2"
+name = "picker_swap_inverts_diff"
+description = "Diff-inversion proof: with two versions selected, note which lines render added and removed, then swap the base and compare selections; the added and removed treatments invert correctly relative to the first orientation, proving the diff derives from live version data rather than a hardcoded rendering."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.3"
+name = "counters_track_picker_inputs"
+description = "Derived-view sensitivity: change either version picker and confirm the lines-added, lines-removed, and net-token-delta counters change to match the newly compared pair rather than redrawing identically regardless of input."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.4"
+name = "merge_echoes_across_views"
+description = "Cross-view echo: complete a merge and confirm the history list, both version pickers, the version graph, and the export preview all show the new head version without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.5"
+name = "history_count_delta_exact"
+description = "Count-delta integrity: note the history list's entry count, complete a restore, and confirm the count increased by exactly one; undo it and confirm the count decreased by exactly one immediately."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.6"
+name = "merge_pipeline_probe"
+description = "Full-pipeline probe: edit two branch resolutions differently across two merge passes — first resolve a given conflict region to the left branch, complete the merge, undo it, then resolve the same region to the right branch and complete again; the two resulting merge versions differ exactly at that region, and the merged text, graph node, and history report each track the choice actually made."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.7"
+name = "interleaved_annotation_and_merge"
+description = "Interleaved-flow integrity: start composing an annotation, switch to the Graph tab and back, then start and complete a merge, and finally post the annotation; confirm the annotation anchors and text are intact and the merge result is unaffected by the interleaving."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.8"
+name = "resolve_unresolve_round_trip"
+description = "Edge-state round-trip: resolve every conflict region with the bulk control so Complete merge enables, then change one region back to unresolved or a different choice; the progress indicator, region chips, and Complete merge enablement track through both transitions."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n1"
+name = "partial_persistence_is_incoherent"
+description = "A facet of user-configured state silently reverts while others survive — for example the unified-mode toggle resets while the picker selections persist — producing incoherent partial state handling."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n2"
+name = "derived_surface_ignores_inputs"
+description = "A derived surface renders identically regardless of its inputs — the counters, blame gutter, or graph stay unchanged after the compared pair or the version chain changes."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n3"
+name = "different_inputs_produce_identical_output"
+description = "Two merges completed with different per-region choices yield byte-identical merged texts."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n4"
+name = "cross_view_state_is_stale"
+description = "A change appears in one view but not another until reload — for example a completed merge shows in the history list while the graph or pickers omit the new version."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "behavioral.catchall"
+name = "behavioral_catchall"
+description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

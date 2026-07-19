@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "4.2"
 name = "client_state_coherent_in_place"
-description = "Shared client state stays coherent: the locale label, active flick-deck card, carousel position, contact form state, and cookie state update immediately in place without a full page reload, and a reload returns every facet coherently to the seeded baseline — never a mix of kept and reset state"
+description = "Shared client state stays coherent: the locale label, active flick-deck card, carousel position, contact form state, cookie state, shortlist count, and discovery brief preview update immediately in place without a full page reload, and a reload returns every facet coherently to the seeded baseline — never a mix of kept and reset state"
 type = "binary"
 weight = 1.0
 
@@ -195,6 +195,51 @@ id = "4.19"
 name = "required_authored_asset_files_load"
 description = "Browser network and playback evidence shows all required Cinder & Bloom images and marks plus distinct local VP9 WebM/poster pairs loading from same-origin paths with no 404, decode, poster, or playback failure"
 type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.20"
+name = "shortlist_brief_state_in_memory_coherent"
+description = "Shortlist count, discovery brief preview, command palette state, and undo/redo stacks live in in-memory client state: mutating shortlist updates the nav count and brief JSON without reload, and a full reload coherently resets shortlist to empty, locale to EN, and cookie banner to seeded visibility with empty undo/redo — never a mixed partial survival."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n20"
+name = "brief_uses_browser_storage"
+description = "After shortlisting clients and exporting a brief, localStorage or sessionStorage holds shortlist/brief/undo state (forbidden for this in-memory homepage)."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.21"
+name = "api_shaped_contact_and_cookie_schema_validation"
+description = "Invalid contact payloads (empty/invalid email, terms false, out-of-bounds phone) and invalid cookie preference drafts (essential false or missing/non-boolean category) are blocked entirely client-side with named inline per-field errors and no success/consent commit; valid payloads alone reach Thanks for your submission! or update cookieCategories."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n21"
+name = "schema_bypass_commits_invalid_payload"
+description = "An invalid contact or cookie payload still reveals Thanks for your submission! or mutates cookieCategories / dismisses the banner without named field errors."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.22"
+name = "discovery_brief_import_schema_validation"
+description = "Import of discovery-brief JSON validates the Discovery brief JSON field contract client-side: schemaVersion must be 1, locale en or fi, cookieCategories and contactSubmitted/contactEmail must satisfy their contracts; invalid imports show a named inline error and leave shortlist, locale, cookie, carousel, and flick state unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n22"
+name = "brief_import_bypasses_schema"
+description = "Importing schema-invalid discovery-brief JSON (wrong schemaVersion, locale outside en/fi, or broken contact/cookie cross-field rules) still mutates session state without a named inline import error."
+type = "binary"
+negate = true
 weight = 1.0
 
 [[criterion]]

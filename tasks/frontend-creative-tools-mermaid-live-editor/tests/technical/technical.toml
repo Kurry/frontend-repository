@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -70,14 +70,14 @@ weight = 1.0
 [[criterion]]
 id = "2.2"
 name = "console_clean_editor_flows"
-description = "First load, source and config editing, undo/redo, syntax failure and recovery, sample switching, theme switching, reload restoration, export, and copy complete with no uncaught error, unhandled rejection, or failed same-origin asset request"
+description = "First load, source and config editing, undo/redo, syntax failure and recovery, sample switching, theme switching, reload restoration, SVG/PNG/MMD/Session JSON export, Session JSON or mmd import, and copy complete with no uncaught error, unhandled rejection, or failed same-origin asset request"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
 name = "shared_surface_state_coherence"
-description = "A source, config, tab, type, error, or theme change appears consistently across editor, preview, badge, actions, error region, and theme surfaces without a disconnected stale copy"
+description = "A source, config, tab, type, error, theme, or Session JSON import change appears consistently across editor, preview, badge, actions, Session JSON preview, error region, and theme surfaces without a disconnected stale copy"
 type = "binary"
 weight = 1.0
 
@@ -131,6 +131,13 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "2.17"
+name = "api_shaped_config_and_session_schemas"
+description = "Config apply and Session JSON import reject payloads that fail the declared Mermaid Config / Session JSON field contracts with inline field-named errors (theme enum, schemaVersion mermaid-session-v1, appTheme, activeTab, diagramType), while a valid Config apply produces a config object whose theme matches the closed enum and appears in the Session JSON preview under the same keys"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "2.7"
 name = "hidden_ground_truth_exposure"
 description = "A hidden node, attribute, or unmandated window global exposes parsed diagram answers, expected output, or internal state that a real user cannot reach through visible interaction"
@@ -149,7 +156,7 @@ negate = true
 [[criterion]]
 id = "2.9"
 name = "fabricated_or_hardcoded_output"
-description = "An export or copy success appears without the underlying artifact, or distinct valid sources yield identical hardcoded preview or export output"
+description = "An export or copy success appears without the underlying artifact, Session JSON lacks required field-contract keys or omits live mutations, or distinct valid sources yield identical hardcoded preview or export output"
 type = "binary"
 weight = 1.0
 negate = true

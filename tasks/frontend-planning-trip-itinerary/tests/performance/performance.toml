@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -206,6 +206,21 @@ weight = 1.0
 id = "9.n10"
 name = "rapid_or_edge_use_crashes"
 description = "The app crashes under rapid or edge-case use."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.11"
+name = "bulk_import_commit_stays_responsive"
+description = "Committing a CSV import of dozens of rows in one action renders the new rows, chart updates, and recomputed balances without freezing the UI."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.n11"
+name = "recompute_lags_behind_edits"
+description = "FX recomputation, formula recalculation, undo/redo, or chart redraw visibly lags its triggering edit or locks the interface while computing."
 type = "binary"
 negate = true
 weight = 1.0

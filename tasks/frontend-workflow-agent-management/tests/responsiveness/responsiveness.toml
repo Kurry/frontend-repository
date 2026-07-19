@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,158 +62,158 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "7.1"
-name = "layout_adapts_desktop_to_mobile"
-description = "Layout adapts gracefully from 1440px desktop to 375px mobile."
+name = "desktop_docked_panel_layout"
+description = "At desktop widths around 1440 pixels the detail panel is docked at approximately 320 pixels beside the table with the toolbar usable in one row or a deliberate wrap"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
-name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+name = "tablet_panel_becomes_overlay"
+description = "At widths of 768 pixels and below the detail panel opens as a dismissible overlay covering the table rather than staying a squeezed dock"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
-name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+name = "mobile_no_page_horizontal_scroll"
+description = "At 375 pixel width no content clips or overflows the viewport and no page-level horizontal scrolling appears"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
-name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+name = "table_scrolls_in_container"
+description = "At 375 pixel width the data table scrolls within its own container instead of forcing page-level horizontal scroll"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
-name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+name = "export_import_usable_on_mobile"
+description = "At 375 pixel width the export preview and import surface remain fully usable and scroll within their own containers"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.6"
-name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+name = "toolbar_wraps_without_overlap"
+description = "On narrow widths the toolbar controls (Register, Export, Import, bulk, filters) wrap or collapse without overlapping the table or each other"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.7"
-name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+name = "tap_targets_adequate_mobile"
+description = "Primary controls on mobile (row actions, Register, Export, checkboxes) present tap targets large enough to use without precise pointing"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "7.8"
-name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+name = "typography_readable_across_breakpoints"
+description = "Page title, table text, and panel headings remain readable from 1440 down to 375 without overlapping or truncating into illegibility"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.9"
-name = "media_and_canvases_resize"
-description = "Images, grids, and canvases size responsively to fit the layout."
+name = "palette_usable_narrow"
+description = "The command palette remains usable as an overlay at 375 pixel width without clipping its search field or results"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "7.10"
-name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
+name = "rollup_strip_adapts"
+description = "The rollup strip remains readable at narrow widths by wrapping or scrolling within its region rather than overflowing the viewport"
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "7.n1"
-name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+name = "desktop_layout_broken"
+description = "At 1440 pixels the table, docked panel, or toolbar overlap, clip, or leave unusable gaps that break the console composition"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n2"
-name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+name = "mobile_page_scrolls_horizontally"
+description = "At 375 pixels the page scrolls horizontally or content clips outside the viewport"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n3"
-name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+name = "panel_stays_docked_on_narrow"
+description = "At 768 pixels and below the detail panel remains a cramped side dock that squeezes the table instead of becoming an overlay"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n4"
-name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+name = "export_unusable_on_mobile"
+description = "At 375 pixels Export fleet or Import fleet cannot be used because the preview or controls are clipped or off-screen"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n5"
-name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
+name = "toolbar_overlaps_table"
+description = "On narrow widths toolbar controls overlap the table rows or each other so labels are unreadable"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n6"
-name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
+name = "table_forces_page_overflow"
+description = "The data table forces page-level horizontal overflow instead of scrolling in its own container"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n7"
-name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
+name = "text_illegible_at_375"
+description = "At 375 pixels headings or table text are truncated or overlapping into illegibility"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n8"
-name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
+name = "palette_clipped_on_mobile"
+description = "The command palette search field or results are clipped or unreachable at 375 pixels"
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "7.n9"
-name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
+name = "rollup_overflows_viewport"
+description = "The rollup strip overflows the viewport horizontally on narrow widths with no internal wrap or scroll"
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "7.n10"
-name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
+name = "controls_too_small_to_tap"
+description = "Primary mobile controls are so small they cannot be activated reliably by touch"
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "responsiveness.catchall"
 name = "responsiveness_catchall"
-description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable responsiveness defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

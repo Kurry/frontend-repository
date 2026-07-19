@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -122,6 +122,20 @@ weight = 0.5
 id = "4.9"
 name = "scrubber_and_chrome_hover_brighten"
 description = "Scrubber thumbs and chrome buttons visibly brighten or otherwise respond on pointer hover, verified with computed styles while hovering"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.10"
+name = "export_drawer_slides_in"
+description = "Opening the export drawer via the real Export timeline control slides it in from the side rather than snapping open"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "toast_feedback_slides_and_dismisses"
+description = "Feedback toasts after create, delete, bulk actions, export copy, or import slide in, remain readable, and auto-dismiss with a fade"
 type = "binary"
 weight = 0.5
 

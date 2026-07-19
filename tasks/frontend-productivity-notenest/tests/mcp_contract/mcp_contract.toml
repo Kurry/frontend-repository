@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,77 +63,77 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "12.1"
 name = "mandated_modules_are_bound"
-description = "All contract-mandated modules are initialized and bound."
+description = "All four contract-mandated modules are initialized and bound: entity-collection-v1, browse-query-v1, structured-editor-v1, and artifact-transfer-v1 (tools discoverable via webmcp_list_tools with entity_*, browse_*, editor_*, and artifact_* prefixes)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.2"
 name = "handlers_match_visible_ui_logic"
-description = "Exposed tool handlers match visible UI command logic."
+description = "Exposed tool handlers call the same application logic as the visible UI: entity create/select/update/delete/toggle, browse open/search, editor set_content/add, and artifact export/import/copy change the same folders, notes, Trash, and Nest export state the shell uses."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.3"
 name = "only_documented_operations_exist"
-description = "Only documented operations and routes are available."
+description = "Only documented operations from the bindings are available: browse destinations all-notes, trash, and export-nest; entity note with create, select, update, delete, and toggle; entity fields title, body, folder, pinned, color, checklist-item; color value bounds none/red/orange/yellow/green/blue/purple; editor checklist-block with set_content and add; artifact export, import, and copy with formats json and markdown and import mode nest-json — no invented destinations."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.4"
 name = "contract_is_automation_exercisable"
-description = "The contract can be fully exercised via automation."
+description = "The contract can be fully exercised via automation: webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool succeed for the bound entity, browse, editor, and artifact tools."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.5"
 name = "declared_entity_operations_work"
-description = "Entity operations declared in the contract, including create, update, delete, and reorder, all work."
+description = "Entity operations declared for note work: create, select, update, delete (with confirm=true), and toggle update the visible note list, pin, color, and Nest JSON export preview."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.6"
-name = "form_flow_operations_are_bound"
-description = "Form submission validation, error, and cancel operations are clearly bound."
+name = "editor_checklist_operations_bound"
+description = "Structured-editor operations set_content and add for checklist-block are bound and produce visible checklist changes consistent with the Insert Checklist control path."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.7"
-name = "queries_match_allowed_spec"
-description = "Query destinations and filters match the allowed specification."
+name = "browse_destinations_match_spec"
+description = "Browse destinations all-notes, trash, and export-nest match the allowed specification and update visible navigation/export state via the same handlers as UI controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.8"
-name = "capabilities_stay_declared"
-description = "No extra or undeclared module routes or capabilities are exposed."
+name = "artifact_export_import_copy_bound"
+description = "Artifact operations export, import, and copy are bound: export formats json and markdown and import mode nest-json are available without putting raw file paths, blobs, or base64 artifact contents in WebMCP arguments or results."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.9"
 name = "session_tool_and_invoke_apis_work"
-description = "Session info, tool list, and invocation are correctly surfaced."
+description = "window.webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool are correctly surfaced and return coherent session/tool data for this app."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.10"
 name = "mcp_initializes_without_harness_edits"
-description = "MCP initialization works without manual editing or test harness changes."
+description = "MCP initialization works from the app's own registration without requiring manual edits to /tests harness files."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.n1"
 name = "mcp_tools_missing_or_noop"
-description = "MCP tooling is unbound, missing, or a no-op."
+description = "WebMCP tooling for entity-collection-v1, browse-query-v1, structured-editor-v1, or artifact-transfer-v1 is unbound, missing, or a no-op when invoked."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n2"
 name = "handlers_diverge_from_ui_logic"
-description = "Handlers do not match UI logic because actions mismatch or state does not sync."
+description = "Invoking a bound entity, browse, editor, or artifact tool leaves notes, Trash, selection, or Nest export preview diverging from what the equivalent visible UI control would produce."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n3"
 name = "undeclared_capabilities_exposed"
-description = "Undeclared destinations or entity operations are exposed."
+description = "Undeclared modules, destinations, entity operations, editor operations, or artifact formats beyond the Bindings are exposed."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +157,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n4"
 name = "automation_cannot_exercise_contract"
-description = "The contract cannot be exercised from automation."
+description = "webmcp_list_tools / webmcp_invoke_tool cannot exercise the declared entity, browse, editor, and artifact bindings."
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +165,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n5"
 name = "validation_bypass_desyncs_state"
-description = "Validation bypasses lead to inconsistent MCP and UI state."
+description = "An entity create or update invocation bypasses title/color validation and leaves MCP/UI state inconsistent (invalid note accepted via MCP while the UI would reject it)."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +173,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n6"
 name = "session_or_tool_api_errors"
-description = "The session or tool API returns errors or incomplete data."
+description = "webmcp_session_info or webmcp_list_tools returns errors or incomplete data for the mandated modules."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +181,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n7"
 name = "mcp_relies_on_undocumented_hacks"
-description = "MCP relies on manual or undocumented test hacks."
+description = "MCP only works after undocumented manual harness hacks or console-only stubs rather than app-registered tools."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n8"
 name = "required_contract_module_missing"
-description = "No module contract is implemented where one is declared required."
+description = "entity-collection-v1, browse-query-v1, structured-editor-v1, or artifact-transfer-v1 is not implemented despite being declared required in the contract."
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +197,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n9"
 name = "mcp_is_stubbed_or_commented_out"
-description = "The MCP interface is commented out or only stubbed."
+description = "The WebMCP interface is commented out or only stubbed so tools list as present but leave the workspace or Nest export state unchanged when invoked."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,15 @@ weight = 1.0
 [[criterion]]
 id = "12.n10"
 name = "automated_contract_validation_fails"
-description = "The project fails automated MCP contract validation."
+description = "Missing tools create fake UI success paths — the note list or Nest export shows success or updated counts without the underlying entity/browse/editor/artifact handler running."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "12.n11"
+name = "artifact_args_contain_raw_blobs"
+description = "WebMCP artifact tool arguments or results include raw file paths, blobs, or base64 artifact contents contrary to the artifact-transfer restrictions."
 type = "binary"
 negate = true
 weight = 1.0
@@ -213,7 +221,7 @@ weight = 1.0
 [[criterion]]
 id = "mcp_contract.catchall"
 name = "mcp_contract_catchall"
-description = "The app exhibits a significant, browser-observable defect in the declared MCP contract that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in the WebMCP action contract that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user or automation consumer, not a nitpick. If present, name the defect and cite the concrete evidence. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

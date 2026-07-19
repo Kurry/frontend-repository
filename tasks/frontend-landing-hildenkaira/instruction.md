@@ -75,7 +75,7 @@ End-to-end flows with tracked state (every step names its visible evidence):
 - On a fresh load a lime page-load veil covers the hero then lifts to reveal it in one timeline with the brand lettermark rising into place letter by letter and the nav settling in — intro stages are orchestrated together rather than firing as unrelated tweens
 - Headings and paragraphs reveal with a line-by-line upward mask wipe (each line rising from fully below its mask to its resting position) the first time each element scrolls to about 80% of the viewport, and stay revealed; headings run 0.8s with a 0.08s per-line stagger and paragraphs 0.6s with a 0.04s stagger, both with a pronounced ease-out
 - Desktop smooth scrolling (768px and wider) stays synchronized with scroll-triggered motion: line reveals, the pinned services throw, nav theme sync, and parallax keep locked to scroll position without visible lag or desync as the page settles
-- The nav's theme class swaps to match whichever section sits under a small probe near the top of the viewport as the page scrolls, recoloring the nav in step with the section beneath it
+- The nav's theme class swaps to match whichever section sits under a small sample point near the top of the viewport as the page scrolls, recoloring the nav in step with the section beneath it
 - Nav link dots scale up from nothing on hover and for the current link with a slight overshoot, running transform over 0.525s with the back-ish easing cubic-bezier(0.175, 0.885, 0.32, 1.275)
 - Hovering a primary button (fine-pointer devices) slides its label upward, rotates its icon backing, translates its arrow across, and wipes the button background; each animated target transitions transform over 0.525s with the primary-motion easing cubic-bezier(0.625, 0.05, 0, 1)
 - Clicking a client deck's Next or Previous control animates the stacked flick cards to new offset/rotation/scale positions per the flick coordinate table (active 0/1 scale, +/-1 at +/-25% and +/-10deg scale 0.9, +/-2 at +/-45% and +/-15deg scale 0.8) with an elastic, springy overshoot settle running about 0.6s, and the active card's caption chips slide up into view
@@ -157,6 +157,7 @@ Modules:
 - browse-query-v1
 - form-workflow-v1
 - command-session-v1
+- artifact-transfer-v1
 
 Module specs:
 <module_spec id="browse-query-v1">
@@ -220,13 +221,36 @@ Module specs:
 }
 </module_spec>
 
+<module_spec id="artifact-transfer-v1">
+{
+  "id": "artifact-transfer-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Artifact transfer",
+  "purpose": "Import, export, copy, print, and conversion workflows.",
+  "permitted_operations": ["import", "export", "copy", "print_preview", "convert"],
+  "binding_keys": {
+    "required_any_of": [["artifact_operations"]],
+    "optional": ["import_modes", "export_formats", "conversion_modes", "visible_postconditions"]
+  },
+  "restrictions": [
+    "No raw files, filesystem paths, blobs, base64, or artifact contents in WebMCP arguments or results.",
+    "File picker interaction, clipboard contents, and downloaded artifacts remain Playwright responsibilities."
+  ],
+  "tool_name_prefix": "artifact"
+}
+</module_spec>
+
 Bindings:
 - Browsable entity: clients
-- Destinations: hero; statement; client; services; testimonials; cta; footer
+- Destinations: hero; statement; client; services; testimonials; about; cta; footer
 - Locales: en; fi
-- Form fields: email; phone; terms
-- Form operations: validate; submit; reset
+- Form fields: email; phone; terms; essential; marketing; analytics; personalization
+- Form operations: validate; submit; cancel; reset
 - Session operations: start; pause; resume; stop
+- Artifact operations: export; import; copy
+- Export formats: json; markdown
+- Import modes: discovery-brief
+- Value bounds: {"email":"required non-empty email with local@domain.tld shape","phone":"optional; null/empty or <=40 chars of digits spaces + - ( )","terms":"required boolean true","essential":"required boolean true (locked on)","marketing":"boolean","analytics":"boolean","personalization":"boolean"}
 
 Mechanics exclusions:
 - Flick-card elastic reshuffle coordinate transforms stay Playwright-only
@@ -238,6 +262,8 @@ Mechanics exclusions:
 - Dynamic counter ticking stays Playwright-observed
 - Mobile lime menu open animation stays Playwright-only
 - SplitText line-mask reveals stay Playwright-only
+- Command palette open/close transition stays Playwright-only
+- Discovery-brief download bytes and clipboard contents stay Playwright-only per artifact-transfer restrictions
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

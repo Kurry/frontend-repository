@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,150 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "create_habit_appears_under_category"
+description = "Create flow: submitting a valid New Habit form under the field contract increases the list count by exactly one and the habit appears when its category chip is selected"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "invalid_habit_field_contract_blocks_create"
+description = "Create flow: submitting a New Habit payload that fails the field contract (blank name, illegal targetCount, or over-length reminder) shows immediate inline validation naming the offending field and adds no habit"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "checkin_updates_grid_and_stats"
+description = "Check-in flow: completing a Once a day habit updates today's weekly-grid cell, streak/flame treatment, and Stats monthly completions without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "pause_removes_from_list_and_stats"
+description = "Pause flow: pausing a habit removes it from the main list and from the Stats active-streak count without deleting its history"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "habits_stats_heatmap_view_switch"
+description = "View switch: opening Stats and Heatmap from the habits list shows those views with state retained for the selected habit, and returning to habits restores the list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "empty_list_after_clear_or_start"
+description = "Edge: with no habits present, the empty-state invitation remains clear and visible"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "category_filter_narrows_list"
+description = "Filter flow: selecting a category chip narrows the habit list to that category and selecting All restores every habit"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "export_import_artifact_round_trip"
+description = "Artifact flow: after creating a habit with a distinctive name and a check-in, Export as JSON then Import of that Workspace JSON after confirmation reconstructs the same visible habits, category chips, check-in state, and Stats numbers"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "import_confirmation_overlay"
+description = "Import confirmation overlay warns that current data will be replaced; Cancel leaves data untouched and Confirm only proceeds for a field-contract-valid document"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "recovery_banner_retry_reset"
+description = "Recovery: when the recovery notice appears, Retry and Reset produce visible deterministic results without requiring a full page reload to regain a usable UI"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "new_habit_flow_unavailable"
+description = "The New Habit create flow is not enabled from the UI"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "created_habit_missing_or_duplicated"
+description = "A successfully submitted New Habit fails to appear in the list or duplicates on a single submit"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "checkin_desyncs_grid_and_stats"
+description = "A check-in updates the habit card but not the weekly grid or Stats (or the reverse) until reload"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "view_switch_breaks_habits_list"
+description = "Switching to Stats or Heatmap and back breaks the habits list layout or loses the active category filter"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_habits_breaks_ui"
+description = "With no habits present, the main list or Stats view is broken or missing required empty-state copy"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "category_filter_disagrees"
+description = "The active category chip and the visible habit list disagree about which habits belong to the filter"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "export_omits_session_work"
+description = "After creating a habit and recording a check-in, Export as JSON omits that habit's name or today's completion from the Workspace JSON"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "import_dialog_blocks_without_exit"
+description = "The Import confirmation overlay blocks the app with no Cancel or dismiss path"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "invalid_import_lacks_feedback"
+description = "Importing a document that fails the Workspace JSON field contract provides no visible validation feedback naming the offending field"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "recovery_requires_full_reload"
+description = "Recovery from corrupted storage or Load Malformed Sample requires a full page reload to regain a usable UI"
 type = "binary"
 negate = true
 weight = 1.0

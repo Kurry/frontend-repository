@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -83,8 +83,8 @@ weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "dialog_popover_enter_exit"
-description = "The Connect agent dialog and the night-mode popover enter and exit with a short opacity-and-scale transition of roughly 200 milliseconds when opened and closed via their real triggers"
+name = "dialog_drawer_palette_enter_exit"
+description = "The Connect agent dialog, night-mode popover, export drawer, and command palette enter and exit with a short opacity-and-scale transition of roughly 200 milliseconds when opened and closed via their real triggers"
 type = "binary"
 weight = 1.0
 
@@ -112,7 +112,7 @@ weight = 0.5
 [[criterion]]
 id = "4.8"
 name = "reduced_motion_fallback"
-description = "With prefers-reduced-motion set, the KPI count-up is instant, feed items appear without animation, and dialog, popover, and step-status transitions apply instantly while every feature remains fully usable"
+description = "With prefers-reduced-motion set, the KPI count-up is instant, feed items appear without animation, and dialog, popover, drawer, palette, and step-status transitions apply instantly while every feature remains fully usable"
 type = "binary"
 weight = 1.0
 
@@ -131,6 +131,14 @@ description = "Buttons, rows, chips, or tiles give no hover, focus, or press fee
 type = "binary"
 weight = 1.0
 negate = true
+
+
+[[criterion]]
+id = "4.9"
+name = "export_drawer_motion"
+description = "Driven through the real Export session control: the export drawer enters and exits with a short opacity-and-scale or slide transition rather than snapping open and shut"
+type = "binary"
+weight = 0.5
 
 [[criterion]]
 id = "4.catchall"

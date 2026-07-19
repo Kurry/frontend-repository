@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,115 +63,99 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "first_load_empty_states"
-description = "On first load with empty storage, the app opens on Home showing a capture bar titled 'Capture a spark', an Unthreaded inbox with the empty state 'Capture your first spark', and a threads column with the empty state 'No threads yet'"
+description = "On first load the app opens on Home showing a capture bar titled 'Capture a spark', an Unthreaded inbox with the empty state 'Capture your first spark', and a threads column with the empty state 'No threads yet'"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.2"
 name = "capture_flow_echoes_to_today"
 description = "Starting from a noted inbox count: typing text into the capture bar and pressing Enter (or selecting Add Spark) increases the inbox count by exactly one, renders the new spark at the top of the Unthreaded inbox with a Captured timestamp sorted most-recent-first, and switching to the Today view shows the same spark in the Unthreaded group without a reload"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.3"
 name = "empty_capture_inline_error"
 description = "Submitting empty or whitespace-only text in the capture bar creates nothing and shows the inline message 'Enter a thought to add a spark'; repeated rapid empty submissions create no records"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.4"
 name = "new_thread_card_created"
 description = "Selecting + New Thread with a non-empty title creates a thread card showing the title, a spark count such as '0 sparks', and an 'updated Xh ago' relative time"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.5"
 name = "assign_flow_updates_all_surfaces"
 description = "Starting with a captured spark and an existing thread: choosing that thread in the spark's Assign to Thread selector decreases the inbox count by exactly one, increases that thread card's spark count by exactly one, places the spark in the thread's Timeline in chronological position, and regroups it under that thread in the Today view, all without a reload"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.6"
 name = "thread_detail_timeline_and_stats"
 description = "Opening a thread shows a detail view with a Back control, the title, a status badge, a Timeline of its sparks in oldest-first order each with a Captured timestamp, and a live stats line reading 'N sparks · N reflections · N days active' where days active is the inclusive calendar-day span between the thread's first and most recent spark"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.7"
 name = "add_reflection_appends_note"
 description = "Selecting Add Reflection on a timeline spark opens a rich-text editor, and saving text appends a dated reflection beneath that spark, visually indented and tinted differently from the spark, while the stats line's reflection count increases by exactly one"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.8"
 name = "status_change_propagates_five_surfaces"
 description = "Setting a thread's status through the Active / Dormant / Resolved segmented control immediately updates the status badge to the same wording and color on the thread card, the detail header, the Today digest, the Archived screen, and search results, all without a reload"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.9"
 name = "edit_and_delete_spark_everywhere"
 description = "Editing an unthreaded spark via Edit updates its text everywhere it appears; selecting Delete removes the spark from the inbox, its thread timeline, search, and the Today digest, and also removes its reflections"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.10"
 name = "merge_flow_counts_and_search"
 description = "Starting with two threads whose spark counts are noted: completing the two-step Merge Into… confirm (Continue then Confirm Merge) moves every spark and reflection into the target in chronological order, raises the target's spark count to the sum of both threads' counts, removes the source thread from the thread list and from search results, and updates the target's stats line immediately"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.11"
 name = "tag_filter_clear_roundtrip"
 description = "Adding a tag to a spark makes the matching chip appear in the Filter by tag panel with a live count (such as '#idea (2)') increased by exactly one; selecting one or more chips narrows the visible sparks and threads to matches, a zero-match filter shows 'No matching sparks', and Clear Filters restores the full lists exactly"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.12"
 name = "search_groups_and_highlights"
 description = "Entering Search text filters across all spark text, reflection text, and thread titles at once, grouping results as Matching threads / Matching sparks / Matching reflections with the matching substring highlighted, and a no-results message appears when nothing matches"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.13"
 name = "pin_today_archive_behaviors"
 description = "Pinning a thread moves it into a separate Pinned section above the regular list ordered most-recently-pinned first and Unpin returns it; the Today view groups today's sparks by thread with an Unthreaded group and shows 'No sparks captured yet today' when none exist; Archive moves a thread to the Archived view (reachable from the top nav, keeping its status badge and stats) where Unarchive restores it to Home"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.14"
-name = "mixed_sequence_reload_roundtrip"
-description = "After a sequence of captures, edits, assignments, reflections, tags, status changes, pins, merges, and archives, a full page refresh restores the exact prior state: the same sparks, threads, reflections, tags, statuses, pin order, and archive contents render again — every facet coherently, never a mix of restored and reset facets"
+name = "reload_resets_to_blank_baseline"
+description = "After a sequence of captures, edits, assignments, reflections, tags, status changes, pins, merges, and archives, a full page refresh returns the blank first-load state: empty inbox, empty threads, empty undo history, and the 'Capture your first spark' / 'No threads yet' empty states — every facet coherently resets, never a mix of surviving and reset facets"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.15"
 name = "virtualized_panel_windowing"
 description = "Selecting Load 10,000 Items populates the Virtualized items panel with a deterministic sample collection, the 'Rendered item count' label reports a DOM row count far below 10,000, and the Filter items field narrows the list live"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.31"
 name = "rapid_capture_burst_integrity"
 description = "The capture bar withstands at least 25 rapid consecutive submissions: the final spark count is exact, controls stay responsive, and the burst produces no blank screen, uncaught error, or freeze"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.32"
 name = "extreme_input_graceful_feedback"
@@ -179,68 +163,120 @@ description = "Invalid or extreme input (very long text, symbols, whitespace) is
 type = "binary"
 weight = 0.5
 optional = true
-
 [[criterion]]
 id = "1.33"
 name = "empty_input_silently_accepted"
 description = "Empty or whitespace-only capture or thread-title input silently adds a record or shows a false success instead of the inline validation message"
 type = "binary"
-weight = 1.0
 negate = true
-
+weight = 1.0
 [[criterion]]
 id = "1.34"
 name = "long_spark_new_thread_title_truncated"
 description = "Choosing New Thread… from the Assign to Thread selector on a spark whose text exceeds 40 characters creates a thread named from the first 40 characters of the spark text followed by an ellipsis and assigns the spark to it"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.35"
 name = "reflection_bold_and_list_roundtrip"
 description = "In the reflection editor's formatting toolbar: applying bold to selected text renders it bold in the editor and in the saved reflection, activating bold again on the same selection removes it, and the bulleted-list control renders the selected lines as a list in the saved reflection"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.36"
 name = "reflection_undo_redo"
 description = "While editing a reflection, activating the undo control (or the standard undo keyboard shortcut) reverses the most recent edit, and redo restores it"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.37"
 name = "thread_and_reflection_validation_messages"
 description = "Submitting an empty thread title shows the inline message 'Enter a title to create a thread' and creates nothing; saving a reflection with empty content shows 'Enter some text to save the reflection' and appends nothing; each inline error names its field and leaves existing data untouched"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.38"
 name = "virtualized_keyboard_navigation"
 description = "In the loaded Virtualized items panel, arrow-key navigation moves through rows and Enter selects one, and focus, selection, and scroll position are preserved as rows enter and leave the DOM during scrolling"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.39"
 name = "last_delete_restores_empty_states"
 description = "Deleting the last spark in the inbox restores the 'Capture your first spark' empty state, and removing the last thread restores the 'No threads yet' empty state"
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "1.40"
 name = "merge_cancel_leaves_threads_untouched"
 description = "Cancelling the Merge Into… dialog at either confirm step (before Continue or before Confirm Merge) leaves both threads untouched: counts, sparks, and reflections are unchanged on both"
 type = "binary"
 weight = 1.0
-
+[[criterion]]
+id = "1.41"
+name = "workspace_export_contains_session_work"
+description = "After capturing sparks, creating a thread, assigning, tagging, adding a reflection, and setting status: opening Export shows Workspace JSON containing schemaVersion mindthread-workspace-v1 plus those sparks, threads, and reflections under the required keys, and the Today digest markdown names the same sparks; both texts differ from the pre-mutation export"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "1.42"
+name = "export_copy_and_download_controls"
+description = "In the Export drawer, Copy places the visible tab text on the clipboard with a visible confirmation, and Download starts a file download for the active tab (Workspace JSON or Today digest)"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "1.43"
+name = "import_round_trip_workspace_json"
+description = "Exporting Workspace JSON, changing the workspace, then Importing that same JSON reconstructs the same visible sparks, threads, reflections, statuses, pins, and archive membership in Home, Today, Archived, and Export previews"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "1.44"
+name = "import_rejects_invalid_workspace_contract"
+description = "Importing malformed JSON, or a document missing schemaVersion/sparks/threads/reflections, or with schemaVersion other than mindthread-workspace-v1, or with status outside Active|Dormant|Resolved, leaves the workspace unchanged and shows visible validation naming the offending field"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "1.45"
+name = "spark_and_tag_field_contract_bounds"
+description = "Spark text longer than 2000 characters is rejected naming the text field; a tag with spaces, punctuation, or length over 32 characters is rejected naming the tag field; neither mutation adds a record"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "1.46"
+name = "thread_title_field_contract_bound"
+description = "A thread title longer than 80 characters is rejected with an inline message naming the title field and creates no thread"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "1.47"
+name = "bulk_select_tray_actions"
+description = "Selecting three unthreaded sparks raises a bulk tray with the live selected count; bulk Add Tag with a valid tag updates all three and the Filter by tag count; bulk Delete after confirmation naming the count removes them"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "1.48"
+name = "domain_undo_redo_restores_state"
+description = "After a capture then an assignment, Undo restores the spark to the inbox and prior counts; Redo reapplies the assignment; Undo/Redo are disabled when their stacks are empty"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "1.49"
+name = "command_palette_navigation"
+description = "Opening the command palette with Ctrl+K or Cmd+K lists Home, Today, Archived, focus capture, Export, and Import actions; arrow keys move the highlight, Enter runs the action, and Escape closes the palette"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "1.50"
+name = "export_omits_session_mutations"
+description = "After mutating sparks, threads, tags, or status, Export Workspace JSON or Today digest text is identical to the pre-mutation text — an export that omits the session's actual work"
+type = "binary"
+negate = true
+weight = 1.0
 [[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0

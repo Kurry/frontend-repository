@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -104,8 +104,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "triage_form_validation"
-description = "The Classify form on a divergent row requires a classification choice (capability-gap or spec-defect) and a rationale of at least 15 characters; a too-short rationale shows an inline message naming the rationale field and its minimum, submit stays disabled until valid, and an invalid submission changes no total"
+name = "classification_field_contract_validation"
+description = "The Classify form validates the Classification field contract: classification must be exactly capability-gap or spec-defect and rationale a trimmed string of at least 15 and at most 500 characters; a too-short rationale or out-of-enum classification shows an inline message naming the offending field, submit stays disabled until valid, and an invalid submission changes no triage total"
 type = "binary"
 weight = 1.0
 
@@ -205,6 +205,86 @@ negate = true
 id = "1.21"
 name = "disconnected_variance_copy"
 description = "The variance view or chart renders from a disconnected data copy: after a completed re-run or an applied filter, its values contradict the heatmap for the same model and harness until a reload"
+type = "binary"
+weight = 1.0
+negate = true
+
+
+[[criterion]]
+id = "1.22"
+name = "baseline_pin_shows_signed_deltas"
+description = "Pin baseline captures current per-cell means; after a completed re-run that changes a cell mean, that cell shows a signed delta to 2 decimal places beside the live mean; Clear baseline removes every delta readout in the same interaction"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "bulk_triage_applies_classification_contract"
+description = "Selecting two or more divergent rows reveals Apply classification; submitting a valid Classification payload badges every selected row and shifts triage summary totals by exactly that count without double-counting; stable rows cannot be selected"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "undo_redo_classification_and_threshold"
+description = "Undo reverses the most recent threshold move or classification (single or bulk) and restores chips, badges, and triage summary totals exactly; Redo reapplies that edit; both controls are disabled when their stack is empty"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "command_palette_opens_export"
+description = "Pressing Control-K or Command-K opens a command palette listing at least heatmap, variance, chart, timeline, and export; choosing export opens the export drawer and closes the palette; Escape closes the palette without changing state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "calibration_pack_json_field_contract"
+description = "After opening Export, the JSON tab preview is a CalibrationPack object showing required keys schemaVersion (integer 1), document (meridian-calibration), sigmaThreshold, models, harnesses, cells, varianceRows, timeline, baseline, filters, and triage, with nested Classification payloads under triage matching the Classification field contract"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "variance_csv_field_contract"
+description = "The CSV tab preview begins with a header naming task, category, one column per current harness, coefficientOfVariation, stability, and classification, followed by one line per variance task whose classification cell is empty or exactly capability-gap or spec-defect"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "export_reflects_session_mutations"
+description = "Scripted probe: classify a divergent row, complete a re-run, move the threshold, open Export, and confirm the JSON triage array includes the new Classification, cells reflect the updated mean and trial rewards, and sigmaThreshold equals the live slider — Copy shows a brief copied confirmation and Download triggers a real file download"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "import_calibration_pack_round_trip"
+description = "After classifying at least two divergent rows, export CalibrationPack JSON, reload to seeded state, restore the divergent set with the threshold if needed, import that JSON, and confirm the same badges and triage summary totals return"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "import_rejects_invalid_field_contract"
+description = "Importing unparseable JSON, schemaVersion not 1, document outside meridian-triage or meridian-calibration, missing entries/triage, or a Classification entry that breaks the Classification field contract shows an inline error naming the offending field and leaves badges and summary totals unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "export_omits_session_or_breaks_schema"
+description = "After a saved classification or completed re-run, the Export JSON omits that session work from triage or cells, or the preview is missing a required CalibrationPack key such as schemaVersion, document, or triage"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.32"
+name = "valid_classify_payload_mismatches_contract"
+description = "A successful Classify submit badges a row with a classification outside capability-gap and spec-defect, or persists a rationale shorter than 15 characters against the Classification field contract"
 type = "binary"
 weight = 1.0
 negate = true

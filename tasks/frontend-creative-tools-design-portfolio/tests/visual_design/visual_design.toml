@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -146,6 +146,28 @@ description = "A required theme, welcome column, project board, overlay, or dens
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "3.13"
+name = "export_and_palette_visual_structure"
+description = "Export view shows a monospaced Portfolio JSON / Resume Markdown preview with Copy and Download affordances, and the command palette reads as a centered overlay with kind-labeled result rows."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.14"
+name = "bulk_bar_and_stats_strip_chrome"
+description = "Projects Board includes a compact stats strip and a bulk actions bar that visually belong to the terminal chrome rather than a disconnected dashboard widget."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.n4"
+name = "export_or_palette_visually_broken"
+description = "Export preview, archive vault, or command palette renders with unreadable contrast, clipped controls, or layout that breaks the terminal-over-wallpaper composition."
+type = "binary"
+negate = true
+weight = 1.0
 
 [[criterion]]
 id = "3.catchall"

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,77 +63,91 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+description = "Toolbar, board, panel, dialog, export, import, archive, and command-palette controls are reachable and operable with the keyboard alone."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
 name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+description = "Delete confirmation, Export workspace, Import, and Command palette trap focus while open, dismiss with Escape, and return focus to the control that opened them."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "icons_have_accessible_names"
+description = "Icon-bearing toolbar and selection controls expose accessible names so each action is identifiable without relying on the icon alone."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
 name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+description = "Status changes (object added, deleted, archived, restored, board renamed, event applied, export copied) are announced in a polite live status line."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
 name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+description = "Board rename and Import controls have explicit labels or accessible names associated with their fields and validation messages."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
 name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+description = "Visible section headings in chrome panels (Outline, Archive, live events, Export) follow a logical heading order without skipping levels arbitrarily."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
 name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+description = "Primary regions (toolbar/chrome and main canvas) are exposed with landmarks or equivalent structure for assistive navigation."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
 name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+description = "Primary text on canvas background and button labels on primary accent meet readable contrast in the default theme."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
 name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+description = "Dialogs expose dialog semantics; tabs and toggle tools expose selected/pressed state to assistive technology, not only through color."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
 name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+description = "With prefers-reduced-motion set, entrance/flip/list animations are removed while features remain fully usable."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "nudge_controls_keyboard_alternative"
+description = "Each singly selected object's Move and Grow / Shrink controls provide a keyboard-operable alternative to dragging and corner-handle resizing."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "undo_redo_and_palette_shortcuts"
+description = "Canvas-level Undo/Redo work from Ctrl+Z / Ctrl+Shift+Z or Ctrl+Y when a text editor is not focused, and the Command palette opens from Ctrl+K (Cmd+K)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
 name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+description = "Primary toolbar or dialog controls cannot be reached or activated from the keyboard."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +155,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n2"
 name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+description = "Keyboard focus has no visible indicator on interactive chrome, or the indicator is fully obscured."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +163,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n3"
 name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+description = "Custom tool toggles or dialogs lack roles/names so assistive technology cannot identify them."
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +171,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n4"
 name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+description = "Active tool, selection, or stream status is conveyed by color alone with no additional non-color cue."
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +179,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n5"
 name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+description = "With a dialog open, Tab moves focus into background page content while the dialog remains open."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +187,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n6"
 name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+description = "Primary chrome or note labels have contrast so poor they are unreadable against their background."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,15 +195,15 @@ weight = 1.0
 [[criterion]]
 id = "1.n7"
 name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+description = "Board-rename or Import validation errors are visual only with no programmatic association or live announcement path."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+name = "icon_only_controls_unnamed"
+description = "Icon-only controls lack accessible names."
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +211,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n9"
 name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+description = "Heading levels jump in a way that breaks logical document structure in the chrome panels."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +219,7 @@ weight = 1.0
 [[criterion]]
 id = "1.n10"
 name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+description = "Entrance, flip, or list animations continue under prefers-reduced-motion."
 type = "binary"
 negate = true
 weight = 1.0

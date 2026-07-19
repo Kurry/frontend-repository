@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,172 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_library_after_delete_all"
+description = "After deleting every library entry, the library list shows an empty state with a message and a control that returns to the workbench."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "insert_variable_and_save_inline_validation"
+description = "Insert Variable confirm stays disabled until name is 1 to 64 characters of letters/digits/underscores; an invalid name (spaces, punctuation, or over 64 characters) shows an inline message naming the name field and allowed format. Save confirm stays disabled until title (1 to 80 characters, unique) and technique (closed enum zero-shot|few-shot|chain-of-thought|role-prompt|extraction|summarization) are valid, with inline messages naming each invalid field."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "validation_names_field_and_fix"
+description = "Insert Variable, Save, and Import validation copy names the field and the field-contract fix (name pattern, title length/uniqueness, technique enum, or schemaVersion) rather than only saying 'Invalid'."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "save_success_toast_and_copy_confirmation"
+description = "Confirming Save adds the prompt to the library and shows a success toast; activating a code-block copy control shows a visible confirmation such as an icon swap or a toast."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "run_status_affordance_during_stream"
+description = "While a run is in progress, a status affordance visibly distinguishes waiting, streaming, and complete states; Stop freezes the response and marks the run stopped."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "unbound_variables_block_run_with_warning"
+description = "Clicking Run while the prompt contains unbound variables shows a warning notice naming the unbound variables and does not start a run."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "attachment_badge_hover_preview_guidance"
+description = "Hovering an attachment badge reveals a preview showing the asset name and type, and reveals a remove control for that attachment."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "workbench_controls_use_semantic_tags"
+description = "Toolbar buttons, binding inputs, Save/Insert Variable fields, suggestion chips, history rows, and library rows use semantic button/input/label elements rather than unlabeled decorative wrappers."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "save_modal_close_paths"
+description = "The Save modal can be dismissed without completing save (close control and/or Escape), returning to the workbench without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "double_save_confirm_creates_one_entry"
+description = "Double-activating the Save modal confirm control creates exactly one library entry: the count increases by one and one new row appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_library_shows_nothing"
+description = "After every library entry is deleted, the library list shows nothing — no empty-state message and no control returning to the workbench."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "validation_errors_only_in_console"
+description = "Invalid Insert Variable name or Save field failures surface only in the browser console with no visible inline field feedback."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "run_or_save_silent_failure"
+description = "Activating Run or Save produces no visible status change, toast, or warning when the action is blocked or completes (silent failure)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "unbound_run_starts_anyway"
+description = "Clicking Run with unbound variables starts a run anyway with no warning naming the unbound variables."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "interactive_controls_are_nonsemantic"
+description = "Primary interactive controls (suggestion chips, history rows, library rows, toolbar actions) are non-semantic div/span click targets without button/role semantics."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "save_modal_not_keyboard_dismissible"
+description = "With the Save modal open, keyboard users cannot dismiss it (no Escape path and no focusable close control)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "empty_editor_allows_run_or_nonzero_tokens"
+description = "With the editor empty, the token count is not 0 or Run is enabled."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "ambiguous_or_missing_action_labels"
+description = "Primary actions show blank, placeholder, or ambiguous labels such as 'Submit', 'OK', or 'Button' instead of specific labels like Insert Variable, Run, Stop, or Save."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "removed_placeholder_leaves_stale_binding_warning"
+description = "After removing a placeholder from the editor text, its binding row remains in the side panel or the preview still shows a warning for that removed variable."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "double_save_creates_duplicates"
+description = "Double-activating Save confirm creates more than one library entry or increases the visible library count by more than one."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "import_rejects_nonconforming_prompt_package"
+description = "Importing parseable JSON that fails the PromptPackage field contract — schemaVersion not exactly prompt-package-v1, missing required model/promptText/messages/bindings/attachments keys, a messages role outside system|user, or technique outside the closed enum — shows visible validation naming the offending field and leaves the workbench draft unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "save_rejects_duplicate_or_overlong_title"
+description = "Saving with a duplicate library title or a title longer than 80 characters does not add a row and shows an inline error naming the title field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "import_mutates_on_invalid_schema"
+description = "Importing JSON that fails the PromptPackage field contract still mutates the workbench draft (prompt text, bindings, persona, or model change)."
 type = "binary"
 negate = true
 weight = 1.0

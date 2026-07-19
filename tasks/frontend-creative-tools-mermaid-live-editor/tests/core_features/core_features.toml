@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -112,7 +112,7 @@ weight = 1.0
 [[criterion]]
 id = "1.12"
 name = "code_config_document_roundtrip"
-description = "Editing Code, switching to Config, changing its seeded theme value to another valid JSON value, then switching back preserves the exact Code text; returning to Config preserves its edit and the preview reflects the valid configuration"
+description = "Editing Code, switching to Config, changing its seeded theme value to another valid Mermaid Config theme enum (default, base, dark, forest, or neutral), then switching back preserves the exact Code text; returning to Config preserves its edit and the preview reflects the valid configuration"
 type = "binary"
 weight = 1.0
 
@@ -140,14 +140,14 @@ weight = 1.0
 [[criterion]]
 id = "1.26"
 name = "config_inline_validation"
-description = "Entering invalid configuration data shows a specific inline field or document error before apply, preserves the last valid diagram configuration, and correcting the value clears the error"
+description = "Entering Config text that is not valid JSON, or valid JSON that fails the Mermaid Config field contract (missing theme, theme outside default|base|dark|forest|neutral, or a non-object root), shows an inline validation message naming the theme field or the config document before apply, preserves the last valid diagram configuration, and correcting to a valid theme enum clears the error and applies the config"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.14"
 name = "in_app_controls_only"
-description = "Editing, tab switching, sample selection, theme switching, export, and copy remain in the workspace with no outbound navigation or backend-dependent step"
+description = "Editing, tab switching, sample selection, theme switching, export, import, and copy remain in the workspace with no outbound navigation or backend-dependent step"
 type = "binary"
 weight = 1.0
 
@@ -164,6 +164,34 @@ name = "empty_source_stability"
 description = "Clearing the source to empty keeps the workspace stable: the preview shows the error treatment or an empty-source message rather than a stale diagram presented as current, and export controls become unavailable"
 type = "binary"
 weight = 0.5
+
+[[criterion]]
+id = "1.32"
+name = "session_json_field_contract_export"
+description = "Session JSON preview/Copy/Download is a single object with required schemaVersion exactly mermaid-session-v1 plus code, config (theme closed enum default|base|dark|forest|neutral), appTheme (light|dark), activeTab (code|config), and diagramType (flowchart|class|sequence|entity-relationship|state|mindmap|pie|gantt); after editing source, config.theme, sample type, and dark app theme, the preview contains those live values and every required key"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "mmd_export_matches_source"
+description = "With valid source, MMD downloads a .mmd file whose text matches the Code document exactly, and the control is unavailable while the source has a syntax error"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "session_json_import_roundtrip"
+description = "Import of a previously exported Session JSON that satisfies the MermaidSession field contract restores code, config.theme, appTheme, activeTab, and diagramType so editor, preview, badge, Config pane, and theme match without reload; Import of parseable JSON that fails the contract (wrong schemaVersion, illegal theme/appTheme/activeTab/diagramType, or missing keys) shows validation naming the offending field and changes nothing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "mmd_export_import_roundtrip"
+description = "With valid source, MMD download text matches the Code document; Import of that same .mmd text replaces Code and re-renders the preview to match; after a distinctive source edit, a fresh MMD export contains the new source"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "1.27"
@@ -184,7 +212,7 @@ negate = true
 [[criterion]]
 id = "1.29"
 name = "broken_export_contract"
-description = "An enabled export produces no file, a generic or wrong extension, content unrelated to the current diagram, or remains enabled while syntax is invalid"
+description = "An enabled SVG/PNG/MMD/Session JSON export produces no file, a wrong extension, content that omits the session's actual source or config.theme, Session JSON missing a required field-contract key, or an image/MMD export that remains enabled while syntax is invalid"
 type = "binary"
 weight = 1.0
 negate = true

@@ -1,0 +1,148 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "three_region_layout_with_docked_panel"
+description = "At desktop width the app composes a left sidebar (schema library and metadata builder), a central tree editor, and a right region with tabs for compiled text, example, and format instruction; the configuration panel docks to the right at roughly 280 pixels wide with a structured form layout"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "tree_rows_indented_with_chevrons"
+description = "The schema tree renders as indented rows with chevron toggles on object and array nodes, and indentation depth visibly communicates nesting level"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "type_badges_monospace_consistent"
+description = "Type badges render in a monospace face inside compact tags with one consistent color per type (string, number, boolean, object, array) everywhere that type appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.4"
+name = "required_asterisk_error_accent"
+description = "Required fields show an asterisk in the error-accent color after the field name in the tree, consistent with the compiled text's required listing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "code_surfaces_syntax_styled"
+description = "The compiled schema text and example payload render in monospaced, syntax-styled read-only code surfaces with visible structure indentation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "diff_treatments_labeled"
+description = "Diff treatments are unambiguous: added fields in the success color, removed in the error color, changed in the warning color, each carrying a text label so color is not the only signal"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "annotations_pair_icon_and_color"
+description = "Validation annotations pair an icon with the color — a success mark on passing nodes and an error mark with message text on failing nodes — and step statuses (pending, running, retrying, failed, complete) are visually distinct and consistent between the step list and event timeline"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "typography_hierarchy"
+description = "Typography shows a clear hierarchy — app title larger than panel headings, panel headings larger than tree row and body text — consistent across views"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "spacing_and_component_states"
+description = "Spacing follows a consistent rhythm across the sidebar, tree, and panes with no crowded or orphaned regions, and buttons, inputs, selects, toggles, and checkboxes show distinct default, hover, focus (visible ring), disabled, and error treatments with one consistent icon set throughout"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n1"
+name = "diff_or_annotation_color_only"
+description = "Diff categories or validation outcomes are conveyed by color alone with no text label or icon, or the same color is reused across contradictory meanings"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.n2"
+name = "layout_clipping_or_overlap"
+description = "At 1440 pixel width, any tree row, panel, tab, or code surface renders clipped, overlapping another element, or misaligned with its container"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

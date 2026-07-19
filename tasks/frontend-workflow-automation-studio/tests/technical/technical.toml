@@ -1,0 +1,179 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "10.1"
+name = "serves_clean_on_start_path"
+description = "The app serves and runs via its documented start path on port 3000 and renders the seeded studio with no errors"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.2"
+name = "shared_state_coherence"
+description = "A change made in one view is immediately reflected everywhere that data appears — a completed run updates the library badge, Runs view, rollup, and Run report together without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.3"
+name = "storage_stays_empty"
+description = "After a full exercise of the app (script editing, runs, diffs, schedules, undo, export copy), localStorage, sessionStorage, and other browser storage remain empty"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.4"
+name = "reload_returns_seeded_baseline"
+description = "A page reload returns the app to its seeded state: the seeded scripts, their versions and runs, no schedules, empty undo history, and the default view"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.5"
+name = "console_clean_under_exercise"
+description = "No console errors or unhandled promise rejections appear during a full exercise of the app, including a complete run with retries, a diff, and rapid undo/redo"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.6"
+name = "no_outbound_requests"
+description = "Only same-origin requests appear in devtools; placeholder screenshots, fonts, and icons load locally with no outbound network requests, and no real page navigation to any target URL is attempted"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.7"
+name = "no_debug_artifacts"
+description = "No debug output, placeholder scaffolding, or leftover console.log spam is visible in the running app"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.8"
+name = "rapid_input_stays_coherent"
+description = "Rapid interaction — quick script switches, fast step edits, rapid undo/redo, palette open and close during a streaming run — never desyncs views or leaves stale counts"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.9"
+name = "all_views_reachable"
+description = "All documented views (step editor, Playground, Runs, Scheduled queue, Export, Versions panel) are reachable from the UI and render completely"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.10"
+name = "interactive_within_two_seconds"
+description = "The app is interactive within 2 seconds of a local cold load"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.n1"
+name = "storage_violation"
+description = "localStorage, sessionStorage, or another browser storage API is non-empty after exercising the app"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "10.n2"
+name = "views_desync"
+description = "The same datum shows different values in two places — for example the rollup totals disagree with the Run report for the same run"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "10.n3"
+name = "console_errors_during_flows"
+description = "Console errors or unhandled rejections appear during normal flows"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "10.n4"
+name = "outbound_request_observed"
+description = "An outbound network request to a non-local origin occurs at any point"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "10.n5"
+name = "interaction_throws_runtime_error"
+description = "A specific interaction (dragging a step, comparing runs, triggering a scheduled run) throws a runtime exception observable in the console, even if the UI limps on"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "technical.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable defect in technical quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

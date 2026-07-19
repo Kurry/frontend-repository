@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -91,14 +91,14 @@ weight = 1.0
 [[criterion]]
 id = "14.5"
 name = "count_delta_is_exact"
-description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+description = "Count-delta integrity: measure the active workspace bookmark row count immediately before and after submitting a field-contract-valid Add bookmark; the delta is exactly one and the SideDock package preview gains that bookmark's url in the same step."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.6"
 name = "different_inputs_change_outcomes"
-description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+description = "Input-dependent output: add two bookmarks with different field-contract-valid urls and titles; the tree rows and the SideDock package preview show two distinct url/title pairs rather than identical records."
 type = "binary"
 weight = 1.0
 
@@ -135,7 +135,7 @@ weight = 1.0
 [[criterion]]
 id = "14.n3"
 name = "different_inputs_produce_identical_output"
-description = "Repeating an action with different inputs yields byte-identical output."
+description = "Adding two bookmarks with different field-contract-valid urls yields SideDock package preview text and tree rows that are byte-identical for those bookmarks."
 type = "binary"
 negate = true
 weight = 1.0
@@ -144,6 +144,22 @@ weight = 1.0
 id = "14.n4"
 name = "cross_view_state_is_stale"
 description = "State changes appear in one view but not another until reload."
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "14.9"
+name = "package_preview_tracks_session_mutations"
+description = "After creating a workspace with a chosen accentColor, adding a bookmark, pinning it, and toggling sidebar view, reopen Export SideDock package and confirm the live JSON preview includes schemaVersion sidedock-package-v1, that accentColor, the bookmark url and title, a pinnedBookmarkIds entry, and sidebarView matching the toggle"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "package_export_ignores_mutations"
+description = "After mutating workspaces, bookmarks, pins, or sidebar view, the SideDock package JSON preview stays identical to a prior export and omits those session mutations"
 type = "binary"
 negate = true
 weight = 1.0

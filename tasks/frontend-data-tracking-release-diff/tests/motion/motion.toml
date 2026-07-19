@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -130,6 +130,14 @@ description = "Interactive chrome feels static: buttons, rows, or sidebar entrie
 type = "binary"
 weight = 1.0
 negate = true
+
+
+[[criterion]]
+id = "8.20"
+name = "export_import_panel_enter"
+description = "Export release pack and Import release pack panels open with a short opacity and scale enter transition of roughly 200 milliseconds rather than appearing with no transition (unless prefers-reduced-motion is set)"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "4.catchall"

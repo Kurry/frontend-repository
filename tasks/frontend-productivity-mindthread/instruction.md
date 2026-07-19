@@ -37,7 +37,7 @@ Feature: Tags, Today, and search —
 - A Search field filters across all spark text, reflection text, and thread titles at once; matching substrings are highlighted, results are grouped as Matching threads / Matching sparks / Matching reflections, and a no-results message appears when nothing matches
 Feature: Forms and large lists —
 - Every form (the capture bar, the thread-title form, the tag input, and the reflection editor) validates its input against a schema before anything is recorded: invalid input shows an inline error message naming the field, adds no record, and leaves existing data untouched
-- A Virtualized items panel with a Load 10,000 Items control generates a deterministic 10,000-row sample collection and renders only the visible window plus a small overscan buffer; a Rendered item count label reports how many rows are in the DOM (far fewer than 10,000), a Filter items field narrows the list live, and arrow-key navigation with Enter selection preserves focus, selection, and scroll position as rows enter and leave the DOM
+- A Virtualized items panel with a Load 10,000 Items control generates a deterministic 10,000-row sample collection and renders only the visible window plus a small overscan buffer; a Rendered item count label reports the number of rows present in the DOM (far fewer than 10,000), a Filter items field narrows the list live, and arrow-key navigation with Enter selection preserves focus, selection, and scroll position as rows enter and leave the DOM
 </core_features>
 
 <user_flows>
@@ -141,6 +141,7 @@ Modules:
 - browse-query-v1
 - entity-collection-v1
 - form-workflow-v1
+- artifact-transfer-v1
 
 Module specs:
 <module_spec id="browse-query-v1">
@@ -207,20 +208,44 @@ Module specs:
 }
 </module_spec>
 
+<module_spec id="artifact-transfer-v1">
+{
+  "id": "artifact-transfer-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Artifact transfer",
+  "purpose": "Import, export, copy, print, and conversion workflows.",
+  "permitted_operations": ["import", "export", "copy", "print_preview", "convert"],
+  "binding_keys": {
+    "required_any_of": [["artifact_operations"]],
+    "optional": ["import_modes", "export_formats", "conversion_modes", "visible_postconditions"]
+  },
+  "restrictions": [
+    "No raw files, filesystem paths, blobs, base64, or artifact contents in WebMCP arguments or results.",
+    "File picker interaction, clipboard contents, and downloaded artifacts remain Playwright responsibilities."
+  ],
+  "tool_name_prefix": "artifact"
+}
+</module_spec>
+
 Bindings:
 - Browsable entity: sparks
-- Destinations: home; today; archived; thread-detail
+- Destinations: home; today; archived; thread-detail; export-drawer
 - Filters: tag
 - Entity: spark
 - Entity operations: create; select; update; delete; toggle
 - Entity fields: text; tags; thread; status; pinned; archived
 - Form fields: spark-text; thread-title
 - Form operations: validate; submit; cancel
+- Artifact operations: export; import; copy
+- Export formats: json; markdown
+- Import modes: workspace-json
 
 Mechanics exclusions:
 - Merge-confirm and toast animation stay Playwright-observed
 - Virtualized scroll stays Playwright-observed
 - Badge-color and reflection-tint treatments stay Playwright-observed
+- Export drawer clipboard contents and downloaded artifact bytes stay Playwright-observed
+- Command palette open animation stays Playwright-observed
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

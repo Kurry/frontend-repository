@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -135,7 +135,7 @@ weight = 1.0
 [[criterion]]
 id = "3.12"
 name = "button_styles_match_spec"
-description = "The primary button is solid #0F9D74 with white text, 8px border-radius, and no shadow; the secondary button is transparent with a 1px solid #64748B border, #1B2430 text, 8px border-radius, and no shadow"
+description = "The primary button is a filled #0F9D74 background with white text, 8px border-radius, and no shadow; the secondary button is transparent with a 1px #64748B border, #1B2430 text, 8px border-radius, and no shadow"
 type = "binary"
 weight = 1.0
 

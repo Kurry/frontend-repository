@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,99 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_state_present_with_recovery"
+description = "When filters or the year window match nothing, or all user-managed events are deleted, the list/stage region shows an empty state message plus a control that restores filters or opens create"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "forms_validate_timeline_event_contract"
+description = "Create and edit forms show inline validation for empty title, year outside -4000..2100, empty place, empty summary, and zero categories before submit"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "errors_name_failing_field"
+description = "Validation and import error messages name the failing field and the fix rather than only saying Invalid"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "actions_show_toast_or_confirmation"
+description = "Create, delete, bulk actions, export copy, and import show visible success feedback such as a toast or confirmation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "double_submit_adds_single_event"
+description = "Double-activating create submit adds exactly one event: count increases by one and one new row appears"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "undo_available_after_destructive_actions"
+description = "After delete or batch delete, Undo is enabled and restores the prior collection; cancel paths exist on batch-delete confirmation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "about_helps_non_obvious_modes"
+description = "About/help overlay explains Scrub/Explore and Library/Filter modes in complete sentences"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "controls_use_semantic_interactive_tags"
+description = "Mode switch, filters, scrubber inputs, undo/redo, export, and bulk actions use semantic buttons/inputs rather than clickable bare text nodes"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "overlays_support_close_paths"
+description = "Detail, About, export drawer, and batch confirmation close via Escape and a visible close or cancel control"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "malformed_import_leaves_collection_unchanged"
+description = "Importing malformed Timeline JSON or an events entry that breaks the TimelineEvent contract shows an inline error naming the failing field and leaves events count and titles unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "zero_selection_bulk_is_noop"
+description = "Batch delete or Batch categorize with zero selected rows does nothing and shows no confirmation; the tray stays hidden until at least one row is selected"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "redo_clears_after_new_mutation"
+description = "After Undo restores a deleted event, Redo deletes it again; after a new create following an undo, Redo is disabled"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "bulk_skips_seeded_readonly"
+description = "Bulk categorize and bulk delete never rewrite or remove seeded read-only events even when those rows are visible"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
 name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+description = "An empty filter match or emptied user-managed set shows nothing and provides no empty-state UI"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +162,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n2"
 name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+description = "Create/import validation failures surface only in the browser console with no inline field message"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +170,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n3"
 name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+description = "Create, delete, bulk, export copy, or import succeeds or fails with no visible feedback"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,7 +178,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n4"
 name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+description = "Batch delete removes selected events with no confirmation naming the selected count"
 type = "binary"
 negate = true
 weight = 1.0
@@ -165,7 +186,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n5"
 name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+description = "Primary interactive chrome is only non-semantic div or span click targets without button/input roles"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +194,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n6"
 name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+description = "Detail, About, export drawer, or batch confirmation cannot be dismissed with Escape"
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,7 +202,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n7"
 name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+description = "Contract-violating create submits with no immediate inline field indication"
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,15 +210,15 @@ weight = 1.0
 [[criterion]]
 id = "4.n8"
 name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+description = "Export, bulk, or undo controls use ambiguous or missing labels where Timeline JSON, Batch delete, or Undo wording is required"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "malformed_import_mutates_collection"
+description = "A malformed Timeline JSON import still changes the events count or titles"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +226,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n10"
 name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+description = "Undo/redo, export, or multi-select checkboxes are visually hidden or inaccessible when the corresponding feature should be reachable"
 type = "binary"
 negate = true
 weight = 1.0

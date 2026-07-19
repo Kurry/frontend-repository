@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "single_page_sections_in_order"
-description = "On load, / returns 200 as a single continuous scrolling homepage (no in-app route change) and renders all sections in order: navigation, hero, Why Astra, quick links, trusted marquee, Developer Hub, Network, News, Solutions, Community, events/support, Newsletter, Contact, and footer"
+description = "On load, / returns 200 as a single continuous scrolling homepage (no in-app route change) and renders all sections in order: navigation, hero, Why Astra, quick links, trusted marquee, Developer Hub, Network, News, Solutions, Community, events/support, Newsletter, Contact, Session leads, and footer"
 type = "binary"
 weight = 1.0
 
@@ -84,7 +84,7 @@ weight = 1.0
 [[criterion]]
 id = "1.4"
 name = "news_carousel_seven_titles_in_order"
-description = "On load, the News carousel shows exactly seven cards whose titles appear in this order: Astra Payments Collective: How a Payments Ecosystem Took Shape on Astra; Aegis Labs Signs MOU to Explore Biometric-Verified On-Chain Services on Astra; TokenWorks is Now on Astra; Retro9000 C-Chain Round 4: New Mechanics, Rewards and Opportunities for Builders; Astra Team1 Applications Are Now Open; The Astra Foundation Introduces Call For Research Program Selection Committee; and The Astra Foundation Opens Up To $50,000 In Research Grants On Astra Network Economics — with previous/next controls and a View More call to action"
+description = "On load, the News carousel shows exactly seven cards whose titles appear in this order: Astra Payments Collective: How a Payments Ecosystem Took Shape; Northstar Systems Explores Biometric-Verified On-Chain Services; LedgerWorks is Now on Astra; Forge9000 Round 4: New Mechanics, Rewards and Opportunities for Builders; Launch Team Applications Are Now Open; The Astra Foundation Introduces Its Research Selection Committee; and The Astra Foundation Opens $50,000 In Research Grants for Network Economics — with previous/next controls and a View More call to action"
 type = "binary"
 weight = 1.0
 
@@ -105,14 +105,14 @@ weight = 1.0
 [[criterion]]
 id = "1.7"
 name = "newsletter_submit_thank_you"
-description = "After completing the five newsletter steps and submitting, the message Thank you for subscribing appears"
+description = "After completing the five newsletter steps with a valid subscribe request body and submitting on step 5, the message Thank you for subscribing appears and the Session leads total increments by 1 with a new newsletter lead row whose payload matches the subscribe field contract"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
 name = "contact_valid_submit_success_and_clear"
-description = "After submitting the contact form with valid first name, last name, email, project type, and message, the message Success! We'll be in touch. appears and the form clears"
+description = "After submitting the contact form with a valid lead request body (firstname, lastname, email, project_type, astra_contact_message of at least 10 characters, gdpr true, and otherDetail when project_type is Other), the message Success! We'll be in touch. appears, the form clears, and the Session leads total increments by 1 with a new contact lead row"
 type = "binary"
 weight = 1.0
 
@@ -125,8 +125,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "contact_other_conditional_field_round_trip"
-description = "When project type Other is selected in the contact form a conditional detail input is revealed; after typing into it and switching the project type away from Other, the detail input is hidden again and re-selecting Other shows it empty (its value was discarded)"
+name = "contact_otherDetail_conditional_round_trip"
+description = "When project_type Other is selected in the contact form the conditional otherDetail input is revealed; after typing into it and switching the project type away from Other, otherDetail is hidden again and re-selecting Other shows it empty (its value was discarded)"
 type = "binary"
 weight = 1.0
 
@@ -175,7 +175,7 @@ weight = 1.0
 [[criterion]]
 id = "1.24"
 name = "events_summit_and_support_cards"
-description = "The Events section shows an Astra Summit New York card dated Sep 16-17, 2026 and the support cards Questions about Astra?, Astra Team1, and The Community Hub"
+description = "The Events section shows an Astra Forum New York card dated Sep 16-17, 2026 in NYC and the support cards Questions about Astra?, Launch Team, and The Community Hub"
 type = "binary"
 weight = 0.5
 optional = true
@@ -191,7 +191,7 @@ negate = true
 [[criterion]]
 id = "1.27"
 name = "form_controls_are_nonfunctional"
-description = "A form control appears but does nothing: the newsletter never reaches Thank you for subscribing or the contact form never reaches Success! We'll be in touch."
+description = "After completing the five newsletter steps and submitting, the UI stays on the form without showing Thank you for subscribing; or after a valid contact submit, the UI stays without showing Success! We'll be in touch."
 type = "binary"
 weight = 1.0
 negate = true
@@ -272,6 +272,71 @@ weight = 1.0
 id = "1.38"
 name = "multi_route_app_shell_present"
 description = "Exercising primary chrome (mega-menu destinations, Start Building, or footer column links) navigates into a second in-app route or page shell with its own document content instead of staying on the single continuous homepage scroll at /"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.39"
+name = "session_leads_panel_live_count"
+description = "Between Contact and Footer, a Session leads panel shows a live total count starting at 0 with an empty-state line; after a successful newsletter or contact submit the total increments by exactly one and a newest-first lead row appears without reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "download_astra_session_leads_json"
+description = "After at least one successful lead submit, activating Download JSON triggers a real download named astra-session-leads.json whose body is live-compiled JSON with version, theme, counts, and a leads array containing that submission's payload fields"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "copy_json_shows_copied_confirmation"
+description = "Activating Copy JSON copies the same session-lead JSON text to the clipboard and shows a visible Copied confirmation (label swap or toast) that clears within about three seconds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "undo_last_lead_decrements"
+description = "With two or more leads present, Undo last lead removes only the newest row, decrements the total by exactly one, and leaves older leads visible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "export_reflects_distinct_session_mutations"
+description = "After two successful submits with different emails (or names), the exported astra-session-leads.json leads array contains both distinct payloads and counts.total equals 2"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n39"
+name = "export_omits_session_lead_mutations"
+description = "After a successful newsletter or contact submit, Download/Copy JSON yields a leads array that omits the just-submitted payload or keeps counts.total at 0"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.44"
+name = "newsletter_subscribe_payload_step_fields"
+description = "The five-step newsletter form exposes the subscribe request-body fields by step: step 1 firstname/lastname/email/socialhandle; step 2 country and vertical closed enums; step 3 isDeveloper and hasWeb3Experience; step 4 isStudent and source; step 5 gdpr, marketing_consent, and newsletter — and a valid final submit's lead payload includes those collected values."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "contact_lead_payload_otherDetail_cross_field"
+description = "A valid contact submit with project_type Other includes otherDetail on the contact lead payload; a valid submit with a non-Other project_type omits otherDetail from the payload; Success! We'll be in touch. appears only when the lead request body passes the field contract."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n40"
+name = "success_without_passing_field_contract"
+description = "Thank you for subscribing or Success! We'll be in touch. appears after a submit whose payload fails the declared subscribe or contact field contract (missing required fields, invalid email, out-of-enum values, or otherDetail missing when project_type is Other)."
 type = "binary"
 weight = 1.0
 negate = true

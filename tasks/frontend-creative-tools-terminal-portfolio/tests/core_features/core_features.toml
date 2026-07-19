@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -77,7 +77,7 @@ weight = 1.0
 [[criterion]]
 id = "1.3"
 name = "1_3"
-description = "After creating a project named 'Harbor Atlas' with valid required fields, the text 'Harbor Atlas' is visible in the projects list or board"
+description = "After creating a project named 'Northline Atlas' with valid required fields, the text 'Northline Atlas' is visible in the projects list or board"
 type = "binary"
 weight = 1.0
 
@@ -125,8 +125,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
-description = "After switching between Terminal CLI mode and Projects Board mode, the main canvas shows the other mode without full page navigation"
+name = "three_modes_switchable"
+description = "After switching among Terminal CLI, Projects Board, and Config Studio modes, the main canvas shows the selected mode without full page navigation"
 type = "binary"
 weight = 1.0
 
@@ -181,8 +181,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.18"
-name = "1_18"
-description = "At least two distinct views or interaction modes are switchable without full page navigation"
+name = "three_distinct_modes"
+description = "At least three distinct views or interaction modes (Terminal CLI, Projects Board, Config Studio) are switchable without full page navigation"
 type = "binary"
 weight = 1.0
 
@@ -282,8 +282,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.35"
-name = "create_form_inline_field_validation"
-description = "The project create/edit form validates per field before submit: an inline message names each invalid field, and the submit control stays disabled or inert until all required fields are valid"
+name = "create_form_field_contracts"
+description = "The project create/edit form validates the API-shaped field contracts before submit: inline messages name each invalid field and rule (empty name, uppercase slug, status outside shipped/wip/archived, year outside 2000 to 2100, more than 5 tags), and submit stays disabled or inert until valid"
 type = "binary"
 weight = 1.0
 
@@ -342,6 +342,208 @@ name = "reopen_restores_history_and_theme"
 description = "After switching to a non-default theme and running several commands, closing the terminal with the red dot and pressing Reopen restores the terminal with its output history and the chosen theme intact"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "duplicate_project_copy_suffix"
+description = "Duplicating a selected project increases the visible count by exactly one and inserts a card whose name is the original name plus the suffix \" (copy)\", with the same status, tags, summary, and year, and a unique slug"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "name_sort_reverses_board_cards"
+description = "Switching the Projects Board name sort from A to Z to Z to A reverses the visible card order relative to the other choice; switching back restores the previous order"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "featured_toggle_persists_across_modes"
+description = "Toggling a project featured flag on Projects Board shows the featured indicator on that card, and the same flag state remains after switching to Terminal CLI and back without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "batch_featured_three_projects"
+description = "Selecting three Projects Board cards and activating Batch featured toggles the featured flag on all three at once when under the three-featured cap; the same three flags remain after switching modes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "batch_delete_decrements_by_selection"
+description = "Selecting two projects and confirming Batch delete decreases the visible project count by exactly two and removes both cards from Projects Board and the export previews"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "undo_restores_delete"
+description = "After deleting a project via the UI (shell command or board control), Undo restores that project card, shortcut, prior visible count, and its entry in the Portfolio JSON export preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "redo_disabled_after_new_action"
+description = "After Undo restores a deleted project, performing a new create clears the redo stack so Redo is disabled and cannot re-delete via redo"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "export_surface_three_formats"
+description = "The Export Center (via /export or an Export control) offers Portfolio JSON, Terminal Config, and Theme CSS format tabs, each showing a monospaced live preview compiled from the current store"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.52"
+name = "export_reflects_session_create"
+description = "After creating a valid project with a distinctive name, that name appears in the Portfolio JSON export preview and its slug appears in Terminal Config when featured (or the project object is present when not featured) before any download or copy"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.53"
+name = "export_omits_deleted_project"
+description = "After deleting a project, that project name is absent from the Portfolio JSON export preview and from the Terminal Config preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.54"
+name = "export_includes_theme_featured_identity"
+description = "After running /retro, featuring a project, and saving a distinctive identity displayName, the Portfolio JSON preview includes theme retro, that project in featuredSlugs, and the new displayName under identity; Theme CSS shows a retro data-theme block"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.55"
+name = "export_copy_and_download"
+description = "Export Copy writes the visible preview text to the clipboard with a brief copied confirmation, and Download starts a file download of that same preview text for the active tab (portfolio.json, terminal.config, or theme.css)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.56"
+name = "import_portfolio_json_applies"
+description = "Importing a valid declared-portfolio JSON replaces the collection so visible project names, statuses, tags, years, featured flags, skills, and identity match the imported payload, and all three export tabs match that imported state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n44"
+name = "export_omits_session_mutations"
+description = "After a create, edit, delete, duplicate, featured toggle, batch action, identity save, skill edit, or theme change that is visible in the shell or board, the Export Center previews still omit that session mutation (stale or seed-only export text)"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n45"
+name = "undo_does_not_restore"
+description = "After deleting or batch-deleting a project via the UI, Undo leaves the collection unchanged — the deleted projects stay gone from board and export"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n46"
+name = "sort_identical_across_directions"
+description = "Switching name sort between A to Z and Z to A leaves the Projects Board card order visually identical — a derived surface ignoring its inputs"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.57"
+name = "portfolio_json_api_shaped_fields_visible"
+description = "Portfolio JSON preview visibly includes schemaVersion 1.0 and the field names identity, theme, consent, projects, skills, featuredSlugs, and profiles with enum values drawn from the live session"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.58"
+name = "terminal_config_key_value_header"
+description = "Terminal Config preview starts with the comment line # terminal-portfolio config and shows key = value lines for theme, display_name, email, location, and featured"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.59"
+name = "theme_css_active_theme_block"
+description = "Theme CSS preview shows a :root[data-theme=...] custom-properties block for the active theme with background, text, accent, and chrome token declarations"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.60"
+name = "config_studio_identity_save"
+description = "In Config Studio, saving a valid new displayName and email updates /about and /email output and the identity fields in Portfolio JSON and Terminal Config without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.61"
+name = "skills_crud_updates_bars_and_export"
+description = "Creating or editing a skill with proficiency 72 adds or updates a /skills bar that reaches that width and appears with proficiency 72 in the Portfolio JSON skills array"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.62"
+name = "featured_fourth_rejected"
+description = "With three projects already featured, attempting to feature a fourth shows a featured-limit validation message and leaves the fourth project unfeatured"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.63"
+name = "named_profile_save_and_apply"
+description = "Saving a named shell profile with a non-default theme and at least one featured project, then changing theme and clearing featured pins, then applying that profile restores theme, featured pins, and matching export preview values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.64"
+name = "config_diff_shows_changes"
+description = "After mutating identity or projects away from seed, Config Diff marks changed fields with a distinct changed treatment; with no mutations it shows an explicit no-differences state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.65"
+name = "slug_uppercase_rejected"
+description = "Submitting project create with a slug containing uppercase letters does not increase the projects count and shows validation naming the slug field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n47"
+name = "export_formats_missing_config_or_css"
+description = "Export Center lacks a live Terminal Config or Theme CSS preview tab, leaving only a partial artifact surface"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n48"
+name = "form_payload_disagrees_with_export_record"
+description = "After creating a valid project, the Portfolio JSON project object omits required contract fields (name, slug, summary, status, tags, year, featured) or shows values that disagree with the create form"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n49"
+name = "featured_cap_not_enforced"
+description = "Four or more projects simultaneously show featured indicators with no featured-limit validation"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.catchall"

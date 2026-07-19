@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,186 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "For fidelity tasks, evaluate whether the app matches the reference's UX affordances. Empty state UI is present and renders when a collection is empty."
+name = "escape_noop_when_solutions_closed"
+description = "Pressing Escape while the Solutions menu is closed does nothing: no error, no visual change, and focus stays where it was."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "slideshow_wrap_opacity_treatment"
+description = "The slideshow wraps seamlessly: advancing past the sixth frame returns to the first with the same opacity treatment (active 1.0, neighbors 0.35) and no blank or double-active frame across the wrap."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "clicks_pass_through_custom_cursor"
+description = "Clicks pass through the custom cursor: clicking any link or button while the cursor image overlaps it activates the element beneath, never the cursor layer."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "coarse_pointer_restores_system_cursor"
+description = "On coarse-pointer devices the custom cursor is absent and the system cursor is fully visible; the system pointer is never hidden without a visible replacement."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "reload_resets_menus_slideshow_reveals"
+description = "Reloading the page returns it to its initial state: menus closed, the slideshow back on its first frame, and scroll-reveal sections unrevealed until scrolled into view."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "interactive_chrome_uses_semantic_controls"
+description = "Header Solutions trigger, Menu button, Sign up / Try Canvasly pills, and footer links use real button or link semantics rather than unlabeled div shells."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "solutions_and_mobile_menus_dismissible"
+description = "The open Solutions menu panel and the open mobile Menu panel can each be dismissed (Escape / outside click for Solutions; dismiss or widen for mobile) restoring the page without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "reload_leaves_menus_or_reveals_stuck"
+description = "After a reload, a menu remains open, the slideshow is not on its first frame, or scroll-reveal cards stay pre-revealed without scrolling into view."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "escape_errors_when_solutions_closed"
+description = "Pressing Escape while the Solutions menu is closed throws a console error or visibly mutates the page."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "cursor_layer_captures_clicks"
+description = "Clicking a link or button while the custom cursor image overlaps it fails to activate the element because the cursor layer captures the pointer."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "slideshow_wrap_shows_blank_or_double_active"
+description = "Advancing past the sixth slideshow frame shows a blank frame or two fully opaque active frames at once."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "system_cursor_hidden_without_replacement"
+description = "On a coarse-pointer viewport the system pointer is hidden while no visible custom cursor replacement is shown."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "menu_not_keyboard_dismissible"
+description = "The open Solutions menu panel cannot be dismissed via Escape, leaving the overlay stuck."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "primary_cta_labels_ambiguous_or_missing"
+description = "Primary CTA controls (Try Canvasly, Sign up, Menu, Solutions) lack readable labels or use ambiguous blank text."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "chrome_links_navigate_away_to_errors"
+description = "Header, footer, or CTA chrome links navigate away from the homepage to a blank, error, or Not found page."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "trial_brief_invalid_submit_names_fields"
+description = "A name shorter than 2 characters after trim, a name longer than 80 characters, a malformed email (missing @, missing domain dot, or more than one @), a missing plan, or a missing team_size shows inline messages naming the offending field, keeps Submit trial brief disabled or unsuccessful, shows no Trial brief ready message, and does not clear valid fields; Download JSON and Copy brief still emit the current invalid preview with all seven required keys present."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "empty_undo_redo_disabled"
+description = "Undo with an empty undo stack and Redo with an empty redo stack are disabled; activating them does nothing and produces no console errors."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "malformed_import_leaves_brief_unchanged"
+description = "Importing a JSON file that fails the trial-signup field contract (missing required keys, product not Canvasly, name outside 2–80, malformed email, plan or team_size outside closed enums, interests with unknown or duplicate labels, or a cross-field violation) shows a visible import error naming the problem and leaves the current brief unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "palette_closes_solutions_first"
+description = "Opening the command palette while the Solutions menu is open closes Solutions first; Escape closes the palette without also toggling Solutions open."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "reload_resets_brief_and_palette"
+description = "Reloading returns menus closed, command palette closed, slideshow on first frame, unrevealed cards, and an empty trial brief baseline preview (product Canvasly, empty name/email/plan/team_size strings, interests [], fresh generated_at) with empty undo/redo stacks."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "cross_field_plan_team_size_interests"
+description = "Choosing plan Free trial while team_size is 2-10, 11-50, or 51+ — or plan Team while team_size is 1 — or plan Pro or Team with zero interests — keeps Submit trial brief disabled, shows an inline message naming the conflicting field (team_size or interests), and never shows Trial brief ready until the cross-field rule is satisfied."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.17"
+name = "reset_clears_success_and_errors"
+description = "After a valid Submit shows Trial brief ready (or after named field/import errors are visible), activating Reset clears those messages along with returning the form and preview to the empty baseline."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "invalid_brief_submit_shows_success"
+description = "Submitting an invalid trial brief still shows Trial brief ready — download or copy your JSON above."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n12"
+name = "import_accepts_schema_violating_json"
+description = "Import brief accepts a JSON file with plan or team_size outside the closed enums, product not Canvasly, or a Free-trial/Team/Pro cross-field violation and mutates the form or preview anyway."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n13"
+name = "invalid_preview_omits_required_keys"
+description = "On an invalid or empty draft, the live preview omits one or more of the seven required keys (product, name, email, plan, team_size, interests, generated_at) or uses null instead of empty strings / [] for unset scalars and interests."
 type = "binary"
 negate = true
 weight = 1.0

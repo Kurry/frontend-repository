@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -128,16 +128,16 @@ id = "1.17"
 name = "static_library_no_working_crud"
 description = "Palettes list is static HTML only with no working create/edit/delete against shared state"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "1.18"
 name = "chrome_navigates_outbound"
 description = "App chrome (logo, menu, cart, painting/source titles, footer links) navigates via real outbound links to other origins instead of staying in-app"
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
 
 [[criterion]]
 id = "1.19"
@@ -170,7 +170,7 @@ weight = 1.0
 [[criterion]]
 id = "1.23"
 name = "invalid_create_rejected"
-description = "Submitting an invalid create (empty palette name or fewer than 3 swatches) does not add a palette — the palette count is unchanged — and shows visible validation feedback naming the problem"
+description = "Submitting an invalid create (empty palette name, empty artist, out-of-list period, fewer than 3 swatches, or invalid hex) does not add a palette — the palette count is unchanged — and shows visible validation feedback naming the problem"
 type = "binary"
 weight = 1.0
 
@@ -198,14 +198,14 @@ weight = 1.0
 [[criterion]]
 id = "1.28"
 name = "reload_resets_to_seeded_state"
-description = "Scripted probe: create a palette, switch to Swatch view, apply a period filter, and toggle a favorite flag, then reload the page. The app returns coherently to its seeded baseline — the seeded palettes only, the Nomenclature layout active, the all-periods filter, and no palette selected — never a mix of surviving and reset facets"
+description = "Scripted probe: create a palette, switch to Swatch view, apply a period filter, toggle a favorite flag, and open Export — then reload. The app returns coherently to its seeded baseline — the seeded palettes only, Nomenclature active, all-periods filter, Name A–Z sort, empty undo/redo, vision simulation None, and no palette selected"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.29"
 name = "save_disabled_until_fields_valid"
-description = "In the palette create/edit form, an empty name or fewer than 3 swatches shows an inline message naming the offending field before submit, and the save control stays disabled until every field is valid"
+description = "In the palette create/edit form, an empty name, empty artist, or fewer than 3 swatches shows an inline message naming the offending field before submit, and the save control stays disabled until every field is valid"
 type = "binary"
 weight = 1.0
 
@@ -219,7 +219,7 @@ weight = 0.5
 [[criterion]]
 id = "1.31"
 name = "subscribe_popup_lifecycle"
-description = "The subscribe popup appears after roughly 45 seconds of idle or after scrolling past about half the page; submitting it with an invalid email shows an inline message naming the email field instead of dismissing; closing or submitting it dismisses it, and it stays dismissed for the rest of the session despite further idle time or scrolling"
+description = "The subscribe popup appears after roughly 45 seconds of idle or after scrolling past about half the page; submitting a value that is not a valid email address (missing at-sign or domain) shows an inline message naming the email field and does not dismiss; closing or submitting a valid email dismisses it, and it stays dismissed for the rest of the session despite further idle time or scrolling"
 type = "binary"
 weight = 1.0
 
@@ -245,9 +245,169 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "1.35"
+name = "duplicate_palette_copy_suffix"
+description = "Duplicating a selected palette increases the visible count by exactly one and inserts a card whose name is the original name plus the suffix '(copy)', with the same period and swatch order"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "name_sort_reverses_palette_cards"
+description = "Switching the name sort from Name A–Z to Name Z–A reverses the visible Palette-view card order relative to the other choice; switching back restores the previous order"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "batch_favorite_three_palettes"
+description = "Selecting three Palette-view cards and activating Batch favorite toggles the favorite flag on all three at once; the same three flags remain after switching layouts"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "batch_delete_decrements_by_selection"
+description = "Selecting two palettes and confirming Batch delete decreases the visible palette count by exactly two and removes both cards from Palette view"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "contrast_matrix_lists_pairs"
+description = "Opening Detail/Editor for a palette with at least 3 swatches shows a WCAG contrast matrix listing unique unordered swatch pairs with contrast ratios and AA (4.5:1) / AAA (7:1) pass/fail marks"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "contrast_matrix_live_recolor"
+description = "Recoloring a swatch in Detail/Editor changes at least one listed contrast ratio or pass/fail mark in the contrast matrix without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "vision_simulation_deuteranopia"
+description = "Choosing Deuteranopia on the vision-simulation control visibly alters swatch appearance on the library canvas relative to None; choosing None restores the unfiltered appearance"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "undo_restores_delete"
+description = "After deleting a palette via the UI, Undo restores that palette's card, swatches, and the prior visible count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "redo_disabled_after_new_action"
+description = "After Undo restores a deleted palette, performing a new create clears the redo stack so Redo is disabled and cannot re-delete via redo"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "export_drawer_four_formats"
+description = "The Export drawer offers CSS, utility-theme, SCSS, and archive JSON format tabs, each showing a monospaced live preview compiled from the current store"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "export_reflects_session_create"
+description = "After creating a valid palette with a distinctive hex not in the seed set, that hex appears in the CSS / utility-theme / SCSS export previews and the new palette's id, name, artist, period, swatches, and favorite flag appear in the archive JSON preview before any download or copy"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "export_omits_deleted_palette"
+description = "After deleting a palette, that palette's name is absent from the archive JSON export preview and its unique hexes are absent from the CSS preview when no other palette still uses them"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "export_copy_and_download"
+description = "Export Copy writes the visible preview text to the clipboard with a brief copied confirmation, and Download starts a file download of that same preview text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "import_archive_json_applies"
+description = "Importing a valid archive JSON replaces the library so visible palette names, artists, periods, swatches, and favorite flags match the imported payload, and the archive JSON export preview matches that imported state including version palette-archive.v1 and each palette's id, name, artist, period, swatches, and favorite"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "archive_json_api_shaped_fields_visible"
+description = "The archive JSON export preview is API-shaped: a top-level version string exactly palette-archive.v1 and a palettes array whose entries visibly include id, name, artist, period (a closed-list value), swatches as six-digit hex strings with a leading number-sign, and favorite boolean — and after creating a valid palette those fields for the new record appear in the preview without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "create_form_enforces_palette_field_contract"
+description = "Palette create/edit rejects empty name, empty artist, a period outside the closed period list, fewer than 3 or more than 12 swatches, or a swatch that is not a six-digit hex with a leading number-sign: each case shows an inline message naming the offending field, the save control stays disabled until valid, and the palette count is unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "form_record_matches_archive_json_shape"
+description = "After a successful create with distinctive name, artist, closed-list period, and at least 3 valid hex swatches, the new Palette-view card shows that name and artist and the archive JSON palettes entry for it carries the same name, artist, period, swatches, and favorite values (the form record matches the export shape)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n35"
+name = "export_omits_session_mutations"
+description = "After a create, edit, delete, duplicate, favorite toggle, or batch action that is visible in the library, the Export drawer previews still omit that session mutation (stale or seed-only export text)"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n36"
+name = "undo_does_not_restore"
+description = "After deleting or batch-deleting a palette via the UI, Undo leaves the collection unchanged — the deleted palettes stay gone"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n37"
+name = "contrast_matrix_static_after_recolor"
+description = "Recoloring a swatch in Detail/Editor leaves every contrast-matrix ratio and pass/fail mark identical — a derived surface ignoring its inputs"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n38"
+name = "invalid_palette_payload_still_saves"
+description = "Submitting a palette create/edit with empty artist, an out-of-list period, or an invalid hex swatch still adds or updates a palette — field-contract validation is skipped"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n39"
+name = "archive_json_missing_required_fields"
+description = "The archive JSON export preview omits required API-shaped fields (version palette-archive.v1, or palette id/name/artist/period/swatches/favorite) even when the library has palettes"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core functionality or an end-to-end user flow that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-weight = 1.0
 negate = true
+weight = 1.0
+

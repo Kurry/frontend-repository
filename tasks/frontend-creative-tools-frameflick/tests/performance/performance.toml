@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,78 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "9.1"
-name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+name = "cold_start_interactive_under_2s"
+description = "The app is interactive within 2 seconds of a local cold load."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
-name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+name = "console_clean_full_exercise"
+description = "No console errors or warnings appear during a full exercise of upload, styling, export, presets, and the Collaboration scenario."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
-name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
+name = "slider_drags_update_without_lag"
+description = "Dragging any style slider (Padding, Corner radius, Shadow, Zoom, or caption size) re-renders the canvas live with no visible lag or dropped updates."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.4"
-name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+name = "copy_confirmation_appears_promptly"
+description = "After Copy image succeeds, the Copied! confirmation appears promptly rather than hanging the UI with no feedback."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.5"
-name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+name = "recent_strip_and_presets_stay_smooth"
+description = "Working with a populated Recent strip (up to 6 thumbnails) and multiple Saved presets keeps list scrolling and Apply/Del interactions without perceived multi-second lag."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.6"
-name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+name = "ui_interactive_during_canvas_updates"
+description = "The UI remains interactive while sliders and background swatches update the live canvas (controls stay operable)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
-name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+name = "canvas_drag_stays_smooth"
+description = "Dragging the screenshot inside the canvas to reposition it keeps a smooth interaction (grabbing cursor and live position updates) without multi-second freezes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.8"
-name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+name = "rapid_preset_save_delete_responsive"
+description = "Rapid repeated preset saves and deletes keep the UI responsive with no blank screen or freeze."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+name = "extended_styling_session_stable"
+description = "After an extended session of uploads, slider adjustments, preset apply/delete, and Collaboration offline/online, the app remains responsive without runaway resource use that freezes interaction."
 type = "binary"
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+name = "twenty_five_rapid_preset_repetitions"
+description = "The Saved presets workflow withstands 25 rapid deterministic repetitions through its normal controls with an exact final count, responsive controls, and no blank screen, uncaught error, or sustained freeze."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.n1"
 name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+description = "More than 2 seconds pass before FrameFlick is interactive on a local cold load."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,31 +141,31 @@ weight = 1.0
 [[criterion]]
 id = "9.n2"
 name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+description = "Console errors or warnings appear during upload, styling, export, preset, or Collaboration flows."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n3"
-name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+name = "slider_updates_block_or_lag"
+description = "Dragging a style slider blocks the UI or visibly drops canvas updates for a prolonged stretch."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n4"
-name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
+name = "export_or_copy_hangs_ui"
+description = "Download PNG or Copy image causes the UI to hang or freeze."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n5"
-name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+name = "populated_lists_kill_responsiveness"
+description = "A populated Recent strip or Saved presets list makes Apply/Del or thumbnail clicks unusably slow."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,39 +173,54 @@ weight = 1.0
 [[criterion]]
 id = "9.n6"
 name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
+description = "During preset list entry/exit animations or Copied! feedback, primary Editor controls become unresponsive."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n7"
-name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
+name = "upload_blocks_entire_render"
+description = "Choosing an image blocks the entire UI with a blank screen until the canvas eventually appears."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n8"
-name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
+name = "session_resource_runaway"
+description = "An extended styling and Collaboration session produces runaway browser resource usage that freezes interaction."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n9"
-name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
+name = "blank_during_canvas_work"
+description = "While an image is processing onto the canvas or a preset Apply runs, the workspace shows a prolonged blank screen with no usable chrome."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n10"
-name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+name = "rapid_preset_use_crashes"
+description = "Rapid preset save/delete repetitions crash the app or leave an uncaught error state."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.11"
+name = "rapid_undo_redo_stays_responsive"
+description = "Rapid repeated undo/redo and style JSON export preview updates keep the UI responsive with no blank screen, freeze, or dropped interactions."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.n11"
+name = "style_export_preview_janks_on_slider_drag"
+description = "Dragging style sliders causes sustained freeze or multi-second lag while updating the live Export preview JSON."
 type = "binary"
 negate = true
 weight = 1.0

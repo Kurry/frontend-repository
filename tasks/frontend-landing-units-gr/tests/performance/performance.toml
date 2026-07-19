@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,99 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "9.1"
-name = "cold_start_is_under_two_seconds"
-description = "Cold start to interactive is under 2 seconds on local render."
+name = "cold_start_interactive_under_2s"
+description = "The homepage is interactive within 2 seconds of a local cold load, with the documented 0.2s reveal gate and intro timeline the only intentional delays."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.2"
-name = "console_is_clean"
-description = "Browser devtools show no errors or warnings."
+name = "console_clean_on_load_and_exercise"
+description = "No console errors, warnings, or hydration mismatch warnings appear on load or during a full exercise of the page — menu, carousel, consent banner, shortlist, booking inquiry/export, FAQ, command palette, hover, and full-page scroll included — on the root route."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.3"
-name = "transitions_respond_under_100ms"
-description = "UI transitions respond in under 100ms."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "9.4"
-name = "async_work_has_loading_indicators"
-description = "Loading indicators are shown for async or simulated delays."
+name = "chrome_responds_without_multi_second_lag"
+description = "Hamburger, carousel next/previous, and consent buttons respond without multi-second lag after first paint (chrome interactions feel under ~100ms once the intro has settled)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.5"
-name = "large_collections_render_without_lag"
-description = "Large collections render without perceived lag."
+name = "long_page_scroll_without_lag"
+description = "Scrolling the full long-form homepage (hero through footer) remains usable without perceived multi-second freezes between sections."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.6"
-name = "state_changes_remain_interactive"
-description = "The UI remains interactive during state changes."
+name = "interactive_during_menu_and_carousel"
+description = "The UI remains interactive during menu open/close and living carousel paging (controls stay clickable)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.7"
-name = "animations_maintain_smooth_frame_rate"
-description = "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."
+name = "scroll_marquees_cursor_hold_frame_rate"
+description = "After the intro settles, continuous scrolling from top to bottom holds a smooth frame rate through marquees, cursor motion, and scroll reveals with no visible hitching."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.8"
-name = "rapid_input_does_not_freeze"
-description = "The app does not hang or freeze even under rapid user input."
+name = "rapid_carousel_clicks_never_freeze"
+description = "Rapidly clicking the living carousel next control several times never freezes the page."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
+name = "extended_scroll_session_stable"
+description = "After an extended scroll-through with menu open/close and carousel paging, the page remains responsive without runaway resource use that freezes interaction."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "9.10"
+name = "deep_link_root_matches_settled_page"
+description = "Loading the root URL directly renders the same settled page as any in-page interaction path, with no content flash beyond the documented opacity gate."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
+id = "9.a1"
+name = "scroll_linked_animation_frame_rate"
+description = "Scroll-linked section reveals and continuous marquee motion hold a smooth frame rate through the full page length on a 1440-wide viewport with no visible hitching during continuous scroll."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.a2"
+name = "smooth_scroll_feels_continuous"
+description = "Continuous page scrolling feels smooth with natural inertial settle; scroll-triggered section reveals stay synced with the live scroll position during that continuous scroll."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.a4"
+name = "layout_stable_after_load"
+description = "After first paint, media regions hold their space so fonts and images finishing load cause no visible layout jumps; the hero photograph (about 1253x850 at 1440px) is the LCP image."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.a6"
+name = "fonts_swap_and_motion_after_paint"
+description = "Fonts are self-hosted and load with font-display swap; client motion scripts attach after first paint without blocking navigation chrome beyond the documented opacity gate."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "9.n1"
-name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
+name = "cold_load_exceeds_two_seconds"
+description = "More than 2 seconds pass before the page is interactive on a local cold load (excluding only the documented 0.2s gate and intro)."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,31 +162,23 @@ weight = 1.0
 [[criterion]]
 id = "9.n2"
 name = "console_errors_during_flows"
-description = "Errors or warnings are present in the console during flows."
+description = "Console errors, warnings, or hydration mismatch warnings appear during load, menu, carousel, consent, hover, or full-page scroll exercise."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n3"
-name = "transitions_block_or_lag"
-description = "Transitions block or lag."
+name = "scroll_or_intro_transitions_block"
+description = "Scroll-driven reveals or the intro timeline block interaction for multiple seconds after they should have settled."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
-id = "9.n4"
-name = "async_work_hangs_ui"
-description = "Async or simulated-async work causes the UI to hang or freeze."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n5"
-name = "large_data_kills_frame_rate"
-description = "Large data sets kill the frame rate."
+id = "9.a3"
+name = "heavy_assets_collapse_frame_rate"
+description = "Heavy visual assets (hero imagery, marquees, lottie/vector animation, or scroll scripts) cause frame-rate collapse, delayed first render, or input latency during signature scroll/hover interactions."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +186,7 @@ weight = 1.0
 [[criterion]]
 id = "9.n6"
 name = "animation_blocks_input"
-description = "Input becomes unresponsive during animation."
+description = "During the skeleton intro or section reveals, primary controls (Book CTA, hamburger below 1024px, carousel arrows) become unresponsive."
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,31 +194,30 @@ weight = 1.0
 [[criterion]]
 id = "9.n7"
 name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading resources."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n8"
-name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n9"
-name = "loading_state_is_blank"
-description = "Nothing is displayed while data is loading."
+description = "The UI blocks rendering with a blank page while fonts or images load instead of showing reserved-space layout after the opacity gate."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "9.n10"
-name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid or edge-case use."
+name = "rapid_use_crashes_page"
+description = "Rapid carousel clicking or fast continuous scrolling crashes the page or leaves it permanently unresponsive."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.11"
+name = "inquiry_export_never_freezes"
+description = "Opening the booking inquiry overlay and exporting a JSON or Markdown packet never freezes the page or blocks interaction for multiple seconds."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.n11"
+name = "export_or_overlay_hangs_ui"
+description = "Opening the inquiry overlay or triggering Export JSON/Markdown hangs or freezes the UI for multiple seconds."
 type = "binary"
 negate = true
 weight = 1.0

@@ -204,16 +204,19 @@ Bindings:
 - Editor object types: theme
 - Editor properties: color; radius; font
 - Editor operations: select; update_property; preview
+- Editor modes: edit; compare
 - Entity: theme
 - Entity operations: create; select; update; delete
 - Entity fields: name; tokens
-- Artifact operations: export; import; copy
-- Export formats: css; json
+- Artifact operations: export; import; copy; convert
+- Export formats: css; json; config
 - Import modes: declared-theme
+- Conversion modes: css-to-json; json-to-config
 
 Mechanics exclusions:
 - Raw file path / base64 blobs must not appear in WebMCP args
 - Color-picker drag gestures stay Playwright when mechanism matters
+- Hold-to-add press timing stays Playwright when mechanism matters
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

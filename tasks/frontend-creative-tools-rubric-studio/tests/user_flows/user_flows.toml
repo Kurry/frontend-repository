@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,158 +62,158 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "add_criterion_updates_all_surfaces"
+description = "Create flow: opening Add criterion, submitting a valid form appends exactly one new accordion row, increases the header criteria count by one, and the new criterion appears in the Tune view and sample-submission panel without a page reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "invalid_add_shows_inline_validation"
+description = "Create flow: submitting the criterion form with an empty name or description shows immediate inline messages naming those fields, adds no criterion, and leaves the header criteria count unchanged."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "version_gated_description_edit_end_to_end"
+description = "Version-gated edit end to end: on the default Response Quality rubric, edit one criterion's description, observe save disabled with the minor-bump explanation, enter a version that only increases the patch number and observe the violation message naming minor bump required, then enter a correct minor bump and save — the rail badge shows the new version, exactly one new history entry appears at the top naming that criterion, and selecting it shows the description marked as changed with before and after values, all without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "delete_with_major_bump_end_to_end"
+description = "Delete with major bump: delete a criterion, confirm, observe the major-bump explanation, enter a correct major bump and save — the criteria count decreases by exactly one, the rail badge shows the major version, and the new history entry's diff view shows that criterion in the red-tinted removed treatment with struck-through text."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "criteria_tune_preview_switch_retains_rubric"
+description = "View/mode switch: switching among criteria, Tune, and preview modes on the opened rubric changes the canvas without a reload and keeps the same active rubric, header selects, and criteria set."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "last_delete_reveals_criteria_empty_state"
+description = "Edge: after deleting all criteria from a rubric (each with its major bump), the criteria list shows a clear empty state naming what belongs there and offering Add criterion, and Tune and preview show their own empty states instead of broken bars."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "tune_case_toggles_update_bars_and_summary"
+description = "Tune sensitivity: in the Tune view, note one criterion's F1 value, exclude two labelled cases and observe the precision/recall/F1 bars and summary strip change, then re-include them and observe the original values restored exactly."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "rail_collapse_preserves_open_rubric"
+description = "At widths of 1024px and below the left rail collapses behind a toggle; opening the overlay, selecting a different seeded rubric, and closing the overlay keeps that rubric open in the canvas with workflow continuity."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "criterion_form_and_diff_overlays"
+description = "Overlays: the Add/Edit criterion form dialog opens for create/edit and closes via Cancel or Escape without changing the rubric; selecting a history entry opens the read-only diff view and Close/Back returns to the editable criteria list."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "reload_recovers_to_seeded_studio"
+description = "Recovery: after editing views, toggles, or pending form state, a page reload returns the app to its seeded state — exactly 4 rubrics at seeded versions, Response Quality open by default, and all seeded history entries present — with no dead end requiring a second reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "criterion_crud_unavailable_from_ui"
+description = "Add criterion, edit, or delete cannot be completed from the visible UI controls on the opened rubric."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "add_fails_to_appear_or_duplicates"
+description = "Submitting a valid Add criterion form either fails to append a visible accordion row or adds duplicate rows for a single submit."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "version_save_desyncs_surfaces"
+description = "After a successful version-gated save, the rail version badge, criteria accordion, Tune bars, preview panel, and export text disagree about the same criterion or version."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "mode_switch_breaks_or_loses_rubric"
+description = "Switching among criteria, Tune, and preview breaks the layout or loses the active rubric selection."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_criteria_region_broken"
+description = "After deleting all criteria, the criteria list is blank or broken with no empty state, or Tune/preview show zero-division artifacts instead of empty states."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "tune_and_preview_disagree_on_metrics"
+description = "After toggling labelled-case includes, the Tune bars and the summary strip disagree about included-case count or macro-averaged precision/recall/F1."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "collapsed_rail_cannot_reopen"
+description = "At 1024px or below, after the left rail collapses, the toggle cannot reopen the rail overlay."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "form_or_diff_blocks_with_no_exit"
+description = "The criterion form dialog or the history diff view blocks the canvas with no working Cancel, Close/Back, or Escape exit."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "wrong_version_bump_silent"
+description = "A save attempt with a version that fails the pending minor or major bump requirement applies the criterion change, or shows only a generic error that omits the violation kind names minor bump required and major bump required."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "export_or_diff_dead_end_requires_reload"
+description = "Recovering from the export panel or the history diff view requires a full page reload — the UI reaches a dead end."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "user_flows.catchall"
 name = "user_flows_catchall"
 description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true

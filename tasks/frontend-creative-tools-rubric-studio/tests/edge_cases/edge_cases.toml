@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,158 +62,158 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_criteria_tune_preview_states"
+description = "After deleting all criteria from a rubric (each with its major bump), the criteria list shows an empty state naming what belongs there and offering Add criterion, and the Tune view and preview panel show their own empty states instead of broken bars."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "empty_name_description_inline_before_submit"
+description = "Submitting the criterion form with an empty name or description shows inline messages naming those fields before a successful add, and no criterion is added — the criteria count is unchanged."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "validation_names_field_not_bare_invalid"
+description = "Criterion-form and version-bump validation copy names the offending field or violation kind (for example name, description, id, minor bump required, major bump required) rather than only saying Invalid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "save_delete_copy_show_confirmation"
+description = "After a successful version-gated save, a confirmed delete save, or activating Export copy, a confirmation toast or visible confirmation appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "pending_bump_feedback_before_save"
+description = "When a pending edit requires a minor or major bump, the save control stays disabled and an inline explanation of the required bump kind is visible before any save attempt."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "delete_asks_confirmation_cancel_safe"
+description = "Deleting a criterion asks for confirmation; choosing Cancel on the confirmation or Cancel on a pending version bump leaves the rubric, its version, and its history unchanged."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "version_gate_explains_required_bump"
+description = "Editing description/type shows an inline explanation that a minor bump is required, and deleting shows an inline explanation that a major bump is required — so the version gate is guided in-app."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "studio_controls_use_semantic_tags"
+description = "Rail entries, header selects, accordion headers, Add criterion, verdict toggles, case include toggles, history entries, and copy use semantic button/input/label elements or equivalent accessible roles rather than unlabeled decorative wrappers."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "criterion_form_close_paths"
+description = "The criterion form dialog closes via Cancel and Escape, returning to the canvas without applying changes or requiring a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "exclude_all_cases_shows_tune_empty_state"
+description = "Excluding every labelled case in the Tune view shows an empty state in place of the bars rather than NaN, Infinity, or zero-division artifacts, and the summary strip reflects zero included cases."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_criteria_shows_nothing"
+description = "After the criteria collection is empty, the criteria list shows nothing — no empty-state copy and no Add criterion affordance."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "validation_errors_only_in_console"
+description = "Invalid criterion submissions or wrong version bumps surface only in the browser console with no visible inline field or violation feedback."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "save_or_tune_toggle_silent"
+description = "Saving a correctly bumped change or toggling a labelled-case include produces no visible change to version badge, history, bars, or aggregate (silent failure)."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "delete_proceeds_without_confirmation"
+description = "Deleting a criterion proceeds with no confirmation step before the pending major-bump state."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "interactive_controls_are_nonsemantic"
+description = "Primary interactive controls (rail entries, accordion headers, verdict toggles, case toggles, Add criterion) are non-semantic div/span click targets without button/role semantics."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "criterion_form_not_keyboard_dismissible"
+description = "With the criterion form dialog open, keyboard users cannot dismiss it (no Escape path and no focusable Cancel control)."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "duplicate_id_still_submits"
+description = "Entering a duplicate criterion id still enables submit and adds a second criterion with that id, or shows no inline message naming the id field as already in use."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "ambiguous_or_missing_action_labels"
+description = "Primary actions show blank, placeholder, or ambiguous labels such as Submit, OK, or Button instead of specific labels like Add criterion, Export, or Copy."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "likert_min_gte_max_accepted"
+description = "Choosing likert with min greater than or equal to max still allows submit, or shows no inline message on the range fields."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "cancel_still_mutates_rubric"
+description = "Cancel on the criterion form or Cancel on a pending version bump still changes the rubric criteria, version, or history."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"
 description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true

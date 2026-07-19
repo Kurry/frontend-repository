@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.5
@@ -78,7 +78,7 @@ weight = 0.5
 [[criterion]]
 id = "15.3"
 name = "errors_name_problem_and_fix"
-description = "Where the app renders error messages, they name the problem and the fix ('Amount must be a positive number'), not just a rejection ('Invalid')."
+description = "Where the app renders error messages for Bookmark create, workspace create, or SideDock package import field-contract failures, they name the problem and the fix (for example Enter a complete web address, such as https://example.com, or name the offending field such as title, name, accentColor, or schemaVersion), not just a rejection (Invalid)."
 type = "binary"
 weight = 0.5
 

@@ -1,0 +1,219 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "double_run_single_execution"
+description = "Double-activating Run Script starts exactly one run: one set of step highlights, one new run record, and one rollup sequence"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "double_create_single_script"
+description = "Double-activating the New Script Create control creates exactly one script"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "delete_selected_script_empty_state"
+description = "Deleting the currently selected script clears the editor to an empty state with a message and a control to create or select a script"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "all_disabled_steps_run"
+description = "Running a script whose steps are all disabled completes immediately showing every step Skipped and a run record with zero passes and zero failures"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "empty_stacks_disable_undo_redo"
+description = "Undo with an empty stack and Redo with an empty redo stack are disabled and produce no console errors"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "invalid_wait_fails_gracefully"
+description = "A Wait step with a non-numeric duration keeps its warning marker and the run treats it as failed validation rather than crashing; fixing the value clears the marker"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "stepless_script_state"
+description = "Removing every step shows an empty-state message naming Add Step as the next action, and Run Script is disabled while the script has no enabled steps"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "timeline_filter_empty_state"
+description = "Filtering the event timeline to a status with no entries shows an empty-state message rather than a blank area"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "jump_to_latest_visibility"
+description = "The console jump-to-latest control appears only after scrolling away from the newest line and disappears once following resumes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "copy_matches_visible_preview"
+description = "Copying the export mid-run copies exactly the text currently visible in the preview block"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n1"
+name = "empty_regions_render_blank"
+description = "An emptied collection (library, step list, runs, scheduled queue, palette results) renders a blank area with no explanatory feedback"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n2"
+name = "errors_only_in_console"
+description = "A rejected input or failed action is surfaced only in the browser console, with no visible UI feedback"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n3"
+name = "destructive_without_warning"
+description = "Deleting a script, a step, or selected steps proceeds without its confirmation"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n4"
+name = "double_activation_duplicates"
+description = "Double-activating Run Script, Create, a bulk action, or Trigger now duplicates its effect"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n5"
+name = "nonsemantic_interactive_wrappers"
+description = "Interactive elements are bare div or span wrappers without button or input semantics"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n6"
+name = "dialog_not_keyboard_dismissable"
+description = "A modal or confirmation cannot be dismissed via keyboard"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n7"
+name = "validation_feedback_missing"
+description = "A form accepts invalid input silently or shows validation feedback only after a delay with no indication"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n8"
+name = "ambiguous_control_labels"
+description = "Primary controls carry ambiguous or missing labels that leave their action unclear"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n9"
+name = "boundary_input_corrupts_state"
+description = "A boundary input (zero or negative wait, empty selector sent to a step, malformed playground selector) corrupts state or throws instead of being rejected with feedback"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n10"
+name = "affordances_hidden"
+description = "Interactive affordances (bulk bars, Retry, jump-to-latest, Compare) are visually hidden or unreachable when their preconditions are met"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "edge_cases.catchall"
+name = "edge_cases_catchall"
+description = "The app exhibits a significant, browser-observable defect in edge-case and recovery behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

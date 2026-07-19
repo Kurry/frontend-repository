@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,14 +63,14 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.1"
 name = "shared_state_coherence"
-description = "All surfaces derive from one shared state: a step advancing during a run updates the step list, the event timeline, and the rollup together; a completed run updates the suite entry, results table, and both charts together; and a suite edit or delete is reflected in every view where the suite appears, all without a reload"
+description = "All surfaces derive from one shared state: a step advancing during a run updates the step list, the event timeline, and the rollup together; a completed run updates the suite entry, results table, both charts, and the export preview together; suite edit/delete and undo/redo are reflected in every view where the suite appears, all without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
 name = "no_storage_reload_seeded"
-description = "No browser storage is used: localStorage and sessionStorage remain empty after creating, editing, deleting, running, pausing, and scheduling suites, and a page reload returns the app to its seeded state (seeded suites, historical runs, default view, no night-mode schedules)"
+description = "No browser storage is used: localStorage and sessionStorage remain empty after creating, editing, deleting, running, pausing, scheduling, exporting, importing, and undoing suites, and a page reload returns the app to its seeded state (seeded suites, historical runs, default view, no night-mode schedules)"
 type = "binary"
 weight = 1.0
 
@@ -93,7 +93,7 @@ negate = true
 [[criterion]]
 id = "2.5"
 name = "console_clean"
-description = "The console is free of errors and warnings on first load and stays clean while creating, editing, deleting, running, pausing, retrying, and scheduling suites and switching views"
+description = "The console is free of errors and warnings on first load and stays clean while creating, editing, deleting, running, pausing, retrying, scheduling, exporting, importing, undoing, and redoing suites and switching views"
 type = "binary"
 weight = 1.0
 
@@ -114,14 +114,14 @@ weight = 1.0
 [[criterion]]
 id = "2.8"
 name = "keyboard_operability_focus"
-description = "Every interactive control — suite entries, toolbar controls, table headers, row actions, step retry and pause/resume controls, form fields — is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space), with a visible focus indicator at each stop"
+description = "Every interactive control — suite entries, toolbar controls including Export results, Import results, Undo, and Redo, table headers, row actions, step retry and pause/resume controls, form fields — is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space), with a visible focus indicator at each stop"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.9"
 name = "modal_focus_trap_escape"
-description = "The New Suite, Edit Suite, and confirmation modals trap keyboard focus while open, close on the Escape key, and return focus to the control that opened them"
+description = "The New Suite, Edit Suite, and confirmation modals and the export drawer trap keyboard focus while open, close on the Escape key, and return focus to the control that opened them"
 type = "binary"
 weight = 1.0
 
@@ -136,6 +136,21 @@ weight = 1.0
 id = "2.11"
 name = "labels_and_error_association"
 description = "Form fields in the New Suite, Edit Suite, and night-window forms have visible labels, and each validation message names the field it belongs to and renders in association with that field"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "2.12"
+name = "export_import_live_from_store"
+description = "Export JSON and CSV compile from the shared results store so a completed run changes the next export preview, and a successful Import updates the table, charts, and suite badge from that same store without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.13"
+name = "schema_validation_visible"
+description = "Suite, night-window, and import forms reject invalid API-shaped payloads with inline per-field errors naming the field, and do not mutate suites or results on rejection"
 type = "binary"
 weight = 1.0
 

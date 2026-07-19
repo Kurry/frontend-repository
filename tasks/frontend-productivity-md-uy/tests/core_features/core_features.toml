@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -126,7 +126,7 @@ weight = 1.0
 [[criterion]]
 id = "1.11"
 name = "copy_and_download_with_confirmation"
-description = "When the Copy control is clicked it copies the Markdown source and briefly shows a confirmation; when Download is clicked it saves a document.md file and briefly shows a confirmation"
+description = "When the Copy control is clicked it copies the live Markdown source and briefly shows a confirmation; when Download Markdown is clicked it saves a document.md file whose contents match the current source and briefly shows a confirmation"
 type = "binary"
 weight = 1.0
 
@@ -147,7 +147,7 @@ weight = 1.0
 [[criterion]]
 id = "1.14"
 name = "profile_dialog_updates_chip"
-description = "When the profile control is clicked, a dialog opens to set a display name and a color, and saving a valid profile updates the profile chip to show the chosen name and a dot in the chosen color"
+description = "When the profile control is clicked, a dialog opens to set displayName and color under the profile field contract, and saving a valid profile (trimmed non-empty displayName at most 40 characters and color as #RRGGBB) updates the profile chip to show the chosen name and a dot in the chosen color"
 type = "binary"
 weight = 1.0
 
@@ -206,8 +206,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.32"
-name = "profile_empty_name_inline_validation"
-description = "Leaving the display name empty in the profile dialog shows an inline message naming the display name field before submit and keeps the save control disabled; attempting to submit with an empty name saves nothing — the chip keeps its previous name and color"
+name = "profile_field_contract_inline_validation"
+description = "Leaving displayName empty or whitespace-only, entering a displayName longer than 40 characters, or setting color to a value that is not #RRGGBB shows an inline message naming the offending field before submit and keeps save disabled or refuses commit; attempting to submit saves nothing — the chip keeps its previous name and color"
 type = "binary"
 weight = 1.0
 
@@ -228,7 +228,7 @@ weight = 1.0
 [[criterion]]
 id = "1.35"
 name = "profile_echo_across_modes_flow"
-description = "Scripted flow: save a display name and color in the profile dialog and see the chip's name and colored dot update immediately without a reload; reopening the dialog shows the saved values pre-filled, and the chip keeps the same name and color while switching through Edit, Preview, and Present"
+description = "Scripted flow: save a displayName and color that satisfy the profile field contract and see the chip's name and colored dot update immediately without a reload; reopening the dialog shows the saved values pre-filled, the Document package preview shows the same profile.displayName and profile.color, and the chip keeps the same name and color while switching through Edit, Preview, and Present"
 type = "binary"
 weight = 1.0
 
@@ -240,9 +240,38 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "1.43"
+name = "document_package_api_shaped_field_contract"
+description = "The Document package JSON preview is a single object whose visible text includes the required field contract: schemaVersion exactly mduy-document-v1; roomId exactly 10 or 20 uppercase A-Z matching the live breadcrumb/URL id; markdown equal to the current source; theme exactly light or dark matching the theme toggle; and profile with displayName and color (#RRGGBB) matching the profile chip"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "document_package_copy_download_import"
+description = "The Document package surface offers Copy package (clipboard confirmation) and Download package (real .json download matching the preview); Import package of a contract-valid JSON restores source markdown, theme, and profile so the source pane, theme surfaces, profile chip, and package preview match the imported values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "artifact_end_state_export_import_round_trip"
+description = "Scripted flow: type a distinctive line into the source, save a valid profile name and color, confirm Download Markdown contains that line and the Document package preview still shows schemaVersion mduy-document-v1 plus roomId, markdown, theme, and profile with those live values; then Download package and Import package of that same JSON reconstructs the same source text, theme, and profile chip"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "export_omits_session_mutations"
+description = "After typing a distinctive line into the source and saving a new profile name and color, Download Markdown or the Document package preview omits that line or those profile values, or the package preview is missing a required field-contract key (schemaVersion, roomId, markdown, theme, or profile)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "1.37"
 name = "empty_document_muted_placeholders"
-description = "After selecting all source text and deleting it, the source pane and the preview each show a muted placeholder instead of stale content"
+description = "After selecting all source text and deleting it, the source pane and the preview each show a muted placeholder instead of stale content, and the Document package preview's markdown field is the empty string while schemaVersion, roomId, theme, and profile keys remain present"
 type = "binary"
 weight = 1.0
 
@@ -272,11 +301,10 @@ optional = true
 
 [[criterion]]
 id = "1.41"
-name = "join_field_invalid_id_inline_error"
-description = "Entering an invalid document id (wrong length or non-uppercase characters) into the top-bar join field surfaces an inline validation message naming the problem before submit, and a valid 10 or 20 character uppercase A-Z id is accepted"
+name = "join_room_field_contract_inline_error"
+description = "Entering an invalid roomId into the top-bar join field (wrong length, lowercase, digits, or punctuation) surfaces an inline validation message naming the roomId field before navigate and does not leave the current room; a valid exactly-10 or exactly-20 character uppercase A-Z id is accepted"
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "1.42"

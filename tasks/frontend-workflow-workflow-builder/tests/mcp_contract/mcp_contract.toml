@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,86 +62,93 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "12.1"
-name = "mandated_modules_are_bound"
-description = "All contract-mandated modules are initialized and bound."
+name = "four_mandated_modules_bound"
+description = "All four contract-mandated modules are initialized and bound: structured-editor-v1, command-session-v1, entity-collection-v1, and artifact-transfer-v1 (tools discoverable via webmcp_list_tools with editor_*, session_*, entity_*, and artifact_* prefixes)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.2"
 name = "handlers_match_visible_ui_logic"
-description = "Exposed tool handlers match visible UI command logic."
+description = "Exposed tool handlers call the same application logic as the visible UI: editor/session/entity/artifact operations change the same canvas badges, rollup, timeline, saved-workflows list, and artifact preview state the toolbar and panels use"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.3"
-name = "only_documented_operations_exist"
-description = "Only documented operations and routes are available."
+name = "only_declared_operations"
+description = "Only documented operations from the bindings are available: editor select/add/delete/update_property on prompt-node/agent-node/eval-node/condition-node/output-node/edge; session start/pause/resume/restart with demos seeded-workflow-run and retry-from-failed-node; entity create/select/delete on saved-workflow; artifact export/import/copy/convert with formats json/mermaid — no invented modules"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.4"
-name = "contract_is_automation_exercisable"
-description = "The contract can be fully exercised via automation."
+name = "contract_exercisable_via_webmcp"
+description = "The contract can be fully exercised via automation: webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool succeed for the bound editor, session, entity, and artifact tools"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.5"
-name = "declared_entity_operations_work"
-description = "Entity operations declared in the contract, including create, update, delete, and reorder, all work."
+name = "entity_saved_workflow_ops"
+description = "Entity operations declared for entity saved-workflow work: create, select, and delete (with confirm=true) update the visible Saved Workflows panel and canvas load behavior"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.6"
-name = "form_flow_operations_are_bound"
-description = "Form submission validation, error, and cancel operations are clearly bound."
+name = "editor_node_ops_bound"
+description = "Editor operations for the five node object types and edge work: select, add, delete, and update_property (title, prompt, agent, timeout-seconds 1–300, rubric, condition-expression, destination-name) update visible configuration badges"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.7"
-name = "queries_match_allowed_spec"
-description = "Query destinations and filters match the allowed specification."
+name = "session_run_ops_bound"
+description = "Session operations start, pause, resume, and restart (plus demos seeded-workflow-run and retry-from-failed-node) are bound and invoke the same run progression the Run/Pause/Resume/Retry controls use"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.8"
-name = "capabilities_stay_declared"
-description = "No extra or undeclared module routes or capabilities are exposed."
+name = "artifact_export_import_copy_convert"
+description = "Artifact operations export, import, copy, and convert with export formats json and mermaid, import mode workflow-definition, and conversion mode json-to-mermaid are bound and invoke without throwing when called through WebMCP"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.9"
-name = "session_tool_and_invoke_apis_work"
-description = "Session info, tool list, and invocation are correctly surfaced."
+name = "session_info_list_tools_invoke_work"
+description = "window.webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool are correctly surfaced and return coherent session/tool data for this app"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.10"
-name = "mcp_initializes_without_harness_edits"
-description = "MCP initialization works without manual editing or test harness changes."
+name = "mcp_init_without_harness_edits"
+description = "MCP initialization works from the app's own registration without requiring manual edits to /tests harness files"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.11"
+name = "visible_postconditions_update"
+description = "Invoking bound tools updates declared visible postconditions: node-status-badges, run-rollup-n-of-m, configuration-badge, and artifact-preview"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.n1"
 name = "mcp_tools_missing_or_noop"
-description = "MCP tooling is unbound, missing, or a no-op."
+description = "WebMCP tooling for structured-editor-v1, command-session-v1, entity-collection-v1, or artifact-transfer-v1 is unbound, missing, or a no-op when invoked"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n2"
-name = "handlers_diverge_from_ui_logic"
-description = "Handlers do not match UI logic because actions mismatch or state does not sync."
+name = "handlers_diverge_from_ui_state"
+description = "Invoking a bound editor/session/entity/artifact tool leaves canvas badges, rollup, timeline, or artifact preview diverging from what the equivalent visible UI control would produce"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +156,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n3"
 name = "undeclared_capabilities_exposed"
-description = "Undeclared destinations or entity operations are exposed."
+description = "Undeclared modules or operations beyond the Bindings (including a browse-query module that was not assigned) are exposed on the WebMCP surface"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,15 +164,15 @@ weight = 1.0
 [[criterion]]
 id = "12.n4"
 name = "automation_cannot_exercise_contract"
-description = "The contract cannot be exercised from automation."
+description = "webmcp_list_tools / webmcp_invoke_tool cannot exercise the declared editor, session, entity, and artifact bindings"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n5"
-name = "validation_bypass_desyncs_state"
-description = "Validation bypasses lead to inconsistent MCP and UI state."
+name = "mcp_update_bypasses_shared_state"
+description = "An editor update_property, session start, entity create, or artifact export invocation updates a parallel copy of state, leaving visible canvas/artifact surfaces showing stale values (MCP/UI desync)"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,7 +180,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n6"
 name = "session_or_tool_api_errors"
-description = "The session or tool API returns errors or incomplete data."
+description = "webmcp_session_info or webmcp_list_tools returns errors or incomplete data for the mandated modules"
 type = "binary"
 negate = true
 weight = 1.0
@@ -181,31 +188,31 @@ weight = 1.0
 [[criterion]]
 id = "12.n7"
 name = "mcp_relies_on_undocumented_hacks"
-description = "MCP relies on manual or undocumented test hacks."
+description = "MCP only works after undocumented manual harness hacks or console-only stubs rather than app-registered tools"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n8"
-name = "required_contract_module_missing"
-description = "No module contract is implemented where one is declared required."
+name = "required_modules_not_implemented"
+description = "structured-editor-v1, command-session-v1, entity-collection-v1, or artifact-transfer-v1 is not implemented despite being declared required"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n9"
-name = "mcp_is_stubbed_or_commented_out"
-description = "The MCP interface is commented out or only stubbed."
+name = "mcp_stubbed_or_commented_out"
+description = "The WebMCP interface is commented out or only stubbed so tools list as present but leave canvas/run/artifact state unchanged when invoked"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "12.n10"
-name = "automated_contract_validation_fails"
-description = "The project fails automated MCP contract validation."
+name = "mechanics_exclusion_faked_via_mcp"
+description = "Node drag/pan/zoom, edge-handle drawing, retry countdown visuals, keyboard cycling, multi-select marquee, or raw file path/base64 blobs are faked solely through WebMCP as a success path, bypassing Playwright-observed mechanics exclusions"
 type = "binary"
 negate = true
 weight = 1.0

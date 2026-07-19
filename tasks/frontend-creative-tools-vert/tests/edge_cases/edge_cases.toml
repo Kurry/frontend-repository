@@ -62,150 +62,209 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_queue_explicit_state"
+description = "When the conversion queue is empty it shows the explicit empty state \"Your conversion queue is empty\" plus guidance that a local file is needed, and the counts line reads \"0 files queued\"."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "settings_quality_inline_validation"
+description = "In Settings, entering an output quality outside 1 to 100 shows an inline message naming the quality field before submit, and the invalid value is never applied."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "unsupported_plain_language_reason"
+description = "A file whose format cannot be decoded is marked Unsupported with a plain-language reason (not a bare code), and its Download control never enables."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "converting_status_is_visible_feedback"
+description = "While Convert runs, ready rows move through a visible Converting status (and the counts line updates) so the async work is not silent."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "cancel_stops_in_progress_run"
+description = "Cancel during an in-progress run stops the run: no row left mid-run shows Done, and the counts line matches the rows actually completed."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "clear_queue_empties_with_feedback"
+description = "Clear queue empties every row and restores the empty-state copy and \"0 files queued\" counts line."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "dropzone_helper_names_supported_inputs"
+description = "Before any file is chosen, the drop zone helper text names the supported local inputs so the primary affordance is guided in-app."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
 name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+description = "Drop zone, Convert, Download, Remove, Clear queue, Cancel, Convert-to selectors, batch actions, Undo/Redo, preset controls, Session export controls, and Settings fields use semantic button/input/label elements rather than unlabeled decorative wrappers."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "double_convert_runs_once"
+description = "Double-activating Convert runs each ready file exactly once: the done count increases only by the number of ready rows, with no duplicate rows created."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "long_filename_ellipsis_preserves_download_name"
+description = "A long filename is truncated with an ellipsis in its queue row without breaking the row layout, and Download still uses the full name with the correct extension."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_queue_shows_nothing"
+description = "When the queue is empty the region shows nothing — no \"Your conversion queue is empty\" copy, no guidance, and no \"0 files queued\" counts line."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "empty_queue_shows_false_success"
+description = "While the queue is empty it shows progress, a checkmark, or an enabled Download control."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "unsupported_shows_false_success"
+description = "An undecodable file shows Done, a checkmark, or an enabled Download instead of Unsupported with a plain reason."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "cancel_leaves_false_done"
+description = "After Cancel during an in-progress run, a row that did not finish still shows Done or the counts line overstates completed rows."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "interactive_controls_nonsemantic"
+description = "Primary interactive controls (drop zone, Convert, Download, Remove, selectors, batch tray, Undo/Redo) are non-semantic div/span click targets without button/role semantics."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "quality_validation_missing"
+description = "Entering a quality outside 1–100 applies the invalid value or provides no visible inline feedback naming the quality field."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
+id = "4.11"
+name = "invalid_session_import_rejected"
+description = "Importing malformed session JSON shows an inline error naming the import field, leaves quality, presets, and queue targets unchanged, and does not clear undo history as if the import succeeded."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "empty_preset_name_rejected"
+description = "Saving a preset with an empty name does not increase the preset count and shows an inline message naming the name field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "double_convert_duplicates_or_double_counts"
+description = "Double-activating Convert creates duplicate rows or increases the done count by more than the number of ready rows."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "ambiguous_or_missing_action_labels"
+description = "Primary actions show blank, placeholder, or ambiguous labels such as 'Submit', 'OK', or 'Button' instead of specific labels like Convert, Download, Batch remove, Undo, or Save preset."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "conversion_failure_silent"
+description = "A failed conversion provides no visible Failed/Unsupported status or plain-language reason — only a silent or console-only failure."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "long_filename_breaks_row_layout"
+description = "A very long filename overflows or breaks the queue row layout instead of truncating with an ellipsis."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "invalid_session_import_mutates_state"
+description = "Importing malformed session JSON still mutates settings, presets, queue targets, or clears undo history as if the import succeeded."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "batch_remove_zero_selected_noop"
+description = "Batch remove with zero selected rows does nothing and shows no confirmation; the tray stays hidden until at least one row is selected."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "undo_redo_preset_edge"
+description = "After Undo restores a deleted preset, Redo deletes it again; after a new Save preset following an undo, Redo is disabled and cannot resurrect the cleared redo stack."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "empty_queue_session_export_valid"
+description = "Session export with an empty queue still compiles valid session JSON and conversion-report text (settings and presets present, files array empty) without errors."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n12"
+name = "batch_remove_fires_with_zero_selected"
+description = "With zero rows selected, Batch remove shows a confirmation or removes rows anyway."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n13"
+name = "empty_queue_export_errors"
+description = "Opening Session export with an empty queue throws an error or fails to compile session JSON / conversion-report text."
 type = "binary"
 negate = true
 weight = 1.0

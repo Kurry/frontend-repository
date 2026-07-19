@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -98,14 +98,21 @@ weight = 1.0
 [[criterion]]
 id = "3.7"
 name = "disclosures_and_toasts_animate"
-description = "Evidence disclosures expand and collapse with an animated height transition and rotating chevron when clicked, and toasts after add finding, request revision, approve, and override slide in, remain readable, and auto-dismiss with a fade"
+description = "Evidence disclosures expand and collapse with an animated height transition and rotating chevron when clicked, and toasts after add finding, request revision, approve, override, bulk actions, and copy export slide in, remain readable, and auto-dismiss with a fade"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.8"
 name = "reduced_motion_respected"
-description = "With prefers-reduced-motion enabled, drawer, list, banner, bar, step, and toast animations are removed or reduced to instant state changes while every flow (triage, revision, approve, override, re-check) remains fully available"
+description = "With prefers-reduced-motion enabled, drawer, list, banner, bar, step, toast, palette, and bulk-bar animations are removed or reduced to instant state changes while every flow (triage, revision, approve, override, re-check, export, undo) remains fully available"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "palette_and_bulk_bar_animate"
+description = "Through the real keyboard shortcut, the command palette opens with a short opacity and scale transition of roughly 200 to 300 milliseconds; the bulk action bar appears and dismisses with a short eased height or fade rather than snapping when selection changes"
 type = "binary"
 weight = 1.0
 

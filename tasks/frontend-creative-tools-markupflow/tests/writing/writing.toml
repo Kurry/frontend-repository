@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.5
@@ -63,64 +63,64 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "15.1"
-name = "headings_use_consistent_capitalization"
-description = "Where the app renders headings and section titles, they use consistent capitalization (one convention — title case or sentence case — throughout)."
+name = "consistent_capitalization_chrome_and_panels"
+description = "Where the app renders header labels, tool-rail section titles (Shapes, Effects, Style), Layers / Saved projects / Collaboration headings, and buttons, they use one consistent capitalization convention throughout."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.2"
-name = "actions_use_specific_labels"
-description = "Where the app renders button or action labels, they are specific verbs ('Add expense', 'Start session'), not generic ('Submit', 'OK') when a specific label is possible."
+name = "specific_verbs_on_actions"
+description = "Where the app renders button or action labels, they use specific labels such as Export PNG, Try sample image, Choose image, Go offline, Go online, Reset workspace, Save, Open, Update, and Delete rather than generic Submit/OK when a specific label is possible."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.3"
-name = "errors_name_problem_and_fix"
-description = "Where the app renders error messages, they name the problem and the fix ('Amount must be a positive number'), not just a rejection ('Invalid')."
+name = "validation_names_problem_and_fix"
+description = "Where the app renders SavedProjectCreate/SnapshotCreate name validation, Import project field-contract errors, or Collaboration conflict messages, they name the problem and the way forward (name field / schemaVersion / geometry field / Keep local / Keep remote / Merge both), not only a bare rejection like 'Invalid'."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.4"
 name = "empty_states_explain_next_step"
-description = "Where the app renders empty states, the copy explains what belongs there and how to add it."
+description = "Where the app renders empty states, the drop zone names its two ways to load an image (Drop an image here / Choose image / Try sample image) and the empty Layers panel explains that annotations will appear there."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.5"
-name = "body_copy_is_well_written"
-description = "Where the app renders body or marketing copy, rate how free it is of spelling and grammatical errors."
+name = "studio_copy_polished"
+description = "Where the app renders workspace labels, empty-state copy, and Collaboration notes (Syncing..., pending-changes), rate how free the text is of spelling and grammatical errors."
 type = "likert"
 points = 5
 weight = 0.5
 
 [[criterion]]
 id = "15.6"
-name = "terminology_is_consistent"
-description = "Where the app renders labels for the same concept in multiple places, terminology is consistent (not 'task' here and 'todo' there)."
+name = "terminology_consistent_across_surfaces"
+description = "Where the app renders labels for the same concept in multiple places (Layers vs annotation, Saved projects vs project, edit/preview), terminology stays consistent rather than inventing conflicting names."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.7"
-name = "numbers_dates_and_units_are_consistent"
-description = "Where the app renders numbers, dates, and units, formatting is consistent (same date format, same decimal precision, units labeled)."
+name = "tool_and_style_labels_consistent"
+description = "Where the app renders tool names and style names (Rectangle, Oval, Plain, Bold caption, Thin/Medium/Thick), the same labels appear consistently on the tool rail, Layers type labels, and text style bar."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.8"
-name = "success_messages_are_specific"
-description = "Where the app renders confirmation and success messages, they state what happened ('Entry saved'), not vague affirmations."
+name = "success_or_status_messages_are_specific"
+description = "Where the app renders confirmation or status feedback (Collaboration Syncing... / pending-changes note, save success if shown), the copy states what is happening rather than a vague affirmation alone."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.n1"
-name = "placeholder_copy_is_visible"
+name = "placeholder_copy_visible"
 description = "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI."
 type = "binary"
 negate = true
@@ -128,32 +128,55 @@ weight = 0.5
 
 [[criterion]]
 id = "15.n2"
-name = "prominent_copy_has_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as headings, hero text, or primary buttons."
+name = "prominent_copy_has_spelling_errors"
+description = "Spelling or grammatical errors appear in prominent copy such as MarkupFlow, Export PNG, Try sample image, Drop an image here, Layers, Go offline, or Keep local / Keep remote / Merge both."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n3"
-name = "concept_names_are_inconsistent"
-description = "The same concept is named inconsistently across surfaces."
+name = "inconsistent_concept_naming"
+description = "The same annotation or project concept is named inconsistently across tool rail, Layers, Saved projects, and Collaboration in a way that would confuse a user."
 type = "binary"
 negate = true
 weight = 0.5
 
 [[criterion]]
 id = "15.n4"
-name = "copy_is_truncated_or_overflowing"
-description = "Truncated or overflowing text renders copy unreadable."
+name = "truncated_or_overflowing_labels"
+description = "Tool-rail section titles, validation messages, conflict choices, or primary button labels are truncated or overflowing so the copy is unreadable."
 type = "binary"
 negate = true
+weight = 0.5
+
+# HARDEN_MARKUPFLOW_V1
+
+[[criterion]]
+id = "15.9"
+name = "history_versions_empty_state_copy"
+description = "Where the app renders empty History and Versions panels, the copy explains how entries appear (actions / snapshots) rather than leaving a blank region"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.10"
+name = "specific_export_and_preset_verbs"
+description = "Where the app renders export and preset controls, labels use specific verbs/names such as Export project JSON, Import project, Copy project JSON, Save snapshot, Blur redaction, and Callout arrow rather than generic Submit/OK"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.11"
+name = "import_errors_name_offending_field"
+description = "Where the app renders an Import project rejection for a field-contract failure, the message names the offending field or rule (for example schemaVersion, imageDataUrl, strokeWidth, fontSize, width, or x2) rather than only a generic Import failed"
+type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "writing.catchall"
 name = "writing_catchall"
-description = "The app exhibits a significant, browser-observable defect in rendered copy quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app's rendered text exhibits a significant copy-quality defect not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

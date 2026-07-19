@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.5
@@ -64,64 +64,63 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "15.1"
 name = "headings_use_consistent_capitalization"
-description = "Where the app renders headings and section titles, they use consistent capitalization (one convention — title case or sentence case — throughout)."
+description = "Where the app renders headings, toolbar labels, and buttons, they use one consistent capitalization convention throughout"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.2"
 name = "actions_use_specific_labels"
-description = "Where the app renders button or action labels, they are specific verbs ('Add expense', 'Start session'), not generic ('Submit', 'OK') when a specific label is possible."
+description = "Where the app renders button or action labels, they are specific verbs — Add repository, Scan Now, Scan selected, Retry step, Export scan index, Import scan index, Copy, Download, Undo, Redo — rather than generic labels where a specific one is possible"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.3"
 name = "errors_name_problem_and_fix"
-description = "Where the app renders error messages, they name the problem and the fix ('Amount must be a positive number'), not just a rejection ('Invalid')."
+description = "Where the app renders validation or Import errors, messages name the field/problem and the fix rather than a generic failure string"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.4"
 name = "empty_states_explain_next_step"
-description = "Where the app renders empty states, the copy explains what belongs there and how to add it."
+description = "Where the app renders empty states for the repository list or document tree, copy explains what belongs there and how to add or scan"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.5"
 name = "body_copy_is_well_written"
-description = "Where the app renders body or marketing copy, rate how free it is of spelling and grammatical errors."
-type = "likert"
-points = 5
+description = "Where the app renders helper or status copy (scan rollups, timeline filters, export hints), the prose is clear and free of placeholder/lorem text"
+type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.6"
 name = "terminology_is_consistent"
-description = "Where the app renders labels for the same concept in multiple places, terminology is consistent (not 'task' here and 'todo' there)."
+description = "Where the app names repositories, documents, scans, and export, it uses one consistent term set rather than mixing synonyms for the same control"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.7"
 name = "numbers_dates_and_units_are_consistent"
-description = "Where the app renders numbers, dates, and units, formatting is consistent (same date format, same decimal precision, units labeled)."
+description = "Where the app renders document counts, files-scanned fractions, and last-scanned timestamps, number/date formatting is consistent across list, rollups, and export previews"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.8"
 name = "success_messages_are_specific"
-description = "Where the app renders confirmation and success messages, they state what happened ('Entry saved'), not vague affirmations."
+description = "Where the app renders copy/download/import success confirmations, they name the action completed rather than a vague OK"
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.n1"
 name = "placeholder_copy_is_visible"
-description = "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI."
+description = "Where the app renders UI copy, placeholder or lorem text is visible in the shipped scanner"
 type = "binary"
 negate = true
 weight = 0.5
@@ -129,7 +128,7 @@ weight = 0.5
 [[criterion]]
 id = "15.n2"
 name = "prominent_copy_has_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as headings, hero text, or primary buttons."
+description = "Where the app renders prominent headings or primary buttons, obvious spelling errors are present"
 type = "binary"
 negate = true
 weight = 0.5
@@ -137,7 +136,7 @@ weight = 0.5
 [[criterion]]
 id = "15.n3"
 name = "concept_names_are_inconsistent"
-description = "The same concept is named inconsistently across surfaces."
+description = "Where the app refers to the same control, labels flip between unrelated names across toolbar and empty states"
 type = "binary"
 negate = true
 weight = 0.5
@@ -145,7 +144,7 @@ weight = 0.5
 [[criterion]]
 id = "15.n4"
 name = "copy_is_truncated_or_overflowing"
-description = "Truncated or overflowing text renders copy unreadable."
+description = "Where the app renders button or empty-state copy, text is truncated mid-word or overflows its container unreadable"
 type = "binary"
 negate = true
 weight = 0.5
@@ -153,7 +152,7 @@ weight = 0.5
 [[criterion]]
 id = "writing.catchall"
 name = "writing_catchall"
-description = "The app exhibits a significant, browser-observable defect in rendered copy quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "Where the app renders user-visible copy, a significant writing defect is present that is NOT covered by any other criterion in this file. If present, name the defect and cite the concrete evidence. If already covered — even partially — by another criterion in this file, answer no here."
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5

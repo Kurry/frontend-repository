@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,170 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "For fidelity tasks, evaluate the reference's flows. Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "fresh_load_preloader_then_hero"
+description = "Loading /sprint/26 on a fresh visit shows the full-viewport black preloader with the white Novapay Sprint mark and a progress bar filling toward 100 percent; the loader then exits upward and reveals the pinned 3D hero with the SPRINT 26 billboard and SCROLL TO SEE 100+ UPDATES pill."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "scroll_scrubs_hero_then_releases"
+description = "After the preloader exits: scrolling down scrubs the 3D hero camera through the scene while the billboard and pill stay overlaid; once the scroll-linked sequence completes, the hero releases and the first stacked section scrolls into view with the scroll-spy highlighting 01.AGENTIC STACK."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "reload_restarts_preloader_at_top"
+description = "Reloading the page from any scroll depth returns to the top and restarts the preloader-then-hero sequence from the beginning; no prior scroll position, active nav cell, or modal state survives the reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "nav_click_scrolls_payment_gateway"
+description = "From the hero at desktop width: clicking 03.PAYMENT GATEWAY scrolls the payment-gateway section into view on the same document, that nav cell shows the click-active blue and is marked active, and the section's index numeral, executive block, and card grid are visible."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "scroll_spy_moves_to_d2c"
+description = "After navigating to Payment Gateway: continuing to scroll manually into the D2C section moves the scroll-spy highlight from 03.PAYMENT GATEWAY to 04.D2C without any click."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "wordmark_returns_to_hero"
+description = "From a mid-page section: clicking the Novapay wordmark in the segment nav returns the page to the hero (#Hero) on the same document without loading a different HTML page."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "video_modal_opens_locks_scroll"
+description = "In any stacked section: clicking the executive play control opens a full-viewport video modal that plays that section's local VP9 WebM; while open, the page behind cannot be scrolled and the segment-nav active state is unchanged."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "video_modal_close_unlocks_same_section"
+description = "Closing the open video modal via its close control stops playback, unlocks body scrolling, and leaves the page at the same section so the scroll-spy highlight is unchanged."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "mobile_menu_lists_roman_sections"
+description = "At a viewport narrower than 768px: the desktop segment nav is gone and a hamburger is present; opening it lists I.AGENTIC STACK through VI.BUSINESS BANKING."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "mobile_menu_marketing_scrolls_closes"
+description = "Below 768px: choosing V.MARKETING from the open hamburger menu closes the menu and scrolls the Marketing section into view on the same document."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "primary_nav_or_hero_flow_unavailable"
+description = "The preloader-then-hero reveal cannot complete, or the six segment-nav labels cannot scroll their matching in-page sections from the visible UI."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "nav_click_loads_different_page"
+description = "Clicking a segment-nav label or the wordmark navigates to a different HTML page or client route instead of scrolling within /sprint/26."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "scroll_spy_and_click_active_desync"
+description = "After clicking a nav label or scrolling into a section, the marked-active nav cell disagrees with the section in view (click-active and scroll-spy state desync)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "video_modal_leaves_scroll_locked"
+description = "After closing the video modal, body scroll stays locked or the video keeps playing in the background."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "mobile_menu_dead_end"
+description = "Below 768px the hamburger opens but choosing a section leaves the menu stuck open or fails to scroll, requiring a reload to recover."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "video_modal_no_exit"
+description = "The video modal opens but offers no operable close control, blocking navigation with no exit path."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "flow_dead_end_requires_reload"
+description = "After opening the video modal, using segment nav, or opening the mobile menu, recovering normal page interaction requires a full page reload."
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "6.20"
+name = "shortlist_compare_flow"
+description = "Pin Voice Payments then Quick Buy 2.0 (count 2, both names listed); add Biometric Card Authentication to compare; unpin Voice Payments — count returns to 1 and that name disappears from the tray and both brief preview tabs without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.21"
+name = "sprint_brief_export_flow"
+description = "After shortlist/compare/filter/search/watch mutations, open Export sprint brief; JSON matches the Sprint launch brief field contract with brand Novapay, event Sprint 26, matching shortlistedFeatures, compareFeatures, themeFilter, searchQuery, watchedExecutives, and ISO-8601 UTC generatedAt ending in Z; Download offers novapay-sprint-26-brief.json; Copy shows Copied; Markdown shows the same facts under Shortlisted launches, Compare set, Theme filter, Search, and Watched executives."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.22"
+name = "import_round_trip_flow"
+description = "With a non-empty shortlist, compare set, and Watch log entry, Download JSON, clear both trays and the Watch log, then Import that file; Shortlist tray, Compare tray, Watch log, pinned marks, and both preview tabs match the exported session again; a follow-up Import of themeFilter NotATheme, four compareFeatures, or a catalog-illegal shortlistedFeatures name keeps trays and Watch log unchanged and shows a named-field import error."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.23"
+name = "command_palette_flow"
+description = "Press Ctrl+K, type Payment, choose Jump to Payment Gateway; palette closes and payment-gateway is in view with its nav cell active; reopen palette and choose Open sprint brief to open the brief panel."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.24"
+name = "undo_flow"
+description = "Pin Voice Payments, then Undo — Shortlist count returns to 0, pin clears, brief shortlistedFeatures is []; Redo restores the pin and preview together."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n20"
+name = "brief_export_dead_end"
+description = "Export sprint brief opens but Download/Copy are missing or inert, leaving no way to obtain the session artifact without a reload."
 type = "binary"
 negate = true
 weight = 1.0

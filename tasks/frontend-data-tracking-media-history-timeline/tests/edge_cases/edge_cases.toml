@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,70 +63,112 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "4.1"
 name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+description = "Empty state UI is present and renders when filters match nothing or all user-managed events are deleted, with a message and a reset/create control"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
 name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+description = "Inline validation appears on create/edit before submit for empty title, place, summary, detail, missing categories, and invalid year, naming each field"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
 name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+description = "Error messages name the field and the fix rather than only saying Invalid"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
 name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+description = "Success or confirmation feedback appears after actions such as Copy (Copied) or completed import"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
 name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+description = "Where import or export compilation takes noticeable time, a loading or regenerating indication is visible; otherwise rapid preview updates still leave the UI responsive"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
 name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+description = "Undo is available after create/edit/delete/bulk mutations, and bulk Delete requires an explicit confirm step"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
 name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+description = "About/help overlay or tooltips explain scrubbing, filtering, or export for non-obvious controls"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
 name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+description = "Buttons, inputs, and labels use semantic tags for chrome, forms, and bulk actions"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
 name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+description = "Modal/drawer close controls and Escape both close About, Filters, and Export overlays"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
 name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+description = "Export drawer tab switches and import paste/validate provide visible progress or immediate preview feedback"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "scrubber_handles_cannot_cross"
+description = "Dragging one scrubber handle into the other stops at the minimum gap and the range readout never shows an inverted range"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "year_out_of_bounds_rejected"
+description = "A year below -3200 or above 2024 is rejected with an inline error naming year and does not change the collection"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "bulk_with_none_checked_is_noop"
+description = "Bulk Set category and bulk Delete with no rows checked perform no destructive change"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "malformed_import_rejected"
+description = "Importing malformed JSON or a pack missing required keys/fields shows an inline error naming the import field and leaves collection, filters, and stage unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "undo_redo_noop_when_empty"
+description = "Undo with nothing to undo and Redo with nothing to redo leave the collection unchanged; controls show disabled treatment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "empty_export_still_valid_shape"
+description = "With an empty user-managed set (or empty collection where allowed), Export still produces JSON with version 1, live yearWindow/filters, events covering remaining rows or empty, and totals that match; Copy still shows Copied"
 type = "binary"
 weight = 1.0
 
@@ -135,85 +177,101 @@ id = "4.n1"
 name = "empty_collection_has_no_feedback"
 description = "An empty collection shows nothing and provides no UI feedback."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n2"
 name = "errors_only_reach_console"
 description = "Errors are surfaced only in the browser console."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n3"
 name = "actions_lack_visible_feedback"
 description = "Actions lack visible feedback and silently succeed or fail."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n4"
 name = "destructive_actions_lack_warning"
 description = "Destructive actions have no warnings."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n5"
 name = "interactive_elements_use_nonsemantic_tags"
 description = "Non-semantic div or span tags wrap interactive elements."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n6"
 name = "modal_not_keyboard_dismissible"
 description = "Modal overlays cannot be dismissed via keyboard."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n7"
 name = "validation_feedback_missing_or_delayed"
 description = "Validation feedback is missing or delayed with no UI indication."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n8"
 name = "button_text_ambiguous_or_missing"
 description = "Button text is ambiguous or missing."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n9"
 name = "non_obvious_flows_lack_guidance"
 description = "Non-obvious flows have no in-app guidance at all."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n10"
 name = "affordances_hidden_or_inaccessible"
 description = "Interactive affordances are visually hidden or inaccessible."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.n11"
+name = "inverted_scrubber_range_shown"
+description = "The year-range readout shows an inverted from/to range after dragging scrubber handles."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.n12"
+name = "malformed_import_applies_partially"
+description = "A malformed import partially applies some fields while leaving others stale, without a blocking error."
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"
 description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true

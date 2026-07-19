@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,158 +62,216 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "zero_overrides_empty_state_visible"
+description = 'With zero overrides, the generated-config panel shows the empty-state comment line "# No changes to the default config yet", the override count reads zero, and Copy, Download, and Reset all are disabled and read as non-interactive.'
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "invalid_setting_inline_validation"
+description = "Typing an invalid value into a validated setting control shows an inline message naming that setting next to the control, and no malformed line is emitted into the generated configuration while the value is invalid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "validation_names_setting_and_range"
+description = 'Validation messages name the setting and the accepted range or format rather than only saying "Invalid".'
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "copy_download_reset_show_toast_feedback"
+description = "After Copy, Download, or Reset all (when enabled), transient toast feedback appears with visible confirmation of the action."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "font_size_clamped_to_4_60"
+description = "The font-size control cannot produce a value outside 4 to 60: dragging stops at the bounds, and a typed out-of-range value is rejected or clamped with the shown value staying inside the range."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "single_reset_preserves_unrelated_overrides"
+description = "Deleting or resetting one override removes exactly that override; every unrelated override keeps its generated line and value, and the override count decreases by exactly one."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "section_notes_guide_settings"
+description = "Grouped settings sections include short notes that explain what a setting does, so non-obvious terminal options have in-app guidance."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "export_and_setting_controls_semantic"
+description = "Export actions and setting editors use semantic button/input/label elements rather than unlabeled decorative wrappers."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "toast_feedback_dismisses"
+description = "Toast feedback for Copy/Download/Reset enters, stays readable, and dismisses with a fade without permanently blocking the editor."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "successive_font_family_no_duplicate_lines"
+description = "Entering two different font-family values in succession leaves the generated line following the latest value, with no duplicate font-family lines in the output."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "empty_overrides_show_nothing"
+description = "With zero overrides, the generated-config panel shows nothing — no empty-state comment and no zero override count."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "validation_errors_only_in_console"
+description = "Invalid setting values surface only in the browser console with no visible inline field feedback."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "copy_or_reset_silent_no_feedback"
+description = "Activating Copy, Download, or Reset all produces no visible toast or confirmation feedback."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "reset_all_clears_without_clear_affordance"
+description = "Reset all proceeds with blank or ambiguous labeling that fails to identify the destructive clear-all action."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "interactive_controls_are_nonsemantic"
+description = "Primary interactive controls (sidebar categories, switches, export actions) are non-semantic div/span click targets without button/role semantics."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "toast_blocks_editor_with_no_exit"
+description = "Toast or overlay feedback for export actions blocks the editor with no dismiss path."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "font_size_accepts_out_of_range"
+description = "The font-size control accepts and commits a value outside 4 to 60 into the generated configuration."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "ambiguous_or_missing_export_labels"
+description = 'Copy, Download, or Reset all show blank, placeholder, or ambiguous labels such as "Submit", "OK", or "Button" instead of naming the action.'
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "no_in_app_setting_guidance"
+description = "Grouped settings sections have no notes or guidance text explaining what settings do."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "disabled_exports_still_look_active"
+description = "With zero overrides, Copy, Download, or Reset all still look fully interactive and invite clicks despite being disabled."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.11"
+name = "malformed_import_rejected"
+description = "Importing malformed config text (lines that are not comments and not valid key = value) shows a visible parse error naming the problem, applies no overrides, and leaves the override count unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "empty_undo_redo_disabled"
+description = "Undo with an empty history and Redo with an empty redo stack are disabled, not silent no-ops."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "empty_profile_name_rejected"
+description = "Saving a profile with an empty or whitespace-only name creates no profile and shows validation naming the name field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "diff_zero_overrides_no_differences"
+description = "Opening Diff with zero overrides shows a no-differences state rather than a blank or broken panel."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "empty_search_filter_state"
+description = "A settings search that matches nothing shows an empty filter state; clearing the query restores the full category form."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "malformed_import_mutates_state"
+description = "A malformed Import applies partial or corrupted overrides, or changes the override count, despite the parse failure."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.16"
+name = "field_contract_violations_rejected"
+description = "Importing or committing a value that violates the Ghostty field contract — font-size outside 4 to 60, cursor-style outside block/bar/underline/block_hollow, a color that is not #RRGGBB, an opacity outside 0 to 1, clipboard outside ask/allow/deny, copy-on-select outside true/false/clipboard, window-decoration outside auto/none/client/server, theme outside the declared set, a palette index outside 0 to 255, empty font-family, or an empty profile-name — shows inline validation naming the field, does not emit that malformed override into the generated configuration, and on Import leaves existing overrides and the override count unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n12"
+name = "out_of_contract_value_emitted"
+description = "An out-of-bound or out-of-enum setting value is committed into the generated configuration without inline validation naming the field, or Import of a contract-invalid payload partially mutates overrides."
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"
 description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true

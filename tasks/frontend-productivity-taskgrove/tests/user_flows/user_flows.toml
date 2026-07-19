@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,78 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "create_root_appears_in_tree_and_export"
+description = "Create flow: submitting a valid New root task title adds exactly one root to the main tree, clears the empty-state message, shows a toast, and includes that title in the Export grove JSON preview."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
 name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+description = "Create flow: blank title on New root task or Add Child, or blank/duplicate tag name, triggers immediate inline validation naming the offending field and adds nothing."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "add_child_updates_ring_and_export"
+description = "Nesting flow: adding two children under a root shows both indented, grows a 0 percent progress ring on the parent, and lists both child titles under that parent in the Export grove JSON."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "archive_restore_updates_all_surfaces"
+description = "Archive flow: archiving a fully-complete branch removes it from the main tree and adds it to the Archive panel; Restore returns it as a top-level root with structure and tags intact and removes the archive entry."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "zoom_retains_branch_state"
+description = "Zoom flow: Zoom In hides everything outside the branch and shows breadcrumbs; adding a child while zoomed keeps the new node after zooming back out via breadcrumb."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "empty_tree_message_after_clear"
+description = "Edge: when the main tree has no roots, the empty-state message inviting the first root task is clear and visible."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "tag_filter_updates_tree_everywhere"
+description = "Filter flow: toggling a toolbar tag filter chip narrows the tree to matching branches with ancestors auto-expanded, and toggling it off restores the full tree."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "tag_manager_panel_preserves_workflow"
+description = "Tag manager panel can be opened and closed while the tree, filters, and Export grove preview remain coherent with the same tag list."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "move_to_picker_and_grove_panel_flows"
+description = "Move To picker and Grove package panel open, complete their action (reparent or Download/Copy/Import), and dismiss without trapping the user."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "grove_import_recovers_session_without_reload"
+description = "Recovery: after mutating away from an exported grove, Import of that package restores tree, tags, theme, and Export grove preview without requiring a full page reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
 name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+description = "New root task, Add Child, Tag manager create, Export grove, or Import grove are not enabled from the UI."
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n2"
 name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+description = "A valid created task or tag fails to show up in the tree/Tag manager or appears duplicated."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,23 +149,23 @@ weight = 1.0
 [[criterion]]
 id = "6.n3"
 name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+description = "A tag or task title appears in the tree but not in the Export grove JSON, or the reverse, without reload."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "zoom_breaks_or_loses_branch"
+description = "Zoom In breaks layout or loses the zoomed branch's children after zooming back out."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_tree_breaks_ui"
+description = "An empty main tree produces broken or missing UI instead of the empty-state message."
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,15 +173,15 @@ weight = 1.0
 [[criterion]]
 id = "6.n6"
 name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+description = "Tag-filtered tree visibility disagrees with which nodes actually carry the active tag."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "tag_manager_cannot_reopen"
+description = "After closing the Tag manager panel it cannot be re-opened."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n8"
 name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+description = "Move To picker or Grove package panel blocks navigation with no exit option."
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +197,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n9"
 name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+description = "A failed create or Import grove provides no user feedback naming the problem."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +205,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n10"
 name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+description = "Zoom, Move To, or Grove package panel leaves a dead end that requires reload for recovery."
 type = "binary"
 negate = true
 weight = 1.0

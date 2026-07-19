@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -182,7 +182,7 @@ weight = 1.0
 [[criterion]]
 id = "1.24"
 name = "invalid_submit_blocks_and_names_fields"
-description = "Submitting the add/edit expense form with an empty or non-positive amount, a missing date, or no category shows visible validation feedback and adds or changes no row"
+description = "Submitting the add/edit expense form with an empty or non-positive amount, a missing or non-YYYY-MM-DD date, or no category shows visible validation feedback naming each invalid field under the expense field contract and adds or changes no row"
 type = "binary"
 weight = 1.0
 
@@ -295,6 +295,78 @@ name = "last_delete_empties_category_not_list"
 description = "Deleting the last expense in a category drops that category's spent amount to zero — its progress bar empties and its chart segment disappears — while the category itself remains listed on the Dashboard and in the filter"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "valid_expense_matches_field_contract"
+description = "After submitting a valid add-expense dialog (positive value, YYYY-MM-DD date, existing category, counterparty at most 80 characters), the new Expenses row shows those submitted date, counterparty, category, and value fields — the created record matches the expense field contract"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "budget_document_export_shows_contract_keys"
+description = "Opening Export JSON shows a single BudgetDocument object whose visible preview text includes the required field contract keys displayName, activePeriod (with month and year), categories (each with id, name, maxExpenses), and expenses (each with id, value, datetime, categoryId, counterparty, and period)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "csv_export_header_and_session_row"
+description = "Opening Export CSV shows a header line Date, Counterparty, Category, Value, Period and, after adding a valid expense, a data line that contains that expense's YYYY-MM-DD date, counterparty, category name, and value"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "export_copy_and_download_available"
+description = "Export offers CSV and JSON formats each with Copy (clipboard write plus brief confirmation) and Download (real file whose contents match the preview)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "import_json_round_trip_restores_state"
+description = "After adding one expense and renaming one category, exporting BudgetDocument JSON then changing the display name and deleting one expense, then Import JSON of the earlier document restores the exported display name, deleted expense row, category limits, and Dashboard totals without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "bulk_categorize_and_bulk_delete"
+description = "Selecting at least two expense rows reveals a bulk action tray with Bulk categorize and Bulk delete; Bulk categorize reassigns every selected row to the chosen category and recomputes Dashboard totals; Bulk delete removes every selected row and lowers those categories' spent amounts by exactly the deleted totals"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "undo_redo_expense_mutations"
+description = "After deleting one expense, Undo restores that exact row and every Dashboard total that changed, and Redo removes it again; Undo and Redo stay disabled when their stacks are empty and become enabled after a reversible mutation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "over_budget_row_distinct_treatment"
+description = "Any category whose spent amount exceeds its budget limit shows a distinct over-budget treatment on its Dashboard row (label or border distinct from under-budget rows) that updates live when spent crosses the limit"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n40"
+name = "export_omits_session_expense_or_contract_keys"
+description = "After adding a valid expense, an open CSV or JSON export preview omits that expense's contracted fields, or the JSON preview lacks required BudgetDocument keys displayName, activePeriod, categories, or expenses"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n41"
+name = "import_accepts_contract_invalid_budget_document"
+description = "Import JSON accepts a parseable document that violates the BudgetDocument field contract (missing required keys, activePeriod.month outside 1–12, expense value not greater than 0, datetime not YYYY-MM-DD, or unknown categoryId) and still mutates expenses, categories, or totals"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.catchall"

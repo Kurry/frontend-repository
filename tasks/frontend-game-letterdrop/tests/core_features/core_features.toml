@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -140,7 +140,7 @@ weight = 1.0
 [[criterion]]
 id = "1.12"
 name = "history_list_and_empty_state"
-description = "After finishing a run, the History tab lists that run most-recent-first with its score, tiles-cleared count and duration, and before any run finishes History shows a friendly empty-state message."
+description = "After finishing a run, the History tab lists that game-result most-recent-first with score, tilesCleared, durationSec, playerName, tierReached, and endedAt visible, and before any run finishes History shows a friendly empty-state message."
 type = "binary"
 weight = 1.0
 
@@ -177,8 +177,7 @@ id = "1.29"
 name = "best_score_display_updates"
 description = "Best Score is displayed at all times and updates only when a run's final score beats the previous best."
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "1.30"
@@ -199,49 +198,49 @@ negate = true
 [[criterion]]
 id = "1.32"
 name = "settings_form_inline_validation"
-description = "The Settings control opens a form with a required player name field (2 to 20 characters) and a starting tier select (Tier 1, 2, or 3); typing a one-character name shows an inline message directly under the name field naming the field and the length rule before any submit, Save stays disabled while invalid, and correcting the name clears the message and enables Save."
+description = "The Settings control opens a form whose fields match the settings request body: playerName (required, 2 to 20 characters) and startingTier (enum 1, 2, or 3 shown as Tier 1/2/3); typing a one-character playerName shows an inline message under the field naming playerName and the 2-to-20 length rule before any submit, Save stays disabled while invalid, and correcting the name clears the message and enables Save."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.33"
 name = "settings_save_applies_name_and_tier"
-description = "Saving valid settings closes the form; each Match History entry recorded afterwards shows the saved player name, and a run started afterwards begins at the chosen starting tier shown in the tier readout."
+description = "Saving valid settings closes the form; each Match History game-result recorded afterwards shows the saved playerName, and a run started afterwards begins at the chosen startingTier shown in the tier readout."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.34"
-name = "full_run_round_trip_flow"
-description = "Scripted flow without reload until the final step: press Start game, submit one valid word and confirm the HUD score rises and the streak meter increments, let a tile cross the danger line and confirm Game Over shows that run's final score, switch to the History tab and confirm exactly one new top entry listing the same final score, tiles-cleared count and duration, confirm the Best Score readout shows the new value if it was beaten, then reload the page and confirm the History entry and Best Score are still present."
+name = "history_entry_fields_after_game_over"
+description = "After a danger-line Game Over, the History tab shows a new top game-result whose score matches the Game Over final score and that also lists tilesCleared, durationSec, playerName, tierReached, and endedAt."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.35"
-name = "achievement_unlock_echo_flow"
-description = "Scripted flow: fully clear the board during a run and confirm the Board Cleared! confirmation plus an unlock toast appear at the moment of the clear, switch to the Achievements tab and confirm Clean Sweep flipped from locked to unlocked in full color without a reload, then reload the page and confirm Clean Sweep remains unlocked."
+name = "clean_sweep_unlocks_on_board_clear"
+description = "Fully clearing the board shows Board Cleared! and unlocks Clean Sweep on the Achievements tab (full color) with an unlock confirmation at the moment of the clear."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.36"
-name = "streak_build_and_reset_flow"
-description = "Scripted flow: three consecutive valid submissions show the streak meter at 3 and a multiplier badge next to the score; one invalid submission then resets the meter to zero and removes the badge, and the next valid word scores without the streak multiplier."
+name = "streak_threshold_three_and_reset"
+description = "Three consecutive valid submissions show the streak meter at 3 with a multiplier badge; an invalid submission clears the badge and returns the meter to zero."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.37"
-name = "settings_name_history_round_trip"
-description = "Scripted flow: with at least one prior History entry recorded, save a new player name in the settings form, finish a run, and open the History tab; the new entry carries the new name while entries recorded before the change keep their original name."
+name = "settings_name_on_new_history_only"
+description = "After saving a new playerName, a newly finished run's History game-result shows that playerName while earlier History entries keep their original playerName values."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.38"
-name = "pause_integrity_flow"
-description = "Scripted flow: pausing mid-run freezes the timer value and all tile positions; resuming continues the timer from the frozen value and the tiles from the frozen positions, and the score is unchanged by the pause itself."
+name = "pause_does_not_change_score"
+description = "Pausing and resuming mid-run leaves the HUD score unchanged by the pause itself while timer and tiles freeze for the pause duration."
 type = "binary"
 weight = 1.0
 
@@ -282,10 +281,85 @@ description = "The bundled word list accepts everyday short words: submitting a 
 type = "binary"
 weight = 0.5
 
+
 [[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in its core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+id = "1.44"
+name = "export_run_json_contains_session_play"
+description = "After Game Over on a run that scored at least one valid word, Export Run produces downloadable or copyable JSON whose top-level game-result includes format letterdrop-game-v1, schemaVersion 1, that run's actual score, tilesCleared, durationSec, playerName, tierReached, endedAt, result game_over, and a words array listing each submitted word with its points — compiled from the session, not a blank stub."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "export_history_archive_lists_runs"
+description = "With at least one finished run in Match History, Export History downloads or copies a run-history JSON with format letterdrop-history-v1, schemaVersion 1, and a runs array that includes that run's score, tilesCleared, durationSec, playerName, tierReached, endedAt, and words."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "save_progress_checkpoint"
+description = "During an active or paused run after at least one valid word, Save Progress shows a Saved confirmation and writes a letterdrop-checkpoint-v1 payload (format, schemaVersion 1, score, streak, tier, trayLetters, tiles, durationSec, playerName, startingTier); after a full page reload, Resume Saved Run restores the same score, tray, streak, tier, and tile layout."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "import_run_json_appends_history"
+description = "Importing a previously exported run-json appends a Match History game-result whose score, tilesCleared, durationSec, playerName, tierReached, endedAt, and words match the imported record."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "play_again_clean_restart"
+description = "From Game Over, Play again starts a fresh falling-tile run with score and streak reset for the new run while prior History entries and Best Score remain listed."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "game_result_field_contract_visible"
+description = "After a finished run, the History row and Export Run preview both expose the required game-result field names format, schemaVersion, score, tilesCleared, durationSec, playerName, tierReached, endedAt, result, and words (with word and points on each words entry)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "settings_payload_field_contract"
+description = "Saving settings with a valid playerName (2 to 20 chars) and startingTier (1, 2, or 3) produces a settings record that carries exactly those two fields; invalid playerName length keeps Save disabled with an inline message naming playerName and the 2-to-20 rule."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n49"
+name = "export_omits_session_words_or_score"
+description = "Export Run JSON omits required game-result fields (format, schemaVersion, score, tilesCleared, durationSec, playerName, tierReached, endedAt, result, or words) for the finished run, or shows hardcoded placeholder values unrelated to that run."
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "1.n50"
+name = "resume_starts_empty_instead_of_checkpoint"
+description = "After Save Progress and a full page reload, Resume Saved Run starts an empty new run instead of restoring the saved score, tray, streak, tier, and tiles."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n51"
+name = "import_accepts_wrong_format_literal"
+description = "Import accepts a JSON payload whose format is not letterdrop-game-v1 or letterdrop-history-v1 (or whose schemaVersion is not 1) without a visible rejection, mutating History as if valid."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "A specified core behavior is broken or missing in a way not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot). If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true
+

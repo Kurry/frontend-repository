@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -91,7 +91,7 @@ weight = 1.0
 [[criterion]]
 id = "1.5"
 name = "rename_updates_all_surfaces"
-description = "After renaming the selected custom theme to 'Evening Tide', that name replaces the old name in My themes, the editor, and exported CSS without reload"
+description = "After renaming the selected custom theme to 'Evening Tide', that name replaces the old name in My themes, the editor, and every Export format preview (CSS, Theme JSON, theme-extension) without reload"
 type = "binary"
 weight = 1.0
 
@@ -112,7 +112,7 @@ weight = 1.0
 [[criterion]]
 id = "1.8"
 name = "invalid_theme_name_validation"
-description = "Submitting theme creation with an empty and then a whitespace-only name leaves the custom-theme count unchanged both times and shows visible inline validation feedback at the name field"
+description = "Submitting theme creation with an empty name, a whitespace-only name, and a name that violates the Theme JSON name contract (over 64 characters or illegal characters) leaves the custom-theme count unchanged each time and shows visible inline validation feedback naming the name field"
 type = "binary"
 weight = 1.0
 
@@ -146,8 +146,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.14"
-name = "css_export_copy_and_dismiss"
-description = "Opening CSS export shows a [data-theme=\"name\"] CSS block containing the active values; Copy writes that block to the clipboard and confirms the copy, and each of Close, backdrop click, and Escape can dismiss a freshly opened modal"
+name = "export_formats_copy_download_dismiss"
+description = "Opening Export shows CSS, Theme JSON, and theme-extension tabs regenerated from the active theme (Theme JSON showing the API-shaped field contract keys); each tab's Copy writes that format's text with confirmation, Download triggers a real file whose contents match the preview, and Close, backdrop, or Escape dismiss the modal"
 type = "binary"
 weight = 1.0
 
@@ -219,7 +219,7 @@ weight = 1.0
 [[criterion]]
 id = "1.24"
 name = "create_edit_preview_export_flow"
-description = "Starting from the initial My themes count: create 'Harbor Dawn', change its primary color and box radius, switch to Color Palette, then open CSS export; the count is exactly one higher, the selected row swatches, editor values, 16-swatch palette, preview styling, and exported CSS all show the same changed theme without reload"
+description = "Starting from the initial My themes count: create 'Harbor Dawn', change its primary color and box radius, switch to Color Palette, then open Export; the count is exactly one higher, and the selected row swatches, editor values, 16-swatch palette, preview styling, Contrast primary pair, and all three Export format previews show the same changed theme without reload"
 type = "binary"
 weight = 1.0
 
@@ -264,6 +264,108 @@ id = "1.30"
 name = "rapid_random_stays_coherent"
 description = "After clicking Random five or more times in quick succession, exactly one coherent token set remains applied: the editor color rows, live preview, and Color Palette tab values all agree with each other"
 type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "undo_redo_token_and_duplicate"
+description = "After editing a custom theme's primary color, Undo restores the previous primary in editor, list swatch, preview, Contrast, and Export; Redo reapplies it. After Duplicate adds exactly one matching custom theme, Undo removes that duplicate and restores prior selection"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "contrast_matrix_live_aa_aaa"
+description = "The Contrast panel lists every face/content pair from the 11 Change Colors rows with a live numeric ratio plus AA and AAA pass/fail badges; changing a face or content color immediately updates that pair's ratio and badges, and failing pairs show a distinct warning treatment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "snapshots_and_before_after"
+description = "Save snapshot with a valid name adds a Snapshots row; restoring it writes those tokens into editor and preview; after further edits, Before / After flips the preview between the snapshot tokens and the live edits without losing either set"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "vision_mode_filters_preview_only"
+description = "Choosing Deuteranopia on the preview vision-mode control applies a client-side color-vision simulation to the preview pane while editor swatches stay unfiltered; choosing None clears the simulation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "import_theme_json_round_trip"
+description = "After editing tokens and downloading Theme JSON from Export, Import of that same document reconstructs the same name and tokens in editor, My themes swatches, preview, Contrast, and all three Export format previews"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "duplicate_custom_theme"
+description = "With a custom theme active, Duplicate adds exactly one new My themes row whose tokens match the source, selects the duplicate, and leaves the source row intact"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "theme_json_api_shaped_field_contract"
+description = "The Theme JSON export preview is a single object whose visible text includes the required field contract: name; color-scheme exactly light or dark; the twenty --color-* keys each valued as oklch(...) or #RRGGBB; --radius-box/--radius-field/--radius-selector each from the closed rem enum; --size-field/--size-selector each from the closed size-step enum; --border from the four-width enum; and --depth/--noise each 0 or 1"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "created_theme_record_matches_theme_json"
+description = "After creating or renaming a custom theme and editing its tokens through the form controls, the Theme JSON preview for that theme shows the same name, color-scheme, and token field names/values the create/rename/token forms produced — the created record is the would-be request body / export payload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "snapshot_field_contract_name_and_theme"
+description = "Save snapshot with a valid name adds a Snapshots row whose restored theme matches the Theme JSON field contract (name, color-scheme, --color-* in oklch/#RRGGBB, closed radius/size/border/depth/noise); empty or over-length snapshot names show validation naming the name field and add nothing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "color_scheme_cross_field_with_dark_option"
+description = "With Dark color scheme checked, Theme JSON shows color-scheme dark; unchecking it updates color-scheme to light in the export preview without reload — the cross-field rule between the option and the payload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n31"
+name = "export_omits_session_mutations"
+description = "After editing primary color and box radius on the active theme, an open Export format preview (CSS, Theme JSON, or theme-extension) omits those edited values"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n32"
+name = "undo_fails_to_restore_tokens"
+description = "After a primary-color edit, Undo leaves editor, preview, Contrast, or Export still showing the edited color instead of restoring the prior value"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n33"
+name = "theme_json_missing_required_contract_keys"
+description = "An open Theme JSON export preview omits required contract keys (name, color-scheme, a required --color-* key, radius/size/border, or depth/noise), shows a --color-* value that is neither oklch(...) nor #RRGGBB, or shows color-scheme / radius / size / border / depth / noise values outside their closed enums"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n34"
+name = "cross_field_color_scheme_disagrees"
+description = "After toggling Dark color scheme, the Theme JSON color-scheme field stays on the previous light|dark value, disagreeing with the editor option"
+type = "binary"
+negate = true
 weight = 1.0
 
 [[criterion]]

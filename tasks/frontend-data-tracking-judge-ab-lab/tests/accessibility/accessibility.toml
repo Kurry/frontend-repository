@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,14 +63,14 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+description = "Every interactive control — nav items, chips, label pickers, flip expanders, attribution/rescore/saved-pair fields, Export, Import, Undo/Redo, legend toggles, and command palette results — is keyboard accessible with Tab, Shift+Tab, Enter, or Space and a visible focus indicator."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
 name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+description = "The command palette and export panel trap focus while open, close on Escape, and return focus to the control that opened them."
 type = "binary"
 weight = 1.0
 
@@ -84,14 +84,14 @@ weight = 1.0
 [[criterion]]
 id = "1.4"
 name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+description = "Completing a rescore run and saving an attribution are announced through an aria-live region as well as shown visually."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
 name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+description = "Rescore, attribution, and saved-pair form fields have visible labels, and each validation message names the field it belongs to."
 type = "binary"
 weight = 1.0
 

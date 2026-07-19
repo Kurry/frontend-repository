@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -186,6 +186,21 @@ description = "During load and a full exercise of the app, devtools shows outbou
 type = "binary"
 weight = 1.0
 negate = true
+
+
+[[criterion]]
+id = "2.18"
+name = "forms_and_package_share_field_contracts"
+description = "Create workspace, Add bookmark, folder create, SideDock package export preview, and SideDock package import all enforce the same observable field contracts: http/https url, title at most 120 characters, workspace name 1–40 characters, accentColor from the nine closed hex swatches, pinnedBookmarkIds length at most 8, and schemaVersion sidedock-package-v1"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.19"
+name = "package_import_rejects_without_partial_mutation"
+description = "Importing a SideDock package payload that violates the field contract does not partially mutate workspaces or pins; the prior session remains visible and an inline import error names the offending field or rule"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "2.catchall"

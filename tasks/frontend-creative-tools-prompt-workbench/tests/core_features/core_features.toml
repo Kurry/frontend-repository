@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -84,7 +84,7 @@ weight = 1.0
 [[criterion]]
 id = "1.4"
 name = "insert_variable_popover_validation"
-description = "Clicking Insert Variable opens a popover whose confirm control stays disabled until the name field contains only letters, digits, and underscores; entering an invalid name (e.g. 'my var!') shows an inline message naming the field and the allowed format, and confirming a valid name inserts the double-brace placeholder at the cursor position and closes the popover"
+description = "Clicking Insert Variable opens a popover whose confirm control stays disabled until the VariableInsert name field is 1 to 64 characters of letters, digits, and underscores only; entering an invalid name (e.g. 'my var!' or longer than 64 characters) shows an inline message naming the name field and the allowed format, and confirming a valid name inserts the double-brace placeholder at the cursor position and closes the popover"
 type = "binary"
 weight = 1.0
 
@@ -154,7 +154,7 @@ weight = 1.0
 [[criterion]]
 id = "1.14"
 name = "save_modal_validation_and_toast"
-description = "Clicking Save opens a modal whose confirm control stays disabled until the required title and technique tag are valid; submitting an invalid state shows inline messages naming the field and the fix, and confirming a valid save adds the prompt to the library and shows a success toast"
+description = "Clicking Save opens a modal that submits a LibraryPrompt create payload: confirm stays disabled until title (1 to 80 characters, unique) and technique (exactly one of zero-shot, few-shot, chain-of-thought, role-prompt, extraction, summarization) are valid; invalid title or technique shows inline messages naming that field and the fix, and confirming a valid save adds one library row whose visible title and technique match the payload and shows a success toast"
 type = "binary"
 weight = 1.0
 
@@ -212,6 +212,35 @@ negate = true
 id = "1.22"
 name = "binding_panel_disconnected"
 description = "An entry in the variable binding panel disagrees with the editor: a placeholder present in the editor text has no panel entry, or a removed placeholder's entry lingers, or a typed binding value never reaches the preview"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.23"
+name = "prompt_package_export_field_contract"
+description = "Opening Export shows a live JSON package preview whose visible text includes the PromptPackage field contract keys schemaVersion exactly prompt-package-v1, model, promptText, messages (role system|user objects), bindings, and attachments; after editing the draft and binding a variable, reopening Export shows that prompt text and binding value in the preview, and Copy/Download are available for the JSON format"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "prompt_package_import_round_trip_and_reject"
+description = "Exporting then importing a conforming PromptPackage JSON reconstructs the same visible prompt text, bindings, persona, and model; importing parseable JSON that fails the field contract (wrong schemaVersion, missing required keys, messages role outside system|user, or technique outside the closed enum) shows validation naming the offending field and leaves the workbench draft unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "persona_preface_in_preview_and_export"
+description = "Selecting a persona attaches a system preface visible in the live preview and included in the Export JSON messages/persona fields; clearing the persona removes the preface from the preview and from a subsequent Export package"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "export_omits_session_or_contract_keys"
+description = "After editing the prompt or bindings, the Export JSON preview omits the session's prompt text or binding value, or is missing required PromptPackage keys schemaVersion, model, promptText, messages, bindings, or attachments"
 type = "binary"
 weight = 1.0
 negate = true

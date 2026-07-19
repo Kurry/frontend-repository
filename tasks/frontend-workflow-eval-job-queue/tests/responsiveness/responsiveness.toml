@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "7.1"
 name = "layout_adapts_desktop_to_mobile"
-description = "Layout adapts gracefully from 1440px desktop to 375px mobile."
+description = "Layout adapts from 1440px desktop to 375px mobile: at 768px and below the lanes panel stacks and the filter toolbar wraps; at 375px the jobs table, trial grid, and export preview scroll in their containers without page-level horizontal scrolling."
 type = "binary"
 weight = 1.0
 

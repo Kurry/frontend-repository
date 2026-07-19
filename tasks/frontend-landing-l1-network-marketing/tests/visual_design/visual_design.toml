@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -188,6 +188,43 @@ id = "3.18"
 name = "why_ridge_static_list_below_768"
 description = "At a viewport narrower than 768px, the Why Ridge pillars render as a static vertical list — all four pillars fully readable in document order with no sticky stacking or cards covering one another"
 type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "3.20"
+name = "export_catalog_void_notch_panel"
+description = "Export catalog renders as a dedicated panel with JSON and ICS preview regions plus Copy/Download/Load controls using the same void/notch visual language as the landing — not a plain unstyled browser dialog"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.21"
+name = "command_palette_ridge_overlay"
+description = "The command palette is a centered overlay with a search field and listed destinations/actions; the active row is highlighted and the chrome matches Ridge rather than a default OS menu"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.22"
+name = "manager_rollup_and_bulk_bar"
+description = "Events Manager shows a live status rollup strip and, when rows are selected, a bulk action bar with selected count — both styled in the same visual system as the dense list/table"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.23"
+name = "session_leads_panel_matches_token_system"
+description = "Session leads panel uses the same void/notch surfaces and ember accent on Download leads JSON / Copy leads JSON / Undo last lead controls as the surrounding conversion forms and footer rather than a visually alien widget"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.n8"
+name = "export_or_palette_unstyled_defaults"
+description = "Export catalog, Session leads, or the command palette renders as unstyled browser-default chrome that breaks the Ridge void/notch system"
+type = "binary"
+negate = true
 weight = 1.0
 
 [[criterion]]

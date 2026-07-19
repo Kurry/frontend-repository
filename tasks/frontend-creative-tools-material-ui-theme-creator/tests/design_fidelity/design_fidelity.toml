@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,142 +62,149 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "spacing_and_sizing_follow_scale"
-description = "Spacing and sizing follow the design system's scale, with no arbitrary one-off values visible in computed styles."
+name = "spacing_matches_studio_density"
+description = "Compared with /reference-screenshots/, spacing and density of the dark studio header, tabs, Preview split, and tool panels match the reference composition at desktop width (text wins on conflicts)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "typography_matches_spec"
-description = "Typography matches the spec for all headings and body copy."
+name = "typography_matches_roboto_studio_spec"
+description = "Typography weight and hierarchy for the Material-UI Theme Creator brand, tabs, and tools match the Roboto studio look shown in the reference screenshots."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "layout_matches_reference"
-description = "Layout matches reference screenshots to within a small tolerance at all specified breakpoints; fidelity tasks achieve near pixel-parity."
+name = "desktop_composition_matches_reference"
+description = "At desktop width, the composition matches the reference: brand lockup above Preview/Components/Saved Themes with device preview plus editor/tools — not a marketing landing."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.4"
-name = "specified_state_changes_animate"
-description = "Transitions or animations are applied to the state changes the spec calls out, such as add, delete, filter, or view switch."
+name = "specified_state_changes_have_motion"
+description = "Specified state changes (tab switch indicator, accordion expand, Tutorial enter/exit, toast, card add/remove) show motion consistent with the instruction when reduced motion is unset."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "responsive_behavior_matches_reference"
-description = "Responsive behavior matches reference patterns."
+name = "responsive_behavior_matches_reference_patterns"
+description = "Responsive stacking at <=1024 and no clip/overflow at 375 match the instruction's responsive contract and do not invent a conflicting layout system versus the reference desktop anatomy."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.6"
-name = "control_styling_matches_spec"
-description = "Button and form radii, padding, and shadows conform to the spec."
+name = "controls_styled_not_browser_default"
+description = "Tabs, buttons, accordions, and form controls are styled to the dark studio system rather than unstyled browser defaults."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.7"
-name = "typography_has_clear_hierarchy"
-description = "Typography has a clear hierarchy that distinguishes section and body text."
+name = "clear_hierarchy_header_tabs_tools"
+description = "Visual hierarchy clearly separates header brand, main tabs, Preview stage, editor/tools, and Saved Themes list as in the reference."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.8"
 name = "component_states_match_spec"
-description = "Component states (default, hover, active, disabled) match the spec where specified."
+description = "Default/hover/focus/disabled treatments on buttons, inputs, and accordion rows match the specified studio interaction language."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.9"
-name = "surface_treatments_match_spec"
-description = "Color, depth, and border treatments are precise per the design."
+name = "surfaces_driven_by_live_theme_options"
+description = "Sample sites and component demos are visibly driven by the live theme options rather than a static mock that ignores Palette edits."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.10"
-name = "microinteractions_match_spec"
-description = "Microinteraction feedback for hover and press follows the spec in duration and motion."
+name = "microinteraction_timing_matches_spec"
+description = "Microinteraction timing for hover washes, tab indicator, and toasts reads as short studio transitions consistent with the instruction rather than multi-second theatrical delays."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "export_and_contrast_surfaces_fit_studio"
+description = "Theme Files drawer and Contrast matrix read as native studio panels consistent with the dark Material tool chrome rather than a bolted-on alien widget style."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.n1"
-name = "sizing_or_spacing_contradicts_scale"
-description = "Visible sizing or spacing values contradict the specified scale."
+name = "spacing_contradicts_reference_studio"
+description = "Spacing/density grossly contradicts the reference studio (huge empty marketing gaps or cramped overlapping panels) despite no conflicting instruction override."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n2"
-name = "colors_fall_outside_palette"
-description = "Colors appear outside the specified palette."
+name = "colors_ignore_live_theme_options"
+description = "Preview/Components colors ignore live theme options and stay fixed regardless of Palette edits."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n3"
-name = "sizing_mismatches_spec"
-description = "Sizing mismatches the spec."
+name = "preview_editor_split_mismatches_reference"
+description = "Desktop Preview/editor split grossly mismatches the reference studio anatomy (missing device frame or missing editor/tools column)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n4"
-name = "required_animations_missing_or_wrong"
-description = "Animations are missing or incorrect where the spec requires them."
+name = "required_studio_animations_missing"
+description = "Required studio animations specified in instruction/motion are entirely absent when reduced motion is unset."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n5"
-name = "specified_controls_use_browser_defaults"
-description = "Form or button controls use browser default styles when the spec styles them."
+name = "controls_use_browser_default_styles"
+description = "Primary controls use unstyled browser-default appearance that breaks the dark studio system."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n6"
-name = "layout_misaligned_at_breakpoints"
-description = "The grid or layout is misaligned at reference breakpoints."
+name = "desktop_layout_misaligned_vs_reference"
+description = "Desktop layout alignment of header/tabs/workspace is grossly misaligned versus the reference screenshots."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n7"
-name = "elements_are_clipped_or_offscreen"
-description = "Elements render off-screen or clipped."
+name = "elements_clipped_or_offscreen_vs_reference"
+description = "Key studio elements that the reference shows on-canvas are clipped or offscreen at desktop width."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n8"
-name = "structure_deviates_from_reference"
-description = "Section order, content, or structure deviates from the reference on fidelity tasks."
+name = "structure_deviates_from_reference_studio"
+description = "Information structure invents a conflicting product shell that is not a Material theme studio (for example a dashboard grid replacing Preview/Components/Saved Themes)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n9"
-name = "heading_and_body_text_undifferentiated"
-description = "Heading and body text have no distinction."
+name = "no_hierarchy_between_brand_and_tools"
+description = "There is no readable hierarchy between brand, tabs, and tools — everything competes at one visual level."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +212,7 @@ weight = 1.0
 [[criterion]]
 id = "3.n10"
 name = "microinteractions_deviate_from_reference"
-description = "Microinteractions are missing or deviate from the provided reference."
+description = "Microinteractions grossly deviate from the specified studio language (no hover washes, no tab indicator motion) when reduced motion is unset."
 type = "binary"
 negate = true
 weight = 1.0
@@ -213,7 +220,7 @@ weight = 1.0
 [[criterion]]
 id = "design_fidelity.catchall"
 name = "design_fidelity_catchall"
-description = "The app exhibits a significant, browser-observable defect in fidelity to the spec or reference that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in design fidelity versus the reference/instruction that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

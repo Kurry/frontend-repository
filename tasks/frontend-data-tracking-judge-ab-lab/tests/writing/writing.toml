@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.5
@@ -71,7 +71,7 @@ weight = 0.5
 [[criterion]]
 id = "15.2"
 name = "actions_use_specific_labels"
-description = "Where the app renders button or action labels, they are specific verbs ('Add expense', 'Start session'), not generic ('Submit', 'OK') when a specific label is possible."
+description = "Where the app renders action labels for rescore, export, import, undo, and saved pairs, they use specific verbs (Rescore with new label, Export lab results, Import, Undo, Redo, Save pair) rather than generic Submit or OK."
 type = "binary"
 weight = 0.5
 

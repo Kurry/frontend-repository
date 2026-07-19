@@ -1,0 +1,148 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "three_region_layout"
+description = "At desktop width the app composes a main search column (query input, chips row, threshold slider, results), a right side panel area for document detail, and a left rail with sections or tabs for history, saved searches, compare, and the index panel"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "accent_bar_encodes_score"
+description = "Result cards carry a left accent bar whose opacity visibly scales with the similarity score — a card scoring near 1.0 renders the accent clearly stronger than a card scoring near 0.5 — so ranking strength is readable at a glance"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "badges_and_markers_distinct"
+description = "Similarity badges render their two-decimal value in a monospace face inside a compact tag, and feedback markers, overlap markers, and unique markers are visually distinct chips that cannot be confused with each other"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.4"
+name = "excerpt_highlight_scoped"
+description = "The highlighted excerpt passage uses a warm highlight background distinct from the card background, applied only to the matching span rather than the whole excerpt"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "status_bar_semantic_treatments"
+description = "The index status bar uses an informational treatment while indexing and a success treatment when the index is current, and the stale count renders in a warning treatment whenever it is above zero"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "step_status_treatments_consistent"
+description = "Pending, running, retrying, failed, and complete ingest states each carry a distinct color or icon treatment, applied consistently between the step list and the event timeline"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "typography_hierarchy"
+description = "Typography shows a clear hierarchy — app title larger than panel headings, panel headings larger than card titles, card titles larger than body and metadata text — consistent across views"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "spacing_rhythm"
+description = "Gaps between the rail, results column, and side panel, and between cards and sections, are visually regular with no crowded or orphaned regions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "component_state_treatments"
+description = "Buttons, inputs, sliders, and toggles show distinct default, hover, focus (visible ring), disabled, and error treatments, and one consistent icon set is used across the toolbar, cards, status bar, and panels"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n1"
+name = "accent_bar_ignores_score"
+description = "The result-card accent bar renders identically for high-scoring and low-scoring cards, or is absent, so the specified score-to-opacity encoding does not exist"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.n2"
+name = "layout_clipping_or_overlap"
+description = "At 1440 pixel width, any card, panel, chip row, or control renders clipped, overlapping another element, or misaligned with its container"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "5.2"
 name = "console_clean_full_exercise"
-description = "No console errors, warnings, or unhandled promise rejections appear on load or during a full exercise of the app, including a scan with the failure path, pause/resume, filters, pattern toggles, and the viewer"
+description = "No console errors, warnings, or unhandled promise rejections appear on load or during a full exercise of the app, including a scan with the failure path, pause/resume, batch scan, filters, pattern toggles, export, import, undo/redo, command palette, and the viewer"
 type = "binary"
 weight = 1.0
 
@@ -85,14 +85,14 @@ negate = true
 [[criterion]]
 id = "5.4"
 name = "reload_returns_seeded_baseline"
-description = "After changing several facets (add a repository, run a scan, disable a pattern, expand disclosures) a page reload returns the app to its seeded baseline: at least 3 seeded repositories with at least 8 documents each, default patterns enabled, and no scan running — all facets reset coherently, never a mix"
+description = "After changing several facets (add a repository, run a scan, disable a pattern, select rows, open Export, expand disclosures) a page reload returns the app to its seeded baseline: at least 3 seeded repositories with at least 8 documents each, default patterns enabled, empty undo/redo stacks, and no scan running — all facets reset coherently, never a mix"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "5.5"
 name = "cross_view_state_coherence"
-description = "A change made in one view is immediately reflected everywhere the datum appears without a reload: a completed scan updates the repository row, document tree, and rollups together; renaming a repository updates every reference; timeline, step list, and rollups never disagree"
+description = "A change made in one view is immediately reflected everywhere the datum appears without a reload: a completed scan updates the repository row, document tree, rollups, and Export previews together; renaming a repository updates every reference; timeline, step list, and rollups never disagree"
 type = "binary"
 weight = 1.0
 
@@ -107,14 +107,14 @@ negate = true
 [[criterion]]
 id = "5.7"
 name = "responsive_during_scan"
-description = "While a scan is running, filtering the tree, opening documents, and pausing all respond without hangs, dropped interactions, or view desyncs, and rapid repeated input causes no runtime exceptions in the console"
+description = "While a scan is running, filtering the tree, opening documents, pausing, and opening Export all respond without hangs, dropped interactions, or view desyncs, and rapid repeated input causes no runtime exceptions in the console"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "5.8"
 name = "full_page_reload_on_actions"
-description = "A primary action — adding a repository, starting or pausing a scan, switching the right panel, or toggling filters — triggers a full page reload instead of updating client state in place"
+description = "A primary action — adding a repository, starting or pausing a scan, switching the right panel, toggling filters, exporting, or undoing — triggers a full page reload instead of updating client state in place"
 type = "binary"
 weight = 1.0
 negate = true
@@ -122,10 +122,17 @@ negate = true
 [[criterion]]
 id = "5.9"
 name = "webmcp_registry_matches_ui"
-description = "The page exposes window.webmcp_session_info, window.webmcp_list_tools, and window.webmcp_invoke_tool, and invoking a state-changing tool produces the same rendered result, step statuses, and timeline trail as the equivalent visible control"
+description = "The page exposes window.webmcp_session_info, window.webmcp_list_tools, and window.webmcp_invoke_tool, and invoking a state-changing tool produces the same rendered result, step statuses, timeline trail, and export preview state as the equivalent visible control"
 type = "binary"
 weight = 0.5
 optional = true
+
+[[criterion]]
+id = "5.10"
+name = "export_import_share_field_contracts"
+description = "Export Scan Index JSON and Import validate against the same visible field contract (schemaVersion, patterns, repository path, document type enum); a payload that fails those rules is rejected with named-field feedback and does not partially apply"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "5.catchall"

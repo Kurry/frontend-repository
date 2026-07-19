@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,21 +63,21 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.1"
 name = "shared_state_coherence"
-description = "All panes derive from one shared state: changing the active step from any control (timeline click, arrow keys, scrubber, annotation link, report link) updates the timeline highlight, file tree badges, and right rail together in one interaction, and an added or removed annotation is reflected immediately everywhere it appears without a reload"
+description = "All panes derive from one shared state: changing the active step from any control (timeline click, arrow keys, scrubber, annotation link, report link, command palette) updates the timeline highlight, file tree badges, and right rail together in one interaction, and an added, edited, or removed annotation plus a classification submit update the annotations list, report card, and export preview immediately without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
 name = "no_storage_reload_seeded"
-description = "No browser storage is used: localStorage and sessionStorage remain empty after opening trials, scrubbing, annotating, and classifying, and a page reload returns the app to its seeded state — the 3-task catalog with no annotations and no classification reports"
+description = "No browser storage is used: localStorage and sessionStorage remain empty after opening trials, scrubbing, annotating, classifying, exporting, and undoing, and a page reload returns the app to its seeded state — the 3-task catalog with no annotations, no classification reports, empty undo history, and a default export preview with empty annotations and a null failure_report"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
 name = "storage_persistence_used"
-description = "localStorage or sessionStorage holds trial, step, annotation, or report state after exercising the app"
+description = "localStorage or sessionStorage holds trial, step, annotation, report, undo, or export state after exercising the app"
 type = "binary"
 weight = 1.0
 negate = true
@@ -93,30 +93,45 @@ negate = true
 [[criterion]]
 id = "2.5"
 name = "console_clean_full_exercise"
-description = "The console is free of errors and warnings on load and stays clean after opening tasks and trials, scrubbing the timeline, streaming terminal output, annotating, and submitting classifications"
+description = "The console is free of errors and warnings on load and stays clean after opening tasks and trials, scrubbing the timeline, streaming terminal output, filtering steps, using the command palette, annotating, classifying, undoing, and exporting"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.7"
 name = "load_and_interaction_stability"
-description = "The app is interactive (catalog entries respond to activation) within 2 seconds of a local cold load, rapidly scrubbing back and forth across all steps of a trial stays smooth with no hangs, no dropped interactions, and no pane showing a step other than the active one, and the timeline, tree, and forms remain responsive while terminal output is streaming"
+description = "The app is interactive (catalog entries respond to activation) within 2 seconds of a local cold load, rapidly scrubbing back and forth across all steps of a trial stays smooth with no hangs, no dropped interactions, and no pane showing a step other than the active one, and the timeline, tree, forms, undo, and export preview remain responsive while terminal output is streaming"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.8"
 name = "keyboard_operability_focus"
-description = "Every interactive control — catalog entries, table rows, the filesystem toggle, timeline entries, the scrubber, tree rows, disclosure toggles, form fields, and annotation links — is reachable and operable with the keyboard alone with a visible focus indicator, Home and End jump the timeline to the first and last steps, the active timeline entry is programmatically marked as current, opening the note form moves focus to its first field with focus returning to the opening control on close, and overlays close on the Escape key"
+description = "Every interactive control — catalog entries, table rows, the filesystem toggle, timeline entries, the scrubber, tree rows, disclosure toggles, form fields, annotation links, step-type filter, undo and redo, export format tabs, copy and download, import, and the command palette — is reachable and operable with the keyboard alone with a visible focus indicator, Home and End jump the timeline to the first and last visible steps, the active timeline entry is programmatically marked as current, opening the note form or command palette moves focus to its first field with focus returning to the opening control on close, and overlays close on the Escape key"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.10"
 name = "labels_errors_alt_text"
-description = "Form fields have visible labels, each validation message names the field it belongs to and renders in association with that field, and images rendered in the file workspace carry descriptive alternative text"
+description = "Form fields have visible labels, each validation message names the field it belongs to (including note_text, stage, root_cause, behavior, impact, evidence, and implicated_steps) and renders in association with that field, and images rendered in the file workspace carry descriptive alternative text"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "api_shaped_form_and_export_contracts"
+description = "The note and classification forms enforce the declared API-shaped bounds and enums (note_text non-empty ≤500 chars; stage/root_cause/behavior/impact restricted to their declared option sets; evidence 20–2000 chars; implicated_steps non-empty), and the Review JSON export uses the same field names and nesting (annotations[].note_text/step_index; failure_report.stage/root_cause/behavior/impact/evidence/implicated_steps)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.12"
+name = "export_preview_stale_after_mutation"
+description = "After a visible annotation or classification mutation, the Export panel preview text remains unchanged from its pre-mutation content"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "2.catchall"

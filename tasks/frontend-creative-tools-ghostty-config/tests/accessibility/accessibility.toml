@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,158 +62,187 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "controls_are_keyboard_accessible"
-description = "All interactive controls are keyboard accessible with Tab, Shift+Tab, Enter, or Space."
+name = "font_family_keyboard_editable"
+description = "The font-family input can be reached and edited with the keyboard alone (Tab to focus, then type), and typed text updates both the input and the generated font-family line."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "modals_manage_focus"
-description = "Modal dialogs trap focus and return it to the originating control on close."
+name = "sidebar_and_export_keyboard_operable"
+description = "Every interactive control — sidebar categories, sliders, switches, pill toggles, dropdowns, and the Copy/Download/Reset all actions — is reachable and operable with the keyboard, each showing a visible focus indicator when focused."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "images_and_icons_have_alt_text"
-description = "All images and icons have descriptive alt text."
+name = "category_icons_have_accessible_names"
+description = "Sidebar category icons and other meaningful iconography expose descriptive accessible names (aria-label or equivalent) so assistive technology can identify the category or action."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "feedback_uses_live_regions"
-description = "Errors and notifications are conveyed both visually and via ARIA live regions."
+name = "export_feedback_uses_live_region"
+description = "Copy, Download, and Reset all feedback is announced through a polite ARIA live region as well as shown visually."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "forms_have_explicit_labels"
-description = "All form elements use explicit label elements."
+name = "setting_controls_explicitly_labeled"
+description = "Setting form controls (font-family, font-size, colors, cursor-style, and other validated editors) use explicit label elements associated with the controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
 name = "headings_follow_logical_order"
-description = "Headings follow a logical order with no skips, such as H1 to H2 to H3."
+description = "Settings section titles and panel headings follow a logical heading order with no skips (for example H1 to H2 to H3)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "landmark_navigation_is_present"
-description = "Skip-to-content or landmark navigation is present."
+name = "landmarks_for_editor_chrome"
+description = "The editor exposes semantic landmarks (for example nav for the category sidebar and main for the settings form / generated-config region) so assistive technology can navigate the chrome."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
 name = "text_and_controls_have_contrast"
-description = "All text and controls have sufficient color contrast."
+description = "Sidebar labels, settings form text, generated-config lines, and primary export controls have sufficient color contrast against their light and dark surfaces."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "semantic_html_roles_are_used"
-description = "Semantic HTML roles such as nav, main, and button are used."
+name = "switches_expose_selected_state"
+description = "Switches and pill toggles expose their on/off or selected state to assistive technology, and that state updates when toggled."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "reduced_motion_is_respected"
-description = "Animations respect the prefers-reduced-motion setting."
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion set, category transitions, override-line enter/exit, and toast enter/dismiss are removed or minimized while every state change still applies instantly and completely."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.n1"
 name = "controls_unreachable_by_keyboard"
-description = "Controls cannot be activated or reached via keyboard."
+description = "A sidebar category, slider, switch, pill toggle, dropdown, or export action cannot be reached or activated via keyboard alone."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.n2"
 name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured."
+description = "Focused setting controls, sidebar categories, or export actions show no visible focus indicator or the indicator is obscured."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.n3"
 name = "custom_controls_lack_semantics"
-description = "Custom components use non-semantic tags and lack ARIA roles or labels."
+description = "Switches, pill toggles, or sidebar category controls use non-semantic tags without ARIA roles or accessible names."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.n4"
-name = "state_uses_color_only"
-description = "Color-only indicators are used for error or state."
+name = "invalid_state_color_only"
+description = "Invalid setting state or disabled export status is conveyed by color alone with no text, disabled labeling, or other non-color cue."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = "Modals do not trap keyboard focus."
+name = "toast_or_dialog_focus_trapped_badly"
+description = "When a toast or dialog overlay for Copy/Download/Reset feedback is open, Tab moves focus to unrelated controls behind it with no focus management."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = "Text is unreadable due to poor contrast."
+name = "poor_contrast_on_editor_surfaces"
+description = "Sidebar labels, generated-config text, or primary button labels are unreadable due to poor contrast against their background."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.n7"
-name = "errors_are_visual_only"
-description = "Error feedback is visual only and is not screen-reader accessible."
+name = "export_feedback_visual_only"
+description = "Copy, Download, or Reset feedback is visual only with no polite live-region announcement for assistive technology."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.n8"
-name = "media_is_missing_alt_text"
-description = "Icon or image content is missing alt text."
+name = "icons_missing_accessible_names"
+description = "Meaningful category or action icons are missing alt text or an accessible name."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3."
+name = "heading_order_skipped"
+description = "Settings or panel headings skip levels (for example jumping H1 to H3) or have no coherent order."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.n10"
 name = "animations_ignore_reduced_motion"
-description = "Animations ignore reduced-motion settings."
+description = "With prefers-reduced-motion set, category body transitions, override-line animations, or toast motion still animate."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.11"
+name = "hardened_controls_keyboard_operable"
+description = "Undo, Redo, Import, Diff, Profiles, and the command palette are reachable and operable with the keyboard alone, each with a visible focus indicator."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "command_palette_dialog_focus_trap"
+description = "The command palette uses dialog semantics: focus moves into the search field on open, stays trapped while open, closes on Escape, and returns focus to the control that opened it."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "import_profile_feedback_live_region"
+description = "Import and profile action feedback is announced through a polite ARIA live region as well as shown visually."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n11"
+name = "palette_no_focus_trap"
+description = "The command palette opens without trapping focus or fails to return focus on Escape/close."
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "accessibility.catchall"
 name = "accessibility_catchall"
 description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-negate = true
 weight = 1.0
+negate = true

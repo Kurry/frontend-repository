@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,86 +62,114 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "add_task_updates_board_footer_calendar"
+description = "Create flow: submitting Add task on July 19 with a valid title, planned time, and scheduled start appends exactly one card, increases the column count by one, updates the planned-time footer, and shows the task on the July 19 calendar day panel without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
 name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+description = "Create flow: submitting Add task with an empty title shows immediate inline validation naming the title field and adds no task"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "edit_updates_card_total_and_calendar"
+description = "Edit flow: editing Work's title and planned time updates the board card, recomputes the July 20 footer, and updates the July 20 calendar block without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "delete_removes_card_block_and_total"
+description = "Delete flow: deleting Work removes its card from July 20, removes its calendar block, and reduces the July 20 footer by 1:00 to 0:00"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "calendar_day_switch_retains_board_state"
+description = "View/mode switch: selecting a different day updates the calendar panel in place while the multi-day board and its tasks remain intact without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "last_delete_reveals_empty_column"
+description = "Edge: after deleting every task in July 18, the column shows an empty state with Add task still available and a 0:00 planned-time total"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "channel_filter_updates_all_columns"
+description = "Filter flow: setting channel filter to work then personal then clearing it reveals and hides tasks across every day column as expected, with footers tracking visible tasks"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "export_canvas_preserves_board_workflow"
+description = "Opening Export and switching between ICS and Planner JSON tabs keeps the board workflow continuous — closing Export returns to the same board state without losing tasks"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "edit_dialog_supports_save_and_cancel"
+description = "Overlays: the task edit dialog supports save and cancel/close; cancel leaves the task unchanged and save updates the board"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "failed_import_recovers_without_reload"
+description = "Recovery: importing malformed planner JSON shows a visible error naming the problem and leaves the session unchanged so the user can continue without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "bulk_complete_flow_end_to_end"
+description = "Bulk complete flow: select Daily planning and Work, activate Complete selected, and confirm both cards render completed on the board and Work's July 20 calendar block reflects completed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "rollover_flow_end_to_end"
+description = "Rollover flow: add incomplete Carry me on July 17, activate Rollover incomplete, and confirm Carry me moves to July 18 with footers updated"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "undo_redo_flow_end_to_end"
+description = "Undo/redo flow: delete Weekly planning, Undo restores it on July 18 with the footer restored, Redo removes it again"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "export_import_round_trip_flow"
+description = "Export then import flow: mutate tasks, Copy or Download planner JSON, reload to seed, Import that JSON, and confirm board, footers, calendar, ICS, and planner JSON match the pre-export state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
 name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+description = "Add task, edit, complete, delete, Export, or Import are not enabled from the UI"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "new_tasks_missing_or_duplicated"
+description = "New tasks fail to show up on the board or duplicate on a single submit"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,23 +177,23 @@ weight = 1.0
 [[criterion]]
 id = "6.n3"
 name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+description = "Board, calendar panel, footers, or export previews disagree about the same task after a mutation"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "calendar_day_switch_breaks_board"
+description = "Selecting a different calendar day breaks the board layout or loses task cards"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_column_breaks_ui"
+description = "Emptying a day column produces broken or missing UI instead of an empty column with Add task and 0:00"
 type = "binary"
 negate = true
 weight = 1.0
@@ -173,23 +201,23 @@ weight = 1.0
 [[criterion]]
 id = "6.n6"
 name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+description = "Channel filter and search disagree across columns about which tasks are visible"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "export_canvas_cannot_close"
+description = "The export canvas cannot be closed or re-opened, trapping the user off the board"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "edit_dialog_blocks_without_exit"
+description = "The task edit dialog blocks navigation with no exit option"
 type = "binary"
 negate = true
 weight = 1.0
@@ -197,7 +225,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n9"
 name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+description = "A failed Add task, Import, or bulk delete provides no user feedback"
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,7 +233,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n10"
 name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+description = "A flow dead-ends or requires reload for recovery after Export, Import, or Filter"
 type = "binary"
 negate = true
 weight = 1.0

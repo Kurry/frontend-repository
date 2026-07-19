@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -209,6 +209,28 @@ description = "Microinteractions are missing or deviate from the provided refere
 type = "binary"
 negate = true
 weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "extended_surfaces_adopt_reference_language"
+description = "The added surfaces (buffer cards, bucket drawer, kanban columns, conflict modal, export canvas) adopt the reference workspace's spacing scale, radii, and coastal palette so they read as native parts of the screenshotted app"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.12"
+name = "dual_pane_proportions_match_reference"
+description = "The plan-column card anatomy and map-pane proportions match the reference screenshots, and the added route, cluster, and isochrone layers do not obscure or distort the referenced three-pane layout"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.n11"
+name = "added_features_clash_with_reference"
+description = "An added surface visibly clashes with the reference style — foreign palette, mismatched radii or shadows, or default-browser styling dropped into the screenshotted workspace"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "design_fidelity.catchall"

@@ -1,0 +1,180 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "9.1"
+name = "cold_start_is_under_two_seconds"
+description = "Cold start to an interactive seeded library is under 2 seconds on local render"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.2"
+name = "console_is_clean"
+description = "Browser devtools show no errors or warnings on load or during a full exercise of the app"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.3"
+name = "slider_scrub_stays_smooth"
+description = "Scrubbing a trait slider rapidly keeps the numeric readout and radar chart updating smoothly without lag or dropped frames"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.4"
+name = "streaming_never_blocks_app"
+description = "While a test bench run streams, the rest of the app stays interactive — filters, navigation, and editing still respond"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.5"
+name = "long_history_stays_smooth"
+description = "The transcript pane and run history stay smooth when the history holds many long entries"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.6"
+name = "derived_recomputes_feel_instant"
+description = "Facet counts, comparison deltas, blend previews, and export text recompute without perceptible lag after a change"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.7"
+name = "animations_maintain_smooth_frame_rate"
+description = "Card entrances, the flip, drawer slides, and vote arrivals stay smooth without stutter"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.8"
+name = "rapid_input_does_not_freeze"
+description = "Rapid repeated input — fast filter changes, quick undo/redo, rapid view switches — never hangs the app or drops interactions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.9"
+name = "extended_sessions_avoid_resource_runaway"
+description = "An extended session of runs, polls, edits, and exports shows no runaway resource use or progressive slowdown"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "9.n1"
+name = "local_load_exceeds_two_seconds"
+description = "More than 2 seconds pass before the seeded library is interactive on local render"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n2"
+name = "console_errors_during_flows"
+description = "Errors or warnings appear in the console while exercising create, traits, flip, compose, bench, polls, diff, bulk, undo, or export"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n3"
+name = "streaming_hangs_ui"
+description = "A streaming run freezes the UI, blocks input, or janks the transcript"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n4"
+name = "slider_lag"
+description = "Trait slider scrubbing visibly lags the readout or radar redraw"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n5"
+name = "animation_blocks_input"
+description = "Input becomes unresponsive while cards, the flip, drawers, or votes animate"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "9.n6"
+name = "rapid_or_edge_use_crashes"
+description = "The app crashes or renders a broken page under rapid or edge-case use"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "performance.catchall"
+name = "performance_catchall"
+description = "The app exhibits a significant, browser-observable defect in performance or stability that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

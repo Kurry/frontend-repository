@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 weight = 0.25
@@ -64,156 +64,84 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "11.1"
 name = "delightful_microinteractions"
-description = "The app has unique, delightful microinteractions."
+description = "Beyond the required motion, the app adds a delightful microinteraction somewhere in triage (for example a satisfying gate-pass flourish or bulk-bar entrance) that feels intentional"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.2"
 name = "advanced_motion_mechanics"
-description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+description = "The app goes beyond the required transitions with an advanced motion detail (for example staggered finding list entrances or coordinated chip updates) that remains tasteful"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.3"
 name = "guided_onboarding"
-description = "The app has a narrative or guided onboarding flow."
+description = "Optional guided onboarding or coachmarks help a first-time reviewer discover Export, bulk actions, or the command palette without blocking required flows"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.4"
 name = "enhanced_interactive_graphics"
-description = "Data visualizations or interactive graphics provide extra usability."
+description = "The failure-profile panel or another chart offers an extra usability aid beyond the required bars (tooltips with counts, brushable range, or comparable ranking callouts)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.5"
 name = "alternative_input_support"
-description = "The app supports voice, gesture, or another alternative input."
+description = "Beyond the required command palette, the app supports an additional power-user input path (for example slash commands or extra keyboard shortcuts for triage actions)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.6"
 name = "preference_personalization"
-description = "The app provides personalization features for user preferences."
+description = "Optional personalization such as density, default sort, or column visibility helps operators tailor the queue without breaking seeded behavior"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.7"
 name = "polished_brand_narrative"
-description = "The app presents polished storytelling or a branding narrative."
+description = "The ops console presents a polished fictional platform identity in chrome and empty states that feels product-like rather than generic scaffold"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.8"
 name = "dynamic_theming_beyond_requirements"
-description = "The app provides dynamic theming or a color mode beyond requirements."
+description = "Optional light/dark or theme density beyond the required visual system is available without interfering with stage/tier semantics"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.9"
 name = "genre_appropriate_platform_features"
-description = "The app uses web platform features such as PWA or offline support where the genre allows."
+description = "A genre-appropriate enhancement such as a printable QC report preview layout or keyboard shortcut cheat sheet appears without claiming backend connectivity"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.10"
 name = "competition_level_innovation"
-description = "Competition-level innovation is visible to users."
+description = "Overall, the triage experience shows competition-level craft beyond the written minimum — cohesive export-centric workflow polish a real QC operator would notice"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The demo is purely spec-compliant, barebones, and unenhanced."
+name = "innovation_is_generic_queue_shell"
+description = "Beyond the mandated QC queue surfaces, the UI reads as a generic ticket list shell with no triage-operator polish or optional enhancement."
 type = "binary"
+weight = 0.5
 negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals are generic, templated, or copied."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The app has no polish, guidance, or story."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n4"
-name = "experience_lacks_extra_polish"
-description = "The app has no extra visual or interactive polish."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n5"
-name = "interface_is_flat_and_static"
-description = "The UI is flat and static with no immersion."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n6"
-name = "helpful_platform_capabilities_ignored"
-description = "Modern platform capabilities are ignored where they would clearly help."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n7"
-name = "personalization_is_impossible"
-description = "Personalization is impossible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n8"
-name = "delightful_moments_are_absent"
-description = "The app has no new or delightful user moments."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n9"
-name = "design_has_no_twist"
-description = "The design repeats well-trod patterns without a twist."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n10"
-name = "effort_stops_at_mvp"
-description = "The app shows minimal effort beyond the MVP or deliverable."
-type = "binary"
-negate = true
-weight = 1.0
 
 [[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
-description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable innovation or polish strength beyond the specification that is NOT covered by any other criterion in this file. If present, name it and cite the concrete evidence. If already covered by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0

@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,64 +62,71 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "14.1"
-name = "multi_facet_round_trip"
-description = "Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline — never a mix."
+name = "multi_facet_reset_round_trip"
+description = "Multi-facet reload round-trip: open a trial, add an annotation, submit a classification, set the step-type filter to tool-call, and switch the export tab to Review markdown, then reload. All facets coherently reset to the seeded baseline — no annotations, no report card, filter back to All, empty undo history, and default export preview with empty annotations and null failure_report — never a mix where some facets survive"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.2"
-name = "sort_reversal_proves_live_data"
-description = "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders."
+name = "reward_sort_reversal_live"
+description = "Sort-reversal proof: on a task page, click the reward column header to sort ascending, note the first and last model names, then click again for descending; the order reverses correctly relative to reward values, proving sort derives from live data rather than two hardcoded orders"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.3"
-name = "derived_view_responds_to_input"
-description = "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input."
+name = "export_and_badges_track_inputs"
+description = "Derived-view sensitivity: add a note on step 3, then submit a classification with evidence mentioning a unique phrase; the annotations list, report card, and Review JSON export preview each change to include that note_text and evidence while unrelated trials remain untouched"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.4"
 name = "cross_view_echo_without_reload"
-description = "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list ↔ detail, board ↔ stats) without reload."
+description = "Cross-view echo: submit a classification on a trial, then confirm the report card and the Export panel failure_report object show the same stage, root_cause, behavior, impact, evidence, and implicated_steps without a reload; clicking an implicated-step link also moves the timeline highlight to that step"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.5"
-name = "count_delta_is_exact"
-description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+name = "annotation_count_delta_exact"
+description = "Count-delta integrity: note the annotations list count, add exactly one valid note, and immediately confirm the list length increased by exactly one and the Review JSON annotations array length matches; remove that note and confirm both counts decrease by exactly one"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.6"
-name = "different_inputs_change_outcomes"
-description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+name = "different_reviews_different_exports"
+description = "Input-dependent output: on two different trials (or two successive review sessions with Undo between), enter different note_text and different classification enum values, export each Review JSON, and confirm the two previews differ exactly where the entered values differ"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.7"
 name = "interleaved_flows_preserve_state"
-description = "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state."
+description = "Interleaved-flow integrity: start a note on trial A, switch to trial B via the catalog, classify trial B, return to trial A, and confirm A's draft or saved annotation state is intact while B shows its report card and both export previews reflect only their own trial's review state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.8"
-name = "empty_to_repopulated_round_trip"
-description = "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions."
+name = "empty_annotations_to_repopulated"
+description = "Edge-state round-trip: with no annotations, confirm the empty annotations state and an empty annotations array in the export preview; add two notes and a classification, confirm both surfaces fill; Undo until annotations are empty again and failure_report is null, and confirm the empty state and export preview track both transitions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "full_pipeline_to_export_import"
+description = "Full-pipeline probe: open a task, sort by reward descending, open the top trial, annotate a late step, submit a valid classification, open Export and confirm Review JSON carries those values, Copy export with confirmation, then import that JSON after clearing the session edits and confirm the annotations list and report card match the imported package"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.n1"
-name = "partial_persistence_is_incoherent"
-description = "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence."
+name = "partial_reset_is_incoherent"
+description = "After a reload, some session facets reset to the seeded baseline while others survive — for example annotations clear but a classification report or undo stack persists — producing incoherent partial state"
 type = "binary"
 negate = true
 weight = 1.0
@@ -127,23 +134,23 @@ weight = 1.0
 [[criterion]]
 id = "14.n2"
 name = "derived_surface_ignores_inputs"
-description = "A derived surface renders identically regardless of its inputs."
+description = "The export preview, report card, or file-change badges render identically regardless of the annotation, classification, or active-step changes performed"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n3"
-name = "different_inputs_produce_identical_output"
-description = "Repeating an action with different inputs yields byte-identical output."
+name = "different_inputs_identical_export"
+description = "Two Review JSON exports from differently annotated or classified trials yield byte-identical preview text"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "State changes appear in one view but not another until reload."
+name = "surfaces_stale_until_reload"
+description = "An annotation or classification change appears in one surface (annotations list, report card, or export preview) but not another until a reload"
 type = "binary"
 negate = true
 weight = 1.0

@@ -119,7 +119,8 @@ Contract version: zto-webmcp-v1
 
 Modules:
 - structured-editor-v1
-- command-session-v1
+- entity-collection-v1
+- artifact-transfer-v1
 
 Module specs:
 <module_spec id="structured-editor-v1">
@@ -141,36 +142,65 @@ Module specs:
 }
 </module_spec>
 
-<module_spec id="command-session-v1">
+<module_spec id="entity-collection-v1">
 {
-  "id": "command-session-v1",
+  "id": "entity-collection-v1",
   "contract_version": "zto-webmcp-v1",
-  "title": "Command / session",
-  "purpose": "Media, games, presentations, simulations, demos, and remote-control shells.",
-  "permitted_operations": ["start", "pause", "resume", "stop", "restart", "advance", "trigger_demo", "connect", "disconnect"],
+  "title": "Entity collection",
+  "purpose": "Carts, records, favorites, calendar events, list items, and local entities.",
+  "permitted_operations": ["create", "select", "update", "delete", "toggle", "quantity", "reorder"],
   "binding_keys": {
-    "required_any_of": [["session_operations"]],
-    "optional": ["demos", "visible_postconditions"]
+    "required_any_of": [["entity"], ["entity_operations"]],
+    "optional": ["entity_fields", "value_bounds", "visible_postconditions"]
   },
   "restrictions": [
-    "No batching or replay of gameplay.",
-    "Timing, animation, collision, repeated input, and transient UI require immediate Playwright observation.",
-    "Tool output cannot prove successful playback or connection."
+    "Closed entity and field enums only.",
+    "Bounded string and numeric values.",
+    "No generic state setter or arbitrary patch object.",
+    "Invokes the same domain command used by the visible control.",
+    "Delete requires explicit confirm=true.",
+    "Reorder only when gesture mechanics are not being evaluated."
   ],
-  "tool_name_prefix": "session"
+  "tool_name_prefix": "entity"
+}
+</module_spec>
+
+<module_spec id="artifact-transfer-v1">
+{
+  "id": "artifact-transfer-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Artifact transfer",
+  "purpose": "Import, export, copy, print, and conversion workflows.",
+  "permitted_operations": ["import", "export", "copy", "print_preview", "convert"],
+  "binding_keys": {
+    "required_any_of": [["artifact_operations"]],
+    "optional": ["import_modes", "export_formats", "conversion_modes", "visible_postconditions"]
+  },
+  "restrictions": [
+    "No raw files, filesystem paths, blobs, base64, or artifact contents in WebMCP arguments or results.",
+    "File picker interaction, clipboard contents, and downloaded artifacts remain Playwright responsibilities."
+  ],
+  "tool_name_prefix": "artifact"
 }
 </module_spec>
 
 Bindings:
 - Editor object types: grid-cell
-- Editor properties: color
-- Editor modes: paint; erase
-- Editor operations: select; update_property; switch_mode; preview
-- Session operations: start; stop; restart; trigger_demo
-- Demos: fill-demo
+- Editor properties: color; brush; mirror
+- Editor modes: paint; erase; qr
+- Editor operations: select; update_property; switch_mode; preview; set_content
+- Entity: board
+- Entity operations: create; select; update; delete; toggle
+- Entity fields: name; tag; favorite; cells
+- Artifact operations: export; import; copy
+- Export formats: session-json; png
+- Import modes: session-json
 
 Mechanics exclusions:
 - Drag-paint / brush stroke geometry stays Playwright (gesture mechanics)
+- Mirror-partner cell painting during continuous drag stays Playwright-observed
+- Raw file paths/blobs forbidden in WebMCP args
+- PNG rasterization fidelity and clipboard copy stay Playwright-observed
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

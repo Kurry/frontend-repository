@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,110 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "run_suite_end_to_end"
+description = "Selecting a suite and clicking Run Suite advances step statuses while the run log streams, the rollup reaches n of m complete, the results table populates, the bar chart redraws, the line chart gains one trend point, and a result row opens a detail panel whose prompt title, model, and score match that row — without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "create_suite_then_run"
+description = "Submitting New Suite with a valid name (1 to 80 characters) and at least one prompt adds the entry with its prompt count; running it produces first results and an average score badge on the entry"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "failure_retry_flow"
+description = "When a step exhausts retries and is marked failed, the rollup failure count increases; activating Retry resumes from that step and on success clears the failure while earlier steps' outputs remain unchanged"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "pause_resume_timeline_flow"
+description = "Pausing freezes the step list and rollup at the current step; resuming continues from that step and the event timeline shows pause and resume transitions in order"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "sort_and_comparison_preserve_data"
+description = "Sorting results by score ascending then descending reverses row order; toggling to comparison and back preserves matching prompt/model scores between views"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "export_flow_after_run"
+description = "After completing a run, Export results shows a JSON results array whose length and scores match the table, a CSV tab with those promptTitle values, Download JSON/CSV named eval-run-results.json and eval-run-results.csv, and Copy showing Copied"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "import_round_trip_flow"
+description = "Export JSON after a completed run, change the suite's latest results so the table no longer matches, then Import that JSON — the table, charts, suite badge, and a fresh export reconstruct to match the imported document"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "undo_redo_flow"
+description = "Create a suite, activate Undo so the suite disappears and the count decreases by one, then Redo restores that suite with the same name and prompt count"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "reload_returns_seeded"
+description = "After creating a suite, scheduling night mode, and opening the export drawer, a page reload returns seeded suites, historical runs, default view, no night-mode schedules, and no unsaved export drawer state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "delete_selected_empty_state_flow"
+description = "Deleting the currently selected suite clears results and charts to an empty state with a message and a control to select or create a suite"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "export_flow_missing"
+description = "After a completed run, Export results is missing, or the drawer opens without JSON/CSV previews that reflect the visible results"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "import_does_not_restore"
+description = "Importing a valid exported results JSON leaves the results table, charts, or suite badge mismatched with the imported document"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "undo_fails_to_restore"
+description = "Undo after creating a suite leaves the suite in the list, or Redo fails to restore the same name and prompt count"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "run_flow_desyncs_surfaces"
+description = "Completing a run updates the results table but leaves the suite average score badge, bar chart, or trend chart unchanged"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "comparison_scores_diverge"
+description = "A comparison cell shows a score that does not match the results table for the same prompt and model"
 type = "binary"
 negate = true
 weight = 1.0

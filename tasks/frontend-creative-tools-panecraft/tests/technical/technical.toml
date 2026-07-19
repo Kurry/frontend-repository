@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -167,7 +167,7 @@ negate = true
 [[criterion]]
 id = "2.15"
 name = "dialog_keyboard_and_announcements"
-description = "The source preview modal, pane wizard, Share panel, and confirmation dialogs trap focus while open, close on Escape, and return focus to their opening control, and the transient Copied confirmation and inline validation errors are exposed through an aria-live polite region"
+description = "The source preview modal, pane wizard, Share panel, Export center, and confirmation dialogs trap focus while open, close on Escape, and return focus to their opening control, and the transient Copied confirmation and inline validation errors are exposed through an aria-live polite region"
 type = "binary"
 weight = 1.0
 
@@ -177,6 +177,21 @@ name = "fast_interactive_cold_load"
 description = "On a local cold load the workspace renders its seeded content and responds to a first interaction within roughly 2 seconds"
 type = "binary"
 weight = 0.5
+
+[[criterion]]
+id = "2.17"
+name = "form_validation_matches_field_contracts"
+description = "Pane create/edit, page name, saved-analysis, and Workspace JSON import forms reject payloads that violate the PaneConfig, Page, SavedAnalysis, or WorkspaceDocument field contracts with inline errors naming the offending field, and valid submits produce records whose exported fields match the submitted values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n11"
+name = "import_accepts_schema_invalid_payload"
+description = "Import applies a Workspace JSON payload that fails the WorkspaceDocument field contract (wrong schemaVersion, missing required keys, or closed-enum violations) and mutates pages, panes, date range, or saved analyses"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "2.catchall"

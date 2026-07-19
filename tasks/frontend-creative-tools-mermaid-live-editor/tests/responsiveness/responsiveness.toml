@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,150 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "7.1"
-name = "layout_adapts_desktop_to_mobile"
-description = "Layout adapts gracefully from 1440px desktop to 375px mobile."
+name = "layout_adapts_desktop_to_375"
+description = "Resizing from 1280px+ desktop to about 375px mobile keeps a usable Mermaid workspace: editor, preview, samples, and actions remain present and operable at both widths."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.2"
-name = "mobile_tap_targets_are_large_enough"
-description = "UI controls are tap targets at least 44px on mobile."
+name = "mobile_tap_targets_adequate"
+description = "At about 375px width, sample buttons, SVG/PNG/Copy image controls, Code/Config tabs, and the theme toggle present tap targets at least 44px in at least one dimension."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.3"
-name = "typography_resizes_across_breakpoints"
-description = "Typography resizes for both mobile and desktop."
+name = "typography_readable_both_widths"
+description = "Header title, tab labels, sample/action labels, and error text remain legible at both 1280px+ and about 375px — type scales or reflows without becoming unreadably small on mobile."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.4"
-name = "content_avoids_clipping_and_overflow"
-description = "Content never clips or overflows the viewport."
+name = "no_clip_or_overflow_at_375"
+description = "At about 375px width, editor, preview, samples, and actions never clip or overflow the viewport."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.5"
-name = "chrome_adapts_to_small_screens"
-description = "Collapsible chrome such as sidebars and menus adapts for smaller screens."
+name = "regions_stack_at_phone_width"
+description = "At a narrow phone width around 375px the two regions reflow into a single readable column and the export controls stay reachable without horizontal page scrolling."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.6"
-name = "stacking_reflows_logically"
-description = "Layout stacking order reflows logically at narrow widths."
+name = "narrow_stack_order_stays_usable"
+description = "At about 375px width, editor and preview reflow into a logical stacking order without covering each other into an unusable pile."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.7"
-name = "mobile_touch_gestures_work"
-description = "Touch gestures such as swipe and tap work on mobile where present."
+name = "mobile_controls_tappable"
+description = "At about 375px width, tap/click activation works on Code/Config tabs, sample buttons, export/copy controls, and the theme toggle."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.8"
-name = "small_screens_avoid_horizontal_scroll"
-description = "Small screens have no horizontal scrolling."
+name = "no_horizontal_scroll_at_375"
+description = "At about 375px width the page does not produce horizontal scrolling of the document."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.9"
-name = "media_and_canvases_resize"
-description = "Images, grids, and canvases size responsively to fit the layout."
+name = "preview_diagram_scales"
+description = "The rendered diagram SVG/canvas sizes responsively inside the preview region rather than staying a fixed overflowing size at 375px or desktop widths."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.10"
-name = "fixed_controls_remain_accessible"
-description = "Fixed controls remain accessible on all devices."
+name = "side_by_side_at_desktop"
+description = "At desktop widths 1280px and above the editor column and preview region sit side by side; resizing between desktop and phone widths never produces horizontal scrolling of the document or content cut off outside the viewport."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "7.n1"
-name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at common breakpoints."
+name = "layout_breaks_at_375_or_desktop"
+description = "At about 375px or 1280px+ the editor/preview workspace layout breaks: overlapping regions, overflow, or unusable stacking."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n2"
-name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small or misaligned on mobile."
+name = "mobile_controls_too_small"
+description = "At about 375px width, sample buttons, export/copy controls, tabs, or the theme toggle are too small or misaligned to operate reliably."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n3"
-name = "text_too_small_on_devices"
-description = "Text is too small to read on some devices."
+name = "editor_text_unreadable_on_mobile"
+description = "At about 375px width, header title, tab labels, sample/action labels, or error text are too small to read."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n4"
-name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or scrollbars appear unnecessarily."
+name = "content_cropped_with_spurious_scrollbars"
+description = "At about 375px or 1280px+, workspace content is cropped or unnecessary document scrollbars appear for content that should fit the viewport."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n5"
-name = "sidebar_or_menu_breaks_by_width"
-description = "The sidebar or menu is unresponsive or missing at some widths."
+name = "region_missing_at_phone_width"
+description = "At about 375px width, the editor, preview, Sample diagrams panel, or Actions panel is missing or unreachable."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n6"
-name = "fixed_positions_obscure_content"
-description = "Fixed positions obscure content."
+name = "fixed_chrome_obscures_workspace"
+description = "Fixed-position header chrome obscures editor tabs, samples, or export controls so they cannot be used."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n7"
-name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear at some viewport size."
+name = "overlap_at_narrow_width"
+description = "At about 375px width, editor and preview regions overlap into an unusable stack."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n8"
-name = "required_mobile_touch_actions_missing"
-description = "Touch actions are not available on mobile where the spec requires them."
+name = "mobile_exports_inoperable"
+description = "At about 375px width, SVG, PNG, or Copy image cannot be reached or operated."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n9"
-name = "fixed_size_media_overflows"
-description = "Images, charts, or canvases use a static size and overflow the viewport."
+name = "preview_static_size_overflows"
+description = "The rendered diagram uses a static size that overflows the viewport at about 375px."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "7.n10"
-name = "controls_disappear_at_sizes"
-description = "Controls disappear at specific sizes."
+name = "controls_disappear_at_width"
+description = "At about 375px or 1280px+, required controls (tabs, samples, exports, or theme toggle) disappear from the layout."
 type = "binary"
 negate = true
 weight = 1.0

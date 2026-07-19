@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -63,137 +63,119 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "12.1"
 name = "mandated_modules_are_bound"
-description = "All contract-mandated modules are initialized and bound."
+description = "Contract modules command-session-v1, entity-collection-v1, form-workflow-v1, and artifact-transfer-v1 are initialized and bound so webmcp_list_tools surfaces session_*, entity_*, form_*, and artifact_* tools for this app."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.2"
 name = "handlers_match_visible_ui_logic"
-description = "Exposed tool handlers match visible UI command logic."
+description = "Invoking bound session, entity, form, or artifact tools produces the same visible state changes as the matching UI controls (Start game, custom-card create/delete, Export/Import/Copy Session) via the same store commands."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.3"
 name = "only_documented_operations_exist"
-description = "Only documented operations and routes are available."
+description = "Exposed tools stay within declared session operations, entity fields (prompt, category, intensity, name, outcome), form fields (player-name, card-prompt, card-category, card-intensity), and artifact operations (export, import, copy) with export format json — no invented modules."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.4"
 name = "contract_is_automation_exercisable"
-description = "The contract can be fully exercised via automation."
+description = "webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool can exercise the bound operations without manual harness edits."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.5"
 name = "declared_entity_operations_work"
-description = "Entity operations declared in the contract, including create, update, delete, and reorder, all work."
+description = "Entity operations create, select, update, delete, and toggle work for custom cards / player-related fields declared in Bindings when invoked through WebMCP with the same visible effects as the UI."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.6"
 name = "form_flow_operations_are_bound"
-description = "Form submission validation, error, and cancel operations are clearly bound."
+description = "Form operations validate, submit, cancel, and reset are bound for player-setup and add-custom-card workflow steps and keep normal inline validation active."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.7"
-name = "queries_match_allowed_spec"
-description = "Query destinations and filters match the allowed specification."
+name = "artifact_export_import_copy_bound"
+description = "Artifact operations export, import, and copy for format json / import mode dare-night-session are bound and trigger the same Export Session, Import Session, and Copy Session JSON flows as the visible controls (file picker and clipboard remain Playwright-observed)."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.8"
 name = "capabilities_stay_declared"
-description = "No extra or undeclared module routes or capabilities are exposed."
+description = "No extra undeclared module routes or capabilities are exposed beyond the four mandated modules and their Bindings."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.9"
 name = "session_tool_and_invoke_apis_work"
-description = "Session info, tool list, and invocation are correctly surfaced."
+description = "webmcp_session_info returns usable session metadata, webmcp_list_tools lists the bound tools, and webmcp_invoke_tool returns structured results without errors for declared operations."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.10"
 name = "mcp_initializes_without_harness_edits"
-description = "MCP initialization works without manual editing or test harness changes."
+description = "MCP tools register from the app's own implementation of the module_spec + Bindings without requiring edits to /tests or the verifier harness."
 type = "binary"
 weight = 1.0
-
 [[criterion]]
 id = "12.n1"
 name = "mcp_tools_missing_or_noop"
-description = "MCP tooling is unbound, missing, or a no-op."
+description = "WebMCP session/entity/form/artifact tools are missing, unbound, or invoke as no-ops that leave the visible game state unchanged."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "12.n2"
 name = "handlers_diverge_from_ui_logic"
-description = "Handlers do not match UI logic because actions mismatch or state does not sync."
+description = "A WebMCP invoke reports success while the visible UI stays on a mismatched setup/play/export state."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "12.n3"
 name = "undeclared_capabilities_exposed"
-description = "Undeclared destinations or entity operations are exposed."
+description = "Tools expose undeclared destinations, entity fields, or artifact formats beyond the Bindings list."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "12.n4"
 name = "automation_cannot_exercise_contract"
-description = "The contract cannot be exercised from automation."
+description = "The declared contract cannot be exercised from automation via webmcp_invoke_tool."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "12.n5"
 name = "validation_bypass_desyncs_state"
-description = "Validation bypasses lead to inconsistent MCP and UI state."
+description = "A form or entity invoke bypasses validation and leaves MCP state disagreeing with the visible inline errors or roster/card list."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "12.n6"
 name = "session_or_tool_api_errors"
-description = "The session or tool API returns errors or incomplete data."
+description = "The session or tool API returns errors or incomplete data for declared operations."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "12.n7"
 name = "mcp_relies_on_undocumented_hacks"
-description = "MCP relies on manual or undocumented test hacks."
+description = "MCP relies on manual or undocumented test hacks outside the app's registered tools."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "12.n8"
 name = "required_contract_module_missing"
-description = "No module contract is implemented where one is declared required."
+description = "One of command-session-v1, entity-collection-v1, form-workflow-v1, or artifact-transfer-v1 is not implemented where declared required."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "12.n9"
 name = "mcp_is_stubbed_or_commented_out"
@@ -201,15 +183,13 @@ description = "The MCP interface is commented out or only stubbed."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "12.n10"
 name = "automated_contract_validation_fails"
-description = "The project fails automated MCP contract validation."
+description = "The project fails automated MCP contract validation for the declared bindings."
 type = "binary"
 negate = true
 weight = 1.0
-
 [[criterion]]
 id = "mcp_contract.catchall"
 name = "mcp_contract_catchall"

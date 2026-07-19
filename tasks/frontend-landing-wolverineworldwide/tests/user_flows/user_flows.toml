@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,192 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "For fidelity tasks, evaluate the reference's flows. Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "cookie_manage_preferences_save_dismisses"
+description = "On a fresh load the cookie banner with heading We use cookies is visible; activating Manage preferences opens the preferences modal with Necessary, Analytics, Marketing, and Functional toggles; saving a valid four-key boolean payload closes the modal and dismisses the banner in the same pass."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "cookie_accept_or_reject_dismisses_without_modal"
+description = "Activating Accept all or Reject all on the cookie banner dismisses the banner without opening the preferences modal, and no consent surface reappears while scrolling or interacting during the session."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "responsibility_dropdown_open_close_aria"
+description = "Hovering or activating the Responsibility toggler flips aria-expanded to true and reveals the panel with Purpose, Planet, and Product; activating a pillar link or pressing Escape hides the panel, returns aria-expanded to false, and leaves the rest of the header unchanged."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "mobile_menu_open_locks_scroll_staggers"
+description = "Below 1000px, activating the Menu toggle opens the full-screen overlay with menu items revealing in a staggered sequence, keyboard focus is contained inside the open overlay, and the page behind does not scroll."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "mobile_menu_close_restores_focus_and_scroll"
+description = "Below 1000px, with the mobile menu open: activating Close or pressing Escape dismisses the overlay, restores background scrolling, returns focus to the Menu toggle, and leaves the page's scroll position unchanged."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "news_carousel_next_prev_advances_track"
+description = "In Latest News, activating Next advances the horizontal track so later cards become visible and the track position visibly moves; activating Prev. returns toward earlier cards without leaving the homepage."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "news_carousel_drag_and_holds_while_scrolling"
+description = "Dragging the news carousel track with the pointer moves it (a visible dragging state during drag); after advancing away from the first cards, scrolling elsewhere on the page and returning leaves the carousel at the same client position."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "reload_returns_seeded_homepage_baseline"
+description = "After dismissing the cookie banner, advancing the news carousel, and opening then closing the Responsibility dropdown or mobile menu: a page reload returns the homepage to its seeded baseline — scrolled to top, cookie banner visible again, carousel back at its first card."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "cookie_banner_stays_dismissed_in_session"
+description = "After Accept all, Reject all, or saving preferences, the cookie banner stays dismissed while scrolling and interacting anywhere on the page for the rest of the session (until reload)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "consent_category_toggles_update_before_save"
+description = "In the open preferences modal, switching per-category consent toggles updates their visible states immediately; saving then closes the modal and dismisses the banner together."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "cookie_or_menu_primary_flow_unavailable"
+description = "The cookie banner cannot be dismissed via Accept all, Reject all, or Manage preferences → save, or below 1000px the Menu toggle cannot open the full-screen overlay from the visible UI."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "carousel_or_dropdown_state_desyncs"
+description = "After advancing the news carousel or opening Responsibility, the visible track/panel state disagrees with controls (e.g. Next appears to fire but the track stays put, or aria-expanded stays false while the panel is visible)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "overlay_blocks_with_no_exit"
+description = "The mobile menu overlay, Responsibility dropdown, or cookie preferences modal opens but cannot be dismissed via Close, Escape, or the specified dismiss path, blocking homepage interaction."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "failed_consent_flow_lacks_feedback"
+description = "Activating cookie banner actions or saving preferences produces no visible change to the banner/modal (silent failure with no dismiss or open)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "flow_dead_end_requires_reload"
+description = "After opening the mobile menu, Responsibility dropdown, preferences modal, or advancing the carousel, recovering normal homepage scrolling and interaction requires a full page reload."
 type = "binary"
 negate = true
 weight = 1.0
 
+
+[[criterion]]
+id = "6.11"
+name = "briefing_shortlist_export_flow"
+description = "Pin two distinct news cards; the shortlist count becomes 2 of 8 and both titles appear in order in the JSON and Markdown previews; Download briefing on the JSON tab yields text containing both titles plus 18.16 USD; unpinning the first story returns the count to 1 of 8 and removes that title from both previews without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "consent_into_briefing_undo_flow"
+description = "On a fresh load open Manage preferences, turn Analytics off and Marketing on, save; the banner dismisses and the briefing consent object shows necessary true, analytics false, marketing true; Undo restores the banner to visible and returns the briefing consent object to the pre-save values."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "command_palette_jump_flow"
+description = "Press Ctrl+K (or Cmd+K), type Market, press Enter on Market Snapshot; the page scrolls Market Snapshot into view with the palette closed; reopen the palette, choose Open cookie preferences, and the preferences modal (or manage path) opens."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "accept_vs_reject_export_divergence_flow"
+description = "On one load Accept all then open the JSON briefing preview and note consent all-true; on a fresh load Reject all then open the JSON preview and confirm only necessary is true with analytics, marketing, and functional false."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "reload_clears_pins_and_undo_stacks"
+description = "After pinning stories, dismissing cookies, and using undo: a reload returns shortlist empty at 0 of 8, briefing with no pinned titles, cookie banner visible, and empty undo/redo stacks."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.16"
+name = "consent_invalid_save_validation_flow"
+description = "On a fresh load open Manage preferences, force an invalid draft (necessary false or a missing boolean category), activate Save preferences; the modal stays open with named field errors, the banner remains visible, and the briefing consent object is unchanged; correcting to a valid draft and saving then dismisses the banner and writes the four-key payload."
+type = "binary"
+weight = 1.0
+
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "briefing_flow_dead_end"
+description = "After pinning stories or opening the Investor briefing / command palette, recovering normal homepage scrolling and interaction requires a full page reload."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "undo_does_not_restore_consent_or_pins"
+description = "After Save preferences or a pin, Undo leaves the banner dismissed / shortlist unchanged and the briefing preview still shows the post-action values."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "consent_validation_flow_silent_commit"
+description = "An invalid consent Save preferences attempt dismisses the banner or mutates briefing consent without named field errors, or a subsequent valid save fails to write the four-key payload."
 type = "binary"
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.17"
+name = "briefing_export_import_round_trip_flow"
+description = "Pin two distinct news cards and Accept all; copy or note the JSON briefing; unpin both to 0 of 8; Import that JSON; shortlist returns to 2 of 8 with both titles pinned in order, banner stays dismissed with consent all true, and the JSON preview again shows those pinnedTitles and consent values."
+type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "import_round_trip_fails_to_restore"
+description = "After exporting a briefing with pins and consent then clearing pins, Importing that JSON leaves the shortlist empty or consent mismatched without restoring the exported session state."
 type = "binary"
 negate = true
 weight = 1.0

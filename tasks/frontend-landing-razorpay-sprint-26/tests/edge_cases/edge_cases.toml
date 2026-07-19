@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,202 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "For fidelity tasks, evaluate whether the app matches the reference's UX affordances. Empty state UI is present and renders when a collection is empty."
+name = "preloader_clears_input_after_exit"
+description = "After the preloader finishes its upward exit and is removed, it no longer intercepts pointer or keyboard input anywhere on the page — nav, rail, and section controls remain operable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "hash_deeplink_matches_in_app_nav"
+description = "Deep-linking /sprint/26#payment-gateway renders the same view as in-app navigation: the payment-gateway section is in view and its nav cell is highlighted."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "rapid_nav_clicks_settle_last_active"
+description = "Rapid successive clicks across three or more segment-nav labels settle on the last clicked section with exactly one nav cell marked active."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "video_modal_reopen_clean_playback"
+description = "Closing and reopening the video modal plays the video from a clean state (not stuck mid-playback), and body scroll is never left locked after a close."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "resize_across_768_swaps_nav"
+description = "Resizing the viewport across the 768px breakpoint swaps between the desktop segment nav and the mobile hamburger treatment without a page reload and without console errors."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "webgl_fallback_keeps_page_usable"
+description = "If WebGL is unavailable, the hero region falls back to a static composition with its heading text still present, and every section, nav link, and CTA below remains reachable and usable."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "get_access_rail_opens_external_signup"
+description = "The persistent GET ACCESS rail link opens an external signup destination in a new tab (target _blank with rel noopener noreferrer) without navigating the /sprint/26 document away."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "play_and_nav_use_semantic_controls"
+description = "Executive play controls, segment-nav anchors, the hamburger, and the video-modal close control use semantic buttons/links rather than unlabeled div shells."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "video_modal_close_path_works"
+description = "The open video modal can be dismissed via its close control, restoring scroll and stopping playback."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "preloader_progress_visible_during_load"
+description = "During the initial asset load, the preloader shows a visible progress track/bar filling toward 100 percent rather than a blank black screen with no feedback."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+name = "preloader_traps_input_after_exit"
+description = "After the preloader exit animation, an invisible overlay still traps pointer or keyboard input so the page cannot be used."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+name = "deeplink_hash_ignored"
+description = "Loading /sprint/26#payment-gateway leaves the page at the hero top with no payment-gateway section in view and no matching nav highlight."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+name = "nav_or_modal_actions_silent"
+description = "Clicking a segment-nav label or executive play control produces no visible scroll, modal, or active-state feedback."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+name = "multiple_nav_cells_active"
+description = "After rapid nav clicks or mixed click-and-scroll, more than one segment-nav cell remains marked active at once."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "play_control_nonsemantic_shell"
+description = "The executive play control is a non-semantic div/span with no button/link role or accessible name."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "video_modal_not_keyboard_dismissible"
+description = "The open video modal cannot be dismissed via keyboard (focusable close control with Enter/Space or Escape)."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "webgl_failure_breaks_below_fold"
+description = "When WebGL is unavailable, sections below the hero, nav links, or CTAs become unreachable or blank."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "ambiguous_or_missing_control_labels"
+description = "Primary nav labels, GET ACCESS, or the video-modal close control lack readable accessible names."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "resize_breaks_nav_or_errors"
+description = "Resizing across 768px leaves both desktop and mobile nav missing, or throws console errors during the swap."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "scroll_left_locked_after_modal"
+description = "Body scroll remains locked after the video modal is closed."
+type = "binary"
+negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "4.20"
+name = "duplicate_pin_rejected"
+description = "Pinning the same feature twice in a row does not duplicate its name in the shortlist or inflate the count past a single pin for that card."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.21"
+name = "compare_fourth_refused"
+description = "Adding a fourth compare feature shows Compare is full (3/3) and the Compare tray still holds exactly three names."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.22"
+name = "empty_shortlist_brief_valid"
+description = "Opening Export sprint brief with an empty shortlist still produces schema-valid JSON whose shortlistedFeatures is [], brand is Novapay, event is Sprint 26, themeFilter is the live closed-enum value, generatedAt is an ISO-8601 UTC string ending in Z, and other required keys reflect the live session without crashing or showing lorem."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.23"
+name = "malformed_import_rejected"
+description = "Importing a malformed or contract-invalid brief JSON (missing required string brand or required array shortlistedFeatures, brand not Novapay, themeFilter outside the closed enum, compareFeatures longer than 3, a feature name not on the page catalog, a watchedExecutives name outside the closed executive set, or generatedAt not ending in Z) does not apply partial state; shortlist, compare, theme filter, search, and watch log stay unchanged and an inline import error names the offending field or rule."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.24"
+name = "invalid_theme_filter_import_named_error"
+description = "Importing a brief whose themeFilter is NotATheme keeps Theme filter and trays unchanged and shows an inline import error that names themeFilter (or the enum rule)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n20"
+name = "malformed_import_corrupts_state"
+description = "Importing malformed or contract-invalid brief JSON partially mutates shortlist, compare, theme filter, search, or watch log into an inconsistent mix."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "4.n21"
+name = "oversized_compare_import_applied"
+description = "Importing a brief with four compareFeatures names applies those names into the Compare tray or leaves compare state partially updated instead of refusing the payload."
 type = "binary"
 negate = true
 weight = 1.0

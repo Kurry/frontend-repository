@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,78 +62,78 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "empty_state_is_present"
-description = "Empty state UI is present and renders when a collection is empty."
+name = "empty_feed_and_empty_agents_states"
+description = "When feed filters match no events the feed shows an empty-state message with Clear filters; when every agent is disconnected the agent panel shows an empty state offering Connect agent"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "forms_validate_inline"
-description = "Inline validation appears on all forms before submit."
+name = "forms_enforce_agent_and_schedule_contracts"
+description = "Connect agent and night-schedule forms show inline per-field validation for the declared field contracts before submit, and submit/save stays blocked while invalid"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "errors_are_actionable"
-description = "Error messages are clear and actionable rather than only saying 'Invalid'."
+name = "validation_messages_name_field_and_rule"
+description = "Validation and import error messages name the offending field and the violated rule rather than only saying Invalid"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "actions_show_confirmation"
-description = "Success or confirmation feedback appears after actions."
+name = "actions_show_confirmation_feedback"
+description = "Connect, disconnect, export Copy, and successful import show visible confirmation or feed/toast feedback"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "async_work_shows_loading_state"
-description = "Loading spinners or indicators are shown for async or simulated-async work."
+name = "running_agent_shows_step_progress"
+description = "A running agent shows live step progression and an n-of-m summary rather than an inert static row"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "destructive_actions_support_undo_or_cancel"
-description = "Undo or cancel options are available where destructive actions exist."
+name = "disconnect_supports_confirm_and_undo"
+description = "Disconnect asks for confirmation before removal, and Undo can restore a disconnected agent"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "non_obvious_controls_have_help"
-description = "Help or tooltips are present for non-obvious controls."
+name = "night_badge_and_palette_are_discoverable"
+description = "Night-mode badge and Command palette control are labeled or titled so their purpose is discoverable"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "controls_use_semantic_tags"
-description = "Buttons, inputs, and labels use semantic tags."
+name = "controls_use_semantic_interactive_elements"
+description = "Connect, Disconnect, Export, Undo, Redo, checkboxes, and filter chips use semantic buttons/inputs/labels rather than non-interactive divs only"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.9"
-name = "modal_supports_close_paths"
-description = "Modal close controls and background clicks both close the overlay."
+name = "modals_support_close_paths"
+description = "Connect dialog, export drawer, and command palette close via explicit close and Escape"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.10"
-name = "long_flows_show_progress"
-description = "Long task flows provide progress or feedback steps."
+name = "running_agent_shows_step_progress_feedback"
+description = "Long simulated agent runs provide visible step-status progress rather than a silent wait"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.n1"
 name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
+description = "An empty filtered feed or empty agent panel shows nothing with no empty-state message or recovery control"
 type = "binary"
 negate = true
 weight = 1.0
@@ -141,7 +141,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n2"
 name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
+description = "Connect, schedule, or import validation failures appear only in the browser console"
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "4.n3"
 name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
+description = "Connect, disconnect, export Copy, or import succeed or fail with no visible UI feedback"
 type = "binary"
 negate = true
 weight = 1.0
@@ -157,55 +157,55 @@ weight = 1.0
 [[criterion]]
 id = "4.n4"
 name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
+description = "Disconnect or bulk Disconnect selected removes agents with no confirmation"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
+name = "double_submit_creates_duplicates"
+description = "Double-activating Connect agent submit creates more than one agent row"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
+name = "import_malformed_mutates_session"
+description = "Importing malformed Session JSON or contract-violating agents mutates the agent collection or clears undo as if import succeeded"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
+name = "bulk_disconnect_with_zero_selection_fires"
+description = "Bulk Disconnect selected with zero checked rows still removes agents or opens a confirmation"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
+name = "long_agent_name_breaks_layout"
+description = "An agent name longer than 40 characters overflows or breaks the panel row layout instead of truncating with an ellipsis"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
+name = "export_empty_agents_errors"
+description = "With zero agents, opening Export session errors or fails to show header-only CSV / empty agents array JSON"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
+name = "redo_after_new_mutation_still_applies"
+description = "After Undo then a new connect, Redo is still enabled and resurrects the cleared redo stack"
 type = "binary"
 negate = true
 weight = 1.0

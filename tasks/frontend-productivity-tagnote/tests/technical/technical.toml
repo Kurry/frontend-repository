@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -83,8 +83,8 @@ weight = 1.0
 
 [[criterion]]
 id = "TI-4"
-name = "TI-4"
-description = "After creating notes and marking domain state, a full page refresh restores note text, tags, TODO designation, done, pin, and archive state exactly"
+name = "reload_returns_empty_seeded_baseline"
+description = "After creating notes and marking domain state, a full page refresh returns the app to the empty seeded baseline (empty timeline, empty rail) rather than restoring prior notes — in-memory genre"
 type = "binary"
 weight = 1.0
 
@@ -104,8 +104,8 @@ weight = 1.0
 
 [[criterion]]
 id = "TI-NEG-1"
-name = "TI-NEG-1"
-description = "A deleted note reappears after a reload, or a success toast/checkmark shows while the underlying note is absent after reload (fabricated or hardcoded success)"
+name = "browser_storage_used_or_fake_persist"
+description = "After exercising send/pin/archive/export, localStorage or sessionStorage is non-empty, or a success toast claims persistence while a reload still shows notes from the prior session (good-app in-memory violation)"
 type = "binary"
 weight = 1.0
 negate = true
@@ -176,6 +176,28 @@ name = "chrome_navigates_off_app"
 description = "App chrome contains an outbound navigational link, or activating any in-app control navigates the browser away from the app's origin"
 type = "binary"
 weight = 0.5
+negate = true
+
+[[criterion]]
+id = "TI-12"
+name = "in_memory_store_coherence_across_surfaces"
+description = "A pin, archive, or done toggle updates the timeline bubble, the Archived or TODO split view, and the Export Session JSON preview from one shared collection without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "TI-13"
+name = "session_json_and_composer_share_field_contract"
+description = "Composer rejection of blank or over-length text and Import rejection of Session JSON that violates the same text/marks/boolean rules both name the offending field and leave the last valid notes collection intact"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "TI-NEG-6"
+name = "export_preview_stale_after_mutation"
+description = "After sending or pinning a note, reopening Export shows Session JSON identical to the pre-mutation preview (export not compiled live from the store)"
+type = "binary"
+weight = 1.0
 negate = true
 
 [[criterion]]

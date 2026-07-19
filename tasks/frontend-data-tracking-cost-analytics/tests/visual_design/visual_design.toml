@@ -1,0 +1,148 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "dashboard_layout_composition"
+description = "The app composes as a header (title, budget cap input, capacity gauge, undo/redo), a KPI strip, a main chart region with the spend and breakdown charts, the team budget panel and anomaly list alongside, and the event table with formula box and filter chips below"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "kpi_tile_anatomy"
+description = "KPI tiles show a bold numeric value, a label, and a 16 pixel trend arrow icon, and the over-budget tile carries the 2 pixel error border and over-budget label"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "categorical_palette_consistent"
+description = "Chart series use one consistent categorical palette with the same member-to-color mapping across the breakdown legend, the budget wheel, and the delta chips, and the compare overlay series is visually distinct from the primary"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "error_family_distinct"
+description = "Anomaly markers and overage highlights share one error color family clearly distinct from the categorical series palette"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "currency_format_consistent"
+description = "Currency renders with one consistent format — dollar sign, two decimals for totals, four for unit rates — across tiles, charts, tables, and exports"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "typography_hierarchy"
+description = "Typography shows a clear hierarchy — the app title larger than panel headings, which are larger than table body and label text — consistent across views"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "spacing_rhythm"
+description = "Gaps between the KPI strip, charts, panels, and table are visually regular with no crowded or orphaned regions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "control_state_treatments"
+description = "Buttons, inputs, selects, sliders, and toggles show distinct default, hover, focus (visible ring), disabled, and error treatments"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "single_icon_set"
+description = "One consistent icon set is used throughout the header, tiles, panel controls, and row actions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.n1"
+name = "series_rely_on_color_only"
+description = "Chart series, anomaly, or over-budget distinctions are carried by hue alone with no accompanying label, icon, or pattern, or the same member maps to different colors in different surfaces"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n2"
+name = "desktop_layout_overlap"
+description = "At 1440 pixel width any tile, chart, panel, or table content overlaps another element or is clipped by its container"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "visual_design.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

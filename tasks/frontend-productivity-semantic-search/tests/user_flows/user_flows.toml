@@ -1,0 +1,219 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "6.1"
+name = "search_to_report_flow_complete"
+description = "The full search flow works end to end: entering a query and pressing Enter renders the ranked list with scores descending, moving the threshold slider hides low-scoring cards and updates the count, thumbs-up moves a result up with a feedback marker, and the export report shows the same query, threshold, order, and marker — all without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.2"
+name = "invalid_forms_validate_inline"
+description = "Submitting Save search with an empty name, or Add document with an empty title or body, triggers immediate inline validation naming the field and creates nothing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.3"
+name = "index_flow_updates_related_displays"
+description = "The add-and-index flow updates every related display: after adding a document the index list, stale count, and status bar all change; after Index Now completes the results, statistics, and status bar all reflect the rebuilt index"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.4"
+name = "delete_flow_updates_all_surfaces"
+description = "Deleting a document (singly or via bulk delete) removes it from the index list, any visible results, the related rows, and the index statistics after deletion"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.5"
+name = "view_switch_retains_state"
+description = "Switching between the results, compare, history, and index sections and back retains the current query, threshold, chips, and selection — no view switch silently clears search state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.6"
+name = "no_match_empty_state_recovers"
+description = "Driving results to empty (an unmatched query or an over-raised threshold) shows a clear empty state whose recovery control (clear chips / reset threshold) restores results without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.7"
+name = "filters_update_all_surfaces"
+description = "Applying and removing chips updates the result list, the visible count, and the cluster groups together — no surface keeps showing filtered-out documents"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.8"
+name = "collapsible_chrome_preserves_workflow"
+description = "Collapsing and reopening the left rail (and closing then reopening the detail panel) preserves workflow continuity — the same query, results, and selection are still in place"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.9"
+name = "overlays_support_expected_flows"
+description = "The command palette, export modal, save-search form, and delete confirmations open, complete their flow, and close as expected, returning the user to an intact search context"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.10"
+name = "flow_recovers_without_reload"
+description = "Every dead-end candidate recovers in-app: an unknown syntax token, an empty compare selection, a failed ingest step, and an emptied history all leave working controls to continue without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n1"
+name = "primary_flows_unavailable_from_ui"
+description = "A primary flow — running a query, adding a document, re-indexing, saving a search, or exporting the report — is not reachable from the visible UI"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "6.n2"
+name = "new_items_missing_or_duplicated"
+description = "An added document or saved search fails to appear where it should, or appears duplicated after a single submission"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "6.n3"
+name = "state_changes_desync_displays"
+description = "A state change (feedback, deletion, rebuild) leaves two displays disagreeing — for example the status bar says indexed while the stale count stays above zero"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "6.n4"
+name = "view_switch_breaks_or_loses_selection"
+description = "Switching sections breaks the layout or loses the active query, threshold, or selected result"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "6.n5"
+name = "empty_collection_breaks_ui"
+description = "Emptying a collection (deleting all history entries or bulk-deleting documents) produces a broken or blank region instead of a designed empty state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "6.n6"
+name = "filtered_views_disagree"
+description = "The flat result list, the cluster groups, and the compare columns disagree about which documents currently match the same query and filters"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "6.n7"
+name = "collapsed_chrome_cannot_reopen"
+description = "The collapsed left rail or a closed detail panel cannot be reopened from the visible UI"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "6.n8"
+name = "overlay_blocks_navigation"
+description = "The palette, a modal, or the detail panel blocks the rest of the app with no visible exit (no close control and no Escape path)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "6.n9"
+name = "failed_flow_lacks_feedback"
+description = "A failed flow — an invalid form submit, an exhausted ingest retry, an invalid syntax token — completes silently with no visible feedback"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "6.n10"
+name = "navigation_dead_end_requires_reload"
+description = "Some navigation state (deep in the related-breadcrumb trail, mid-run pause, an emptied results view) can only be escaped by reloading the page"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "user_flows.catchall"
+name = "user_flows_catchall"
+description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

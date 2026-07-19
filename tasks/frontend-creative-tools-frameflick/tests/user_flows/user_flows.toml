@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,152 +62,218 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "upload_style_save_preset_persists"
+description = "After uploading an image, picking the Night swatch, setting padding to 12, and saving a preset named Warm Card, the Saved presets list count increases by exactly one, the new entry appears with Apply and Del controls, and a full page refresh restores the canvas settings, keeps Warm Card in the Saved presets list, and shows the uploaded image as a Recent thumbnail."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "empty_preset_name_blocks_create"
+description = "Create flow: attempting Save preset with an empty name triggers immediate inline validation naming the name field and does not add a Saved presets entry."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "apply_preset_restores_all_settings"
+description = "After changing background, padding, and frame style away from a saved preset, clicking that preset's Apply restores every stored setting at once: background, padding value, corner radius, shadow label, frame choice, caption, and watermark all revert to the stored combination and the live canvas re-renders to match without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "delete_preset_confirm_and_refresh"
+description = "Deleting a preset through Del and its confirm dialog decreases the Saved presets count by exactly one, the removed entry disappears from the list, and after a full page refresh the deleted preset does not reappear."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "editor_collaboration_tab_retains_state"
+description = "Switching between the Editor and Collaboration tabs changes the main view without a page reload, highlights the active tab, and returning to Editor retains the prior canvas composition and Saved presets list."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "last_preset_delete_clears_list"
+description = "After deleting the last Saved preset through Del and confirm, the Saved presets list is empty (count zero) with no leftover Apply/Del row for the removed preset."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "recent_strip_switches_image_settings"
+description = "Uploading a second image adds a new thumbnail to the Recent strip (up to 6), and clicking the first image's thumbnail first captures the current settings onto the second image, then reloads the first image together with the settings last used on it; switching back and forth shows each image with its own settings without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "collaboration_offline_online_apply_to_canvas"
+description = "In the Collaboration scenario, clicking Go offline and making one edit in the Shared editor and one in the simulated peer editor grows the queued-operations list by one entry per edit; clicking Go online empties the queue, merges both changes into the Shared content region so either application order shows the same converged text, and clicking Apply to canvas then switching to the Editor tab shows that converged text as the canvas caption without a page reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "preset_delete_overlay_confirm_flow"
+description = "The Del confirm overlay behaves as expected: confirming removes the preset; canceling/Escape leaves it; focus returns to a usable Editor state afterward."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "conflict_choice_recovers_without_reload"
+description = "When a genuine Collaboration conflict surfaces Use mine / Use theirs / Merge choices, selecting one completes the flow and returns to a usable Shared content / Apply to canvas path without requiring a page reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "preset_or_collaboration_flows_unavailable"
+description = "Saved preset create/apply/delete or the Collaboration Go offline → edit → Go online → Apply to canvas path cannot be completed from the visible UI controls."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "new_presets_missing_or_duplicated"
+description = "After a valid Save preset, the new entry fails to appear, or a single save creates duplicate Saved presets rows for the same name."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "apply_or_recent_settings_desync"
+description = "After Apply on a preset or after switching Recent thumbnails, the canvas background/padding/frame/caption surfaces disagree with each other about the restored settings."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "tab_switch_breaks_or_loses_canvas"
+description = "Switching Editor ↔ Collaboration breaks the layout or loses the prior canvas image/settings when returning to Editor."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_presets_list_breaks_ui"
+description = "After deleting all Saved presets, the Saved presets region is broken or missing rather than an empty list state."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "recent_thumbnails_disagree_with_canvas"
+description = "After switching Recent thumbnails, the canvas image or attached settings disagree with the thumbnail that was just activated."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "collaboration_queue_stuck_after_online"
+description = "After Go online following offline edits, the queued-operations list stays non-empty, or Shared content omits one author's non-conflicting change."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "delete_dialog_blocks_with_no_exit"
+description = "The preset delete confirm overlay opens but cannot be closed, leaving the Editor blocked with no exit path."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "failed_save_or_upload_lacks_feedback"
+description = "A failed Save preset (empty/duplicate name) or unsupported upload provides no visible user feedback."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "flow_dead_end_requires_reload"
+description = "After opening Collaboration, applying a preset, or dismissing the delete dialog, recovering normal Editor interaction requires a full page reload."
 type = "binary"
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "style_recipe_export_import_flow"
+description = "Style recipe end to end: after uploading an image, picking Ocean, setting padding to 16, enabling Browser frame, typing a caption, and enabling a watermark with a distinct watermark color, the Export preview JSON contains those values under RenderSettings keys including watermarkColor and still shows every required key; importing the downloaded frameflick-style.json after changing settings restores Ocean, padding 16, Browser frame, the caption, and the watermark color without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "undo_redo_round_trip_flow"
+description = "Undo round trip: after changing background from Night to Ocean and padding from 8 to 18, Undo restores Night and padding 8 on the canvas and in the Export preview JSON; Redo reapplies Ocean and padding 18."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "before_after_compare_flow"
+description = "Before/After compare: after dressing an uploaded image, activating Before shows the earlier undressed look and returning to After shows the current dressed look with the same settings still applied."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "copy_paste_group_flow"
+description = "Copy/paste groups: after Copy settings on a Night-plus-Browser look, changing background and padding, then Paste settings with only Background checked restores Night while padding stays at the changed value."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "style_import_fails_to_restore"
+description = "After importing a previously exported style JSON, the canvas still shows the post-change background, padding, frame, or caption instead of the exported combination."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n12"
+name = "paste_applies_unchecked_groups"
+description = "Paste settings with only Background checked also mutates unchecked groups such as padding or frame."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "preset_save_settings_payload_flow"
+description = "After configuring Night, padding 12, Browser frame, caption, and watermark with watermarkColor, saving Warm Card increases the Saved presets count by exactly one; Apply after changing those controls restores the full PresetCreate settings combination; the Export preview after Apply shows matching RenderSettings field values for background, padding, frame, caption, watermark, and watermarkColor."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n13"
+name = "preset_apply_mismatches_export_preview"
+description = "After Apply on a saved preset, the canvas controls and Export preview JSON disagree about the restored background, padding, frame, caption, or watermark values."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.21"
+name = "import_rejects_out_of_contract_then_valid_round_trip"
+description = "After a valid style configuration, importing a parseable but field-contract-invalid style JSON (for example padding 99 or frame Tablet) leaves the canvas unchanged with a named-field or Invalid style JSON error; then importing a previously exported valid frameflick-style.json restores the prior RenderSettings combination."
+type = "binary"
 weight = 1.0
 
 [[criterion]]

@@ -1,0 +1,339 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_library_table"
+description = "On load, the experiment library shows a data table with columns name, variants, sample size, status, started, and actions, listing at least 3 completed and at least 2 pending seeded experiments"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "status_filter_and_search"
+description = "Status filters narrow the visible rows to the chosen status with a removable active-filter indicator and an immediately updated row count, and typing in the search field narrows rows incrementally to matching names while clearing it restores the previously filtered set exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "bulk_archive_delete"
+description = "Selecting two or more rows reveals a bulk action bar showing the selected count; confirming Archive selected moves every selected experiment to archived in one action, and confirming Delete selected removes exactly the selected rows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "archive_toggle_unarchive"
+description = "An Archived toggle reveals archived experiments, and unarchiving one from its row actions returns it to its prior status"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "designer_full_field_set"
+description = "New Experiment opens a modal with experiment name, hypothesis, success metric select listing the judge criteria, minimum sample size (integer 1 to 500), and a variants section starting with variants A and B, each variant having a title, prompt selector, model select, and temperature value"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "variant_add_remove_bounds"
+description = "An Add variant control appends variants C and then D, remove controls delete C or D, and the designer never allows fewer than 2 or more than 4 variants"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "allocation_sum_live_validation"
+description = "Each variant has a traffic allocation slider, adjusting one updates a displayed total immediately, the indicator turns to an error treatment with a message naming the allocation rule whenever the sum is not 100, and Submit stays disabled while the sum is not exactly 100"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "valid_submit_adds_pending"
+description = "Submitting a valid designer form closes the modal, adds exactly one experiment with a Pending status badge, and increases the visible experiment count by one"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "invalid_submit_named_errors"
+description = "Submitting with an empty name or hypothesis shows an inline validation message naming the offending field and adds no experiment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "edit_prefilled_updates_row"
+description = "A pending experiment's Edit action reopens the designer prefilled with its name, hypothesis, variants, allocations, metric, and minimum sample size, and saving updates the library row without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "criteria_view_and_form"
+description = "The Criteria view lists at least 4 seeded judge criteria with name, description, and pass threshold, and the New Criterion form validates name, description, and threshold (0 to 100) inline, adding nothing on an invalid submit"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "new_criterion_feeds_metric_select"
+description = "A newly added judge criterion immediately appears as a choice in the designer's success metric select without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "preview_playground_columns"
+description = "The designer's Preview opens a playground with one synchronized column per configured variant (2 to 4) under a single shared prompt-input row; running fills every column with a simulated response showing variant title, model name, latency, and tokens, and differently configured columns show different responses"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "preview_rerun_replaces_all"
+description = "Editing the playground's shared input and running again replaces every column's response, and columns never show responses from different preview runs at the same time"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "run_per_variant_progress"
+description = "Clicking Run on a pending experiment fills a per-variant progress bar as that variant's samples complete, with a numeric fraction (such as 23 of 50 samples) beside each bar, while the row shows an inline loading indicator, the overall progress fraction, and a Running badge"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "pause_resume_preserves_samples"
+description = "Pausing a running experiment freezes every variant's sample count and shows a Paused badge; resuming continues from exactly those counts and samples collected before the pause are never recollected or changed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "event_timeline_live_filterable"
+description = "The run's event timeline lists started, sample milestone, paused, resumed, and completed entries in order with timestamps, gains entries live during the run, and can be filtered by entry type"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "results_grouped_bar_chart"
+description = "A completed experiment's results panel shows a grouped bar chart of every variant's mean score per judge criterion, with criteria on the x-axis and one consistently colored series per variant"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "distributions_differ_by_config"
+description = "The distribution strip shows a per-variant score distribution, and variants configured with different prompts or models show visibly different distributions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "difference_chart_ci_band"
+description = "A difference chart plots the score delta between the leading variant and the baseline with a shaded 95 percent confidence band around the delta line"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "summary_strip_stats"
+description = "The summary strip shows four labeled stat cells — winner badge (variant letter or Tie), win rate percentage, p-value, and the 95 percent confidence interval for the score delta — computed from the current sample scores"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "underpowered_gate_then_verdict"
+description = "Before every variant reaches the minimum sample size the summary shows an explicit Underpowered state naming how many samples are still needed with no significance verdict; at or past the threshold a p-value below 0.05 renders the winner badge in the success treatment and 0.05 or above renders it in the warning treatment labeled Not significant"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "sample_table_delta_sort"
+description = "The sample-level table lists each input with every variant's score, sorts by score delta on header click, and reverses the order on a second click"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "monitoring_convergence_chart"
+description = "The Monitoring tab plots each variant's cumulative mean score against samples collected with a reference line at the minimum sample size, and hovering a point with the real pointer shows a tooltip with variant, sample count, and cumulative mean"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "comparison_matrix_coherent"
+description = "The Matrix tab shows one column per variant with rows for mean score, mean latency, mean tokens, token efficiency, and win rate, highlights the best cell per row, and its values agree with the summary strip and sample table"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "radial_criterion_wheels"
+description = "The Analytics tab renders a radial wheel per judge criterion whose ring fill is proportional to that criterion's pass rate with the numeric percentage in the center"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "inspector_flag_recompute"
+description = "The Inspector tab lists each variant's responses with input, response text, per-criterion scores, latency, and tokens, switchable between variants without a reload; flagging a response as an outlier excludes it from every statistic and immediately produces a visible change in the summary strip, charts, matrix, and radial wheels, and unflagging recomputes them again"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "decision_locks_experiment"
+description = "The decision dialog offers Declare winner, Inconclusive, or Stop early with a required rationale and disabled Submit until it is entered; confirming sets the status to Decided, shows the decision and rationale in the results header, and disables Edit and Flag outlier controls with a visible locked indicator"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "promote_winner_head_version"
+description = "Declaring a winner offers a Promote winner confirmation; confirming records the winning variant's prompt as the new head version in the prompt library panel and shows a success toast naming the variant"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "undo_redo_state_edits"
+description = "Undo and Redo controls revert and reapply designer saves, outlier flag changes, archives, and deletions across every affected surface, disable when there is nothing to undo or redo, and confirmed decisions stay locked and excluded from undo"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "export_report_live_derived"
+description = "Export report assembles a preview and download containing the experiment design, per-variant sample counts, current statistics excluding flagged outliers, and any decision with rationale, and the report values match the values currently visible in the results panel — flagging an outlier or deciding before exporting changes the report content"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "double_activation_single_effect"
+description = "Rapidly double-activating Run starts exactly one run (progress fills once, one completed result set), and rapidly double-activating the designer Submit creates exactly one experiment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "empty_and_edge_states"
+description = "When filters and search match nothing the table shows an empty state with a Clear filters control; deleting or archiving the open experiment empties its panel to a message with a control to choose another; flagging every response of a variant shows an insufficient-data state in the summary; a name longer than 60 characters truncates with an ellipsis in the row and shows in full in the results header"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "variant_removal_keeps_allocations"
+description = "Removing a variant in the designer keeps the remaining allocation values unchanged while the sum indicator updates, requiring a manual rebalance before submitting"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.n1"
+name = "significance_shown_while_underpowered"
+description = "A significant or not-significant verdict (green or yellow winner badge, or a significance label) is displayed while one or more variants are still below the experiment's minimum sample size"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n2"
+name = "identical_distributions_across_configs"
+description = "Two variants or experiments with different prompt or model configurations render identical score distributions or byte-identical statistics, indicating hardcoded rather than configuration-driven simulation"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n3"
+name = "fabricated_run_completion"
+description = "The Run flow presents a Completed status while the results surfaces, sample counts, or summary statistics remain unchanged from before the run"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n4"
+name = "flag_leaves_stats_stale"
+description = "Flagging or unflagging an outlier leaves the p-value, means, matrix cells, radial percentages, or export content unchanged from their pre-flag values"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

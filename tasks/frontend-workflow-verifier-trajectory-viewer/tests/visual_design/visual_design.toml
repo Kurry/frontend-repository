@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -60,24 +60,25 @@ allowed_tools = [
 [scoring]
 aggregation = "weighted_mean"
 
+
 [[criterion]]
 id = "3.1"
 name = "split_instrument_composition"
-description = "At a 1440px viewport the review workspace composes as a split instrument: two trajectory panes with a strong vertical divider and persistent headers naming the agent and judge sides, the verdict table and rollup bar docked below or beside them, all separated by hairline borders with subtle panel shadows"
+description = "At a 1440px viewport the review workspace composes as a split instrument: two trajectory panes with a strong vertical divider and persistent headers naming the agent and scorer sides, the verdict table and rollup bar docked below or beside them, all separated by hairline borders with subtle panel shadows"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
 name = "type_roles_and_hierarchy"
-description = "A monospaced face is used for code, terminal output, file paths, criterion ids, and step indices while a UI sans is used elsewhere, and page titles are visibly larger than section headings, which are larger than body and label text, consistently across views"
+description = "A monospaced face is used for code, terminal output, file paths, criterion ids, step indices, and the export JSON preview while a UI sans is used elsewhere, and page titles are visibly larger than section headings, which are larger than body and label text, consistently across views"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
 name = "verdict_status_labeling_system"
-description = "One color system covers verdicts and statuses everywhere they appear — green for yes/pass, red for no/fail, amber for running or in-review, one accent for the active step and selected criterion — and flip flags, adjudication classifications, and change badges each render a distinct treatment that always includes its word (Flipped, agent-bug, rubric-bug, judge-error, Added, Modified, Deleted, Truncated) so color is never the only indicator"
+description = "One color system covers verdicts and statuses everywhere they appear — green for yes/pass, red for no/fail, amber for running or in-review, one accent for the active step and selected criterion — and flip flags, adjudication classifications, and change badges each render a distinct treatment that always includes its word (Flipped, agent-bug, rubric-bug, scorer-error, Added, Modified, Deleted, Truncated) so color is never the only indicator"
 type = "binary"
 weight = 1.0
 
@@ -91,7 +92,7 @@ weight = 1.0
 [[criterion]]
 id = "3.5"
 name = "dense_register_icons_states"
-description = "The verdict table, trial table, and both timelines use compact dense rows matching a review-console register, one consistent icon set is used across the chrome, and loading and empty surfaces (including the no-flips state) are deliberately designed with explanatory copy rather than blank regions"
+description = "The verdict table, trial table, and both timelines use compact dense rows matching a review-console register; bulk selection, Undo/Redo/Export/Import sit in the workspace chrome; one consistent icon set is used across the chrome; and loading and empty surfaces (including the no-flips state) are deliberately designed with explanatory copy rather than blank regions"
 type = "binary"
 weight = 1.0
 
@@ -105,7 +106,7 @@ weight = 1.0
 [[criterion]]
 id = "3.7"
 name = "mobile_375_overflow"
-description = "At 375px viewport width, content clips, overflows the viewport, or page-level horizontal scrolling appears instead of the verdict table, code blocks, and terminal scrolling within their own containers"
+description = "At 375px viewport width, content clips, overflows the viewport, or page-level horizontal scrolling appears instead of the verdict table, code blocks, terminal, export drawer, import surface, and command palette scrolling or reflowing within their own containers"
 type = "binary"
 weight = 1.0
 negate = true
@@ -113,7 +114,7 @@ negate = true
 [[criterion]]
 id = "3.8"
 name = "copy_conventions_specific_labels"
-description = "Headings, buttons, and labels follow one consistent capitalization convention throughout, and action labels are specific verbs (Adjudicate criterion, Compare labels) rather than generic labels where a specific one is possible"
+description = "Headings, buttons, and labels follow one consistent capitalization convention throughout, and action labels are specific verbs (Adjudicate criterion, Compare labels, Export review package, Import review package, Apply classification to selected) rather than generic labels where a specific one is possible"
 type = "binary"
 weight = 0.5
 
@@ -121,6 +122,21 @@ weight = 0.5
 id = "3.9"
 name = "placeholder_text_visible"
 description = "Lorem ipsum, 'TODO', template variable names, real product or model-vendor brand names, or other placeholder text is visible somewhere in the shipped UI"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.10"
+name = "export_drawer_monospace_preview"
+description = "The Export review package surface shows format tabs, a scrollable monospaced preview block, and Copy and Download actions, visually consistent with the review-console chrome"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "export_preview_unstyled_dump"
+description = "The export preview renders as an unstyled plain text dump or is missing Copy/Download controls, breaking the designed review-package export surface"
 type = "binary"
 weight = 1.0
 negate = true

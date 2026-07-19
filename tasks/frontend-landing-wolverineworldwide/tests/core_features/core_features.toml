@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -297,6 +297,152 @@ id = "1.42"
 name = "homepage_only_scope_stub_links"
 description = "Activating header, footer, social, legal, and brand-grid links keeps the browser on the single homepage: each is in-page, inert, or a fictional-destination stub, and no in-page control triggers a full-page navigation to an additional built page or a real company, brand, investor, careers, or social destination"
 type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "1.43"
+name = "news_pin_adds_to_shortlist"
+description = "Activating Pin to briefing on a Latest News card adds that card's exact title to the Briefing shortlist, marks the card pinned, and increments the shortlist count by exactly one (n of 8)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "news_unpin_removes_from_shortlist"
+description = "Activating Unpin on a pinned news card removes that title from the shortlist, clears the pinned mark, and decrements the shortlist count by exactly one without leaving the homepage"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "shortlist_empty_state_copy"
+description = "When zero stories are pinned, the Briefing shortlist shows the empty-state line No stories pinned yet rather than a blank region"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "investor_briefing_json_markdown_tabs"
+description = "The Investor briefing region shows a live-compiled preview with tabs labelled JSON and Markdown that both update from current session state after pin, unpin, Accept all, Reject all, or Save preferences"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "briefing_json_field_contract"
+description = "The JSON briefing preview conforms to the Investor briefing JSON field contract: schemaVersion 1, company Northstar Collective, Inc. (NST), quote object with value 18.16 currency USD daysHigh 18.6 daysLow 18.16 daysVolume 38982 lastUpdated 2hours ago, brands array of the eleven portfolio names in order, pinnedTitles matching the shortlist, consent satisfying the four-boolean consent field contract, and generatedAt ending in Z"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "briefing_download_and_copy_controls"
+description = "Download briefing downloads the active tab's exact visible text as northstar-investor-briefing.json or northstar-investor-briefing.md, and Copy briefing copies that same text with a brief visible confirmation that reverts after about two seconds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "command_palette_opens_on_mod_k"
+description = "Pressing Ctrl+K (Cmd+K on macOS) or activating the header Search / Commands control opens a command palette overlay with a search input focused"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "command_palette_fuzzy_jump_and_actions"
+description = "Typing in the command palette fuzzy-matches section names, news titles, and action rows; Enter on Market Snapshot scrolls that section into view, and Open cookie preferences opens the preferences modal via the same handlers as Manage preferences"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "undo_redo_consent_and_pins"
+description = "Undo reverses the most recent pin, unpin, Accept all, Reject all, or Save preferences and updates the shortlist and briefing preview to match; Redo reapplies the undone action; empty stacks leave Undo/Redo disabled"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.52"
+name = "four_named_consent_categories"
+description = "Manage preferences presents exactly four named category toggles — Necessary (locked on), Analytics, Marketing, and Functional — plus Save preferences"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.53"
+name = "accept_all_writes_all_true_consent_payload"
+description = "Activating Accept all dismisses the banner without opening the modal and writes the consent payload necessary true, analytics true, marketing true, functional true into session state, readable in the Investor briefing consent object"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.54"
+name = "reject_all_writes_necessary_only_consent_payload"
+description = "Activating Reject all dismisses the banner without opening the modal and writes the consent payload necessary true, analytics false, marketing false, functional false into session state, readable in the Investor briefing consent object"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.55"
+name = "invalid_consent_save_shows_named_field_errors"
+description = "With Manage preferences open, forcing an invalid draft (necessary false or a missing boolean category) and activating Save preferences keeps the modal open, shows named field errors on the offending keys, leaves the banner visible, and does not mutate the Investor briefing consent object"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.56"
+name = "valid_save_applies_exact_consent_payload"
+description = "Saving preferences with Analytics off and Marketing on applies exactly that validated payload (necessary true, analytics false, marketing true, and the saved functional boolean) to in-memory consent state, closes the modal, dismisses the banner, and shows those same four values in the Investor briefing consent object"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n43"
+name = "briefing_export_omits_session_mutations"
+description = "After pinning a news story or saving distinct consent choices, the JSON or Markdown briefing preview omits the pinned title, omits market-snapshot figures, or shows consent values that disagree with the last Accept all / Reject all / Save preferences action"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n44"
+name = "pin_duplicates_or_navigates_away"
+description = "Pinning a news card duplicates its title in the shortlist, advances/resets the carousel as a side effect, or navigates away from the homepage"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n45"
+name = "invalid_consent_save_still_commits"
+description = "Saving an invalid consent draft (necessary false or incomplete category booleans) dismisses the banner or writes a consent object that disagrees with the field contract without showing named field errors"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.57"
+name = "briefing_import_restores_pins_and_consent"
+description = "After pinning two news cards and Accept all, copying the JSON briefing, unpinning both to 0 of 8, then Importing that JSON restores shortlist 2 of 8 with both titles pinned in order, keeps the cookie banner dismissed with consent matching the payload, and regenerates the JSON preview to show those pinnedTitles and consent values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n46"
+name = "briefing_json_missing_required_schema_keys"
+description = "The JSON briefing preview omits schemaVersion, quote, brands, pinnedTitles, consent, or generatedAt, or shows consent that violates the four-boolean necessary-true field contract"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n47"
+name = "invalid_briefing_import_mutates_session"
+description = "Importing malformed or schema-invalid briefing JSON changes the shortlist or consent state instead of showing a named import error and leaving state unchanged"
+type = "binary"
+negate = true
 weight = 1.0
 
 [[criterion]]

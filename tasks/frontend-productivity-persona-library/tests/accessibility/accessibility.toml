@@ -1,0 +1,211 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "keyboard_reaches_everything"
+description = "Cards, card actions, sliders, variant tabs, facet entries, tray actions, the poll overlay, and drawer entries are all reachable and operable with the keyboard alone, with a visible focus indicator"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "flip_and_attach_keyboard_paths"
+description = "The card flip is operable with Enter or Space, and the attacher drawer offers a keyboard alternative to drag (choosing the persona from the list fills the slot)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "modals_manage_focus"
+description = "The editor modal, poll overlay, and drawers trap focus while open, close on Escape, and return focus to the control that opened them"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "live_region_announcements"
+description = "Stream completion, poll results, and bulk apply results are announced through an aria-live region as well as shown visually"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "sliders_and_forms_labeled"
+description = "Each trait slider has a visible label and an accessible value readout, every form field has a visible label, and validation messages are programmatically associated with their fields"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "headings_follow_logical_order"
+description = "Page, view, and panel headings follow a logical order with no skipped levels"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.7"
+name = "state_not_color_only"
+description = "Role categories, promoted state, and archived state are conveyed by text or icon in addition to color"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "text_and_controls_have_contrast"
+description = "All text and controls — including badges, tag chips, chart legends, and the card back — keep sufficient color contrast"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "semantic_html_roles_are_used"
+description = "The app uses semantic structure: real buttons for actions, list semantics for facets and history, and landmark regions for toolbar and main content"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "reduced_motion_is_respected"
+description = "With prefers-reduced-motion set, the flip becomes an instant swap and card, vote, and drawer animations are replaced by instant changes while all functionality remains"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n1"
+name = "controls_unreachable_by_keyboard"
+description = "Some interactive control (a card action, slider, facet entry, tray button, or overlay control) cannot be reached or activated via keyboard"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n2"
+name = "focus_indicators_missing_or_obscured"
+description = "Focus indicators are missing or visually obscured on cards, sliders, or form controls"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n3"
+name = "custom_controls_lack_semantics"
+description = "Custom controls (flip cards, drop slot, variant tabs, vote rows) use non-semantic tags with no ARIA role, name, or state"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n4"
+name = "state_uses_color_only"
+description = "Role, promoted, or archived state is distinguishable only by color"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n5"
+name = "modals_fail_to_trap_focus"
+description = "A modal, overlay, or drawer lets Tab move into the background content while open"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n6"
+name = "poor_contrast_makes_text_unreadable"
+description = "Some text (badges, chips, legends, secondary labels) is unreadable due to poor contrast"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n7"
+name = "errors_are_visual_only"
+description = "Validation or flow errors are conveyed visually only, with no screen-reader-accessible association or announcement"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n8"
+name = "drag_only_attachment"
+description = "Filling the test bench slot works only by pointer drag, with no keyboard-accessible alternative"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "1.n9"
+name = "animations_ignore_reduced_motion"
+description = "The flip, card entrances, or vote arrivals still animate with prefers-reduced-motion set"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "accessibility.catchall"
+name = "accessibility_catchall"
+description = "The app exhibits a significant accessibility barrier that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the barrier and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the barrier is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

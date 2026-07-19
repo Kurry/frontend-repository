@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -246,9 +246,88 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "1.36"
+name = "hand_reaches_decided_end_state"
+description = "Every completed hand announces a decided end state on the table: either a fold win naming the winner, or a showdown naming the winner and winning hand type — never a silent freeze with chips still contested"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "difficulty_changes_ai_strength"
+description = "Switching the difficulty control among Easy, Standard, and Hard observably changes AI strength across subsequent hands: Hard opponents call or raise more often and fold less often than Easy opponents under comparable spots"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "undo_last_action_restores_street"
+description = "On the human's turn, after raising a specific amount, using \"Undo last action\" restores the human's stack, the pot, and the turn indicator to their pre-raise values when the raise has not yet been followed by an AI response that advanced the street"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "save_table_mid_hand_resumes"
+description = "During an active hand after the flop is dealt, using \"Save table\" and then reloading (or using \"Load saved table\") resumes with the same board, pot, stacks, street, and side to act"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "export_session_json_schema"
+description = "The Export panel shows a monospaced session JSON preview whose schemaVersion is exactly \"feltrun-session-v1\" and that includes required top-level keys session, stacks, handHistory, and inProgressHand"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "export_reflects_session_mutations"
+description = "After completing at least one hand so Session stats and Hand history change, the Export panel's session JSON preview lists that hand in handHistory with matching pot, winnerName, and handType, and session.handsPlayed matches the visible stats — not a stale pre-play document"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "export_copy_and_download"
+description = "Export Copy writes the visible preview text to the clipboard and shows a brief copied confirmation, and Download starts a file download of that same preview text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "import_round_trip_session_json"
+description = "After mutating the session (complete at least one hand), importing the exported feltrun-session-v1 JSON restores stacks, Session stats, Hand history, badges, and difficulty to match the pre-export mutated state, and the export preview matches again"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "raise_amount_field_contract"
+description = "Entering a fractional or non-numeric raise amount, or an amount below the legal minimum raise or above the human's stack, shows an inline validation message next to the raise-amount input naming amount or the violated limit, and raise confirm stays disabled until amount is a legal integer"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n_export_omits_mutations"
+name = "export_omits_session_mutations"
+description = "After completing a hand that changes stats and Hand history, the Export panel's session JSON preview still omits that hand from handHistory or keeps session.handsPlayed at the pre-play value"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n_undo_no_restore"
+name = "undo_does_not_restore_stacks"
+description = "Using \"Undo last action\" after a legal human raise leaves the pot and human stack at the post-raise values instead of restoring the prior street state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in its core poker, stats, persistence, or collaboration features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable defect in its core poker, stats, persistence, export, save/resume, or collaboration features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

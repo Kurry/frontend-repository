@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -98,7 +98,7 @@ weight = 1.0
 [[criterion]]
 id = "12.6"
 name = "form_flow_operations_are_bound"
-description = "Form submission validation, error, and cancel operations are clearly bound."
+description = "Bookmark create and workspace create field-contract validation is bound so invalid url/title/name/accentColor submissions reject through the same handlers the UI uses, with no MCP path bypassing those rules."
 type = "binary"
 weight = 1.0
 
@@ -208,6 +208,21 @@ name = "automated_contract_validation_fails"
 description = "The project fails automated MCP contract validation."
 type = "binary"
 negate = true
+weight = 1.0
+
+
+[[criterion]]
+id = "12.11"
+name = "artifact_bindings_include_sidedock_json"
+description = "Artifact-transfer bindings expose import, export, and copy with import modes netscape-html and sidedock-json and export formats netscape-html and sidedock-json, matching the instruction contract"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "12.12"
+name = "sidedock_json_export_import_via_same_handlers"
+description = "Export and import of sidedock-json invoke the same SideDock package compile/validate handlers as the Export SideDock package and Import SideDock package UI controls, so a contract-valid package round-trips workspace, bookmark, pin, and sidebar state"
+type = "binary"
 weight = 1.0
 
 [[criterion]]

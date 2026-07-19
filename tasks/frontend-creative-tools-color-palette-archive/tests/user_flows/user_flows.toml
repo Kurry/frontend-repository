@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,215 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "6.1"
-name = "create_flow_updates_all_surfaces"
-description = "Create flow: a new item can be created via the UI and appears everywhere it should."
+name = "create_palette_updates_all_layouts_and_export"
+description = "Starting in Browse with the seeded library: create a valid palette via the editor; confirm the visible palette count increases by exactly one, the new card appears in Palette view, its swatches join Nomenclature and Swatch tiles, and the Export drawer CSS/utility-theme/SCSS/JSON previews include the new palette's hexes and metadata — without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
-name = "invalid_create_shows_inline_validation"
-description = "Create flow: invalid submission triggers immediate inline validation."
+name = "invalid_palette_create_inline_validation"
+description = "In the create editor, submit with an empty name, empty artist, out-of-list period, fewer than 3 swatches, or an invalid hex: no new palette is added and an inline validation message naming the offending field is visible immediately, with the save control staying disabled until every field is valid."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.3"
-name = "edit_flow_updates_related_displays"
-description = "Edit flow: edits save and update all related displays."
+name = "edit_palette_echoes_everywhere_including_export"
+description = "Edit a palette's name, artist, and period in Detail/Editor mode: the Palette-view card, the source title and artist columns of its Nomenclature rows, its membership under the current period filter, and the archive JSON export preview all update to the new values without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.4"
-name = "delete_flow_updates_all_surfaces"
-description = "Delete flow: the item is removed from all lists/panes after deletion."
+name = "delete_palette_clears_all_surfaces_and_export"
+description = "Delete a palette: its card disappears from Palette view, its unique swatches drop from Nomenclature and Swatch, any selection pointing at it clears, the visible palette count decreases by exactly one, and it is removed from the archive JSON export preview."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.5"
-name = "view_switch_retains_state"
-description = "View/mode switch: the view changes properly, with state retained."
+name = "view_toggle_retains_favorites_and_filter"
+description = "With a favorite flagged and a non-all period filter active, switch among Nomenclature, Palette, and Swatch via the view toggle: the active option shows a filled circular indicator, the canvas updates without a full reload, and the favorite flag plus filter membership stay coherent."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.6"
-name = "last_delete_reveals_empty_state"
-description = "Edge: after the last delete, the empty state is clear and visible."
+name = "last_delete_shows_library_empty_state"
+description = "After deleting every user palette, the library region shows a clear empty state with a visible way to start a new palette, and export previews still compile without errors."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.7"
-name = "filters_update_all_surfaces"
-description = "Edge: filtering reveals/hides items everywhere as expected."
+name = "period_filter_updates_all_three_layouts"
+description = "Choosing a specific period hides non-matching items across Nomenclature, Palette, and Swatch at once; returning to the all-periods choice restores the full collection identically in each layout."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.8"
-name = "collapsible_chrome_preserves_workflow"
-description = "Collapsible chrome (sidebar, panel) can be hidden and reopened with workflow continuity."
+name = "detail_editor_open_close_keeps_browse_state"
+description = "Open Detail/Editor for a selected palette, then close it back to Browse: the prior view toggle selection, period filter, name sort, and favorite flags remain intact with no navigation away and no reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.9"
-name = "overlays_support_expected_flows"
-description = "Overlays behave as expected for details, edits, confirmations."
+name = "subscribe_popup_and_editor_overlays_dismiss"
+description = "When the subscribe popup appears (after idle or deep scroll) or Detail/Editor / Export drawer is open, each overlay can be dismissed via its close path and returns the user to a usable Browse library without trapping them."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.10"
-name = "flow_recovers_without_reload"
-description = "Recovery: navigation loss or error can be corrected without a reload (no dead ends)."
+name = "reload_resets_seeded_browse_baseline"
+description = "After creating a palette, switching to Palette view, applying a period filter, sorting Z–A, selecting cards, and opening Export: a page reload returns the seeded palettes, Nomenclature layout active, all-periods filter, Name A–Z sort, empty undo/redo, vision None, and no palette selected."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "duplicate_flow_adds_copy_and_export"
+description = "Duplicate a palette: count increases by exactly one, a card with the '(copy)' suffix appears, and that copy's metadata is present in the archive JSON export preview."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "name_sort_reversal_flow"
+description = "Switch Name sort from A–Z to Z–A and confirm Palette-view card order reverses relative to the prior sort; switch back and confirm the previous order restores."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "batch_favorite_then_undo_flow"
+description = "Select three palettes, run Batch favorite so all three flags toggle, switch layouts and confirm flags persist, then Undo — all three flags return to their prior values and the export preview favorite fields match."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "batch_delete_then_undo_flow"
+description = "Select two palettes, confirm Batch delete (count decreases by exactly two), then Undo — both palettes and the prior count are restored and both reappear in the archive JSON export."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "contrast_matrix_and_vision_flow"
+description = "Open Detail/Editor and confirm the contrast matrix lists pair ratios; recolor one swatch and confirm at least one ratio/pass mark changes; close editor, set vision simulation to Deuteranopia and confirm swatches visibly shift vs None."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.16"
+name = "export_import_round_trip_flow"
+description = "After mutating the collection (create or edit at least one palette), Copy or Download the archive JSON, then Import that same JSON text — visible names, artists, periods, swatches, and favorite flags match the pre-export mutated state, and the export preview matches again including version palette-archive.v1 and each palette's id, name, artist, period, swatches, and favorite."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.17"
+name = "create_echoes_api_shaped_export_fields"
+description = "Create a valid palette with distinctive name, artist, closed-list period, and at least 3 valid hex swatches: Palette-view card shows name and artist, and the archive JSON preview includes that palette's id, name, artist, period, swatches, and favorite without a reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete (or genre-equivalent primary flows) are not enabled from the UI."
+name = "palette_crud_unavailable_from_ui"
+description = "Palette create, edit, or delete cannot be completed from the visible UI controls."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New items fail to show up or duplicate."
+name = "created_palette_missing_or_duplicated"
+description = "Creating a valid palette either fails to add a visible card/index entry or adds duplicate palettes for a single submit."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays."
+name = "edit_desyncs_layouts"
+description = "After editing a palette's name or period, Palette view, Nomenclature source titles, period-filter results, and the archive JSON export disagree about that record without a reload."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "View/mode switching breaks layout or loses selection."
+name = "view_toggle_breaks_or_loses_selection"
+description = "Switching among Nomenclature, Palette, and Swatch breaks the layout or loses the current selection, favorite flags, or period filter."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n5"
-name = "empty_collection_breaks_ui"
-description = "Emptying the collection produces broken or missing UI."
+name = "empty_library_region_broken"
+description = "After deleting all palettes, the library region is blank or broken with no empty-state guidance or create affordance."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible."
+name = "period_filter_layouts_disagree"
+description = "For the same period choice, Nomenclature, Palette, and Swatch disagree about which items are visible."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed chrome can't be re-opened."
+name = "detail_editor_cannot_reopen_or_close"
+description = "After opening or closing Detail/Editor, the panel cannot be reopened or dismissed again from the UI."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block navigation with no exit option."
+name = "overlay_blocks_with_no_exit"
+description = "Detail/Editor, Export drawer, batch-delete confirmation, or the subscribe popup blocks the library with no working close, Escape, or equivalent exit path."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed flow provides no user feedback."
+name = "failed_create_silent"
+description = "An invalid palette create attempt provides no visible validation feedback naming the problem."
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Navigation dead ends or requires reload for recovery."
+name = "browse_or_editor_dead_end_requires_reload"
+description = "Recovering from a view switch, Detail/Editor, Export drawer, or subscribe popup requires a full page reload — the UI reaches a dead end."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "export_import_round_trip_breaks"
+description = "After export-then-import of archive JSON following a session mutation, the library names/swatches/favorites diverge from the pre-export mutated state."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n12"
+name = "batch_or_undo_flow_fails"
+description = "Batch favorite, Batch delete, or Undo after those actions fails to update the visible collection, flags, or export preview as specified."
 type = "binary"
 negate = true
 weight = 1.0
@@ -217,3 +282,4 @@ description = "The app exhibits a significant, browser-observable defect in crit
 type = "binary"
 negate = true
 weight = 1.0
+

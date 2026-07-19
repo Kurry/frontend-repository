@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -70,14 +70,14 @@ weight = 1.0
 [[criterion]]
 id = "1.2"
 name = "header_card_selects_and_rollup"
-description = "The opened rubric's header card shows the rubric name, its current semantic version, a judge model select offering exactly quartz-arbiter-2, sable-jury-9, and cinder-panel-1, an aggregation mode select offering exactly weighted mean, required-pass, and all-pass, and a derived rollup line with total criteria count, load-bearing count (weight 3 or more), and weight sum; changing either select updates the header without a page reload"
+description = "The opened rubric's header card shows the rubric name, its current semantic version, an arbiter model select offering exactly quartz-arbiter-2, sable-jury-9, and cinder-panel-1, an aggregation mode select offering exactly weighted mean, required-pass, and all-pass, and a derived rollup line with total criteria count, load-bearing count (weight 3 or more), and weight sum; changing either select updates the header without a page reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
 name = "criterion_accordion_anatomy"
-description = "Each collapsed criterion row shows an id, a name, a type badge reading binary or likert with min and max values, a weight value, and an importance label (must have or nice to have); expanding the row with a click reveals the full multiline description and a Grading notes disclosure that expands on activation and stays open for that criterion while the app remains open"
+description = "Each collapsed criterion row shows an id, a name, a type badge reading binary or likert with min and max values, a weight value, and an importance label (must have or nice to have); expanding the row with a click reveals the full multiline description and a Rationale notes disclosure that expands on activation and stays open for that criterion while the app remains open"
 type = "binary"
 weight = 1.0
 

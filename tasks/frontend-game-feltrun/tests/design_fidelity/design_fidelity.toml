@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -62,150 +62,150 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "spacing_and_sizing_follow_scale"
-description = "For games, evaluate spec fidelity of the HUD and screens rather than pixel-parity. Spacing and sizing follow the design system's scale, with no arbitrary one-off values visible in computed styles."
+name = "felt_spacing_matches_reference_scale"
+description = "Spacing and sizing on the table chrome follow the tight 2px-based scale and ~5px radii from the instruction and reference screenshots, without large arbitrary one-off gaps"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "typography_matches_spec"
-description = "Typography matches the spec for all headings and body copy."
+name = "poppins_type_matches_reference"
+description = "Typography matches the Poppins stack and approximate heading/body sizes called out in the instruction and visible in the reference screenshots"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "layout_matches_reference"
-description = "Layout matches reference screenshots to within a small tolerance at all specified breakpoints; fidelity tasks achieve near pixel-parity."
+name = "table_layout_matches_reference"
+description = "At desktop width the table, seats, community board, and side panels compose like the reference screenshots (felt table center, chrome panels around it) within a small tolerance — HUD fidelity, not pixel-perfect landing parity"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.4"
-name = "specified_state_changes_animate"
-description = "Transitions or animations are applied to the state changes the spec calls out, such as add, delete, filter, or view switch."
+name = "mandated_state_changes_animate"
+description = "Equity street changes, history entrance, showdown reveal, and badge toast animate as the instruction specifies when driven through real play"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "responsive_behavior_matches_reference"
-description = "Responsive behavior matches reference patterns."
+name = "mobile_drawer_matches_reference_pattern"
+description = "At about 375px the stats/history collapse into a drawer pattern consistent with the instruction rather than keeping a clipped desktop sidebar"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.6"
-name = "control_styling_matches_spec"
-description = "Button and form radii, padding, and shadows conform to the spec."
+name = "control_chrome_matches_felt_spec"
+description = "Buttons, the raise slider, and panels use the near-black felt palette with primary #FFFF7D CTAs as in the instruction/reference"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.7"
-name = "typography_has_clear_hierarchy"
-description = "Typography has a clear hierarchy that distinguishes section and body text."
+name = "type_hierarchy_matches_reference"
+description = "Section headings versus body/stat text show a clear hierarchy matching the large heading / large body scale in the instruction"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.8"
-name = "component_states_match_spec"
-description = "Component states (default, hover, active, disabled) match the spec where specified."
+name = "control_states_match_spec"
+description = "Default, hover, and disabled states on betting and session controls are visually distinct as required"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.9"
-name = "surface_treatments_match_spec"
-description = "Color, depth, and border treatments are precise per the design."
+name = "surface_treatments_match_felt"
+description = "Felt background #02070C, primary #FFFF7D, and accent #FFFE68 treatments match the design tokens in the instruction"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.10"
-name = "microinteractions_match_spec"
-description = "Microinteraction feedback for hover and press follows the spec in duration and motion."
+name = "microinteractions_match_duration_intent"
+description = "Badge toast auto-dismiss and equity transition feel brief and non-blocking as specified rather than multi-second blocking overlays"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.n1"
-name = "sizing_or_spacing_contradicts_scale"
-description = "Visible sizing or spacing values contradict the specified scale."
+name = "spacing_contradicts_scale"
+description = "Visible spacing on panels contradicts the tight 2px-based scale with large arbitrary gaps unlike the reference"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n2"
-name = "colors_fall_outside_palette"
-description = "Colors appear outside the specified palette."
+name = "typography_mismatches_spec"
+description = "Headings or body clearly use a different type family or scale than Poppins / the stated sizes with no resemblance to the reference"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n3"
-name = "sizing_mismatches_spec"
-description = "Sizing mismatches the spec."
+name = "layout_unlike_reference_table"
+description = "Desktop layout does not read as a felt poker table with surrounding chrome as in the reference screenshots"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n4"
-name = "required_animations_missing_or_wrong"
-description = "Animations are missing or incorrect where the spec requires them."
+name = "wrong_palette_vs_felt"
+description = "The page uses a light or unrelated palette instead of the near-black felt tokens"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n5"
-name = "specified_controls_use_browser_defaults"
-description = "Form or button controls use browser default styles when the spec styles them."
+name = "mobile_ignores_drawer_pattern"
+description = "At about 375px the app keeps a broken desktop chrome instead of the drawer pattern"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n6"
-name = "layout_misaligned_at_breakpoints"
-description = "The grid or layout is misaligned at reference breakpoints."
+name = "controls_missing_hover_states"
+description = "Betting controls have no distinct hover state despite the spec requiring one"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n7"
-name = "elements_are_clipped_or_offscreen"
-description = "Elements render off-screen or clipped."
+name = "export_chrome_visually_alien"
+description = "The Export panel looks like an unrelated default browser form disconnected from the felt chrome in the reference aesthetic"
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "3.n8"
-name = "structure_deviates_from_reference"
-description = "Section order, content, or structure deviates from the reference on fidelity tasks."
+name = "showdown_highlight_missing_vs_reference"
+description = "At showdown the winning hand has no distinguishable highlight unlike the reference treatment"
 type = "binary"
 negate = true
 weight = 1.0
 
 [[criterion]]
 id = "3.n9"
-name = "heading_and_body_text_undifferentiated"
-description = "Heading and body text have no distinction."
+name = "radius_scale_ignored"
+description = "Cards and panels use large default radii that ignore the ~5px radius system"
 type = "binary"
 negate = true
-weight = 1.0
+weight = 0.5
 
 [[criterion]]
 id = "3.n10"
-name = "microinteractions_deviate_from_reference"
-description = "Microinteractions are missing or deviate from the provided reference."
+name = "style_badges_not_distinct_vs_reference"
+description = "AI style badges are not visually distinct beyond identical text-only pills"
 type = "binary"
 negate = true
 weight = 1.0
@@ -213,7 +213,7 @@ weight = 1.0
 [[criterion]]
 id = "design_fidelity.catchall"
 name = "design_fidelity_catchall"
-description = "The app exhibits a significant, browser-observable defect in fidelity to the spec or reference that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+description = "The app exhibits a significant, browser-observable design-fidelity defect versus the instruction and reference screenshots that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 negate = true
 weight = 1.0

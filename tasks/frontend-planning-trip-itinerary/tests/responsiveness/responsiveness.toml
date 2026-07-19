@@ -2,7 +2,7 @@
 judge = "codex"
 model = "gpt-5.6-sol"
 prompt_template = "../system_prompt.md"
-cwd = "/app"
+cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
 
@@ -206,6 +206,21 @@ weight = 1.0
 id = "7.n10"
 name = "controls_disappear_at_sizes"
 description = "Controls disappear at specific sizes."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "7.11"
+name = "grids_scroll_in_own_containers_mobile"
+description = "At 375px width the ledger grid and spreadsheet matrix scroll horizontally inside their own containers rather than widening the page, and the charts resize to fit their panes."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.n11"
+name = "wizard_or_reports_unusable_at_mobile"
+description = "At 375px width the import wizard, diagnostics screen, or a report surface becomes unusable — controls unreachable, steps clipped, or the commit/copy actions off-screen with no way to reach them."
 type = "binary"
 negate = true
 weight = 1.0
