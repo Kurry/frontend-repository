@@ -107,7 +107,7 @@ negate = true
 [[criterion]]
 id = "te-neg-external"
 name = "external_origin_request_fires"
-description = "The page issues a request to an external origin (a units.gr asset, a font/image/script CDN, or an analytics endpoint)"
+description = "The page issues a request to an external origin (a source site asset, a font/image/script CDN, or an analytics endpoint)"
 type = "binary"
 weight = 1.0
 negate = true
@@ -168,6 +168,13 @@ description = "Scroll capture traps the user, prevents reaching the footer, figh
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "te-authored-assets-load"
+name = "required_authored_asset_files_load"
+description = "Browser network/render evidence shows every required Noma image, map, SVG/icon, animation JSON plus fallback, and cursor asset loading from same-origin paths with no 404, transparent/broken response, image decode, or vector-animation parse failure"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "technical.catchall"

@@ -158,7 +158,7 @@ optional = true
 [[criterion]]
 id = "2.14"
 name = "real_brand_assets_shipped"
-description = "The page ships a real third-party brand asset: the actual Wolverine Worldwide logo or wordmark, a real logo of any of the eleven portfolio brands, the reference's licensed typeface, or real brand photography/video, instead of original placeholder stand-ins"
+description = "The page ships copyrighted, trademarked, scraped, stock, press/social, source-site, screenshot-derived, or otherwise third-party-controlled creative material—or a recognizable trace, near-copy, or derivative—including a source company/brand logo, proprietary typeface, recognizable photograph/video frame, product image, press artwork/copy, social-platform mark, PDF, metadata, or hidden/preloaded asset instead of the fictional Northstar system"
 type = "binary"
 weight = 1.0
 negate = true
@@ -196,6 +196,21 @@ weight = 1.0
 id = "2.19"
 name = "equal_column_or_chaotic_broken_grid"
 description = "The hero or portfolio opener collapses into equal-width centered columns with no asymmetric hierarchy, or the portfolio title offsets clip or overlap so the broken-grid stepping is unreadable"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.20"
+name = "scratch_authored_media_inventory_craft"
+description = "The Northstar identity and complete media inventory are visibly art-directed: corporate symbol/logotype, eleven distinct fictional portfolio marks, hero montage/still, dense particle-gallery imagery, annual-report cover, eight distinct news images, careers imagery, share image, and complete icon sprite occupy the reference roles without repetition"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.21"
+name = "missing_reused_or_source_media"
+description = "A required Northstar surface is omitted, empty, broken, reused where distinct art is required, reduced to a generic gradient/emoji/text placeholder, or exposes a source-company/brand name, ticker, logo silhouette, recognizable source media, press copy, social-platform mark, metadata, or destination"
 type = "binary"
 weight = 1.0
 negate = true

@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "1.2"
 name = "portfolio_heading_and_footer_brand_grid"
-description = "On load, the brand-portfolio section shows the exact heading A portfolio built for every step. over a particle/galaxy image field, and the eleven brands Merrell, Saucony, Wolverine, Sweaty Betty, CAT Footwear, Chaco, Hush Puppies, Stride Rite, HYTEST, Harley-Davidson, and Bates are all reachable as footer brand-grid links"
+description = "On load, the brand-portfolio section shows the exact heading A portfolio built for every step. over a particle/galaxy image field, and the eleven brands Trailmark, Cadence, Forgeworks, Alder & Ash, Ironcat, Solstice, Hearthstep, First Mile, Highline, Wildhorse, and Foundry are all reachable as footer brand-grid links"
 type = "binary"
 weight = 1.0
 
@@ -91,7 +91,7 @@ weight = 1.0
 [[criterion]]
 id = "1.5"
 name = "market_snapshot_full_stat_list"
-description = "On load, the Market Snapshot section shows the exact heading Market Snapshot, the name Wolverine World Wide, Inc. (WWW), the label Common Stock, the quote value 18.16 USD, and the stat list DAY'S HIGH $18.60, DAY'S LOW $18.16, DAY'S VOLUME 38,982.00, and LAST UPDATED 2hours ago"
+description = "On load, the Market Snapshot section shows the exact heading Market Snapshot, the name Northstar Collective, Inc. (NST), the label Common Stock, the quote value 18.16 USD, and the stat list DAY'S HIGH $18.60, DAY'S LOW $18.16, DAY'S VOLUME 38,982.00, and LAST UPDATED 2hours ago"
 type = "binary"
 weight = 1.0
 
@@ -111,8 +111,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "awards_news_card_verbatim"
-description = "On load, a Latest News carousel card reads WWW was awarded Company of the Year for its \"new, more-focused brand-building model\" at the 2025 Footwear News Achievement Awards (FNAA)."
+name = "company_of_year_news_card"
+description = "On load, a Latest News carousel card reads Northstar Named Company of the Year."
 type = "binary"
 weight = 1.0
 
@@ -154,21 +154,21 @@ weight = 1.0
 [[criterion]]
 id = "1.22"
 name = "careers_copy_and_outbound_cta"
-description = "The careers call-to-action section shows the supporting copy No matter the role, the door is open to you at Wolverine Worldwide to create positive change and leave a lasting impact. and an outbound Careers CTA button whose href points at the external careers subdomain"
+description = "The careers call-to-action section shows the supporting copy No matter the role, the door is open to you at Northstar Collective to create positive change and leave a lasting impact. and a Careers CTA whose href is inert or points to a fictional .example destination"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.23"
 name = "news_press_copy_verbatim"
-description = "The Latest News section carries the real press copy including Footwear News' June 2026 Milestone Issue exploring Merrell's 45th anniversary and Saucony's Endorphin Pro 5 winning Best Racing Shoe"
+description = "The Latest News section includes the fictional stories Northstar Earns People-First Workplace Certification, Trailmark Celebrates 45 Years Outside, and Cadence Velocity Pro Wins Best Racing Shoe among its eight distinct cards"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.24"
 name = "footer_full_structure"
-description = "The footer shows About Us, Brands, Careers, Responsibility, Investors, and Contact, plus a social group (Instagram, Life at WWW, LinkedIn), the brand grid, a legal group (Privacy Policy, Terms & Conditions, Patents, the California supply-chain transparency statement labeled Anti-Human Trafficking and Transparency in Supply Chain Statement linking to /ca-supply, Customer Returns, Retail Vendor Partners), and the copyright line © 2026 Wolverine World Wide, Inc."
+description = "The footer shows About Us, Brands, Careers, Responsibility, Investors, and Contact, plus a social group (Photos, People stories, Professional network), the eleven-label fictional brand grid, a legal group (Privacy Policy, Terms & Conditions, Patents, Supply Chain Transparency, Customer Returns, Retail Partners), and the copyright line © 2026 Northstar Collective, Inc."
 type = "binary"
 weight = 0.5
 optional = true
@@ -192,7 +192,7 @@ negate = true
 [[criterion]]
 id = "1.27"
 name = "brand_grid_or_press_copy_filler"
-description = "The brand grid omits one or more of the eleven brands or the news cards show generic filler instead of the real press copy"
+description = "The brand grid omits one or more of the eleven fictional brands or the news cards show generic filler instead of the specified fictional editorial stories"
 type = "binary"
 weight = 0.5
 negate = true

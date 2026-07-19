@@ -92,7 +92,7 @@ optional = true
 [[criterion]]
 id = "2.5"
 name = "two_videos_reused_media_renders"
-description = "Exactly two original placeholder case videos are reused across the deck's slots and all five client marks are original placeholders, with every slot showing real rendered media"
+description = "Every client deck visibly contains at least three distinct newly authored vertical video/poster faces, the five fictional clients each have a distinct authored mark, and every slot shows rendered media without cross-client reuse"
 type = "binary"
 weight = 1.0
 
@@ -181,7 +181,7 @@ optional = true
 [[criterion]]
 id = "2.17"
 name = "mandated_copy_exact_with_accent"
-description = "All mandated copy strings render exactly as specified — including the é in Hildén & Kaira wherever the brand name appears — and headings, buttons, and captions keep the reference's casing and terminology consistently across sections"
+description = "All mandated copy strings render exactly as specified — including the é in Cinder & Bloom wherever the brand name appears — and headings, buttons, and captions keep the reference's casing and terminology consistently across sections"
 type = "binary"
 weight = 1.0
 
@@ -196,7 +196,7 @@ negate = true
 [[criterion]]
 id = "2.19"
 name = "real_brand_assets_shipped"
-description = "The page ships real brand or third-party assets instead of original stand-ins: the reference site's actual logo, wordmark, or lettermark artwork, real client logos for Finlayson, Kierrätyskeskus, Uusi Juttu, Autoliitto, or Liikku, licensed commercial typefaces, brand photography or case-video footage — or the footer credit names the reference site's real designer or agency instead of an invented generic name"
+description = "The page exposes copyrighted, trademarked, scraped, stock, source-site, screenshot-derived, or otherwise third-party-controlled creative material—or a recognizable trace, near-copy, or derivative—including a source identity, client/logo silhouette, licensed commercial typeface, recognizable photograph/video frame, social-platform mark, or real source credit instead of the fictional Cinder & Bloom system"
 type = "binary"
 weight = 1.0
 negate = true
@@ -227,6 +227,21 @@ weight = 1.0
 id = "2.23"
 name = "lime_wash_everywhere_failure"
 description = "Lime is used as a broad page wash or default surface color across unrelated sections instead of staying scarce to its reserved roles (Organic views tile, theme-media headings, selection, primary buttons, load veil)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.24"
+name = "scratch_authored_media_inventory_craft"
+description = "The Cinder & Bloom identity and media inventory are visibly complete and art-directed: twelve letterform images, four hero-case thumbnails, five fictional client marks, at least three distinct video/poster deck faces per client, three service videos/posters, five testimonial portraits or marks, two about images, and the contact/footer art and icons occupy the reference roles without repetition"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.25"
+name = "missing_reused_or_source_media"
+description = "A required media surface is omitted, empty, broken, reused where distinct art is required, reduced to a generic gradient/emoji/text placeholder, or exposes a source-site name, client name, logo silhouette, recognizable source imagery, metadata, or destination"
 type = "binary"
 weight = 1.0
 negate = true

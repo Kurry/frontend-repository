@@ -135,7 +135,7 @@ weight = 1.0
 [[criterion]]
 id = "4.11"
 name = "document_metadata_present"
-description = "The document sets a language attribute, the title \"Readymag – the design tool for outstanding websites\", a meta description \"Design, prototype, collaborate, publish.\", matching social title/description metadata with a Twitter summary_large_image card and a local placeholder social image, and a favicon"
+description = "The document sets a language attribute, the title \"Canvasly – the design tool for outstanding websites\", a meta description \"Design, prototype, collaborate, publish.\", matching social title/description metadata with a social summary_large_image card and a local placeholder social image, and a favicon"
 type = "binary"
 weight = 0.5
 
@@ -143,6 +143,13 @@ weight = 0.5
 id = "4.12"
 name = "html_first_landmarks_semantics"
 description = "The homepage is HTML-first: real header/nav/main/section/footer landmarks and native button/link controls carry the chrome (not div-only click targets for Solutions or Menu), with keyboard focus indicators visible on those controls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "required_authored_asset_files_load"
+description = "Browser network and playback evidence shows the complete Canvasly marks, project art, local VP9 WebM/poster pair, illustrations, slideshow frames, tile graphics, cursor art, share image, and icons loading from same-origin paths with no 404, decode, or playback failure"
 type = "binary"
 weight = 1.0
 

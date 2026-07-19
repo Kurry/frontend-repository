@@ -105,7 +105,7 @@ weight = 1.0
 [[criterion]]
 id = "1.7"
 name = "video_modal_locks_scroll"
-description = "Clicking an executive play control opens the full-viewport video modal playing a local placeholder MP4 and locks body scroll (document.body overflow hidden) while it is open; closing it stops the video and unlocks scroll."
+description = "Clicking an executive play control opens the full-viewport video modal playing that section's newly authored local VP9 WebM and locks body scroll (document.body overflow hidden) while it is open; closing it stops the video and unlocks scroll."
 type = "binary"
 weight = 1.0
 
@@ -140,7 +140,7 @@ weight = 1.0
 [[criterion]]
 id = "1.12"
 name = "footer_copy_and_links"
-description = "The footer shows Copyright © Novapay FTX26, the copy AI-native fintech. / Built from India. For the world., a GET ACCESS CTA, Instagram, X, and LinkedIn social links, a www.novapay.example link, and a /SPRINT'26 word-mark."
+description = "The footer shows Copyright © Novapay FTX26, the copy AI-native fintech. / Built with ambition. For the world., a GET ACCESS CTA, Photos, Updates, and Network links, a www.novapay.example link, and a /SPRINT'26 word-mark."
 type = "binary"
 weight = 1.0
 
@@ -227,7 +227,7 @@ weight = 1.0
 [[criterion]]
 id = "1.30"
 name = "video_modal_flow_chain"
-description = "Clicking an executive play control in a section opens the full-viewport modal with the placeholder video playing while the page behind cannot be scrolled and the nav state is unchanged; closing it stops playback, unlocks scrolling, and leaves the page at the same section with the scroll-spy highlight unchanged; closing and reopening plays the video from a clean state with body scroll never left locked."
+description = "Clicking an executive play control in a section opens the full-viewport modal with that section's VP9 WebM playing while the page behind cannot be scrolled and the nav state is unchanged; closing it stops playback, unlocks scrolling, and leaves the page at the same section with the scroll-spy highlight unchanged; closing and reopening plays from a clean state with body scroll never left locked."
 type = "binary"
 weight = 1.0
 
@@ -271,7 +271,7 @@ optional = true
 [[criterion]]
 id = "1.36"
 name = "card_cta_affordance_and_links"
-description = "EXPLORE and READ MORE calls to action on cards use an underline plus chevron affordance and link out to absolute external destination URLs in a new tab."
+description = "EXPLORE and READ MORE calls to action on cards use an underline plus chevron affordance and point to fictional absolute .example destinations in a new tab."
 type = "binary"
 weight = 0.5
 optional = true

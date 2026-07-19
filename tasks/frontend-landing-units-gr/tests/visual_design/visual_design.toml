@@ -124,7 +124,7 @@ optional = true
 [[criterion]]
 id = "vd-cardsurfaces"
 name = "info_card_and_tile_exact_hexes"
-description = "The colored surfaces measure their exact brand hexes: the locations info card is yellow rgb(255, 178, 0), the community info card is red rgb(234, 55, 55), the Instagram panel is purple rgb(171, 84, 247), the what-we-stand-for cards are blue rgb(0, 114, 227), and the three insta tiles are rgb(199, 157, 252), rgb(255, 178, 0), and rgb(27, 227, 73)"
+description = "The colored surfaces measure their exact brand hexes: the locations info card is yellow rgb(255, 178, 0), the community info card is red rgb(234, 55, 55), the Stories panel is purple rgb(171, 84, 247), the what-we-stand-for cards are blue rgb(0, 114, 227), and the three social-feed tiles are rgb(199, 157, 252), rgb(255, 178, 0), and rgb(27, 227, 73)"
 type = "binary"
 weight = 1.0
 
@@ -196,7 +196,7 @@ weight = 0.5
 [[criterion]]
 id = "vd-neg-brandassets"
 name = "real_brand_assets_shipped"
-description = "The shipped page includes brand-owned media from the source site — the units.gr wordmark or logo, its brand photography, its licensed display/body font files, or copied third-party logo or social marks — instead of original placeholder equivalents"
+description = "The shipped page includes copyrighted, trademarked, scraped, stock, source-site, screenshot-derived, or otherwise third-party-controlled creative material—or a recognizable trace, near-copy, or derivative—including a source wordmark/logo, recognizable photography, proprietary font, third-party/social mark, map artwork, animation artboard, metadata, or hidden/preloaded asset instead of the fictional Noma system"
 type = "binary"
 weight = 1.0
 negate = true
@@ -205,6 +205,21 @@ negate = true
 id = "vd-neg-filler"
 name = "filler_text_or_mojibake_visible"
 description = "Lorem-ipsum or placeholder filler text (\"TODO\", \"Lorem\", template variable names) is visible in the shipped UI, or Greek copy shows machine-garbled diacritics or mojibake, or headings and buttons mix capitalization conventions inconsistently"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "vd-authored-media-inventory"
+name = "scratch_authored_media_inventory_craft"
+description = "The Noma identity and complete media inventory are visibly art-directed: wordmark, hero photograph, illustrated map with both markers, vector animation and fallback, four amenity images, eight feature icons, multi-image studio gallery, two community photos, three values icons, three feed artworks, three social-style icons, both arrow variants, carousel arrows, and custom cursor occupy the reference roles without repetition"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "vd-neg-missing-source-media"
+name = "missing_reused_or_source_media"
+description = "A required Noma surface is omitted, empty, broken, reused where distinct art is required, reduced to a generic gradient/emoji/text placeholder, or exposes a source-site name, domain/email, logo silhouette, social-platform logo, recognizable source media, metadata, or destination"
 type = "binary"
 weight = 1.0
 negate = true

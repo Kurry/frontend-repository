@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "2.2"
 name = "usecase_tile_exact_colors"
-description = "By computed style, the six use-case tiles render color rgb(255, 255, 255) text on their EXACT backgrounds: Portfolios rgb(255,136,186) #FF88BA, Landing pages rgb(255,203,0) #FFCB00, Editorials rgb(0,139,255) #008BFF, Company websites rgb(166,166,166) #A6A6A6, Design studios rgb(74,172,84) #4AAC54, by Readymag team rgb(236,82,11) #EC520B, each with border-radius 16px"
+description = "By computed style, the six use-case tiles render color rgb(255, 255, 255) text on their EXACT backgrounds: Portfolios rgb(255,136,186) #FF88BA, Landing pages rgb(255,203,0) #FFCB00, Editorials rgb(0,139,255) #008BFF, Company websites rgb(166,166,166) #A6A6A6, Design studios rgb(74,172,84) #4AAC54, by Canvasly team rgb(236,82,11) #EC520B, each with border-radius 16px"
 type = "binary"
 weight = 1.0
 
@@ -84,7 +84,7 @@ weight = 1.0
 [[criterion]]
 id = "2.4"
 name = "orange_and_purple_accents"
-description = "Primary orange #FF6600 (rgb(255, 102, 0)) appears on the \"Hello!\" accent and support-band emphasis, secondary orange #EC520B appears among brand accents such as button hover and the by-Readymag-team tile, and the Ready/? cluster uses purple #7A24FF (rgb(122, 36, 255))"
+description = "Primary orange #FF6600 (rgb(255, 102, 0)) appears on the \"Hello!\" accent and support-band emphasis, secondary orange #EC520B appears among brand accents such as button hover and the by-Canvasly-team tile, and the Ready/? cluster uses purple #7A24FF (rgb(122, 36, 255))"
 type = "binary"
 weight = 1.0
 
@@ -158,7 +158,7 @@ weight = 1.0
 [[criterion]]
 id = "2.14"
 name = "real_brand_assets_shipped"
-description = "The page ships real third-party brand assets: the reference site's actual logo or wordmark files, its licensed display typeface, real project thumbnails, photography, or video lifted from the reference, or placeholder art/wordmark/cursor imagery that names or depicts real third-party brands, sites, or agencies instead of invented identities"
+description = "The page ships copyrighted, trademarked, scraped, stock, source-site, screenshot-derived, or otherwise third-party-controlled creative material—or a recognizable trace, near-copy, or derivative—including a source logo/wordmark, proprietary typeface, real project thumbnail, photograph/video frame, cursor art, customer/agency identity, metadata, or hidden/preloaded asset instead of the fictional Canvasly system"
 type = "binary"
 weight = 1.0
 negate = true
@@ -189,6 +189,21 @@ weight = 1.0
 id = "2.18"
 name = "accent_colors_sprayed_as_washes"
 description = "Orange or purple is used as a large page-wide background wash or repeated fill across multiple unrelated sections, breaking the scarce-accent rule"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.19"
+name = "scratch_authored_media_inventory_craft"
+description = "The Canvasly identity and complete media inventory are visibly art-directed: default/hover marks, distinct project art across all three marquees, one playable video/poster pair, four feature illustrations, six slideshow frames, six use-case tile graphics, orange orb, cursor images, share image, and supporting icons occupy the reference roles without repetition"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.20"
+name = "missing_reused_or_source_media"
+description = "A required Canvasly surface is omitted, empty, broken, reused where distinct art is required, reduced to a generic gradient/emoji/text placeholder, or exposes a source-site name, logo silhouette, recognizable source media, distinctive copy, metadata, or destination"
 type = "binary"
 weight = 1.0
 negate = true

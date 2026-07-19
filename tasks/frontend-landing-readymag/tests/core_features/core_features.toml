@@ -63,14 +63,14 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "header_placeholder_wordmark_and_nav"
-description = "On load, a sticky white header stays fixed to the top of the viewport on scroll and shows an original placeholder wordmark in the logo position (which swaps to a distinct hover mark on hover), a Solutions control plus Pricing, Examples, Templates, and Learn links, and account actions on the right: a \"Log in\" text link and a \"Sign up\" pill button"
+description = "On load, a sticky white header stays fixed to the top of the viewport on scroll and shows a newly authored Canvasly wordmark in the logo position (which swaps to a distinct hover mark on hover), a Solutions control plus Pricing, Examples, Templates, and Learn links, and account actions on the right: a \"Log in\" text link and a \"Sign up\" pill button"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
 name = "hero_headline_subtitle_cta"
-description = "On load, the hero shows the headline \"Design and launch outstanding websites\", the subtitle \"Design, prototype, collaborate, publish.\", and a \"Try Readymag\" button followed by \"or choose your subscription plan\""
+description = "On load, the hero shows the headline \"Design and launch outstanding websites\", the subtitle \"Design, prototype, collaborate, publish.\", and a \"Try Canvasly\" button followed by \"or choose your subscription plan\""
 type = "binary"
 weight = 1.0
 
@@ -91,7 +91,7 @@ weight = 1.0
 [[criterion]]
 id = "1.6"
 name = "usecase_tiles_labels_and_colors"
-description = "On load, six color-coded use-case tiles appear with the exact labels Portfolios (#FF88BA), Landing pages (#FFCB00), Editorials (#008BFF), Company websites (#A6A6A6), Design studios (#4AAC54), and by Readymag team (#EC520B), all with white text"
+description = "On load, six color-coded use-case tiles appear with the exact labels Portfolios (#FF88BA), Landing pages (#FFCB00), Editorials (#008BFF), Company websites (#A6A6A6), Design studios (#4AAC54), and by Canvasly team (#EC520B), all with white text"
 type = "binary"
 weight = 1.0
 
@@ -112,14 +112,14 @@ weight = 1.0
 [[criterion]]
 id = "1.9"
 name = "closing_cta_copy"
-description = "On load, the closing call-to-action shows \"Try for free\", a \"Try Readymag\" button, and a \"View pricing\" link"
+description = "On load, the closing call-to-action shows \"Try for free\", a \"Try Canvasly\" button, and a \"View pricing\" link"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
 name = "footer_groups_copyright_email"
-description = "The footer is a dark multi-column layout with four link groups carrying the exact labels — company (about, careers, reviews, terms of service, privacy policy, cookie policy), product (pricing, templates, product updates, affiliate program, referral program, npo discount), resources (examples, design almanac, design stories, help, forum, status, blog), solutions (portfolios, presentations, editorials, companies, freelancers, students) — ending with \"© 2026 Readymag Inc.\" and \"support@readymag.com\""
+description = "The footer is a dark multi-column layout with four link groups carrying the exact labels — company (about, careers, reviews, terms of service, privacy policy, cookie policy), product (pricing, templates, product updates, affiliate program, referral program, npo discount), resources (examples, design almanac, design stories, help, forum, status, blog), solutions (portfolios, presentations, editorials, companies, freelancers, students) — ending with \"© 2026 Canvasly Inc.\" and \"support@canvasly.example\""
 type = "binary"
 weight = 1.0
 
@@ -140,7 +140,7 @@ weight = 1.0
 [[criterion]]
 id = "1.17"
 name = "feature_cards_exact_copy"
-description = "Four feature cards render with the exact titles \"Enjoy easy workflow\", \"Streamline teamwork\", \"Attract with interactivity\", and \"Expand functionality to infinity\" and their described bodies, including the Attract card body that names \"Lottie\""
+description = "Four feature cards render with the exact titles \"Enjoy easy workflow\", \"Streamline teamwork\", \"Attract with interactivity\", and \"Expand functionality to infinity\" and their described bodies, including the Attract card body that names video and vector motion"
 type = "binary"
 weight = 1.0
 

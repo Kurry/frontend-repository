@@ -135,7 +135,7 @@ weight = 1.0
 [[criterion]]
 id = "4.11"
 name = "split_headings_keep_accessible_text"
-description = "Split and letter-assembled headings keep their full text accessible: the hero H1 container carries the complete phrase while per-line fragments are hidden from the accessibility tree, and the brand lettermark carries an accessible label reading Hildén & Kaira with its per-letter fragments hidden"
+description = "Split and letter-assembled headings keep their full text accessible: the hero H1 container carries the complete phrase while per-line fragments are hidden from the accessibility tree, and the brand lettermark carries an accessible label reading Cinder & Bloom with its per-letter fragments hidden"
 type = "binary"
 weight = 1.0
 
@@ -187,6 +187,13 @@ weight = 1.0
 id = "4.18"
 name = "html_first_landmarks_and_controls"
 description = "The page exposes HTML-first landmarks (nav, main, footer), a logical heading outline, and interactive controls as buttons/links/labelled inputs rather than anonymous unlabelled divs for primary chrome"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.19"
+name = "required_authored_asset_files_load"
+description = "Browser network and playback evidence shows all required Cinder & Bloom images and marks plus distinct local VP9 WebM/poster pairs loading from same-origin paths with no 404, decode, poster, or playback failure"
 type = "binary"
 weight = 1.0
 

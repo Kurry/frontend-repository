@@ -182,6 +182,13 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "4.17"
+name = "required_authored_asset_files_load"
+description = "Browser network/render evidence shows the Northstar mark, eleven portfolio marks, VP9 WebM hero and still, particle images, annual-report cover and valid local PDF, eight news images, careers art, share image, and icon sprite loading from same-origin paths with no 404, decode, playback, or PDF failure"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "4.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical, accessibility, or performance defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, console line, network entry, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

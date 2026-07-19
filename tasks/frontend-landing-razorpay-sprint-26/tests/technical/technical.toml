@@ -158,6 +158,13 @@ weight = 0.5
 optional = true
 
 [[criterion]]
+id = "4.14"
+name = "required_authored_asset_files_load"
+description = "Browser network/render evidence shows all portraits, VP9 WebM/poster pairs, original interactive vector files and fallbacks, desktop/mobile GLB scenes, materials/textures, decoder files, card art, SVGs, and share image loading from same-origin paths with no 404, decode, playback, WebGL, or vector-runtime failure"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "4.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical defect (console health, network hygiene, accessibility, performance, or routing) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, console or network log) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

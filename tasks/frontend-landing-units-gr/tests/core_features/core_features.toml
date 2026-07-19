@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "1.2"
 name = "root_title_and_canvas_color"
-description = "On load, the document body background color computes to exactly #f4e9e1 (rgb(244, 233, 225)) with black text and the document title is \"Αρχική - Units\""
+description = "On load, the document body background color computes to exactly #f4e9e1 (rgb(244, 233, 225)) with black text and the document title is \"Αρχική - Noma\""
 type = "binary"
 weight = 1.0
 
@@ -147,7 +147,7 @@ weight = 1.0
 [[criterion]]
 id = "1.13"
 name = "insta_feed_section_content"
-description = "On the insta-feed section, a black \"Our way of living\" strip bar, an \"Instagram\" / \"Staying connected\" panel, and an #instafeed grid of three colored tiles are present"
+description = "On the social-feed section, a black \"Our way of living\" strip bar, a \"Stories\" / \"Staying connected\" panel, and a three-tile colored feed mosaic are present"
 type = "binary"
 weight = 1.0
 
@@ -162,7 +162,7 @@ optional = true
 [[criterion]]
 id = "1.20"
 name = "locations_card_and_map_markers"
-description = "The locations section shows the yellow info card heading \"Σημεία που κάνουν τη ζωή σου εύκολη\" with the chips \"Σύντομα κοντά σου\" and \"Έτοιμα να μπεις!\" beside a map panel carrying the \"Units Parkside\" marker"
+description = "The locations section shows the yellow info card heading \"Σημεία που κάνουν τη ζωή σου εύκολη\" with the chips \"Σύντομα κοντά σου\" and \"Έτοιμα να μπεις!\" beside a map panel carrying the \"Noma Parkside\" marker"
 type = "binary"
 weight = 0.5
 optional = true
@@ -178,7 +178,7 @@ optional = true
 [[criterion]]
 id = "1.23"
 name = "footer_address_and_policies"
-description = "The footer shows the Units Parkside address block with the email hey@units.gr and phone (+30) 6940006565 plus the policies list Πολιτική Απορρήτου, Πολιτική Cookies, and Όροι Χρήσης"
+description = "The footer shows the Noma Parkside address block with the email hello@noma.example and phone (+30) 6940006565 plus the policies list Πολιτική Απορρήτου, Πολιτική Cookies, and Όροι Χρήσης"
 type = "binary"
 weight = 0.5
 optional = true

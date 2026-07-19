@@ -91,7 +91,7 @@ weight = 1.0
 [[criterion]]
 id = "1.15"
 name = "home_document_title_and_hero"
-description = "The document title is exactly \"Mosby's Files—American Modernist Architecture\" and the home hero shows the display title \"American modernism\" with a supporting paragraph"
+description = "The document title is exactly \"Field Notes Archive—American Modernist Architecture\" and the home hero shows the display title \"American modernism\" with a supporting paragraph"
 type = "binary"
 weight = 1.0
 
@@ -105,14 +105,14 @@ weight = 1.0
 [[criterion]]
 id = "1.17"
 name = "eight_architect_tags_by_category"
-description = "All eight architect names appear as tags mapped to the correct categories: Frank Lloyd Wright and Irving Gill under Organic & Early Modernism, Frank Gehry under Expressive, Louis Kahn and I. M. Pei and Paul Rudolph under Monumental Modernism, Louis Sullivan and Mary Colter under Place / culture continuity"
+description = "All eight architect names appear as tags mapped to the correct categories: Ada Mercer and Elias North under Organic & Early Modernism, Mara Voss under Expressive, Julian Kade and Imani Vale and Pavel Rowan under Monumental Modernism, Lucian Shore and Mae Calder under Place / culture continuity"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.18"
 name = "tag_click_swaps_case_route"
-description = "Clicking an architect tag swaps the visible route to that case page without a full page reload, showing the architect name as the largest heading and the matching case document title (e.g. \"Louis Kahn—Mosby's Files\")"
+description = "Clicking an architect tag swaps the visible route to that case page without a full page reload, showing the architect name as the largest heading and the matching case document title (e.g. \"Julian Kade—Field Notes Archive\")"
 type = "binary"
 weight = 1.0
 
@@ -126,7 +126,7 @@ weight = 1.0
 [[criterion]]
 id = "1.20"
 name = "sibling_tags_swap_case"
-description = "Each case shows rotated sibling tags for the other architects in its category, and clicking a sibling tag swaps to that sibling case (Louis Kahn, I. M. Pei, and Paul Rudolph link to each other)"
+description = "Each case shows rotated sibling tags for the other architects in its category, and clicking a sibling tag swaps to that sibling case (Julian Kade, Imani Vale, and Pavel Rowan link to each other)"
 type = "binary"
 weight = 1.0
 
@@ -140,35 +140,35 @@ weight = 1.0
 [[criterion]]
 id = "1.22"
 name = "louis_kahn_waveform_audio_parts"
-description = "The Louis Kahn case opens a waveform audio player with two parts louis_kahn_part_1 and louis_kahn_part_2 that draw waveform bars from local data and play and pause local audio"
+description = "The Julian Kade case opens a waveform audio player with two parts julian_kade_part_1 and julian_kade_part_2 that draw waveform bars from local data and play and pause local audio"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.23"
 name = "video_popup_local_media_closes"
-description = "A video case (e.g. Frank Gehry) opens a media popup that plays a local video with a local poster image, and the red close button and the dimmed backdrop both close the popup and stop the media"
+description = "A video case (e.g. Mara Voss) opens a media popup that plays a local video with a local poster image, and the red close button and the dimmed backdrop both close the popup and stop the media"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.24"
 name = "about_route_essay_gallery_and_hidden_header"
-description = "The About route shows the exact document title \"About Mosby's Files—The Archive & The Idea\" with the fixed home header hidden, a long-form essay that rejects a Bauhaus-only origin story, situates the archive in a Ukrainian architectural education, states the selection principles, and closes that the folder is open, a photo gallery whose captions name the Salk Institute, the National Assembly Building in Dhaka, the Yale Art and Architecture Building, and the East Building of the National Gallery of Art, an original placeholder archivist signature graphic, and a red circular close button that returns to home"
+description = "The About route shows the exact document title \"About Field Notes Archive—The Archive & The Idea\" with the fixed home header hidden, a long-form essay that rejects a Bauhaus-only origin story, situates the archive in a Ukrainian architectural education, states the selection principles, and closes that the folder is open, a photo gallery whose captions name the Tide Court, the River Assembly Hall, the Northline Arts Building, and the East Archive Pavilion, an original placeholder archivist signature graphic, and a red circular close button that returns to home"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.25"
 name = "ten_distinct_routes_render"
-description = "All ten distinct routes are reachable (home, about, and the eight case routes frank-lloyd-wright, irving-gill, frank-gehry, louis-kahn, i-m-pei, paul-rudolph, louis-sullivan, mary-colter), each loadable by its own URL as well as by in-app navigation, and every case route renders its architect heading without error"
+description = "All ten distinct routes are reachable (home, about, and the eight case routes ada-mercer, elias-north, mara-voss, julian-kade, imani-vale, pavel-rowan, lucian-shore, mae-calder), each loadable by its own URL as well as by in-app navigation, and every case route renders its architect heading without error"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.26"
 name = "overscroll_advances_exactly_one_case"
-description = "Starting on the Louis Kahn case: triggering the overscroll affordance at the bottom once advances to exactly one next architect case in sequence (never two), and the case sub-header category name, the largest heading, the folder cover color, and the document title all update to the new architect's values without a full page reload"
+description = "Starting on the Julian Kade case: triggering the overscroll affordance at the bottom once advances to exactly one next architect case in sequence (never two), and the case sub-header category name, the largest heading, the folder cover color, and the document title all update to the new architect's values without a full page reload"
 type = "binary"
 weight = 1.0
 
@@ -207,7 +207,7 @@ negate = true
 [[criterion]]
 id = "1.31"
 name = "fixed_header_wordmark_and_about_item"
-description = "The home route shows a fixed centered header whose left element is an original placeholder Mosby's Files wordmark that navigates back to home when clicked, and whose right element is a single About navigation item"
+description = "The home route shows a fixed centered header whose left element is an original placeholder Field Notes Archive wordmark that navigates back to home when clicked, and whose right element is a single About navigation item"
 type = "binary"
 weight = 1.0
 
@@ -221,21 +221,21 @@ weight = 1.0
 [[criterion]]
 id = "1.33"
 name = "case_document_titles_exact"
-description = "Each case route's document title matches exactly: \"Frank Lloyd Wright—Mosby's Files\", \"Irving Gill—Mosby's Files\", \"Frank Gehry—Mosby's Files\", \"Louis Kahn—Mosby's Files\", \"I. M. Pei—Mosby's Files\", \"Paul Rudolph—Mosby's Files\", \"Louis Sullivan—Mosby's Files\", and \"Mary Colter—Mosby's Files\""
+description = "Each case route's document title matches exactly: \"Ada Mercer—Field Notes Archive\", \"Elias North—Field Notes Archive\", \"Mara Voss—Field Notes Archive\", \"Julian Kade—Field Notes Archive\", \"Imani Vale—Field Notes Archive\", \"Pavel Rowan—Field Notes Archive\", \"Lucian Shore—Field Notes Archive\", and \"Mae Calder—Field Notes Archive\""
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.34"
 name = "open_case_flow_full_chain"
-description = "Starting fresh on the home route: clicking the Frank Lloyd Wright tag swaps to that case without a full page reload; in the same flow the fixed home header hides, a case sub-header appears showing a link back to home and the category name \"Organic & Early Modernism\", the document title becomes exactly \"Frank Lloyd Wright—Mosby's Files\", and the case shows the architect name heading, the #1E4BD7 folder, the portrait sheet, the Irving Gill sibling tag, and the scrapbook; then clicking the sub-header home link returns to the home route with all four category groups and all eight architect tags still present"
+description = "Starting fresh on the home route: clicking the Ada Mercer tag swaps to that case without a full page reload; in the same flow the fixed home header hides, a case sub-header appears showing a link back to home and the category name \"Organic & Early Modernism\", the document title becomes exactly \"Ada Mercer—Field Notes Archive\", and the case shows the architect name heading, the #1E4BD7 folder, the portrait sheet, the Elias North sibling tag, and the scrapbook; then clicking the sub-header home link returns to the home route with all four category groups and all eight architect tags still present"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.35"
 name = "sibling_swap_updates_all_surfaces"
-description = "Starting on the Louis Kahn case: clicking the I. M. Pei sibling tag swaps to the I. M. Pei case without a full page reload, the largest heading and the document title update to \"I. M. Pei\" and \"I. M. Pei—Mosby's Files\", the folder cover stays the Monumental Modernism color #581E70, and the sibling tag region recomputes to link to Louis Kahn and Paul Rudolph"
+description = "Starting on the Julian Kade case: clicking the Imani Vale sibling tag swaps to the Imani Vale case without a full page reload, the largest heading and the document title update to \"Imani Vale\" and \"Imani Vale—Field Notes Archive\", the folder cover stays the Monumental Modernism color #581E70, and the sibling tag region recomputes to link to Julian Kade and Pavel Rowan"
 type = "binary"
 weight = 1.0
 
@@ -256,7 +256,7 @@ weight = 1.0
 [[criterion]]
 id = "1.38"
 name = "gehry_sole_sibling_tag_no_navigation"
-description = "The Frank Gehry case, alone in its category, shows only its own tag in the sibling tag region, and clicking that tag keeps the app on the Frank Gehry case"
+description = "The Mara Voss case, alone in its category, shows only its own tag in the sibling tag region, and clicking that tag keeps the app on the Mara Voss case"
 type = "binary"
 weight = 0.5
 

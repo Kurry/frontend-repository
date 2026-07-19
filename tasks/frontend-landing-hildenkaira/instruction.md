@@ -1,5 +1,5 @@
 <summary>
-Build a Hildén & Kaira social-media agency homepage using Astro, Tailwind CSS 4.3.2, DaisyUI, and GSAP.
+Build a fully fictional Cinder & Bloom social-media agency homepage using Astro, Tailwind CSS 4.3.2, DaisyUI, and GSAP, preserving the reference's editorial composition and interaction system without its identity or proprietary media.
 </summary>
 
 <reference_screenshots>
@@ -7,21 +7,21 @@ Screenshots of the reference application are provided in-container at
 /reference-screenshots/: overview.png is a full-page desktop-layout
 overview (downscaled); segment-NN.png are full-resolution 1440x900 sections
 in top-to-bottom order with slight overlap. They are part of this instruction:
-recreate what they show. Where a screenshot and the text conflict, the text
-wins. Do not copy the images into /app or ship them as app assets, and where
-a screenshot shows a brand asset (logo, wordmark, lettermark, client mark,
-licensed typeface, brand photography or case-video footage), recreate only
-its size, position, and role with an original stand-in per the requirements.
+recreate their composition, proportions, density, and motion. Any legible
+source agency/client name, logo, letterform, typeface, photograph, or video is
+composition-only reference material and must be replaced with the fictional
+system below. Do not copy, crop, trace, recolor, rename, or ship screenshot
+pixels or source-site files.
 </reference_screenshots>
 
 <core_features>
 Core features (each line is an observable behavior the finished app must exhibit):
-- The page loads a single long-form English (en-GB) homepage at / that returns HTTP 200; no other route is built — this is the homepage only; the brand name always keeps its accent (Hildén & Kaira, with é), and the document title reads Hildén & Kaira
+- The page loads a single long-form English (en-GB) homepage at / that returns HTTP 200; no other route is built — this is the homepage only; the fictional brand name is consistently Cinder & Bloom, and the document title reads Cinder & Bloom
 - A fixed top nav overlays the page with an original placeholder brand wordmark on the left, centered links Our approach, Story, Work, and Blog, a locale dropdown showing EN, and a right-side contact call-to-action button; the centered nav links, the CTA, Show case controls, service and about buttons, and the locale switcher are plain clickable chrome with no working destination page — clicking them stays on / and never opens a second page, and the /fi locale never resolves to a separate page
 - The page presents these sections in this exact top-to-bottom order: hero with editorial headline and floating case thumbnails; statement/manifesto band; client flick-card deck carousel; services trio; testimonials carousel; about/self-esteem band with the H2 "Does your brand have self-esteem issues?"; call-to-action block; full-height footer (sitemap, podcast, social, and legal links live in the footer, not as a separate mid-page section)
 - The hero shows the exact H1 "If you can't reach a million people with 0€ ad spend, your branding sucks." with the exact lead "We will 10x your social presence or work for free until it's done." beneath it, an animated brand lettermark assembled from twelve individual original letterform images, and case thumbnails that continuously drift upward on the left and right edges
 - The statement section shows the H2 lead "Content only you can post because it's built around your people." over a dark media band
-- The client deck is a centered carousel of five client cards — Finlayson, Kierrätyskeskus, Uusi Juttu, Autoliitto, and Liikku — each card carrying a client title with an original placeholder client mark, a Show case control, a stacked flick-card deck of short vertical videos, and two live stat tiles labelled Organic views and Likes
+- The client deck is a centered carousel of five fictional client cards — Loom House, Second Circle, New Current, Roadkind, and Motive Lab — each card carrying a client title with a newly drawn client mark, a Show case control, a stacked flick-card deck of short vertical videos, and two live stat tiles labelled Organic views and Likes
 - Each client's flick-card deck has Previous and Next controls that reshuffle the stacked cards, and only the front card's video player is ever interactive
 - The Organic views and Likes counters begin below their seeded totals and tick upward on their own shortly after load, formatting large numbers with a space as the thousands separator (for example 2 148 665)
 - The active client card embeds a custom video player with a big play control, a play/pause button, a mute button, a fullscreen button, a draggable timeline with elapsed and total time, and likes/views captions
@@ -31,7 +31,7 @@ Core features (each line is an observable behavior the finished app must exhibit
 - The call-to-action block shows the H2 "Ready to work with us?" with two choice cards: "We'll call you" (which opens the contact form) and "Contact us"
 - Choosing "We'll call you" opens a contact popup containing an email field, an optional phone field, and a Privacy Policy agreement checkbox; the submission is posted to a local endpoint only — never to an external form service
 - A cookie consent banner appears shortly after load with an Accept action and a preferences path exposing four categories — Essential (required), Marketing, Analytics, and Personalization; clicking Accept dismisses the banner
-- The footer fills at least the viewport height, re-assembles the brand lettermark from its individual original letterforms, and lists a sitemap, Podcast links (Spotify, YouTube, Apple Podcasts), Social links (Instagram, TikTok, Facebook), legal links, and a generic designer credit line
+- The footer fills at least the viewport height, re-assembles the Cinder & Bloom lettermark from its twelve individual original letterforms, and lists a sitemap, Podcast links (Audio, Video, Episodes), Social links (Photos, Clips, Community), legal links, and a fictional designer credit line
 - No in-app control performs a real outbound navigation or full page reload; every nav link, locale option, case/service/about link, and social/legal/sitemap link that has no in-scope destination is present and clickable but non-navigating chrome that leaves the user on /
 </core_features>
 
@@ -49,11 +49,12 @@ End-to-end flows with tracked state (every step names its visible evidence):
 - Submitting the contact form with an empty or invalid email, or with the agreement checkbox unchecked, does not reveal the success state and marks the offending field while the popup stays open
 - A contact submission attempted within the first few seconds after load is silently ignored as anti-spam: no success state appears and no request is sent
 - Only the front flick card's video player responds to input; the partially visible rear cards never start playback
-- Only two case videos ship for the deck's slots and all five client marks are original placeholders; the two videos are reused across slots and no slot ever references a nonexistent file or shows a broken-media indicator
+- Every client deck has at least three distinct local VP9 WebM/poster pairs, and all five client marks are newly authored; no video is reused across different client identities and no slot references a nonexistent file or shows a broken-media indicator
 - Advancing the testimonials rotator repeatedly cycles through all quotes and the current-position indicator always matches the visible quote
 </edge_cases>
 
 <visual_design>
+- Complete debranding is part of the visible design: only Cinder & Bloom and the five fictional clients may appear. Source agency/client names, source letter shapes or logos, social-service marks, identifiable people, recognizable case footage, licensed typefaces, and real designer credits are prohibited even inside video frames, image pixels, SVGs, metadata rendered in the UI, or tiny footer text.
 - Editorial, high-contrast agency aesthetic: the home body default surface renders off-white rgb(234, 233, 230) (#eae9e6) with near-black rgb(24, 24, 24) (#181818) text, and dark media bands, lime, turquoise, chrome-metallic, and dark-grey theme surfaces swap per section as the page scrolls
 - Color scarcity on this brand (not a lime-everywhere theme): lime rgb(236, 253, 173) is reserved for the Organic views tile, theme-media headings, text selection, primary button fills, and the page-load veil; turquoise rgb(63, 174, 134) is reserved for the Training service card and primary-button hover fills; red rgb(255, 69, 69) appears only as the nav link dot; chrome-metallic is reserved for the Likes tile, contact popup, and footer theme
 - The statement and about bands (theme-media) render black rgb(24, 24, 24) with lime rgb(236, 253, 173) (#ecfdad) headings; the footer (theme-chrome) renders a dark-grey rgb(43, 43, 43) (#2b2b2b) base with white text
@@ -61,10 +62,12 @@ End-to-end flows with tracked state (every step names its visible evidence):
 - Oversized editorial display headings render in the bundled open-license editorial display face at weight 400 (hero H1 about 62.8px at 1440 with a tight ~0.9em line-height and negative letter-spacing; statement and about H2 about 57.6px to 84px depending on tier), paired with the bundled open-license grotesque at weight 500 for body, eyebrow, and nav text (paragraph-m about 15.7px, nav links about 13.1px at 1440); both faces resolve from self-hosted files; Inter is used only for ancillary UI and cookie-consent copy; no external font requests
 - Fluid, viewport-bound type scaling via a clamp-based root size: the body font-size resolves to about 10.5px at 1440 and scales continuously with viewport width (about 16px near 991 and below), so headline and body px grow and shrink smoothly across breakpoints rather than snapping at fixed sizes
 - Broken-grid editorial composition: the hero places a full-width lettermark along the top edge, centers the H1 and lead toward the lower third, and lets case thumbnails drift through left and right zones that cross the headline plane; the about band overlays large display type on a media field with flanking images that break the content column; spacing and offsets stay on a consistent fluid em baseline (multiples of 0.5em / 1em / 2em / 8em that track the root size, equivalent to a 4/8px discipline at the measured root)
-- The client deck cards are dense: an original placeholder client mark and title, a stacked flick deck of vertical video cards, caption chips (age and view count), and two stat tiles — a lime Organic views tile and a chrome Likes tile with a metallic heart
+- The client deck cards are dense: a newly authored fictional client mark and title, a stacked flick deck of vertical video cards, caption chips (age and view count), and two stat tiles — a lime Organic views tile and a chrome Likes tile with a metallic heart
 - The services trio uses full-bleed card faces in contrasting themes (lime, white, turquoise) with large index numbers and background video
 - The contact popup uses a chrome-metallic panel with floating-label fields; the cookie banner uses a dark theme
 - Text selection shows a lime-on-black highlight; scrollbars are hidden; buttons reset their native chrome
+- Replacement-asset craft is mandatory. Create or generate roughly from scratch inside /app: twelve separate Cinder & Bloom letterform images; at least four distinct drifting hero case thumbnails; five different fictional client marks; at least three short vertical VP9 WebM/poster pairs per client deck; three distinct service-background VP9 WebM/poster pairs; five testimonial author portraits or marks; two flanking about-band images; contact/footer decorative artwork; and every utility icon. Each asset must be purposeful, nonempty, and visibly used; gradients, emoji, repeated thumbnails, plain typed names posing as logos, or omitted media do not count.
+- The broken-grid hero, drifting edge thumbnails, dense stacked flick deck, pinned three-card services throw, and flanking-image about band must retain their reference-true asymmetry on a fluid 4/8px-equivalent baseline. Display sizes use rem-bounded clamp() formulas with viewport-relative preferred values, and split/letter-assembled headings preserve the full phrase as the parent's accessible name while fragments are aria-hidden.
 </visual_design>
 
 <motion>
@@ -77,6 +80,7 @@ End-to-end flows with tracked state (every step names its visible evidence):
 - Hovering a primary button (fine-pointer devices) slides its label upward, rotates its icon backing, translates its arrow across, and wipes the button background; each animated target transitions transform over 0.525s with the primary-motion easing cubic-bezier(0.625, 0.05, 0, 1)
 - Clicking a client deck's Next or Previous control animates the stacked flick cards to new offset/rotation/scale positions per the flick coordinate table (active 0/1 scale, +/-1 at +/-25% and +/-10deg scale 0.9, +/-2 at +/-45% and +/-15deg scale 0.8) with an elastic, springy overshoot settle running about 0.6s, and the active card's caption chips slide up into view
 - Signature interactive motion uses inertial or springy easing (button primary-motion curve, nav-dot back ease, flick elastic settle, CTA-card inertia throws) — those gestures do not start and stop on purely linear tweens
+- Reduced motion: under prefers-reduced-motion, smooth scrolling, drifting thumbnails, autoplaying decorative video, marquee motion, and pinned throw transforms stop; every card, heading, control, and form remains visible and operable in its settled state.
 - The client carousel keeps the active slide at scale(1) and shrinks neighboring slides to scale(0.94), transitioning over roughly 600ms
 - Hero case thumbnails drift on continuous 12–15 second bottom-to-top loops in left and right zones, fading in at the start and out near the top of each loop
 - The Organic views and Likes counters tick upward continuously beginning about half a second after load
@@ -101,7 +105,7 @@ End-to-end flows with tracked state (every step names its visible evidence):
 - Text and control labels meet WCAG AA contrast against their surfaces, including lime headings on black media bands, near-black body on off-white, and white text on dark-grey/chrome footer and cookie surfaces
 - The contact popup behaves as a modal dialog: focus moves into it when opened, stays trapped while it is open, and returns to the triggering control when it closes
 - Contact form validation errors and the success state are exposed to assistive technology as well as shown visually
-- Split and letter-assembled headings keep their full text accessible: split heading containers carry the complete phrase as an accessible name while per-line fragments are hidden from the accessibility tree, and the brand lettermark carries an accessible label reading Hildén & Kaira with per-letter fragments hidden or decorative
+- Split and letter-assembled headings keep their full text accessible: split heading containers carry the complete phrase as an accessible name while per-line fragments are hidden from the accessibility tree, and the brand lettermark carries an accessible label reading Cinder & Bloom with per-letter fragments hidden or decorative
 - The video player's play/pause, mute, fullscreen, and timeline controls carry accessible labels
 - While the mobile full-screen menu is open, background scrolling stays locked and the menu can be closed from the keyboard
 </accessibility>
@@ -114,14 +118,15 @@ End-to-end flows with tracked state (every step names its visible evidence):
 </performance>
 
 <writing>
-- All mandated copy strings render exactly as specified, including the é in Hildén & Kaira; no lorem ipsum, TODO, or template placeholder text appears anywhere on the page
+- All mandated copy strings render exactly as specified, including Cinder & Bloom wherever the fictional agency name appears; no lorem ipsum, TODO, or template placeholder text appears anywhere on the page
 - Headings, buttons, and captions keep the reference's casing and terminology consistently across sections
 - The footer designer credit uses an invented generic name and does not credit the reference site's real designer or agency; placeholder client marks do not reproduce real third-party logos
 </writing>
 
 <requirements>
+- Copyright and rights-clearance prohibition: apart from required npm dependency code and explicitly specified open-license fonts or generic utility icons used under their licenses, every creative asset and every piece of visible editorial copy must be newly authored or generated specifically for this fictional build. Do not use scraped, stock, press, social-media, portfolio, source-site, screenshot-derived, copyrighted, trademarked, or otherwise third-party-controlled creative material, and do not make a trace, near-copy, style-identical imitation, or recognizable derivative of it. This applies to raster pixels, individual video frames and audio, SVG paths, canvas/WebGL/Rive artboards and textures, 3D geometry/materials/HDR environments, PDFs, icon/mark silhouettes, metadata, filenames, alt text, and hidden/preloaded assets. If provenance is uncertain, create a fresh fictional replacement.
 Stack: build the homepage with Astro, Tailwind CSS 4.3.2 through @tailwindcss/vite (design tokens in the theme layer), and DaisyUI for base chrome (buttons, form controls, dropdown and modal primitives, restyled by the page's own tokens). Animation runtime: GSAP with ScrollTrigger, SplitText, and InertiaPlugin, Lenis for the desktop smooth scroll, and Swiper for the client-deck carousel; no other animation libraries. Icons are bundled original SVGs or the Iconify Tailwind plugin; no icon CDN. The contact form validates through a Zod schema client-side: inline per-field errors name the offending field before submit, and the success state appears only when the schema passes. All libraries are installed via npm and bundled locally; do not load any font, image, video, or script from an external CDN — the build must run fully offline.
-All shipped assets must be original or open-licensed — this recreation must not contain copyrighted brand assets: do not include the reference site's logo, wordmark, or lettermark files, client marks, brand photography, or case-video footage; ship original placeholder marks, letterform artwork, and media at the same sizes, aspect ratios, placements, and layer counts. Do not bundle licensed fonts: in place of the reference's licensed editorial serif and grotesque, self-host a bundled open-license editorial display face of similar width and contrast at weight 400 and a bundled open-license grotesque at weight 500, plus Inter for ancillary UI and cookie-consent copy. Where a reference screenshot shows a brand asset, recreate its size, position, and role with an original stand-in; the screenshot never licenses the asset itself.
+Author or generate every letterform, client mark, portrait, photograph, video, poster, texture, and decorative file as a new Cinder & Bloom replacement inside /app, matching the reference's counts, placements, dimensions, aspect ratios, and layer counts. Do not copy, derive, trace, recolor, rename, transcode, or redistribute a source-site, screenshot, or reference-bundle file, and do not omit a surface because its source cannot be reused. In place of the reference's licensed editorial serif and grotesque, self-host an open-license editorial display face of similar width and contrast at weight 400 and an open-license grotesque at weight 500, plus Inter for ancillary UI and cookie-consent copy.
 Delivery and behavioral contracts:
 - package.json must define npm scripts named exactly start (serves the app on port 3000) and verify:build (exits 0 when the build succeeds); the homepage must be served on port 3000 and / must return HTTP 200
 - The contact form must POST to a local API route within the app and reveal the app's own success state on success; it must never call an external form endpoint
@@ -131,7 +136,7 @@ Delivery and behavioral contracts:
 - Express colors as three-tier CSS custom properties (swatch tokens, theme role tokens, component consumption) so section theme swaps recolor through shared tokens rather than scattered literal hex
 - Seed the five client decks, the services trio, at least five testimonials, the about band, and the four cookie categories so every section is non-empty on first load
 - The counters must animate upward from below their seeded totals; the flick deck must reshuffle only via its Previous/Next (or card) controls; the carousel must keep exactly one centered active slide
-- Ship original placeholder marks for all five clients and exactly two original placeholder case videos reused across the deck's slots rather than referencing nonexistent files
+- Ship newly drawn marks for all five fictional clients and enough authored video/poster pairs to keep at least three deck faces per client visually distinct; do not recycle one or two clips across every slot
 - No backend beyond the local contact endpoint, and no authentication; all navigation stays on the homepage with no full page reloads and no outbound navigation from chrome links
 - This is a pixel-fidelity build: match exactly the computed theme colors (lime #ecfdad, turquoise #3fae86, red #ff4545, near-black #181818, off-white #eae9e6, dark-grey #2b2b2b), all verbatim copy (including the hero lead), the section order (hero, statement, client deck, services, testimonials, about/self-esteem, CTA, footer), the theme-per-section mapping, the breakpoint behaviors (hamburger only at 479 and below; smooth scroll 768 and up), the flick coordinate table, the carousel scale ratio (1 / 0.94), and the bundled faces' weights and type tiers. Font antialiasing, exact px at odd viewports (the fluid type scale makes px viewport-dependent), subpixel positions, and the deterministic-but-looping hero thumbnail positions only need to match closely
 </requirements>

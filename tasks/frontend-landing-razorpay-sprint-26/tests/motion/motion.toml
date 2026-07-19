@@ -181,6 +181,13 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "3.17"
+name = "reduced_motion_settled_and_operable"
+description = "With prefers-reduced-motion enabled, the preloader clears immediately, smooth scrolling and parallax/pinning stop, the 3D hero presents a static composition, and split/reveal/vector timelines settle while all controls and sections remain visible and operable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "3.catchall"
 name = "motion_catchall"
 description = "The app exhibits a significant, browser-observable defect in motion or animation behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

@@ -105,7 +105,7 @@ weight = 1.0
 [[criterion]]
 id = "2.7"
 name = "footer_wordmark_lines"
-description = "The footer shows the copyright line Copyright © Novapay FTX26, the copy AI-native fintech. / Built from India. For the world., and a /SPRINT'26 word-mark, with a gradient overlay tied to scroll."
+description = "The footer shows the copyright line Copyright © Novapay FTX26, the copy AI-native fintech. / Built with ambition. For the world., and a /SPRINT'26 word-mark, with a gradient overlay tied to scroll."
 type = "binary"
 weight = 0.5
 optional = true
@@ -192,7 +192,7 @@ negate = true
 [[criterion]]
 id = "2.18"
 name = "real_brand_assets_shipped"
-description = "A trademarked logo or wordmark of the real source fintech brand, real brand or executive photography or video, a licensed brand font file, or a third-party site-builder attribution badge appears anywhere on the page instead of the original Novapay placeholder identity and placeholder media."
+description = "Copyrighted, trademarked, scraped, stock, source-site, screenshot-derived, or otherwise third-party-controlled creative material—or a recognizable trace, near-copy, or derivative—appears anywhere, including a source fintech logo, real executive likeness/photo/video frame, proprietary font, partner/social mark, site-builder badge, Rive artboard, WebGL model/texture, metadata, or hidden/preloaded asset instead of the fictional Novapay system."
 type = "binary"
 weight = 1.0
 negate = true
@@ -215,6 +215,21 @@ weight = 1.0
 id = "2.21"
 name = "lime_or_cream_palette_present"
 description = "The page adopts a lime-on-dark or warm-cream editorial palette (for example lime accents near #ecfdad or a cream body near #F4F1EA / #eae9e6) instead of the Novapay electric-blue / near-black / white identity."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.22"
+name = "scratch_authored_media_inventory_craft"
+description = "The Novapay identity and asset inventory are visibly complete and art-directed: logo mark/lockup, six distinct executive portraits, matching local video posters, desktop/mobile 3D scenes and textures, every vector-interaction fallback, all card art, SVG controls, and the social-share image occupy their reference roles without repeated generic filler"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.23"
+name = "missing_reused_or_source_media"
+description = "A required Novapay surface is omitted, empty, broken, duplicated as filler, reduced to a generic gradient/emoji/text placeholder, or exposes a source-site name, logo silhouette, recognizable source media, distinctive copy, metadata, or destination"
 type = "binary"
 weight = 1.0
 negate = true

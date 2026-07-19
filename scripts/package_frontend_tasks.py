@@ -351,11 +351,11 @@ TASK_SPECS.update({
                 "firstname",
                 "lastname",
                 "email",
-                "twitterhandle",
+                "socialhandle",
                 "country",
                 "vertical",
                 "project_type",
-                "avalanche_contact_message",
+                "astra_contact_message",
                 "gdpr",
                 "marketing_consent",
                 "newsletter"
@@ -478,14 +478,14 @@ TASK_SPECS.update({
             "destinations": [
                 "home",
                 "about",
-                "frank-lloyd-wright",
-                "irving-gill",
-                "frank-gehry",
-                "louis-kahn",
-                "i-m-pei",
-                "paul-rudolph",
-                "louis-sullivan",
-                "mary-colter"
+                "ada-mercer",
+                "elias-north",
+                "mara-voss",
+                "julian-kade",
+                "imani-vale",
+                "pavel-rowan",
+                "lucian-shore",
+                "mae-calder"
             ],
             "session_operations": [
                 "play-video",
@@ -583,10 +583,10 @@ TASK_SPECS.update({
                 "home-hero",
                 "locations",
                 "living",
-                "typical-unit",
+                "typical-studio",
                 "community",
                 "what-we-stand-for",
-                "insta-feed",
+                "social-feed",
                 "book-cta",
                 "menu"
             ]

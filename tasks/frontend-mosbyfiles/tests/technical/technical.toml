@@ -191,6 +191,13 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "2.20"
+name = "required_authored_asset_files_load"
+description = "Browser network and playback evidence shows all portraits, scrapbook imagery, five distinct VP9 WebM/poster pairs, both Julian Kade audio files and waveform datasets, four gallery images, marks, and SVG artwork loading from same-origin paths with no 404, decode, or playback failure"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical defect (console, network, storage, hydration, performance, or accessibility) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

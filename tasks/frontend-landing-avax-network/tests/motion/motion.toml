@@ -106,7 +106,7 @@ weight = 1.0
 [[criterion]]
 id = "4.7"
 name = "smooth_scroll_scrub_and_anchors"
-description = "Above 1024px, smooth native scrolling stays active alongside scroll-driven section motion and the desktop quick-link card scrub, hash/anchor navigation eases over about two seconds, and sticky Why Avalanche headings still stick; below 1025px native scrolling is used with the smooth-scroll engine off"
+description = "Above 1024px, smooth native scrolling stays active alongside scroll-driven section motion and the desktop quick-link card scrub, hash/anchor navigation eases over about two seconds, and sticky Why Astra headings still stick; below 1025px native scrolling is used with the smooth-scroll engine off"
 type = "binary"
 weight = 1.0
 
@@ -200,7 +200,7 @@ weight = 1.0
 [[criterion]]
 id = "4.19"
 name = "scroll_hijack_breaks_sticky_or_keyboard"
-description = "Smooth scrolling hijacks the page so sticky Why Avalanche headings fail to stick, keyboard Page Down/Home/End cannot move the viewport, or hash/anchor navigation is trapped and cannot reach lower sections"
+description = "Smooth scrolling hijacks the page so sticky Why Astra headings fail to stick, keyboard Page Down/Home/End cannot move the viewport, or hash/anchor navigation is trapped and cannot reach lower sections"
 type = "binary"
 weight = 1.0
 negate = true

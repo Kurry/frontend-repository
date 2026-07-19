@@ -209,7 +209,7 @@ negate = true
 [[criterion]]
 id = "3.20"
 name = "source_brand_residue_present"
-description = "Any source identity remains visible: a real driver or team name, initials, signature, number, logo silhouette, sponsor or social handle; a recognizable source photograph, video frame, likeness, helmet livery, circuit graphic, monogram, partner mark, or proprietary display font; or source branding embedded in canvas/WebGL textures or tiny footer copy"
+description = "Copyrighted, trademarked, scraped, stock, source-site, screenshot-derived, or otherwise third-party-controlled creative material—or a recognizable trace, near-copy, or derivative—appears anywhere, including a real driver/team identity, signature, number, logo silhouette, sponsor/social handle, recognizable photograph/video frame/likeness, helmet livery, circuit graphic, monogram, partner mark, proprietary font, canvas/WebGL texture, metadata, or tiny footer copy"
 type = "binary"
 weight = 1.0
 negate = true
