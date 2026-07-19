@@ -218,6 +218,13 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "7.12"
+name = "facets_comparison_catalog_at_375"
+description = "At 375 pixel width the search input, tag facet chips, Archived toggle, comparison view, and catalog sheet remain reachable and operable without horizontal scrolling, with comparison columns allowed to stack while per-pair deltas stay legible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "responsiveness.catchall"
 name = "responsiveness_catchall"
 description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

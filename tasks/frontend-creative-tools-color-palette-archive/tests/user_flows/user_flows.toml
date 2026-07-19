@@ -276,6 +276,49 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "6.18"
+name = "reorder_to_export_flow"
+description = "Drag a palette's first swatch to the third position (or use move-down twice), close and reopen Detail confirming the order held in the editor and on the Palette-view card, then open Export and confirm that palette's swatches array lists the hexes in the new order"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.19"
+name = "search_facet_narrow_clear_flow"
+description = "Type a seeded artist fragment into search and confirm only matching palettes remain across all three layouts, activate a tag facet chip and confirm the set narrows conjunctively, then clear all and confirm the full collection returns"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.20"
+name = "comparison_swap_flow"
+description = "Select exactly two palettes, open Compare, confirm aligned swatch pairs show hue-degree and lightness deltas, swap one compared palette for a third, and confirm the deltas update without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.21"
+name = "provenance_note_to_catalog_flow"
+description = "Write a markdown note with a heading and a bold phrase, Preview it rendered, save, and confirm the rendered note appears in Detail and in the Catalog sheet while the archive JSON export carries it as the notes string"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.22"
+name = "bulk_tag_archive_restore_undo_flow"
+description = "Select three palettes, Batch tag them (facet count includes them), Batch archive two (default layouts drop both while the Archived facet reveals them), Restore one, then Undo repeatedly and confirm each step reverses in order"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n13"
+name = "comparison_or_catalog_dead_end"
+description = "Opening the comparison view or the catalog sheet leaves the app stuck: it cannot be closed back to Browse without a reload, or it renders blank while palettes exist"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "user_flows.catchall"
 name = "user_flows_catchall"
 description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

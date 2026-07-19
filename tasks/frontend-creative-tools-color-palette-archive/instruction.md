@@ -44,7 +44,10 @@ Feature: Detail/Editor and palette field contract —
   - period: required; exactly one of Abstract + Geometric, Americana, Baroque to Neoclassical, Expressionism, Fauvism, Impressionism, Medieval, Modern, Old Masters, Post-Impressionism, Primitive + Folk, Realism, Romanticism, Symbolism, Tonalism
   - swatches: required ordered array of 3 to 12 inclusive hex color strings; each string is a six-digit hexadecimal color with a leading number-sign (number-sign followed by six hex digits); short three-digit hex, missing number-sign, and non-hex characters are invalid
   - favorite: optional boolean defaulting to false
-- The form validates per field before submit: an empty name, empty artist, a period outside the closed list, fewer than 3 or more than 12 swatches, or a swatch that is not a six-digit hex with a leading number-sign shows an inline message naming the offending field, and the save control stays disabled until every field is valid
+  - tags: optional array of 0 to 6 tag strings defaulting to empty; each tag is trimmed, lowercase, 1 to 24 characters; duplicate tags within one palette are invalid
+  - notes: optional string defaulting to empty, at most 2000 characters, treated as markdown provenance notes
+  - archived: optional boolean defaulting to false
+- The form validates per field before submit: an empty name, empty artist, a period outside the closed list, fewer than 3 or more than 12 swatches, a swatch that is not a six-digit hex with a leading number-sign, a duplicate or out-of-bounds tag, or notes over 2000 characters shows an inline message naming the offending field, and the save control stays disabled until every field is valid
 - The record a successful create produces IS the object that appears for that palette in the archive JSON export — same field names, same bounds, same period enum, same swatch hex format
 
 Feature: Contrast matrix —
@@ -59,7 +62,7 @@ Feature: Multi-select and batch actions —
 - With zero palettes selected, Batch delete does nothing and shows no confirmation; the selection tray stays hidden until at least one card is selected
 
 Feature: Undo and redo —
-- Undo and Redo controls step backward and forward through mutating actions (create, edit, delete, duplicate, favorite toggle, batch favorite, batch delete, and import)
+- Undo and Redo controls step backward and forward through mutating actions (create, edit, delete, duplicate, favorite toggle, batch favorite, batch delete, batch tag, batch archive, restore, swatch reorder, and import)
 - After deleting a palette via the UI, Undo restores that palette's card, swatches, and the prior visible count
 - After Undo restores a deleted palette, Redo deletes it again; after a new create following an undo, Redo is disabled and cannot resurrect the cleared redo stack
 - Undo and Redo show a visibly disabled appearance when no step is available
@@ -71,16 +74,49 @@ Feature: Export drawer (the archive artifacts the user came for) —
 - SCSS map preview emits an SCSS map whose color entries mirror the same hex values
 - Archive JSON preview is API-shaped. All keys and nesting below are REQUIRED. Example values are illustrative only:
   - version: required string, exactly palette-archive.v1
-  - palettes: required array (may be empty); each entry requires id (non-empty string), name, artist, period (closed list above), swatches (ordered array of 3 to 12 six-digit hex strings with a leading number-sign), and favorite (boolean)
+  - palettes: required array (may be empty); each entry requires id (non-empty string), name, artist, period (closed list above), swatches (ordered array of 3 to 12 six-digit hex strings with a leading number-sign, in the palette's canonical swatch order), favorite (boolean), tags (array of 0 to 6 lowercase tag strings), notes (markdown string, may be empty), and archived (boolean)
 - After creating a valid palette with a distinctive hex not in the seed set, that hex appears in the CSS / utility-theme / SCSS export previews and the new palette's id, name, artist, period, swatches, and favorite flag appear in the archive JSON preview before any download or copy
 - After deleting a palette, that palette's name is absent from the archive JSON export preview and its unique hexes are absent from the CSS preview when no other palette still uses them
 - Export Copy writes the visible preview text to the clipboard with a brief copied confirmation; Download starts a file download of that same preview text
 - An export that omits the session's actual create, edit, delete, duplicate, favorite, or batch mutations is incomplete
 
 Feature: Import round-trip —
-- Import accepts archive JSON (file picker or paste) in the same schema as the archive JSON export (version exactly palette-archive.v1 plus palettes with id, name, artist, period, swatches, favorite)
-- Importing a valid archive JSON replaces the library so visible palette names, artists, periods, swatches, and favorite flags match the imported payload, and the archive JSON export preview matches that imported state
-- Importing malformed or schema-violating archive JSON (missing required palette fields, period outside the closed list, invalid hex, or swatch count outside 3–12) shows an inline error naming the import field, leaves the palette count and names unchanged, and does not apply a successful-import state
+- Import accepts archive JSON (file picker or paste) in the same schema as the archive JSON export (version exactly palette-archive.v1 plus palettes with id, name, artist, period, swatches, favorite, tags, notes, archived)
+- Importing a valid archive JSON replaces the library so visible palette names, artists, periods, swatch orders, favorite flags, tags, notes, and archived flags match the imported payload, and the archive JSON export preview matches that imported state
+- Importing malformed or schema-violating archive JSON (missing required palette fields, period outside the closed list, invalid hex, swatch count outside 3–12, duplicate tags, or a non-boolean favorite or archived flag) shows an inline error naming the import field, leaves the palette count and names unchanged, and does not apply a successful-import state
+
+Feature: Swatch drag-reorder —
+- In Detail/Editor, swatches reorder by dragging: the dragged swatch follows the pointer while the remaining swatches part to show the drop position; releasing commits the new order
+- The committed order is the palette's canonical swatch order: it persists across Detail close/reopen and layout switches, drives the card's swatch order in Palette view, and is the order of that palette's swatches array in the archive JSON export
+- Each swatch row also offers move-up / move-down controls that produce the same reorder as dragging; a committed reorder is an undoable step
+
+Feature: Archive search and facets —
+- A search input in the library controls strip filters palettes as the user types, matching palette name, artist, and tags case-insensitively; clearing it restores the full set
+- Tag facet chips list every tag in use with a per-tag palette count; activating a chip narrows the visible set to palettes carrying that tag, combining conjunctively with the search text and the period filter; an active chip shows a selected state and can be cleared
+- An Archived facet toggle reveals archived palettes; by default archived palettes are hidden from all three Browse layouts, search results, and tag facet counts
+- A search/facet combination matching nothing shows an empty state naming the active search text and facets, with a clear-all control that restores the full set
+
+Feature: Palette comparison —
+- A Compare control accepts exactly two selected palettes and opens a side-by-side comparison showing both palettes' names, artists, periods, and swatch columns aligned by position
+- Each aligned swatch pair shows per-swatch deltas computed from the two hexes: the hue difference in degrees and the lightness difference; positions present in only one palette are marked unmatched rather than showing fabricated deltas
+- Swapping either compared palette for a different one updates the deltas without a reload; with fewer or more than two palettes selected, Compare is disabled with an explanatory hint
+
+Feature: Provenance notes with markdown —
+- Detail/Editor includes a provenance notes editor with a Write/Preview toggle: Write shows the raw markdown; Preview renders at least headings, bold, italic, and unordered lists as formatted text with no raw markdown characters leaking through
+- Saved notes appear rendered in the palette's Detail panel, rendered in the printable catalog sheet, and as the notes string in the archive JSON export; an empty note shows an explanatory placeholder rather than an empty rendered block
+
+Feature: Bulk tagging and archiving —
+- The multi-select tray adds Batch tag and Batch archive: Batch tag prompts for one tag and applies it to every selected palette (visible in their detail, in the tag facet chips, and in facet counts) without duplicating a tag a palette already carries; Batch archive sets the archived flag on every selected palette, removing them from the default Browse layouts at once
+- Archived palettes remain reachable under the Archived facet with a Restore control that clears the flag and returns them to the default layouts; batch tag, batch archive, and restore are undoable steps
+- Tags and archived flags in the archive JSON export match the visible state after any batch action
+
+Feature: Harmony analysis panel —
+- Detail/Editor shows a read-only harmony analysis panel listing each distinct swatch hue in degrees and a classification of the palette's hue relationships — at least Monochrome, Analogous, Complementary, Triadic, or Mixed — derived from the spacing of the palette's distinct hues
+- Recoloring a swatch so the hue spacing changes updates the listed hue degrees and can change the classification without a reload; a palette with fewer than 2 distinct hues shows the Monochrome or an explanatory state instead of a fabricated classification
+
+Feature: Printable catalog sheet —
+- The Export drawer adds a Catalog sheet tab: a print-optimized document listing every non-archived palette with its name, artist, period, tags, swatch chips with hex values, and rendered provenance notes, compiled live from the current store; archived palettes are excluded
+- A Print control opens the browser print preview of the catalog sheet; session mutations (create, edit, delete, duplicate, reorder, tag, archive) are reflected in the catalog sheet before printing
 
 Feature: Subscribe popup —
 - Optional subscribe popup appears after roughly 45s idle or after scrolling past about 50% of the page; closing or submitting it dismisses it in memory (no real network subscribe) and it stays dismissed for the session; submitting it with an invalid email (missing at-sign or domain) shows an inline message naming the email field instead of dismissing
@@ -99,7 +135,13 @@ Feature: Subscribe popup —
 - Contrast matrix and vision flow: open Detail/Editor and confirm the contrast matrix lists pair ratios; recolor one swatch and confirm at least one ratio or pass mark changes; close editor, set vision simulation to Deuteranopia and confirm swatches visibly shift versus None
 - Export/import round-trip: after mutating the collection (create or edit at least one palette), Copy or Download the archive JSON, then Import that same JSON text — visible names, artists, periods, swatches, and favorite flags match the pre-export mutated state, and the export preview matches again including version and each palette's id, name, artist, period, swatches, and favorite
 - Create echoes API-shaped export fields: create a valid palette with distinctive name, artist, closed-list period, and at least 3 valid hex swatches — Palette-view card shows name and artist, and the archive JSON preview includes that palette's id, name, artist, period, swatches, and favorite without a reload
-- A page reload returns the app to its seeded state: the seeded palettes, the Nomenclature layout active, the all-periods filter, Name A–Z sort, empty undo/redo, vision simulation None, and no palette selected
+- Reorder flow: drag a palette's first swatch to the third position (or use move-down twice), close and reopen Detail, and confirm the order held in the editor and on the Palette-view card; open Export and confirm that palette's swatches array lists the hexes in the new order
+- Search and facet flow: type a seeded artist fragment into search and confirm only matching palettes remain across all three layouts; activate a tag facet chip and confirm the set narrows conjunctively with the search; clear all and confirm the full collection returns
+- Comparison flow: select exactly two palettes, open Compare, confirm aligned swatch pairs show hue-degree and lightness deltas, swap one compared palette for a third, and confirm the deltas update without a reload
+- Provenance flow: write a markdown note with a heading and a bold phrase, Preview it rendered, save, and confirm the rendered note appears in Detail and in the Catalog sheet while the archive JSON export carries it as the notes string
+- Bulk tag and archive flow: select three palettes, Batch tag them and confirm the tag's facet count includes them, Batch archive two and confirm the default layouts drop both while the Archived facet reveals them, Restore one, then Undo repeatedly and confirm each step reverses in order
+- Catalog flow: after a create and a batch tag, open the Catalog sheet and confirm the new palette, its tags, and its rendered notes appear while archived palettes are absent; the Print control opens a print preview of that same sheet
+- A page reload returns the app to its seeded state: the seeded palettes, the Nomenclature layout active, the all-periods filter, Name A–Z sort, empty search and no active tag or Archived facet, no comparison open, empty undo/redo, vision simulation None, and no palette selected
 </user_flows>
 
 <edge_cases>
@@ -113,6 +155,11 @@ Feature: Subscribe popup —
 - Importing archive JSON that is missing required palette fields, uses an invalid period, includes an invalid hex, or has a swatch count outside 3–12 shows an inline error naming the import field and leaves palette count and names unchanged
 - After Undo restores a deleted palette, Redo deletes it again; after a new create following an undo, Redo is disabled and cannot resurrect the cleared redo stack
 - A palette with fewer than 2 distinct swatch hexes shows an empty or explanatory contrast-matrix state instead of fabricated contrast ratios
+- A search/facet combination matching nothing shows an empty state naming the active search text and facets with a clear-all control; clearing restores the collection
+- Compare stays disabled with an explanatory hint when fewer or more than two palettes are selected; comparing palettes of different swatch counts marks unmatched positions rather than fabricating deltas
+- Markdown notes render formatting in Preview, Detail, and the catalog sheet — raw number signs and asterisks do not leak into rendered output; an empty note shows a placeholder state
+- Archived palettes never appear in the default Browse layouts, search results, tag facet counts, or the catalog sheet until the Archived facet reveals them; Restore returns them to the default layouts
+- A duplicate tag within one palette is rejected with an inline message naming the tags field; Batch tag on a palette that already carries the tag does not duplicate it
 </edge_cases>
 
 <visual_design>
@@ -122,6 +169,8 @@ Feature: Subscribe popup —
 - Nomenclature rows read as a four-column index (swatch chip · hex · historical name with note · source title and artist) separated by hairline rules
 - Swatch tiles fill edge-to-edge with the color; their hex and name labels flip between dark and light ink so they stay legible on any swatch
 - Library controls row: view toggles with circular fill indicators; period filter, name sort, vision-simulation, and undo/redo as a coherent controls strip
+- The search input, tag facet chips with counts, and the Archived toggle sit in the library controls strip as a coherent facet row; active chips read visibly selected
+- The comparison view reads as two aligned palette columns with per-pair delta readouts between or beside them; the catalog sheet reads as a print-styled document distinct from the library canvas
 - Detail/Editor mode uses a focused panel for the selected palette; empty collection state is clear
 - Export drawer shows format tabs, a monospaced preview block, and Copy / Download actions as a focused drawer — not a bare unstyled textarea dumped on the page
 - When multi-select is active, a compact selection tray appears for Batch favorite / Batch delete; Detail/Editor shows the contrast matrix beneath the swatch editor as a readable table or list
@@ -134,6 +183,8 @@ Feature: Subscribe popup —
 - Smooth scroll and scroll-triggered reveals may pace the editorial page; pause smooth-scroll while overlays that need native scroll locking are open (subscribe popup, Export drawer, or a modal editor panel)
 - Hover animations (required): nomenclature swatches outline on hover; palette-card swatches outline and fade in hex labels; swatch tiles fade in overlays; view-toggle inactive options show brief indicator fill on hover; palette list rows in Detail mode take a hover wash
 - Creating a palette animates its card into the Palette view and deleting one animates it out rather than snapping; adding or removing a swatch inside the editor animates the swatch row to its new arrangement
+- Dragging a swatch to reorder moves it with the pointer while the remaining swatches part and settle into the new order rather than snapping on release
+- Batch archive animates the affected cards out of the default layouts; the comparison view and the catalog sheet open with a brief transition rather than a hard cut
 - Toggling the favorite flag animates the flag's state change rather than swapping instantly
 - Copy feedback: short on-swatch copied confirmation then clear
 - Export drawer enters and exits with a brief opacity/scale transition rather than hard-cutting; Export Copy shows a short copied confirmation with a brief transition before resetting
@@ -149,6 +200,7 @@ Feature: Subscribe popup —
 - Palette cards and swatch tiles reduce their column count at narrower widths so tiles stay legible; the sticky header and library controls remain usable at every width
 - The Detail/Editor panel, contrast matrix, and Export drawer fit within a 375 pixel wide viewport with all fields and controls reachable without horizontal scrolling
 - The multi-select tray and undo/redo controls remain reachable at 375 pixel width without permanently covering primary actions
+- At 375 pixel width the search input, tag facet chips, Archived toggle, comparison view, and catalog sheet remain reachable and operable without horizontal scrolling; comparison columns may stack while keeping per-pair deltas legible
 - At 375 pixel width, view toggles, period filter, name sort, vision simulation, undo/redo, favorite flags, editor fields, export controls, and primary chrome controls present tap targets at least 44 pixels in at least one dimension
 </responsiveness>
 
@@ -159,6 +211,8 @@ Feature: Subscribe popup —
 - Every palette create/edit field (name, artist, period, swatches), the subscribe email field, and the archive import field uses an explicit label element associated with the control
 - Auto-contrast swatch labels keep legible contrast against every swatch color, including very light and very dark swatches
 - Contrast-matrix pass/fail marks include a text label such as Pass or Fail alongside any color cue — not color alone
+- Swatch reorder offers a keyboard path: per-swatch move-up / move-down controls produce the same order changes as dragging
+- The search input, tag facet chips, Archived toggle, Compare control, notes Write/Preview toggle, and catalog Print control are keyboard-operable and labeled; facet chips expose their selected state to assistive technology, not through color alone
 - With prefers-reduced-motion set, scroll reveals and list animations are removed and state changes apply instantly while every feature (views, filter, sort, editor, export, copy, favorites, vision simulation) stays reachable
 </accessibility>
 
@@ -167,6 +221,7 @@ Feature: Subscribe popup —
 - No console errors or warnings appear during a full exercise of the app (switching layouts, creating, editing, deleting, duplicating, filtering, sorting, favoriting, batch actions, undo/redo, contrast matrix updates, vision simulation, exporting, importing, and copying)
 - Switching among the three layouts, filtering, sorting, opening the editor or export drawer, and toggling vision simulation stay smooth with no hangs or dropped interactions
 - Contrast-matrix recomputation after a swatch edit completes without freezing the editor controls
+- Typing in search and toggling facet chips filters the seeded collection without visible input lag; catalog-sheet compilation and comparison delta recomputation complete without freezing the UI
 </performance>
 
 <writing>
@@ -175,23 +230,26 @@ Feature: Subscribe popup —
 - Headings, buttons, and labels use one consistent capitalization convention; action labels use specific verbs such as Batch delete, Copy export, Undo, Duplicate, and Import rather than generic Submit or OK alone when a specific label is possible
 - Validation messages for palette create/edit (name, artist, period, swatches), subscribe email, and archive import field-contract failures name the field and the fix
 - Contrast-matrix headers and export format tab labels use specific wording (for example Contrast, CSS vars, utility-theme snippet, SCSS map, JSON) rather than generic placeholders
-- Hex values across Nomenclature, Palette, Swatch, contrast matrix, and export previews use one consistent case and number-sign prefix convention
+- Hex values across Nomenclature, Palette, Swatch, contrast matrix, comparison deltas, catalog sheet, and export previews use one consistent case and number-sign prefix convention
+- Facet, comparison, and catalog surfaces use specific labels — for example Search, Archived, Compare, Restore, Batch tag, Batch archive, Write, Preview, Catalog sheet, Print — and delta readouts name their units (degrees for hue)
 </writing>
 
 <requirements>
-Shared application state must use Qwik stores, the state library named in summary (in-memory only): palettes collection, active view, period filter, name sort, selection/detail, multi-select set, favorite flags, undo and redo stacks, vision-simulation mode, copy feedback, export preview text, import feedback, and popup dismiss. Do not use localStorage, sessionStorage, or other browser storage APIs. Persistence for this good-app genre is the export artifacts plus the MCP query surface — never browser storage.
+Shared application state must use Qwik stores, the state library named in summary (in-memory only): palettes collection, active view, period filter, name sort, selection/detail, multi-select set, favorite flags, undo and redo stacks, vision-simulation mode, copy feedback, export preview text, import feedback, search text, tag and Archived facets, comparison selection, catalog-sheet content, and popup dismiss. Do not use localStorage, sessionStorage, or other browser storage APIs. Persistence for this good-app genre is the export artifacts plus the MCP query surface — never browser storage.
 State contracts (behavioral, not storage keys):
 - Creating a valid palette increases the collection and shows it in Browse layouts and in every export preview
 - Editing a palette updates that same record (name, artist, period, swatches, favorite) everywhere it appears including the archive JSON export
 - Deleting a palette removes it from lists, selection, filters, and export previews
 - Period filter, name sort, and view mode recompute visible items from the shared collection; they never create a second disconnected copy
 - Undo and Redo change the same collection the Browse layouts and export read; enabled and disabled control states match whether a step is available
-- Export previews compile live from the shared store; import replaces that same store
+- Export previews and the catalog sheet compile live from the shared store; import replaces that same store
+- Search, tag facets, and the Archived facet recompute visible items from the shared collection conjunctively; archived palettes are excluded from default derivations, facet counts, and the catalog sheet
+- Swatch order, tags, notes, and archived flags are part of the palette record: they echo across layouts, comparison, the catalog sheet, and the archive JSON export, and round-trip through import
 - WebMCP tool handlers invoke the same store commands as the visible controls
 Stack: Qwik + Qwik stores + Tailwind CSS 4.3.2 (pinned) + DaisyUI; frontend-only, no backend or authentication. DaisyUI provides the chrome components (drawer, modal/panel, selects, toggles, badges); Tailwind CSS 4.3.2 owns layout, spacing, and custom surfaces with design tokens defined in the theme layer.
 - AutoAnimate, Lenis, and GSAP ScrollTrigger are allowed for animation; no other animation libraries
 - Iconify icons only, delivered through the @iconify/tailwind4 plugin; no raw pasted SVG icon sets
-- All forms (palette create/edit, the subscribe popup, and archive import) are driven by Modular Forms with a Valibot schema: the schema mirrors the palette and archive JSON API payload field contracts above (required fields, formats, bounds, period enum, swatch hex rules), the record a form creates IS the would-be request body, and exports/imports conform to those same schemas; the form shows inline per-field errors before submit
+- All forms (palette create/edit, the subscribe popup, and archive import) are driven by Modular Forms with a Valibot schema: the schema mirrors the palette and archive JSON API payload field contracts above (required fields, formats, bounds, period enum, swatch hex rules, tag and notes bounds, archived flag), the record a form creates IS the would-be request body, and exports/imports conform to those same schemas; the form shows inline per-field errors before submit
 - All libraries are installed via npm and bundled locally; no CDN imports of any library, font, or icon set
 - No other UI, animation, or icon libraries beyond those named above
 - Seed at least 6 user-manageable palettes so first load is non-empty; bundle a color-name dataset so nearest-historical-name derivation runs without any network request
@@ -284,19 +342,20 @@ Module specs:
 
 Bindings:
 - Browsable entity: palettes
-- Destinations: archive-grid; palette-detail; filters; export-drawer
-- Filters: period
+- Destinations: archive-grid; palette-detail; filters; export-drawer; comparison
+- Filters: period; tag; archived
 - Sorts: name-asc; name-desc
 - Entity: palette
 - Entity operations: create; select; update; delete; toggle
-- Entity fields: name; artist; swatches; favorite; period
-- Artifact operations: export; import; copy
+- Entity fields: name; artist; swatches; favorite; period; tags; notes; archived
+- Artifact operations: export; import; copy; print_preview
 - Export formats: css; utility-theme; scss; json
 - Import modes: archive-json
 
 Mechanics exclusions:
 - Raw file paths/blobs forbidden in WebMCP args
 - Color-blindness filter visual verification stays Playwright-observed
+- Swatch drag-reorder gesture stays Playwright-observed; reorder is not exposed as an entity operation
 
 Implementation:
 - Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.

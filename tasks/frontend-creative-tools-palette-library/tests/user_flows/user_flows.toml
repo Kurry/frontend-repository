@@ -213,7 +213,7 @@ weight = 1.0
 [[criterion]]
 id = "6.11"
 name = "export_session_then_omit_on_delete"
-description = "Export flow: create a valid palette, open Export, confirm CSS/Tailwind/SCSS and palette package JSON include its name and swatches, then delete it and confirm the next export omits it."
+description = "Export flow: create a valid palette, open Export, confirm CSS/utility-theme/SCSS and palette package JSON include its name and swatches, then delete it and confirm the next export omits it."
 type = "binary"
 weight = 1.0
 
@@ -241,10 +241,61 @@ weight = 1.0
 [[criterion]]
 id = "6.n11"
 name = "export_preview_ignores_create"
-description = "After creating a valid palette, opening Export shows CSS/Tailwind/SCSS or package JSON that still omit the new palette's name and swatches."
+description = "After creating a valid palette, opening Export shows CSS/utility-theme/SCSS or package JSON that still omit the new palette's name and swatches."
 type = "binary"
 negate = true
 weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "batch_edit_to_export_flow"
+description = "Select at least two swatches in Detail/Editor, drag the Hue shift slider, Apply shift, and confirm the shifted #RRGGBB values appear on the palette's Browse surfaces and in the Export CSS preview and package JSON while unselected swatches are unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.16"
+name = "harmony_wheel_to_export_flow"
+description = "Drag the color-wheel anchor and watch the companion points and hex readouts track, switch mode from Analogous to Triadic and confirm the points reposition, Apply harmony, and confirm the palette's swatches equal the computed set in Detail and Browse and appear in a fresh export"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.17"
+name = "undo_redo_delete_flow"
+description = "Delete a palette (count decreases by one), Undo (card, swatches, and prior count return and the next export includes it again), Redo (deleted again), then create a new palette and confirm Redo shows a disabled appearance and does nothing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.18"
+name = "contrast_recolor_flow"
+description = "Open a palette's contrast matrix, note one pairing's ratio, recolor one swatch via Apply shift, and confirm at least one ratio or pass/fail mark changes without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.19"
+name = "vision_simulation_flow"
+description = "Set vision simulation to Deuteranopia and confirm swatch rendering visibly shifts in Browse and in the Layout simulator versus None; set None and confirm the original appearance returns"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n12"
+name = "undo_or_redo_flow_fails"
+description = "Stepping Undo then Redo around a delete desyncs the collection: the count, Browse layouts, or export previews disagree with the expected state at any step"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "6.n13"
+name = "wheel_or_batch_tray_dead_end"
+description = "Opening the color wheel or the batch-edit tray traps the user: the editor cannot be exited, or the palette is left half-mutated after Cancel"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "user_flows.catchall"

@@ -77,7 +77,7 @@ weight = 1.0
 [[criterion]]
 id = "12.3"
 name = "only_declared_ops_and_bindings"
-description = "Only documented operations from the bindings are available: browse destinations library-grid, palette-detail, export-drawer, layout-simulator; filter period; entity palette with create/select/update/delete/toggle and fields name, swatches, favorite, period; artifact export/import/copy with formats css, tailwind, scss, library-json and import mode library-json — no invented destinations."
+description = "Only documented operations from the bindings are available: browse destinations library-grid, palette-detail, export-drawer, layout-simulator; filter period; entity palette with create/select/update/delete/toggle and fields name, swatches, favorite, period; artifact export/import/copy with formats css, utility-theme, scss, library-json and import mode library-json — no invented destinations."
 type = "binary"
 weight = 1.0
 
@@ -98,7 +98,7 @@ weight = 1.0
 [[criterion]]
 id = "12.6"
 name = "browse_destinations_and_filters_bound"
-description = "Browse operations for destinations library-grid, palette-detail, export-drawer, and layout-simulator, plus apply_filter/clear_filter for period, update the visible Browse layout, export drawer, layout simulator, and filtered results."
+description = "Browse operations for destinations library-grid, palette-detail, export-drawer, layout-simulator, contrast-matrix, and color-wheel, plus apply_filter/clear_filter for period, update the visible Browse layout, export drawer, layout simulator, contrast matrix, color wheel, and filtered results."
 type = "binary"
 weight = 1.0
 
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n3"
 name = "undeclared_capabilities_exposed"
-description = "Undeclared modules, destinations, or operations beyond the Bindings (browse library-grid/palette-detail/export-drawer/layout-simulator; filter period; entity create/select/update/delete/toggle on palette; artifact export/import/copy with css/tailwind/scss/library-json) are exposed."
+description = "Undeclared modules, destinations, or operations beyond the Bindings (browse library-grid/palette-detail/export-drawer/layout-simulator; filter period; entity create/select/update/delete/toggle on palette; artifact export/import/copy with css/utility-theme/scss/library-json) are exposed."
 type = "binary"
 negate = true
 weight = 1.0
@@ -213,7 +213,7 @@ weight = 1.0
 [[criterion]]
 id = "12.11"
 name = "artifact_export_import_library_json"
-description = "Artifact operations export, import, and copy are bound for formats css, tailwind, scss, and library-json with import mode library-json, and invoking them drives the same export drawer / import path as the visible UI without returning raw file/blob contents in WebMCP results."
+description = "Artifact operations export, import, and copy are bound for formats css, utility-theme, scss, and library-json with import mode library-json, and invoking them drives the same export drawer / import path as the visible UI without returning raw file/blob contents in WebMCP results."
 type = "binary"
 weight = 1.0
 

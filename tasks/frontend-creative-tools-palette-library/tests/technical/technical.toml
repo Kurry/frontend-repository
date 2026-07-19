@@ -167,7 +167,7 @@ optional = true
 [[criterion]]
 id = "2.16"
 name = "export_artifacts_track_store"
-description = "After create/edit/delete of a user palette, Export CSS/Tailwind/SCSS previews and palette package JSON update from the shared store without reload, and Import of a conforming package replaces the collection coherently across Browse and Detail"
+description = "After create/edit/delete of a user palette, Export CSS/utility-theme/SCSS previews and palette package JSON update from the shared store without reload, and Import of a conforming package replaces the collection coherently across Browse and Detail"
 type = "binary"
 weight = 1.0
 
@@ -175,6 +175,20 @@ weight = 1.0
 id = "2.17"
 name = "no_browser_storage_for_session"
 description = "Across create, cart add, export, import, and subscribe dismiss, localStorage and sessionStorage remain unused for app state (good-app in-memory rule); persistence is export/MCP only"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.18"
+name = "undo_redo_coherent_with_shared_state"
+description = "Undo and Redo mutate the same collection the Browse layouts, Layout simulator, and export previews read: after any undo or redo step, every surface agrees without a reload, and each control's enabled or disabled appearance matches whether a step is available"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.19"
+name = "derived_color_surfaces_recompute"
+description = "Contrast-matrix ratios, color-wheel hex readouts, and vision-simulated rendering derive from the shared collection: editing a swatch through any path (direct edit, batch shift, harmony apply, import) updates all of them without a reload"
 type = "binary"
 weight = 1.0
 

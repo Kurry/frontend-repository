@@ -200,6 +200,13 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "3.15"
+name = "facet_comparison_catalog_surfaces"
+description = "The search input, tag facet chips with counts, and Archived toggle read as a coherent facet row in the controls strip; the comparison view reads as two aligned palette columns with per-pair delta readouts; the catalog sheet reads as a print-styled document distinct from the library canvas"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "3.catchall"
 name = "visual_design_catchall"
 description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, viewport, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

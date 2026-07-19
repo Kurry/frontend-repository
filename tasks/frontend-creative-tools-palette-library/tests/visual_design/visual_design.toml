@@ -132,7 +132,7 @@ weight = 1.0
 [[criterion]]
 id = "3.10"
 name = "export_drawer_monospace_preview"
-description = "The export drawer presents format tabs (CSS, Tailwind, SCSS) with a monospace code preview distinct from the cream editorial library field"
+description = "The export drawer presents format tabs (CSS, utility-theme, SCSS) with a monospace code preview distinct from the cream editorial library field"
 type = "binary"
 weight = 1.0
 
@@ -140,6 +140,13 @@ weight = 1.0
 id = "3.11"
 name = "layout_simulator_mock_surface"
 description = "Layout simulator reads as a distinct mock blog/dashboard/landing surface recolored by the active palette rather than a second copy of the library grid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.12"
+name = "advanced_editor_surfaces_composition"
+description = "The color wheel reads as a crafted circular control with visible anchor and companion points, the contrast matrix reads as a readable table or grid, the batch-edit tray is a compact toolbar near the swatch list, and Undo/Redo plus the vision-simulation control sit with the library controls with disabled states visually distinct"
 type = "binary"
 weight = 1.0
 

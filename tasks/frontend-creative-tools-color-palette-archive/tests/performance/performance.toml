@@ -211,6 +211,13 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "9.11"
+name = "search_and_catalog_responsive"
+description = "Typing in search and toggling facet chips filters the seeded collection without visible input lag, and catalog-sheet compilation and comparison delta recomputation complete without freezing the UI"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "performance.catchall"
 name = "performance_catchall"
 description = "The app exhibits a significant, browser-observable defect in performance or stability that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

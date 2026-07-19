@@ -83,6 +83,7 @@
         ],
         "artifact_operations": [
           "export",
+          "import",
           "copy"
         ],
         "export_formats": [
@@ -102,12 +103,17 @@
           "dispute requires a one-line reason"
         ],
         "visible_postconditions": [
-          "submitting an annotation decrements the suite queue badge by one, sets the chip to Labeled, adds a History entry, and increments the Labels JSON preview's annotation count",
+          "submitting an annotation decrements the suite queue badge by one, sets the chip to Labeled, adds a History entry, and increments the Labels JSON preview's annotation count with rating/scores under AnnotationCreate field names",
           "a saved taxonomy class appears in the taxonomy list, the class picker, and the Labels JSON taxonomy array with its icon and shortcut without a reload",
-          "adding a region puts the box on the image, a row in the region list, and a regions entry with class id and x/y/w/h in the Labels JSON preview",
+          "adding a region puts the box on the image, a row in the region list, and a regions entry with classId and x/y/w/h in the Labels JSON preview",
           "flag-for-dispute moves the item to the top of the Review queue's Disputed tier and increments its count; resolve returns it to Reviewed",
           "assist-run completion attaches Suggested ratings; accepting one fills the rating and sliders so Submit & Next enables",
-          "Stats summary counts always match the sidebar suite counts, the Agreement view percentage, and the Disputed tier count"
+          "Stats summary counts always match the sidebar suite counts, the Agreement view percentage, and the Disputed tier count",
+          "Labels JSON export shows schemaVersion annotation-studio-labels-v1 and required taxonomy, metadataFields, and items keys reflecting live session mutations",
+          "Import of a conforming LabelsPackage restores taxonomy, annotations, regions, metadata, and review-state chips so Export previews match; non-conforming import leaves state unchanged and names the offending field"
+        ],
+        "import_modes": [
+          "labels-json"
         ]
       },
       "mechanics_exclusions": [
@@ -2870,6 +2876,9 @@
         ],
         "entity_fields": [
           "title",
+          "type",
+          "timestamp",
+          "media-refs",
           "year",
           "place",
           "categories",
@@ -2889,7 +2898,7 @@
           "timeline-json"
         ],
         "visible_postconditions": [
-          "export drawer preview updates after create/edit/delete and includes the mutated event title",
+          "export drawer preview updates after create/edit/delete and includes the mutated event title with type timestamp and mediaRefs",
           "importing timeline-json replaces the events collection so Library list and stage pins match the imported document"
         ]
       },
@@ -2933,10 +2942,14 @@
         ],
         "entity_fields": [
           "title",
+          "type",
+          "timestamp",
+          "media-refs",
           "year",
           "place",
           "categories",
-          "summary"
+          "summary",
+          "source"
         ],
         "artifact_operations": [
           "export",
@@ -3068,14 +3081,17 @@
           "example.com",
           "blog.example.com",
           "shop.example.com",
-          "export-drawer"
+          "export-drawer",
+          "goals-view"
         ],
         "browsable_entity": "visitor-sessions",
         "filters": [
           "source",
           "page",
           "country",
-          "period"
+          "period",
+          "saved-segment",
+          "custom-range"
         ],
         "sorts": [
           "most-visitors",
@@ -3091,6 +3107,13 @@
           "domain",
           "timezone",
           "bounce-rate-ceiling",
+          "visitor-floor",
+          "segment-name",
+          "custom-from",
+          "custom-to",
+          "goal-name",
+          "goal-type",
+          "goal-match-key",
           "import"
         ],
         "form_operations": [
@@ -3100,9 +3123,18 @@
         ],
         "value_bounds": [
           "bounce-rate-ceiling 0-100",
+          "visitor-floor 0-1000000",
+          "segment-name 1-40 chars",
+          "custom-from within seeded data window",
+          "custom-to within seeded data window and on or after custom-from",
           "site-name 1-64 chars",
           "domain 3-253 hostname",
-          "timezone one of UTC, America/New_York, Europe/London, Asia/Tokyo"
+          "timezone one of UTC, America/New_York, Europe/London, Asia/Tokyo",
+          "goal-name 1-64 chars",
+          "goal-type one of event, page",
+          "goal-match-key 1-200 chars per goal_type rules",
+          "filter-dimension one of source, page, country",
+          "filter-value 1-200 chars"
         ],
         "artifact_operations": [
           "export",
@@ -3111,7 +3143,8 @@
         ],
         "export_formats": [
           "stats-json",
-          "breakdown-csv"
+          "breakdown-csv",
+          "panel-csv"
         ],
         "import_modes": [
           "stats-json"
@@ -3119,7 +3152,7 @@
       },
       "mechanics_exclusions": [
         "Chart bar hover/tooltip stays Playwright-observed",
-        "Export drawer slide and toast enter/exit timing stay Playwright-observed",
+        "Export drawer slide and toast enter/exit timing stays Playwright-observed",
         "Compare chip ease-in/out timing stays Playwright-observed"
       ]
     },
@@ -6906,7 +6939,8 @@
           "repository field must match the owner/name shape with exactly one slash",
           "seeded repositories limited to nimbusworks/driftline (TypeScript), cobalt-labs/loomdb (Rust), fernfield/petrel (Python)",
           "difficulty derives from non-test source-file count: 3-4 easy, 5-7 medium, 8-10 hard; runs blocked when the count exceeds 10 (loomdb seeds one such PR)",
-          "package bundle schema: repo owner/name, pr_number positive integer, base_sha 40-character lowercase hex, difficulty in {easy, medium, hard}, created_at ISO 8601, non-empty instruction, task_config, and patch_note",
+          "TaskPackageBundle field contract: schemaVersion exactly live-task-package-v1, repo owner/name, pr_number positive integer, base_sha 40-character lowercase hex, language non-empty, difficulty in {easy, medium, hard}, source_file_count integer 3-10, created_at ISO 8601, non-empty instruction, task_config, and patch_note",
+          "BatchRunReport field contract: total, packaged, trivial, failed, skipped non-negative integers with packaged+trivial+failed+skipped equal total; items each with repo, pr_number, and outcome in {packaged, trivial, failed, skipped}",
           "delete requires explicit confirm=true",
           "credential submit validates field shape only; without a real credential the check fails visibly, the status stays Disconnected, and the app remains in Demo data mode on fixtures"
         ],
@@ -6939,9 +6973,9 @@
         "visible_postconditions": [
           "with no credentials the top-bar mode indicator reads Demo data and every screen is fully populated and exercisable from the seeded fixtures",
           "triage actions immediately update the board header stats and per-reason rejected breakdown; undo restores the card's previous column and reverts the stats exactly; placements survive a reload",
-          "a completed demo pipeline run produces a package whose viewer text, copied text, and downloaded bundle all carry the Generate stage's actual streamed instruction text with metadata matching the source PR, and demo runs of the same fixture PR are deterministic",
-          "a finished batch places every queued PR in exactly one of packaged, trivial, failed, or skipped with bucket counts summing to the batch total, and packaged entries appear in the library",
-          "importing a valid bundle adds its package to the library; an invalid bundle lists every offending field by name and adds nothing",
+          "a completed demo pipeline run produces a TaskPackageBundle whose viewer text, copied text, and downloaded JSON all carry schemaVersion live-task-package-v1, the Generate stage's actual streamed instruction text, and metadata matching the source PR; demo runs of the same fixture PR are deterministic",
+          "a finished batch places every queued PR in exactly one of packaged, trivial, failed, or skipped with bucket counts summing to the batch total, and packaged entries appear in the library as TaskPackageBundle records",
+          "importing a valid TaskPackageBundle adds its package to the library; an invalid bundle lists every offending field by name and adds nothing; export-then-import reconstructs the same visible package content",
           "disconnecting a credential returns its status to Disconnected and the mode indicator to Demo data; after a reload both credentials show Disconnected while packages, triage placements, and coachmark dismissals persist"
         ]
       },

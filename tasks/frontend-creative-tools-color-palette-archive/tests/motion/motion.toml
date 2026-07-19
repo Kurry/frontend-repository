@@ -172,6 +172,20 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "4.14"
+name = "swatch_drag_follows_pointer"
+description = "Dragging a swatch to reorder moves it with the pointer while the remaining swatches part and settle into the new order rather than snapping on release"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "batch_archive_and_panel_transitions"
+description = "Batch archive animates the affected cards out of the default layouts, and the comparison view and catalog sheet open with a brief transition rather than a hard cut"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "4.catchall"
 name = "motion_catchall"
 description = "The app exhibits a significant, browser-observable defect in motion or microinteractions (jank, jarring or missing transitions, animation-induced layout shifts) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (control path exercised, element, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

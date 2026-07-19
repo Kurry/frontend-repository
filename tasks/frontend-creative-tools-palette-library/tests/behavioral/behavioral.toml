@@ -151,7 +151,7 @@ weight = 1.0
 [[criterion]]
 id = "14.9"
 name = "export_contains_session_create"
-description = "Full-pipeline export probe: measure collection, create a valid palette with a unique name and swatches, open Export immediately — CSS/Tailwind/SCSS previews and palette package JSON palettes array contain that exact name and those #RRGGBB values (session work product, not a seed-only snapshot)."
+description = "Full-pipeline export probe: measure collection, create a valid palette with a unique name and swatches, open Export immediately — CSS/utility-theme/SCSS previews and palette package JSON palettes array contain that exact name and those #RRGGBB values (session work product, not a seed-only snapshot)."
 type = "binary"
 weight = 1.0
 
@@ -165,10 +165,47 @@ weight = 1.0
 [[criterion]]
 id = "14.n5"
 name = "export_identical_after_create"
-description = "Creating a palette with a unique name and swatches leaves the Export CSS/Tailwind/SCSS or package JSON visually identical to the pre-create export (derived artifact ignoring session mutations)."
+description = "Creating a palette with a unique name and swatches leaves the Export CSS/utility-theme/SCSS or package JSON visually identical to the pre-create export (derived artifact ignoring session mutations)."
 type = "binary"
 negate = true
 weight = 1.0
+
+[[criterion]]
+id = "14.11"
+name = "batch_hsl_edit_export_pipeline"
+description = "Record a selected swatch's hex, apply a Hue shift of a distinctive amount via the batch tray, and confirm the new hex differs from the original, appears in Nomenclature and Palette views, and appears in the Export CSS preview and package JSON while a different shift amount on a fresh try yields a different hex"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.12"
+name = "harmony_apply_undo_export_pipeline"
+description = "Apply a Triadic harmony from the wheel, confirm the export previews contain the computed set, then Undo and confirm the prior swatches return in Browse and in a fresh export; Redo re-applies the harmony set to both"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.13"
+name = "contrast_matrix_input_dependent"
+description = "Two different recolorings of the same swatch produce two different contrast-matrix readouts; the matrix is not identical across distinct swatch inputs"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n6"
+name = "undo_restore_absent_from_export"
+description = "A palette restored by Undo appears in Browse layouts but is missing from the next export preview or package JSON, or vice versa"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "14.n7"
+name = "vision_mode_no_visible_change"
+description = "Switching vision simulation between None and Deuteranopia produces no visible change in swatch rendering anywhere on the canvas"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "behavioral.catchall"

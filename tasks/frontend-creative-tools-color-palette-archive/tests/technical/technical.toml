@@ -173,6 +173,13 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "2.12"
+name = "extended_fields_round_trip_schema"
+description = "Swatch order, tags, notes, and archived flags are part of the palette record: they echo across layouts, comparison, the catalog sheet, and the archive JSON export, and an export/import round-trip restores all four exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

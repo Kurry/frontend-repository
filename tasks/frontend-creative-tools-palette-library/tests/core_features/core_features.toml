@@ -291,7 +291,7 @@ weight = 1.0
 [[criterion]]
 id = "1.33"
 name = "export_drawer_live_format_previews"
-description = "Opening Export shows live CSS, Tailwind, and SCSS previews plus palette package JSON that regenerate from the current user-manageable palettes; after creating a named palette with distinct swatches, those name and #RRGGBB values appear in the active format preview and the package JSON palettes array"
+description = "Opening Export shows live CSS, utility-theme, and SCSS previews plus palette package JSON that regenerate from the current user-manageable palettes; after creating a named palette with distinct swatches, those name and #RRGGBB values appear in the active format preview and the package JSON palettes array"
 type = "binary"
 weight = 1.0
 
@@ -333,7 +333,65 @@ weight = 1.0
 [[criterion]]
 id = "1.39"
 name = "export_omits_session_mutations"
-description = "After creating or editing a user palette, the Export CSS/Tailwind/SCSS preview or palette package JSON omits that palette's name or swatches — an incomplete session export"
+description = "After creating or editing a user palette, the Export CSS/utility-theme/SCSS preview or palette package JSON omits that palette's name or swatches — an incomplete session export"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.40"
+name = "undo_redo_history_stack"
+description = "Undo and Redo step backward and forward through palette mutations: after deleting a palette via the UI, Undo restores its card, swatches, and the prior collection count; Redo re-applies the delete; a new mutation after Undo leaves Redo visibly disabled"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "batch_hsl_shift_applies_to_selection"
+description = "In Detail/Editor, selecting at least two swatches reveals a batch-edit tray with Hue (-180 to 180), Saturation (-100 to 100), and Lightness (-100 to 100) shift sliders with live numeric readouts; moving a slider previews the shift on the selected swatches live, Apply shift commits new #RRGGBB values as one undoable step, Cancel restores the pre-preview colors, and unselected swatches are unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "color_wheel_harmonic_modes"
+description = "Detail/Editor shows a circular color wheel with a draggable anchor and a harmony mode select offering Analogous, Complementary, and Triadic; dragging the anchor moves the companion points continuously per the active mode (Complementary near 180 degrees apart, Triadic near 120-degree spacing) with live hex readouts, and switching mode repositions the companion points without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "apply_harmony_replaces_swatches"
+description = "Activating Apply harmony replaces the selected palette's swatches with the wheel's computed set as one undoable step, and the committed set satisfies the 3-8 unique #RRGGBB contract everywhere the palette appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "contrast_matrix_ratios_and_marks"
+description = "Detail/Editor for a palette with at least 2 distinct swatch hexes shows a contrast matrix of unique text/background pairings with computed contrast ratios (at least one decimal place) and AA (4.5:1) / AAA (7:1) pass/fail marks that include a text label such as Pass or Fail; recoloring a swatch updates at least one ratio or mark without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "vision_simulation_modes"
+description = "A vision-simulation control offers None (default), Protanopia, and Deuteranopia; choosing Protanopia or Deuteranopia visibly alters swatch rendering across the Browse layouts and the Layout simulator relative to None, and choosing None restores the unfiltered appearance"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "undo_leaves_state_unchanged"
+description = "After a palette is deleted via the UI, activating Undo leaves the collection count and Browse layouts unchanged, or the restored palette is missing swatches or metadata it had before the delete"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.47"
+name = "batch_edit_corrupts_swatches"
+description = "Applying a batch H/S/L shift changes swatches that were not selected, or commits a swatch value that is not a valid #RRGGBB hex"
 type = "binary"
 weight = 1.0
 negate = true

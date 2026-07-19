@@ -201,6 +201,35 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "14.13"
+name = "reorder_export_pipeline"
+description = "Record a palette's swatch order from the archive JSON preview, reorder one swatch via the UI, and confirm the swatches array order in a fresh export changes to match the visible order; a second, different reorder yields a correspondingly different exported order"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.14"
+name = "tag_search_derived_sensitivity"
+description = "Add a distinctive tag to one palette, confirm searching that tag or activating its facet chip isolates exactly that palette, then remove the tag and confirm the same search matches nothing and the chip count updates"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.15"
+name = "notes_edit_catalog_pipeline"
+description = "Two different provenance notes saved on the same palette produce two different rendered catalog-sheet entries and two different notes strings in the archive JSON export"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n8"
+name = "comparison_deltas_static_after_swap"
+description = "Swapping one compared palette for another with different swatches leaves every displayed delta value unchanged"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "behavioral.catchall"
 name = "behavioral_catchall"
 description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

@@ -98,21 +98,21 @@ weight = 1.0
 [[criterion]]
 id = "12.6"
 name = "entity_fields_name_artist_swatches_favorite_period"
-description = "Entity field updates accept the declared fields name, artist, swatches, favorite, and period and produce visible changes consistent with those fields on the palette surfaces and archive JSON export preview."
+description = "Entity field updates accept the declared fields name, artist, swatches, favorite, period, tags, notes, and archived and produce visible changes consistent with those fields on the palette surfaces, facet counts, and archive JSON export preview."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.7"
 name = "browse_destinations_filters_sorts_match"
-description = "Browse destinations archive-grid, palette-detail, filters, and export-drawer, plus filter period and sorts name-asc/name-desc, match the allowed specification and update visible navigation/filter/sort/export state via the same handlers as UI controls."
+description = "Browse destinations archive-grid, palette-detail, filters, export-drawer, and comparison, plus filters period, tag, and archived and sorts name-asc/name-desc, match the allowed specification and update visible navigation/filter/sort/export state via the same handlers as UI controls."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.8"
 name = "artifact_export_import_copy_bound"
-description = "Artifact operations export, import, and copy are bound: export formats css, utility-theme, scss, and json and import mode archive-json are available without putting raw file paths, blobs, or base64 artifact contents in WebMCP arguments or results."
+description = "Artifact operations export, import, copy, and print_preview are bound: export formats css, utility-theme, scss, and json, import mode archive-json, and a catalog-sheet print preview are available without putting raw file paths, blobs, or base64 artifact contents in WebMCP arguments or results."
 type = "binary"
 weight = 1.0
 

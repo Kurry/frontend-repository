@@ -137,6 +137,27 @@ weight = 0.5
 optional = true
 
 [[criterion]]
+id = "4.11"
+name = "wheel_points_track_and_glide"
+description = "Dragging the color-wheel anchor moves the companion points continuously with the pointer rather than jumping on release, and switching harmony mode animates the companion points to their new positions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "batch_preview_and_vision_transitions"
+description = "Batch H/S/L sliders preview the shifted colors live while dragging with Apply shift and Cancel transitioning rather than hard-swapping, and (without prefers-reduced-motion) changing vision-simulation mode eases the appearance change rather than hard-cutting"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "undo_restore_card_animates"
+description = "Undo restoring a deleted palette animates its card back into the grid rather than snapping the layout"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "4.catchall"
 name = "motion_catchall"
 description = "The app exhibits a significant, browser-observable defect in motion or microinteraction quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence (real control path, animated element, scroll state, timing, or resulting state) that demonstrates it. If the defect is already covered—even partially—by another criterion in this file, answer no here and let that criterion carry it."

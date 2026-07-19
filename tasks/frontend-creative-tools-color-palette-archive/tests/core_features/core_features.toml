@@ -404,6 +404,86 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "1.52"
+name = "swatch_reorder_canonical_order"
+description = "Dragging a swatch in Detail/Editor (or using its move-up / move-down controls) commits a new order that persists across Detail close/reopen and layout switches, drives the card's swatch order in Palette view, and is the order of that palette's swatches array in the archive JSON export"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.53"
+name = "search_and_tag_facets_conjunctive"
+description = "Typing in the search input narrows palettes by name, artist, and tags case-insensitively across all three layouts; tag facet chips show per-tag counts and combine conjunctively with the search text and the period filter; clearing restores the full set"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.54"
+name = "archived_facet_hides_and_reveals"
+description = "Archived palettes are hidden from the default Browse layouts, search results, and tag facet counts; the Archived facet toggle reveals them with a Restore control that clears the flag and returns them to the default layouts"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.55"
+name = "comparison_per_swatch_deltas"
+description = "With exactly two palettes selected, Compare opens a side-by-side view with names, artists, periods, and swatch columns aligned by position, each aligned pair showing a hue difference in degrees and a lightness difference computed from the two hexes; swapping either palette updates the deltas without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.56"
+name = "provenance_markdown_write_preview"
+description = "The provenance notes editor offers a Write/Preview toggle where Preview renders headings, bold, italic, and unordered lists as formatted text; saved notes appear rendered in Detail and the catalog sheet and as the notes string in the archive JSON export"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.57"
+name = "bulk_tag_and_archive_tray"
+description = "With multiple palettes selected, Batch tag applies one tag to every selected palette (visible in facet counts and detail, without duplicating an existing tag) and Batch archive sets the archived flag on all of them at once, removing them from the default layouts"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.58"
+name = "harmony_analysis_classification"
+description = "Detail/Editor shows a read-only harmony analysis panel listing each distinct swatch hue in degrees and a classification (at least Monochrome, Analogous, Complementary, Triadic, or Mixed) derived from hue spacing; recoloring a swatch so the spacing changes updates the hues and can change the classification without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.59"
+name = "catalog_sheet_print_document"
+description = "The Export drawer's Catalog sheet tab shows a print-optimized document listing every non-archived palette with name, artist, period, tags, swatch chips with hexes, and rendered provenance notes, compiled live from the store, and a Print control opens the browser print preview of that sheet"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n40"
+name = "reorder_lost_or_not_exported"
+description = "A committed swatch reorder reverts after closing and reopening Detail or switching layouts, or the archive JSON export lists that palette's swatches in the old order"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n41"
+name = "search_or_facets_decorative"
+description = "Typing in the search input or activating a tag or Archived facet leaves the visible palette set unchanged when matching and non-matching palettes both exist"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n42"
+name = "catalog_sheet_stale_or_leaks_archived"
+description = "The catalog sheet omits a session create, edit, tag, or reorder, or includes palettes that are archived"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core functionality or an end-to-end user flow that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

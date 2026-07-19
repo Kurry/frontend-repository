@@ -211,6 +211,28 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "1.11"
+name = "wheel_sliders_and_history_keyboard"
+description = "The color-wheel anchor is keyboard-adjustable (arrow keys move the anchor with companion points tracking), and the batch-edit sliders, harmony mode select, Undo/Redo controls, and vision-simulation control are keyboard-operable with visible focus indicators"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "contrast_marks_not_color_only"
+description = "Contrast-matrix pass/fail marks include a text label such as Pass or Fail alongside any color cue rather than color alone"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n11"
+name = "wheel_pointer_only"
+description = "The color-wheel anchor can only be adjusted by pointer drag, with no keyboard path that moves it"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "accessibility.catchall"
 name = "accessibility_catchall"
 description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
