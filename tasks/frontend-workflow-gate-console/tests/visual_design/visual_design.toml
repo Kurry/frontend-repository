@@ -1,0 +1,133 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "console_pane_composition"
+description = "At desktop width the app composes as a run list pane beside a detail canvas holding the stage strip, gate checklist, chain visualization, and timeline, with gate rows in a dense checklist register and panels rendered as cards with hairline borders and subtle shadows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "consistent_status_color_language"
+description = "The four status colors (passed, rejected, running, pending) are identical wherever statuses appear — stage strip segments, gate states, chain links, and timeline entries — and match the visible legend"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "severity_chips_distinct_and_consistent"
+description = "S1, S2, and S3 severity chips are visually distinct from one another, S1 reads as the most severe treatment, and each severity keeps one consistent treatment across the gate checklist and the registry"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.4"
+name = "typography_hierarchy_and_monospace"
+description = "Run and stage titles are visibly larger than gate names, which are larger than evidence and timestamp text, and gate identifiers and fingerprint hashes render in a monospaced face"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "theme_toggle_recolors_surfaces"
+description = "Toggling the header light/dark control recolors surfaces, chips, and the chain visualization without a page reload, and toggling back restores the original colors"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "component_states_and_icons"
+description = "One icon set is used consistently across the chrome, and buttons and inputs show distinct default, hover, focus (visible ring), disabled, and error treatments"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "responsive_layout_at_narrow_widths"
+description = "At 768 pixels and below the run list collapses to a selectable list or drawer above the detail canvas, and at 375 pixels no content clips or overflows the viewport, no page-level horizontal scrolling appears, and the stage strip and chain scroll within their own containers"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "copy_conventions_consistent"
+description = "Headings and action labels use one consistent capitalization convention, action labels are specific verbs (such as Start re-run, Copy fingerprint, Add note), and no placeholder or lorem-ipsum text appears anywhere in the shipped UI"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.n1"
+name = "overlap_clipping_or_default_styles"
+description = "At 1440 pixel width, text or chips overlap other elements or are clipped by their containers, or form controls and banners render with unstyled browser defaults that break the console's visual language"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

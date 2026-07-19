@@ -113,7 +113,7 @@ Build tooling: Next.js with static export (or SSR with client hydration); all in
 
 <delivery>
 - Produce an original self-contained app in `/app`; scaffold under `/app` as needed for the stack in `<summary>`; `/app/package.json` MUST define npm scripts named exactly `start` (serves the app on port 3000) and `verify:build` (exits 0 when the app entry/build is present and succeeds); run via `npm start` on port 3000; do not iframe, proxy, or fetch the product from another origin.
-- WebMCP is a required delivery step, not a scoring criterion: implement exactly the `<webmcp_action_contract>` below.
+- WebMCP is a required delivery step, not a scoring criterion; implement exactly the `<webmcp_action_contract>` below; register tools yourself from `<module_spec>` + Bindings using the same handlers as the visible UI; honor mechanics exclusions; optional self-test via `webmcp_session_info` / `webmcp_list_tools` / `webmcp_invoke_tool` only.
 </delivery>
 
 <webmcp_action_contract>
@@ -181,6 +181,8 @@ Mechanics exclusions:
 - Chart hover tooling stays Playwright-observed
 
 Implementation:
-- Register a WebMCP tool for every permitted operation in the module specs above, bound to the product values in Bindings and subject to each spec's restrictions; tools must not create success paths the UI does not have.
-- Expose the registry on `window` as `window.webmcp_session_info()`, `window.webmcp_list_tools()`, and `window.webmcp_invoke_tool(name, args)`; a `navigator.modelContext` registration may be added in addition. These functions are also your self-test surface.
+- Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.
+- Tool handlers must call the same application logic as the visible UI.
+- Do not invent extra modules, destinations, or operations beyond this block.
+- WebMCP is not graded; missing tools must not create fake UI success paths.
 </webmcp_action_contract>

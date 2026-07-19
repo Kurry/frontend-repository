@@ -1,0 +1,218 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_catalog_complete"
+description = "On load, the model catalog table contains at least 20 seeded models from at least 5 distinct providers, and each row shows model name, provider, context window, cost per 1k input tokens, cost per 1k output tokens, and a free or paid badge; rows reachable by scrolling within the table container count as present"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "free_models_badged"
+description = "At least 4 seeded models display a green Free badge in the cost column and a star icon in the name column, while paid models display a gray Paid badge"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "search_narrows_and_restores"
+description = "Typing a fragment of a model or provider name into the search input narrows the table to matching rows as the text is typed, and clearing the field restores the full list to its prior row count exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "provider_filter_combines_with_search"
+description = "Selecting a provider in the provider filter narrows the table to that provider only, and applying a search query at the same time shows only rows satisfying both constraints, with the visible row count matching the combined result"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "suggestion_chips_apply_filters"
+description = "A row of at least 4 suggestion chips renders above the table, and clicking a chip fills the search input or applies the matching provider filter exactly as typing or selecting would, narrowing the table accordingly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "shown_of_total_count_tracks"
+description = "A visible count near the table states how many models are shown out of the total (for example 12 of 24 models) and updates correctly after a search, after a provider filter, and after a refresh"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "zero_match_empty_state"
+description = "When search and filter combine to match zero models, the table region shows an empty state that names the query or filter and offers a clear-filters control that restores the full list when activated"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "alert_form_validates_inline"
+description = "The bell toolbar button opens an alert configuration modal containing an on/off toggle and a minimum context window field; entering a negative or non-numeric context window value shows an inline message naming the field before submit and the save control stays disabled until the form is valid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "free_transition_toast_respects_toggle"
+description = "With alerts toggled on, a model transitioning to free during a refresh or simulation produces an in-app toast naming that model which auto-dismisses; with alerts toggled off, an equivalent transition produces no toast"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "cost_sidebar_seeded_rollups"
+description = "The right sidebar opens non-empty with at least 3 per-model cost rows each showing model name, requests made, and cost subtotal, and a header showing the session total and total request count derived from at least 6 seeded usage events"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "pie_tooltip_on_hover"
+description = "Hovering a pie chart slice with the real pointer shows a tooltip containing that model's name and dollar amount"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "legend_toggle_redraws_chart"
+description = "Clicking a chart legend entry removes that model's slice and the remaining slices redraw to fill the circle; clicking it again restores the slice"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "cost_row_sources_disclosure"
+description = "Activating a cost row's contributing-events count trigger opens a list of that model's usage events with timestamp, request label, token count, and cost, and activating an entry's model link highlights that model's row in the catalog table without any outbound navigation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "simulation_stream_updates_rollups"
+description = "Scripted probe: record the session total, one model's request count and subtotal, and the pie chart state; start the simulation and wait for at least two usage events to appear in the feed; confirm the feed gained the events with timestamp, model, tokens, and cost, and the affected models' rows, the session total, the total request count, and the pie chart all changed together without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "simulation_pause_freezes_totals"
+description = "Pausing the running simulation freezes the event feed and all totals at their current values for at least a few seconds, resuming appends new events again, and the control's label or icon reflects the running versus paused state at all times"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "refresh_mutates_catalog_visibly"
+description = "Clicking Refresh shows a brief loading affordance and visibly changes the catalog: at least one model is added, removed, or flips between free and paid; removed models show a strikethrough with reduced emphasis for about 5 seconds before disappearing, and the shown-of-total count updates to match"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "compare_flow_round_trip"
+description = "Scripted probe: select three model rows by checkbox, confirm the Compare control enables only once two or more are selected, open it, confirm the modal shows a side-by-side table with name, provider, context window, input cost, output cost, and free/paid state for all three, close the modal, and confirm the three rows remain selected"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "double_refresh_stays_coherent"
+description = "Rapidly clicking Refresh twice yields a single coherent result: no duplicate model rows appear and the shown-of-total count matches the visible rows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "empty_chart_state_when_all_toggled_off"
+description = "Toggling every model off via the chart legend shows a designed empty chart state rather than a broken or blank chart, and toggling models back on restores the distribution"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "rollups_static_despite_events"
+description = "The session totals, per-model cost rows, or pie chart render identical values before and after simulated usage events arrive, indicating the rollups are hardcoded rather than derived from the event stream"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.21"
+name = "filters_cosmetic_only"
+description = "Search, the provider filter, or the suggestion chips leave the visible table rows unchanged when applied, indicating the controls are cosmetic rather than recomputing the list from shared state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

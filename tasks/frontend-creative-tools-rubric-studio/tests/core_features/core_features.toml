@@ -1,0 +1,183 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_rubric_rail_walkthrough"
+description = "On first load the left rail lists exactly 4 seeded rubric files — Response Quality, Code Review Depth, Safety Screening, and Summarization Fidelity — each entry showing the rubric name, a semantic-version badge (three dot-separated numbers), and a criteria count; the default open rubric (Response Quality) shows at least 6 criteria and each other rubric, when opened, shows at least 4"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "header_card_selects_and_rollup"
+description = "The opened rubric's header card shows the rubric name, its current semantic version, a judge model select offering exactly quartz-arbiter-2, sable-jury-9, and cinder-panel-1, an aggregation mode select offering exactly weighted mean, required-pass, and all-pass, and a derived rollup line with total criteria count, load-bearing count (weight 3 or more), and weight sum; changing either select updates the header without a page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "criterion_accordion_anatomy"
+description = "Each collapsed criterion row shows an id, a name, a type badge reading binary or likert with min and max values, a weight value, and an importance label (must have or nice to have); expanding the row with a click reveals the full multiline description and a Grading notes disclosure that expands on activation and stays open for that criterion while the app remains open"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "load_bearing_accent_on_heavy_weights"
+description = "Every criterion whose weight is 3 or higher renders with a distinct load-bearing accent treatment (accent border or badge) that criteria with lower weights visibly lack, and editing a criterion's weight across the 3 boundary adds or removes the accent accordingly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "add_criterion_count_delta"
+description = "Submitting the Add criterion form with valid values (unique id, name, description, type, weight, importance) appends exactly one new accordion row showing those values and increases the header criteria count by exactly one, measured immediately before and after the submit"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "criterion_form_inline_validation"
+description = "Submitting the criterion form with an empty name or description, a duplicate id, or a likert range where min is not less than max shows inline per-field messages naming the offending fields, keeps the submit control disabled until all required fields are valid, and adds no criterion (the criteria count is unchanged)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "minor_bump_gate_on_description_edit"
+description = "After editing a criterion's description or type, the save control is disabled and an inline explanation states that at least a minor version bump is required; entering a version with the middle number increased (and third number reset) enables save, and saving applies the edit"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "wrong_bump_names_violation_kind"
+description = "Attempting to save a description/type change with only a patch bump shows a violation message containing the phrase minor bump required, and attempting to save a criterion deletion with only a minor or patch bump shows major bump required; in both cases the rubric, its version badge, and its history remain unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "delete_requires_major_bump"
+description = "Deleting a criterion asks for confirmation, then blocks save with an inline major-bump explanation until the version's first number is increased with the others reset; after a correct major bump and save, the criteria count decreases by exactly one and the rail badge shows the new major version"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "save_appends_history_entry"
+description = "Saving a correctly bumped change appends exactly one new entry at the top of the version history panel showing the new version number, a timestamp, and a one-line summary naming the changed criterion, and the rail entry's version badge updates to match — all without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "history_entry_opens_diff_view"
+description = "Selecting a version history entry opens a read-only diff-style view where added criteria appear in a green-tinted added treatment, removed criteria in a red-tinted treatment with struck-through text, and changed criteria in an amber-tinted treatment showing before and after values; a Close or Back control returns to the editable criteria list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "tune_toggle_recomputes_metrics"
+description = "Scripted probe: in the Tune view, record one criterion's precision, recall, and F1 numbers, toggle two labelled cases off and confirm the bars and numbers change along with the summary strip's included-case count and macro averages, then toggle them back on and confirm the original values are restored exactly; additionally, changing a likert criterion's pass threshold recomputes that criterion's bars to different values when seeded case scores straddle the threshold"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "aggregate_honors_mode_and_verdicts"
+description = "Scripted probe: in the sample submission panel set a mix of pass and fail verdicts and record the weighted-mean aggregate; switch the aggregation mode to all-pass and confirm the aggregate drops to 0 percent; apply the All pass suggestion chip and confirm the aggregate reads 100 percent; flip a single verdict off under weighted mean and confirm the aggregate decreases by that criterion's weight share"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "export_reflects_live_rubric"
+description = "The Export control reveals the opened rubric as structured text in a monospaced code block with a copy control that gives visible confirmation and places exactly the displayed text on the clipboard; after adding a new criterion, re-opening the export includes that criterion's id and name"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n1"
+name = "version_gate_bypassed"
+description = "A description, type, or delete change can be saved without the required version bump — the save control activates, or the change lands in the rubric, while the version field still shows an insufficient bump"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n2"
+name = "derived_surfaces_static"
+description = "The Tune bars, the summary strip, or the preview aggregate renders identical values regardless of case toggles, threshold edits, verdict flips, or aggregation-mode changes, indicating hardcoded rather than derived output"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

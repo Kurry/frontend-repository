@@ -125,7 +125,14 @@ additions:
 - WebMCP bindings name only values that exist on the page. A chrome-only
   Filter control does NOT justify a filter binding.
 
-## Stage 7 — Register and package
+## Stage 7 — Register and package (NON-SKIPPABLE: the WebMCP contract ships WITH authoring)
+
+**A task without a `<webmcp_action_contract>` is not a task** — the judge's webmcp
+bridge discovers its tool surface from the contract, and the unit suite fails any
+task dir whose instruction lacks the rendered block. Never defer the contract or
+tell a subagent to skip it. Per-feature-group coverage: every `Feature:` group in
+`<core_features>` is reachable through the assigned modules' bindings or listed in
+`mechanics_exclusions` with a reason (judge-observation-only mechanics only).
 
 Per `create-task`: add the slug to `TASK_SPECS` mirroring the existing entry
 archetype (source, house-style description "<Brand> <domain> good-app eval.",

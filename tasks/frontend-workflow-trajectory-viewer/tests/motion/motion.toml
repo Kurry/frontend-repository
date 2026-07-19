@@ -1,0 +1,119 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "hover_washes_required"
+description = "Hovering with the real pointer shows a full-width hover wash on timeline entries, trial table rows, and file tree rows, buttons ease background and shadow with a slight press effect, and form controls show focus rings — verified while hovering, not from static styles"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "step_change_crossfade"
+description = "Changing the active step through the real timeline controls (click or arrow keys, never a state-shortcut tool call) eases the highlight to the new entry and cross-fades the center and right pane content over roughly 150 to 250 milliseconds rather than snapping instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "disclosure_chevron_height_ease"
+description = "Activating the reasoning region or a tool output panel expands and collapses it with an eased height transition while the disclosure chevron rotates over roughly 0.2 seconds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "terminal_streaming_indicator"
+description = "Activating a terminal-bearing step through the real UI streams its output incrementally with a cursor or streaming indicator while active, and the indicator visibly changes state when streaming completes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "terminal_pops_in_complete"
+description = "Activating a terminal-bearing step renders its entire output instantly as one finished block with no progressive appearance and no streaming affordance"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.6"
+name = "annotation_list_microinteractions"
+description = "Driven through the real UI controls: a newly added annotation animates into the annotations list and a removed annotation animates out rather than appearing or vanishing instantly, ingest checklist items tick complete with an animated check transition, the code copy control briefly swaps to a confirmation state after copying, and a newly created classification report card enters with a short opacity and scale transition"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion set, animations are removed and state changes apply instantly, while every surface and flow (step navigation, streaming completion, forms) remains complete and usable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction performed, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

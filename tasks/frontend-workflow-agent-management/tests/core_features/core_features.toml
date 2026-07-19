@@ -1,0 +1,225 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_registry_complete"
+description = "On load, the agent table contains at least 8 seeded agents visible without pagination, spanning at least 3 editor integrations and covering idle, running, error, and offline statuses, and each row shows name, type, editor integration, a status badge, and a last-seen timestamp"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "rollup_strip_tracks_collection"
+description = "A summary strip above the table shows per-status counts plus a total that match the actual rows, and the counts update in the same interaction as any status change or registration"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "error_retry_transitions_to_idle"
+description = "An agent in error status shows a Retry control in its row; activating it flips the status badge to idle and appends a matching entry to that agent's event timeline"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "register_valid_agent_appears"
+description = "Submitting Register Agent with a valid name, type, editor integration, and access key closes the modal and adds exactly one new row with idle status and a fresh last-seen timestamp, and the rollup total increases by one"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "register_invalid_shows_inline_errors"
+description = "Submitting the registration form with an empty name, missing type, or empty access key shows an inline error naming each invalid field, adds no row, and the submit control stays disabled until required fields are valid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "detail_panel_tabs_render"
+description = "Clicking an agent row opens a right-docked panel naming the agent with its status badge and three tabs: Configuration showing name, type, editor integration, a masked access key, and status; History showing the last 10 status events with timestamps in reverse chronological order; Activity listing today's executed prompts with timestamps or a designed empty state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "edit_prefilled_updates_in_place"
+description = "The panel's Edit button opens the registration modal pre-filled with the agent's current values, and saving a change updates both the registry row and the open panel without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "remove_requires_confirm"
+description = "The row overflow menu offers a Remove action that deletes the agent only after an explicit confirm step, after which the row disappears and the rollup counts decrease accordingly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "start_run_advances_steps"
+description = "Scripted probe: start a run on an idle agent through the real control; its badge flips to running, the Activity tab shows a progress list of at least 5 named steps, step statuses advance visibly from pending to running to complete over the following seconds, and the n of m complete indicator updates with each tick"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "retry_backoff_countdown_visible"
+description = "In the seeded failure scenario, the failing step shows a retrying state with a visible attempt counter and a backoff countdown (for example waiting 5s before retry 2 of 3) that counts down on screen before the retry begins"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "manual_retry_resumes_from_step"
+description = "A step that exhausts its retries is marked failed with an inline error summary and a manual retry control, and activating it resumes the run from that step while previously completed steps keep their original timestamps and outputs unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "run_completion_returns_idle"
+description = "When all steps of a run complete, the run is marked complete with a visible total duration and the agent's status badge returns to idle"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "pause_checkpoint_resume"
+description = "Scripted probe: pause a running agent mid-run and confirm the badge shows paused, the step list freezes with a visible checkpoint on the in-progress step, and after resuming the run continues from exactly that step with earlier completed steps' timestamps unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "bulk_pause_resume_selection"
+description = "Scripted probe: select at least three agents by checkbox including running ones, activate Pause All, and confirm every selected running agent's badge flips to paused and the rollup counts shift in one action; Resume All then returns the paused selections to running"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "timeline_appends_and_filters"
+description = "Every status transition, retry, checkpoint, and manual action appends a timestamped entry to the agent's History timeline in the same interaction; a filter control narrows the timeline by status kind and clearing it restores all entries"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "timeline_entry_highlights_step"
+description = "Selecting a timeline entry that refers to a run step highlights that step in the Activity tab's progress list"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.17"
+name = "work_summary_disclosure_behavior"
+description = "Each agent row's collapsible current-work summary is collapsed by default, expands on activation, remembers its open state per agent while the app stays open, shows an active indicator plus the in-progress step name while running, and shows a duration summary line after the last run completes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "status_filter_union_and_clear"
+description = "Selecting multiple statuses in the filter toolbar shows the union of matching agents, clearing the filter restores all agents, the rollup strip continues to reflect the full collection while a filter is active, and a zero-match filter shows a designed empty state with a clear-filter control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "cancel_and_double_submit_guarded"
+description = "Cancel on the register or edit modal leaves the registry unchanged, and rapidly double-activating the submit control creates exactly one agent"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "removed_agent_leaves_selection"
+description = "Removing an agent that is checkbox-selected also drops it from the selection, and the bulk controls disable when the selection becomes empty"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.21"
+name = "run_progress_hardcoded_static"
+description = "The run progress list, rollup counts, or event timeline render as static content that stays frozen while an agent is nominally running, indicating the run machinery is hardcoded display rather than live state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.22"
+name = "status_change_leaves_stale_surface"
+description = "A status change made in one surface (row control, bulk action, or detail panel) leaves a different surface (badge, rollup strip, panel, or timeline) showing the old value until a reload"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "4.1"
 name = "preloader_animates_out"
-description = "On a fresh real page load the lime LOAD NORRIS preloader animates out (fading and clearing) to reveal the page and does not stay covering content"
+description = "On a fresh real page load the lime LOAD VALE preloader animates out (fading and clearing) to reveal the page and does not stay covering content"
 type = "binary"
 weight = 1.0
 
@@ -91,8 +91,8 @@ weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "scroll_linked_horizontal_track"
-description = "Scrolling vertically through the pinned horizontal section drives the media row sideways as a scroll-linked transform so later cards scroll into view"
+name = "signature_pinned_horizontal_track"
+description = "Signature interaction on a fresh load: scrolling vertically through the pinned horizontal media section drives the media row sideways as a scroll-linked transform tied to scroll progress so later cards scroll into view, and scrolling back reverses the travel rather than leaving a static non-pinned row"
 type = "binary"
 weight = 1.0
 
@@ -129,7 +129,7 @@ optional = true
 [[criterion]]
 id = "4.10"
 name = "reduced_motion_respected"
-description = "Under prefers-reduced-motion reduce the page settles immediately rather than hanging on scroll-linked animation, the preloader does not block content, and the continuous marquees do not run"
+description = "Under prefers-reduced-motion reduce the page settles immediately rather than hanging on scroll-linked animation, the preloader does not block content, in-page jumps use instant scroll, and the continuous marquees do not run"
 type = "binary"
 weight = 0.5
 optional = true
@@ -195,6 +195,44 @@ name = "newsletter_confirmation_animates"
 description = "After submitting the newsletter form with a valid email, the inline confirmation message animates in with a short fade or slide of roughly 200 to 300 milliseconds rather than appearing instantly"
 type = "binary"
 weight = 0.5
+
+[[criterion]]
+id = "4.20"
+name = "inertial_easing_on_chrome"
+description = "Menu overlay open/close, Store split reveal, and helmet reveal use the shared non-linear cubic-bezier(0.65, 0.05, 0, 1) easing (getAnimations reports that easing) rather than mechanical linear tweens"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.21"
+name = "smooth_scroll_keeps_sticky_pin"
+description = "Activating an in-page menu destination (HOME, ON TRACK, OFF TRACK, or CALENDAR) eases the page to the target section with smooth scrolling while the horizontal media pin's sticky relationship stays intact and the scroll-linked track remains synchronized"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.22"
+name = "signature_motion_uses_linear_tweens"
+description = "The menu overlay, Store split reveal, or helmet reveal signature motions use purely linear tweens that start and stop at constant speed with no inertial easing"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.23"
+name = "scroll_story_section_sequence"
+description = "On a fresh load, continuous vertical scrolling advances through the cream hero, the pinned horizontal media chapter, the impact statement character fill, the helmet grid, the collaborators marquee, the social video card, and the footer statement fill as a sequential narrative rather than unrelated static blocks"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.24"
+name = "interactive_vector_motif_reacts"
+description = "Using the real UI path on a fresh load, hovering, pressing, opening the menu, or advancing scroll progress causes the original local vector motif to transition crisply between states rather than remaining static or autoplaying an unrelated identical loop"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "4.catchall"

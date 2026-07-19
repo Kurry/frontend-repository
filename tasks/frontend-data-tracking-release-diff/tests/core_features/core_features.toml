@@ -1,0 +1,218 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_versions_and_manifests"
+description = "On load, the releases sidebar lists at least 4 seeded versions with semver names, cut dates, and task counts; the default-selected version's manifest shows at least 20 rows, each with slug, truncated content digest, title, and split tags"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "version_select_swaps_manifest"
+description = "Selecting a different version in the sidebar swaps the main canvas to that version's manifest rows without a full page reload, and the selected entry is visually marked as active"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "diff_classifies_all_tasks"
+description = "With two distinct seeded versions picked as base and compare, every task from both manifests appears in the diff classified as added, removed, changed, or unchanged, with + / - / ~ markers on added, removed, and changed rows and truncated before and after digests shown side by side on changed rows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "diff_summary_counts_track_pair"
+description = "The diff summary strip shows per-kind counts (added, removed, changed, unchanged) that sum to the union of both manifests, and changing either version picker immediately recomputes both the counts and the row classification"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "unchanged_disclosure_collapses"
+description = "Unchanged tasks are collapsed under a disclosure row labeled with their count; activating it expands the unchanged rows in place and activating it again collapses them"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "same_version_diff_all_unchanged"
+description = "Picking the same version in both diff pickers renders a valid diff where every task is unchanged and the added, removed, and changed counts are all zero, with no error or blank region"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "swap_pair_flips_added_removed"
+description = "Scripted probe: record the four summary counts for a base/compare pair, then swap the two pickers; the added and removed counts exchange values exactly while the changed and unchanged counts stay the same"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "splits_fill_bars_with_shortfall"
+description = "The splits view lists fictional splits (such as auric-holdout, basalt-train, cinder-public) with a per-category fill bar showing current composition against a target quota and the numeric current/target pair beside each bar; at least one below-target category renders a visually distinct unfilled highlight"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "cut_form_semver_unique_validation"
+description = "The cut form shows an inline message naming the name field when the name is empty or not valid semver, shows a message stating the version already exists when a duplicate name is entered, keeps submit disabled until the name is valid, and starts no cut in any invalid case"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "cut_steps_advance_in_order"
+description = "Running a cut walks four visible steps in order — collect manifests, compute digests, rank-stability check, seal — with badges advancing pending to running to complete and only one step running at a time"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "rank_stability_gate_blocks_and_retries"
+description = "The rank-stability step displays a correlation value against the stated 0.95 threshold; a below-threshold value marks the step failed, blocks the release, and shows an inline explanation naming the value and threshold with a Retry check control, and activating retry draws a new value and re-runs the step"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "sealed_release_appears_immutable"
+description = "A cut that reaches seal adds the new version to the sidebar with its name and task count, selects it, and renders it sealed: no edit or delete controls appear on its manifest and an info affordance reveals a tooltip explaining sealed releases cannot be modified"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "rotation_advance_updates_panel"
+description = "The rotation panel shows the active held-out subsets, the cycle number, and a history list; activating Advance rotation changes the active subsets, increments the cycle number by exactly one, prepends the new cycle to the history, and no subset in the history repeats within a 3-cycle window"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "timeline_appends_events"
+description = "Scripted probe: record the event timeline length, then complete one release cut and one rotation advance; the timeline gains exactly one entry per action, newest first, each with a timestamp and a description matching the action"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "manifest_summary_copy_works"
+description = "The selected release shows a monospaced manifest summary code block (version, task count, per-split counts, digest prefix) whose copy control places the exact summary text on the clipboard and shows visible confirmation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "double_submit_single_cut"
+description = "Rapidly double-activating the cut submit control starts exactly one cut, and while a cut is running the Cut release control is disabled so a second cut cannot start; a successful cut adds exactly one version"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "cancel_leaves_state_unchanged"
+description = "Using Cancel on the cut form closes it and leaves the versions collection, sidebar count, and event timeline unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "empty_states_designed"
+description = "List regions with no entries (for example a diff pair or filter matching nothing) show a designed empty state message explaining what belongs there rather than a blank region or broken table"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "reload_resets_to_seed"
+description = "After cutting a release and advancing rotation, a page reload returns the app to its seeded state: the seeded version list, default selection, and seeded cycle number, with no session-cut versions remaining"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "diff_counts_static_regardless_of_pair"
+description = "The diff summary counts or row classification render identically regardless of which version pair is selected, indicating a hardcoded diff rather than one derived from the selected manifests"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.21"
+name = "correlation_never_varies"
+description = "Across multiple rank-stability runs and retries, the correlation value is byte-identical every time, indicating a hardcoded gate rather than a re-randomized draw"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

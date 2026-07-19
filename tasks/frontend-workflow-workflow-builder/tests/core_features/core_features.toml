@@ -1,0 +1,197 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_workflow_walkthrough"
+description = "On load, the canvas shows one seeded example workflow of exactly 5 connected nodes — one each of Prompt, Agent, Eval, Condition, Output — joined by 4 edges forming a valid source-to-sink path, with a left palette listing all five node types"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "canvas_pan_zoom_drag"
+description = "The canvas pans and zooms with the real pointer, and dragging a node repositions it with the new position holding while the app stays open; dragging a node type from the palette onto the canvas with a real drag creates a new node of that type at the drop position"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "compatible_connection_creates_edge"
+description = "Dragging from a node's output handle to a compatible input handle creates a directed edge between the two nodes that remains visible on the canvas; attempting an incompatible connection (for example output handle to output handle) shows an error toast naming the incompatibility and creates no edge (edge count unchanged)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "select_delete_edge_and_node"
+description = "Clicking an edge selects it with a visibly distinct style and pressing Delete removes it; selecting a node and pressing Delete removes the node together with its attached edges in the same interaction"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "node_config_forms_type_specific"
+description = "Double-clicking a node opens a type-specific configuration modal: Prompt shows a prompt selector (at least 4 seeded prompts), Agent shows an agent selector (at least 3 seeded names) plus a timeout field bounded 1 to 300 seconds, Eval shows a rubric selector (at least 3 names), Condition shows a required expression field, Output shows a required destination field; an invalid or empty required field shows an inline message naming that field with Save disabled until valid, and saving updates the node's configuration badge on the canvas"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "run_topological_progression"
+description = "Pressing Run sets every node to a pending badge, then nodes advance one at a time in topological source-to-sink order through running (with an active indicator) to complete, each with a watchable simulated duration — never all at once"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "retry_attempt_and_backoff_visible"
+description = "During a run, the seeded Agent node visibly retries: a retrying badge appears with an attempt counter and a live backoff countdown of the form 'waiting Ns before retry 2 of 3' before the next attempt, then the node succeeds on its third attempt"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "failed_run_stops_downstream"
+description = "When a node exhausts its retries, it shows a failed badge with a short inline error summary, downstream nodes stay pending, and the run-level status reads failed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "retry_from_failed_node_freezes_upstream"
+description = "After a failed run, activating the Retry from failed node control resumes execution from exactly the failed node; upstream completed nodes keep their frozen outputs, timestamps, and complete badges and visibly do not re-execute"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "pause_resume_checkpoint"
+description = "Pressing Pause mid-run freezes progression at a checkpoint (the current node finishes, no further node starts, the rollup stops advancing); pressing Resume continues from exactly the next node and nodes already complete never re-execute"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "rollup_derives_live"
+description = "The toolbar rollup shows n of m nodes complete, elapsed duration, and failure count, and its values update live as nodes advance during a run, matching the badges actually visible on the canvas"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "node_io_summary_expandable"
+description = "After a run, each executed node exposes an expandable input/output summary: activating the disclosure reveals the simulated input received and output produced, and outputs differ between nodes reflecting each node's own configuration"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "timeline_ordered_timestamped"
+description = "The timeline panel lists one timestamped entry per step transition (started, completed, failed, retry scheduled, paused, resumed) in order with newest appended at the end, and running the workflow twice produces two distinct sets of entries with fresh timestamps; filtering the timeline by status narrows the visible entries (clearing restores the full log) and selecting an entry highlights its node on the canvas, panning it into view when offscreen"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "save_load_confirmation_round_trip"
+description = "Saving via the Save modal with a valid name adds the workflow to the Saved Workflows panel with name and node count; clicking a saved workflow replaces the canvas only after a confirmation dialog is accepted (declining leaves the canvas untouched), and loading resets execution badges and the rollup; saving with an empty name shows an inline validation message naming the name field and nothing is added to the panel"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "keyboard_node_selection"
+description = "Node selection can be cycled from the keyboard with a visible selection highlight, Enter opens the selected node's configuration modal, and Delete removes the selected node or edge — all without pointer use"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "run_empty_canvas_message"
+description = "Pressing Run after deleting all nodes shows a visible message that there is nothing to run and starts no execution; the Run control is also disabled while a run is already in progress"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "canvas_static_no_authoring"
+description = "The canvas is a static picture: nodes cannot actually be created from the palette, repositioned, or connected — authoring interactions leave the graph unchanged"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.23"
+name = "execution_fabricated"
+description = "Execution evidence is fabricated: the rollup or timeline shows values that do not match the badges on the canvas, all nodes complete instantly in one jump with no sequential progression, or two runs produce byte-identical timeline entries with identical timestamps"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

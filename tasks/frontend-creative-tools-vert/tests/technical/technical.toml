@@ -130,7 +130,7 @@ negate = true
 [[criterion]]
 id = "2.10"
 name = "2_10"
-description = "The app does not render or behave differently under automation: no runtime code path keys behavior on navigator.webdriver or other automation signals (anticheat AC-004)."
+description = "The app renders or behaves differently under automation: with navigator.webdriver set, page content, behavior, or styling observably differs from a normal session (anticheat AC-004)."
 type = "binary"
 weight = 1.0
 negate = true
@@ -139,6 +139,14 @@ negate = true
 id = "2.11"
 name = "2_11"
 description = "A reload before any file is added must not restore a phantom file row, a stale converted result, or false progress; the queue returns to a single empty state."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

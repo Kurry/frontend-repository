@@ -1,0 +1,119 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "studio_regions_separated"
+description = "At 1440px width the app composes as a fixed-width left rail, a main canvas with the header card above the criteria list, and a distinct version history surface, with the regions separated by hairline borders or elevation rather than running together, and spacing following a consistent rhythm across rail entries, criterion rows, history entries, and Tune bars with no crowded or orphaned regions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "dual_accent_discipline"
+description = "One accent color consistently marks selection and primary actions while a second, visibly different hue marks load-bearing criteria (weight 3 or more) and the load-bearing rollup count; type badges (binary vs likert with range) and importance labels render as visually distinct chip treatments consistent across every criterion row; the two accents are distinguishable side by side and applied consistently across rail, list, Tune, and preview surfaces"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.4"
+name = "diff_color_language_consistent"
+description = "In the diff view, added entries carry a green-tinted treatment, removed entries a red-tinted treatment with strikethrough, and changed entries an amber-tinted treatment with before and after values, each also carrying a non-color label or icon, and all text stays readable against its tint"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "typography_hierarchy_clear"
+description = "The rubric name is visibly larger than section headings, which are larger than criterion names, which are larger than body and metadata text, consistently across views; the export block renders in a monospaced face distinct from the UI face"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "component_state_treatments"
+description = "Buttons, selects, toggles, and form fields show distinct default, hover, focus (visible ring), disabled, and error treatments; the gated save control in its disabled state is visibly muted and sits adjacent to its inline explanation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "responsive_reflow_clean"
+description = "At 1024px the left rail collapses behind a toggle that opens it as an overlay, and at 375px width no content clips or overflows the viewport, no page-level horizontal scrolling appears, the Tune bars and diff view reflow to stacked layouts, and the code block scrolls within its own container"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n1"
+name = "overlap_or_default_theme_slop"
+description = "At 1440px or 375px width, text or controls overlap, clip, or collide, or the UI reads as unstyled default component output with no coherent palette or identity layer"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

@@ -1,0 +1,218 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "add_repository_form_validation"
+description = "The toolbar Add repository button opens a modal with a required local path input and an optional display name input; the submit control stays disabled while the path is empty, and an empty or invalid path shows an inline message naming the path field before submit"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "add_repository_creates_exactly_one"
+description = "Submitting a valid Add repository form closes the modal and adds exactly one row to the repository list (row count delta measured immediately around the action is one, even when the submit control is double-activated)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "repository_row_anatomy_and_seed"
+description = "At least 3 seeded repositories are listed on first load, each row showing path, display name, last-scanned timestamp, document count, and a Scan Now button, with at least 8 documents per seeded repository reachable in the document tree"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "rename_and_remove_repository"
+description = "Rename edits a repository's display name in place and the new name appears everywhere the repository is referenced; Remove asks for confirmation and then deletes the repository row and removes its documents from the document tree in the same interaction"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "scan_now_inline_loading_and_row_update"
+description = "Clicking Scan Now shows an inline loading indicator in that repository's row while the simulated scan runs, and after completion the row's document count and last-scanned timestamp both update"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "progress_bar_files_scanned"
+description = "During a scan the scan panel shows a progress bar labeled files scanned / total files that fills from 0 to 100 percent over the scan duration, with the label numbers advancing alongside the bar"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "per_document_step_statuses"
+description = "The active scan decomposes into named per-document steps whose statuses advance visibly from pending to running to complete during the run, with failed and retrying states appearing on the simulated failure path"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "retry_backoff_countdown"
+description = "A failing step retries automatically showing a visible attempt count and a backoff countdown (for example waiting 3s before retry 2 of 3) whose countdown text updates each second while waiting"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "manual_retry_resumes_from_step"
+description = "A step that exhausts its retries shows a failed status with an inline error summary and a manual Retry step control; activating it resumes the scan from that step, and already-completed steps keep their original timestamps and outputs without re-running"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "pause_resume_from_checkpoint"
+description = "Pausing a running scan freezes step progression and the progress bar; Resume continues from the exact step where it stopped, previously completed steps never re-execute, and the scan then completes normally"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "live_rollups_track_steps"
+description = "The scan panel shows rollups — steps complete of total, failure count, and elapsed duration — that update live as steps advance and always match what the step list shows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "event_timeline_filter_highlight"
+description = "Each scan has an ordered event timeline of step transitions with timestamps; filtering the timeline by status narrows the visible entries, and selecting a timeline entry highlights the matching step in the step list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "document_tree_grouped_by_type"
+description = "The document tree groups detected files by type — CLAUDE.md, AGENTS.md, .cursorrules, and README — in accordion sections whose headers show the per-group document count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "file_viewer_readonly_line_numbers"
+description = "Clicking a document entry opens a read-only viewer showing the file content in monospace type with line numbers, and its copy control gives visible confirmation when activated"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "document_hover_preview"
+description = "Hovering a document row reveals a compact preview with the file name, a type glyph, and the first lines of content, without opening the full viewer"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.16"
+name = "findings_disclosure_remembered"
+description = "Each document row has a findings disclosure collapsed by default; expanding it reveals that document's scan findings with a rotating chevron cue, and each row's open state is remembered after switching panels while the app stays open"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "type_filter_checkboxes"
+description = "Checking type filter checkboxes narrows the tree to only the checked document types with visible document and group counts updating, and unchecking all types shows all documents again"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "pattern_toggles_affect_future_scans"
+description = "Toggling a document pattern off in the scan configuration excludes that type from future scans — rescanning a repository afterward yields no documents of the disabled type while documents from earlier scans remain until rescan — and toggling off the last enabled pattern shows an inline validation message naming the problem"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "no_concurrent_scan_same_repo"
+description = "Clicking Scan Now on a repository that is already scanning does not start a second concurrent scan of that repository (no duplicated steps, progress bars, or timeline entries)"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.n1"
+name = "fabricated_scan_results"
+description = "Scans are fabricated: the progress bar or step statuses render without advancing over time, scanning different repositories yields byte-identical documents and timelines, or the document count and last-scanned timestamp change without any scan having run"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n2"
+name = "missing_empty_states"
+description = "Removing every repository, or filtering the tree to zero matching documents, leaves a blank region with no empty-state message or recovery control"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "A specified core behavior is broken or missing in a way NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action performed, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

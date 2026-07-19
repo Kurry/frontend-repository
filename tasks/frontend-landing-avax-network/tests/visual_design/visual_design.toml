@@ -62,7 +62,7 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
+name = "cut_corner_frames_and_rounded_shells"
 description = "Calls to action and panels use custom cut-corner frames rather than plain rectangles, with large-radius rounded section containers"
 type = "binary"
 weight = 1.0
@@ -90,15 +90,15 @@ weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "3_5"
-description = "On a desktop viewport the hero composes three regions (Payments Collective, animated center, clock/date and scroll cue) and Why Avalanche uses a sticky heading with full-height stacked cards"
+name = "asymmetric_hero_and_sticky_why"
+description = "On a desktop viewport the hero composes three unequal regions (Payments Collective lower left, animated center, clock/date and scroll cue on the right) with deliberate offset whitespace rather than equal thirds, and Why Avalanche uses a sticky heading with full-height stacked cards"
 type = "binary"
 weight = 0.5
 optional = true
 
 [[criterion]]
 id = "3.6"
-name = "3_6"
+name = "flat_equal_width_dashboard_layout"
 description = "The layout is a flat single-column stack of equal-width blocks with no cut-corner geometry, no accent color, and no display type hierarchy"
 type = "binary"
 weight = 1.0
@@ -106,7 +106,7 @@ negate = true
 
 [[criterion]]
 id = "3.7"
-name = "3_7"
+name = "dark_mode_unreadable_or_missing"
 description = "Dark mode is missing or leaves unreadable low-contrast surfaces after the theme toggle is used"
 type = "binary"
 weight = 0.5
@@ -115,7 +115,7 @@ optional = true
 
 [[criterion]]
 id = "3.8"
-name = "3_8"
+name = "cta_accent_red_computed"
 description = "The CTA accent red computes rgb(255, 57, 74) on primary buttons and .text-red elements (getComputedStyle color/fill)"
 type = "binary"
 weight = 1.0
@@ -187,6 +187,36 @@ description = "At 1440x900 body copy computes about 15.7px / 21.2px line-height 
 type = "binary"
 weight = 0.5
 optional = true
+
+[[criterion]]
+id = "3.18"
+name = "fluid_clamp_type_and_padding"
+description = "Resizing between 1440 and 390 widths shows typography and section padding scaling continuously via clamp-driven tokens (rem minima/maxima with vw midpoints) with no abrupt size jump at the 1025px breakpoint"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.19"
+name = "four_px_baseline_spacing_rhythm"
+description = "Section paddings, gaps, and major offsets align to a 4px baseline (root --spacing computes to 0.25rem / 4px and measured gaps land on multiples of 4px) rather than arbitrary odd-pixel spacing"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.20"
+name = "three_tier_css_tokens_and_red_scarcity"
+description = "Document styles expose three tiers of CSS custom properties — palette (--color-red near #ff394a, --color-dark, --color-neutral-950), functional/theme (--text-base/--text-9xl, --padding-md, --ease-out-cubic), and component usage of those tokens on nav/buttons/headings — while the red accent stays scarce on CTAs/active states against the dual-tone black/white canvas rather than washing large surfaces"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.21"
+name = "broken_grid_collapses_to_noise"
+description = "Cut-corner panels or overlapping sticky stacks clip interactive controls, make overlaid text unreadable, or the asymmetry collapses into visual noise at 1440 or 390 widths"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "3.catchall"

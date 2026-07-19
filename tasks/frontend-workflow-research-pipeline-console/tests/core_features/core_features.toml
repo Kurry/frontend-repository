@@ -1,0 +1,218 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_board_strips_with_statuses"
+description = "On load, the Pipeline board shows at least 6 seeded run strips, each rendered as three connected phase cards in the order Data generation, Fine-tuning, Evaluation with visible connectors, each phase carrying a status chip reading exactly one of Pending, Running, Complete, Failed, or Skipped; without any interaction at least one phase is Running, at least one is Failed, and at least two runs are Complete across all three phases"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "phase_card_config_summary"
+description = "Every phase card on the board shows a config summary containing the dataset name, the model name, the epoch or trial count, and the assigned cluster name"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "running_phase_progress_advances"
+description = "Observed over several seconds without a reload: a Running data-generation card's tasks-generated counter increments on its own; a Running fine-tuning card's loss curve chart gains new points as its epoch n of m label advances; a Running evaluation card's trial n of m label advances while its running mean score updates"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "submit_valid_job_adds_run"
+description = "After filling the Submit job form with valid values and submitting, the panel closes, the Pipeline board gains exactly one new run strip, and the active jobs rollup increases by exactly one"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "evaluate_reveals_conditional_fields"
+description = "Choosing job type Evaluate in the submission form reveals a benchmark select offering Switchboard, Cartographer, and Ledger plus a repetition count field defaulting to 3, and those fields are absent when job type is Data generation or Fine-tune"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "invalid_submit_blocked_with_messages"
+description = "With an empty required field or an out-of-range count (0 or above 50), the form shows an inline message naming the offending field (the count message states the allowed range), the submit control is disabled, and no run is added to the board"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "config_preview_and_suggestion_chips"
+description = "The config preview panel renders the assembled job configuration as a monospaced code block that updates live as any form field changes; its copy control puts the exact preview text on the clipboard with visible confirmation; and clicking one of at least 3 suggestion chips fills the form fields with that configuration and the preview follows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "chained_selects_gated_by_completion"
+description = "The Fine-tune dataset select lists only datasets whose data-generation phase is Complete and the Evaluate model select lists only checkpoints from a Complete fine-tuning phase; ineligible options are absent from the select (not merely disabled) and an inline note under each gated select explains the eligibility rule"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "auto_trigger_starts_evaluation"
+description = "For a Fine-tune run submitted with the automatic-evaluation toggle on: when its fine-tuning phase turns Complete, the evaluation phase flips from Pending to Running without any user action, and the run's event timeline records an entry naming the automatic trigger between the two phase transitions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "failed_phase_retry_metadata"
+description = "A Failed phase card shows an error category label, an attempt count, and an automatic-retry backoff countdown that visibly counts down second by second; when retries are exhausted the card settles on Failed with an inline error summary and a manual Retry control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "resume_from_checkpoint_frozen_history"
+description = "Manual Retry returns only the failed phase to Running while earlier Complete phases keep their outputs and timestamps byte-identical; and pausing a Running phase freezes its counter, epoch, or trial value, with Resume continuing from exactly that value rather than restarting from zero"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "datasets_catalog_and_run_filter"
+description = "The Datasets view lists at least 5 seeded datasets each showing name, task-count size, provenance (the generation run and config that produced it), and a task-type distribution mini-chart; selecting a dataset filters the Pipeline board to the runs that used it with a visible active-filter chip, clearing restores the full board, and a zero-match filter shows an empty state message with the clear control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "leaderboard_cells_and_sort_roundtrip"
+description = "The Results leaderboard renders models by benchmarks with every populated cell showing a mean score, a spread indicator, a simulated cost, and a trial count; activating a column header sorts the rows by that column and activating it again reverses the same rows' order"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "comparison_delta_derives_live"
+description = "Picking two models in the comparison picker renders paired bars per benchmark plus a delta strip of per-benchmark differences, and swapping either picked model updates the bars and deltas immediately without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "trial_drilldown_trace_streams"
+description = "Clicking a populated leaderboard cell opens a trial drill-down list showing trial id, score, and duration per row, and expanding a trial's detail disclosure the first time reveals a short simulated trace excerpt that appears progressively (streams in) rather than rendering all at once"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "timeline_filter_and_highlight"
+description = "A run's detail panel shows an ordered, timestamped event timeline of phase transitions, retries, pauses, resumes, and triggers; filtering by phase or status narrows the entries, and selecting an entry visibly highlights the phase card it belongs to"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "rollups_track_shared_state"
+description = "The rollup strip shows active jobs, queue depth for each of the three clusters, total simulated cost, and mean benchmark score per model, and these values change appropriately as jobs are submitted, phases advance, and runs complete or fail — never staying static across those events"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "double_submit_creates_one_run"
+description = "Rapidly double-activating the submit control on a valid job form creates exactly one run: the board gains exactly one strip and the active jobs rollup increases by exactly one"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "eval_completion_updates_leaderboard"
+description = "Scripted probe: record a leaderboard cell's trial count and mean, submit an Evaluate job against that model and benchmark, let it run to Complete, and confirm the cell's trial count increased by the repetition count and the mean recomputed — all without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "progress_surfaces_static"
+description = "Phase progress surfaces are fake: a counter, loss curve, epoch label, or trial tally on a card marked Running renders fixed values that never advance while the app is left open"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.21"
+name = "leaderboard_ignores_completed_runs"
+description = "The Results leaderboard renders identical cell values regardless of newly completed evaluation runs: trial counts and mean scores stay frozen after an evaluation completes"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

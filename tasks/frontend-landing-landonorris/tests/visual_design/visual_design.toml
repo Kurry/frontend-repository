@@ -62,15 +62,15 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "dark_cinematic_palette"
-description = "The composition reads as a dark cinematic F1 brand site: sections compute to the dark-green base rgb(40, 44, 32) with off-white rgb(244, 244, 237) text, lime rgb(210, 255, 0) is the single loud accent, and the hero is a lighter cream band"
+name = "dual_tone_scarcity_palette"
+description = "The composition reads as a dual-tone cinematic elite-motorsport profile: sections compute to the slate-black dark-green base rgb(40, 44, 32) with off-white rgb(244, 244, 237) text, the hero is a lighter cream band, and neon lime rgb(210, 255, 0) is the single loud accent reserved for the Store button, current-menu stroke, and hover/highlight states rather than flooding large section backgrounds"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
 name = "wordmark_serif_sans_pairing"
-description = "The stacked LANDO NORRIS wordmark pairs a serif display treatment for LANDO with a heavy sans treatment for NORRIS, both about 32px at 1440, and oversized display copy (impact statement, menu items, footer statement) renders in the bundled serif display face"
+description = "The stacked AVERY VALE wordmark pairs a serif display treatment for AVERY with a heavy Mona Sans treatment for VALE, both about 32px at 1440, and oversized display copy (impact statement, menu items, footer statement) renders in the bundled open-license serif display face"
 type = "binary"
 weight = 0.5
 optional = true
@@ -78,7 +78,7 @@ optional = true
 [[criterion]]
 id = "3.3"
 name = "menu_overlay_composition"
-description = "The open menu is a full-screen dark-green overlay with a topographic line texture, oversized uppercase display-face menu items (roughly 96px at 1440) on the left, a staggered placeholder photo grid on the right, and the current HOME item de-emphasized to the muted green rgb(180, 184, 165) with a lime stroke"
+description = "The open menu is a full-screen dark-green overlay with a topographic line texture, oversized uppercase display-face menu items (roughly 96px at 1440) on the left, a staggered four-image fictional editorial grid on the right, and the current HOME item de-emphasized to the muted green rgb(180, 184, 165) with a lime stroke"
 type = "binary"
 weight = 1.0
 
@@ -124,7 +124,7 @@ optional = true
 [[criterion]]
 id = "3.9"
 name = "wordmark_weights_and_color"
-description = "The wordmark renders LANDO in a serif family at weight 400 and NORRIS in the bundled variable sans face at weight 900, both in the dark color rgb(17, 17, 18)"
+description = "The wordmark renders AVERY in a bundled serif family at weight 400 and VALE in Mona Sans Variable at weight 900, both in the dark color rgb(17, 17, 18)"
 type = "binary"
 weight = 0.5
 optional = true
@@ -171,14 +171,14 @@ weight = 1.0
 [[criterion]]
 id = "3.15"
 name = "mobile_390_adaptation"
-description = "At 390px width the nav wraps to about 140px tall with the monogram and a centered LANDO NORRIS wordmark (about 24px) plus the MCLAREN F1 SINCE 2019 sub-line stacked, the helmet grid collapses to a single column with cards about 326 by 435, the impact heading drops to about 48px, and the menu photo grid is hidden"
+description = "At 390px width the nav wraps to about 140px tall with the AV monogram and a centered AVERY VALE wordmark (about 24px) plus the NOVA RACING SINCE 2019 sub-line stacked, the helmet grid collapses to a single column with cards about 326 by 435, the impact heading drops to about 48px, and the menu photo grid is hidden"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.16"
 name = "fluid_type_across_breakpoints"
-description = "Resizing across the 992, 991, 767, and 479 pixel breakpoints scales type fluidly rather than jumping abruptly between adjacent widths"
+description = "Resizing across the 992, 991, 767, and 479 pixel breakpoints scales type fluidly via clamp() or equivalent continuous viewport sizing rather than jumping abruptly between adjacent widths"
 type = "binary"
 weight = 0.5
 optional = true
@@ -208,8 +208,74 @@ negate = true
 
 [[criterion]]
 id = "3.20"
-name = "real_brand_assets_shipped"
-description = "The page ships brand-owned assets — real McLaren or Lando Norris logos or monograms, real partner brand logos or wordmarks, licensed driver photography or video, or the reference site's licensed display font — instead of original placeholder or open-license equivalents"
+name = "source_brand_residue_present"
+description = "Any source identity remains visible: a real driver or team name, initials, signature, number, logo silhouette, sponsor or social handle; a recognizable source photograph, video frame, likeness, helmet livery, circuit graphic, monogram, partner mark, or proprietary display font; or source branding embedded in canvas/WebGL textures or tiny footer copy"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.21"
+name = "asymmetric_hero_baseline_grid"
+description = "The hero composes asymmetrically rather than as an equal-column stack: the driver silhouette anchors the center field, the NEXT RACE widget sits lower-left, and the fixed nav occupies the top edge, with section spacing and card gaps aligning to a consistent 1.25rem (20px) baseline unit and its multiples"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.22"
+name = "clamp_fluid_display_type"
+description = "Display type for the impact statement, menu item labels, footer brand statement, and preloader word uses fluid clamp() (or equivalent continuous viewport scaling) so sizes change smoothly across widths rather than jumping only at breakpoints"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.23"
+name = "three_tier_token_surfaces"
+description = "Computed styles resolve the three-tier brand tokens: surface colors dark-green #282c20 / cream #efefe5 / off-white #f4f4ed, text colors black #111112 / off-white #f4f4ed / muted greens #dde1d2 and #b4b8a5, and accent colors lime #d2ff00 / lime-off #b2c73a / orange #ff6b00"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.24"
+name = "lime_floods_section_backgrounds"
+description = "Neon lime is used as a large section or page background flood instead of remaining a scarce accent on the Store button, current-menu stroke, and hover/highlight states"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.25"
+name = "original_media_density_and_variety"
+description = "The newly authored media matches the reference's visual density without copying it: the horizontal strip has six distinct editorial scenes, the menu uses a separate staggered set of at least four photos, and the social poster/video form a purposefully art-directed racing composition rather than gradients, repeated stock thumbnails, or generic placeholders"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.26"
+name = "layered_hero_art_direction"
+description = "At 1440x900 the fictional racer portrait/cutout, contour field, translucent blobs, soft shadow or reflection planes, and lower-left race widget overlap as an intentional depth composition; the hero is not a single rectangular image or empty cream field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.27"
+name = "fictional_helmet_and_partner_craft"
+description = "The three fictional helmet cards have recognizably different surface systems with shaped masks, highlights, shadows, and distinct reveal states, while the five fictional partner marks vary in symbol/wordmark construction but share a controlled monochrome optical weight"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.28"
+name = "physical_3d_and_crisp_vector_assets"
+description = "The hero's original debranded 3D object shows visibly different matte, glossy, and reflective material responses under environment lighting, and the original interactive vector motif remains crisp at desktop and mobile sizes rather than appearing as a blurry raster substitute"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.29"
+name = "low_effort_or_missing_replacement_assets"
+description = "A major reference media surface is omitted or replaced by a flat color block, repeated image, emoji, unstyled text posing as a logo, broken/transparent asset, or generic rectangle with no authored visual content"
 type = "binary"
 weight = 1.0
 negate = true

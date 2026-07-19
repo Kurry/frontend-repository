@@ -16,10 +16,10 @@ its size, position, and role with an original stand-in per the requirements.
 
 <core_features>
 Core features (each line is an observable behavior the finished app must exhibit):
-- The homepage route / returns HTTP 200 and renders the English (en-GB) Hildén & Kaira homepage; the brand name always keeps its accent (Hildén & Kaira, with é), and the document title reads Hildén & Kaira
-- A fixed top nav overlays the page with an original placeholder brand wordmark on the left, centered links Our approach, Story, Work, and Blog, a locale dropdown showing EN, and a right-side contact call-to-action button; the centered nav links, the CTA, and the locale switcher are plain clickable chrome with no working destination page — clicking them navigates nowhere real, and the /fi locale never resolves to a separate page
-- The page presents these sections in order: a hero with the editorial headline and floating case thumbnails, a statement/manifesto band, a client flick-card deck carousel, a services trio, a testimonials carousel, a call-to-action block, a contact-and-social area, and a full-height footer
-- The hero shows the exact H1 "If you can't reach a million people with 0€ ad spend, your branding sucks." with the brand promise lead beneath it, an animated brand lettermark assembled from twelve individual original letterform images, and case thumbnails that continuously drift upward on the left and right edges
+- The page loads a single long-form English (en-GB) homepage at / that returns HTTP 200; no other route is built — this is the homepage only; the brand name always keeps its accent (Hildén & Kaira, with é), and the document title reads Hildén & Kaira
+- A fixed top nav overlays the page with an original placeholder brand wordmark on the left, centered links Our approach, Story, Work, and Blog, a locale dropdown showing EN, and a right-side contact call-to-action button; the centered nav links, the CTA, Show case controls, service and about buttons, and the locale switcher are plain clickable chrome with no working destination page — clicking them stays on / and never opens a second page, and the /fi locale never resolves to a separate page
+- The page presents these sections in this exact top-to-bottom order: hero with editorial headline and floating case thumbnails; statement/manifesto band; client flick-card deck carousel; services trio; testimonials carousel; about/self-esteem band with the H2 "Does your brand have self-esteem issues?"; call-to-action block; full-height footer (sitemap, podcast, social, and legal links live in the footer, not as a separate mid-page section)
+- The hero shows the exact H1 "If you can't reach a million people with 0€ ad spend, your branding sucks." with the exact lead "We will 10x your social presence or work for free until it's done." beneath it, an animated brand lettermark assembled from twelve individual original letterform images, and case thumbnails that continuously drift upward on the left and right edges
 - The statement section shows the H2 lead "Content only you can post because it's built around your people." over a dark media band
 - The client deck is a centered carousel of five client cards — Finlayson, Kierrätyskeskus, Uusi Juttu, Autoliitto, and Liikku — each card carrying a client title with an original placeholder client mark, a Show case control, a stacked flick-card deck of short vertical videos, and two live stat tiles labelled Organic views and Likes
 - Each client's flick-card deck has Previous and Next controls that reshuffle the stacked cards, and only the front card's video player is ever interactive
@@ -27,11 +27,12 @@ Core features (each line is an observable behavior the finished app must exhibit
 - The active client card embeds a custom video player with a big play control, a play/pause button, a mute button, a fullscreen button, a draggable timeline with elapsed and total time, and likes/views captions
 - The services section shows a stacked trio — Organic content, Ads for social, and Training — each with its own number, heading, description, background video, and its own call-to-action button; scrolling through the pinned section throws the top card away to reveal the next
 - The testimonials section is a rotator of at least five client quotes with the client's name and role; advancing shows the next quote with its author details, and the current-position indicator updates
-- The call-to-action block shows the H2 "Ready to work with us?" with two choice cards: "We'll call you" (which opens the contact form) and "Contact us"; a separate band shows the line "Does your brand have self-esteem issues?"
+- The about/self-esteem band shows the H2 "Does your brand have self-esteem issues?" with supporting copy and two call-to-action controls over a dark media band with flanking images
+- The call-to-action block shows the H2 "Ready to work with us?" with two choice cards: "We'll call you" (which opens the contact form) and "Contact us"
 - Choosing "We'll call you" opens a contact popup containing an email field, an optional phone field, and a Privacy Policy agreement checkbox; the submission is posted to a local endpoint only — never to an external form service
 - A cookie consent banner appears shortly after load with an Accept action and a preferences path exposing four categories — Essential (required), Marketing, Analytics, and Personalization; clicking Accept dismisses the banner
 - The footer fills at least the viewport height, re-assembles the brand lettermark from its individual original letterforms, and lists a sitemap, Podcast links (Spotify, YouTube, Apple Podcasts), Social links (Instagram, TikTok, Facebook), legal links, and a generic designer credit line
-- No in-app control performs a real outbound navigation or full page reload; every nav link, locale option, and social/legal link that has no in-scope destination is present and clickable but non-navigating chrome
+- No in-app control performs a real outbound navigation or full page reload; every nav link, locale option, case/service/about link, and social/legal/sitemap link that has no in-scope destination is present and clickable but non-navigating chrome that leaves the user on /
 </core_features>
 
 <user_flows>
@@ -54,10 +55,12 @@ End-to-end flows with tracked state (every step names its visible evidence):
 
 <visual_design>
 - Editorial, high-contrast agency aesthetic: the home body default surface renders off-white rgb(234, 233, 230) (#eae9e6) with near-black rgb(24, 24, 24) (#181818) text, and dark media bands, lime, turquoise, chrome-metallic, and dark-grey theme surfaces swap per section as the page scrolls
-- The statement band (theme-media) renders black rgb(24, 24, 24) with lime rgb(236, 253, 173) (#ecfdad) headings; the footer (theme-chrome) renders a dark-grey rgb(43, 43, 43) (#2b2b2b) base with white text; the Organic views tile renders lime rgb(236, 253, 173); the Training service card renders turquoise rgb(63, 174, 134) (#3fae86); the nav link dot renders red rgb(255, 69, 69) (#ff4545)
-- Oversized editorial display headings render in the bundled open-license editorial display face at weight 400 (hero H1 about 62.8px at 1440 with a tight ~0.9em line-height and negative letter-spacing; statement and CTA H2 about 57.6px), paired with the bundled open-license grotesque at weight 500 for body, eyebrow, and nav text (paragraph-m about 15.7px, nav links about 13.1px at 1440); both faces resolve from self-hosted files; Inter is used only for ancillary UI and cookie-consent copy; no external font requests
-- Fluid, viewport-bound type scaling: the body font-size resolves to about 10.5px at 1440 and clamps up to 16px at 991 and below, so headline and body px grow and shrink smoothly across breakpoints rather than snapping at fixed sizes
-- The hero pairs a large editorial headline with a brand lettermark built from twelve individual original letterform images and thumbnails floating in left and right zones
+- Color scarcity on this brand (not a lime-everywhere theme): lime rgb(236, 253, 173) is reserved for the Organic views tile, theme-media headings, text selection, primary button fills, and the page-load veil; turquoise rgb(63, 174, 134) is reserved for the Training service card and primary-button hover fills; red rgb(255, 69, 69) appears only as the nav link dot; chrome-metallic is reserved for the Likes tile, contact popup, and footer theme
+- The statement and about bands (theme-media) render black rgb(24, 24, 24) with lime rgb(236, 253, 173) (#ecfdad) headings; the footer (theme-chrome) renders a dark-grey rgb(43, 43, 43) (#2b2b2b) base with white text
+- Three-tier design tokens drive surfaces: raw swatches (lime, turquoise, black, off-white, red, dark-grey) resolve into per-theme role tokens (background, body-text, heading, button fills) that sections and chrome consume — swapping a section theme recolors its role tokens from the same swatch set rather than inventing one-off hex values
+- Oversized editorial display headings render in the bundled open-license editorial display face at weight 400 (hero H1 about 62.8px at 1440 with a tight ~0.9em line-height and negative letter-spacing; statement and about H2 about 57.6px to 84px depending on tier), paired with the bundled open-license grotesque at weight 500 for body, eyebrow, and nav text (paragraph-m about 15.7px, nav links about 13.1px at 1440); both faces resolve from self-hosted files; Inter is used only for ancillary UI and cookie-consent copy; no external font requests
+- Fluid, viewport-bound type scaling via a clamp-based root size: the body font-size resolves to about 10.5px at 1440 and scales continuously with viewport width (about 16px near 991 and below), so headline and body px grow and shrink smoothly across breakpoints rather than snapping at fixed sizes
+- Broken-grid editorial composition: the hero places a full-width lettermark along the top edge, centers the H1 and lead toward the lower third, and lets case thumbnails drift through left and right zones that cross the headline plane; the about band overlays large display type on a media field with flanking images that break the content column; spacing and offsets stay on a consistent fluid em baseline (multiples of 0.5em / 1em / 2em / 8em that track the root size, equivalent to a 4/8px discipline at the measured root)
 - The client deck cards are dense: an original placeholder client mark and title, a stacked flick deck of vertical video cards, caption chips (age and view count), and two stat tiles — a lime Organic views tile and a chrome Likes tile with a metallic heart
 - The services trio uses full-bleed card faces in contrasting themes (lime, white, turquoise) with large index numbers and background video
 - The contact popup uses a chrome-metallic panel with floating-label fields; the cookie banner uses a dark theme
@@ -65,12 +68,15 @@ End-to-end flows with tracked state (every step names its visible evidence):
 </visual_design>
 
 <motion>
-- On load a lime page-load veil covers the hero then lifts to reveal it, the brand lettermark rises into place letter by letter, and the nav settles in
+- Signature interaction (scroll storytelling): scrolling through the pinned services region throws the top service card away with rotation to reveal the next card in the Organic content / Ads for social / Training trio, driven by real scroll progress; scrolling back reverses the throw sequence
+- On a fresh load a lime page-load veil covers the hero then lifts to reveal it in one timeline with the brand lettermark rising into place letter by letter and the nav settling in — intro stages are orchestrated together rather than firing as unrelated tweens
 - Headings and paragraphs reveal with a line-by-line upward mask wipe (each line rising from fully below its mask to its resting position) the first time each element scrolls to about 80% of the viewport, and stay revealed; headings run 0.8s with a 0.08s per-line stagger and paragraphs 0.6s with a 0.04s stagger, both with a pronounced ease-out
+- Desktop smooth scrolling (768px and wider) stays synchronized with scroll-triggered motion: line reveals, the pinned services throw, nav theme sync, and parallax keep locked to scroll position without visible lag or desync as the page settles
 - The nav's theme class swaps to match whichever section sits under a small probe near the top of the viewport as the page scrolls, recoloring the nav in step with the section beneath it
 - Nav link dots scale up from nothing on hover and for the current link with a slight overshoot, running transform over 0.525s with the back-ish easing cubic-bezier(0.175, 0.885, 0.32, 1.275)
 - Hovering a primary button (fine-pointer devices) slides its label upward, rotates its icon backing, translates its arrow across, and wipes the button background; each animated target transitions transform over 0.525s with the primary-motion easing cubic-bezier(0.625, 0.05, 0, 1)
 - Clicking a client deck's Next or Previous control animates the stacked flick cards to new offset/rotation/scale positions per the flick coordinate table (active 0/1 scale, +/-1 at +/-25% and +/-10deg scale 0.9, +/-2 at +/-45% and +/-15deg scale 0.8) with an elastic, springy overshoot settle running about 0.6s, and the active card's caption chips slide up into view
+- Signature interactive motion uses inertial or springy easing (button primary-motion curve, nav-dot back ease, flick elastic settle, CTA-card inertia throws) — those gestures do not start and stop on purely linear tweens
 - The client carousel keeps the active slide at scale(1) and shrinks neighboring slides to scale(0.94), transitioning over roughly 600ms
 - Hero case thumbnails drift on continuous 12–15 second bottom-to-top loops in left and right zones, fading in at the start and out near the top of each loop
 - The Organic views and Likes counters tick upward continuously beginning about half a second after load
@@ -79,22 +85,23 @@ End-to-end flows with tracked state (every step names its visible evidence):
 - The cookie banner eases into view shortly after load; the mobile lime menu slides in from the top when opened
 - Hover feedback is required on interactive chrome: buttons, nav links, locale options, form controls (focus ring), and carousel controls all give a visible hover/focus response
 - The footer's brand lettermark animates its individual letters into place
-- With prefers-reduced-motion set, the load veil, line reveals, thumbnail drift loops, counter ticking easing, and inertia throws are suppressed or reduced to instant state changes while every section, control, and piece of content remains visible and reachable
 </motion>
 
 <responsiveness>
-- Smooth (inertial) scrolling is active on viewports 768px and wider and is disabled below 768px, where native scrolling applies
+- Smooth (inertial) scrolling is active on viewports 768px and wider and is disabled below 768px, where native scrolling applies; below 768px touch scrolling keeps native platform physics and is not hijacked
 - On narrow viewports (about 479px and below) the centered nav links are replaced by a hamburger button; tapping it opens a full-screen lime menu and locks page scrolling until it is closed
-- The fluid type scale tracks the viewport: the hero H1 measures about 62.8px at 1440, 76px at 991, 60px at 767, and 52px at 479, with no abrupt size jumps between breakpoints
+- The fluid type scale tracks the viewport: the hero H1 measures about 62.8px at 1440, 76px at 991, 60px at 767, and 52px at 479, with no abrupt size jumps between breakpoints; at about 479px the hero re-composes (lettermark and content stack tighter) rather than merely shrinking a desktop layout
 - On wide and tablet viewports the full centered nav is shown; below roughly 479px the type scale tightens alongside the hamburger navigation
 - No content clips or overflows the viewport and no horizontal scrollbar appears at 1440, 768, or 479 widths
 </responsiveness>
 
 <accessibility>
+- Markup stays HTML-first: landmarks (nav, main, footer), real headings, buttons, and labelled form controls — interactive chrome is not anonymous divs without roles
 - Every interactive control — nav links, locale options, deck and carousel controls, video player buttons, form fields, cookie banner actions — is reachable and operable with the keyboard alone, and buttons reveal a visible focus outline on keyboard focus
+- Text and control labels meet WCAG AA contrast against their surfaces, including lime headings on black media bands, near-black body on off-white, and white text on dark-grey/chrome footer and cookie surfaces
 - The contact popup behaves as a modal dialog: focus moves into it when opened, stays trapped while it is open, and returns to the triggering control when it closes
 - Contact form validation errors and the success state are exposed to assistive technology as well as shown visually
-- Split and letter-assembled headings (the hero H1 reveals and the brand lettermark) keep their full text accessible: the container carries the complete phrase while the per-line or per-letter fragments are hidden from the accessibility tree, and the lettermark carries an accessible label reading Hildén & Kaira
+- Split and letter-assembled headings keep their full text accessible: split heading containers carry the complete phrase as an accessible name while per-line fragments are hidden from the accessibility tree, and the brand lettermark carries an accessible label reading Hildén & Kaira with per-letter fragments hidden or decorative
 - The video player's play/pause, mute, fullscreen, and timeline controls carry accessible labels
 - While the mobile full-screen menu is open, background scrolling stays locked and the menu can be closed from the keyboard
 </accessibility>
@@ -120,12 +127,13 @@ Delivery and behavioral contracts:
 - The contact form must POST to a local API route within the app and reveal the app's own success state on success; it must never call an external form endpoint
 - Video must be served locally with HTTP range support (206 Partial Content) so the player timeline can seek and scrub
 - Domain state lives in in-memory client state only: the locale label, the active flick-deck index per client, the client carousel position, the contact form's validation and success state, the cookie consent visibility and category toggles, the live counters, the active video's play/seek state, the nav's per-section theme, and the mobile menu open/scroll-lock state. Do not use localStorage, sessionStorage, or any other browser storage API
-- Scope is the homepage only, in English only; other nav destinations and the /fi locale are present, clickable chrome with no working destination — the locale dropdown updates its label but /fi need not resolve to a page
-- Seed the five client decks, the services trio, at least five testimonials, and the four cookie categories so every section is non-empty on first load
+- Homepage-only scope in English only: implement the single route /; other nav destinations, case/service/about targets, and the /fi locale are present as clickable chrome with no working destination page — the locale dropdown updates its label but choosing FI must not navigate away from /, and no second marketing page is built
+- Express colors as three-tier CSS custom properties (swatch tokens, theme role tokens, component consumption) so section theme swaps recolor through shared tokens rather than scattered literal hex
+- Seed the five client decks, the services trio, at least five testimonials, the about band, and the four cookie categories so every section is non-empty on first load
 - The counters must animate upward from below their seeded totals; the flick deck must reshuffle only via its Previous/Next (or card) controls; the carousel must keep exactly one centered active slide
 - Ship original placeholder marks for all five clients and exactly two original placeholder case videos reused across the deck's slots rather than referencing nonexistent files
-- No backend beyond the local contact endpoint, and no authentication; all navigation stays in-app with no full page reloads
-- This is a pixel-fidelity build: match exactly the computed theme colors (lime #ecfdad, turquoise #3fae86, red #ff4545, near-black #181818, off-white #eae9e6, dark-grey #2b2b2b), all verbatim copy, the section order, the theme-per-section mapping, the breakpoint behaviors (hamburger only at 479 and below; smooth scroll 768 and up), the flick coordinate table, the carousel scale ratio (1 / 0.94), and the bundled faces' weights and type tiers. Font antialiasing, exact px at odd viewports (the fluid type scale makes px viewport-dependent), subpixel positions, and the deterministic-but-looping hero thumbnail positions only need to match closely
+- No backend beyond the local contact endpoint, and no authentication; all navigation stays on the homepage with no full page reloads and no outbound navigation from chrome links
+- This is a pixel-fidelity build: match exactly the computed theme colors (lime #ecfdad, turquoise #3fae86, red #ff4545, near-black #181818, off-white #eae9e6, dark-grey #2b2b2b), all verbatim copy (including the hero lead), the section order (hero, statement, client deck, services, testimonials, about/self-esteem, CTA, footer), the theme-per-section mapping, the breakpoint behaviors (hamburger only at 479 and below; smooth scroll 768 and up), the flick coordinate table, the carousel scale ratio (1 / 0.94), and the bundled faces' weights and type tiers. Font antialiasing, exact px at odd viewports (the fluid type scale makes px viewport-dependent), subpixel positions, and the deterministic-but-looping hero thumbnail positions only need to match closely
 </requirements>
 
 <integrity>

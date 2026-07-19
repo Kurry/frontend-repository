@@ -1,0 +1,126 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "hover_system_present"
+description = "While actually hovering with the pointer, buttons ease background and shadow with a slight press effect on activation, rail entries, criterion rows, and history entries take a full-width hover wash, chips lift subtly, and form controls show focus rings — verified via computed styles while the hover is held"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "accordion_animates_with_chevron"
+description = "Clicking a criterion accordion header animates the row open with a height transition while its chevron rotates, and clicking again animates it closed; the Grading notes disclosure animates the same way at its own level — driven through the real click path, not a state shortcut"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "list_add_remove_animate"
+description = "Submitting the Add criterion form through the UI animates the new row into the list, and completing a delete-with-major-bump animates the removed row out rather than snapping the list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "tune_bars_ease_to_new_values"
+description = "Toggling a labelled case or moving a threshold with the real controls animates the affected precision/recall/F1 bars easing to their new widths rather than jumping instantly, and flipping a verdict toggle or switching the aggregation mode animates the preview aggregate's change (count-up or eased transition) instead of a hard swap"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "dialog_enter_exit_timed"
+description = "The criterion form dialog enters and exits with a short opacity and scale transition of roughly 200 to 300 milliseconds when opened and closed via its real controls, and the diff view transitions in without a full page repaint"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "toasts_slide_and_dismiss"
+description = "After a save, delete, or copy action performed through the UI, a toast slides in, remains readable, and auto-dismisses with a fade"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion enabled, accordion, list, bar, dialog, and toast animations are removed or reduced to instant state changes while every flow (add, edit, delete, tune, preview, export) remains fully available"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.n1"
+name = "motion_missing_or_janky"
+description = "Interactive surfaces give no motion feedback at all (accordions, dialogs, and toasts snap with zero transitions and hovers produce no visible change), or animations stutter, flicker, or shift surrounding layout while running"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

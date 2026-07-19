@@ -1,63 +1,8 @@
 {
-  "frontend-workflow-daisyui-admin-dashboard": {
-    "source": "DaisyUI",
-    "instruction": "DaisyUI/instruction.md",
-    "description": "DaisyUI admin user-management dashboard good-app eval."
-  },
-  "frontend-creative-tools-daisyui-theme-generator": {
-    "source": "DaisyUI/theme-generator",
-    "instruction": "DaisyUI/theme-generator/instruction.md",
-    "description": "daisyUI theme generator good-app eval."
-  },
   "frontend-creative-tools-camera-exposure": {
     "source": "CameraExposure",
     "instruction": "CameraExposure/instruction.md",
     "description": "Camera exposure simulator good-app eval."
-  },
-  "frontend-creative-tools-design-portfolio": {
-    "source": "DesignPortfolio",
-    "instruction": "DesignPortfolio/instruction.md",
-    "description": "CLI terminal product designer portfolio good-app eval."
-  },
-  "frontend-data-tracking-finance-reports": {
-    "source": "FinanceReports",
-    "instruction": "FinanceReports/instruction.md",
-    "description": "Personal finance reports page good-app eval."
-  },
-  "frontend-creative-tools-material-ui-theme-creator": {
-    "source": "MaterialUI",
-    "instruction": "MaterialUI/instruction.md",
-    "description": "Material UI theme creator good-app eval."
-  },
-  "frontend-data-tracking-media-timeline": {
-    "source": "MediaTimeline",
-    "instruction": "MediaTimeline/instruction.md",
-    "description": "Media history timeline explorer good-app eval."
-  },
-  "frontend-creative-tools-palette-library": {
-    "source": "PaletteLibrary",
-    "instruction": "PaletteLibrary/instruction.md",
-    "description": "Fine-art color palette library good-app eval."
-  },
-  "frontend-creative-tools-shapeshift-grid": {
-    "source": "Shapeshift",
-    "instruction": "Shapeshift/instruction.md",
-    "description": "SHAPESHIFT QR color grid painter good-app eval."
-  },
-  "frontend-creative-tools-story-docs": {
-    "source": "StoryDocs",
-    "instruction": "StoryDocs/instruction.md",
-    "description": "Storyboard getting-started tutorial good-app eval."
-  },
-  "frontend-planning-trip-itinerary": {
-    "source": "TripItinerary",
-    "instruction": "TripItinerary/instruction.md",
-    "description": "French Riviera trip itinerary planner good-app eval."
-  },
-  "frontend-data-tracking-admin-analytics-dashboard": {
-    "source": "variants/AdminAnalyticsDashboard",
-    "instruction": "variants/AdminAnalyticsDashboard/instruction.md",
-    "description": "Commerce ops admin analytics dashboard variant."
   },
   "frontend-creative-tools-color-palette-archive": {
     "source": "variants/ColorPaletteArchive",
@@ -69,35 +14,95 @@
     "instruction": "variants/CssThemeBuilder/instruction.md",
     "description": "CSS theme builder variant."
   },
-  "frontend-data-tracking-expense-breakdown-reports": {
-    "source": "variants/ExpenseBreakdownReports",
-    "instruction": "variants/ExpenseBreakdownReports/instruction.md",
-    "description": "Personal finance expense breakdown reports variant."
+  "frontend-creative-tools-daisyui-theme-generator": {
+    "source": "DaisyUI/theme-generator",
+    "instruction": "DaisyUI/theme-generator/instruction.md",
+    "description": "daisyUI theme generator good-app eval."
+  },
+  "frontend-creative-tools-design-portfolio": {
+    "source": "DesignPortfolio",
+    "instruction": "DesignPortfolio/instruction.md",
+    "description": "CLI terminal product designer portfolio good-app eval."
+  },
+  "frontend-creative-tools-euroscope": {
+    "source": "Euroscope",
+    "instruction": "Euroscope/instruction.md",
+    "description": "Custom EuroScope air-traffic-client theme and icon patcher good-app eval."
   },
   "frontend-creative-tools-exposure-control-lab": {
     "source": "variants/ExposureControlLab",
     "instruction": "variants/ExposureControlLab/instruction.md",
     "description": "Camera exposure control lab variant."
   },
+  "frontend-creative-tools-frameflick": {
+    "source": "Frameflick",
+    "instruction": "Frameflick/instruction.md",
+    "description": "FrameFlick screenshot-dressing canvas compositor good-app eval."
+  },
+  "frontend-creative-tools-ghostty-config": {
+    "source": "GhosttyConfig",
+    "instruction": "GhosttyConfig/instruction.md",
+    "description": "Ghostty terminal configuration generator with live preview good-app eval."
+  },
   "frontend-creative-tools-grid-paint-studio": {
     "source": "variants/GridPaintStudio",
     "instruction": "variants/GridPaintStudio/instruction.md",
     "description": "QR color grid paint studio variant."
   },
-  "frontend-landing-l1-network-marketing": {
-    "source": "variants/L1NetworkMarketing",
-    "instruction": "variants/L1NetworkMarketing/instruction.md",
-    "description": "Layer-1 blockchain network marketing site good-app eval."
+  "frontend-creative-tools-markupflow": {
+    "source": "Markupflow",
+    "instruction": "Markupflow/instruction.md",
+    "description": "Solid.js image annotation and markup studio good-app eval."
   },
   "frontend-creative-tools-material-theme-studio": {
     "source": "variants/MaterialThemeStudio",
     "instruction": "variants/MaterialThemeStudio/instruction.md",
     "description": "Material theme design studio variant."
   },
-  "frontend-data-tracking-media-history-timeline": {
-    "source": "variants/MediaHistoryTimeline",
-    "instruction": "variants/MediaHistoryTimeline/instruction.md",
-    "description": "Media history timeline explorer variant."
+  "frontend-creative-tools-material-ui-theme-creator": {
+    "source": "MaterialUI",
+    "instruction": "MaterialUI/instruction.md",
+    "description": "Material UI theme creator good-app eval."
+  },
+  "frontend-creative-tools-mermaid-live-editor": {
+    "source": "MermaidLiveEditor",
+    "instruction": "MermaidLiveEditor/instruction.md",
+    "description": "Mermaid live diagram source editor with preview good-app eval."
+  },
+  "frontend-creative-tools-palette-library": {
+    "source": "PaletteLibrary",
+    "instruction": "PaletteLibrary/instruction.md",
+    "description": "Fine-art color palette library good-app eval."
+  },
+  "frontend-creative-tools-panecraft": {
+    "source": "Panecraft",
+    "instruction": "Panecraft/instruction.md",
+    "description": "PaneCraft mock-data dashboard builder good-app eval."
+  },
+  "frontend-creative-tools-portfolioframe": {
+    "source": "Portfolioframe",
+    "instruction": "Portfolioframe/instruction.md",
+    "description": "Resume-and-portfolio builder good-app eval."
+  },
+  "frontend-creative-tools-prompt-workbench": {
+    "source": "feature-editor-prompt-workbench PRD",
+    "instruction": "tasks/frontend-creative-tools-prompt-workbench/instruction.md",
+    "description": "Prompt workbench editor with streaming runs, variants, and library."
+  },
+  "frontend-creative-tools-rubric-studio": {
+    "source": "mercor-constellation rubric surfaces (debranded)",
+    "instruction": "tasks/frontend-creative-tools-rubric-studio/instruction.md",
+    "description": "Rubric authoring studio with version gates, tuning, and preview."
+  },
+  "frontend-creative-tools-shapeshift-grid": {
+    "source": "Shapeshift",
+    "instruction": "Shapeshift/instruction.md",
+    "description": "SHAPESHIFT QR color grid painter good-app eval."
+  },
+  "frontend-creative-tools-story-docs": {
+    "source": "StoryDocs",
+    "instruction": "StoryDocs/instruction.md",
+    "description": "Storyboard getting-started tutorial good-app eval."
   },
   "frontend-creative-tools-storyboard-tutorial": {
     "source": "variants/StoryboardTutorial",
@@ -109,15 +114,115 @@
     "instruction": "variants/TerminalPortfolio/instruction.md",
     "description": "CLI terminal product designer portfolio variant."
   },
-  "frontend-planning-travel-itinerary-planner": {
-    "source": "variants/TravelItineraryPlanner",
-    "instruction": "variants/TravelItineraryPlanner/instruction.md",
-    "description": "French Riviera trip itinerary planner variant."
+  "frontend-creative-tools-vert": {
+    "source": "Vert",
+    "instruction": "Vert/instruction.md",
+    "description": "VERT private local file converter good-app eval."
   },
-  "frontend-planning-daily-planner-board": {
-    "source": "DailyPlannerBoard",
-    "instruction": "DailyPlannerBoard/instruction.md",
-    "description": "Cadence multi-day daily planner board good-app eval."
+  "frontend-data-tracking-admin-analytics-dashboard": {
+    "source": "variants/AdminAnalyticsDashboard",
+    "instruction": "variants/AdminAnalyticsDashboard/instruction.md",
+    "description": "Commerce ops admin analytics dashboard variant."
+  },
+  "frontend-data-tracking-budget-angular": {
+    "source": "BudgetAngular",
+    "instruction": "BudgetAngular/instruction.md",
+    "description": "Native personal expense and budget tracker good-app eval."
+  },
+  "frontend-data-tracking-calibration-matrix": {
+    "source": "mercor-constellation calibration surfaces (debranded)",
+    "instruction": "tasks/frontend-data-tracking-calibration-matrix/instruction.md",
+    "description": "Model-harness calibration heatmap with variance and fairness triage."
+  },
+  "frontend-data-tracking-command-center": {
+    "source": "feature-dashboard-command-center PRD",
+    "instruction": "tasks/frontend-data-tracking-command-center/instruction.md",
+    "description": "Ops command center with KPIs, agent panel, and live activity feed."
+  },
+  "frontend-data-tracking-eval-dashboard": {
+    "source": "feature-analytics-eval-dashboard PRD",
+    "instruction": "tasks/frontend-data-tracking-eval-dashboard/instruction.md",
+    "description": "Prompt-eval suite dashboard with durable runs and score analytics."
+  },
+  "frontend-data-tracking-expense-breakdown-reports": {
+    "source": "variants/ExpenseBreakdownReports",
+    "instruction": "variants/ExpenseBreakdownReports/instruction.md",
+    "description": "Personal finance expense breakdown reports variant."
+  },
+  "frontend-data-tracking-finance-reports": {
+    "source": "FinanceReports",
+    "instruction": "FinanceReports/instruction.md",
+    "description": "Personal finance reports page good-app eval."
+  },
+  "frontend-data-tracking-ghostfolio": {
+    "source": "Ghostfolio",
+    "instruction": "Ghostfolio/instruction.md",
+    "description": "Ghostfolio wealth portfolio dashboard good-app eval."
+  },
+  "frontend-data-tracking-judge-ab-lab": {
+    "source": "harbor-score judge A/B workflow (debranded)",
+    "instruction": "tasks/frontend-data-tracking-judge-ab-lab/instruction.md",
+    "description": "Judge-config A/B lab with labeled rescores, flips, and cost analytics."
+  },
+  "frontend-data-tracking-media-history-timeline": {
+    "source": "variants/MediaHistoryTimeline",
+    "instruction": "variants/MediaHistoryTimeline/instruction.md",
+    "description": "Media history timeline explorer variant."
+  },
+  "frontend-data-tracking-media-timeline": {
+    "source": "MediaTimeline",
+    "instruction": "MediaTimeline/instruction.md",
+    "description": "Media history timeline explorer good-app eval."
+  },
+  "frontend-data-tracking-model-monitor": {
+    "source": "feature-monitor-openrouter-monitor PRD (debranded)",
+    "instruction": "tasks/frontend-data-tracking-model-monitor/instruction.md",
+    "description": "Model marketplace monitor with catalog, alerts, and cost tracking."
+  },
+  "frontend-data-tracking-plausible-analytics": {
+    "source": "PlausibleAnalytics",
+    "instruction": "PlausibleAnalytics/instruction.md",
+    "description": "Plausible privacy web-analytics dashboard good-app eval."
+  },
+  "frontend-data-tracking-release-diff": {
+    "source": "mercor-constellation dataset surfaces (debranded)",
+    "instruction": "tasks/frontend-data-tracking-release-diff/instruction.md",
+    "description": "Dataset release manager with version diffs, cuts, and rotation."
+  },
+  "frontend-data-tracking-sourcing-console": {
+    "source": "programbench sourcing-engine spec (debranded)",
+    "instruction": "tasks/frontend-data-tracking-sourcing-console/instruction.md",
+    "description": "Repository sourcing console with quotas, guards, and build queue."
+  },
+  "frontend-game-dare-night": {
+    "source": "DareNight",
+    "instruction": "DareNight/instruction.md",
+    "description": "Dare Night pass-the-device party card game good-app eval."
+  },
+  "frontend-game-fandangofury": {
+    "source": "Fandangofury",
+    "instruction": "Fandangofury/instruction.md",
+    "description": "FandangoFury side-scrolling hack-and-slash festival combat game good-app eval."
+  },
+  "frontend-game-feltrun": {
+    "source": "Feltrun",
+    "instruction": "Feltrun/instruction.md",
+    "description": "Single-player Texas hold'em poker table good-app eval."
+  },
+  "frontend-game-letterdrop": {
+    "source": "Letterdrop",
+    "instruction": "Letterdrop/instruction.md",
+    "description": "LetterDrop falling-tile canvas word game good-app eval."
+  },
+  "frontend-game-mineclash": {
+    "source": "Mineclash",
+    "instruction": "Mineclash/instruction.md",
+    "description": "Dueling minefield puzzle game good-app eval."
+  },
+  "frontend-game-repquest": {
+    "source": "Repquest",
+    "instruction": "Repquest/instruction.md",
+    "description": "RepQuest fitness-quest canvas game-sim good-app eval."
   },
   "frontend-landing-avax-network": {
     "source": "AvaxNetwork",
@@ -129,15 +234,15 @@
     "instruction": "Hildenkaira/instruction.md",
     "description": "Hilden & Kaira social-media agency homepage fidelity eval."
   },
+  "frontend-landing-l1-network-marketing": {
+    "source": "variants/L1NetworkMarketing",
+    "instruction": "variants/L1NetworkMarketing/instruction.md",
+    "description": "Layer-1 blockchain network marketing site good-app eval."
+  },
   "frontend-landing-landonorris": {
     "source": "LandoNorris",
     "instruction": "LandoNorris/instruction.md",
     "description": "Lando Norris F1 driver homepage fidelity eval."
-  },
-  "frontend-mosbyfiles": {
-    "source": "MosbyFiles",
-    "instruction": "MosbyFiles/instruction.md",
-    "description": "Mosby's Files American Modernist architecture editorial archive fidelity eval."
   },
   "frontend-landing-razorpay-sprint-26": {
     "source": "RazorpaySprint26",
@@ -159,169 +264,184 @@
     "instruction": "WolverineWorldwide/instruction.md",
     "description": "Wolverine Worldwide corporate marketing homepage fidelity eval."
   },
-  "frontend-productivity-focuspath": {
-    "source": "Focuspath",
-    "instruction": "Focuspath/instruction.md",
-    "description": "FocusPath goal decomposition and roadmap tool good-app eval."
+  "frontend-mosbyfiles": {
+    "source": "MosbyFiles",
+    "instruction": "MosbyFiles/instruction.md",
+    "description": "Mosby's Files American Modernist architecture editorial archive fidelity eval."
   },
-  "frontend-game-mineclash": {
-    "source": "Mineclash",
-    "instruction": "Mineclash/instruction.md",
-    "description": "Dueling minefield puzzle game good-app eval."
+  "frontend-planning-daily-planner-board": {
+    "source": "DailyPlannerBoard",
+    "instruction": "DailyPlannerBoard/instruction.md",
+    "description": "Cadence multi-day daily planner board good-app eval."
   },
-  "frontend-game-letterdrop": {
-    "source": "Letterdrop",
-    "instruction": "Letterdrop/instruction.md",
-    "description": "LetterDrop falling-tile canvas word game good-app eval."
+  "frontend-planning-execution-kanban": {
+    "source": "feature-task-manager-execution-kanban PRD",
+    "instruction": "tasks/frontend-planning-execution-kanban/instruction.md",
+    "description": "Execution kanban with drag/keyboard moves and durable card runs."
   },
-  "frontend-creative-tools-frameflick": {
-    "source": "Frameflick",
-    "instruction": "Frameflick/instruction.md",
-    "description": "FrameFlick screenshot-dressing canvas compositor good-app eval."
+  "frontend-planning-travel-itinerary-planner": {
+    "source": "variants/TravelItineraryPlanner",
+    "instruction": "variants/TravelItineraryPlanner/instruction.md",
+    "description": "French Riviera trip itinerary planner variant."
   },
-  "frontend-game-dare-night": {
-    "source": "DareNight",
-    "instruction": "DareNight/instruction.md",
-    "description": "Dare Night pass-the-device party card game good-app eval."
-  },
-  "frontend-productivity-lineforge": {
-    "source": "Lineforge",
-    "instruction": "Lineforge/instruction.md",
-    "description": "LineForge chess opening study app good-app eval."
-  },
-  "frontend-productivity-notenest": {
-    "source": "Notenest",
-    "instruction": "Notenest/instruction.md",
-    "description": "Nested-folder note-taking app good-app eval."
-  },
-  "frontend-game-feltrun": {
-    "source": "Feltrun",
-    "instruction": "Feltrun/instruction.md",
-    "description": "Single-player Texas hold'em poker table good-app eval."
+  "frontend-planning-trip-itinerary": {
+    "source": "TripItinerary",
+    "instruction": "TripItinerary/instruction.md",
+    "description": "French Riviera trip itinerary planner good-app eval."
   },
   "frontend-productivity-cipherlog": {
     "source": "Cipherlog",
     "instruction": "Cipherlog/instruction.md",
     "description": "CipherLog covert-transmissions memo log good-app eval."
   },
-  "frontend-productivity-tagnote": {
-    "source": "Tagnote",
-    "instruction": "Tagnote/instruction.md",
-    "description": "TagNote inline-tag note timeline good-app eval."
+  "frontend-productivity-clockcraft": {
+    "source": "Clockcraft",
+    "instruction": "Clockcraft/instruction.md",
+    "description": "Personal time-tracking productivity app with branching edit history good-app eval."
   },
-  "frontend-creative-tools-markupflow": {
-    "source": "Markupflow",
-    "instruction": "Markupflow/instruction.md",
-    "description": "Solid.js image annotation and markup studio good-app eval."
+  "frontend-productivity-focuspath": {
+    "source": "Focuspath",
+    "instruction": "Focuspath/instruction.md",
+    "description": "FocusPath goal decomposition and roadmap tool good-app eval."
   },
-  "frontend-productivity-swiftnote": {
-    "source": "Swiftnote",
-    "instruction": "Swiftnote/instruction.md",
-    "description": "Keyboard-first SwiftNote note app good-app eval."
-  },
-  "frontend-productivity-sidedock": {
-    "source": "Sidedock",
-    "instruction": "Sidedock/instruction.md",
-    "description": "SideDock color-coded workspace bookmark manager good-app eval."
-  },
-  "frontend-productivity-mindthread": {
-    "source": "Mindthread",
-    "instruction": "Mindthread/instruction.md",
-    "description": "MindThread thought-capture and idea-threading good-app eval."
-  },
-  "frontend-productivity-scribblespace": {
-    "source": "Scribblespace",
-    "instruction": "Scribblespace/instruction.md",
-    "description": "ScribbleSpace freeform infinite-canvas notes board good-app eval."
-  },
-  "frontend-creative-tools-panecraft": {
-    "source": "Panecraft",
-    "instruction": "Panecraft/instruction.md",
-    "description": "PaneCraft mock-data dashboard builder good-app eval."
-  },
-  "frontend-game-repquest": {
-    "source": "Repquest",
-    "instruction": "Repquest/instruction.md",
-    "description": "RepQuest fitness-quest canvas game-sim good-app eval."
+  "frontend-productivity-lineforge": {
+    "source": "Lineforge",
+    "instruction": "Lineforge/instruction.md",
+    "description": "LineForge chess opening study app good-app eval."
   },
   "frontend-productivity-loopdaily": {
     "source": "Loopdaily",
     "instruction": "Loopdaily/instruction.md",
     "description": "LoopDaily habit tracker with malformed-data recovery good-app eval."
   },
-  "frontend-productivity-taskgrove": {
-    "source": "Taskgrove",
-    "instruction": "Taskgrove/instruction.md",
-    "description": "TaskGrove hierarchical task-tree planner good-app eval."
-  },
-  "frontend-productivity-clockcraft": {
-    "source": "Clockcraft",
-    "instruction": "Clockcraft/instruction.md",
-    "description": "Personal time-tracking productivity app with branching edit history good-app eval."
-  },
-  "frontend-game-fandangofury": {
-    "source": "Fandangofury",
-    "instruction": "Fandangofury/instruction.md",
-    "description": "FandangoFury side-scrolling hack-and-slash festival combat game good-app eval."
-  },
-  "frontend-creative-tools-portfolioframe": {
-    "source": "Portfolioframe",
-    "instruction": "Portfolioframe/instruction.md",
-    "description": "Resume-and-portfolio builder good-app eval."
-  },
-  "frontend-creative-tools-euroscope": {
-    "source": "Euroscope",
-    "instruction": "Euroscope/instruction.md",
-    "description": "Custom EuroScope air-traffic-client theme and icon patcher good-app eval."
-  },
-  "frontend-workflow-docuseal": {
-    "source": "Docuseal",
-    "instruction": "Docuseal/instruction.md",
-    "description": "Docuseal PDF form builder and document signing workspace good-app eval."
-  },
-  "frontend-creative-tools-mermaid-live-editor": {
-    "source": "MermaidLiveEditor",
-    "instruction": "MermaidLiveEditor/instruction.md",
-    "description": "Mermaid live diagram source editor with preview good-app eval."
-  },
   "frontend-productivity-md-uy": {
     "source": "MdUy",
     "instruction": "MdUy/instruction.md",
     "description": "md.uy collaborative markdown editor good-app eval."
   },
-  "frontend-data-tracking-ghostfolio": {
-    "source": "Ghostfolio",
-    "instruction": "Ghostfolio/instruction.md",
-    "description": "Ghostfolio wealth portfolio dashboard good-app eval."
-  },
-  "frontend-data-tracking-plausible-analytics": {
-    "source": "PlausibleAnalytics",
-    "instruction": "PlausibleAnalytics/instruction.md",
-    "description": "Plausible privacy web-analytics dashboard good-app eval."
-  },
-  "frontend-creative-tools-ghostty-config": {
-    "source": "GhosttyConfig",
-    "instruction": "GhosttyConfig/instruction.md",
-    "description": "Ghostty terminal configuration generator with live preview good-app eval."
-  },
-  "frontend-creative-tools-vert": {
-    "source": "Vert",
-    "instruction": "Vert/instruction.md",
-    "description": "VERT private local file converter good-app eval."
+  "frontend-productivity-mindthread": {
+    "source": "Mindthread",
+    "instruction": "Mindthread/instruction.md",
+    "description": "MindThread thought-capture and idea-threading good-app eval."
   },
   "frontend-productivity-nostrpass": {
     "source": "Nostrpass",
     "instruction": "Nostrpass/instruction.md",
     "description": "Native local Nostr identity and key manager good-app eval."
   },
+  "frontend-productivity-notenest": {
+    "source": "Notenest",
+    "instruction": "Notenest/instruction.md",
+    "description": "Nested-folder note-taking app good-app eval."
+  },
+  "frontend-productivity-prompt-library": {
+    "source": "feature-content-manager-prompt-library PRD",
+    "instruction": "tasks/frontend-productivity-prompt-library/instruction.md",
+    "description": "Prompt library manager with versions, sources, and attachments."
+  },
+  "frontend-productivity-repository-scanner": {
+    "source": "feature-document-scanner-repository-scanner PRD",
+    "instruction": "tasks/frontend-productivity-repository-scanner/instruction.md",
+    "description": "Repository document scanner with durable scan runs and doc index."
+  },
+  "frontend-productivity-scribblespace": {
+    "source": "Scribblespace",
+    "instruction": "Scribblespace/instruction.md",
+    "description": "ScribbleSpace freeform infinite-canvas notes board good-app eval."
+  },
+  "frontend-productivity-sidedock": {
+    "source": "Sidedock",
+    "instruction": "Sidedock/instruction.md",
+    "description": "SideDock color-coded workspace bookmark manager good-app eval."
+  },
+  "frontend-productivity-swiftnote": {
+    "source": "Swiftnote",
+    "instruction": "Swiftnote/instruction.md",
+    "description": "Keyboard-first SwiftNote note app good-app eval."
+  },
+  "frontend-productivity-tagnote": {
+    "source": "Tagnote",
+    "instruction": "Tagnote/instruction.md",
+    "description": "TagNote inline-tag note timeline good-app eval."
+  },
+  "frontend-productivity-taskgrove": {
+    "source": "Taskgrove",
+    "instruction": "Taskgrove/instruction.md",
+    "description": "TaskGrove hierarchical task-tree planner good-app eval."
+  },
   "frontend-productivity-weblink": {
     "source": "Weblink",
     "instruction": "Weblink/instruction.md",
     "description": "Weblink peer-to-peer WebRTC chat and file-transfer client good-app eval."
   },
-  "frontend-data-tracking-budget-angular": {
-    "source": "BudgetAngular",
-    "instruction": "BudgetAngular/instruction.md",
-    "description": "Native personal expense and budget tracker good-app eval."
+  "frontend-workflow-agent-management": {
+    "source": "feature-orchestration-agent-management PRD",
+    "instruction": "tasks/frontend-workflow-agent-management/instruction.md",
+    "description": "Agent registry with durable work runs, timelines, and status filters."
+  },
+  "frontend-workflow-daisyui-admin-dashboard": {
+    "source": "DaisyUI",
+    "instruction": "DaisyUI/instruction.md",
+    "description": "DaisyUI admin user-management dashboard good-app eval."
+  },
+  "frontend-workflow-docuseal": {
+    "source": "Docuseal",
+    "instruction": "Docuseal/instruction.md",
+    "description": "Docuseal PDF form builder and document signing workspace good-app eval."
+  },
+  "frontend-workflow-eval-job-queue": {
+    "source": "oddish concept (debranded)",
+    "instruction": "tasks/frontend-workflow-eval-job-queue/instruction.md",
+    "description": "Cloud eval job queue monitor with provider lanes and retries."
+  },
+  "frontend-workflow-flake-triage": {
+    "source": "programbench flake-filter spec (debranded)",
+    "instruction": "tasks/frontend-workflow-flake-triage/instruction.md",
+    "description": "Test-determinism triage queue with run matrices and quarantine map."
+  },
+  "frontend-workflow-gate-console": {
+    "source": "programbench gate-engine spec (debranded)",
+    "instruction": "tasks/frontend-workflow-gate-console/instruction.md",
+    "description": "Stage-gate acceptance console with certificates and what-if mode."
+  },
+  "frontend-workflow-leak-review": {
+    "source": "programbench decontamination spec (debranded)",
+    "instruction": "tasks/frontend-workflow-leak-review/instruction.md",
+    "description": "Leak review console with similarity evidence, canaries, mutations."
+  },
+  "frontend-workflow-research-pipeline-console": {
+    "source": "OpenThoughts-Agent concept (debranded)",
+    "instruction": "tasks/frontend-workflow-research-pipeline-console/instruction.md",
+    "description": "Research pipeline console chaining datagen, training, and eval."
+  },
+  "frontend-workflow-submission-qc-queue": {
+    "source": "mercor-constellation QC surfaces (debranded)",
+    "instruction": "tasks/frontend-workflow-submission-qc-queue/instruction.md",
+    "description": "Submission QC triage queue with gates, tiers, and review actions."
+  },
+  "frontend-workflow-task-factory": {
+    "source": "SWE-gen concept (debranded)",
+    "instruction": "tasks/frontend-workflow-task-factory/instruction.md",
+    "description": "PR-to-eval-task factory dashboard with validation and trial analysis."
+  },
+  "frontend-workflow-template-forms": {
+    "source": "feature-form-builder-template-forms PRD",
+    "instruction": "tasks/frontend-workflow-template-forms/instruction.md",
+    "description": "Schema-driven prompt technique forms with preview and library."
+  },
+  "frontend-workflow-trajectory-viewer": {
+    "source": "ATIF-style viewer concept (debranded)",
+    "instruction": "tasks/frontend-workflow-trajectory-viewer/instruction.md",
+    "description": "Agent-trial trajectory viewer with timeline scrub and annotations."
+  },
+  "frontend-workflow-verifier-trajectory-viewer": {
+    "source": "ATIF-style viewer concept, verifier review (debranded)",
+    "instruction": "tasks/frontend-workflow-verifier-trajectory-viewer/instruction.md",
+    "description": "Verifier review workbench with verdicts, labels, and adjudication."
+  },
+  "frontend-workflow-workflow-builder": {
+    "source": "feature-workflow-builder-workflow-builder PRD",
+    "instruction": "tasks/frontend-workflow-workflow-builder/instruction.md",
+    "description": "Node-graph workflow builder with durable executions and timelines."
   }
 }

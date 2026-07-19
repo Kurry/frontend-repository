@@ -1,0 +1,204 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_jobs_table_complete"
+description = "On load, the Jobs view shows at least 10 seeded jobs, each row with a job id, dataset name, agent name, model name, trial count, a status of queued, running, completed, failed, or cancelled, a progress readout of n of m trials, and a submitted time; the seed includes at least two running, two completed, one failed, one queued, and one cancelled job"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "filters_combine_and_clear"
+description = "Filter controls narrow the jobs table by status, by model, and by dataset; applying two filters together shows only jobs matching both, and clearing the filters restores the full table exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "live_simulation_advances_progress"
+description = "While the app is open with no user interaction, a running job's completed-trial count visibly increases over time and its n of m progress readout tracks the count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "job_detail_trial_grid"
+description = "Selecting a job opens its detail without a full page reload, showing a per-trial grid where each trial shows its id, status, reward value when complete, duration, and retry count, with statuses distinguished by a consistent color treatment plus a readable label"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "failed_trial_backoff_retry"
+description = "A failed trial with automatic retries remaining shows an error category chip, an automatic-retry indicator with its attempt count, and a backoff countdown that visibly counts down in seconds; when the countdown reaches zero the trial flips back to running"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "manual_retry_single_trial"
+description = "A trial that exhausted its automatic retries stays failed with its final attempt count, and activating its manual retry control returns only that trial to running while every other trial's status and results remain unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "provider_lanes_panel"
+description = "The provider lanes panel shows at least 3 fictional providers, each lane with its current queue depth, its in-flight trial count, and a rate-limit chip reading exactly one of normal, throttled, or paused"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "throttled_lane_slows_and_queue_positions"
+description = "A throttled lane's jobs advance visibly more slowly than a normal lane's jobs over the same observation window, and queued jobs display their position within their lane's queue"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "pause_resume_checkpoint"
+description = "Pausing a lane through its confirm toggle freezes that lane's running trials at their checkpoint (completed counts and durations stop advancing while paused), and resuming continues the same trials from the same counts, with already-completed trials never re-running and their results never changing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "submit_form_bounds_validation"
+description = "The submit-job form offers dataset, agent, and model selects and a trial count field accepting only whole numbers from 1 to 10; a value of 0, 11, or non-numeric shows an inline message naming the trial count field and its allowed range while the submit control stays disabled, and missing selects show messages naming each missing field with no job created"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "valid_submit_enqueues_job"
+description = "Submitting the form with valid values creates exactly one new job that appears with status queued in both the jobs table and the chosen model's provider lane, without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "sweep_creates_job_per_model"
+description = "Submitting once with a sweep model also chosen creates one job per selected model, each appearing in its own model's lane, and the jobs table row count increases by exactly the number of models chosen"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "config_preview_derives_live"
+description = "The configuration preview panel renders a structured, YAML-like text block that updates immediately when any form field changes, and its copy control places the exact preview text on the clipboard with visible confirmation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "mean_reward_chart_interactive"
+description = "The aggregates view renders mean reward per model across completed jobs as grouped bars — hovering a bar with the real pointer shows a tooltip with the underlying value, and toggling a model's series in the legend hides and then restores that series without a reload — and shows a total cost figure that increases as running jobs complete more trials during the session"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "completions_timeline_filterable"
+description = "The completions event timeline lists ordered, timestamped entries for job and trial completions, gains entries as the simulation completes work, supports filtering by status, and restores the full list when the filter is cleared"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "cancel_confirm_keeps_results"
+description = "Activating cancel on a queued or running job asks for confirmation; confirming flips the job to cancelled and stops its progress while its already-completed trials keep their reward and duration values visible in the detail, and declining leaves the job unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "double_submit_and_empty_states"
+description = "Rapidly double-activating the submit control creates exactly one job (or exactly one per sweep model), and filters that match no jobs show an empty state message with a control that clears the filters"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "progress_frozen_static"
+description = "Running jobs are static markup: over a full observation window no running job's completed-trial count, progress readout, or lane in-flight count ever advances without user interaction"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.20"
+name = "aggregates_hardcoded"
+description = "Aggregate surfaces are hardcoded: the mean-reward bars, total cost figure, or lane queue depths render exactly the same values after new jobs are submitted and trials complete as before"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

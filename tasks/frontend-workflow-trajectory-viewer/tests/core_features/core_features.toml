@@ -1,0 +1,190 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_catalog_and_task_page"
+description = "On load, the task catalog lists exactly 3 seeded benchmark tasks, each showing a task name, a one-line description, a trial count of 3, and a best-reward value; selecting a task opens its page with the instruction text rendered as formatted rich text, a config summary panel, a reference environment file tree, and a test listing with at least 3 named tests"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "trial_table_columns_complete"
+description = "The task page lists all 3 of that task's trials in a comparison table whose columns include model (fictional model names, no real vendor or product names), reward shown as a number between 0 and 1 with two decimals, a pass or fail outcome, duration, and step count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "reward_sort_reversal"
+description = "Scripted probe: click the reward column header and note the row order, then click it again; the second order is the reverse of the first relative to the reward values, proving the sort derives from live data rather than fixed markup"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "filesystem_toggle_swaps_tree"
+description = "Activating the two-position toggle above the file tree swaps the visible tree between the reference filesystem and the selected trial's final agent filesystem without a full page reload, the two trees differ in content, and the active side is visibly indicated at all times"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "ingest_checklist_then_viewer_header"
+description = "Clicking a trial row first shows a simulated ingest checklist of at least 4 items that tick complete one by one with per-item status icons and an overall progress indicator, then opens the trial viewer whose header strip shows that trial's model name, reward, pass or fail badge, and duration matching its table row"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "timeline_mixed_step_types"
+description = "The trial timeline lists at least 12 ordered steps, includes at least one reasoning, one tool call, one observation, one terminal output, and one screenshot step, and each entry shows a step index, a type glyph, a one-line summary, a timestamp, and a status marker; in the trial seeded with a failed step, that step shows an error status in the timeline and an error-styled output in its tool invocation panel while the viewer remains fully functional"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "click_step_syncs_all_panes"
+description = "Clicking any timeline entry highlights that entry as active and updates both the center file workspace and the right rail step detail to that step's content in the same interaction, without a page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "keyboard_and_scrubber_navigation"
+description = "With the timeline focused, pressing the arrow keys moves the active step to the previous or next step with the newly active entry scrolled into view and the other panes following; dragging the scrubber updates the active step continuously while the handle moves, not only on release"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "badge_accumulation_probe"
+description = "Scripted probe: activate an early step and record which files carry Added/Modified/Deleted/Truncated badges, advance several steps and confirm badges accumulate for newly changed files, then step backward and confirm the badge set recomputes so it reflects only changes at or before the now-active step"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "file_renderers_by_type"
+description = "Selecting files in the tree renders each by type: a markdown file as formatted rich text (headings/lists, not raw markup), a code file in a monospaced block with syntax-aware coloring, a visible language label, and a copy control that shows visible confirmation and places the exact text on the clipboard, an image file scaled to fit its pane, and a tabular data file as a grid with column headers; a file badged Deleted shows a deleted-file notice instead of stale content"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "terminal_streaming_and_follow"
+description = "Activating a step with terminal output renders the output progressively (text appears incrementally) with a status affordance distinguishing streaming from complete; while streaming, the panel auto-follows the latest line, scrolling up pauses following and reveals a jump-to-latest control, and activating that control resumes following"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "annotation_round_trip_probe"
+description = "Scripted probe: activate a late step, submit a note through the annotate control, confirm the note appears immediately in the annotations list with that step's index, navigate to an early step, click the note, and confirm the timeline highlight, center workspace, and right rail all jump to the annotated step; the note's remove control then deletes exactly that note"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "forms_inline_validation"
+description = "Submitting the note form with an empty note shows an inline message naming the note field and attaches nothing; submitting the classification form with any select unset or evidence text shorter than 20 characters shows inline per-field messages naming each invalid field and creates no report card"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "classification_report_links_jump"
+description = "Submitting a valid failure classification renders a report card showing all four chosen classifications (stage, root cause, behavior, impact), the evidence text, and one link per implicated step; clicking an implicated-step link jumps the viewer to that step, and re-submitting the form updates the existing card in place"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "reasoning_disclosure_remembers_state"
+description = "The reasoning region on a step is collapsed by default, expands and collapses on activation, and after expanding it on one step, navigating away and back shows that step's reasoning still expanded while other steps remain collapsed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "static_viewer_no_sync"
+description = "Clicking timeline entries changes the highlight but the center file workspace or right rail content stays the same for different steps — the viewer is static markup rather than synchronized shared state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.18"
+name = "double_submit_duplicates_report"
+description = "Rapidly double-activating the classification submit control produces two or more report cards on the trial"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

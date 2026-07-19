@@ -62,8 +62,8 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
-description = "Clicking an architect tag opens the folder with a three-dimensional rotateY cover rotation and position morph revealing the sheet, not a flat opacity crossfade; the opened cover computes a matrix3d transform (rotateY) with a transition of transform 0.8s cubic-bezier(0.33, 1, 0.68, 1)"
+name = "folder_open_3d_rotatey_inertial"
+description = "Clicking an architect tag opens the folder with a three-dimensional rotateY cover rotation and position morph revealing the sheet, not a flat opacity crossfade; the opened cover computes a matrix3d transform (rotateY) with a transition of transform 0.8s cubic-bezier(0.33, 1, 0.68, 1) inertial easing"
 type = "binary"
 weight = 1.0
 
@@ -76,42 +76,42 @@ weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
+name = "stack_cover_hover_and_unfold"
 description = "Hovering a home category group lifts and rotates its cover and rotates its chevron; unfolding a group animates its expansion"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "4_4"
+name = "architect_tag_hover_lift"
 description = "Hovering a real architect tag lifts it upward via a translateY transform toward -10px with a drop shadow"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "4_5"
+name = "about_nav_and_close_hover"
 description = "Hovering the About navigation item raises its opacity from a rest value of 0.8 toward 1 (opacity 0.65s transition), and the circular close button computes a scale(0.970) transform on hover over a transform 0.325s transition with its icon scaling"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "4_6"
+name = "about_gallery_crossfade"
 description = "The About gallery crossfades between its photographs, the images computing a transition of opacity 0.65s cubic-bezier(0.33, 1, 0.68, 1), with the active caption at full opacity and inactive captions hidden"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.7"
-name = "4_7"
+name = "scrapbook_drag_motion"
 description = "Scrapbook notes and photographs can be dragged with the pointer and stay at their released position"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.8"
-name = "4_8"
+name = "media_popup_enter_leave_motion"
 description = "Media popups enter and leave with a fading dimmed background, a rising info box, fading media, and a close button that scales up from a smaller size"
 type = "binary"
 weight = 0.5
@@ -119,7 +119,7 @@ optional = true
 
 [[criterion]]
 id = "4.9"
-name = "4_9"
+name = "sibling_folder_next_reentry"
 description = "Clicking a sibling tag animates a folder-next re-entry with the architect name re-splitting into characters and the folder and sheet re-entering"
 type = "binary"
 weight = 0.5
@@ -127,7 +127,7 @@ optional = true
 
 [[criterion]]
 id = "4.10"
-name = "4_10"
+name = "wind_rose_and_header_scroll_hide"
 description = "The wind roses rotate continuously as ambient motion via a keyframe animation of 40s infinite iteration, and the fixed header hides on scroll-down and returns on scroll-up on the home route while staying forced-hidden on About"
 type = "binary"
 weight = 0.5
@@ -135,7 +135,7 @@ optional = true
 
 [[criterion]]
 id = "4.11"
-name = "4_11"
+name = "folder_open_flat_opacity_only"
 description = "The folder open and close is a flat opacity fade with no three-dimensional rotateY rotation or Flip-style morph"
 type = "binary"
 weight = 1.0
@@ -143,7 +143,7 @@ negate = true
 
 [[criterion]]
 id = "4.12"
-name = "4_12"
+name = "scrapbook_items_not_draggable"
 description = "Scrapbook items are static and cannot be dragged with the pointer"
 type = "binary"
 weight = 1.0
@@ -151,7 +151,7 @@ negate = true
 
 [[criterion]]
 id = "4.13"
-name = "4_13"
+name = "hover_feedback_missing"
 description = "Hover feedback is missing on architect tags, the navigation item, and the stack covers, so the interface feels static on pointer hover"
 type = "binary"
 weight = 1.0
@@ -160,7 +160,7 @@ negate = true
 [[criterion]]
 id = "4.14"
 name = "case_open_reveals_name_tags_scrapbook"
-description = "After clicking a real architect tag to open a case, the architect name reveals character by character with a horizontal stagger, the sibling tags rise into view, and the scrapbook items rise from below while fading in"
+description = "After clicking a real architect tag to open a case, the folder-open sequence runs as one orchestrated timeline: the cover rotates open, then the architect name reveals character by character with a horizontal stagger, then sibling tags rise into view, then scrapbook items rise from below while fading in — not four unrelated simultaneous fades"
 type = "binary"
 weight = 1.0
 
@@ -199,6 +199,28 @@ name = "reduced_motion_collapses_timelines"
 description = "With prefers-reduced-motion emulated and a fresh load, smooth scrolling is disabled and the folder open/close and hero split timelines collapse to their end state immediately while all text remains readable at essential opacity"
 type = "binary"
 weight = 0.5
+
+[[criterion]]
+id = "4.20"
+name = "smooth_scroll_inertia_and_transition_freeze"
+description = "On desktop, continuous wheel or trackpad scrolling eases with inertia and settles naturally after input stops; during a real folder-open, folder-close, or sibling-navigation transition the smooth-scroll driver freezes and then unfreezes so scroll position does not fight the folder morph"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.21"
+name = "overscroll_synced_to_scroll_driver"
+description = "Triggering the overscroll affordance through real scrolling lifts the folder as scroll-linked motion synchronized with the same smooth-scroll driver used on the case route, rather than a disconnected timer snap"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.22"
+name = "signature_motion_uses_linear_tweens"
+description = "The folder-open cover rotation or the hero split reveal uses purely linear easing that starts and stops at constant speed with no inertial settle"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "4.catchall"

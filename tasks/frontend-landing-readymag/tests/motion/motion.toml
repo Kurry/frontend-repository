@@ -62,56 +62,56 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
-description = "On load the hero title, subtitle, and CTA row rise upward from 24px and fade in; getAnimations reports duration 800ms with delays 0ms, 80ms, and 160ms (grade by loading and reading getAnimations, not a static snapshot)"
+name = "hero_intro_timeline_stagger"
+description = "On a fresh load the hero title, subtitle, and CTA row rise upward from 24px and fade in as one orchestrated intro timeline; getAnimations reports duration 800ms with inertial easing cubic-bezier(.56,.86,.59,1) and delays 0ms, 80ms, and 160ms (grade by loading and reading getAnimations, not a static snapshot)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
+name = "feature_card_scroll_reveal"
 description = "Scrolling the workflow section into view triggers the four feature cards to fade and rise from translateY(28px); computed transition is opacity 0.45s cubic-bezier(.56,.86,.59,1), transform 0.45s cubic-bezier(.56,.86,.59,1), staggered ~80ms per card (grade via the real scroll-into-view path, not a state shortcut)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
+name = "hero_gallery_offset_path_marquees"
 description = "The three hero gallery rows travel continuously along CSS offset-path motion (offset-distance ending at 1496px, 1655px, 1696px; getAnimations reports linear infinite durations ~40s/46s/52s) and loop seamlessly"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.4"
-name = "3_4"
+name = "lower_marquee_offset_path"
 description = "The lower use-case marquee row travels along path('M 0 40 L 2000 40') from 0px to 1496px; getAnimations reports a linear infinite duration of 28000ms"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "3_5"
+name = "slideshow_timed_opacity_advance"
 description = "Letting the six-image slideshow run advances the active (opacity 1.0) frame every ~2200ms while neighbors stay at 0.35, with computed slide transition opacity 0.35s ease-in-out (grade by observing the timed advance, not a WebMCP shortcut)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.6"
-name = "3_6"
+name = "support_orb_path_travel"
 description = "The orange support orb travels along path('M 0 0 C 120 80, 240 -40, 480 60 S 820 20, 960 80') across ~1561px; getAnimations reports a linear infinite duration of 18000ms"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.7"
-name = "3_7"
+name = "usecase_tile_hover_tilt_scale"
 description = "Hovering a use-case tile with the real pointer rotates it -2deg and scales it to 1.02 (grade by hovering the actual tile)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.8"
-name = "3_8"
+name = "primary_button_hover_lift_orange"
 description = "Hovering a primary/CTA button with the real pointer lifts it 1 to 2px and shifts its background from #282828 toward orange (grade by hovering the actual button)"
 type = "binary"
 weight = 0.5
@@ -119,7 +119,7 @@ optional = true
 
 [[criterion]]
 id = "3.9"
-name = "3_9"
+name = "feature_cards_pre_revealed"
 description = "The four feature cards appear already in their final state with no reveal animation when their section scrolls into view"
 type = "binary"
 weight = 1.0
@@ -127,7 +127,7 @@ negate = true
 
 [[criterion]]
 id = "3.10"
-name = "3_10"
+name = "hover_produces_no_feedback"
 description = "Hovering a use-case tile or a primary button with the real pointer produces no visible transform, lift, or color change"
 type = "binary"
 weight = 1.0
@@ -150,9 +150,31 @@ weight = 1.0
 [[criterion]]
 id = "3.13"
 name = "hello_accent_reveal_600ms"
-description = "On a fresh load the \"Hello!\" accent reveals with the same rise-and-fade treatment as the hero copy at a measured duration of about 600ms (grade on a fresh load via getAnimations, not a static snapshot)"
+description = "On a fresh load the \"Hello!\" accent reveals with the same rise-and-fade treatment as the hero copy at a measured duration of about 600ms with inertial cubic-bezier(.56,.86,.59,1) easing (grade on a fresh load via getAnimations, not a static snapshot)"
 type = "binary"
 weight = 0.5
+
+[[criterion]]
+id = "3.14"
+name = "signature_marquees_cursor_tilts"
+description = "On a fine-pointer desktop viewport the signature ambient motion is present together: the three hero gallery offset-path marquees travel continuously, the 43px custom cursor follows the pointer and swaps on interactive targets, and the floating media card plus Ready/? accents run their tilt animations"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.15"
+name = "native_scroll_not_hijacked"
+description = "Continuous wheel/trackpad scrolling from the top of the homepage to the footer advances native document scroll position freely, the sticky header remains stuck to the top while scrolling, and scrolling is never trapped, reversed, or replaced by a full-page scroll capture that prevents reaching later sections"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.16"
+name = "reveal_easings_are_pure_linear"
+description = "The hero intro rise/fade and the feature-card scroll reveal use purely linear timing functions with no inertial cubic-bezier easing (marquees and path travels may remain linear)"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "3.catchall"

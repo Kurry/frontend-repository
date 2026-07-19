@@ -1,0 +1,119 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "hover_feedback_on_chrome"
+description = "Hovering with the real pointer shows visible feedback: buttons ease background and shadow with a slight press effect, run rows, gate rows, and registry rows take a full-width hover wash, and form controls show focus rings (verify via computed styles while hovering)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "gate_disclosure_animates"
+description = "Clicking a gate row with the real pointer animates the evidence area open with a short height-plus-opacity transition and rotates the chevron, and collapsing reverses it, rather than snapping open and closed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "rerun_progress_animates"
+description = "During a re-run started from the real re-run control (never a state-shortcut tool call), each gate's status icon visibly transitions as it changes state and the overall progress indicator advances smoothly rather than jumping between states"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "banners_toasts_timeline_motion"
+description = "The what-if and rejection banners slide in with a short transition, feedback toasts (copy confirmation, note added) slide in, remain readable, and auto-dismiss with a fade, and a new timeline entry animates into the list rather than appearing instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "certificate_dialog_transition"
+description = "Opening the certificate view through its real control enters with a short opacity-plus-scale transition of roughly 200 to 300 milliseconds and exits the same way"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion set, animations are removed while every state change (disclosures, re-run results, banners, toasts) still applies instantly and completely"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n1"
+name = "snapping_or_janky_transitions"
+description = "Interactive chrome gives no motion feedback at all — disclosures, banners, dialogs, and toasts snap with no transitions anywhere — or animations cause visible layout jank or flicker that disrupts reading the checklist"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

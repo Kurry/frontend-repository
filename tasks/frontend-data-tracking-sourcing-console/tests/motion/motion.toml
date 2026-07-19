@@ -1,0 +1,119 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "hover_feedback_on_chrome"
+description = "Hovering with the real pointer over buttons, table rows, queue entries, navigation items, and quota cells shows a visible hover treatment (wash, shadow, or background ease), and form controls show focus rings"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "list_add_remove_microinteractions"
+description = "Driven through the real UI controls (never a state-shortcut tool call): a fetch-more candidate row animates into the table, a newly queued entry animates into the build-queue panel, and a removed queue entry animates out rather than vanishing instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "queue_reorder_slides_entries"
+description = "Reordering the queue by real drag or by the keyboard move controls animates entries sliding to their new positions rather than snapping, and position numbers settle correctly after the animation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "progress_steps_animate"
+description = "During a real fetch-more run, each progress step visibly transitions from pending to running to complete, the running step shows an animated activity indicator, and the completed run's notice appears with a transition"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "chip_transitions_and_toasts"
+description = "Status chip changes transition their color rather than hard-swapping; the pin confirm dialog enters and exits with a short opacity and scale transition of roughly 200 to 300 milliseconds through the real controls; and after pinning, queueing, and copy actions a confirmation toast slides in, remains readable long enough to scan, and auto-dismisses with a fade"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion enabled, transitions are removed and state changes apply instantly while dialogs, reorders, runs, and filters remain fully functional"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "static_chrome_no_hover_feedback"
+description = "Interactive chrome feels static: buttons, rows, or navigation items show no visible hover or press feedback under the real pointer"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction performed, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

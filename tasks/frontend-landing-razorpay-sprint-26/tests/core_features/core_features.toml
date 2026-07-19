@@ -84,7 +84,7 @@ weight = 1.0
 [[criterion]]
 id = "1.4"
 name = "nav_links_scroll_sections"
-description = "Clicking the 01.AGENTIC STACK segment nav link scrolls #agentic-stack into view; clicking each of the six links (#agentic-stack, #international, #payment-gateway, #D2C, #Marketers, #finance) scrolls that section in and marks its nav cell active, and clicking the wordmark returns to the hero (#Hero)."
+description = "Clicking the 01.AGENTIC STACK segment nav link scrolls #agentic-stack into view on the same /sprint/26 document without loading a different HTML page; clicking each of the six links (#agentic-stack, #international, #payment-gateway, #D2C, #Marketers, #finance) scrolls that section in and marks its nav cell active, and clicking the wordmark returns to the hero (#Hero)."
 type = "binary"
 weight = 1.0
 

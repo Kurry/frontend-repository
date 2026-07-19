@@ -62,14 +62,14 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "2.1"
-name = "2_1"
+name = "canvas_and_surface_colors"
 description = "By computed style, the support band and footer backgrounds are rgb(40, 40, 40) with rgb(255, 255, 255) text, the body background is rgb(255, 255, 255), and body text is rgb(40, 40, 40) (EXACT color match; CLOSE only for antialiasing)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
-name = "2_2"
+name = "usecase_tile_exact_colors"
 description = "By computed style, the six use-case tiles render color rgb(255, 255, 255) text on their EXACT backgrounds: Portfolios rgb(255,136,186) #FF88BA, Landing pages rgb(255,203,0) #FFCB00, Editorials rgb(0,139,255) #008BFF, Company websites rgb(166,166,166) #A6A6A6, Design studios rgb(74,172,84) #4AAC54, by Readymag team rgb(236,82,11) #EC520B, each with border-radius 16px"
 type = "binary"
 weight = 1.0
@@ -83,14 +83,14 @@ weight = 1.0
 
 [[criterion]]
 id = "2.4"
-name = "2_4"
-description = "Primary orange (#FF6600) and secondary orange (#EC520B) appear on brand accents such as the \"Hello!\" accent, the support-band emphasis, and button hover states"
+name = "orange_and_purple_accents"
+description = "Primary orange #FF6600 (rgb(255, 102, 0)) appears on the \"Hello!\" accent and support-band emphasis, secondary orange #EC520B appears among brand accents such as button hover and the by-Readymag-team tile, and the Ready/? cluster uses purple #7A24FF (rgb(122, 36, 255))"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.5"
-name = "2_5"
+name = "media_card_and_slide_geometry"
 description = "By computed style, the floating hero media card has border-radius 24px and box-shadow rgba(0,0,0,0.12) 0px 24px 80px, and each slideshow frame measures 276px by 180px with border-radius 12px"
 type = "binary"
 weight = 0.5
@@ -98,28 +98,28 @@ optional = true
 
 [[criterion]]
 id = "2.6"
-name = "2_6"
-description = "The desktop composition presents the sections in order (hero, workflow with cards and slideshow, use-case tiles, dark support band, marquee, closing CTA, footer) with a coherent spacing rhythm on the 1024px design"
+name = "section_order_spacing_rhythm"
+description = "The desktop composition presents the sections in order (hero, workflow with cards and slideshow, use-case tiles, dark support band, marquee, closing CTA, footer) with a coherent 4px-baseline spacing rhythm on the 1024px design (about 28px horizontal padding and 96px section vertical padding)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.7"
-name = "2_7"
-description = "All rendered copy matches the PRD exactly with no invented claims (headline, subtitle, feature titles and bodies, tile labels, support and closing copy)"
+name = "copy_matches_prd_exactly"
+description = "All rendered copy matches the PRD exactly with no invented claims (headline, subtitle, feature titles and bodies including the Attract card's \"Lottie\" wording, tile labels, support and closing copy)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.8"
-name = "2_8"
+name = "mobile_390_visual_coherence"
 description = "At the mobile viewport (about 390px) the page keeps a coherent visual system: readable type hierarchy, correct colors, and proportional spacing with no clipped or overlapping content"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.9"
-name = "2_9"
+name = "usecase_tiles_gray_or_nonwhite"
 description = "The use-case tiles render as gray or placeholder boxes instead of their six specified hex colors, or their text is not white"
 type = "binary"
 weight = 1.0
@@ -167,6 +167,28 @@ negate = true
 id = "2.15"
 name = "placeholder_or_typo_copy_present"
 description = "Lorem ipsum, TODO, or template placeholder text appears somewhere on the page, or prominent copy (headline, section headings, buttons, footer labels) contains spelling errors or casing inconsistent with the mandated strings"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.16"
+name = "asymmetric_hero_broken_grid"
+description = "At desktop width the hero reads as an asymmetric broken-grid composition: a multi-row gallery band above a left-biased headline/CTA stack, a floating media card overlapping the right side of the hero, and an oversized Hello!/Ready/? accent cluster that breaks the section rhythm below the CTA — not a centered equal-column stack"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.17"
+name = "color_scarcity_accent_rule"
+description = "Orange and purple stay scarce accents: orange is limited to Hello!, support emphasis/orb, and primary-button hover (plus categorical tile use where specified); purple appears on the Ready/? cluster; large page regions are not flooded with orange or purple fills"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.18"
+name = "accent_colors_sprayed_as_washes"
+description = "Orange or purple is used as a large page-wide background wash or repeated fill across multiple unrelated sections, breaking the scarce-accent rule"
 type = "binary"
 weight = 1.0
 negate = true

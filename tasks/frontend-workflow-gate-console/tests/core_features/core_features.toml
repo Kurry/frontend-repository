@@ -1,0 +1,197 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_runs_and_stage_strip"
+description = "On load, the run list shows at least 6 seeded runs without pagination, each row with a run identifier, a submitted-at label, and a 5-stage strip in the fixed order Source, Build, Test Generation, Hardening, Publish, with segments colored by status and a visible status legend; the seed includes at least one fully passed run, one run rejected at an intermediate stage, and one run with pending stages"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "run_selection_opens_detail"
+description = "Clicking a run row opens that run's detail view (stage strip, chain, timeline) without a full page navigation, and the selected row stays visibly highlighted in the run list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "stage_gate_checklist_anatomy"
+description = "Opening a stage from a run's detail shows a gate checklist of 6 to 10 gates, each row with a gate identifier, a human-readable name, a severity chip reading S1, S2, or S3, and a visible pass or fail state; activating a gate row expands an evidence detail string beneath it and activating again collapses it, with at least two rows expandable at the same time"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "failed_hard_gate_rejects_stage"
+description = "For a stage whose recorded results include a failed S1 gate, the stage is marked rejected and a rejection banner at the top of the stage detail names every failing hard gate by identifier and name"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "aggregation_mode_and_outcome"
+description = "Each gate suite displays its aggregation mode (required-pass, all-pass, or weighted-mean) next to a computed outcome, weighted-mean suites additionally show a percentage score, and the outcome is consistent with the gate pass/fail states currently shown"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "whatif_flip_recomputes_live"
+description = "Scripted probe: enter what-if mode, flip one gate's state, and confirm the suite outcome (and percentage where shown) and the stage status update immediately without a reload, with the flipped gate carrying a visible simulated marker; flipping a failing S1 gate to pass on an otherwise-passing rejected stage flips the stage to passed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "whatif_revert_restores_recorded"
+description = "Scripted probe: after flipping gates in what-if mode, activating revert (or leaving and re-entering the stage) shows every gate row, the suite outcome, and the stage status exactly as recorded before the simulation, with no simulated markers remaining"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "certificate_view_contents"
+description = "A passed stage exposes a certificate view showing the stage name, the full list of that stage's gate results, a fingerprint hash string, and an issuance timestamp"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "chain_break_renders_distinctly"
+description = "The run detail shows a chain visualization linking the 5 stage certificates in pipeline order; for a run with a rejected intermediate stage, the chain shows a visibly distinct break at that stage and the downstream links render broken or pending rather than intact"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "copy_fingerprint_with_confirmation"
+description = "Activating the fingerprint copy control places text on the clipboard that exactly matches the displayed hash and shows a visible confirmation (icon swap or toast) that resets after a moment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "registry_lists_and_filters_gates"
+description = "The gate registry lists gates from across the suites with identifier, name, severity chip, and description; the severity filter narrows to only the chosen severity and clearing it restores the full list exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "registry_selection_highlights_stages"
+description = "Selecting a gate in the registry shows its full description and visibly highlights exactly the pipeline stages that include that gate, leaving the others unhighlighted"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "rerun_ticks_gates_sequentially"
+description = "Starting a stage re-run from its real control flips the stage to running and ticks the gate checklist one gate at a time through pending, running, then pass or fail, with an overall progress indicator advancing as gates complete, ending in either a certificate or a rejection banner naming the failing gates"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "rerun_updates_all_surfaces"
+description = "Scripted probe: after a re-run completes, the stage strip color, the chain visualization, and the suite outcome all reflect the new results in the same session without a reload, and the run's event timeline gains ordered, timestamped entries for the re-run start and its final outcome"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "timeline_filter_and_empty_states"
+description = "The event timeline filters by entry type (re-run, rejection, certificate, note); filtering to a type with no entries shows an empty state message, clearing the filter restores all entries in order, and a run with no events shows an empty state naming what will appear there"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "note_form_validates_and_attaches"
+description = "The gate add-note form shows inline messages naming the note text and category fields when they are invalid and keeps submit disabled until both are valid; submitting a valid note shows it in that gate's expanded evidence area and appends a note entry to the run's timeline, while cancel and invalid submits change nothing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n1"
+name = "whatif_leaks_into_recorded_results"
+description = "After using what-if mode and reverting or navigating away, some recorded gate state, suite outcome, stage status, or chain link still shows a simulated value instead of the recorded result"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n2"
+name = "console_is_static_markup"
+description = "The stage strip, gate checklist, or outcomes are static HTML only: what-if flips, re-runs, or registry filtering produce no visible state change, or a re-run's final results contradict what the strip, chain, or outcome then display"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

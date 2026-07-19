@@ -1,0 +1,126 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "hover_system_present"
+description = "While actually hovering with the pointer, buttons ease background and shadow with a slight press effect on activation, table rows take a full-width hover wash, chips and tags lift subtly, and form controls show focus rings — verified via computed styles while the hover is held"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "drawer_slides_view_transitions"
+description = "Opening the contributor drawer through its real trigger slides it in from the edge with an eased transition and closing slides it out, and the queue-to-detail switch transitions without a full page reload or a hard content snap"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "finding_changes_animate"
+description = "Submitting a valid Add finding form animates the new finding into the list, overriding a finding animates its struck-through state in rather than snapping, and the queue row's tier chips update with a brief eased change — all through the real controls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "gate_banner_animated_swap"
+description = "Adding, re-tiering, or overriding a finding through the UI animates the gate banner's failed/passed swap with a short cross-fade or slide of roughly 200 to 300 milliseconds rather than an instant hard swap, and changing the date-range control animates the failure-profile bars easing to their new widths rather than jumping instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "recheck_steps_animate"
+description = "During a re-check run started from its real control, each step's status transition animates (icon swap plus an eased overall progress indicator) as steps tick one by one, and the completion summary fades in rather than appearing abruptly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "disclosures_and_toasts_animate"
+description = "Evidence disclosures expand and collapse with an animated height transition and rotating chevron when clicked, and toasts after add finding, request revision, approve, and override slide in, remain readable, and auto-dismiss with a fade"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion enabled, drawer, list, banner, bar, step, and toast animations are removed or reduced to instant state changes while every flow (triage, revision, approve, override, re-check) remains fully available"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.n1"
+name = "motion_missing_or_janky"
+description = "Interactive surfaces give no motion feedback at all (drawer, disclosures, and toasts snap with zero transitions and hovers produce no visible change), or animations stutter, flicker, or shift surrounding layout while running"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

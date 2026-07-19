@@ -62,14 +62,14 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "2.1"
-name = "2_1"
+name = "console_clean_during_exercise"
 description = "No console.error output or unhandled promise rejections appear in the browser log while exercising navigation, popups, and media across the routes"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
-name = "2_2"
+name = "local_media_path_network_only"
 description = "The network log for the home, about, and every case route contains only candidate-origin asset requests, with content imagery resolving under local /media/storyblok/f paths, audio and waveform data under /media/blob/audio, and videos under /media/videos"
 type = "binary"
 weight = 1.0
@@ -83,14 +83,14 @@ weight = 1.0
 
 [[criterion]]
 id = "2.7"
-name = "2_7"
+name = "surface_text_and_header_computed_colors"
 description = "The page background computes to rgb(25, 25, 25) with text rgb(253, 250, 247) and gray body text rgb(120, 122, 127), and the fixed header background computes to rgba(25, 25, 25, 0.8) with a 1px rgba(255, 255, 255, 0.1) bottom border"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.5"
-name = "2_5"
+name = "browser_storage_written"
 description = "localStorage or sessionStorage is written during the session"
 type = "binary"
 weight = 1.0
@@ -98,7 +98,7 @@ negate = true
 
 [[criterion]]
 id = "2.6"
-name = "2_6"
+name = "outbound_cms_blob_vimeo_font_request"
 description = "A route issues a request to a.storyblok.com, a Vercel Blob host, player.vimeo.com, or a Google Fonts host"
 type = "binary"
 weight = 1.0
@@ -136,7 +136,7 @@ weight = 1.0
 [[criterion]]
 id = "2.12"
 name = "smooth_frames_and_rapid_navigation"
-description = "Continuous scrolling and the folder open and close transitions hold a smooth frame rate with no visible hitching, and rapid repeated navigation between cases stays responsive with no hangs or stuck transition states"
+description = "Continuous scrolling and the folder open and close transitions hold a smooth frame rate with no visible hitching or input lag between wheel or trackpad movement and the page response, and rapid repeated navigation between cases stays responsive with no hangs or stuck transition states"
 type = "binary"
 weight = 1.0
 
@@ -165,6 +165,28 @@ weight = 0.5
 id = "2.16"
 name = "single_store_surface_coherence"
 description = "The header hidden state, the case sub-header category name, and the document title all follow the same active case the route shows: after any navigation path (tag, sibling, overscroll, deep link) no surface displays a stale or different case's value"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.17"
+name = "split_headings_character_soup"
+description = "A character-split display heading exposes individual character spans to the accessibility tree as character soup, with no full-phrase label on the heading container"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.18"
+name = "semantic_controls_and_dialog"
+description = "Interactive controls (header wordmark, About, architect tags, sibling tags, overscroll, close buttons) are semantic buttons or links with accessible names, and the open media popup behaves as a dialog that keeps keyboard focus inside until closed"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.19"
+name = "layout_stable_after_first_paint"
+description = "After first paint on a fresh load of home, about, and a case route, no visible layout jumps occur as fonts, portraits, or scrapbook media finish loading; folder and media regions hold their reserved space from the start"
 type = "binary"
 weight = 1.0
 

@@ -1,0 +1,133 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "table_columns_and_toolbar"
+description = "The library renders as a data table with columns for title, technique, created, version, attachments, and actions, and the toolbar row contains the search input, technique filter, prompt count, New Prompt button, and the conditional Extend and Combine buttons"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "row_hover_and_selected_layers"
+description = "Hovering a table row shows a full-width hover treatment, and checkbox-selected rows carry a visually distinct selected-layer treatment that differs from the hover treatment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "illustrated_empty_state"
+description = "The empty state shown when the library is empty or no rows match is illustrated and prompt-relevant, with a New Prompt call to action"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "technique_badge_color_consistency"
+description = "Technique tags render as colored badges, and every row sharing a technique uses the same badge color across the table"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "monospace_body_block"
+description = "The prompt body block on detail and edit surfaces renders in a monospaced face visually distinct from the app's UI text, with a visible format label and its Copy control aligned to the block"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "typography_and_spacing_rhythm"
+description = "Typography shows a clear hierarchy (app title larger than toolbar and table headers, which are larger than body and metadata text), and spacing across the toolbar, table, side panel, and modals follows a visually regular rhythm with no crowded or orphaned regions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "component_states_and_icons"
+description = "Buttons, inputs, and selects show distinct default, hover, focus (visible ring), disabled, and error treatments, and one consistent icon set is used across the toolbar, row actions, and attachment type glyphs"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "responsive_toolbar_and_mobile"
+description = "At widths of 768 pixels and below the toolbar wraps or collapses its controls behind an overflow control while keeping search reachable and the history panel becomes a full-width overlay, and at 375 pixel width no content clips or overflows the viewport, no page-level horizontal scrolling appears, and the table scrolls within its own container"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "overlapping_clipped_text"
+description = "At 1440 pixel width, any table cell, badge, chip, panel, or modal text overlaps another element or is clipped by its container"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

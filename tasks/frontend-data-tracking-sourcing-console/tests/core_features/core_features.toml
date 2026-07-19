@@ -1,0 +1,190 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_candidates_columns_complete"
+description = "On load, the candidates table shows at least 25 seeded rows with fictional org-slash-repo names, and each row shows language, star count, a difficulty score from 0 to 10 to one decimal, category, cluster id, a license chip reading Permissive, Weak copyleft, Strong copyleft, or Unlicensed, and a status chip reading Candidate, Scored, Selected, Rejected (with its reason), Pinned, or Queued"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "sort_round_trip_with_indicator"
+description = "Scripted probe: click the difficulty column header and confirm rows sort by difficulty with a visible direction indicator; click it again and confirm the order reverses relative to the first click without changing the visible row count; sorting by stars behaves the same"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "combined_filters_and_clear"
+description = "Filtering by a language plus a difficulty band (Easy 0-3.9, Medium 4-6.9, Hard 7-10) narrows the table to rows matching both, adding a license or status filter narrows it further, and the clear control restores the full table with the pre-filter row count; when filters match nothing an empty state names the active filters and offers the clear control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "score_select_transitions_update_everywhere"
+description = "Scripted probe: use Score on a Candidate row and confirm its chip reads Scored and its difficulty is revealed; use Select on a Scored row and confirm the chip reads Selected, the rollup Selected count increases by exactly one, the matching quota cell's achieved count increases by exactly one, and the timeline gains one entry recording the old and new status — all without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "rejection_reason_constrained_select"
+description = "The Reject form's reason control is a constrained select offering exactly license-blocked, gui-heavy, network-dependent, duplicate-cluster, and too-large with no free-text entry; submitting with no reason shows an inline message naming the reason field and changes no status, and submitting with a reason moves the row to Rejected showing that reason"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "timeline_records_status_changes"
+description = "The timeline view lists status-change entries newest first, each showing time, repository name, old status, new status, and the rejection reason when there is one, and a newly performed transition appears at the top without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "quota_grid_cells_render"
+description = "The quota view shows a language-by-band grid where each cell reads achieved of target with a fill bar proportional to achieved over target, cells below target carry a visible unfilled highlight, and at least one seeded cell shows an oversubscription indicator because its achieved count exceeds 1.5 times its target"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "quota_cell_click_filters_table"
+description = "Activating a quota cell switches to the candidates view with the language and difficulty-band filters set to that cell so the table shows exactly the matching rows, with the active filters visible and clearable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "cluster_guard_blocks_selection"
+description = "Scripted probe: select a Scored candidate, then attempt to Select a second Scored candidate with the same cluster id; the second attempt shows an inline explanation naming the cluster guard, the cluster id, and the already-holding repository, and the second row's chip, the rollups, the quota grid, and the timeline are all unchanged; attempting to Select a candidate whose org already holds 3 candidates in Selected, Pinned, or Queued status is blocked the same way, with the explanation naming the org cap of 3 and the org"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "pin_dialog_hash_and_copy"
+description = "The Pin action on a Selected row opens a confirm dialog showing the repository name, an automatically generated fictional 12-character commit hash, and an optional notes field with the confirm control disabled until the dialog is valid; after confirming, the row reads Pinned and shows the frozen 12-character hash with a copy control that places the exact hash on the clipboard with visible confirmation; cancelling the dialog leaves status, queue, and timeline unchanged, and rapidly double-activating the confirm control pins exactly once"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "queue_append_positions_metadata"
+description = "Using Queue on a Pinned row moves it to Queued and appends it to the build-queue panel, where each entry shows a position number, repository name, difficulty score, and cluster id, and positions run contiguously from 1"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "queue_reorder_persists_across_views"
+description = "Scripted probe: with at least three queued entries, move the third entry to position one by dragging or by the keyboard move controls, confirm positions renumber contiguously in the new order, navigate to another view and back, and confirm the order persists"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "queue_remove_returns_to_selected"
+description = "Scripted probe: remove a queue entry and confirm the candidate's chip returns to Selected, the queue renumbers contiguously, the queue-length rollup decreases by exactly one, and the affected quota cell keeps counting the candidate (still Selected) while the timeline records the change"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "rollup_strip_derives_live"
+description = "The rollup strip shows one count per status, the overall quota fill percentage to the nearest whole percent, and the queue length, and after any transition (select, reject, pin, queue, remove) every rollup value agrees with the table and updates in the same interaction"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "fetch_more_run_appends_coherently"
+description = "Scripted probe: record the table row count, start Fetch more candidates, confirm a progress list steps Querying then Scoring then Classifying from pending to running to complete in order while the control is disabled, and on completion exactly 6 new fictional candidates appear in the table with the rollups and quota grid updated to include them; a second run appends 6 further distinct candidates"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "guards_are_warnings_only"
+description = "A blocked selection still goes through: after the cluster-guard or org-cap message appears, the candidate's chip reads Selected anyway or any rollup, quota, or timeline value changes"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.17"
+name = "derived_surfaces_static"
+description = "The quota grid, rollup strip, or build-queue positions are static markup: a status transition, queue reorder, or fetch-more run leaves a dependent count, fill bar, or position number unchanged or contradicting the table"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

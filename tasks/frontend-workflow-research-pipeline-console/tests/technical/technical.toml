@@ -1,0 +1,127 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "shared_state_coherence"
+description = "All views derive from one shared run collection: a submitted job, an advancing phase, a retry, or a completed evaluation is immediately reflected everywhere it appears — board strip, detail panel, event timeline, rollup strip, and leaderboard cell — without a reload, and the dataset filter recomputes the visible board from that same collection"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "no_storage_reload_seeded"
+description = "No browser storage is used: localStorage and sessionStorage remain empty after submitting, pausing, retrying, filtering, and exercising every view, and a page reload returns the app to its seeded runs, datasets, leaderboard values, and default Pipeline board view"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "storage_persistence_used"
+description = "localStorage or sessionStorage holds runs, datasets, results, filters, or view state after exercising the app"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.4"
+name = "external_network_requests"
+description = "The devtools network log shows requests to external origins or third-party CDNs (scripts, styles, fonts, icons, or data) during load or a full exercise of the app, or app chrome navigates via outbound links to other origins"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.5"
+name = "console_clean_during_session"
+description = "No console errors, warnings, or unhandled promise rejections appear on load or during a full exercise of the app, including while phases are advancing on the simulated tick"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "load_and_rapid_input_performance"
+description = "The app is interactive within 2 seconds of a local cold load, and while the simulation is advancing, rapid view switches, filter changes, and form input cause no hangs, with counters and charts continuing to advance without blocking interaction"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "keyboard_and_dialog_accessibility"
+description = "Every interactive control — sidebar items, submit and retry controls, form fields, table headers, timeline filters, disclosures — is reachable and operable with the keyboard alone with a visible focus indicator; the submission panel traps focus while open, closes on Escape, and returns focus to the Submit job control; and form fields have visible labels with each validation message naming and rendering in association with its field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "live_region_announcements"
+description = "Toast notifications and the automatic-trigger event are announced through a polite live region in the accessibility tree as well as shown visually"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

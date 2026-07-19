@@ -1,0 +1,133 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "dashboard_layout_composition"
+description = "The app composes as a left sidebar containing the suite list and a main content area with a chart strip on top and the results table below it, with the run step list and event timeline rendered alongside the results panel while a run is active or selected"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "score_badge_thresholds"
+description = "Average score badges render green for scores 80 to 100, yellow for 60 to 79, and red below 60, applied consistently on suite entries and anywhere average scores appear"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "pass_fail_badge_colors"
+description = "Pass badges render in a green success treatment and Fail badges in a red danger treatment, consistent between the results table and the detail panel"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "step_status_treatments_distinct"
+description = "The pending, running, retrying, failed, and complete step statuses are each visually distinct at a glance (distinct color or icon treatment), and the same treatment for each status is used in both the step list and the event timeline"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "chart_palette_consistent_mapping"
+description = "Chart series use one consistent accent palette with the primary model in the brand accent and each additional model in a distinct supporting accent, and the model-to-color mapping is identical between the bar chart and the comparison view"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "typography_and_spacing_rhythm"
+description = "Typography shows a clear hierarchy (app title larger than panel headings, which are larger than table body and label text) and spacing between the sidebar, chart strip, table, and detail panel follows a visually regular rhythm with no crowded or orphaned regions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "component_states_and_icons"
+description = "Buttons, inputs, selects, and toggles show distinct default, hover, focus (visible ring), disabled, and error treatments, and one consistent icon set is used across the toolbar, suite entries, step statuses, and row actions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "responsive_sidebar_and_mobile"
+description = "At widths of 768 pixels and below the suite sidebar collapses behind a toggle that opens it as an overlay while desktop widths show it open by default, and at 375 pixel width no content clips or overflows the viewport, no page-level horizontal scrolling appears, and the results and comparison tables scroll within their own containers"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "overlapping_clipped_text"
+description = "At 1440 pixel width, any panel heading, table cell, badge, chart label, or timeline text overlaps another element or is clipped by its container"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

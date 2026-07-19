@@ -84,7 +84,7 @@ weight = 1.0
 [[criterion]]
 id = "vd-shell"
 name = "sidebar_shell_and_mobile_collapse"
-description = "On desktop a fixed left sidebar (about 122px wide) sits beside a right-offset main column whose left margin is about 167px at 1440px width, and below 1024px the layout collapses to a single stacked column (main left margin 0) with a mobile bar and hamburger"
+description = "On desktop the composition is an asymmetric shell: a fixed left sidebar of numbered colored nav cards (about 122px wide) sits beside a right-offset main column whose left margin is about 167px at 1440px width, and below 1024px the layout collapses to a single stacked column (main left margin 0) with a mobile bar and hamburger"
 type = "binary"
 weight = 1.0
 
@@ -149,6 +149,35 @@ description = "At a viewport <=1023px wide the marquee text renders at 14px and 
 type = "binary"
 weight = 0.5
 optional = true
+
+[[criterion]]
+id = "vd-brokengrid"
+name = "hero_cta_overlaps_photograph"
+description = "At desktop width the hero Book CTA black pill overlaps the lifestyle photograph's lower edge while its label stays fully legible against the image, rather than sitting in a separate non-overlapping equal-column stack"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "vd-threetier"
+name = "three_tier_tokens_compute"
+description = "Computed styles expose the three token tiers: theme ink/paper (--color-1 #000 and --color-2 #fff under the light theme), fluid layout tokens (--box-padding, --border-radius, --gap, --sidebar-width resolving through clamp()/vw), and named brand surface utilities matching the documented hexes on their designated bands and cards"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "vd-fluidtype"
+name = "fluid_type_scales_continuously"
+description = "Resizing the viewport between 1440 and 390 pixels scales display and body typography fluidly via clamp()/vw with no abrupt size jumps beyond the documented <=1023px marquee 14px and radius 30px overrides"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "vd-neg-equalstack"
+name = "equal_width_plain_stack_shell"
+description = "At desktop width the page is an equal-width plain stack of centered columns instead of the asymmetric fixed-sidebar plus right-offset content shell"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "vd-copyexact"

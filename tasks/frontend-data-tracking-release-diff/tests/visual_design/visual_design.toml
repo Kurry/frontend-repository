@@ -1,0 +1,149 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "two_pane_data_ops_shell"
+description = "The app composes as a fixed-width releases sidebar beside a tabbed main canvas (Manifest, Diff, Splits, Rotation) with the event timeline docked as a column or panel; tables are dense with hairline row separators and sections keep generous, consistent padding"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "diff_color_language_consistent"
+description = "Diff rows use one consistent color language — green tint with a + marker for added, red tint with a - marker for removed, amber tint with a ~ marker for changed, neutral surface for unchanged — and the same three accents recur in the summary strip counts"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "monospace_digests_everywhere"
+description = "Content digests render in a monospaced typeface everywhere they appear (manifest rows, changed-row before/after pairs, the manifest summary code block), truncated to a fixed-length prefix with an ellipsis"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "typography_hierarchy_clear"
+description = "A clear type hierarchy is visible: the selected version name is the largest text on the canvas, tab labels and section headings step down distinctly, table body text is the smallest tier, and exactly one sans-serif family plus one monospaced family are used"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "fill_bar_anatomy_uniform"
+description = "Every split fill bar shares one anatomy — track, filled segment proportional to current/target, right-aligned numeric pair — and below-target bars carry a hatched or outlined unfilled segment visually distinct from met quotas"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "step_badge_system_consistent"
+description = "Cut-flow step badges use one consistent system: muted for pending, accent with an activity indicator for running, success tint for complete, error tint for failed; the same badge treatment is not improvised differently per step"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "sealed_lock_and_icon_set"
+description = "Sealed releases show a lock glyph beside the version name, and one consistent icon set is used across the chrome with no mixed icon styles"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "responsive_sidebar_and_mobile"
+description = "At 1024 pixels and above the sidebar stays visible beside the canvas; below 1024 pixels it collapses behind a toggle that opens an overlay; at 375 pixels no content clips or overflows the viewport, tables scroll within their own containers, and the summary strip wraps"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "diff_kind_color_only"
+description = "Diff kinds are conveyed by color alone: added, removed, or changed rows lack their +, -, or ~ markers or kind labels, so the classification is unreadable without color perception"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.10"
+name = "overlapping_or_clipped_content"
+description = "At 1440 pixel width, any table, badge, code block, or panel text overlaps another element or is clipped by its container"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.11"
+name = "inconsistent_surface_treatments"
+description = "Panels and cards mix visibly different corner radii, shadow depths, or border treatments with no consistent system across the four views"
+type = "binary"
+weight = 0.5
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

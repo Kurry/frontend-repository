@@ -62,56 +62,56 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
+name = "category_cover_exact_fills"
 description = "The category covers compute their exact fills: Organic & Early Modernism #1E4BD7, Expressive #0C7866, Monumental Modernism #581E70, and Place / culture continuity #D71E1E"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
+name = "folder_cover_3d_reveals_sheet"
 description = "After opening a case via a tag, the folder cover transforms in 3D (a rotateY matrix3d transform), not a flat opacity fade, revealing the portrait sheet with a born/died line and biography"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
+name = "scrapbook_drag_stays_released"
 description = "When dragging a scrapbook note or photo with the pointer, the item follows and stays at its released position"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "1_13"
+name = "offline_assets_and_empty_storage"
 description = "After exercising navigation, popups, and media across the home, about, and case routes, the network log contains zero non-candidate-origin asset requests (no Storyblok, Vercel Blob, Vimeo, or web font hosts) and localStorage and sessionStorage remain empty"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.15"
-name = "1_15"
+name = "home_document_title_and_hero"
 description = "The document title is exactly \"Mosby's Files—American Modernist Architecture\" and the home hero shows the display title \"American modernism\" with a supporting paragraph"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.16"
-name = "1_16"
+name = "four_category_group_names"
 description = "The home stack shows four category groups named exactly \"Organic & Early Modernism\", \"Expressive\", \"Monumental Modernism\", and \"Place / culture continuity\""
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.17"
-name = "1_17"
+name = "eight_architect_tags_by_category"
 description = "All eight architect names appear as tags mapped to the correct categories: Frank Lloyd Wright and Irving Gill under Organic & Early Modernism, Frank Gehry under Expressive, Louis Kahn and I. M. Pei and Paul Rudolph under Monumental Modernism, Louis Sullivan and Mary Colter under Place / culture continuity"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.18"
-name = "1_18"
+name = "tag_click_swaps_case_route"
 description = "Clicking an architect tag swaps the visible route to that case page without a full page reload, showing the architect name as the largest heading and the matching case document title (e.g. \"Louis Kahn—Mosby's Files\")"
 type = "binary"
 weight = 1.0
@@ -125,28 +125,28 @@ weight = 1.0
 
 [[criterion]]
 id = "1.20"
-name = "1_20"
+name = "sibling_tags_swap_case"
 description = "Each case shows rotated sibling tags for the other architects in its category, and clicking a sibling tag swaps to that sibling case (Louis Kahn, I. M. Pei, and Paul Rudolph link to each other)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.21"
-name = "1_21"
+name = "scrapbook_item_types_present"
 description = "Each case shows a scrapbook of loose positioned items drawn from notes, photographs, a paperclip, a plan or drawing, and per architect a video poster, a PDF preview, or an audio card"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.22"
-name = "1_22"
+name = "louis_kahn_waveform_audio_parts"
 description = "The Louis Kahn case opens a waveform audio player with two parts louis_kahn_part_1 and louis_kahn_part_2 that draw waveform bars from local data and play and pause local audio"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.23"
-name = "1_23"
+name = "video_popup_local_media_closes"
 description = "A video case (e.g. Frank Gehry) opens a media popup that plays a local video with a local poster image, and the red close button and the dimmed backdrop both close the popup and stop the media"
 type = "binary"
 weight = 1.0
@@ -160,8 +160,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.25"
-name = "1_25"
-description = "All ten routes are reachable and every one of the eight case routes (frank-lloyd-wright, irving-gill, frank-gehry, louis-kahn, i-m-pei, paul-rudolph, louis-sullivan, mary-colter) renders its architect heading without error"
+name = "ten_distinct_routes_render"
+description = "All ten distinct routes are reachable (home, about, and the eight case routes frank-lloyd-wright, irving-gill, frank-gehry, louis-kahn, i-m-pei, paul-rudolph, louis-sullivan, mary-colter), each loadable by its own URL as well as by in-app navigation, and every case route renders its architect heading without error"
 type = "binary"
 weight = 1.0
 
@@ -182,7 +182,7 @@ optional = true
 
 [[criterion]]
 id = "1.28"
-name = "1_28"
+name = "case_route_fails_to_render"
 description = "One or more of the eight case routes fails to render its architect content"
 type = "binary"
 weight = 1.0
@@ -190,7 +190,7 @@ negate = true
 
 [[criterion]]
 id = "1.29"
-name = "1_29"
+name = "case_nav_full_page_loads"
 description = "Case routes navigate via outbound anchor href full page loads instead of an in-app route swap"
 type = "binary"
 weight = 1.0
@@ -198,7 +198,7 @@ negate = true
 
 [[criterion]]
 id = "1.30"
-name = "1_30"
+name = "remote_vimeo_player_embedded"
 description = "The popup video embeds a live player.vimeo.com iframe or other remote video player instead of a local poster and local video"
 type = "binary"
 weight = 1.0

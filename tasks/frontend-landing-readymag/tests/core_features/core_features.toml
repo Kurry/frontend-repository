@@ -69,49 +69,49 @@ weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
+name = "hero_headline_subtitle_cta"
 description = "On load, the hero shows the headline \"Design and launch outstanding websites\", the subtitle \"Design, prototype, collaborate, publish.\", and a \"Try Readymag\" button followed by \"or choose your subscription plan\""
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
+name = "hello_ready_accent_cluster"
 description = "On load, the oversized accent cluster reads \"Hello!\" in orange followed by \"Ready\" and \"?\" in purple near the hero transition"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
+name = "slideshow_auto_advances"
 description = "When the six-image project slideshow is left running, its active (fully opaque) frame changes on its own about every 2.2 seconds while neighboring frames stay dimmed at 0.35 opacity"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
+name = "usecase_tiles_labels_and_colors"
 description = "On load, six color-coded use-case tiles appear with the exact labels Portfolios (#FF88BA), Landing pages (#FFCB00), Editorials (#008BFF), Company websites (#A6A6A6), Design studios (#4AAC54), and by Readymag team (#EC520B), all with white text"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
+name = "support_band_copy_and_orb"
 description = "On load, a dark #282828 support band shows \"Get the best support\" with \"around-the-clock support on business days\" emphasized in orange and an animated orange orb traveling a curved path"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
+name = "usecase_marquee_labels"
 description = "On load, a traveling marquee row cycles through the oversized labels Company websites, Landing pages, Editorials, Presentations, Design studios, and Portfolios"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
+name = "closing_cta_copy"
 description = "On load, the closing call-to-action shows \"Try for free\", a \"Try Readymag\" button, and a \"View pricing\" link"
 type = "binary"
 weight = 1.0
@@ -125,49 +125,49 @@ weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
+name = "mobile_390_layout_adaptations"
 description = "After resizing the viewport to about 390px wide, the floating hero card and desktop nav are hidden, the use-case tiles collapse to two columns, and no page-wide horizontal scrollbar appears"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "1_13"
+name = "reduced_motion_resting_state"
 description = "When prefers-reduced-motion is enabled, path travel, tilt, and reveal animation stop while every section remains visible in its final resting position"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.17"
-name = "1_17"
-description = "Four feature cards render with the exact titles \"Enjoy easy workflow\", \"Streamline teamwork\", \"Attract with interactivity\", and \"Expand functionality to infinity\" and their described bodies"
+name = "feature_cards_exact_copy"
+description = "Four feature cards render with the exact titles \"Enjoy easy workflow\", \"Streamline teamwork\", \"Attract with interactivity\", and \"Expand functionality to infinity\" and their described bodies, including the Attract card body that names \"Lottie\""
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.19"
-name = "1_19"
+name = "support_band_full_sentence"
 description = "The support band shows \"Get the best support\" and the sentence \"Our agents offer around-the-clock support on business days and treat you with care.\" with \"around-the-clock support on business days\" emphasized"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.22"
-name = "1_22"
+name = "solutions_menu_a11y_and_items"
 description = "The Solutions control is a button with accessible name \"Solutions menu\", aria-haspopup and aria-controls, and opens a menu (Portfolios, Presentations, Editorials, Companies, Freelancers, Students) on click or Enter with aria-expanded flipping to true; Escape closes it and returns focus to the trigger"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.24"
-name = "1_24"
+name = "landmarks_and_keyboard_focus"
 description = "The page uses header, nav, main, section, article, and footer landmarks with one page-level heading, and interactive controls are keyboard reachable with visible focus"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.25"
-name = "1_25"
+name = "solutions_is_noninteractive_link"
 description = "The Solutions control is a plain non-interactive link with no menu, no aria-haspopup, and no synchronized aria-expanded state"
 type = "binary"
 weight = 1.0
@@ -175,8 +175,8 @@ negate = true
 
 [[criterion]]
 id = "1.26"
-name = "1_26"
-description = "A homepage interaction leads to an application-error or \"Not found\" page, or a header/footer chrome link is missing so navigation is not present"
+name = "chrome_nav_lands_on_missing_page"
+description = "Activating a header, footer, CTA, tile, or Solutions-menu chrome link navigates away from the homepage to an application-error or \"Not found\" page, or a required header/footer chrome link is missing so navigation chrome is not present"
 type = "binary"
 weight = 1.0
 negate = true
@@ -248,6 +248,20 @@ weight = 1.0
 id = "1.36"
 name = "reload_restores_initial_state"
 description = "Scripted flow: open the Solutions menu, let the slideshow advance a few frames, and scroll toward the bottom; reloading the page then returns it to its initial state — menus closed, the slideshow back on its first frame, and the scroll-reveal sections unrevealed until scrolled into view again"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "single_page_chrome_stays_on_homepage"
+description = "Scripted flow: from the homepage, activate Pricing, Examples, Templates, Learn, View pricing, and at least one footer group link in turn — after each activation the URL remains a homepage path or homepage hash (no secondary route content such as a Pricing plans page), the sticky header and homepage sections remain available, and no blank/error/Not-found document replaces the homepage"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "hero_gallery_three_marquee_rows"
+description = "On load the hero shows three distinct animated gallery rows of original placeholder project thumbnails traveling continuously across the top of the hero"
 type = "binary"
 weight = 1.0
 

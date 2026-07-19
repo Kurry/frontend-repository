@@ -40,7 +40,19 @@ Create at repo root (e.g. `MyNewApp/` or `variants/MyNewApp/`):
 - The reference implementation files (static HTML/CSS/JS or built app) — these
   become the oracle.
 
-## Step 2 — Register the task
+## Step 2 — Register the task (NON-SKIPPABLE: the WebMCP contract ships WITH authoring)
+
+**A task without a `<webmcp_action_contract>` is not a task.** The judge's webmcp
+bridge discovers its tool surface from the contract; a contract-less instruction is
+untestable, and the unit suite fails any `tasks/frontend-*` dir whose instruction
+lacks the rendered block. Never defer this step "to registration later" and never
+tell an authoring agent to skip the webmcp block — the assignment + rendered
+contract is part of the authoring deliverable itself.
+
+**Per-feature-group coverage rule:** every `Feature:` group in `<core_features>`
+must be either reachable through the assigned modules' bindings or listed in
+`mechanics_exclusions` with a reason (only for judge-observation-only mechanics —
+chart hover, drag gesture fidelity, streaming visuals). No unmapped groups.
 
 Three places, kept consistent:
 

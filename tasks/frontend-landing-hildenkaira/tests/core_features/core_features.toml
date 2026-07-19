@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "hero_h1_exact_and_http_200"
-description = "On load, the homepage at / returns HTTP 200, the document title reads Hildén & Kaira (with the é), and the hero shows the exact H1 \"If you can't reach a million people with 0€ ad spend, your branding sucks.\" with the brand promise lead beneath it"
+description = "On load, the single homepage at / returns HTTP 200, the document title reads Hildén & Kaira (with the é), and the hero shows the exact H1 \"If you can't reach a million people with 0€ ad spend, your branding sucks.\" with the exact lead \"We will 10x your social presence or work for free until it's done.\""
 type = "binary"
 weight = 1.0
 
@@ -176,7 +176,7 @@ optional = true
 [[criterion]]
 id = "1.27"
 name = "chrome_click_navigates_away"
-description = "Clicking a centered nav link, the locale switcher, the contact CTA, or a footer social/legal/sitemap link performs a real outbound navigation or a full page reload instead of behaving as non-navigating in-app chrome"
+description = "Clicking a centered nav link, a Show case or service/about button, the locale switcher, the contact CTA, or a footer social/legal/sitemap link leaves / for another route, opens an outbound destination, or triggers a full page reload instead of staying on the single homepage as non-navigating chrome"
 type = "binary"
 weight = 1.0
 negate = true
@@ -192,7 +192,7 @@ negate = true
 [[criterion]]
 id = "1.29"
 name = "section_order_matches_reference"
-description = "Scrolling top to bottom, the page presents the sections in this order: hero with floating case thumbnails, statement/manifesto band, client flick-card deck carousel, services trio, testimonials carousel, call-to-action block (with the H2 \"Ready to work with us?\", the two choice cards, and the \"Does your brand have self-esteem issues?\" band), contact-and-social area, and full-height footer"
+description = "Scrolling top to bottom, the page presents the sections in this exact order: hero with floating case thumbnails; statement/manifesto band; client flick-card deck carousel; services trio; testimonials carousel; about/self-esteem band with the H2 \"Does your brand have self-esteem issues?\"; call-to-action block with the H2 \"Ready to work with us?\" and the two choice cards; full-height footer (sitemap/podcast/social/legal live in the footer)"
 type = "binary"
 weight = 1.0
 
@@ -227,7 +227,7 @@ weight = 1.0
 [[criterion]]
 id = "1.34"
 name = "locale_flow_round_trip_copy_english"
-description = "Scripted locale flow: opening the locale dropdown shows a small EN / FI list; choosing FI updates the visible label to FI and choosing EN returns it to EN, all without leaving the homepage or triggering a reload, and the page copy stays English throughout (the /fi locale never resolves to a separate page)"
+description = "Scripted locale flow on the single-page homepage: opening the locale dropdown shows a small EN / FI list; choosing FI updates the visible label to FI and choosing EN returns it to EN, all without leaving / or triggering a reload, and the page copy stays English throughout (no separate /fi page is rendered)"
 type = "binary"
 weight = 1.0
 
@@ -266,6 +266,13 @@ description = "A partially visible rear flick card's video player responds to in
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "1.40"
+name = "about_self_esteem_band_present"
+description = "The about/self-esteem band appears after testimonials and before the CTA block, showing the H2 \"Does your brand have self-esteem issues?\" with supporting copy and two call-to-action controls over a dark media band"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "1.catchall"

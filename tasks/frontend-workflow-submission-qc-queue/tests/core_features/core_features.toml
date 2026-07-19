@@ -1,0 +1,183 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_queue_walkthrough"
+description = "On load the queue table shows at least 12 seeded submissions across at least 4 distinct fictional contributors, with columns for submission title, contributor, stage, findings, and payout state; stage values are drawn from exactly submitted, in-review, needs-revision, and approved as visually distinct tags, and payout states from pending, held, and released"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "tier_chips_summarize_findings"
+description = "Each queue row's findings column shows tier chips (blocker, major, minor) with a count for every tier that has at least one open finding on that submission, and submissions with zero open findings show a clear zero-findings indicator instead"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "filters_combine_and_clear"
+description = "Filtering by stage, tier, and contributor each narrows the queue to matching rows, active filters combine and are visibly indicated, clearing filters restores the full row set exactly, and a zero-match combination shows a designed empty state with a control that clears the filters"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "sort_by_finding_count_reverses"
+description = "Scripted probe: sort the queue by open finding count ascending, note the row order, then switch to descending; the order reverses relative to ascending without changing the visible row count, proving sort derives from live data"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "detail_view_anatomy"
+description = "Clicking a queue row opens that submission's detail view without a full page reload, showing its title, contributor, current stage, payout state, and a findings list where each finding shows a tier chip, a category label, a description, and a collapsed evidence disclosure that expands on activation to reveal the evidence text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "gate_banner_derives_live"
+description = "Scripted probe: on a submission with no open blockers the gate banner reads passed; adding a blocker finding through the UI flips it to failed immediately, re-tiering or overriding that blocker flips it back to passed, all without a reload, and the failed and passed treatments are visibly different"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "add_finding_validated_count_delta"
+description = "The Add finding form requires tier, category, and a description of at least 10 characters, showing inline messages naming invalid fields with submit disabled until valid; submitting a valid form appends exactly one finding to the detail list and updates the queue row's tier chips, measured immediately before and after"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "revision_loop_stage_round_trip"
+description = "Scripted probe: Request revision rejects a summary under 20 characters with an inline message and no stage change; submitting a valid summary moves the stage to needs-revision in the detail view and the queue row and appends the comment to the submission's history; Mark revised then returns the stage to in-review in both places"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "approve_gating_and_effect"
+description = "The Approve control is disabled with an inline explanation naming the reason while the submission has any open blocker finding or its stage is not in-review; approving an in-review submission with zero open blockers moves the stage to approved and the payout state to released in both the detail view and the queue row"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "override_flow_gate_flip"
+description = "Overriding a finding requires justification text of at least 10 characters; the overridden finding renders struck-through with an overridden label and its justification, stops counting toward the gate banner and the queue tier chips, and overriding the last open blocker flips the gate to passed; overriding every finding leaves all entries visible struck-through with the gate passed and the queue chips at zero, and a submission with zero findings shows a designed empty state in its findings region naming what belongs there and offering the Add finding control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "failure_profile_anatomy"
+description = "The failure-profile panel renders one horizontal bar per criterion computed from at least 8 seeded trial results, sorted by failure rate descending, each bar showing the criterion name, its failure rate as a percentage, and its mean score"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "date_range_recomputes_profile"
+description = "Scripted probe: record two criteria's failure rates and mean scores, narrow the date-range control and confirm the bars, percentages, and mean scores change to different values, then restore the full range and confirm the original values return exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "contributor_drawer_timeline"
+description = "Clicking a contributor's name opens a slide-in drawer listing that contributor's submissions with current stages plus a stage-history timeline of ordered, timestamped events; requesting a revision on one of their submissions appends a matching timestamped revision-requested event to the timeline without a reload, and the drawer closes via its close control and by clicking outside"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "recheck_progress_list"
+description = "Activating Run re-check starts a simulated run rendered as a task progress list of at least 4 named steps that tick to completion one by one with per-step status icons, an overall progress indicator, and a visible loading affordance while running; completion shows a summary line, and starting a new run resets the steps to pending and replays the progression"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n1"
+name = "approve_bypasses_gate"
+description = "A submission can be approved while it still has an open blocker finding, or from a stage other than in-review — the Approve control activates, or the stage lands on approved, despite the gate condition"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n2"
+name = "derived_surfaces_static"
+description = "The gate banner, queue tier chips, or failure-profile bars render identical output regardless of finding changes, overrides, or date-range input, indicating hardcoded rather than derived state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

@@ -180,7 +180,7 @@ Module specs:
 Bindings:
 - Browsable entity: palettes
 - Destinations: archive-grid; palette-detail; filters
-- Filters: period
+- Filters: era; artist
 - Entity: palette
 - Entity operations: create; select; update; delete; toggle
 - Entity fields: name; swatches; favorite

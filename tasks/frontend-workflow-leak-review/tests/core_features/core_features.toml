@@ -1,0 +1,183 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_queue_ranked_complete"
+description = "On load, the queue shows at least 12 seeded submission rows visible without pagination, ordered by similarity score from highest to lowest, and each row shows a score between 0.00 and 1.00, a benchmark task name, a submitter name, and a review-state chip reading exactly one of Unreviewed, Review triggered, Confirmed clean, or Confirmed leak"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "threshold_rederives_triggered_and_bands_live"
+description = "Dragging the threshold slider (labeled with its current value, seeded at 0.75, range 0.50 to 0.95) to a lower value flips undecided rows whose score is at or above the new value to Review triggered and re-bands the three-color score scale in the same interaction without a reload; dragging back up returns those rows to Unreviewed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "confirmed_states_immune_and_banner_present"
+description = "A persistent banner near the slider states that the threshold only flags submissions and a human reviewer decides, and after confirming one submission clean and one leak, dragging the threshold across its full range leaves both confirmed chips unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "evidence_panes_highlight_pairs"
+description = "Opening a triggered submission shows two side-by-side panes labeled as submission and reference excerpts, a match count of at least 3 pairs, a per-match similarity value for the focused pair, and the overlapping tokens visibly highlighted with the same treatment in both panes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "pair_stepping_syncs_both_panes"
+description = "Activating Next and Previous in the evidence view steps a position label of the form current of total, scrolls both panes so the focused pair's highlights are in view in both at once, and disables Previous on the first pair and Next on the last"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "decision_form_schema_validation"
+description = "The decision form offers exactly Confirm clean and Confirm leak verdicts plus a rationale field; submitting with no verdict or a rationale under 20 characters shows inline messages naming the invalid field, records no decision and no timeline entry, and the submit control stays disabled until both are valid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "decision_badges_row_and_appends_timeline"
+description = "Scripted probe: with the Review triggered filter active, record the visible row count and the audit timeline entry count; submit a valid Confirm leak decision with a 20-plus-character rationale for one triggered submission; confirm the row's chip reads Confirmed leak in the queue, the triggered filter loses exactly that one row, and the timeline gains exactly one entry showing timestamp, submitter, task, verdict, and the entered rationale — all without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "timeline_filter_and_empty_states"
+description = "After decisions with both verdicts exist, the audit timeline lists entries newest first and its verdict filter narrows to matching entries; before any decision, when the verdict filter matches nothing, and when every triggered submission has been decided, the respective region shows an explanatory empty state instead of a blank area"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "canary_checklists_render_counts"
+description = "The canary view lists at least 4 tasks, and expanding one reveals a placement-coverage checklist with a pass or fail chip and a present-in-N-of-M-files count per token, plus a post-strip verification checklist with a pass or fail chip per token"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "failing_strip_alert_names_file"
+description = "At least one seeded task shows a failing post-strip check, and the canary view renders an alert banner for it that names the exact file where the canary token survived"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "mutation_flip_count_derives_from_toggles"
+description = "Scripted probe: on a mutation comparison card showing at least 8 per-test original-versus-mutant results with pass-to-fail flips highlighted, note the flip count, toggle off one included flipped test, and confirm the count decreases by exactly one; toggling it back restores the prior count exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "rollup_strip_derives_live"
+description = "Scripted probe: record the rollup strip's triggered, clean, and leak counts and mean similarity; move the threshold and confirm the triggered count changes to match the queue; then submit one valid decision and confirm the matching confirmed count increases by exactly one while the mean similarity stays a two-decimal value consistent with the collection"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "export_block_copies_exact_text"
+description = "The Export summary control opens a monospaced code block containing the rollup values, and activating its copy control places the exact block text on the clipboard and shows a visible confirmation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "view_switching_no_reload"
+description = "Switching among the queue, canary, mutation, and audit views through the navigation swaps the main region without a full page reload, and the active navigation item matches the current view"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "threshold_auto_confirms_rows"
+description = "Moving the threshold slider changes some row's chip to Confirmed clean or Confirmed leak, or otherwise records a confirmed decision without the reviewer decision form being submitted"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.16"
+name = "queue_static_no_live_derivation"
+description = "The queue, rollup strip, or mutation flip count is static markup: moving the threshold, submitting a decision, or toggling an included test leaves the dependent chips or numbers unchanged"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

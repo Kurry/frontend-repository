@@ -1,0 +1,126 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "hover_feedback_required"
+description = "Hovering with the real pointer (verify computed styles while hovering): toolbar buttons ease background/shadow with a slight press effect, palette entries and saved-workflow rows take a visible hover wash, nodes lift subtly, and form controls show focus rings"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "node_drop_scale_in"
+description = "A node dropped onto the canvas via a real palette drag scales from roughly 0.8 to 1.0 over roughly 150 milliseconds rather than appearing instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "edge_flow_progression_animates"
+description = "During a run started from the real Run control, the currently executing node's border pulses with a repeating opacity animation until it completes or fails, and edges out of a completed node animate — a moving dash or pulse travels along the curve toward the next node — showing flow progression"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "badge_transitions_and_countdown"
+description = "Status badge changes transition their color rather than hard-swapping, and the retry backoff countdown visibly ticks down once per second during the seeded Agent node's retries"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "timeline_entries_animate_in"
+description = "New timeline entries animate in as they are appended during a run, and applying or clearing a timeline filter animates rows in and out rather than snapping; selecting an entry whose node is offscreen pans the canvas smoothly to the highlighted node rather than jumping instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "modal_panel_disclosure_motion"
+description = "Modals enter and exit with a short opacity/scale transition of roughly 200 to 300 milliseconds, the Saved Workflows panel slides open and closed, and the node input/output disclosure opens with a smooth height transition and a rotating chevron; error toasts for incompatible connections slide in, remain readable, and auto-dismiss with a fade"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion set, node drop is instant, the running state shows a static border color instead of pulsing, edge progression uses a static highlight, and all state changes (badges, rollup, timeline, countdown text) still occur"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "no_motion_anywhere"
+description = "Under default motion settings, node drops, badge changes, modals, and panels all snap instantly with no transition anywhere in the app"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable motion or microinteraction defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

@@ -62,14 +62,14 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
+name = "same_origin_asset_requests"
 description = "Every request the page makes is same-origin with the app or a data:/about: URL; no external font, image, video, CSS, or script CDN request fires (negative anchor: a remote font or analytics request is issued to an external host)"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "4_2"
+name = "console_clean_assets_ok"
 description = "The page produces no uncaught JavaScript console errors and no failed asset request (no 4xx/5xx or net::ERR) for scripts, styles, images, fonts, or media"
 type = "binary"
 weight = 1.0
@@ -83,7 +83,7 @@ weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "4_4"
+name = "external_host_request_issued"
 description = "The page issues a request to an external host (remote font, image, video, script, analytics, consent, or telemetry endpoint)"
 type = "binary"
 weight = 1.0
@@ -91,7 +91,7 @@ negate = true
 
 [[criterion]]
 id = "4.5"
-name = "4_5"
+name = "console_error_or_failed_asset"
 description = "The console reports an uncaught error, or an asset request fails with a 4xx/5xx status or net::ERR"
 type = "binary"
 weight = 1.0
@@ -138,6 +138,13 @@ name = "document_metadata_present"
 description = "The document sets a language attribute, the title \"Readymag – the design tool for outstanding websites\", a meta description \"Design, prototype, collaborate, publish.\", matching social title/description metadata with a Twitter summary_large_image card and a local placeholder social image, and a favicon"
 type = "binary"
 weight = 0.5
+
+[[criterion]]
+id = "4.12"
+name = "html_first_landmarks_semantics"
+description = "The homepage is HTML-first: real header/nav/main/section/footer landmarks and native button/link controls carry the chrome (not div-only click targets for Solutions or Menu), with keyboard focus indicators visible on those controls"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "4.catchall"

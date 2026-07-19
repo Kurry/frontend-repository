@@ -1,0 +1,119 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "hover_feedback_required"
+description = "Hovering with the real pointer shows visible feedback: buttons ease background and shadow with a slight press effect, table rows and nav items take a full-width hover wash, interactive chips respond, and form controls show focus rings"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "create_dialog_enter_exit"
+description = "Opening the create-task control with the real pointer brings the form dialog in with a short opacity and scale transition of roughly 200 to 300 milliseconds, and closing exits the same way rather than disappearing instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "run_and_timeline_microinteractions"
+description = "Driven through the real UI controls (never a state-shortcut tool call): submitting the create-task form animates the new run row into the pipeline table, new timeline entries animate in rather than popping, the currently running stage carries a visible animated indicator (pulse or spinner) that settles when the stage completes, and activating a verdict filter animates the distribution bar segments and trial rows to their new arrangement rather than snapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "log_disclosure_transition"
+description = "Activating a log excerpt disclosure expands it with a smooth height transition and a chevron rotation, and activating it again collapses it the same way"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "toasts_slide_autodismiss"
+description = "After starting a run, on run completion, and after copying the manifest, a feedback toast slides in, remains readable long enough to scan, and auto-dismisses with a fade"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion enabled, animations are removed or reduced to instant state changes while every flow — create, run progression, disclosures, filters — remains fully usable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "transitions_snap_everywhere"
+description = "Overlay panels, disclosures, and stage-status changes snap abruptly with no transition anywhere in the app, leaving the interface feeling entirely static"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction performed, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

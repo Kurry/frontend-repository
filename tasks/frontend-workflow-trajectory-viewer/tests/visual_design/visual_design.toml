@@ -1,0 +1,134 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "three_pane_workspace_composition"
+description = "At a 1440px viewport the trial viewer composes as a fixed three-pane workspace separated by hairline borders — a left timeline rail roughly one fifth of the width, a center file workspace as the widest pane, and a right detail rail roughly one quarter — reading as one instrument rather than a stack of disconnected cards"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "type_roles_and_hierarchy"
+description = "A monospaced face is used for code, terminal output, file paths, and step indices while a UI sans is used elsewhere, and page titles are visibly larger than section headings, which are larger than body and label text, consistently across views"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "status_color_system_consistent"
+description = "One status color system is applied consistently wherever a status appears (timeline markers, tool panels, outcome badges): a single accent marks the active step, green marks complete/pass, red marks error/fail, amber marks running/streaming, and every status also carries a text label or glyph so color is never the only indicator"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "change_badge_treatments_distinct"
+description = "The Added, Modified, Deleted, and Truncated change badges each render a visually distinct treatment and always include their word, never a color chip alone"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "dense_register_icons_states"
+description = "The trial table, timeline, and file tree use compact dense rows with cards and panels carrying subtle shadows and hairline borders rather than heavy outlines, one consistent icon set is used across the chrome, and the ingest checklist, the empty terminal state, and the empty annotations state are each deliberately designed surfaces with explanatory copy rather than blank regions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "tabbed_collapse_small_viewport"
+description = "At a viewport of 1024px wide or below, the three panes collapse into a tabbed arrangement where timeline, workspace, and detail are switchable one at a time, and the active step stays consistent across tab switches"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "mobile_375_overflow"
+description = "At 375px viewport width, content clips, overflows the viewport, or page-level horizontal scrolling appears"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.9"
+name = "copy_conventions_specific_labels"
+description = "Headings, buttons, and labels follow one consistent capitalization convention throughout, and action labels are specific verbs (Add note, Classify failure) rather than generic labels where a specific one is possible"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.10"
+name = "placeholder_text_visible"
+description = "Lorem ipsum, 'TODO', template variable names, real product or model-vendor brand names, or other placeholder text is visible somewhere in the shipped UI"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design, responsiveness, or UI copy that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, viewport, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

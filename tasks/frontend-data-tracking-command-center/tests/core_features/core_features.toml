@@ -1,0 +1,218 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "kpi_strip_four_tiles_seeded"
+description = "On first load the header row shows at least four KPI tiles — total prompts, active agents, evaluations run, and cost this month — each with a numeric value, an up-or-down trend indicator arrow, and a small sparkline of at least 7 points"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "sparkline_hover_tooltip"
+description = "Hovering a point on a KPI tile sparkline (or the detail chart) with the real pointer shows a tooltip containing the underlying numeric value for that point"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "kpi_tile_detail_view_roundtrip"
+description = "Clicking a KPI tile opens that metric's detail view without a full page reload, showing a larger chart of the same series and a breakdown table with at least 6 rows; the Back control returns to the dashboard with prior dashboard state (feed filters, expanded agent rows) intact"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "active_agents_kpi_tracks_panel"
+description = "The active agents KPI value equals the number of agents in the running state shown in the agent panel, and connecting or disconnecting an agent updates the KPI and the panel together in the same interaction without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "agent_panel_rows_and_seed_states"
+description = "The agent panel lists at least 4 seeded agents, each row showing agent name, model, a state chip (idle, running, or error), and a last-active timestamp, with at least one seeded agent in each of the idle, running, and error states on first load"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "running_agent_step_progression"
+description = "A running agent's row names its current step and shows a live status progression: steps advance visibly from pending to running to complete during the simulated run, and an n-of-m steps-complete summary on the row updates as steps advance"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "agent_row_expand_collapse_remembered"
+description = "Clicking an agent row expands an inline detail area listing that agent's named steps with per-step status indicators; clicking again collapses it; after switching to a metric detail view and back, each row's expanded or collapsed state is unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "error_agent_retry_resets_and_logs"
+description = "An agent row in error state renders with the danger color treatment and a Retry control; activating Retry flips that agent's state chip to idle immediately and a corresponding retry event appears at the top of the activity feed in the same interaction"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "connect_agent_form_validation"
+description = "The Connect agent control opens a dialog with agent name (required), model select (required), and description (optional); the submit control stays disabled until required fields are valid, and each invalid field shows an inline message naming that field before submit"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "connect_agent_creates_exactly_one"
+description = "Submitting a valid Connect agent form closes the dialog, adds exactly one new row to the agent panel (row count delta measured immediately around the action is one, even when the submit control is double-activated), and appends an agent-connected event to the feed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "rename_and_disconnect_agent"
+description = "Rename edits an agent's name in place and the new name appears everywhere the agent is referenced (panel row, expanded detail, feed references); Disconnect asks for confirmation, removes the row, updates the active agents KPI when the agent was running, and appends a disconnected event to the feed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "feed_newest_first_capped_50"
+description = "The activity feed shows seeded events (at least 12 on first load) newest-first with relative timestamps; each item has an icon, a description, a status chip (info, success, or error), and an elapsed-time label; the feed never shows more than 50 events"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "feed_item_opens_related_resource"
+description = "Clicking an agent event in the feed opens the agent panel with that agent's detail expanded, and clicking a metric event opens that metric's detail view, both without a full page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "feed_filter_chips_and_clear"
+description = "Selecting filter chips above the feed narrows the visible feed to matching events with the visible event count updating, and the Clear filters control restores the full feed exactly (same items and order as before filtering)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "simulate_activity_appends_event"
+description = "Activating the Simulate activity control appends one new event at the top of the feed carrying the newest relative timestamp; repeating it with different resulting events shows differing descriptions rather than identical hardcoded output"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "feed_autofollow_and_jump_to_latest"
+description = "While new events arrive the feed keeps the newest event in view; after scrolling down into older events auto-follow stops and a jump-to-latest control appears; activating it scrolls back to the newest event and resumes following"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "suggestion_chips_apply_named_filter"
+description = "Clicking a suggestion chip above the feed applies exactly the filter it names to the feed, and when the row overflows it scrolls horizontally without shifting the vertical layout"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.18"
+name = "night_mode_badge_schedule_form"
+description = "The header night-mode badge distinguishes active (blue), scheduled (gray), and disabled (neutral); clicking it opens a popover schedule form with an enable toggle and start/end times where invalid or empty times show inline messages naming the field and block saving; saving with the current simulated time inside the window switches the badge to active and recolors the app to the dark theme without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "long_agent_name_truncation"
+description = "An agent name longer than 40 characters is truncated with an ellipsis in the panel row and shown in full in the expanded detail area"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.n1"
+name = "static_feed_or_fabricated_actions"
+description = "The activity feed is static or fabricated: connecting an agent, retrying an errored agent, or activating Simulate activity produces no new feed event, or repeated actions yield byte-identical feed content regardless of input"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n2"
+name = "missing_empty_states"
+description = "Filtering the feed to zero matches or disconnecting every agent leaves a blank region with no empty-state message or recovery control"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "A specified core behavior is broken or missing in a way NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action performed, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

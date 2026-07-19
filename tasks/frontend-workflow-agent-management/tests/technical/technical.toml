@@ -1,0 +1,135 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "cold_load_interactive"
+description = "The app serves from its documented start path and is interactive (table rendered, controls responding) within 2 seconds of a local cold load"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "console_clean_full_exercise"
+description = "No console errors, warnings, or unhandled promise rejections appear on load or during a full exercise of the app, including active simulated runs, retries, and bulk actions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "run_state_single_source"
+description = "The Activity progress list and the History timeline stay consistent with each other during a run: a step transition visible in one is reflected in the other in the same interaction, indicating both derive from one live run state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "reload_restores_seeded_baseline"
+description = "After exercising the app (registration, runs, pauses, filters), a page reload returns it to the seeded baseline: the seeded agents and histories, no active filter, and no open panel"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "runs_differ_across_repeats"
+description = "Running the simulated work twice (or on two agents) produces visibly different step timings or outcomes, proving the run machinery derives from live logic rather than one hardcoded script"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "responsive_under_concurrent_runs"
+description = "With multiple agents running simultaneously, rapid repeated filtering, selection changes, and panel switches cause no hangs, dropped interactions, or desynced counts"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "browser_storage_used"
+description = "localStorage, sessionStorage, or another browser storage API is non-empty after a full exercise of the app, violating the in-memory-only state rule"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.8"
+name = "outbound_network_requests"
+description = "The devtools network log shows outbound requests to other origins (CDN scripts, fonts, icons, or data) after load, instead of all assets being served locally"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.9"
+name = "runtime_exceptions_on_interaction"
+description = "Specific interactions (run start, retry, pause, resume, bulk actions, remove, timeline filter) throw runtime exceptions visible in the console, even if the UI appears to continue"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

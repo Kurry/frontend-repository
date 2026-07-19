@@ -1,0 +1,183 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_board_walkthrough"
+description = "On load, the board shows exactly four columns named Backlog, In Progress, Review, and Done, each header showing a live card count, with at least 12 seeded cards total distributed so no column is empty (at least 4 Backlog, 3 In Progress, 3 Review, 2 Done)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "card_anatomy_complete"
+description = "Every seeded card shows a title, a status chip naming its execution state, and an n of m progress indicator for its task items; cards with an assignee show an avatar or initials, and at least 3 seeded cards show a prompt chip with icon and prompt title"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "drag_between_columns_updates_counts"
+description = "Using a real pointer drag, moving a card from one column to another places it in the destination column and both column header counts update immediately (source down by one, destination up by one) without a page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "drop_position_exact"
+description = "Scripted probe: drag a card and drop it between the first and second cards of another column; the card lands at exactly that index (position 2), not at the top or bottom. Then drag a card within its own column to a new position and confirm it lands at exactly the drop position"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "keyboard_move_control_parity"
+description = "Each card exposes a move control (overflow menu or equivalent) offering moves to each of the four columns plus Move up and Move down, operable with the keyboard alone; using it moves the card and updates both column counts exactly as a drag would"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "create_card_valid_submit"
+description = "Clicking Add Card in a column opens a modal with title (required), description, attached prompt select, and assignee select; submitting with a valid title closes the modal, inserts the new card at the top of that column, and increments that column's count by exactly one"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "create_card_invalid_blocked"
+description = "In the Add Card modal, the Submit control stays disabled while the title is empty; submitting with an empty or whitespace-only title shows an inline validation message naming the title field and no card is added (column count unchanged); rapidly double-activating Submit with a valid title creates exactly one card"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "prompt_panel_readonly"
+description = "Clicking a card's prompt chip opens a side panel showing the prompt title and full prompt text in read-only form; the panel closes via its close control and via the Escape key"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "card_detail_edit_saves_in_place"
+description = "Clicking a card opens a detail modal showing title, description, attached prompt, assignee, a comment thread area, the task item checklist, and a status badge matching the card's current column; editing the title and clicking Save updates the card on the board in place without a reload, while Cancel leaves it unchanged; submitting a comment appends it to the thread with a visible timestamp"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "filter_search_narrow_all_columns"
+description = "Selecting an assignee in the toolbar filter narrows all four columns simultaneously to that assignee's cards while the four-column structure remains, and column counts change to reflect visible cards; typing in the search input narrows cards incrementally by title, a visible Clear filters control restores the full board, and clearing the search restores the full board exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "run_progresses_subitems_sequentially"
+description = "Pressing Run on a card starts a watchable simulated execution: sub-items advance one at a time in order through pending, running, and complete states, the card's status chip reads running with an active indicator during the run, the n of m progress indicator increments live, and on completion the chip reads complete with m of m shown"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "retry_backoff_visible"
+description = "Running the seeded failing card shows a sub-item entering a retrying state with a visible attempt counter and a live backoff countdown of the form 'waiting Ns before retry 2 of 3' before the next attempt starts"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "manual_retry_resumes_from_failed_step"
+description = "After a run reaches a failed state, a Retry control appears; activating it resumes execution from exactly the failed sub-item — sub-items already complete keep their checked state and visibly do not re-run from the start"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "empty_column_state_with_add"
+description = "Moving or filtering the last card out of a column leaves that column showing an empty state message with an Add Card control that opens the create flow targeting that column"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "board_static_no_working_flows"
+description = "The board is static markup only: dragging, keyboard moves, or card creation fail to change the shared board state (counts or card positions never actually change)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.20"
+name = "execution_fabricated"
+description = "Card execution is fabricated: pressing Run completes all sub-items instantly in one jump with no visible sequential progression, or runs on two different cards produce identical progressions ignoring each card's own sub-item list"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

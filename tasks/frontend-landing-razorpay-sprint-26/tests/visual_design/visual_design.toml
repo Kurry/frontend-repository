@@ -198,6 +198,28 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "2.19"
+name = "asymmetric_stack_composition"
+description = "On desktop the stacked thematic sections overlap the predecessor by the measured 100px stack overlap, section headers use an asymmetric two-column layout (index column about 330px with title/tagline in the remaining span) rather than equal-width stacks, and feature-hero card grids use uneven column ratios."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.20"
+name = "color_scarcity_electric_blues"
+description = "Electric blue #0039ff (rgb(0,57,255)) appears as the click-flash nav cell, GET ACCESS rail rest, and blue section band, and #305eff (rgb(48,94,255)) appears as the scroll-spy cell, loader bar, rail hover, and focus outline — not as a page-wide body fill — while yellow #e3f51a and sky #b8cbd1 remain sparse accents rather than dominant backgrounds."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.21"
+name = "lime_or_cream_palette_present"
+description = "The page adopts a lime-on-dark or warm-cream editorial palette (for example lime accents near #ecfdad or a cream body near #F4F1EA / #eae9e6) instead of the Novapay electric-blue / near-black / white identity."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "2.catchall"
 name = "visual_design_catchall"
 description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

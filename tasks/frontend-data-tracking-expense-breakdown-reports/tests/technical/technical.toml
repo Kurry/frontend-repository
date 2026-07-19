@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "2.2"
 name = "2_2"
-description = "Implemented with React, Zustand, and Styled Components; no browser storage APIs for persistence"
+description = "No browser storage is used for persistence: localStorage and sessionStorage remain empty after a full exercise of the app, and a reload returns the seeded state"
 type = "binary"
 weight = 1.0
 
@@ -71,6 +71,14 @@ weight = 1.0
 id = "2.3"
 name = "2_3"
 description = "Uses localStorage or sessionStorage to persist transactions or filters"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
 weight = 1.0
 negate = true

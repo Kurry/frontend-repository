@@ -1,0 +1,140 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "hover_feedback_present"
+description = "While hovering with the real pointer, toolbar buttons and chips visibly change background or border with a slight press effect on activation, and table rows take a full-width hover wash, confirmed via computed styles while the hover is held"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "new_rows_animate_in"
+description = "After clicking Refresh through the real control, newly added model rows animate in from transparency over roughly 200 milliseconds rather than appearing instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "departing_rows_strikethrough_collapse"
+description = "After a refresh removes a model, its row fades to reduced opacity with a strikethrough style and then collapses out of the table over about 5 seconds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "feed_events_slide_in"
+description = "While the simulation is running, each arriving usage event slides into the top of the feed with a transition and existing entries shift down smoothly rather than snapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "modals_transition"
+description = "Opening and closing the alert modal and the comparison modal through their real controls shows a short opacity and scale transition of roughly 200 to 300 milliseconds in each direction"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "toasts_slide_and_dismiss"
+description = "Free-model alert toasts slide in, remain readable for a moment, and auto-dismiss with a fade"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "disclosure_animates_with_chevron"
+description = "Activating a cost row's contributing-events disclosure expands it with a smooth height transition and a rotation cue on its chevron, and collapsing reverses both"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "chart_slices_animate"
+description = "Toggling a legend entry or receiving a simulated usage event animates the pie slices to their new proportions rather than redrawing instantly"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.9"
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion enabled, transitions apply instantly and every flow (refresh, simulation, modals, disclosure) remains fully usable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "surfaces_snap_without_motion"
+description = "Model rows, modals, toasts, or feed entries appear and disappear instantly with no transition anywhere when driven through the real controls, leaving the app without the specified microinteractions"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file — for example animation that causes layout jank or flicker. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

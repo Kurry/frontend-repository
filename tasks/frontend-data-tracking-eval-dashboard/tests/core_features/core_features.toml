@@ -1,0 +1,260 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_suite_list_complete"
+description = "On load, the left panel lists at least 3 seeded eval suites, and each entry shows a suite name, a prompt count, a last-run timestamp, and an average score badge"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "create_suite_flow"
+description = "Clicking New Suite opens a modal with a suite name field and a prompt multi-select; the Submit control is disabled until a name is entered and at least one prompt is selected, and submitting a valid form closes the modal and adds exactly one new entry to the suite list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "invalid_create_validation"
+description = "Attempting to submit New Suite with an empty suite name shows an inline validation message that names the suite name field, and the suite list gains no entry"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "edit_suite_prefilled_updates"
+description = "Choosing a suite entry's Edit action opens the form prefilled with that suite's name and prompt selection, and saving updates the entry's name and prompt count in the list without a page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "delete_confirm_cancel"
+description = "Choosing a suite's Delete action opens a confirmation dialog; confirming removes exactly that suite from the list, while canceling leaves the suite intact"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "run_steps_visible_progression"
+description = "Clicking Run Suite shows one visible step per prompt in the suite, each labeled with its prompt title, and step statuses advance visibly through pending, running, and complete (or failed) as the simulated run progresses"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "run_log_streams_progressively"
+description = "During a run started from the real Run Suite control, the inline run log grows progressively — lines appear incrementally over the course of the run, not all at once — and a status affordance distinguishes waiting, running, and complete states"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "retry_backoff_attempt_counter"
+description = "When a simulated step failure occurs, the step shows a retrying state with a visible backoff countdown and an attempt counter (such as retry 2 of 3) before the retry executes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "failed_retry_resumes_from_step"
+description = "A step that exhausts its retries is marked failed with an inline error summary and a manual Retry control; activating that control resumes the run from that step, and steps completed earlier keep their original outputs and timestamps without re-executing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "pause_resume_checkpoint"
+description = "Pausing a running suite freezes step progression at the current step; resuming continues from exactly that step, and steps completed before the pause remain unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "rollup_derives_from_steps"
+description = "A run-level rollup shows completed count out of total (n of m), overall elapsed duration, and failure count, and these values update live as step statuses advance during a run"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "event_timeline_filter_highlight"
+description = "The run's event timeline lists step transitions in order with timestamps, filtering the timeline by status narrows the visible entries, and selecting a timeline entry highlights the corresponding step in the step list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "run_completion_updates_suite"
+description = "When a run finishes, the results panel populates with that run's rows, and the suite entry's last-run timestamp and average score badge update to reflect the new run without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "results_table_columns_pass_badge"
+description = "The results table shows columns for prompt title, model, score (0 to 100), latency in milliseconds, tokens used, and a pass/fail badge, and rows with a score of 70 or above show Pass while rows below 70 show Fail"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "column_sort_round_trip"
+description = "Clicking a results column header sorts the table by that column ascending, clicking the same header again reverses the order to descending, and the reordering is consistent with the visible cell values (proving sort derives from live data)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "detail_panel_with_disclosure"
+description = "Clicking a result row opens a detail panel showing the full prompt text, the model response, and a per-dimension scoring breakdown inside a collapsible region that is collapsed by default, expands on activation, and remembers its open state per result while the app is open"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "charts_render_with_tooltip"
+description = "A bar chart shows the average score per model for the selected suite's latest run and hovering a bar with the real pointer shows a tooltip with the model name and exact score; a line chart below it plots average score across the suite's last 7 runs with run dates on the x-axis"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "charts_update_on_new_run"
+description = "Completing a new run appends one new point to the trend line chart and redraws the bar chart to reflect the new run's per-model averages — the charts visibly change when their input data changes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "comparison_view_coherent"
+description = "The toolbar comparison toggle switches to a side-by-side table with one column per model and one row per prompt where each cell shows score and latency; the score in any comparison cell matches the results table for the same prompt and model, and toggling back restores the results view with the prior sort intact"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "night_scheduling_flow"
+description = "The Night Window settings form saves a start and end time and shows the configured window in the toolbar, rejecting a missing time or an end not after the start with inline messages naming the field; toggling Night Mode on a suite shows a moon icon badge on the entry and toggling it off removes the badge"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "suite_switch_swaps_context"
+description = "Selecting a different suite in the left panel swaps the results table, both charts, and the detail panel context to that suite's latest run without a full page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "double_activation_single_effect"
+description = "Rapidly double-activating Run Suite starts exactly one run (one step-list fill, one new trend point), and rapidly double-activating the New Suite Submit control creates exactly one suite (the count increases by exactly one)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "empty_states_present"
+description = "A never-run suite shows an empty state in the results region explaining that running the suite populates results; deleting the currently selected suite clears the results panel and charts to an empty state with a message and a control to select or create a suite; filtering the event timeline to a status with no entries shows an empty state message"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "long_title_truncation"
+description = "A prompt title longer than 60 characters renders truncated with an ellipsis in the results table row and is shown in full in the detail panel"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.25"
+name = "rerun_replaces_and_caps_trend"
+description = "Running the same suite a second time replaces the latest-run results, appends exactly one new trend point, and the trend chart never plots more than the last 7 runs"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "fabricated_run_success"
+description = "The Run Suite flow presents a completed state while the results table, the suite's last-run timestamp, or the trend chart remain unchanged from before the run"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.27"
+name = "identical_rerun_output"
+description = "Running the same suite twice yields byte-identical scores, latencies, and per-model averages both times, indicating hardcoded rather than simulated results"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

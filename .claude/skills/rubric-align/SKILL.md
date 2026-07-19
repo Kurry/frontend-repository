@@ -19,6 +19,8 @@ You are editing the four dimension tomls of one task so the rubric and the instr
 
 ## Inputs to read first
 
+**Blocker check before anything else:** the instruction must contain a non-empty `<webmcp_action_contract>` block. State-setup criteria presume the judge can drive state through the contract's bindings; aligning rubrics against a contract-less instruction produces criteria the judge cannot set up. If the block is missing, STOP and report it — the contract (assignment in `schemas/webmcp-assignments.json`, rendered by `scripts/webmcp_h3.py`) must be added first.
+
 1. The task's `instruction.md` — the contract being graded. List its behavioral promises per section as you read.
 2. The task's four tomls: `tests/core_features/core_features.toml`, `tests/visual_design/visual_design.toml`, `tests/motion/motion.toml`, `tests/technical/technical.toml`.
 3. `docs/rubrics.md` — you need: the dimension definitions, "Authoring Criteria: From HLI Verifier to TOML", "Open-Ended Judge Catch-All Criterion", and (when the task's kit or genre calls for them) the showcase extensions and Meta-Framework Delivery Criteria (10.m).

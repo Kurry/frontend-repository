@@ -62,29 +62,29 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "tab_title_exact"
-description = "On load the browser tab title reads exactly 2025 McLaren Formula 1 Driver — Lando Norris"
+name = "single_page_homepage_title"
+description = "On load the app serves a single homepage at route / (no other route is built), and the browser tab title reads exactly 2025 Apex Grand Prix Driver — Avery Vale"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
 name = "preloader_shows_then_clears"
-description = "On a fresh load a full-bleed lime preloader shows the text LOAD NORRIS and then clears within about one to two seconds to reveal the homepage rather than staying on screen blocking content"
+description = "On a fresh load a full-bleed lime preloader shows the text LOAD VALE and then clears within about one to two seconds to reveal the homepage rather than staying on screen blocking content"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
 name = "fixed_nav_contents"
-description = "A fixed nav stays pinned to the top over all sections and shows, left to right, a stacked LANDO NORRIS text wordmark (LANDO above NORRIS), a centered original placeholder monogram mark, a lime STORE button, and a square hamburger button"
+description = "A fixed nav stays pinned to the top over all sections and shows, left to right, a stacked AVERY VALE text wordmark (AVERY above VALE), a centered original AV monogram, a lime STORE button, and a square hamburger button"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
 name = "menu_overlay_contents"
-description = "After clicking the hamburger, a full-screen dark-green menu overlay covers the viewport listing HOME, ON TRACK, OFF TRACK, CALENDAR, the socials TikTok, Instagram, YouTube, Twitch, and the business contact business@landonorris.com"
+description = "After clicking the hamburger, a full-screen dark-green menu overlay covers the viewport listing HOME, ON TRACK, OFF TRACK, CALENDAR, the social labels CLIPS, PHOTOS, VIDEO, LIVE, and the business contact hello@averyvale.example"
 type = "binary"
 weight = 1.0
 
@@ -105,7 +105,7 @@ weight = 1.0
 [[criterion]]
 id = "1.7"
 name = "next_race_widget_contents"
-description = "The hero fills at least the first full viewport height and a NEXT RACE widget sits at its lower left showing the eyebrow NEXT RACE, a circuit outline graphic, the label SPA GP, a laurel graphic, and the team line MCLAREN F1 SINCE 2019"
+description = "The hero fills at least the first full viewport height and a NEXT RACE widget sits at its lower left showing the eyebrow NEXT RACE, an original circuit outline graphic, the label ALPINE GP, an original laurel graphic, and the fictional team line NOVA RACING SINCE 2019"
 type = "binary"
 weight = 1.0
 
@@ -147,14 +147,14 @@ weight = 1.0
 [[criterion]]
 id = "1.22"
 name = "helmet_grid_three_indexed_cards"
-description = "A helmet grid shows at least three tall portrait cards masked to a helmet silhouette, built from original placeholder imagery, each carrying a visible index label"
+description = "A helmet grid shows at least three tall portrait cards masked to a helmet silhouette, each with a different newly authored fictional livery, separate base and reveal artwork, and a visible index label"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.23"
-name = "collaborators_marquee_placeholder_logos"
-description = "A collaborators strip shows a horizontal marquee of at least five distinct original placeholder partner logos"
+name = "collaborators_marquee_fictional_marks"
+description = "A collaborators strip shows a horizontal marquee of at least five distinct newly drawn fictional partner symbols or wordmarks; plain typed company names do not count as marks"
 type = "binary"
 weight = 0.5
 optional = true
@@ -162,14 +162,14 @@ optional = true
 [[criterion]]
 id = "1.24"
 name = "video_card_layered_still"
-description = "A social video card shows a still placeholder image layered over a muted looping locally served video element"
+description = "A social video card shows an original poster image layered over a muted looping locally served VP9 WebM video whose frames visibly change"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.25"
 name = "footer_contents"
-description = "The footer shows a large split-text brand statement, a partner logo marquee, the LANDO NORRIS wordmark, a newsletter signup form, and the legal links Privacy Policy, Terms, and Cookies"
+description = "The footer shows a large split-text brand statement, a fictional-partner logo marquee, the AVERY VALE wordmark, a newsletter signup form, and the legal links Privacy Policy, Terms, and Cookies"
 type = "binary"
 weight = 1.0
 
@@ -199,7 +199,7 @@ negate = true
 [[criterion]]
 id = "1.29"
 name = "next_race_widget_missing"
-description = "The hero omits the NEXT RACE widget or its SPA GP and MCLAREN F1 SINCE 2019 labels"
+description = "The hero omits the NEXT RACE widget or its ALPINE GP and NOVA RACING SINCE 2019 labels"
 type = "binary"
 weight = 0.5
 negate = true
@@ -208,7 +208,7 @@ optional = true
 [[criterion]]
 id = "1.30"
 name = "hero_composition_with_silhouette"
-description = "The hero shows an off-white blob-and-topographic field with an original driver-silhouette placeholder image rendered behind the navigation chrome"
+description = "The hero shows a newly authored fictional racer portrait/cutout composed in depth with an off-white topographic field, translucent organic blobs, and soft shadow or reflection layers behind the navigation chrome"
 type = "binary"
 weight = 0.5
 optional = true
@@ -216,7 +216,7 @@ optional = true
 [[criterion]]
 id = "1.31"
 name = "media_strip_six_cards"
-description = "The horizontal media strip holds a row of at least six landscape placeholder photo cards"
+description = "The horizontal media strip holds at least six visually distinct newly authored or generated fictional-racer editorial images, rather than repeated thumbnails or flat color placeholders"
 type = "binary"
 weight = 1.0
 
@@ -230,7 +230,7 @@ weight = 1.0
 [[criterion]]
 id = "1.33"
 name = "menu_photo_grid_and_texture"
-description = "The open menu overlay shows a faint topographic line pattern and an image grid of original placeholder photos"
+description = "The open menu overlay shows a newly drawn topographic line pattern and a staggered grid of at least four distinct original fictional editorial photos separate from the horizontal-strip set"
 type = "binary"
 weight = 0.5
 optional = true
@@ -245,7 +245,7 @@ weight = 1.0
 [[criterion]]
 id = "1.35"
 name = "menu_flow_probe"
-description = "Scripted menu flow: scroll partway down the page and note the scroll position, click the hamburger, confirm the overlay covers the viewport with the HOME item showing its current-item stroke, then activate a menu item or the X control; confirm the overlay closes, the fixed nav is still pinned, the scroll position and section content are unchanged, and no document reload occurred at any step"
+description = "Scripted menu flow: scroll partway down the page and note the scroll position, click the hamburger, confirm the overlay covers the viewport with the HOME item showing its current-item stroke; activate the X control and confirm the overlay closes with scroll position unchanged; reopen the menu and activate ON TRACK, confirm the overlay closes and the page scrolls within / to the horizontal media section without a document reload, and the fixed nav stays pinned"
 type = "binary"
 weight = 1.0
 
@@ -303,6 +303,20 @@ weight = 1.0
 id = "1.43"
 name = "webgl_fallback_hero_static"
 description = "With WebGL rendering unavailable, the hero shows a static composition of the same artwork and every section, control, and flow remains present and usable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "menu_items_scroll_in_page"
+description = "With the menu open, activating HOME, ON TRACK, OFF TRACK, or CALENDAR scrolls within the same homepage document to the hero, horizontal media strip, social video section, or helmet grid respectively, closes the overlay, and does not load another route or origin"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "authored_asset_surface_inventory"
+description = "Across the rendered page, every major reference media surface is populated: the layered hero portrait, six distinct horizontal-strip images, at least four separate menu photos, three two-state helmet designs, five fictional partner marks, the social poster and changing-frame video, and original monogram/circuit/laurel/telemetry/icon artwork are all visible in their intended sections"
 type = "binary"
 weight = 1.0
 

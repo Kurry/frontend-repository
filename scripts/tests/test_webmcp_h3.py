@@ -74,10 +74,10 @@ class TestWebmcpContract(unittest.TestCase):
             self.assertIn("@playwright/mcp@0.0.76", pw_args)
             self.assertIn("$WEBMCP_CDP_ENDPOINT", pw_args)
 
-    def test_assignment_map_covers_65(self) -> None:
+    def test_assignment_map_covers_89(self) -> None:
         data = json.loads((ROOT / "schemas/webmcp-assignments.json").read_text())
         self.assertEqual(data["contract_version"], "zto-webmcp-v1")
-        self.assertEqual(len(data["assignments"]), 65)
+        self.assertEqual(len(data["assignments"]), 89)
         for entry in data["assignments"]:
             contract = webmcp_h3.render_contract(entry)
             self.assertIn("<webmcp_action_contract>", contract)
@@ -107,6 +107,29 @@ class TestWebmcpContract(unittest.TestCase):
             self.assertIn("webmcp_session_info", section)
             self.assertNotIn("Baseline Quality Bar", section)
             self.assertNotIn("/opt/webmcp-contracts", section)
+
+    def test_every_task_dir_has_assignment_and_contract(self) -> None:
+        """A contract-less task dir is a corpus defect: the judge's webmcp bridge
+        discovers its tool surface from the rendered <webmcp_action_contract>, so
+        every tasks/frontend-* instruction must carry one and have an assignment.
+        (Guard added after a 24-task authoring wave shipped without contracts.)"""
+        data = json.loads((ROOT / "schemas/webmcp-assignments.json").read_text())
+        assigned = {e["task"] for e in data["assignments"]}
+        task_dirs = sorted(
+            p.name for p in (ROOT / "tasks").iterdir()
+            if p.is_dir() and p.name.startswith("frontend-")
+            and (p / "instruction.md").exists()
+        )
+        missing_assignment = [t for t in task_dirs if t not in assigned]
+        self.assertEqual(missing_assignment, [],
+                         f"task dirs without a webmcp assignment: {missing_assignment}")
+        missing_contract = []
+        for t in task_dirs:
+            text = (ROOT / "tasks" / t / "instruction.md").read_text()
+            if "<webmcp_action_contract>" not in text or "</webmcp_action_contract>" not in text:
+                missing_contract.append(t)
+        self.assertEqual(missing_contract, [],
+                         f"instructions missing <webmcp_action_contract>: {missing_contract}")
 
     def test_delivery_requires_package_json_scripts(self) -> None:
         preamble = webmcp_h3.render_instruction_preamble()

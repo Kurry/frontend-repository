@@ -1,0 +1,141 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "shared_state_coherence"
+description = "All surfaces derive from one shared state: typing into a form advances its sidebar chip, drafts survive technique switches from the same store, a submit updates the preview and the Generated chip together, and saving, opening, and deleting library entries update the list, count, and Saved chips together — all without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "no_storage_reload_seeded"
+description = "localStorage and sessionStorage remain empty after exercising all seven forms, attachments, previews, and the library, and a page reload returns the app to its seeded state: 5 library prompts, empty technique forms, and neutral sidebar chips"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "storage_persistence_used"
+description = "localStorage or sessionStorage holds draft, library, chip, or view state after exercising the app"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.4"
+name = "external_network_requests"
+description = "The devtools network log shows requests to external origins or third-party CDNs (scripts, styles, fonts, icons, or data) during load or a full exercise of the app"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.5"
+name = "console_clean_during_session"
+description = "The console is free of errors and unhandled promise rejections on first load and stays clean while filling all seven forms, adding and removing dynamic rows, attaching and removing assets, generating previews, and saving, opening, and deleting library entries"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "cold_load_interactive_2s"
+description = "The app is interactive (sidebar responds and the active form accepts typing) within 2 seconds of a local cold load"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "many_rows_stay_responsive"
+description = "With 10 example rows added to the Few-Shot form, typing in any row and the Add and Remove controls stay responsive with no hangs, and rapid technique switching never shows one technique's draft values inside another's form"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "keyboard_operability_focus"
+description = "Every interactive control — technique entries, form fields, add and remove row controls, attachment badges, the copy control, modal fields, library rows — is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space), showing a visible focus indicator at each stop"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "modal_focus_management"
+description = "The save modal traps focus while open, closes on Escape, and returns keyboard focus to the Save to Library control that opened it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "labels_errors_live_region"
+description = "Every field has a programmatically associated visible label, each inline error is associated with its field so the field name reads with the error, and submitting an invalid form announces the failure through a polite live region"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

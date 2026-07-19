@@ -140,7 +140,7 @@ weight = 1.0
 [[criterion]]
 id = "1.12"
 name = "book_cta_reachable_no_navigation"
-description = "On load, a \"Book your Unit\" CTA is present in the header/sidebar and reachable within two clicks, and no chrome interaction navigates off the homepage or reaches a 404"
+description = "On load, a \"Book your Unit\" CTA is present in the header/sidebar and reachable within two clicks, and activating chrome (nav items, Book CTAs, footer links, social icons, or the \"English\" control) either scrolls within this homepage or performs a no-op — never navigating to another route, opening an external origin, or reaching a 404"
 type = "binary"
 weight = 1.0
 
@@ -247,6 +247,13 @@ name = "hero_photo_and_supporting_line"
 description = "The hero section shows a full-bleed placeholder lifestyle photograph behind the headline together with the supporting line \"All-inclusive φοιτητική διαμονή με όλα όσα χρειάζεσαι για να ζεις, να σπουδάζεις και να συνδέεσαι.\""
 type = "binary"
 weight = 0.5
+
+[[criterion]]
+id = "1.33"
+name = "single_page_chrome_stays_on_homepage"
+description = "After clicking numbered nav items, a Book CTA, a footer link, a social icon, and the \"English\" control in sequence, the document remains on the homepage root with no route change, no external-origin navigation, and no application-error or Not-found page"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "core_features.catchall"

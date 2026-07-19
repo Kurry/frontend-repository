@@ -1,0 +1,120 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "dense_analytics_shell"
+description = "The app renders a persistent header with the app name, Experiments / Compare / Cost navigation, the rescore control, and a theme toggle, and each view's main canvas shows dense analytics surfaces — tables, summary strips, and charts — on card surfaces with hairline borders and regular spacing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "pass_delta_encoding_consistent"
+description = "Pass and fail render as distinct badges rather than plain text, delta values pair a directional hue with a direction glyph, and the same badge and delta encodings recur everywhere those states appear (experiment table, paired table, summary strip)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "typography_and_number_alignment"
+description = "Typography keeps a clear hierarchy — view titles visibly larger than section headings, which are larger than table body text — and numeric columns align consistently with matching decimal precision (rewards to two decimals)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "themes_coherent_icons_consistent"
+description = "Toggling between light and dark themes recolors surfaces, borders, and text into coherent, readable palettes in both modes, and one consistent icon set is used throughout the chrome"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "responsive_layouts_hold"
+description = "At 1440px width all three views render their full layout with header navigation visible; at 375px width the header navigation collapses into a compact menu that still reaches all three views and the experiment and paired tables scroll horizontally within their own containers"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "mobile_375_overflow"
+description = "At 375px viewport width, content clips, overflows the viewport, or page-level horizontal scrolling appears"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.7"
+name = "placeholder_or_real_names_visible"
+description = "Lorem ipsum, 'TODO', template variable names, or other placeholder text is visible in the shipped UI, or the seed data displays real product, company, or AI model names instead of fictional ones"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design, responsiveness, or UI copy that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, viewport, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

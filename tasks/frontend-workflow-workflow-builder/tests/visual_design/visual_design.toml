@@ -1,0 +1,119 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "dot_grid_canvas_background"
+description = "The canvas background shows a light gray dot-grid pattern visually distinct from the surrounding panel chrome, and node tiles carry a colored left border per type — blue Prompt, purple Agent, orange Eval, yellow Condition, green Output — with the palette entries using the same per-type color coding"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "edge_styling_and_selection"
+description = "Edges render as smooth bezier curves in a mid gray, and a selected edge renders in the primary accent blue, visibly distinct from unselected edges"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.4"
+name = "status_badge_palette_consistent"
+description = "Status badges use one consistent palette everywhere (canvas nodes, timeline, rollup): pending neutral gray, running blue with an active indicator, retrying amber, failed red, complete green — every badge naming its state in text, never color alone"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "workspace_layout_composition"
+description = "The layout composes as left palette panel, central canvas, collapsible right Saved Workflows panel, a toolbar above the canvas containing Run, Pause/Resume, Retry from failed node, Save, and the live rollup, and a timeline panel below the canvas; one consistent icon set is used across the palette, toolbar, badges, and timeline, and typography keeps a clear hierarchy between panel titles, node titles, and metadata text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "component_states_styled"
+description = "Buttons, selects, and inputs show distinct default, hover, focus (visible ring), disabled, and error treatments, with no bare browser-default-styled controls anywhere"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "responsive_panels_collapse"
+description = "At 1024 pixels the Saved Workflows panel collapses behind a toggle, at 768 pixels the palette collapses to a compact strip or toggle with the timeline still reachable, and at 375 pixels no content clips or overflows and no page-level horizontal scrollbar appears while the canvas remains pannable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "overlap_or_unreadable_text"
+description = "At 1440 or 375 pixel widths, node labels, badges, toolbar controls, or timeline text overlap other elements or are clipped so they become unreadable"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

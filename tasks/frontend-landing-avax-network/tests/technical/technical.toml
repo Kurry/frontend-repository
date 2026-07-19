@@ -62,21 +62,21 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "2.1"
-name = "2_1"
-description = "The page loads and runs with zero console errors and zero unhandled promise rejections during load and while exercising the theme toggle and both forms"
+name = "console_clean_on_load_and_exercise"
+description = "The page loads and runs with zero console errors, zero hydration mismatch warnings, and zero unhandled promise rejections during load and while exercising the theme toggle and both forms"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
-name = "2_2"
+name = "offline_local_assets_only"
 description = "The homepage renders fully with no outbound network requests to remote hosts for fonts, images, video, scripts, or data; the transaction total comes from a local endpoint"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
-name = "2_3"
+name = "client_state_without_reload"
 description = "Toggling the theme and stepping through the newsletter form update the page via client state without a full document reload"
 type = "binary"
 weight = 1.0
@@ -90,7 +90,7 @@ weight = 1.0
 
 [[criterion]]
 id = "2.5"
-name = "2_5"
+name = "outbound_runtime_requests_present"
 description = "The page issues outbound requests to remote hosts at runtime (CDN fonts, images, video, analytics, or a remote data fetch) instead of resolving all assets locally"
 type = "binary"
 weight = 1.0
@@ -98,15 +98,15 @@ negate = true
 
 [[criterion]]
 id = "2.6"
-name = "2_6"
-description = "Console errors, failed asset requests, or unhandled rejections appear on load or while exercising the theme toggle, carousel, or forms"
+name = "console_errors_during_exercise"
+description = "Console errors, hydration mismatch warnings, failed asset requests, or unhandled rejections appear on load or while exercising the theme toggle, carousel, or forms"
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "2.7"
-name = "2_7"
+name = "theme_computed_style_round_trip"
 description = "After clicking the real theme toggle, getComputedStyle on the body color flips between rgb(0, 0, 0) in light and rgb(255, 255, 255) in dark and the visible nav bar surface flips between rgb(255, 255, 255) and rgb(21, 20, 19)"
 type = "binary"
 weight = 0.5
@@ -130,7 +130,7 @@ optional = true
 [[criterion]]
 id = "2.10"
 name = "placeholder_media_accessible_labels"
-description = "All placeholder imagery, logos, and video panels carry descriptive alt text or accessible labels, and text over imagery and control labels meet WCAG AA contrast in both light and dark themes"
+description = "All placeholder imagery, logos, and video panels carry descriptive alt text or accessible labels, and body text meets at least 4.5:1 contrast while UI controls/icons meet at least 3:1 in both light and dark themes including text over imagery"
 type = "binary"
 weight = 0.5
 optional = true
@@ -138,7 +138,7 @@ optional = true
 [[criterion]]
 id = "2.11"
 name = "fast_interactive_no_layout_shift"
-description = "The page is interactive within about 2 seconds of a local cold load, hero imagery loads eagerly while editorial imagery lazy-loads, and no visible layout shift occurs as fonts, images, or video panels finish loading (media regions reserve their space from first paint)"
+description = "The page is interactive within about 2 seconds of a local cold load, the largest above-the-fold content settles within about 2.5 seconds, hero imagery loads eagerly while editorial imagery lazy-loads, and no visible layout shift occurs as fonts, images, or video panels finish loading (media regions reserve their space from first paint; cumulative shift stays under about 0.1)"
 type = "binary"
 weight = 1.0
 
@@ -148,6 +148,37 @@ name = "smooth_scroll_and_toggle_performance"
 description = "Continuous scrolling from top to bottom holds a smooth frame rate through every reveal, scrub, and marquee, and rapidly toggling the theme several times never freezes the page"
 type = "binary"
 weight = 0.5
+optional = true
+
+[[criterion]]
+id = "2.13"
+name = "semantic_landmarks_nav_main_footer"
+description = "The homepage exposes HTML landmarks: a navigation region for the primary nav, a main landmark wrapping the scrolling sections, and a contentinfo/footer landmark for the footer"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.14"
+name = "split_heading_aria_label_pattern"
+description = "After a split-heading character flash has run on real scroll, the heading container keeps the original phrase as an aria-label while the individual character spans are hidden from the accessibility tree (aria-hidden)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.15"
+name = "deep_link_homepage_parity"
+description = "Loading / directly renders the same single continuous homepage chrome and section baseline as remaining on / after in-page interactions — no blank shell, no alternate route content, and no post-hydration flash that replaces the first-paint homepage with different copy or layout"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "2.16"
+name = "motion_blocks_first_interaction"
+description = "Client motion or heavy media initialization blocks first interaction: navigation, theme toggle, or form controls stay unresponsive for several seconds after first paint while scripts or assets finish"
+type = "binary"
+weight = 0.5
+negate = true
 optional = true
 
 [[criterion]]

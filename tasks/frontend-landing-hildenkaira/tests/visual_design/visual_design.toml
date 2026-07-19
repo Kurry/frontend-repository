@@ -122,7 +122,7 @@ weight = 1.0
 [[criterion]]
 id = "2.9"
 name = "statement_and_footer_theme_colors"
-description = "The statement band (theme-media) renders background rgb(24, 24, 24) with lime text rgb(236, 253, 173), and the footer (theme-chrome) renders a dark-grey base rgb(43, 43, 43) with white text"
+description = "The statement and about/self-esteem bands (theme-media) render background rgb(24, 24, 24) with lime text rgb(236, 253, 173), and the footer (theme-chrome) renders a dark-grey base rgb(43, 43, 43) with white text"
 type = "binary"
 weight = 1.0
 
@@ -151,7 +151,7 @@ negate = true
 [[criterion]]
 id = "2.13"
 name = "fluid_type_scale_across_breakpoints"
-description = "The hero H1 measures about 62.8px at 1440 viewport width, about 76px at 991, about 60px at 767, and about 52px at 479, and resizing between these widths scales the type smoothly with no abrupt size jumps at breakpoint boundaries"
+description = "Fluid clamp-based type scaling: the hero H1 measures about 62.8px at 1440 viewport width, about 76px at 991, about 60px at 767, and about 52px at 479, and resizing between these widths scales the type smoothly with no abrupt size jumps at breakpoint boundaries"
 type = "binary"
 weight = 1.0
 
@@ -197,6 +197,36 @@ negate = true
 id = "2.19"
 name = "real_brand_assets_shipped"
 description = "The page ships real brand or third-party assets instead of original stand-ins: the reference site's actual logo, wordmark, or lettermark artwork, real client logos for Finlayson, Kierrätyskeskus, Uusi Juttu, Autoliitto, or Liikku, licensed commercial typefaces, brand photography or case-video footage — or the footer credit names the reference site's real designer or agency instead of an invented generic name"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.20"
+name = "broken_grid_editorial_composition"
+description = "At desktop width the layout reads as broken-grid editorial composition: the hero lettermark spans the top while the H1/lead sit toward the lower third with case thumbnails crossing the left and right zones; the about band overlays large display type on a media field with flanking images that break a single equal-width column stack"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.21"
+name = "fluid_em_baseline_spacing"
+description = "Major paddings and gaps follow a consistent fluid em baseline (multiples of about 0.5em / 1em / 2em / 8em tracking the root size) rather than arbitrary one-off spacing that breaks the 4/8-style rhythm"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "2.22"
+name = "color_scarcity_roles_respected"
+description = "Accent roles stay scarce: lime appears on the Organic views tile, theme-media headings, selection, primary buttons, and load veil — not as a global wash; turquoise appears on the Training card and primary-button hover; red appears only as the nav link dot; chrome-metallic is limited to the Likes tile, contact popup, and footer"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.23"
+name = "lime_wash_everywhere_failure"
+description = "Lime is used as a broad page wash or default surface color across unrelated sections instead of staying scarce to its reserved roles (Organic views tile, theme-media headings, selection, primary buttons, load veil)"
 type = "binary"
 weight = 1.0
 negate = true

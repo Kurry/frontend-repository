@@ -1,0 +1,140 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "hover_feedback_on_chrome"
+description = "Hovering with the real pointer shows visible feedback: heatmap cells lift with a subtle scale or shadow, buttons ease background and shadow with a slight press, variance rows and timeline entries take a full-width hover wash, and form controls show focus rings"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "drawer_slide_transition"
+description = "Clicking a cell with the real pointer slides the drawer in from the edge over roughly 200 to 300 milliseconds, and closing it slides it out rather than snapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "rerun_progress_motion"
+description = "Driven by actually starting a re-run through the UI: the queued badge crossfades to running, each progress-list line ticks complete with a check animation, and the completed cell's new score counts to its value rather than swapping instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "slider_reclassify_motion"
+description = "Moving the threshold slider with the real control animates chips that change classification with a short crossfade between stable and divergent, and the divergent rollup number transitions rather than snapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "chart_bars_animate"
+description = "Changing the chart's model selector or toggling a legend series through the real controls animates the bars: entering bars grow in and leaving bars shrink out rather than the chart repainting instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "timeline_and_summary_microinteractions"
+description = "Driven through the real UI controls (never a state-shortcut tool call): a new timeline entry slides in at the top of the list and the triage summary totals tick to their new values when a classification is saved"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "toasts_slide_autodismiss"
+description = "After a completed re-run and after a saved classification, a toast slides in, remains readable long enough to scan, and auto-dismisses with a fade"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "loading_affordances_animate"
+description = "While a re-run is running, an animated in-progress indicator appears on the affected cell and a loading affordance renders wherever that cell's data is displayed, transitioning smoothly to the settled state on completion"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.9"
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion set, animations are removed and state changes apply instantly while every flow (re-run, triage, filters, chart) remains complete and usable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "static_chrome_or_snapping"
+description = "Interactive chrome feels static: cells, buttons, or rows give no hover feedback, or the drawer and chips snap between states with no transition anywhere"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction performed, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

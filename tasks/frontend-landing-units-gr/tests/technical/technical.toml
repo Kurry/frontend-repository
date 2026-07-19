@@ -84,10 +84,9 @@ weight = 1.0
 [[criterion]]
 id = "te-semantics"
 name = "semantic_landmarks_and_names"
-description = "The page uses header, navigation, main, footer, heading, link, and button semantics with useful accessible names on controls that are keyboard reachable"
+description = "The page uses semantic HTML landmarks first — header, navigation, main, and footer are present — with heading order that does not skip levels from the hero H1, and useful accessible names on controls that are keyboard reachable"
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "te-nooverflow"
@@ -151,9 +150,24 @@ weight = 0.5
 [[criterion]]
 id = "te-stablescroll"
 name = "no_layout_shift_smooth_animations"
-description = "After the intro settles, scrolling the full page produces no layout shift, and the marquee and cursor animations keep advancing smoothly without visible stutter"
+description = "After first paint, media regions hold their space so fonts and images finishing load cause no visible layout jumps; after the intro settles, continuous scrolling from top to bottom holds a smooth frame rate through marquees, cursor motion, and scroll reveals with no visible hitching"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "te-touchscroll"
+name = "native_touch_scroll_below_1024"
+description = "At a viewport below 1024px, touch or trackpad scrolling still moves the page with native-feeling physics (no trapped hijacked scroll), and the mobile bar plus hamburger remain usable while scrolling"
 type = "binary"
 weight = 0.5
+
+[[criterion]]
+id = "te-neg-scrolltrap"
+name = "scroll_capture_traps_user"
+description = "Scroll capture traps the user, prevents reaching the footer, fights the scroll direction, or leaves content unreachable by keyboard or reduced-motion paths"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "technical.catchall"

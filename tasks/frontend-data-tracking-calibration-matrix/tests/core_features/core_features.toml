@@ -1,0 +1,218 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_heatmap_grid"
+description = "On load, the heatmap shows at least 6 fictional model rows by at least 4 fictional harness columns; every cell displays a mean score to 2 decimal places and a trial count, and cells are colored on a red to amber to green scale that visibly tracks the score"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "cell_hover_tooltip_trials"
+description = "Hovering a heatmap cell with the real pointer shows a tooltip listing that cell's per-trial rewards, and the listed rewards are consistent with the cell's displayed mean and trial count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "cell_click_opens_drawer"
+description = "Clicking a heatmap cell opens a drawer showing the model and harness names, a trial list with trial id, reward, runtime, and cost per row, and a mini distribution chart of the rewards; the drawer closes from its close control and by clicking outside it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "variance_rows_with_cv"
+description = "The variance view lists per-task rows showing task name, category, per-harness mean scores, and a coefficient of variation to 2 decimal places, each carrying a stable or divergent classification chip relative to the displayed sigma threshold"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "threshold_slider_reclassifies_live"
+description = "Scripted probe: record the divergent rollup, move the threshold slider down until at least one stable row turns divergent, and confirm the chip flips and the rollup increments in the same interaction with no reload; moving the slider back restores the prior classification and rollup"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "slider_extremes_consistent"
+description = "At the slider maximum all rows classify stable, at the minimum all or nearly all classify divergent, and at every tested position the divergent rollup equals the number of visible divergent chips"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "triage_form_validation"
+description = "The Classify form on a divergent row requires a classification choice (capability-gap or spec-defect) and a rationale of at least 15 characters; a too-short rationale shows an inline message naming the rationale field and its minimum, submit stays disabled until valid, and an invalid submission changes no total"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "triage_badges_and_summary"
+description = "Submitting a valid classification badges the row with the chosen classification and increments the matching triage summary total (capability-gap, spec-defect, unclassified divergent); the three totals always sum to the current divergent count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "reclassify_moves_between_totals"
+description = "Reclassifying an already-classified row from capability-gap to spec-defect moves it between the two totals (one decrements, the other increments) rather than double-counting"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "filters_narrow_both_views"
+description = "Applying a harness filter removes that harness column from the heatmap and removes its scores from every variance coefficient computation in the same interaction; model and task-category filters likewise narrow both views, and clearing filters restores the full grid and rows exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "empty_state_on_no_match"
+description = "When filters combine to match nothing, the heatmap and variance regions each show a designed empty state with a clear-filters control that restores the data, rather than a blank or broken area"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "rerun_status_progression"
+description = "Starting a cell Re-run walks the visible statuses queued, then running with a progress list showing one line per trial that ticks complete as each simulated trial finishes, then complete; while running, the cell shows an in-progress indicator and a loading affordance appears wherever that cell's data is shown"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "rerun_updates_all_surfaces"
+description = "Scripted probe: record a cell's mean score and trial count, run a re-run to completion, and confirm the cell's score and trial count changed, the hover tooltip lists the new per-trial rewards, the drawer trial list shows the new trials, and every variance row including that model and harness recomputed its coefficient and classification coherently"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "rerun_timeline_appends"
+description = "Each completed re-run appends exactly one entry to the event timeline, newest first, showing a timestamp, model, harness, and resulting mean"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "rerun_double_activation_single_run"
+description = "Starting a re-run disables that cell's Re-run control until completion; double-activating it starts exactly one run and appends exactly one timeline entry"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "chart_model_selector_redraws"
+description = "The chart panel renders grouped bars of score by harness for the selected model, and changing the model selector redraws the bars with values matching that model's heatmap row"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "chart_series_toggle_and_tooltip"
+description = "Toggling a harness series off from the chart legend removes its bars and toggling it back restores them; hovering a bar with the real pointer shows a tooltip with the harness name and score; toggling every series off shows a designed empty-chart message"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "cancel_leaves_triage_unchanged"
+description = "Using Cancel on the Classify form leaves the row's chip, any existing badge, and all triage summary totals unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "reload_resets_to_seed"
+description = "After re-running a cell, classifying a row, and moving the threshold, a page reload returns the app to its seeded state: the seeded grid values, default threshold, no classifications, and an empty re-run timeline"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "rerun_scores_never_change"
+description = "Repeated re-runs of the same cell produce byte-identical rewards and an unchanged mean every time, indicating hardcoded run output rather than re-randomized simulation"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.21"
+name = "disconnected_variance_copy"
+description = "The variance view or chart renders from a disconnected data copy: after a completed re-run or an applied filter, its values contradict the heatmap for the same model and harness until a reload"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

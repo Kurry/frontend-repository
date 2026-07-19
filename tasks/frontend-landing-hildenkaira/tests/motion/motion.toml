@@ -181,16 +181,32 @@ weight = 1.0
 [[criterion]]
 id = "3.17"
 name = "services_pinned_throw_on_scroll"
-description = "Scrolling through the pinned services section throws the top service card away to reveal the next card in the trio, driven by real scrolling"
+description = "Signature scroll storytelling: on a fresh load, scrolling through the pinned services section throws the top service card away with rotation to reveal the next card in the Organic content / Ads for social / Training trio, driven by real scroll progress, and scrolling back reverses the throw"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.18"
-name = "reduced_motion_preserves_content"
-description = "With prefers-reduced-motion set, the load veil, line reveals, thumbnail drift loops, counter easing, and inertia throws are suppressed or reduced to instant state changes, while every section, control, and piece of content remains visible and reachable"
+name = "smooth_scroll_keeps_triggers_synced"
+description = "At 768px and wider, continuous scrolling keeps line reveals, the pinned services throw, and nav theme sync locked to scroll position without visible lag or desync as inertial smooth scrolling settles; below 768px native scrolling applies without scroll hijacking"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "3.19"
+name = "signature_gestures_use_linear_tweens"
+description = "Primary-button hover, nav-dot scale, flick-deck reshuffle, or CTA-card inertia throws start and stop on purely linear tweens with no inertial, springy, or overshoot easing"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.20"
+name = "load_timeline_orchestrated"
+description = "On a fresh load, the lime veil lift, lettermark letter-by-letter rise, and nav settle play as one coordinated intro timeline rather than unrelated instant pops"
+type = "binary"
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "3.catchall"

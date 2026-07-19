@@ -62,21 +62,21 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
-description = "On load, / returns 200 and renders all homepage sections in order: navigation, hero, Why Avalanche, quick links, trusted marquee, Developer Hub, Network, News, Solutions, Community, events/support, Newsletter, Contact, and footer"
+name = "single_page_sections_in_order"
+description = "On load, / returns 200 as a single continuous scrolling homepage (no in-app route change) and renders all sections in order: navigation, hero, Why Avalanche, quick links, trusted marquee, Developer Hub, Network, News, Solutions, Community, events/support, Newsletter, Contact, and footer"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
+name = "hero_and_why_card_titles"
 description = "On load, the hero shows the Payments Collective card, the brand statement, a live local time and full date, and the four Why Avalanche cards read Fast. Powerful. Secure., Infinitely Scalable by Design, Customizable Layer 1s, and Global Community"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
+name = "network_live_stats_and_tables"
 description = "On load, the Network section shows the transaction total 60,932,291 with a Live Stats badge and Latest blocks and Latest transactions tables of seven rows each"
 type = "binary"
 weight = 1.0
@@ -90,28 +90,28 @@ weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
+name = "theme_toggle_recolors_document"
 description = "When the theme toggle is clicked, the document root gains or loses its dark state and every surface, text, and accent recolors without a full page reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
+name = "newsletter_next_back_step_surfaces"
 description = "After clicking Next in the newsletter form, the step counter advances (1 of 5 to 2 of 5) and the progress bar grows; clicking Back returns to the prior step"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
+name = "newsletter_submit_thank_you"
 description = "After completing the five newsletter steps and submitting, the message Thank you for subscribing appears"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
+name = "contact_valid_submit_success_and_clear"
 description = "After submitting the contact form with valid first name, last name, email, project type, and message, the message Success! We'll be in touch. appears and the form clears"
 type = "binary"
 weight = 1.0
@@ -132,49 +132,49 @@ weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
+name = "mobile_drawer_lenis_off"
 description = "On a viewport 1024px or narrower, the navigation is a hamburger drawer, Lenis smooth scrolling is off, and tapping the hamburger opens the overlay drawer and sets aria-expanded to true"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
+name = "section_reveal_on_real_scroll"
 description = "When a lower section such as Network or Contact scrolls into view, it reveals with its heading character flash and line reveals rather than appearing pre-shown"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "1_13"
+name = "carousel_reset_and_empty_community_feed"
 description = "When the blog carousel is scrolled past and the viewport returns above it, the carousel resets to its first slide; the community feed stays empty with disabled previous/next arrows"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.14"
-name = "1_14"
+name = "hover_chrome_and_marquee_pause"
 description = "On hover, navigation labels and mega-menu link rows take an accent/wash change, buttons ease their frame, and the trusted-logo and footer wordmark marquees pause"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.16"
-name = "1_16"
+name = "why_cards_numbered_titles"
 description = "The four Why Avalanche cards read Fast. Powerful. Secure., Infinitely Scalable by Design, Customizable Layer 1s, and Global Community, numbered 01 to 04"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.19"
-name = "1_19"
+name = "solutions_six_cards"
 description = "The Solutions section shows six cards for Institutions and Capital Markets, Gaming, Enterprise and Consumer Apps, DeFi, NFTs, Arts, and Culture, and Infrastructure and Tooling"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.24"
-name = "1_24"
+name = "events_summit_and_support_cards"
 description = "The Events section shows an Avalanche Summit New York card dated Sep 16-17, 2026 and the support cards Questions about Avalanche?, Avalanche Team1, and The Community Hub"
 type = "binary"
 weight = 0.5
@@ -190,7 +190,7 @@ negate = true
 
 [[criterion]]
 id = "1.27"
-name = "1_27"
+name = "form_controls_are_nonfunctional"
 description = "A form control appears but does nothing: the newsletter never reaches Thank you for subscribing or the contact form never reaches Success! We'll be in touch."
 type = "binary"
 weight = 1.0
@@ -267,6 +267,14 @@ name = "footer_columns_marquee_and_credit"
 description = "The footer shows the original placeholder mark, six link columns, a fast repeating white placeholder-wordmark marquee, and a generic studio credit line"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "multi_route_app_shell_present"
+description = "Exercising primary chrome (mega-menu destinations, Start Building, or footer column links) navigates into a second in-app route or page shell with its own document content instead of staying on the single continuous homepage scroll at /"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.catchall"

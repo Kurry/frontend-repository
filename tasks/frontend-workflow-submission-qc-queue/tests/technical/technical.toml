@@ -1,0 +1,134 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "shared_state_coherence"
+description = "All surfaces derive from one shared collection: a finding change, stage change, or override made in the detail view is immediately reflected in the queue row's tags and chips, the gate banner, the contributor drawer, and the timeline without a reload, and no surface shows stale data another surface already updated"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "no_storage_reload_seeded"
+description = "localStorage and sessionStorage remain empty after adding findings, changing stages, overriding, filtering, sorting, running re-checks, and opening drawers, and a page reload returns the app to its seeded baseline (seeded submissions, stages, findings, payout states, no active filters)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n1"
+name = "browser_storage_used"
+description = "localStorage, sessionStorage, or another browser storage API holds submission, finding, filter, or chrome state after exercising the app"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.n2"
+name = "external_network_requests"
+description = "The devtools network log shows requests to external origins or third-party CDNs (scripts, styles, fonts, icons, or data) during load or a full exercise of the app"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.3"
+name = "console_clean_full_exercise"
+description = "The console is free of errors, warnings, and unhandled promise rejections on load and stays clean through filtering, sorting, triage actions, overrides, drawer use, date-range changes, and a full re-check run"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "cold_load_interactive_2s"
+description = "The app is interactive (queue rows and filter controls respond) within 2 seconds of a local cold load"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "rapid_input_stability"
+description = "Under rapid repeated input (fast filter toggling, quick row switching, rapid disclosure clicks), the UI stays responsive with no hangs, derived surfaces settle to values consistent with the final input state, and rapidly double-activating the Add finding submit control appends exactly one finding"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "keyboard_operability_focus"
+description = "Every interactive control — queue rows, filters, sort, review action controls, finding disclosures, drawer, date-range control, re-check control — is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space), showing a visible focus indicator at each stop"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "drawer_focus_and_semantics"
+description = "The contributor drawer traps focus while open, closes on the Escape key, and returns keyboard focus to the control that opened it; evidence disclosures expose an expanded or collapsed state attribute to the accessibility tree; every form field has a visible label and each validation message names its field and is programmatically associated with it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

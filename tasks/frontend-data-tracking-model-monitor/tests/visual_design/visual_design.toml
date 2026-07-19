@@ -1,0 +1,142 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "monitor_layout_composition"
+description = "At 1440 pixel width the app composes as a full-width data table with a sticky header row that remains visible while the table body scrolls, and a cost sidebar docked to the right at approximately 280 pixels"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "badge_colors_consistent"
+description = "Free badges render in green and paid badges in gray with the same treatment wherever they appear: the catalog table, the comparison modal, and the cost sidebar"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "cost_list_structure"
+description = "The cost sidebar renders as structured rows with hairline dividers between entries, and the session total row is visually heavier (size or weight) than the per-model rows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.4"
+name = "chart_palette_matches_tokens"
+description = "Pie chart slices use a consistent accent palette that visibly matches accent colors used elsewhere in the app (badges, chips, or controls) rather than arbitrary unrelated colors"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "type_hierarchy_clear"
+description = "A clear typographic hierarchy is visible: the app title is larger than panel headings, which are larger than table body and event feed text, consistently across all surfaces"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "spacing_and_icons_consistent"
+description = "Spacing follows one consistent rhythm across the toolbar, chips row, table, and sidebar with no crowded or orphaned regions, and one consistent icon set is used across toolbar, badges, feed, and disclosure triggers"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "control_states_distinct"
+description = "Buttons, inputs, and chips show distinct default, hover, focus (visible ring), and disabled treatments, confirmed by inspecting computed styles while the state is active"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "visual_polish_rating"
+description = "Rate the overall visual polish of the monitor: coherent palette, disciplined density in the table and sidebar, and a designed rather than default-template appearance"
+type = "likert"
+points = 5
+weight = 0.5
+
+[[criterion]]
+id = "2.9"
+name = "desktop_layout_broken"
+description = "At 1440 pixel width, any table, sidebar, feed, or modal text overlaps another element, is clipped by its container, or renders visibly misaligned"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.10"
+name = "mobile_overflow_present"
+description = "At 375 pixel width, page-level horizontal scrolling appears or content clips outside the viewport instead of the table scrolling within its own container and the sidebar collapsing into a toggleable panel"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

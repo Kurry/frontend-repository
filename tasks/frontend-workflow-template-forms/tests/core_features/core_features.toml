@@ -1,0 +1,218 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seven_techniques_switchable"
+description = "The sidebar lists exactly Zero-Shot, One-Shot, Few-Shot, Chain-of-Thought, Outcome-Based, Role-Based, and Constraint-Based; clicking each loads a different form in the main panel without a page reload, and the active entry shows a selected background plus a left accent indicator that inactive entries lack"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "status_chips_track_lifecycle"
+description = "A technique's sidebar chip advances with its lifecycle: neutral or absent before input, In progress after typing into its form, Generated after a successful submit, and Saved after adding its prompt to the library — each transition visible without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "zero_shot_form_generates"
+description = "The Zero-Shot form shows a required multi-line task description, an output format select, and a tone select; submitting with valid values renders a prompt string in the preview that contains the entered task description and the chosen format and tone"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "one_shot_example_pair"
+description = "The One-Shot form shows a required task description plus exactly one required example pair (example input and expected output), and the generated prompt includes both the task and the example pair"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "few_shot_dynamic_rows"
+description = "On the Few-Shot form, clicking Add Example appends a new row with input and expected output fields, clicking Remove on a row deletes exactly that row, and the generated prompt includes every remaining example"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "few_shot_requires_one_example"
+description = "With zero Few-Shot example rows the submit control is disabled and a visible message states that at least one example is required; adding a complete example row re-enables submission"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "chain_of_thought_scratchpad"
+description = "The Chain-of-Thought form shows a required goal, an ordered list of reasoning step inputs with add and remove controls that keep the numbering sequential, and a scratchpad toggle; with the toggle on the generated prompt ends with a think-step-by-step instruction, and with it off that instruction is absent"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "remaining_technique_forms_distinct"
+description = "The Outcome-Based form (goal, dynamic success criteria list, measurement select), Role-Based form (required role, audience, required task), and Constraint-Based form (task plus dynamic constraint rows with a type select and text field) each render their declared fields and generate prompts that include the entered values — the Role-Based prompt opens by assigning the role and the Constraint-Based prompt enumerates every constraint"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "reference_document_attachments"
+description = "On the Few-Shot and Role-Based forms, an add control opens a picker of 6 seeded reference assets; a chosen asset appears immediately as an inline badge, hovering the badge reveals a name-and-type preview and a remove control, and removing deletes exactly that badge"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "inline_errors_name_field_and_fix"
+description = "Attempting to submit a form with a required field empty shows an inline error under that field naming the field and the fix, generates no preview, and correcting the field clears only that field's error"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "submit_disabled_until_valid"
+description = "On every technique form the submit control stays disabled while any required field is invalid and enables once all required fields are valid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "draft_retention_across_switches"
+description = "Scripted probe: enter values into Zero-Shot, switch to Role-Based and enter values there, then return to Zero-Shot; the first form still holds its entered values and its sidebar chip reads In progress"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "preview_copy_confirmation"
+description = "The preview panel's copy control places the exact assembled prompt text on the clipboard and shows a visible confirmation such as an icon swap or a toast"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "regenerate_reflects_edits"
+description = "Scripted probe: after generating a preview, change one field value and resubmit; the preview updates to include the new value and no longer shows the old one"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "save_modal_autotitle_and_toast"
+description = "Clicking Save to Library opens a modal whose title field is auto-populated from the technique name and editable; the confirm control stays disabled while the title is empty, and confirming adds the prompt to the library and shows a success toast"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "library_seeded_and_round_trip"
+description = "Scripted probe: the Library view lists 5 seeded prompts with title, technique tag, and saved-time label; opening one switches to its technique form with every saved field value, dynamic row, and attachment restored and the preview populated"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "library_delete_and_empty_state"
+description = "Deleting a library entry removes its row and decreases the visible count by exactly one, and deleting every entry shows an empty state message with a control that returns to the forms view"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "double_save_creates_one_entry"
+description = "Rapidly double-activating the save modal's confirm control creates exactly one library entry: the count increases by one and exactly one new row appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "long_description_handled"
+description = "A task description of 500 or more characters is accepted, appears in full in the generated preview, and renders truncated with an ellipsis in its library row without breaking the layout"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.20"
+name = "hardcoded_preview_output"
+description = "The generated preview is insensitive to its inputs: two submissions with meaningfully different field values produce byte-identical prompt strings, or the preview text omits the entered values in favor of canned content"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.21"
+name = "invalid_submit_produces_output"
+description = "Submitting with an empty required field still generates a preview or adds a library entry, bypassing the validation the form displays"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

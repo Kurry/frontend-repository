@@ -177,6 +177,20 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "4.17"
+name = "wcag_aa_contrast_on_surfaces"
+description = "Text and control labels meet WCAG AA contrast against their surfaces: near-black body on off-white, lime headings on black media bands, and white text on dark-grey/chrome footer and cookie surfaces"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.18"
+name = "html_first_landmarks_and_controls"
+description = "The page exposes HTML-first landmarks (nav, main, footer), a logical heading outline, and interactive controls as buttons/links/labelled inputs rather than anonymous unlabelled divs for primary chrome"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "4.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical defect (console, network, storage, accessibility, performance, or state coherence) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network request, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

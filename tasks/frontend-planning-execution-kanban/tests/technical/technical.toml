@@ -1,0 +1,127 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "cold_load_interactive"
+description = "The app serves via its documented start path and is interactive within 2 seconds of a local cold load"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "console_clean_full_exercise"
+description = "No console errors, warnings, or unhandled promise rejections appear on load or during a full exercise of the board: drags, keyboard moves, create/edit/delete flows, runs with retries, and filtering"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "state_coherence_across_surfaces"
+description = "A change made in one surface reflects everywhere immediately without reload: moving a card updates both column counts, editing in the detail modal updates the board card, and a completed run updates the card chip, progress indicator, and any filtered view showing that card"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "reload_returns_seeded_baseline"
+description = "A page reload after creating, moving, and running cards returns the app to its seeded baseline (in-memory state only), with no partial mixture of old and new state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "keyboard_and_dialog_semantics"
+description = "Modal dialogs expose role dialog with aria-modal true, trap focus while open, close on Escape, and return focus to their opener; validation messages are associated with their fields and execution state changes are announced via an aria-live region"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "rapid_input_stability"
+description = "The UI stays responsive and consistent under rapid repeated input — rapid drags, rapid filter toggling, and starting a run while filtering — with no hangs, dropped interactions, or desynced counts"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "storage_apis_used"
+description = "After a full exercise of the app, localStorage, sessionStorage, or another browser storage API contains app data (this task mandates in-memory state only)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.8"
+name = "outbound_requests_or_navigation"
+description = "The app issues network requests to non-local origins (CDN scripts, fonts, icons, APIs) or app chrome navigates to an external origin during use"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network request, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

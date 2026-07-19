@@ -1,0 +1,126 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "created_row_fade_in"
+description = "Submitting a valid New Prompt through the real form animates the new row into the table from opacity 0 over roughly 200 milliseconds rather than snapping in"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "deleted_row_collapse"
+description = "Confirming a delete through the real dialog collapses the row's height over roughly 150 milliseconds before it disappears rather than removing it instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "hover_animations_required"
+description = "Buttons ease background and shadow with a slight press effect on hover, table rows and suggestion chips take a visible hover treatment, and form controls show focus rings"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "modal_and_panel_transitions"
+description = "Dialogs enter and exit with a short opacity-plus-scale transition of roughly 200 to 300 milliseconds, and the history side panel slides in when opened and out when closed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "copy_confirmation_animates"
+description = "Activating the Copy control animates its confirmation (icon swap or toast) and reverts smoothly after a moment rather than swapping states with no transition"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.6"
+name = "toasts_slide_autodismiss"
+description = "After create, delete, and attachment removal, a feedback toast slides in, remains readable long enough to scan, and auto-dismisses with a fade"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion set, row entry and collapse animations, dialog and panel transitions, and copy feedback all apply instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "animation_jank_or_snapping"
+description = "Row creation or deletion snaps with no transition, or animations cause visible layout jank, flicker, or blocked input during table updates"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction performed, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

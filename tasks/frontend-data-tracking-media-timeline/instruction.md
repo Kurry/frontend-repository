@@ -174,7 +174,7 @@ Module specs:
 Bindings:
 - Browsable entity: timeline-events
 - Destinations: timeline; event-detail; filters
-- Filters: category
+- Filters: era; type
 - Entity: event
 - Entity operations: create; select; update; delete
 - Entity fields: title; era; type; summary

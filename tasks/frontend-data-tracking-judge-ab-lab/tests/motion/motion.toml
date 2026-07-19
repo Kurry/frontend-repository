@@ -1,0 +1,119 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "hover_feedback_on_chrome"
+description = "Hovering with the real pointer shows visible feedback: buttons and chips ease background or shadow with a slight press effect on activation, table rows take a full-width hover wash, nav items and legend entries show a hover state, and form controls show focus rings (verify hover styles while actually hovering)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "run_step_and_progress_animation"
+description = "Driven through the real rescore form (never a state shortcut): each running step shows an animated indicator, the transition to complete swaps in a check with a short transition rather than an instant swap, and the overall progress indicator fills smoothly as steps finish"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "flip_row_expand_transition"
+description = "Activating a flip row with the real pointer expands its reasoning panel with a height transition and a rotating chevron cue, and collapsing reverses it, rather than the content snapping open and closed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "toasts_and_label_column_entrance"
+description = "After saving an attribution and after a rescore run completes, a toast slides in, remains readable, and auto-dismisses with a fade, and the newly completed label's column animates into the experiment table rather than appearing instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "chart_mark_hover_highlight"
+description = "Hovering a mark on the comparison or cost chart with the real pointer shows a highlighted mark state while the tooltip is visible"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.6"
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion enabled, animations are removed or reduced to instant state changes and every flow — compare, drill-down, attribution, rescore run, cost toggling — remains fully usable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "steps_snap_without_running_state"
+description = "During a rescore run started from the real form, steps jump directly from pending to complete with no visible running state, or interactive chrome (buttons, rows, chips) shows no hover or press feedback at all"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction performed, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

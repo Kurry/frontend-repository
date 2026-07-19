@@ -1,39 +1,88 @@
 [
   {
-    "task": "frontend-workflow-daisyui-admin-dashboard",
+    "task": "frontend-creative-tools-camera-exposure",
     "modules": [
-      "browse-query-v1",
-      "entity-collection-v1",
-      "form-workflow-v1"
+      "command-session-v1",
+      "structured-editor-v1"
     ],
     "bindings": {
-      "browsable_entity": "users",
+      "session_operations": [
+        "start",
+        "stop",
+        "restart",
+        "advance"
+      ],
+      "editor_object_types": [
+        "exposure"
+      ],
+      "editor_properties": [
+        "stop",
+        "brightness"
+      ],
+      "editor_operations": [
+        "select",
+        "update_property",
+        "preview"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Continuous hold-to-repeat on edge buttons stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-creative-tools-color-palette-archive",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "palettes",
       "destinations": [
-        "operations-overview",
-        "all-users",
-        "add-user",
-        "roles",
-        "permissions",
-        "user-logs",
-        "user-stats",
-        "user-payments",
-        "user-products"
+        "archive-grid",
+        "palette-detail",
+        "filters"
       ],
       "filters": [
-        "role",
-        "status"
+        "era",
+        "artist"
       ],
-      "sorts": [
-        "last-active",
-        "newest",
-        "highest-spend",
-        "name-az"
+      "entity": "palette",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete",
+        "toggle"
       ],
-      "themes": [
-        "light",
-        "dark"
+      "entity_fields": [
+        "name",
+        "swatches",
+        "favorite"
+      ]
+    },
+    "mechanics_exclusions": []
+  },
+  {
+    "task": "frontend-creative-tools-css-theme-builder",
+    "modules": [
+      "structured-editor-v1",
+      "entity-collection-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "editor_object_types": [
+        "css-theme"
       ],
-      "entity": "user",
+      "editor_properties": [
+        "token",
+        "value"
+      ],
+      "editor_operations": [
+        "select",
+        "update_property",
+        "preview"
+      ],
+      "entity": "theme",
       "entity_operations": [
         "create",
         "select",
@@ -42,30 +91,22 @@
       ],
       "entity_fields": [
         "name",
-        "email",
-        "role",
-        "status",
-        "payments",
-        "products",
-        "last-active"
+        "tokens"
       ],
-      "form_fields": [
-        "first-name",
-        "last-name",
-        "email",
-        "phone",
-        "role",
-        "status"
+      "artifact_operations": [
+        "export",
+        "import",
+        "copy"
       ],
-      "form_operations": [
-        "validate",
-        "submit",
-        "cancel"
+      "export_formats": [
+        "css"
+      ],
+      "import_modes": [
+        "declared-theme"
       ]
     },
     "mechanics_exclusions": [
-      "Chart hover/tooltip mechanics stay Playwright-only",
-      "Drawer overlay slide on small viewports stays Playwright-observed"
+      "Raw file paths/blobs forbidden in WebMCP args"
     ]
   },
   {
@@ -119,36 +160,6 @@
     ]
   },
   {
-    "task": "frontend-creative-tools-camera-exposure",
-    "modules": [
-      "command-session-v1",
-      "structured-editor-v1"
-    ],
-    "bindings": {
-      "session_operations": [
-        "start",
-        "stop",
-        "restart",
-        "advance"
-      ],
-      "editor_object_types": [
-        "exposure"
-      ],
-      "editor_properties": [
-        "stop",
-        "brightness"
-      ],
-      "editor_operations": [
-        "select",
-        "update_property",
-        "preview"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Continuous hold-to-repeat on edge buttons stays Playwright-observed"
-    ]
-  },
-  {
     "task": "frontend-creative-tools-design-portfolio",
     "modules": [
       "browse-query-v1",
@@ -179,27 +190,317 @@
     ]
   },
   {
-    "task": "frontend-data-tracking-finance-reports",
+    "task": "frontend-creative-tools-euroscope",
     "modules": [
-      "browse-query-v1",
+      "form-workflow-v1",
+      "structured-editor-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "workflow_steps": [
+        "upload-euroscope-executable",
+        "update-theme-colours",
+        "update-embedded-bitmaps",
+        "download-new-executable"
+      ],
+      "form_operations": [
+        "advance",
+        "return"
+      ],
+      "editor_object_types": [
+        "base-theme",
+        "base-icon-set"
+      ],
+      "editor_operations": [
+        "select",
+        "update_property",
+        "switch_mode",
+        "preview"
+      ],
+      "editor_properties": [
+        "backdrop-darkest",
+        "backdrop-darker",
+        "backdrop-main",
+        "backdrop-lighter",
+        "backdrop-lightest",
+        "foreground-secondary"
+      ],
+      "editor_modes": [
+        "theme-colours",
+        "embedded-bitmaps"
+      ],
+      "artifact_operations": [
+        "export"
+      ],
+      "export_formats": [
+        "patched-executable"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Native file-picker / download interaction stays Playwright-driven"
+    ]
+  },
+  {
+    "task": "frontend-creative-tools-exposure-control-lab",
+    "modules": [
+      "command-session-v1",
+      "structured-editor-v1"
+    ],
+    "bindings": {
+      "session_operations": [
+        "start",
+        "stop",
+        "restart",
+        "advance"
+      ],
+      "editor_object_types": [
+        "exposure"
+      ],
+      "editor_properties": [
+        "stop",
+        "brightness"
+      ],
+      "editor_operations": [
+        "select",
+        "update_property",
+        "preview"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Hold-to-repeat control timing stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-creative-tools-frameflick",
+    "modules": [
+      "structured-editor-v1",
       "entity-collection-v1"
     ],
     "bindings": {
-      "browsable_entity": "expenses",
+      "editor_operations": [
+        "update_property",
+        "switch_mode",
+        "set_content",
+        "preview"
+      ],
+      "editor_properties": [
+        "background",
+        "custom-background",
+        "padding",
+        "corner-radius",
+        "shadow",
+        "frame-style",
+        "caption-text",
+        "caption-position",
+        "caption-size",
+        "caption-color",
+        "watermark",
+        "watermark-text",
+        "watermark-opacity",
+        "watermark-corner",
+        "zoom"
+      ],
+      "editor_modes": [
+        "square",
+        "widescreen",
+        "story",
+        "original"
+      ],
+      "value_bounds": [
+        "padding 0-25",
+        "corner-radius 0-48",
+        "shadow 0-10",
+        "caption-size 12-64",
+        "watermark-opacity 5-100",
+        "zoom 20-200"
+      ],
+      "entity": "preset",
+      "entity_operations": [
+        "create",
+        "select",
+        "delete"
+      ],
+      "entity_fields": [
+        "name",
+        "settings"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Drag-to-reposition and the Zoom slider gesture stay Playwright-only",
+      "Drag-and-drop upload stays Playwright-observed",
+      "Live canvas render fidelity, Download PNG 2x rasterization, and Copy Image clipboard stay Playwright-only",
+      "Collaboration Scenario merge convergence stays Playwright-only"
+    ]
+  },
+  {
+    "task": "frontend-creative-tools-ghostty-config",
+    "modules": [
+      "structured-editor-v1",
+      "artifact-transfer-v1",
+      "browse-query-v1"
+    ],
+    "bindings": {
+      "editor_operations": [
+        "select",
+        "update_property",
+        "delete",
+        "preview"
+      ],
+      "editor_object_types": [
+        "application",
+        "terminal",
+        "clipboard",
+        "window",
+        "colors",
+        "fonts",
+        "keybinds",
+        "mouse",
+        "gtk",
+        "linux",
+        "macos"
+      ],
+      "editor_properties": [
+        "font-family",
+        "font-size",
+        "font-thicken",
+        "cursor-style",
+        "cursor-color",
+        "cursor-opacity",
+        "cursor-style-blink",
+        "background",
+        "foreground",
+        "background-opacity",
+        "theme",
+        "window-padding-x",
+        "window-padding-y",
+        "window-decoration",
+        "scrollback-limit",
+        "mouse-scroll-multiplier",
+        "clipboard-read",
+        "clipboard-write",
+        "copy-on-select"
+      ],
+      "artifact_operations": [
+        "export",
+        "copy"
+      ],
       "destinations": [
-        "reports-overview",
-        "category-breakdown",
-        "transaction-list"
+        "application",
+        "terminal",
+        "clipboard",
+        "window",
+        "colors",
+        "fonts",
+        "keybinds",
+        "mouse",
+        "gtk",
+        "linux",
+        "macos"
       ],
-      "filters": [
-        "category",
-        "range"
+      "themes": [
+        "Dracula",
+        "Nord",
+        "Gruvbox Dark",
+        "Catppuccin Mocha",
+        "Solarized Dark - Patched",
+        "Builtin Dark"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Terminal-preview cursor blink stays Playwright-observed",
+      "Dock open/close stays Playwright-observed",
+      "Color-picker/slider drag stays Playwright-driven"
+    ]
+  },
+  {
+    "task": "frontend-creative-tools-grid-paint-studio",
+    "modules": [
+      "structured-editor-v1",
+      "command-session-v1"
+    ],
+    "bindings": {
+      "editor_object_types": [
+        "grid-cell"
       ],
-      "sorts": [
-        "amount",
-        "date"
+      "editor_properties": [
+        "color"
       ],
-      "entity": "expense",
+      "editor_modes": [
+        "paint",
+        "erase"
+      ],
+      "editor_operations": [
+        "select",
+        "update_property",
+        "switch_mode",
+        "preview"
+      ],
+      "session_operations": [
+        "start",
+        "stop",
+        "restart"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Drag-paint gestures stay Playwright"
+    ]
+  },
+  {
+    "task": "frontend-creative-tools-markupflow",
+    "modules": [
+      "structured-editor-v1",
+      "entity-collection-v1"
+    ],
+    "bindings": {
+      "editor_object_types": [
+        "rectangle",
+        "oval",
+        "line",
+        "arrow",
+        "text",
+        "blur",
+        "pixelate",
+        "spotlight",
+        "loupe",
+        "highlighter"
+      ],
+      "editor_properties": [
+        "color",
+        "stroke-width",
+        "text-style",
+        "font-size"
+      ],
+      "editor_operations": [
+        "select",
+        "add",
+        "delete",
+        "update_property",
+        "switch_mode",
+        "preview"
+      ],
+      "editor_modes": [
+        "edit",
+        "preview"
+      ],
+      "value_bounds": {
+        "font-size": [
+          10,
+          72
+        ],
+        "stroke-width": [
+          "thin",
+          "medium",
+          "thick"
+        ],
+        "text-style": [
+          "plain",
+          "bold-caption",
+          "outline",
+          "highlight-box",
+          "shadow"
+        ]
+      },
+      "entity": "project",
       "entity_operations": [
         "create",
         "select",
@@ -207,14 +508,61 @@
         "delete"
       ],
       "entity_fields": [
-        "label",
-        "amount",
-        "category",
-        "date"
+        "name"
       ]
     },
     "mechanics_exclusions": [
-      "Chart geometry / pie segment hover stays Playwright-observed"
+      "Shape/effect click-drag drawing and Loupe click placement stay Playwright-observed",
+      "Layer-reorder drag-and-drop gesture stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-creative-tools-material-theme-studio",
+    "modules": [
+      "structured-editor-v1",
+      "entity-collection-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "editor_object_types": [
+        "material-theme"
+      ],
+      "editor_properties": [
+        "palette",
+        "typography",
+        "shape"
+      ],
+      "editor_operations": [
+        "select",
+        "update_property",
+        "preview"
+      ],
+      "entity": "theme",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "name",
+        "palette"
+      ],
+      "artifact_operations": [
+        "export",
+        "import",
+        "copy"
+      ],
+      "export_formats": [
+        "json",
+        "css"
+      ],
+      "import_modes": [
+        "declared-theme"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Raw file paths/blobs forbidden in WebMCP args"
     ]
   },
   {
@@ -269,38 +617,50 @@
     ]
   },
   {
-    "task": "frontend-data-tracking-media-timeline",
+    "task": "frontend-creative-tools-mermaid-live-editor",
     "modules": [
+      "structured-editor-v1",
       "browse-query-v1",
-      "entity-collection-v1"
+      "artifact-transfer-v1"
     ],
     "bindings": {
-      "browsable_entity": "timeline-events",
+      "editor_object_types": [
+        "diagram"
+      ],
+      "editor_operations": [
+        "set_content",
+        "switch_mode",
+        "preview"
+      ],
+      "editor_modes": [
+        "code",
+        "config"
+      ],
       "destinations": [
-        "timeline",
-        "event-detail",
-        "filters"
+        "flowchart",
+        "class",
+        "sequence",
+        "entity-relationship",
+        "state",
+        "mindmap",
+        "pie",
+        "gantt"
       ],
-      "filters": [
-        "era",
-        "type"
+      "themes": [
+        "light",
+        "dark"
       ],
-      "entity": "event",
-      "entity_operations": [
-        "create",
-        "select",
-        "update",
-        "delete"
+      "artifact_operations": [
+        "export",
+        "copy"
       ],
-      "entity_fields": [
-        "title",
-        "era",
-        "type",
-        "summary"
+      "export_formats": [
+        "svg",
+        "png"
       ]
     },
     "mechanics_exclusions": [
-      "Scroll-linked parallax / scrub timing stays Playwright-observed"
+      "Preview pan/zoom and rendered-diagram hover stay Playwright-observed"
     ]
   },
   {
@@ -336,6 +696,286 @@
     },
     "mechanics_exclusions": [
       "Scroll reveal / hover wash timing stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-creative-tools-panecraft",
+    "modules": [
+      "entity-collection-v1",
+      "form-workflow-v1",
+      "command-session-v1"
+    ],
+    "bindings": {
+      "entity": "pane",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete",
+        "reorder"
+      ],
+      "entity_fields": [
+        "source",
+        "type",
+        "metric",
+        "dimension",
+        "size",
+        "refresh-interval"
+      ],
+      "value_bounds": {
+        "size": [
+          "small",
+          "medium",
+          "large"
+        ],
+        "refresh-interval": [
+          "off",
+          "30s",
+          "5m"
+        ],
+        "type": [
+          "line",
+          "bar",
+          "donut",
+          "table",
+          "counter"
+        ]
+      },
+      "form_fields": [
+        "data-source",
+        "pane-type",
+        "metric-column",
+        "dimension-column"
+      ],
+      "form_operations": [
+        "validate",
+        "submit",
+        "cancel",
+        "advance",
+        "return"
+      ],
+      "workflow_steps": [
+        "choose-source",
+        "choose-type",
+        "configure"
+      ],
+      "session_operations": [
+        "start",
+        "pause",
+        "stop",
+        "connect",
+        "disconnect",
+        "advance"
+      ],
+      "demos": [
+        "refresh-tick",
+        "collaboration-scenario",
+        "go-offline",
+        "go-online"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Date-range recompute and chart hover stay Playwright-observed",
+      "Refresh-tick timing stays Playwright-observed",
+      "Merge convergence visuals stay Playwright-observed",
+      "Page-tab reorder/scroll stays Playwright-driven"
+    ]
+  },
+  {
+    "task": "frontend-creative-tools-portfolioframe",
+    "modules": [
+      "structured-editor-v1",
+      "entity-collection-v1"
+    ],
+    "bindings": {
+      "editor_object_types": [
+        "header",
+        "projects",
+        "skills",
+        "testimonials",
+        "contact"
+      ],
+      "editor_operations": [
+        "select",
+        "update_property",
+        "switch_mode",
+        "preview"
+      ],
+      "editor_properties": [
+        "name",
+        "title",
+        "bio",
+        "email",
+        "location",
+        "theme",
+        "density",
+        "visibility",
+        "order"
+      ],
+      "editor_modes": [
+        "compact",
+        "spacious"
+      ],
+      "entity": "portfolio-item",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "project",
+        "testimonial",
+        "skill",
+        "draft"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Undo/Redo/branch selection and History panel stay Playwright-driven via real controls",
+      "Download PDF (window.print) stays Playwright-observed",
+      "Horizontal testimonials scroll stays Playwright-observed",
+      "Section reorder animation stays Playwright-observed when gesture matters"
+    ]
+  },
+  {
+    "task": "frontend-creative-tools-prompt-workbench",
+    "modules": [
+      "structured-editor-v1",
+      "command-session-v1",
+      "entity-collection-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "editor_object_types": [
+        "prompt-draft",
+        "variable",
+        "attachment"
+      ],
+      "editor_properties": [
+        "prompt-text",
+        "variable-name",
+        "variable-value",
+        "model"
+      ],
+      "editor_operations": [
+        "set_content",
+        "add",
+        "delete",
+        "update_property",
+        "select",
+        "preview",
+        "switch_mode"
+      ],
+      "editor_modes": [
+        "workbench",
+        "library"
+      ],
+      "session_operations": [
+        "start",
+        "stop",
+        "advance"
+      ],
+      "entity": "library-prompt",
+      "entity_operations": [
+        "create",
+        "select",
+        "delete"
+      ],
+      "entity_fields": [
+        "title",
+        "technique",
+        "prompt-text",
+        "bindings",
+        "attachments"
+      ],
+      "artifact_operations": [
+        "copy"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Run and streaming response: incremental text streaming, blinking cursor, and auto-follow/jump-to-latest scroll mechanics stay Playwright-observed",
+      "Reasoning disclosure: expand/collapse gesture, chevron rotation, and active-indicator visuals stay Playwright-observed",
+      "Attachments: badge hover preview and hover-revealed remove control stay Playwright-observed",
+      "Prompt editor: live token-counter update while typing is a derived display judged by observation"
+    ]
+  },
+  {
+    "task": "frontend-creative-tools-rubric-studio",
+    "modules": [
+      "structured-editor-v1",
+      "browse-query-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "editor_object_types": [
+        "criterion",
+        "labelled-case",
+        "sample-verdict"
+      ],
+      "editor_properties": [
+        "id",
+        "name",
+        "description",
+        "type",
+        "likert-min",
+        "likert-max",
+        "weight",
+        "importance",
+        "version",
+        "judge-model",
+        "aggregation-mode",
+        "include",
+        "pass-threshold",
+        "verdict"
+      ],
+      "editor_operations": [
+        "select",
+        "add",
+        "delete",
+        "update_property",
+        "switch_mode",
+        "preview"
+      ],
+      "editor_modes": [
+        "criteria",
+        "tune",
+        "preview"
+      ],
+      "value_bounds": [
+        "weight 0.5-5",
+        "likert min < max",
+        "version must satisfy pending patch/minor/major bump",
+        "judge-model in {quartz-arbiter-2, sable-jury-9, cinder-panel-1}",
+        "aggregation-mode in {weighted-mean, required-pass, all-pass}"
+      ],
+      "browsable_entity": "rubrics",
+      "destinations": [
+        "response-quality",
+        "code-review-depth",
+        "safety-screening",
+        "summarization-fidelity",
+        "version-history",
+        "diff-view",
+        "tune-view",
+        "preview-panel",
+        "export"
+      ],
+      "artifact_operations": [
+        "export",
+        "copy"
+      ],
+      "export_formats": [
+        "structured-text"
+      ],
+      "visible_postconditions": [
+        "rail version badge and history entry update after a version-gated save",
+        "header rollup (criteria count, load-bearing count, weight sum) recomputes after add/delete"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Accordion / Grading-notes height transition and chevron rotation timing stay Playwright-observed",
+      "Tune bar width-easing and aggregate count-up animations stay Playwright-observed",
+      "Row animate-in/animate-out on add/delete stays Playwright-observed"
     ]
   },
   {
@@ -422,410 +1062,6 @@
     "mechanics_exclusions": []
   },
   {
-    "task": "frontend-planning-trip-itinerary",
-    "modules": [
-      "browse-query-v1",
-      "entity-collection-v1",
-      "form-workflow-v1"
-    ],
-    "bindings": {
-      "browsable_entity": "activities",
-      "destinations": [
-        "overview",
-        "day-detail",
-        "activity-form"
-      ],
-      "filters": [
-        "day",
-        "type"
-      ],
-      "entity": "activity",
-      "entity_operations": [
-        "create",
-        "select",
-        "update",
-        "delete",
-        "reorder"
-      ],
-      "entity_fields": [
-        "title",
-        "day",
-        "location",
-        "notes"
-      ],
-      "form_fields": [
-        "title",
-        "day",
-        "location",
-        "notes"
-      ],
-      "form_operations": [
-        "validate",
-        "submit",
-        "cancel"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Map pan/zoom / marker drag stays Playwright"
-    ]
-  },
-  {
-    "task": "frontend-data-tracking-admin-analytics-dashboard",
-    "modules": [
-      "browse-query-v1",
-      "entity-collection-v1"
-    ],
-    "bindings": {
-      "browsable_entity": "users",
-      "destinations": [
-        "operations-overview",
-        "all-users",
-        "add-user",
-        "roles",
-        "permissions",
-        "user-logs",
-        "user-stats",
-        "user-payments",
-        "user-products"
-      ],
-      "filters": [
-        "role",
-        "status"
-      ],
-      "sorts": [
-        "last-active",
-        "newest",
-        "highest-spend",
-        "name-az"
-      ],
-      "themes": [
-        "light",
-        "dark"
-      ],
-      "entity": "user",
-      "entity_operations": [
-        "create",
-        "select",
-        "update",
-        "delete"
-      ],
-      "entity_fields": [
-        "name",
-        "email",
-        "role",
-        "status",
-        "payments",
-        "products",
-        "last-active"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Chart hover tooling stays Playwright-observed"
-    ]
-  },
-  {
-    "task": "frontend-creative-tools-color-palette-archive",
-    "modules": [
-      "browse-query-v1",
-      "entity-collection-v1"
-    ],
-    "bindings": {
-      "browsable_entity": "palettes",
-      "destinations": [
-        "archive-grid",
-        "palette-detail",
-        "filters"
-      ],
-      "filters": [
-        "era",
-        "artist"
-      ],
-      "entity": "palette",
-      "entity_operations": [
-        "create",
-        "select",
-        "update",
-        "delete",
-        "toggle"
-      ],
-      "entity_fields": [
-        "name",
-        "swatches",
-        "favorite"
-      ]
-    },
-    "mechanics_exclusions": []
-  },
-  {
-    "task": "frontend-creative-tools-css-theme-builder",
-    "modules": [
-      "structured-editor-v1",
-      "entity-collection-v1",
-      "artifact-transfer-v1"
-    ],
-    "bindings": {
-      "editor_object_types": [
-        "css-theme"
-      ],
-      "editor_properties": [
-        "token",
-        "value"
-      ],
-      "editor_operations": [
-        "select",
-        "update_property",
-        "preview"
-      ],
-      "entity": "theme",
-      "entity_operations": [
-        "create",
-        "select",
-        "update",
-        "delete"
-      ],
-      "entity_fields": [
-        "name",
-        "tokens"
-      ],
-      "artifact_operations": [
-        "export",
-        "import",
-        "copy"
-      ],
-      "export_formats": [
-        "css"
-      ],
-      "import_modes": [
-        "declared-theme"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Raw file paths/blobs forbidden in WebMCP args"
-    ]
-  },
-  {
-    "task": "frontend-data-tracking-expense-breakdown-reports",
-    "modules": [
-      "browse-query-v1",
-      "entity-collection-v1"
-    ],
-    "bindings": {
-      "browsable_entity": "expenses",
-      "destinations": [
-        "breakdown-overview",
-        "expense-list",
-        "category-filter"
-      ],
-      "filters": [
-        "category"
-      ],
-      "sorts": [
-        "amount",
-        "date"
-      ],
-      "entity": "expense",
-      "entity_operations": [
-        "create",
-        "select",
-        "update",
-        "delete"
-      ],
-      "entity_fields": [
-        "label",
-        "amount",
-        "category"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Chart hover stays Playwright-observed"
-    ]
-  },
-  {
-    "task": "frontend-creative-tools-exposure-control-lab",
-    "modules": [
-      "command-session-v1",
-      "structured-editor-v1"
-    ],
-    "bindings": {
-      "session_operations": [
-        "start",
-        "stop",
-        "restart",
-        "advance"
-      ],
-      "editor_object_types": [
-        "exposure"
-      ],
-      "editor_properties": [
-        "stop",
-        "brightness"
-      ],
-      "editor_operations": [
-        "select",
-        "update_property",
-        "preview"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Hold-to-repeat control timing stays Playwright-observed"
-    ]
-  },
-  {
-    "task": "frontend-creative-tools-grid-paint-studio",
-    "modules": [
-      "structured-editor-v1",
-      "command-session-v1"
-    ],
-    "bindings": {
-      "editor_object_types": [
-        "grid-cell"
-      ],
-      "editor_properties": [
-        "color"
-      ],
-      "editor_modes": [
-        "paint",
-        "erase"
-      ],
-      "editor_operations": [
-        "select",
-        "update_property",
-        "switch_mode",
-        "preview"
-      ],
-      "session_operations": [
-        "start",
-        "stop",
-        "restart"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Drag-paint gestures stay Playwright"
-    ]
-  },
-  {
-    "task": "frontend-landing-l1-network-marketing",
-    "modules": [
-      "browse-query-v1",
-      "form-workflow-v1",
-      "entity-collection-v1"
-    ],
-    "bindings": {
-      "browsable_entity": "features",
-      "destinations": [
-        "marketing-home",
-        "feature-detail",
-        "waitlist"
-      ],
-      "entity": "feature",
-      "entity_operations": [
-        "create",
-        "select",
-        "update",
-        "delete"
-      ],
-      "entity_fields": [
-        "title",
-        "summary"
-      ],
-      "form_fields": [
-        "email",
-        "name"
-      ],
-      "form_operations": [
-        "validate",
-        "submit",
-        "cancel"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Outbound marketing CTAs must remain in-app (no origin navigation)"
-    ]
-  },
-  {
-    "task": "frontend-creative-tools-material-theme-studio",
-    "modules": [
-      "structured-editor-v1",
-      "entity-collection-v1",
-      "artifact-transfer-v1"
-    ],
-    "bindings": {
-      "editor_object_types": [
-        "material-theme"
-      ],
-      "editor_properties": [
-        "palette",
-        "typography",
-        "shape"
-      ],
-      "editor_operations": [
-        "select",
-        "update_property",
-        "preview"
-      ],
-      "entity": "theme",
-      "entity_operations": [
-        "create",
-        "select",
-        "update",
-        "delete"
-      ],
-      "entity_fields": [
-        "name",
-        "palette"
-      ],
-      "artifact_operations": [
-        "export",
-        "import",
-        "copy"
-      ],
-      "export_formats": [
-        "json",
-        "css"
-      ],
-      "import_modes": [
-        "declared-theme"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Raw file paths/blobs forbidden in WebMCP args"
-    ]
-  },
-  {
-    "task": "frontend-data-tracking-media-history-timeline",
-    "modules": [
-      "browse-query-v1",
-      "entity-collection-v1"
-    ],
-    "bindings": {
-      "browsable_entity": "timeline-events",
-      "destinations": [
-        "timeline",
-        "event-detail",
-        "filters"
-      ],
-      "filters": [
-        "era",
-        "type"
-      ],
-      "entity": "event",
-      "entity_operations": [
-        "create",
-        "select",
-        "update",
-        "delete"
-      ],
-      "entity_fields": [
-        "title",
-        "era",
-        "type"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Scroll/scrub timing stays Playwright-observed"
-    ]
-  },
-  {
     "task": "frontend-creative-tools-storyboard-tutorial",
     "modules": [
       "browse-query-v1",
@@ -899,40 +1135,264 @@
     ]
   },
   {
-    "task": "frontend-planning-travel-itinerary-planner",
+    "task": "frontend-creative-tools-vert",
     "modules": [
-      "browse-query-v1",
+      "artifact-transfer-v1",
       "entity-collection-v1",
-      "form-workflow-v1"
+      "command-session-v1"
     ],
     "bindings": {
-      "browsable_entity": "activities",
-      "destinations": [
-        "overview",
-        "day-detail",
-        "activity-form"
+      "artifact_operations": [
+        "import",
+        "convert",
+        "export"
       ],
-      "filters": [
-        "day"
+      "conversion_modes": [
+        "png-to-jpeg",
+        "png-to-webp",
+        "jpeg-to-png",
+        "jpeg-to-webp",
+        "webp-to-png",
+        "webp-to-jpeg",
+        "gif-to-png",
+        "bmp-to-png",
+        "svg-to-png"
       ],
-      "entity": "activity",
+      "export_formats": [
+        "png",
+        "jpeg",
+        "jpg",
+        "webp"
+      ],
+      "entity": "file",
       "entity_operations": [
         "create",
         "select",
         "update",
-        "delete",
-        "reorder"
+        "delete"
       ],
       "entity_fields": [
-        "title",
-        "day",
-        "location"
+        "name",
+        "from",
+        "to",
+        "status"
+      ],
+      "session_operations": [
+        "start",
+        "stop"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Drag-drop drop-zone and native file-picker stay Playwright-observed",
+      "Theme recolor stays Playwright-observed",
+      "Queue reorder is not offered"
+    ]
+  },
+  {
+    "task": "frontend-data-tracking-admin-analytics-dashboard",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "users",
+      "destinations": [
+        "operations-overview",
+        "all-users",
+        "add-user",
+        "roles",
+        "permissions",
+        "user-logs",
+        "user-stats",
+        "user-payments",
+        "user-products"
+      ],
+      "filters": [
+        "role",
+        "status"
+      ],
+      "sorts": [
+        "last-active",
+        "newest",
+        "highest-spend",
+        "name-az"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "entity": "user",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "name",
+        "email",
+        "role",
+        "status",
+        "payments",
+        "products",
+        "last-active"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Chart hover tooling stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-data-tracking-budget-angular",
+    "modules": [
+      "entity-collection-v1",
+      "form-workflow-v1",
+      "browse-query-v1"
+    ],
+    "bindings": {
+      "entity": "expense",
+      "entity_operations": [
+        "create",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "value",
+        "datetime",
+        "categoryId",
+        "counterparty"
       ],
       "form_fields": [
-        "title",
-        "day",
-        "location",
-        "notes"
+        "amount",
+        "date",
+        "category"
+      ],
+      "form_operations": [
+        "validate",
+        "submit",
+        "cancel",
+        "reset"
+      ],
+      "destinations": [
+        "dashboard",
+        "expenses",
+        "settings"
+      ],
+      "filters": [
+        "reporting-period"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Material dialog + snackbar + progress-bar fill + expansion-panel transitions stay Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-data-tracking-calibration-matrix",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1",
+      "command-session-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "cells",
+      "destinations": [
+        "heatmap",
+        "variance",
+        "chart",
+        "timeline",
+        "cell-drawer"
+      ],
+      "filters": [
+        "model",
+        "harness",
+        "task-category",
+        "sigma-threshold",
+        "chart-model",
+        "chart-series"
+      ],
+      "value_bounds": [
+        "models from seeded set (Quillfox-7, Marlin-XL, Cobaltine-2, Peregrine-Lite, Sagebrush-9, Tundra-Mini)",
+        "harnesses from seeded set (driftbench, quarry, lanternctl, mosaic-eval)"
+      ],
+      "entity": "classification",
+      "entity_operations": [
+        "create",
+        "select",
+        "update"
+      ],
+      "entity_fields": [
+        "classification",
+        "rationale"
+      ],
+      "session_operations": [
+        "start"
+      ],
+      "demos": [
+        "cell-re-run"
+      ],
+      "visible_postconditions": [
+        "completed re-run updates cell mean/trial count, drawer trial list, dependent variance rows, and appends one timeline entry",
+        "saving a classification badges the row and shifts exactly one triage summary total"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Heatmap cell hover tooltips and red-amber-green ramp color reads stay Playwright-observed",
+      "Chart bar hover tooltips, legend toggle grow/shrink animations stay Playwright-observed",
+      "Re-run tick animation, score count-up, and chip crossfade on threshold moves stay Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-data-tracking-command-center",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1",
+      "command-session-v1",
+      "form-workflow-v1"
+    ],
+    "bindings": {
+      "destinations": [
+        "dashboard",
+        "total-prompts-detail",
+        "active-agents-detail",
+        "evaluations-run-detail",
+        "cost-this-month-detail"
+      ],
+      "browsable_entity": "activity-events",
+      "filters": [
+        "event-type"
+      ],
+      "themes": [
+        "light",
+        "night"
+      ],
+      "entity": "agent",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "name",
+        "model",
+        "description",
+        "state"
+      ],
+      "session_operations": [
+        "connect",
+        "disconnect",
+        "trigger_demo"
+      ],
+      "demos": [
+        "simulate-activity"
+      ],
+      "form_fields": [
+        "agent-name",
+        "model",
+        "description",
+        "night-enable",
+        "night-start-time",
+        "night-end-time"
       ],
       "form_operations": [
         "validate",
@@ -941,22 +1401,21 @@
       ]
     },
     "mechanics_exclusions": [
-      "Map pan/zoom / marker drag stays Playwright"
+      "KPI metrics strip: sparkline point hover tooltip and count-up animation stay Playwright-observed",
+      "Activity feed: auto-follow scroll behavior and jump-to-latest scroll mechanics stay Playwright-observed",
+      "Agent status panel: live step-status progression animation during a simulated run stays Playwright-observed"
     ]
   },
   {
-    "task": "frontend-planning-daily-planner-board",
+    "task": "frontend-data-tracking-eval-dashboard",
     "modules": [
+      "entity-collection-v1",
+      "command-session-v1",
       "browse-query-v1",
-      "entity-collection-v1"
+      "form-workflow-v1"
     ],
     "bindings": {
-      "browsable_entity": "tasks",
-      "destinations": [
-        "board",
-        "calendar-day-panel"
-      ],
-      "entity": "task",
+      "entity": "suite",
       "entity_operations": [
         "create",
         "select",
@@ -965,16 +1424,787 @@
         "toggle"
       ],
       "entity_fields": [
-        "title",
-        "done",
-        "channel",
-        "planned-time",
-        "day",
-        "start-time"
+        "name",
+        "prompts",
+        "last-run",
+        "average-score",
+        "night-mode"
+      ],
+      "session_operations": [
+        "start",
+        "pause",
+        "resume",
+        "restart"
+      ],
+      "destinations": [
+        "results",
+        "comparison"
+      ],
+      "browsable_entity": "results",
+      "filters": [
+        "timeline-status"
+      ],
+      "sorts": [
+        "prompt-title",
+        "model",
+        "score",
+        "latency",
+        "tokens",
+        "pass-fail"
+      ],
+      "form_fields": [
+        "suite-name",
+        "prompt-selection",
+        "night-start-time",
+        "night-end-time"
+      ],
+      "form_operations": [
+        "validate",
+        "submit",
+        "cancel"
       ]
     },
     "mechanics_exclusions": [
-      "Calendar panel day-scroll / hour-grid gestures stay Playwright-observed"
+      "Score charts: bar/line hover tooltip and bar-grow animation stay Playwright-observed",
+      "Run execution with visible steps: streaming run log incremental appearance, retry backoff countdown ticking, and step-status fade animations stay Playwright-observed",
+      "Results table: detail-panel slide-in and disclosure chevron rotation stay Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-data-tracking-expense-breakdown-reports",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "expenses",
+      "destinations": [
+        "breakdown-overview",
+        "expense-list",
+        "category-filter"
+      ],
+      "filters": [
+        "category"
+      ],
+      "sorts": [
+        "amount",
+        "date"
+      ],
+      "entity": "expense",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "label",
+        "amount",
+        "category"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Chart hover stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-data-tracking-finance-reports",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "expenses",
+      "destinations": [
+        "reports-overview",
+        "category-breakdown",
+        "transaction-list"
+      ],
+      "filters": [
+        "category",
+        "range"
+      ],
+      "sorts": [
+        "amount",
+        "date"
+      ],
+      "entity": "expense",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "label",
+        "amount",
+        "category",
+        "date"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Chart geometry / pie segment hover stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-data-tracking-ghostfolio",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1"
+    ],
+    "bindings": {
+      "destinations": [
+        "portfolio-overview"
+      ],
+      "filters": [
+        "asset-class"
+      ],
+      "entity": "holding",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "name",
+        "symbol",
+        "asset-class",
+        "quantity",
+        "unit-price"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Allocation bars and hover feedback stay Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-data-tracking-judge-ab-lab",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1",
+      "command-session-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "trials",
+      "destinations": [
+        "experiments",
+        "compare",
+        "cost",
+        "trial-criterion-diff"
+      ],
+      "filters": [
+        "task",
+        "pass-fail",
+        "delta-size",
+        "label-columns",
+        "compare-pair",
+        "suggestion-chip"
+      ],
+      "sorts": [
+        "task-name",
+        "label-reward",
+        "delta-size"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "entity": "attribution",
+      "entity_operations": [
+        "create",
+        "select",
+        "update"
+      ],
+      "entity_fields": [
+        "cause",
+        "note"
+      ],
+      "value_bounds": [
+        "cause in {judge-noise, rubric-change-effect, harness-change-effect}",
+        "note max 200 chars"
+      ],
+      "session_operations": [
+        "start"
+      ],
+      "demos": [
+        "rescore-run"
+      ],
+      "artifact_operations": [
+        "copy"
+      ],
+      "export_formats": [
+        "config-summary-text"
+      ],
+      "visible_postconditions": [
+        "new label appears in label picker, both Compare pickers, and cost chart after run completes",
+        "attribution rollup increments when an attribution is saved"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Scatter/dumbbell chart mark hover and tooltip reads stay Playwright-observed",
+      "Rescore step running/retry animation timing and progress-fill smoothness stay Playwright-observed",
+      "Toast slide/fade and new-label-column animate-in stay Playwright-observed",
+      "Cost chart legend hover states stay Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-data-tracking-media-history-timeline",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "timeline-events",
+      "destinations": [
+        "timeline",
+        "event-detail",
+        "filters"
+      ],
+      "filters": [
+        "era",
+        "type"
+      ],
+      "entity": "event",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "title",
+        "era",
+        "type"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Scroll/scrub timing stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-data-tracking-media-timeline",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "timeline-events",
+      "destinations": [
+        "timeline",
+        "event-detail",
+        "filters"
+      ],
+      "filters": [
+        "era",
+        "type"
+      ],
+      "entity": "event",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "title",
+        "era",
+        "type",
+        "summary"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Scroll-linked parallax / scrub timing stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-data-tracking-model-monitor",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1",
+      "form-workflow-v1",
+      "command-session-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "models",
+      "destinations": [
+        "model-catalog",
+        "cost-sidebar",
+        "event-feed",
+        "alert-settings-modal",
+        "comparison-modal"
+      ],
+      "filters": [
+        "provider",
+        "search",
+        "free"
+      ],
+      "entity": "model",
+      "entity_operations": [
+        "select",
+        "toggle"
+      ],
+      "entity_fields": [
+        "compare-selected",
+        "legend-visible",
+        "events-disclosure-open"
+      ],
+      "form_fields": [
+        "alerts-enabled",
+        "min-context-window"
+      ],
+      "form_operations": [
+        "validate",
+        "submit",
+        "cancel"
+      ],
+      "session_operations": [
+        "start",
+        "pause",
+        "resume",
+        "trigger_demo"
+      ],
+      "demos": [
+        "usage-simulation",
+        "catalog-refresh"
+      ],
+      "visible_postconditions": [
+        "shown-of-total-count",
+        "session-total",
+        "per-model-subtotals"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Pie-chart slice hover tooltip stays Playwright-only (computed while hovering)",
+      "Toast slide-in/auto-dismiss timing and event-feed slide-in animations stay Playwright-observed",
+      "Refresh row enter/strikethrough-collapse animations stay Playwright-observed; refresh state change itself goes through session trigger_demo",
+      "Streaming feed pacing (events every few seconds) is observed live, never batched via WebMCP"
+    ]
+  },
+  {
+    "task": "frontend-data-tracking-plausible-analytics",
+    "modules": [
+      "browse-query-v1"
+    ],
+    "bindings": {
+      "destinations": [
+        "example.com",
+        "blog.example.com",
+        "shop.example.com"
+      ],
+      "browsable_entity": "visitor-sessions",
+      "filters": [
+        "source",
+        "page",
+        "country",
+        "period"
+      ],
+      "sorts": [
+        "most-visitors",
+        "fewest-visitors",
+        "name-az"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Chart bar hover/tooltip stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-data-tracking-release-diff",
+    "modules": [
+      "browse-query-v1",
+      "form-workflow-v1",
+      "command-session-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "releases",
+      "destinations": [
+        "manifest",
+        "diff",
+        "splits",
+        "rotation",
+        "timeline"
+      ],
+      "filters": [
+        "diff-base",
+        "diff-compare"
+      ],
+      "value_bounds": [
+        "diff pickers limited to seeded versions 1.0.0, 1.1.0, 1.2.0, 2.0.0 plus session-cut versions"
+      ],
+      "form_fields": [
+        "version-name",
+        "notes"
+      ],
+      "form_operations": [
+        "validate",
+        "submit",
+        "cancel"
+      ],
+      "workflow_steps": [
+        "collect-manifests",
+        "compute-digests",
+        "rank-stability-check",
+        "seal"
+      ],
+      "session_operations": [
+        "start",
+        "restart",
+        "advance"
+      ],
+      "demos": [
+        "release-cut",
+        "retry-rank-stability-check",
+        "advance-rotation"
+      ],
+      "artifact_operations": [
+        "copy"
+      ],
+      "export_formats": [
+        "manifest-summary-text"
+      ],
+      "visible_postconditions": [
+        "sealed version appears selected in sidebar with lock/immutability treatment and a timeline cut event",
+        "rotation advance increments cycle, swaps active subsets, and appends history + timeline entries"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Cut-step badge crossfade and correlation count-up animation stay Playwright-observed",
+      "Unchanged-disclosure height animation and chevron rotation stay Playwright-observed",
+      "New sidebar entry / timeline entry animate-in stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-data-tracking-sourcing-console",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1",
+      "form-workflow-v1",
+      "command-session-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "candidates",
+      "destinations": [
+        "candidates",
+        "quota",
+        "timeline",
+        "build-queue"
+      ],
+      "filters": [
+        "language",
+        "difficulty-band",
+        "license",
+        "status"
+      ],
+      "sorts": [
+        "name",
+        "stars",
+        "difficulty"
+      ],
+      "entity": "candidate",
+      "entity_operations": [
+        "select",
+        "update",
+        "reorder"
+      ],
+      "entity_fields": [
+        "status",
+        "rejection-reason",
+        "queue-position"
+      ],
+      "value_bounds": {
+        "status": [
+          "candidate",
+          "scored",
+          "selected",
+          "rejected",
+          "pinned",
+          "queued"
+        ],
+        "rejection-reason": [
+          "license-blocked",
+          "gui-heavy",
+          "network-dependent",
+          "duplicate-cluster",
+          "too-large"
+        ],
+        "difficulty-band": [
+          "easy",
+          "medium",
+          "hard"
+        ],
+        "license": [
+          "permissive",
+          "weak-copyleft",
+          "strong-copyleft",
+          "unlicensed"
+        ]
+      },
+      "form_fields": [
+        "rejection-reason",
+        "pin-notes"
+      ],
+      "form_operations": [
+        "validate",
+        "submit",
+        "cancel"
+      ],
+      "session_operations": [
+        "start"
+      ],
+      "visible_postconditions": [
+        "fetch-more run advances Querying, Scoring, Classifying in order and appends exactly 6 new candidates",
+        "status changes update chip, rollup strip, quota cell, queue panel, and timeline together",
+        "cluster and org guards block ineligible Select attempts with an inline explanation and no state change"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Commit-hash copy control and its clipboard confirmation stay Playwright (clipboard contents are a Playwright responsibility)",
+      "Drag-reorder gesture and the sliding reorder animation are graded via the real drag/keyboard move controls; WebMCP reorder is for setup only",
+      "Fetch-more per-step pending-to-running-to-complete animation timing stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-game-dare-night",
+    "modules": [
+      "command-session-v1",
+      "entity-collection-v1",
+      "form-workflow-v1"
+    ],
+    "bindings": {
+      "session_operations": [
+        "start",
+        "pause",
+        "resume",
+        "stop",
+        "restart",
+        "advance",
+        "trigger_demo",
+        "connect",
+        "disconnect"
+      ],
+      "demos": [
+        "deliver-out-of-order"
+      ],
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete",
+        "toggle"
+      ],
+      "entity_fields": [
+        "prompt",
+        "category",
+        "intensity",
+        "name",
+        "outcome"
+      ],
+      "form_operations": [
+        "validate",
+        "submit",
+        "cancel",
+        "reset"
+      ],
+      "form_fields": [
+        "player-name",
+        "card-prompt",
+        "card-category",
+        "card-intensity"
+      ],
+      "workflow_steps": [
+        "player-setup",
+        "start-game",
+        "add-custom-card"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Card-flip / toast / timer-pulse animation timing stays Playwright-observed",
+      "Live-stream tick timing stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-game-fandangofury",
+    "modules": [
+      "command-session-v1",
+      "browse-query-v1",
+      "entity-collection-v1"
+    ],
+    "bindings": {
+      "session_operations": [
+        "start",
+        "restart",
+        "advance",
+        "stop"
+      ],
+      "destinations": [
+        "stage-map",
+        "masks",
+        "cantina"
+      ],
+      "entity": "mask",
+      "entity_operations": [
+        "select",
+        "toggle"
+      ],
+      "entity_fields": [
+        "name",
+        "bonus",
+        "equipped"
+      ]
+    },
+    "mechanics_exclusions": [
+      "All combat (light/heavy attacks, Fiesta Combo chain, block/dodge cooldown, Fury meter fill, Fiesta Fury, boss telegraph, health depletion) stays Playwright-driven",
+      "Undo/Redo/branch selection and the History panel stay Playwright-driven via the real controls",
+      "Cantina upgrade purchase (escalating cost) stays Playwright-driven via the real Buy control",
+      "Reset Progress (confirmation-guarded) stays Playwright-driven"
+    ]
+  },
+  {
+    "task": "frontend-game-feltrun",
+    "modules": [
+      "command-session-v1",
+      "browse-query-v1",
+      "structured-editor-v1"
+    ],
+    "bindings": {
+      "session_operations": [
+        "start",
+        "advance",
+        "restart",
+        "trigger_demo",
+        "connect",
+        "disconnect"
+      ],
+      "destinations": [
+        "table",
+        "stats",
+        "hand-history",
+        "badges",
+        "collaboration"
+      ],
+      "editor_operations": [
+        "add",
+        "update_property"
+      ],
+      "editor_object_types": [
+        "shared-note"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Hand-equity meter transition on each new street stays Playwright-observed",
+      "Badge-unlock toast and showdown reveal stay Playwright-observed",
+      "Concurrent-merge delivery ordering and same-note conflict resolution stay Playwright-driven"
+    ]
+  },
+  {
+    "task": "frontend-game-letterdrop",
+    "modules": [
+      "command-session-v1",
+      "browse-query-v1"
+    ],
+    "bindings": {
+      "session_operations": [
+        "start",
+        "pause",
+        "resume",
+        "restart"
+      ],
+      "destinations": [
+        "game-board",
+        "match-history",
+        "achievements"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Falling-tile canvas physics/timing and gradual acceleration stay Playwright-observed",
+      "Tile tap selection and word-tray build stay Playwright-observed",
+      "Danger-line crossing to Game Over stays Playwright-observed",
+      "Combo streak meter animation, power-tile toasts, invalid-word tray shake stay Playwright-observed",
+      "Undo Last Tile and narrow-viewport canvas scaling stay Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-game-mineclash",
+    "modules": [
+      "command-session-v1",
+      "browse-query-v1"
+    ],
+    "bindings": {
+      "session_operations": [
+        "start",
+        "pause",
+        "resume",
+        "restart",
+        "stop"
+      ],
+      "destinations": [
+        "game-board",
+        "stats"
+      ],
+      "filters": [
+        "difficulty"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Tile reveal click + adjacency/ore reveal stays Playwright-observed",
+      "Flag Mode toggle + flagged-tile behavior stays Playwright-observed",
+      "Rival AI thinking-delay animation + heuristic timing stays Playwright-observed",
+      "Hint reveal, Strike-icon fill animation, and Web Audio tones stay Playwright-observed",
+      "Narrow-viewport grid scaling stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-game-repquest",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1",
+      "command-session-v1"
+    ],
+    "bindings": {
+      "destinations": [
+        "quest",
+        "history",
+        "gear",
+        "settings"
+      ],
+      "entity": "rep-set",
+      "entity_operations": [
+        "create",
+        "delete",
+        "select",
+        "toggle"
+      ],
+      "entity_fields": [
+        "reps",
+        "setId",
+        "gearId"
+      ],
+      "value_bounds": {
+        "reps": {
+          "min": 1,
+          "max": 9999
+        }
+      },
+      "session_operations": [
+        "start",
+        "pause",
+        "resume",
+        "stop",
+        "restart",
+        "trigger_demo"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Undo/Redo branch restoration and History-state panel stay Playwright-observed",
+      "Character glide animation stays Playwright-observed",
+      "Zone-unlock palette and boss-defeated marker stay Playwright-observed"
     ]
   },
   {
@@ -1094,6 +2324,45 @@
     ]
   },
   {
+    "task": "frontend-landing-l1-network-marketing",
+    "modules": [
+      "browse-query-v1",
+      "form-workflow-v1",
+      "entity-collection-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "features",
+      "destinations": [
+        "marketing-home",
+        "feature-detail",
+        "waitlist"
+      ],
+      "entity": "feature",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "title",
+        "summary"
+      ],
+      "form_fields": [
+        "email",
+        "name"
+      ],
+      "form_operations": [
+        "validate",
+        "submit",
+        "cancel"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Outbound marketing CTAs must remain in-app (no origin navigation)"
+    ]
+  },
+  {
     "task": "frontend-landing-landonorris",
     "modules": [
       "browse-query-v1",
@@ -1120,43 +2389,6 @@
       "Horizontal-track and helmet-grid scroll-linked motion stays Playwright-observed",
       "Social hover-to-play and placeholder fade stays Playwright-observed",
       "WebGL / Rive rendering stays Playwright-observed"
-    ]
-  },
-  {
-    "task": "frontend-mosbyfiles",
-    "modules": [
-      "browse-query-v1",
-      "command-session-v1"
-    ],
-    "bindings": {
-      "destinations": [
-        "home",
-        "about",
-        "frank-lloyd-wright",
-        "irving-gill",
-        "frank-gehry",
-        "louis-kahn",
-        "i-m-pei",
-        "paul-rudolph",
-        "louis-sullivan",
-        "mary-colter"
-      ],
-      "session_operations": [
-        "play-video",
-        "pause-video",
-        "play-audio",
-        "pause-audio",
-        "open-popup",
-        "close-popup",
-        "advance-case"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Folder-open/close Flip transition stays Playwright-observed",
-      "Scrapbook Draggable stays Playwright-observed",
-      "Stack hover/unfold and tag hover lift stay Playwright-observed",
-      "Gallery crossfade and hero SplitText reveal stay Playwright-observed",
-      "Overscroll scroll-linked motion stays Playwright-observed"
     ]
   },
   {
@@ -1281,294 +2513,55 @@
     ]
   },
   {
-    "task": "frontend-productivity-focuspath",
+    "task": "frontend-mosbyfiles",
     "modules": [
-      "entity-collection-v1",
       "browse-query-v1",
       "command-session-v1"
     ],
     "bindings": {
-      "entity": [
-        "goal",
-        "milestone",
-        "step"
-      ],
-      "entity_operations": [
-        "create",
-        "select",
-        "update",
-        "delete",
-        "toggle",
-        "reorder"
-      ],
       "destinations": [
-        "goals-overview",
-        "goal-detail",
-        "completed-goals"
+        "home",
+        "about",
+        "frank-lloyd-wright",
+        "irving-gill",
+        "frank-gehry",
+        "louis-kahn",
+        "i-m-pei",
+        "paul-rudolph",
+        "louis-sullivan",
+        "mary-colter"
       ],
       "session_operations": [
-        "start",
-        "pause",
-        "resume",
-        "connect",
-        "disconnect"
-      ],
-      "demos": [
-        "deliver-out-of-order"
+        "play-video",
+        "pause-video",
+        "play-audio",
+        "pause-audio",
+        "open-popup",
+        "close-popup",
+        "advance-case"
       ]
     },
     "mechanics_exclusions": [
-      "Milestone-complete node fill-in animation stays Playwright-observed",
-      "Overview-detail view transition stays Playwright-observed",
-      "Narrow-viewport horizontal-vertical path reflow stays Playwright-observed",
-      "Hover/focus washes on nodes, rows, and toggles stay Playwright-observed"
+      "Folder-open/close Flip transition stays Playwright-observed",
+      "Scrapbook Draggable stays Playwright-observed",
+      "Stack hover/unfold and tag hover lift stay Playwright-observed",
+      "Gallery crossfade and hero SplitText reveal stay Playwright-observed",
+      "Overscroll scroll-linked motion stays Playwright-observed"
     ]
   },
   {
-    "task": "frontend-game-mineclash",
+    "task": "frontend-planning-daily-planner-board",
     "modules": [
-      "command-session-v1",
-      "browse-query-v1"
-    ],
-    "bindings": {
-      "session_operations": [
-        "start",
-        "pause",
-        "resume",
-        "restart",
-        "stop"
-      ],
-      "destinations": [
-        "game-board",
-        "stats"
-      ],
-      "filters": [
-        "difficulty"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Tile reveal click + adjacency/ore reveal stays Playwright-observed",
-      "Flag Mode toggle + flagged-tile behavior stays Playwright-observed",
-      "Rival AI thinking-delay animation + heuristic timing stays Playwright-observed",
-      "Hint reveal, Strike-icon fill animation, and Web Audio tones stay Playwright-observed",
-      "Narrow-viewport grid scaling stays Playwright-observed"
-    ]
-  },
-  {
-    "task": "frontend-game-letterdrop",
-    "modules": [
-      "command-session-v1",
-      "browse-query-v1"
-    ],
-    "bindings": {
-      "session_operations": [
-        "start",
-        "pause",
-        "resume",
-        "restart"
-      ],
-      "destinations": [
-        "game-board",
-        "match-history",
-        "achievements"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Falling-tile canvas physics/timing and gradual acceleration stay Playwright-observed",
-      "Tile tap selection and word-tray build stay Playwright-observed",
-      "Danger-line crossing to Game Over stays Playwright-observed",
-      "Combo streak meter animation, power-tile toasts, invalid-word tray shake stay Playwright-observed",
-      "Undo Last Tile and narrow-viewport canvas scaling stay Playwright-observed"
-    ]
-  },
-  {
-    "task": "frontend-creative-tools-frameflick",
-    "modules": [
-      "structured-editor-v1",
+      "browse-query-v1",
       "entity-collection-v1"
     ],
     "bindings": {
-      "editor_operations": [
-        "update_property",
-        "switch_mode",
-        "set_content",
-        "preview"
-      ],
-      "editor_properties": [
-        "background",
-        "custom-background",
-        "padding",
-        "corner-radius",
-        "shadow",
-        "frame-style",
-        "caption-text",
-        "caption-position",
-        "caption-size",
-        "caption-color",
-        "watermark",
-        "watermark-text",
-        "watermark-opacity",
-        "watermark-corner",
-        "zoom"
-      ],
-      "editor_modes": [
-        "square",
-        "widescreen",
-        "story",
-        "original"
-      ],
-      "value_bounds": [
-        "padding 0-25",
-        "corner-radius 0-48",
-        "shadow 0-10",
-        "caption-size 12-64",
-        "watermark-opacity 5-100",
-        "zoom 20-200"
-      ],
-      "entity": "preset",
-      "entity_operations": [
-        "create",
-        "select",
-        "delete"
-      ],
-      "entity_fields": [
-        "name",
-        "settings"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Drag-to-reposition and the Zoom slider gesture stay Playwright-only",
-      "Drag-and-drop upload stays Playwright-observed",
-      "Live canvas render fidelity, Download PNG 2x rasterization, and Copy Image clipboard stay Playwright-only",
-      "Collaboration Scenario merge convergence stays Playwright-only"
-    ]
-  },
-  {
-    "task": "frontend-game-dare-night",
-    "modules": [
-      "command-session-v1",
-      "entity-collection-v1",
-      "form-workflow-v1"
-    ],
-    "bindings": {
-      "session_operations": [
-        "start",
-        "pause",
-        "resume",
-        "stop",
-        "restart",
-        "advance",
-        "trigger_demo",
-        "connect",
-        "disconnect"
-      ],
-      "demos": [
-        "deliver-out-of-order"
-      ],
-      "entity_operations": [
-        "create",
-        "select",
-        "update",
-        "delete",
-        "toggle"
-      ],
-      "entity_fields": [
-        "prompt",
-        "category",
-        "intensity",
-        "name",
-        "outcome"
-      ],
-      "form_operations": [
-        "validate",
-        "submit",
-        "cancel",
-        "reset"
-      ],
-      "form_fields": [
-        "player-name",
-        "card-prompt",
-        "card-category",
-        "card-intensity"
-      ],
-      "workflow_steps": [
-        "player-setup",
-        "start-game",
-        "add-custom-card"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Card-flip / toast / timer-pulse animation timing stays Playwright-observed",
-      "Live-stream tick timing stays Playwright-observed"
-    ]
-  },
-  {
-    "task": "frontend-productivity-lineforge",
-    "modules": [
-      "browse-query-v1",
-      "entity-collection-v1",
-      "command-session-v1"
-    ],
-    "bindings": {
-      "browsable_entity": "openings",
+      "browsable_entity": "tasks",
       "destinations": [
-        "library",
-        "explorer",
-        "practice",
-        "notable-games",
-        "saved-lines"
+        "board",
+        "calendar-day-panel"
       ],
-      "filters": [
-        "favorites",
-        "family"
-      ],
-      "themes": [
-        "classic",
-        "forest",
-        "slate"
-      ],
-      "entity": "saved-line",
-      "entity_operations": [
-        "create",
-        "select",
-        "update",
-        "delete",
-        "toggle"
-      ],
-      "entity_fields": [
-        "name"
-      ],
-      "session_operations": [
-        "start",
-        "pause",
-        "resume",
-        "disconnect",
-        "restart",
-        "advance",
-        "trigger_demo"
-      ],
-      "demos": [
-        "deliver-out-of-order"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Board move animation, piece-lift, and practice green/red flash timing stay Playwright-observed (gesture/transient mechanics)"
-    ]
-  },
-  {
-    "task": "frontend-productivity-notenest",
-    "modules": [
-      "entity-collection-v1",
-      "browse-query-v1",
-      "structured-editor-v1"
-    ],
-    "bindings": {
-      "browsable_entity": "notes",
-      "destinations": [
-        "all-notes",
-        "trash"
-      ],
-      "entity": "note",
+      "entity": "task",
       "entity_operations": [
         "create",
         "select",
@@ -1578,61 +2571,186 @@
       ],
       "entity_fields": [
         "title",
-        "body",
-        "folder",
-        "pinned",
-        "color",
-        "checklist-item"
-      ],
-      "editor_object_types": [
-        "checklist-block"
-      ],
-      "editor_operations": [
-        "set_content",
-        "add"
+        "done",
+        "channel",
+        "planned-time",
+        "day",
+        "start-time"
       ]
     },
     "mechanics_exclusions": [
-      "Bold/Italic/Bulleted-List formatting stays Playwright-driven (selection-dependent, mechanism matters)",
-      "Load 10,000 Items virtualized scroll/overscan geometry stays Playwright-observed",
-      "Raw image blobs / file paths must not appear in WebMCP args"
+      "Calendar panel day-scroll / hour-grid gestures stay Playwright-observed"
     ]
   },
   {
-    "task": "frontend-game-feltrun",
+    "task": "frontend-planning-execution-kanban",
     "modules": [
-      "command-session-v1",
+      "entity-collection-v1",
       "browse-query-v1",
-      "structured-editor-v1"
+      "form-workflow-v1",
+      "command-session-v1"
     ],
     "bindings": {
+      "entity": "card",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete",
+        "reorder"
+      ],
+      "entity_fields": [
+        "title",
+        "description",
+        "column",
+        "position",
+        "assignee",
+        "attached-prompt",
+        "comment"
+      ],
+      "value_bounds": {
+        "column": [
+          "backlog",
+          "in-progress",
+          "review",
+          "done"
+        ]
+      },
+      "browsable_entity": "cards",
+      "destinations": [
+        "board",
+        "card-detail",
+        "prompt-panel"
+      ],
+      "filters": [
+        "assignee",
+        "search"
+      ],
+      "form_fields": [
+        "title",
+        "description",
+        "attached-prompt",
+        "assignee",
+        "comment"
+      ],
+      "form_operations": [
+        "validate",
+        "submit",
+        "cancel"
+      ],
       "session_operations": [
         "start",
-        "advance",
-        "restart",
-        "trigger_demo",
-        "connect",
-        "disconnect"
+        "restart"
       ],
-      "destinations": [
-        "table",
-        "stats",
-        "hand-history",
-        "badges",
-        "collaboration"
+      "demos": [
+        "card-execution",
+        "seeded-failing-run"
       ],
-      "editor_operations": [
-        "add",
-        "update_property"
-      ],
-      "editor_object_types": [
-        "shared-note"
+      "visible_postconditions": [
+        "column-counts",
+        "card-progress-n-of-m",
+        "status-chip-label"
       ]
     },
     "mechanics_exclusions": [
-      "Hand-equity meter transition on each new street stays Playwright-observed",
-      "Badge-unlock toast and showdown reveal stay Playwright-observed",
-      "Concurrent-merge delivery ordering and same-note conflict resolution stay Playwright-driven"
+      "Card moves ARE state changes and go through entity update(column)/reorder, but drag gesture fidelity \u2014 raised shadow, ghost placeholder, exact drop-position insertion, settle animation \u2014 is graded via real Playwright drags only",
+      "Keyboard move-control operability is graded via real Playwright keyboard interaction; WebMCP entity update only proves state parity",
+      "Retry backoff countdown ticking and sub-item check animations are timed visuals, Playwright-observed live",
+      "Toast and modal enter/exit transitions stay Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-planning-travel-itinerary-planner",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1",
+      "form-workflow-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "activities",
+      "destinations": [
+        "overview",
+        "day-detail",
+        "activity-form"
+      ],
+      "filters": [
+        "day"
+      ],
+      "entity": "activity",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete",
+        "reorder"
+      ],
+      "entity_fields": [
+        "title",
+        "day",
+        "location"
+      ],
+      "form_fields": [
+        "title",
+        "day",
+        "location",
+        "notes"
+      ],
+      "form_operations": [
+        "validate",
+        "submit",
+        "cancel"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Map pan/zoom / marker drag stays Playwright"
+    ]
+  },
+  {
+    "task": "frontend-planning-trip-itinerary",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1",
+      "form-workflow-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "activities",
+      "destinations": [
+        "overview",
+        "day-detail",
+        "activity-form"
+      ],
+      "filters": [
+        "day",
+        "type"
+      ],
+      "entity": "activity",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete",
+        "reorder"
+      ],
+      "entity_fields": [
+        "title",
+        "day",
+        "location",
+        "notes"
+      ],
+      "form_fields": [
+        "title",
+        "day",
+        "location",
+        "notes"
+      ],
+      "form_operations": [
+        "validate",
+        "submit",
+        "cancel"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Map pan/zoom / marker drag stays Playwright"
     ]
   },
   {
@@ -1686,98 +2804,14 @@
     ]
   },
   {
-    "task": "frontend-productivity-tagnote",
+    "task": "frontend-productivity-clockcraft",
     "modules": [
       "entity-collection-v1",
-      "browse-query-v1"
+      "browse-query-v1",
+      "command-session-v1"
     ],
     "bindings": {
-      "browsable_entity": "notes",
-      "destinations": [
-        "timeline",
-        "calendar",
-        "archived"
-      ],
-      "filters": [
-        "tag"
-      ],
-      "entity": "note",
-      "entity_operations": [
-        "create",
-        "select",
-        "update",
-        "delete",
-        "toggle"
-      ],
-      "entity_fields": [
-        "text",
-        "tags"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Attach File native OS file picker stays Playwright-observed",
-      "Make-TODO tag-rail toggle and Open/Done split stays Playwright-observed",
-      "Calendar day-marker selection and month navigation stays Playwright-observed",
-      "Toast auto-dismiss and blank-submit shake animation timing stays Playwright-observed",
-      "Undo/Redo branch traversal in the History panel stays Playwright-observed"
-    ]
-  },
-  {
-    "task": "frontend-creative-tools-markupflow",
-    "modules": [
-      "structured-editor-v1",
-      "entity-collection-v1"
-    ],
-    "bindings": {
-      "editor_object_types": [
-        "rectangle",
-        "oval",
-        "line",
-        "arrow",
-        "text",
-        "blur",
-        "pixelate",
-        "spotlight",
-        "loupe",
-        "highlighter"
-      ],
-      "editor_properties": [
-        "color",
-        "stroke-width",
-        "text-style",
-        "font-size"
-      ],
-      "editor_operations": [
-        "select",
-        "add",
-        "delete",
-        "update_property",
-        "switch_mode",
-        "preview"
-      ],
-      "editor_modes": [
-        "edit",
-        "preview"
-      ],
-      "value_bounds": {
-        "font-size": [
-          10,
-          72
-        ],
-        "stroke-width": [
-          "thin",
-          "medium",
-          "thick"
-        ],
-        "text-style": [
-          "plain",
-          "bold-caption",
-          "outline",
-          "highlight-box",
-          "shadow"
-        ]
-      },
-      "entity": "project",
+      "entity": "entry",
       "entity_operations": [
         "create",
         "select",
@@ -1785,66 +2819,46 @@
         "delete"
       ],
       "entity_fields": [
-        "name"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Shape/effect click-drag drawing and Loupe click placement stay Playwright-observed",
-      "Layer-reorder drag-and-drop gesture stays Playwright-observed"
-    ]
-  },
-  {
-    "task": "frontend-productivity-swiftnote",
-    "modules": [
-      "entity-collection-v1",
-      "browse-query-v1"
-    ],
-    "bindings": {
-      "entity": "note",
-      "entity_operations": [
-        "create",
-        "select",
-        "update",
-        "delete",
-        "toggle"
+        "name",
+        "category",
+        "tag",
+        "duration",
+        "start-time"
       ],
-      "entity_fields": [
-        "title",
-        "body"
-      ],
-      "browsable_entity": "notes",
+      "browsable_entity": "entries",
       "destinations": [
-        "editor",
-        "quick-switcher",
-        "shortcuts",
-        "focus-mode"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Quick Switcher arrow-key navigation, wrap, and re-clamp stay Playwright-driven",
-      "Focus Mode / mobile drawer slide and sidebar collapse stay Playwright-observed",
-      "Toast and Saved-indicator appearance/timing stay Playwright-observed",
-      "Drag-and-drop image embedding stays Playwright-observed",
-      "10,000-item virtualization scroll windowing stays Playwright-observed"
-    ]
-  },
-  {
-    "task": "frontend-productivity-sidedock",
-    "modules": [
-      "browse-query-v1",
-      "entity-collection-v1",
-      "artifact-transfer-v1"
-    ],
-    "bindings": {
-      "browsable_entity": "bookmarks",
-      "destinations": [
-        "default-view",
-        "sidebar-view"
+        "timeline",
+        "weekly-chart",
+        "tag-manager"
       ],
       "filters": [
-        "search-scope"
+        "category"
       ],
-      "entity": "bookmark",
+      "session_operations": [
+        "start",
+        "stop",
+        "restart"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Undo/Redo/branch selection and the History panel stay Playwright-driven via the real controls",
+      "Live per-second timer tick stays Playwright-observed",
+      "Duration-proportional timeline block sizing stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-productivity-focuspath",
+    "modules": [
+      "entity-collection-v1",
+      "browse-query-v1",
+      "command-session-v1"
+    ],
+    "bindings": {
+      "entity": [
+        "goal",
+        "milestone",
+        "step"
+      ],
       "entity_operations": [
         "create",
         "select",
@@ -1853,267 +2867,80 @@
         "toggle",
         "reorder"
       ],
-      "entity_fields": [
-        "url",
-        "title",
-        "note",
-        "pinned",
-        "folder"
-      ],
-      "artifact_operations": [
-        "import",
-        "export"
-      ],
-      "import_modes": [
-        "netscape-html"
-      ],
-      "export_formats": [
-        "netscape-html"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Drag-move/reorder gestures stay Playwright-observed",
-      "Inline-rename keystrokes stay Playwright-driven",
-      "Virtualized scroll windowing stays Playwright-observed"
-    ]
-  },
-  {
-    "task": "frontend-productivity-mindthread",
-    "modules": [
-      "browse-query-v1",
-      "entity-collection-v1",
-      "form-workflow-v1"
-    ],
-    "bindings": {
-      "browsable_entity": "sparks",
       "destinations": [
-        "home",
-        "today",
-        "archived",
-        "thread-detail"
+        "goals-overview",
+        "goal-detail",
+        "completed-goals"
       ],
-      "filters": [
-        "tag"
-      ],
-      "entity": "spark",
-      "entity_operations": [
-        "create",
-        "select",
-        "update",
-        "delete",
-        "toggle"
-      ],
-      "entity_fields": [
-        "text",
-        "tags",
-        "thread",
-        "status",
-        "pinned",
-        "archived"
-      ],
-      "form_fields": [
-        "spark-text",
-        "thread-title"
-      ],
-      "form_operations": [
-        "validate",
-        "submit",
-        "cancel"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Merge-confirm and toast animation stay Playwright-observed",
-      "Virtualized scroll stays Playwright-observed",
-      "Badge-color and reflection-tint treatments stay Playwright-observed"
-    ]
-  },
-  {
-    "task": "frontend-productivity-scribblespace",
-    "modules": [
-      "structured-editor-v1",
-      "entity-collection-v1",
-      "command-session-v1"
-    ],
-    "bindings": {
-      "editor_object_types": [
-        "note",
-        "flashcard",
-        "shape"
-      ],
-      "editor_operations": [
-        "add",
-        "select",
-        "delete",
-        "update_property",
-        "set_content",
-        "switch_mode",
-        "preview"
-      ],
-      "editor_properties": [
-        "color",
-        "text",
-        "front",
-        "back",
-        "z-order"
-      ],
-      "editor_modes": [
-        "select",
-        "connect"
-      ],
-      "entity": "board",
-      "entity_operations": [
-        "create",
-        "select",
-        "update",
-        "delete"
-      ],
-      "session_operations": [
-        "start",
-        "pause",
-        "connect",
-        "disconnect",
-        "advance"
-      ],
-      "demos": [
-        "deliver-out-of-order",
-        "reconnect"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Canvas pan/zoom and object drag/resize stay Playwright-driven",
-      "Connect click-sequence stays Playwright-driven",
-      "Mini-map click and search pan stay Playwright-observed",
-      "Live-tick timing stays Playwright-observed"
-    ]
-  },
-  {
-    "task": "frontend-creative-tools-panecraft",
-    "modules": [
-      "entity-collection-v1",
-      "form-workflow-v1",
-      "command-session-v1"
-    ],
-    "bindings": {
-      "entity": "pane",
-      "entity_operations": [
-        "create",
-        "select",
-        "update",
-        "delete",
-        "reorder"
-      ],
-      "entity_fields": [
-        "source",
-        "type",
-        "metric",
-        "dimension",
-        "size",
-        "refresh-interval"
-      ],
-      "value_bounds": {
-        "size": [
-          "small",
-          "medium",
-          "large"
-        ],
-        "refresh-interval": [
-          "off",
-          "30s",
-          "5m"
-        ],
-        "type": [
-          "line",
-          "bar",
-          "donut",
-          "table",
-          "counter"
-        ]
-      },
-      "form_fields": [
-        "data-source",
-        "pane-type",
-        "metric-column",
-        "dimension-column"
-      ],
-      "form_operations": [
-        "validate",
-        "submit",
-        "cancel",
-        "advance",
-        "return"
-      ],
-      "workflow_steps": [
-        "choose-source",
-        "choose-type",
-        "configure"
-      ],
-      "session_operations": [
-        "start",
-        "pause",
-        "stop",
-        "connect",
-        "disconnect",
-        "advance"
-      ],
-      "demos": [
-        "refresh-tick",
-        "collaboration-scenario",
-        "go-offline",
-        "go-online"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Date-range recompute and chart hover stay Playwright-observed",
-      "Refresh-tick timing stays Playwright-observed",
-      "Merge convergence visuals stay Playwright-observed",
-      "Page-tab reorder/scroll stays Playwright-driven"
-    ]
-  },
-  {
-    "task": "frontend-game-repquest",
-    "modules": [
-      "browse-query-v1",
-      "entity-collection-v1",
-      "command-session-v1"
-    ],
-    "bindings": {
-      "destinations": [
-        "quest",
-        "history",
-        "gear",
-        "settings"
-      ],
-      "entity": "rep-set",
-      "entity_operations": [
-        "create",
-        "delete",
-        "select",
-        "toggle"
-      ],
-      "entity_fields": [
-        "reps",
-        "setId",
-        "gearId"
-      ],
-      "value_bounds": {
-        "reps": {
-          "min": 1,
-          "max": 9999
-        }
-      },
       "session_operations": [
         "start",
         "pause",
         "resume",
-        "stop",
-        "restart",
-        "trigger_demo"
+        "connect",
+        "disconnect"
+      ],
+      "demos": [
+        "deliver-out-of-order"
       ]
     },
     "mechanics_exclusions": [
-      "Undo/Redo branch restoration and History-state panel stay Playwright-observed",
-      "Character glide animation stays Playwright-observed",
-      "Zone-unlock palette and boss-defeated marker stay Playwright-observed"
+      "Milestone-complete node fill-in animation stays Playwright-observed",
+      "Overview-detail view transition stays Playwright-observed",
+      "Narrow-viewport horizontal-vertical path reflow stays Playwright-observed",
+      "Hover/focus washes on nodes, rows, and toggles stay Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-productivity-lineforge",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1",
+      "command-session-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "openings",
+      "destinations": [
+        "library",
+        "explorer",
+        "practice",
+        "notable-games",
+        "saved-lines"
+      ],
+      "filters": [
+        "favorites",
+        "family"
+      ],
+      "themes": [
+        "classic",
+        "forest",
+        "slate"
+      ],
+      "entity": "saved-line",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete",
+        "toggle"
+      ],
+      "entity_fields": [
+        "name"
+      ],
+      "session_operations": [
+        "start",
+        "pause",
+        "resume",
+        "disconnect",
+        "restart",
+        "advance",
+        "trigger_demo"
+      ],
+      "demos": [
+        "deliver-out-of-order"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Board move animation, piece-lift, and practice green/red flash timing stay Playwright-observed (gesture/transient mechanics)"
     ]
   },
   {
@@ -2183,6 +3010,463 @@
     ]
   },
   {
+    "task": "frontend-productivity-md-uy",
+    "modules": [
+      "structured-editor-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "editor_object_types": [
+        "markdown-document"
+      ],
+      "editor_operations": [
+        "set_content",
+        "switch_mode",
+        "preview"
+      ],
+      "editor_modes": [
+        "edit",
+        "preview",
+        "presentation"
+      ],
+      "artifact_operations": [
+        "export",
+        "copy"
+      ],
+      "export_formats": [
+        "markdown"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Live-sync/peer collaboration stays chrome-only and Playwright-observed; Present-mode slide gestures stay Playwright-driven"
+    ]
+  },
+  {
+    "task": "frontend-productivity-mindthread",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1",
+      "form-workflow-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "sparks",
+      "destinations": [
+        "home",
+        "today",
+        "archived",
+        "thread-detail"
+      ],
+      "filters": [
+        "tag"
+      ],
+      "entity": "spark",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete",
+        "toggle"
+      ],
+      "entity_fields": [
+        "text",
+        "tags",
+        "thread",
+        "status",
+        "pinned",
+        "archived"
+      ],
+      "form_fields": [
+        "spark-text",
+        "thread-title"
+      ],
+      "form_operations": [
+        "validate",
+        "submit",
+        "cancel"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Merge-confirm and toast animation stay Playwright-observed",
+      "Virtualized scroll stays Playwright-observed",
+      "Badge-color and reflection-tint treatments stay Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-productivity-nostrpass",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1"
+    ],
+    "bindings": {
+      "destinations": [
+        "dashboard",
+        "identities",
+        "permissions",
+        "audit-log",
+        "settings"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "entity": "identity",
+      "entity_operations": [
+        "create",
+        "select",
+        "toggle"
+      ],
+      "entity_fields": [
+        "label",
+        "npub"
+      ],
+      "apps": [
+        "damus",
+        "snort",
+        "coracle",
+        "iris"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Reveal-key and theme-toggle animation stay Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-productivity-notenest",
+    "modules": [
+      "entity-collection-v1",
+      "browse-query-v1",
+      "structured-editor-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "notes",
+      "destinations": [
+        "all-notes",
+        "trash"
+      ],
+      "entity": "note",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete",
+        "toggle"
+      ],
+      "entity_fields": [
+        "title",
+        "body",
+        "folder",
+        "pinned",
+        "color",
+        "checklist-item"
+      ],
+      "editor_object_types": [
+        "checklist-block"
+      ],
+      "editor_operations": [
+        "set_content",
+        "add"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Bold/Italic/Bulleted-List formatting stays Playwright-driven (selection-dependent, mechanism matters)",
+      "Load 10,000 Items virtualized scroll/overscan geometry stays Playwright-observed",
+      "Raw image blobs / file paths must not appear in WebMCP args"
+    ]
+  },
+  {
+    "task": "frontend-productivity-prompt-library",
+    "modules": [
+      "entity-collection-v1",
+      "browse-query-v1",
+      "form-workflow-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "entity": "prompt",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "title",
+        "body",
+        "technique",
+        "description",
+        "attachments",
+        "version",
+        "sources"
+      ],
+      "destinations": [
+        "library-table",
+        "prompt-detail",
+        "version-history"
+      ],
+      "browsable_entity": "prompts",
+      "filters": [
+        "search",
+        "technique"
+      ],
+      "form_fields": [
+        "title",
+        "body",
+        "technique",
+        "description",
+        "extension-text",
+        "combined-body"
+      ],
+      "form_operations": [
+        "validate",
+        "submit",
+        "cancel"
+      ],
+      "artifact_operations": [
+        "copy"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Attachments: attachment badge hover preview and hover-revealed Remove control visibility stay Playwright-observed",
+      "Prompt body as code: clipboard contents verification and copy-confirmation icon swap/toast animation stay Playwright responsibilities"
+    ]
+  },
+  {
+    "task": "frontend-productivity-repository-scanner",
+    "modules": [
+      "entity-collection-v1",
+      "command-session-v1",
+      "browse-query-v1",
+      "form-workflow-v1"
+    ],
+    "bindings": {
+      "entity": "repository",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "path",
+        "display-name",
+        "last-scanned",
+        "document-count"
+      ],
+      "session_operations": [
+        "start",
+        "pause",
+        "resume",
+        "restart"
+      ],
+      "destinations": [
+        "document-tree",
+        "file-viewer"
+      ],
+      "browsable_entity": "documents",
+      "filters": [
+        "document-type",
+        "timeline-status"
+      ],
+      "form_fields": [
+        "repository-path",
+        "display-name",
+        "pattern-claude-md",
+        "pattern-agents-md",
+        "pattern-cursorrules",
+        "pattern-readme"
+      ],
+      "form_operations": [
+        "validate",
+        "submit",
+        "cancel"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Scan runs as durable workflows: progress-bar fill animation and per-second backoff countdown ticking stay Playwright-observed",
+      "Document index: document-row hover preview and findings-disclosure chevron animation stay Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-productivity-scribblespace",
+    "modules": [
+      "structured-editor-v1",
+      "entity-collection-v1",
+      "command-session-v1"
+    ],
+    "bindings": {
+      "editor_object_types": [
+        "note",
+        "flashcard",
+        "shape"
+      ],
+      "editor_operations": [
+        "add",
+        "select",
+        "delete",
+        "update_property",
+        "set_content",
+        "switch_mode",
+        "preview"
+      ],
+      "editor_properties": [
+        "color",
+        "text",
+        "front",
+        "back",
+        "z-order"
+      ],
+      "editor_modes": [
+        "select",
+        "connect"
+      ],
+      "entity": "board",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "session_operations": [
+        "start",
+        "pause",
+        "connect",
+        "disconnect",
+        "advance"
+      ],
+      "demos": [
+        "deliver-out-of-order",
+        "reconnect"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Canvas pan/zoom and object drag/resize stay Playwright-driven",
+      "Connect click-sequence stays Playwright-driven",
+      "Mini-map click and search pan stay Playwright-observed",
+      "Live-tick timing stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-productivity-sidedock",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "bookmarks",
+      "destinations": [
+        "default-view",
+        "sidebar-view"
+      ],
+      "filters": [
+        "search-scope"
+      ],
+      "entity": "bookmark",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete",
+        "toggle",
+        "reorder"
+      ],
+      "entity_fields": [
+        "url",
+        "title",
+        "note",
+        "pinned",
+        "folder"
+      ],
+      "artifact_operations": [
+        "import",
+        "export"
+      ],
+      "import_modes": [
+        "netscape-html"
+      ],
+      "export_formats": [
+        "netscape-html"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Drag-move/reorder gestures stay Playwright-observed",
+      "Inline-rename keystrokes stay Playwright-driven",
+      "Virtualized scroll windowing stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-productivity-swiftnote",
+    "modules": [
+      "entity-collection-v1",
+      "browse-query-v1"
+    ],
+    "bindings": {
+      "entity": "note",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete",
+        "toggle"
+      ],
+      "entity_fields": [
+        "title",
+        "body"
+      ],
+      "browsable_entity": "notes",
+      "destinations": [
+        "editor",
+        "quick-switcher",
+        "shortcuts",
+        "focus-mode"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Quick Switcher arrow-key navigation, wrap, and re-clamp stay Playwright-driven",
+      "Focus Mode / mobile drawer slide and sidebar collapse stay Playwright-observed",
+      "Toast and Saved-indicator appearance/timing stay Playwright-observed",
+      "Drag-and-drop image embedding stays Playwright-observed",
+      "10,000-item virtualization scroll windowing stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-productivity-tagnote",
+    "modules": [
+      "entity-collection-v1",
+      "browse-query-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "notes",
+      "destinations": [
+        "timeline",
+        "calendar",
+        "archived"
+      ],
+      "filters": [
+        "tag"
+      ],
+      "entity": "note",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete",
+        "toggle"
+      ],
+      "entity_fields": [
+        "text",
+        "tags"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Attach File native OS file picker stays Playwright-observed",
+      "Make-TODO tag-rail toggle and Open/Done split stays Playwright-observed",
+      "Calendar day-marker selection and month navigation stays Playwright-observed",
+      "Toast auto-dismiss and blank-submit shake animation timing stays Playwright-observed",
+      "Undo/Redo branch traversal in the History panel stays Playwright-observed"
+    ]
+  },
+  {
     "task": "frontend-productivity-taskgrove",
     "modules": [
       "entity-collection-v1",
@@ -2226,121 +3510,150 @@
     ]
   },
   {
-    "task": "frontend-productivity-clockcraft",
+    "task": "frontend-productivity-weblink",
     "modules": [
-      "entity-collection-v1",
+      "command-session-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "session_operations": [
+        "connect",
+        "disconnect"
+      ],
+      "artifact_operations": [
+        "import"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Real peer connection and file-picker interaction stay Playwright-observed",
+      "Tool output cannot prove a peer connected"
+    ]
+  },
+  {
+    "task": "frontend-workflow-agent-management",
+    "modules": [
       "browse-query-v1",
+      "entity-collection-v1",
+      "form-workflow-v1",
       "command-session-v1"
     ],
     "bindings": {
-      "entity": "entry",
+      "browsable_entity": "agents",
+      "destinations": [
+        "agent-registry",
+        "detail-configuration",
+        "detail-history",
+        "detail-activity"
+      ],
+      "filters": [
+        "status",
+        "timeline-status-kind"
+      ],
+      "entity": "agent",
       "entity_operations": [
         "create",
         "select",
         "update",
-        "delete"
-      ],
-      "entity_fields": [
-        "name",
-        "category",
-        "tag",
-        "duration",
-        "start-time"
-      ],
-      "browsable_entity": "entries",
-      "destinations": [
-        "timeline",
-        "weekly-chart",
-        "tag-manager"
-      ],
-      "filters": [
-        "category"
-      ],
-      "session_operations": [
-        "start",
-        "stop",
-        "restart"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Undo/Redo/branch selection and the History panel stay Playwright-driven via the real controls",
-      "Live per-second timer tick stays Playwright-observed",
-      "Duration-proportional timeline block sizing stays Playwright-observed"
-    ]
-  },
-  {
-    "task": "frontend-game-fandangofury",
-    "modules": [
-      "command-session-v1",
-      "browse-query-v1",
-      "entity-collection-v1"
-    ],
-    "bindings": {
-      "session_operations": [
-        "start",
-        "restart",
-        "advance",
-        "stop"
-      ],
-      "destinations": [
-        "stage-map",
-        "masks",
-        "cantina"
-      ],
-      "entity": "mask",
-      "entity_operations": [
-        "select",
+        "delete",
         "toggle"
       ],
       "entity_fields": [
         "name",
-        "bonus",
-        "equipped"
+        "agent-type",
+        "editor-integration",
+        "access-key",
+        "status",
+        "summary-expanded"
+      ],
+      "value_bounds": {
+        "agent-type": [
+          "aster",
+          "boreal",
+          "cinder"
+        ],
+        "editor-integration": [
+          "codedeck",
+          "nimbus",
+          "quill",
+          "vector",
+          "none"
+        ],
+        "status": [
+          "idle",
+          "running",
+          "paused",
+          "error",
+          "offline"
+        ]
+      },
+      "form_fields": [
+        "name",
+        "agent-type",
+        "editor-integration",
+        "access-key"
+      ],
+      "form_operations": [
+        "validate",
+        "submit",
+        "cancel"
+      ],
+      "session_operations": [
+        "start",
+        "pause",
+        "resume",
+        "restart"
+      ],
+      "demos": [
+        "work-run",
+        "seeded-failure-retry-scenario"
+      ],
+      "visible_postconditions": [
+        "rollup-strip-counts",
+        "run-progress-n-of-m",
+        "timeline-entry-appended"
       ]
     },
     "mechanics_exclusions": [
-      "All combat (light/heavy attacks, Fiesta Combo chain, block/dodge cooldown, Fury meter fill, Fiesta Fury, boss telegraph, health depletion) stays Playwright-driven",
-      "Undo/Redo/branch selection and the History panel stay Playwright-driven via the real controls",
-      "Cantina upgrade purchase (escalating cost) stays Playwright-driven via the real Buy control",
-      "Reset Progress (confirmation-guarded) stays Playwright-driven"
+      "Backoff countdown ticking and retrying pulse are timed visuals \u2014 Playwright-observed live, never asserted from tool output",
+      "Step-status tick animation, badge color transitions, panel slide-in, and chevron rotation stay Playwright-observed",
+      "Bulk Pause All / Resume All button mechanics graded via the real toolbar controls; state parity checkable via session pause/resume per selected agent"
     ]
   },
   {
-    "task": "frontend-creative-tools-portfolioframe",
+    "task": "frontend-workflow-daisyui-admin-dashboard",
     "modules": [
-      "structured-editor-v1",
-      "entity-collection-v1"
+      "browse-query-v1",
+      "entity-collection-v1",
+      "form-workflow-v1"
     ],
     "bindings": {
-      "editor_object_types": [
-        "header",
-        "projects",
-        "skills",
-        "testimonials",
-        "contact"
+      "browsable_entity": "users",
+      "destinations": [
+        "operations-overview",
+        "all-users",
+        "add-user",
+        "roles",
+        "permissions",
+        "user-logs",
+        "user-stats",
+        "user-payments",
+        "user-products"
       ],
-      "editor_operations": [
-        "select",
-        "update_property",
-        "switch_mode",
-        "preview"
+      "filters": [
+        "role",
+        "status"
       ],
-      "editor_properties": [
-        "name",
-        "title",
-        "bio",
-        "email",
-        "location",
-        "theme",
-        "density",
-        "visibility",
-        "order"
+      "sorts": [
+        "last-active",
+        "newest",
+        "highest-spend",
+        "name-az"
       ],
-      "editor_modes": [
-        "compact",
-        "spacious"
+      "themes": [
+        "light",
+        "dark"
       ],
-      "entity": "portfolio-item",
+      "entity": "user",
       "entity_operations": [
         "create",
         "select",
@@ -2348,68 +3661,31 @@
         "delete"
       ],
       "entity_fields": [
-        "project",
-        "testimonial",
-        "skill",
-        "draft"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Undo/Redo/branch selection and History panel stay Playwright-driven via real controls",
-      "Download PDF (window.print) stays Playwright-observed",
-      "Horizontal testimonials scroll stays Playwright-observed",
-      "Section reorder animation stays Playwright-observed when gesture matters"
-    ]
-  },
-  {
-    "task": "frontend-creative-tools-euroscope",
-    "modules": [
-      "form-workflow-v1",
-      "structured-editor-v1",
-      "artifact-transfer-v1"
-    ],
-    "bindings": {
-      "workflow_steps": [
-        "upload-euroscope-executable",
-        "update-theme-colours",
-        "update-embedded-bitmaps",
-        "download-new-executable"
+        "name",
+        "email",
+        "role",
+        "status",
+        "payments",
+        "products",
+        "last-active"
+      ],
+      "form_fields": [
+        "first-name",
+        "last-name",
+        "email",
+        "phone",
+        "role",
+        "status"
       ],
       "form_operations": [
-        "advance",
-        "return"
-      ],
-      "editor_object_types": [
-        "base-theme",
-        "base-icon-set"
-      ],
-      "editor_operations": [
-        "select",
-        "update_property",
-        "switch_mode",
-        "preview"
-      ],
-      "editor_properties": [
-        "backdrop-darkest",
-        "backdrop-darker",
-        "backdrop-main",
-        "backdrop-lighter",
-        "backdrop-lightest",
-        "foreground-secondary"
-      ],
-      "editor_modes": [
-        "theme-colours",
-        "embedded-bitmaps"
-      ],
-      "artifact_operations": [
-        "export"
-      ],
-      "export_formats": [
-        "patched-executable"
+        "validate",
+        "submit",
+        "cancel"
       ]
     },
     "mechanics_exclusions": [
-      "Native file-picker / download interaction stays Playwright-driven"
+      "Chart hover/tooltip mechanics stay Playwright-only",
+      "Drawer overlay slide on small viewports stays Playwright-observed"
     ]
   },
   {
@@ -2471,365 +3747,562 @@
     ]
   },
   {
-    "task": "frontend-creative-tools-mermaid-live-editor",
-    "modules": [
-      "structured-editor-v1",
-      "browse-query-v1",
-      "artifact-transfer-v1"
-    ],
-    "bindings": {
-      "editor_object_types": [
-        "diagram"
-      ],
-      "editor_operations": [
-        "set_content",
-        "switch_mode",
-        "preview"
-      ],
-      "editor_modes": [
-        "code",
-        "config"
-      ],
-      "destinations": [
-        "flowchart",
-        "class",
-        "sequence",
-        "entity-relationship",
-        "state",
-        "mindmap",
-        "pie",
-        "gantt"
-      ],
-      "themes": [
-        "light",
-        "dark"
-      ],
-      "artifact_operations": [
-        "export",
-        "copy"
-      ],
-      "export_formats": [
-        "svg",
-        "png"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Preview pan/zoom and rendered-diagram hover stay Playwright-observed"
-    ]
-  },
-  {
-    "task": "frontend-productivity-md-uy",
-    "modules": [
-      "structured-editor-v1",
-      "artifact-transfer-v1"
-    ],
-    "bindings": {
-      "editor_object_types": [
-        "markdown-document"
-      ],
-      "editor_operations": [
-        "set_content",
-        "switch_mode",
-        "preview"
-      ],
-      "editor_modes": [
-        "edit",
-        "preview",
-        "presentation"
-      ],
-      "artifact_operations": [
-        "export",
-        "copy"
-      ],
-      "export_formats": [
-        "markdown"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Live-sync/peer collaboration stays chrome-only and Playwright-observed; Present-mode slide gestures stay Playwright-driven"
-    ]
-  },
-  {
-    "task": "frontend-data-tracking-ghostfolio",
+    "task": "frontend-workflow-eval-job-queue",
     "modules": [
       "browse-query-v1",
-      "entity-collection-v1"
-    ],
-    "bindings": {
-      "destinations": [
-        "portfolio-overview"
-      ],
-      "filters": [
-        "asset-class"
-      ],
-      "entity": "holding",
-      "entity_operations": [
-        "create",
-        "select",
-        "update",
-        "delete"
-      ],
-      "entity_fields": [
-        "name",
-        "symbol",
-        "asset-class",
-        "quantity",
-        "unit-price"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Allocation bars and hover feedback stay Playwright-observed"
-    ]
-  },
-  {
-    "task": "frontend-data-tracking-plausible-analytics",
-    "modules": [
-      "browse-query-v1"
-    ],
-    "bindings": {
-      "destinations": [
-        "example.com",
-        "blog.example.com",
-        "shop.example.com"
-      ],
-      "browsable_entity": "visitor-sessions",
-      "filters": [
-        "source",
-        "page",
-        "country",
-        "period"
-      ],
-      "sorts": [
-        "most-visitors",
-        "fewest-visitors",
-        "name-az"
-      ],
-      "themes": [
-        "light",
-        "dark"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Chart bar hover/tooltip stays Playwright-observed"
-    ]
-  },
-  {
-    "task": "frontend-creative-tools-ghostty-config",
-    "modules": [
-      "structured-editor-v1",
-      "artifact-transfer-v1",
-      "browse-query-v1"
-    ],
-    "bindings": {
-      "editor_operations": [
-        "select",
-        "update_property",
-        "delete",
-        "preview"
-      ],
-      "editor_object_types": [
-        "application",
-        "terminal",
-        "clipboard",
-        "window",
-        "colors",
-        "fonts",
-        "keybinds",
-        "mouse",
-        "gtk",
-        "linux",
-        "macos"
-      ],
-      "editor_properties": [
-        "font-family",
-        "font-size",
-        "font-thicken",
-        "cursor-style",
-        "cursor-color",
-        "cursor-opacity",
-        "cursor-style-blink",
-        "background",
-        "foreground",
-        "background-opacity",
-        "theme",
-        "window-padding-x",
-        "window-padding-y",
-        "window-decoration",
-        "scrollback-limit",
-        "mouse-scroll-multiplier",
-        "clipboard-read",
-        "clipboard-write",
-        "copy-on-select"
-      ],
-      "artifact_operations": [
-        "export",
-        "copy"
-      ],
-      "destinations": [
-        "application",
-        "terminal",
-        "clipboard",
-        "window",
-        "colors",
-        "fonts",
-        "keybinds",
-        "mouse",
-        "gtk",
-        "linux",
-        "macos"
-      ],
-      "themes": [
-        "Dracula",
-        "Nord",
-        "Gruvbox Dark",
-        "Catppuccin Mocha",
-        "Solarized Dark - Patched",
-        "Builtin Dark"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Terminal-preview cursor blink stays Playwright-observed",
-      "Dock open/close stays Playwright-observed",
-      "Color-picker/slider drag stays Playwright-driven"
-    ]
-  },
-  {
-    "task": "frontend-creative-tools-vert",
-    "modules": [
-      "artifact-transfer-v1",
-      "entity-collection-v1",
-      "command-session-v1"
-    ],
-    "bindings": {
-      "artifact_operations": [
-        "import",
-        "convert",
-        "export"
-      ],
-      "conversion_modes": [
-        "png-to-jpeg",
-        "png-to-webp",
-        "jpeg-to-png",
-        "jpeg-to-webp",
-        "webp-to-png",
-        "webp-to-jpeg",
-        "gif-to-png",
-        "bmp-to-png",
-        "svg-to-png"
-      ],
-      "export_formats": [
-        "png",
-        "jpeg",
-        "jpg",
-        "webp"
-      ],
-      "entity": "file",
-      "entity_operations": [
-        "create",
-        "select",
-        "update",
-        "delete"
-      ],
-      "entity_fields": [
-        "name",
-        "from",
-        "to",
-        "status"
-      ],
-      "session_operations": [
-        "start",
-        "stop"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Drag-drop drop-zone and native file-picker stay Playwright-observed",
-      "Theme recolor stays Playwright-observed",
-      "Queue reorder is not offered"
-    ]
-  },
-  {
-    "task": "frontend-productivity-nostrpass",
-    "modules": [
-      "browse-query-v1",
-      "entity-collection-v1"
-    ],
-    "bindings": {
-      "destinations": [
-        "dashboard",
-        "identities",
-        "permissions",
-        "audit-log",
-        "settings"
-      ],
-      "themes": [
-        "light",
-        "dark"
-      ],
-      "entity": "identity",
-      "entity_operations": [
-        "create",
-        "select",
-        "toggle"
-      ],
-      "entity_fields": [
-        "label",
-        "npub"
-      ],
-      "apps": [
-        "damus",
-        "snort",
-        "coracle",
-        "iris"
-      ]
-    },
-    "mechanics_exclusions": [
-      "Reveal-key and theme-toggle animation stay Playwright-observed"
-    ]
-  },
-  {
-    "task": "frontend-productivity-weblink",
-    "modules": [
+      "form-workflow-v1",
       "command-session-v1",
       "artifact-transfer-v1"
     ],
     "bindings": {
+      "browsable_entity": "jobs",
+      "destinations": [
+        "jobs",
+        "job-detail",
+        "provider-lanes",
+        "aggregates",
+        "timeline"
+      ],
+      "filters": [
+        "status",
+        "model",
+        "dataset",
+        "timeline-status"
+      ],
+      "form_fields": [
+        "dataset",
+        "agent",
+        "model",
+        "trial-count",
+        "sweep-model"
+      ],
+      "form_operations": [
+        "validate",
+        "submit",
+        "cancel"
+      ],
+      "value_bounds": {
+        "dataset": [
+          "orchard-qa",
+          "ledgerline-suite"
+        ],
+        "agent": [
+          "scouthand",
+          "forgeline"
+        ],
+        "model": [
+          "cobalt-4",
+          "meridian-xl",
+          "willow-mini"
+        ],
+        "trial-count": "whole numbers 1 to 10",
+        "status": [
+          "queued",
+          "running",
+          "completed",
+          "failed",
+          "cancelled"
+        ]
+      },
       "session_operations": [
-        "connect",
-        "disconnect"
+        "pause",
+        "resume",
+        "stop",
+        "restart"
+      ],
+      "visible_postconditions": [
+        "pausing a lane (northgale-compute, bluefjord-cloud, skylark-systems) freezes its running trials at their checkpoint; resume continues from the same counts",
+        "stop (cancel) flips the job to cancelled and keeps completed trial results visible",
+        "restart (manual retry) returns only the exhausted trial to running"
       ],
       "artifact_operations": [
-        "import"
+        "copy"
+      ],
+      "export_formats": [
+        "yaml-config-preview"
       ]
     },
     "mechanics_exclusions": [
-      "Real peer connection and file-picker interaction stay Playwright-observed",
-      "Tool output cannot prove a peer connected"
+      "Backoff countdown ticking and the failed-to-running flip animation stay Playwright-observed (timing mechanics)",
+      "Live simulation progress advancement of running jobs is timing behavior observed via Playwright",
+      "Grouped-bar hover tooltips and legend series toggling stay Playwright-only (chart mechanics)",
+      "Cancel and pause confirmation dialogs are graded through the real dialog path when the confirmation itself is the criterion; clipboard contents of the preview copy verified via Playwright"
     ]
   },
   {
-    "task": "frontend-data-tracking-budget-angular",
+    "task": "frontend-workflow-flake-triage",
     "modules": [
+      "browse-query-v1",
       "entity-collection-v1",
-      "form-workflow-v1",
-      "browse-query-v1"
+      "command-session-v1",
+      "artifact-transfer-v1"
     ],
     "bindings": {
-      "entity": "expense",
+      "browsable_entity": "tests",
+      "destinations": [
+        "triage-queue",
+        "test-detail",
+        "quarantine-map",
+        "audit-timeline"
+      ],
+      "filters": [
+        "verdict",
+        "reason",
+        "suite",
+        "timeline-entry-type"
+      ],
+      "sorts": [
+        "divergence"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "entity": "test",
       "entity_operations": [
-        "create",
-        "update",
-        "delete"
+        "select",
+        "update"
       ],
       "entity_fields": [
-        "value",
-        "datetime",
-        "categoryId",
-        "counterparty"
+        "reason"
+      ],
+      "value_bounds": {
+        "reason": [
+          "timing-sensitive",
+          "environment-dependent",
+          "ordering-dependent",
+          "resource-quota",
+          "locale-dependent",
+          "filesystem-path",
+          "parallelism"
+        ],
+        "run-count": [
+          3,
+          5,
+          10
+        ]
+      },
+      "session_operations": [
+        "start",
+        "stop"
+      ],
+      "visible_postconditions": [
+        "re-run writes results one run at a time; matrix, verdict chip, quarantine lists, and timeline update coherently",
+        "stop freezes completed run results; remaining runs never fill in"
+      ],
+      "artifact_operations": [
+        "export",
+        "copy"
+      ],
+      "export_formats": [
+        "quarantine-text"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Re-run form validation mechanics (run-count select required, disabled submit, inline error naming the field) are graded through the real form via Playwright",
+      "Per-run tick-in entrance transitions and progress-indicator smoothness stay Playwright-observed",
+      "Clipboard contents of the quarantine export copy are verified via Playwright, never returned in WebMCP results"
+    ]
+  },
+  {
+    "task": "frontend-workflow-gate-console",
+    "modules": [
+      "browse-query-v1",
+      "structured-editor-v1",
+      "command-session-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "runs",
+      "destinations": [
+        "run-list",
+        "run-detail",
+        "stage-detail",
+        "certificate",
+        "registry",
+        "timeline"
+      ],
+      "filters": [
+        "severity",
+        "timeline-entry-type"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "value_bounds": [
+        "severity in {S1, S2, S3}",
+        "timeline-entry-type in {re-run, rejection, certificate, note}",
+        "stage in {Source, Build, Test Generation, Hardening, Publish}"
+      ],
+      "editor_object_types": [
+        "gate",
+        "note"
+      ],
+      "editor_modes": [
+        "recorded",
+        "what-if"
+      ],
+      "editor_operations": [
+        "select",
+        "switch_mode",
+        "update_property",
+        "add"
+      ],
+      "editor_properties": [
+        "simulated-state",
+        "note-text",
+        "note-category"
+      ],
+      "session_operations": [
+        "start"
+      ],
+      "demos": [
+        "stage-re-run"
+      ],
+      "artifact_operations": [
+        "copy"
+      ],
+      "export_formats": [
+        "fingerprint-hash"
+      ],
+      "visible_postconditions": [
+        "what-if flips recompute suite outcome and stage status; revert restores recorded results exactly",
+        "completed re-run updates stage strip, chain visualization, suite outcome, and appends timeline entries"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Gate row evidence height-plus-opacity expand animation and chevron rotation stay Playwright-observed",
+      "What-if/rejection banner slide-in and toast fade timing stay Playwright-observed",
+      "Re-run status-icon transition and progress-indicator smoothness stay Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-workflow-leak-review",
+    "modules": [
+      "browse-query-v1",
+      "form-workflow-v1",
+      "entity-collection-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "submissions",
+      "destinations": [
+        "queue",
+        "evidence-view",
+        "canary",
+        "mutation",
+        "audit"
+      ],
+      "filters": [
+        "review-state",
+        "audit-verdict"
       ],
       "form_fields": [
-        "amount",
-        "date",
-        "category"
+        "verdict",
+        "rationale"
+      ],
+      "form_operations": [
+        "validate",
+        "submit",
+        "cancel"
+      ],
+      "value_bounds": {
+        "verdict": [
+          "confirm-clean",
+          "confirm-leak"
+        ],
+        "rationale": "min 20 characters",
+        "review-state": [
+          "unreviewed",
+          "review-triggered",
+          "confirmed-clean",
+          "confirmed-leak"
+        ]
+      },
+      "entity": "mutation-test",
+      "entity_operations": [
+        "toggle"
+      ],
+      "entity_fields": [
+        "included"
+      ],
+      "artifact_operations": [
+        "export",
+        "copy"
+      ],
+      "export_formats": [
+        "summary-text"
+      ],
+      "visible_postconditions": [
+        "a submitted decision updates the queue chip, Review triggered filter membership, rollup counts, and appends exactly one audit entry",
+        "toggling a mutation test re-derives the flip count live"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Threshold slider stays Playwright-driven: the graded behavior is live re-banding and rollup updates during the drag (and arrow-key adjustment); a WebMCP setter would snap state past the graded derivation",
+      "Matched-pair Previous/Next stepping with synced two-pane scrolling is scroll-mechanics, graded via the real controls",
+      "Canary disclosure open/close height transition and chevron rotation stay Playwright-observed",
+      "Clipboard contents of the export-summary copy are verified via Playwright"
+    ]
+  },
+  {
+    "task": "frontend-workflow-research-pipeline-console",
+    "modules": [
+      "browse-query-v1",
+      "form-workflow-v1",
+      "command-session-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "runs",
+      "destinations": [
+        "pipeline-board",
+        "run-detail",
+        "datasets",
+        "results",
+        "trial-drill-down"
+      ],
+      "filters": [
+        "dataset",
+        "phase",
+        "status",
+        "comparison-model"
+      ],
+      "sorts": [
+        "mean-score",
+        "spread",
+        "cost",
+        "trial-count"
+      ],
+      "form_fields": [
+        "job-type",
+        "dataset",
+        "model",
+        "count",
+        "cluster",
+        "benchmark",
+        "repetitions",
+        "auto-evaluate"
+      ],
+      "form_operations": [
+        "validate",
+        "submit",
+        "cancel"
+      ],
+      "value_bounds": {
+        "job-type": [
+          "data-generation",
+          "fine-tune",
+          "evaluate"
+        ],
+        "cluster": [
+          "aurora",
+          "basalt",
+          "cinder"
+        ],
+        "benchmark": [
+          "switchboard",
+          "cartographer",
+          "ledger"
+        ],
+        "count": "whole numbers 1 to 50",
+        "repetitions": "defaults to 3",
+        "dataset": "only datasets whose data-generation phase is Complete (gated)",
+        "model": "for Evaluate, only checkpoints from a Complete fine-tuning phase (gated)"
+      },
+      "session_operations": [
+        "pause",
+        "resume",
+        "restart"
+      ],
+      "visible_postconditions": [
+        "manual retry (restart) resumes from the failed phase only; earlier Complete phases keep outputs and timestamps",
+        "pause freezes the counter/epoch/trial checkpoint; resume continues from the exact frozen value",
+        "a valid submission adds exactly one run strip and increments the active jobs rollup"
+      ],
+      "artifact_operations": [
+        "copy"
+      ],
+      "export_formats": [
+        "job-config"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Live phase progress (tasks-generated counter, loss-curve points, trial-by-trial mean) is simulation timing observed via Playwright",
+      "Backoff countdown ticking and the automatic Pending-to-Running chain flip are timing behaviors observed via Playwright after real setup",
+      "Suggestion-chip fill and the streamed trace excerpt's progressive rendering stay Playwright-observed",
+      "Chart geometry (loss curves, distribution mini-charts, comparison bars/deltas) stays Playwright-only; clipboard contents of the config copy verified via Playwright"
+    ]
+  },
+  {
+    "task": "frontend-workflow-submission-qc-queue",
+    "modules": [
+      "browse-query-v1",
+      "entity-collection-v1",
+      "form-workflow-v1",
+      "command-session-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "submissions",
+      "destinations": [
+        "queue",
+        "submission-detail",
+        "contributor-drawer"
+      ],
+      "filters": [
+        "stage",
+        "tier",
+        "contributor",
+        "date-range"
+      ],
+      "sorts": [
+        "open-finding-count-asc",
+        "open-finding-count-desc"
+      ],
+      "entity": "submission",
+      "entity_operations": [
+        "select",
+        "update"
+      ],
+      "entity_fields": [
+        "stage",
+        "payout-state"
+      ],
+      "value_bounds": [
+        "stage in {submitted, in-review, needs-revision, approved}",
+        "payout-state in {pending, held, released}",
+        "approve only from in-review with zero open blockers"
+      ],
+      "form_fields": [
+        "tier",
+        "category",
+        "description",
+        "revision-summary",
+        "override-justification"
+      ],
+      "form_operations": [
+        "validate",
+        "submit",
+        "cancel"
+      ],
+      "workflow_steps": [
+        "add-finding",
+        "request-revision",
+        "override-finding",
+        "approve",
+        "mark-revised"
+      ],
+      "session_operations": [
+        "start",
+        "restart"
+      ],
+      "demos": [
+        "re-check-run"
+      ],
+      "visible_postconditions": [
+        "gate banner flips when blocker condition changes",
+        "queue tier chips and contributor timeline update after stage/finding changes"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Contributor drawer slide-in/out easing stays Playwright-observed",
+      "Gate banner cross-fade and struck-through override animate-in stay Playwright-observed",
+      "Failure-profile bar width easing on date-range change stays Playwright-observed",
+      "Re-check step tick animation timing stays Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-workflow-task-factory",
+    "modules": [
+      "browse-query-v1",
+      "form-workflow-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "pull-requests",
+      "destinations": [
+        "repositories",
+        "repository-pipeline",
+        "task-detail",
+        "timeline",
+        "analytics"
+      ],
+      "filters": [
+        "trial-verdict",
+        "event-status"
+      ],
+      "form_fields": [
+        "repository",
+        "pull-request-number",
+        "min-file-bound",
+        "max-file-bound"
+      ],
+      "form_operations": [
+        "validate",
+        "submit",
+        "cancel"
+      ],
+      "value_bounds": {
+        "repository": [
+          "quartz-orm",
+          "copperline",
+          "fernweh-gateway",
+          "lattice-db"
+        ],
+        "trial-verdict": [
+          "good-success",
+          "bad-success",
+          "good-failure",
+          "bad-failure",
+          "infrastructure-error"
+        ],
+        "min-max-rule": "min-file-bound must not exceed max-file-bound (cross-field)"
+      },
+      "artifact_operations": [
+        "copy"
+      ],
+      "export_formats": [
+        "task-manifest"
+      ],
+      "visible_postconditions": [
+        "a valid submission starts exactly one simulated run whose stage strip advances Fetch, Evaluate, Skeleton, Generate, Validate",
+        "an accepted run updates tasks-produced count, yield percentage, charts, and timeline without a reload"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Simulated stage advancement, failure-and-retry attempt counts, and resume-from-stage timing are run output observed via Playwright; no session controls exist beyond starting the run through the create form",
+      "Check-card and log-excerpt disclosure expand/collapse mechanics stay Playwright-observed",
+      "Chart hover tooltips and distribution-bar segment geometry stay Playwright-only",
+      "Clipboard contents of the manifest copy are verified via Playwright"
+    ]
+  },
+  {
+    "task": "frontend-workflow-template-forms",
+    "modules": [
+      "form-workflow-v1",
+      "browse-query-v1",
+      "entity-collection-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "form_fields": [
+        "task-description",
+        "output-format",
+        "tone",
+        "example-input",
+        "expected-output",
+        "goal",
+        "reasoning-step",
+        "scratchpad",
+        "success-criterion",
+        "measurement",
+        "role",
+        "audience",
+        "constraint-type",
+        "constraint-text",
+        "reference-documents",
+        "title"
       ],
       "form_operations": [
         "validate",
@@ -2838,16 +4311,253 @@
         "reset"
       ],
       "destinations": [
-        "dashboard",
-        "expenses",
-        "settings"
+        "zero-shot",
+        "one-shot",
+        "few-shot",
+        "chain-of-thought",
+        "outcome-based",
+        "role-based",
+        "constraint-based",
+        "library"
       ],
-      "filters": [
-        "reporting-period"
+      "browsable_entity": "library-prompts",
+      "entity": "library-prompt",
+      "entity_operations": [
+        "create",
+        "select",
+        "delete"
+      ],
+      "entity_fields": [
+        "title",
+        "technique",
+        "field-values",
+        "attachments"
+      ],
+      "artifact_operations": [
+        "copy"
       ]
     },
     "mechanics_exclusions": [
-      "Material dialog + snackbar + progress-bar fill + expansion-panel transitions stay Playwright-observed"
+      "Technique selector: sidebar status-chip transition animation and form cross-fade stay Playwright-observed",
+      "Schema-driven forms: attachment badge hover preview/remove reveal and dynamic-row height animations stay Playwright-observed",
+      "Preview and save: clipboard contents verification and copy-confirmation animation stay Playwright responsibilities"
+    ]
+  },
+  {
+    "task": "frontend-workflow-trajectory-viewer",
+    "modules": [
+      "browse-query-v1",
+      "command-session-v1",
+      "entity-collection-v1",
+      "form-workflow-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "trials",
+      "destinations": [
+        "task-catalog",
+        "task-page",
+        "trial-viewer",
+        "reference-filesystem",
+        "trial-filesystem",
+        "annotations-list",
+        "classification-report"
+      ],
+      "sorts": [
+        "reward-asc",
+        "reward-desc"
+      ],
+      "session_operations": [
+        "start",
+        "advance"
+      ],
+      "demos": [
+        "trial-ingest",
+        "step-playback"
+      ],
+      "entity": "annotation",
+      "entity_operations": [
+        "create",
+        "select",
+        "delete"
+      ],
+      "entity_fields": [
+        "note-text",
+        "step-index"
+      ],
+      "form_fields": [
+        "note-text",
+        "stage",
+        "root-cause",
+        "behavior",
+        "impact",
+        "evidence",
+        "implicated-steps"
+      ],
+      "form_operations": [
+        "validate",
+        "submit"
+      ],
+      "visible_postconditions": [
+        "active-step-index",
+        "file-change-badges",
+        "report-card-present"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Scrubber continuous-drag updating is a gesture-fidelity criterion \u2014 Playwright-only; session advance covers discrete step state",
+      "Terminal progressive streaming, auto-follow, and jump-to-latest visuals are streaming mechanics observed live via Playwright",
+      "Ingest checklist tick animation and per-item pacing stay Playwright-observed (session start trial-ingest only initiates it)",
+      "File renderer visuals \u2014 syntax coloring, copy-to-clipboard confirmation, image scaling, markdown rendering \u2014 are Playwright/clipboard observations; no file contents in WebMCP results",
+      "Cross-fade pane transitions and reasoning-disclosure chevron animation stay Playwright-observed"
+    ]
+  },
+  {
+    "task": "frontend-workflow-verifier-trajectory-viewer",
+    "modules": [
+      "browse-query-v1",
+      "command-session-v1",
+      "entity-collection-v1",
+      "form-workflow-v1"
+    ],
+    "bindings": {
+      "browsable_entity": "trials",
+      "destinations": [
+        "task-list",
+        "task-detail",
+        "review-workspace",
+        "agent-trajectory-pane",
+        "judge-trajectory-pane",
+        "verdict-table"
+      ],
+      "filters": [
+        "active-label",
+        "comparison-labels",
+        "flips-only"
+      ],
+      "session_operations": [
+        "advance"
+      ],
+      "demos": [
+        "agent-step-playback",
+        "judge-step-playback"
+      ],
+      "entity": "adjudication",
+      "entity_operations": [
+        "create",
+        "update",
+        "select"
+      ],
+      "entity_fields": [
+        "criterion-id",
+        "classification",
+        "rationale"
+      ],
+      "value_bounds": {
+        "classification": [
+          "agent-bug",
+          "rubric-bug",
+          "judge-error"
+        ]
+      },
+      "form_fields": [
+        "classification",
+        "rationale"
+      ],
+      "form_operations": [
+        "validate",
+        "submit"
+      ],
+      "visible_postconditions": [
+        "dimension-rollup-scores",
+        "adjudication-summary-counts",
+        "trial-adjudication-badge",
+        "active-step-index"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Terminal progressive streaming and its streaming-vs-complete affordance are observed live via Playwright",
+      "Linked-highlight easing, smooth scroll-to-step, rollup-bar segment animation, and flips-filter row enter/exit animations are motion criteria \u2014 Playwright-observed; the underlying selection state changes via the bound tools",
+      "Verdict cross-fade on label switch and pane slide transitions stay Playwright-observed",
+      "Evidence-link and criterion-row hover washes and copy-control confirmation stay Playwright-only"
+    ]
+  },
+  {
+    "task": "frontend-workflow-workflow-builder",
+    "modules": [
+      "structured-editor-v1",
+      "command-session-v1",
+      "entity-collection-v1",
+      "browse-query-v1"
+    ],
+    "bindings": {
+      "editor_object_types": [
+        "prompt-node",
+        "agent-node",
+        "eval-node",
+        "condition-node",
+        "output-node",
+        "edge"
+      ],
+      "editor_operations": [
+        "select",
+        "add",
+        "delete",
+        "update_property"
+      ],
+      "editor_properties": [
+        "title",
+        "prompt",
+        "agent",
+        "timeout-seconds",
+        "rubric",
+        "condition-expression",
+        "destination-name"
+      ],
+      "value_bounds": {
+        "timeout-seconds": [
+          1,
+          300
+        ]
+      },
+      "session_operations": [
+        "start",
+        "pause",
+        "resume",
+        "restart"
+      ],
+      "demos": [
+        "seeded-workflow-run",
+        "retry-from-failed-node"
+      ],
+      "entity": "saved-workflow",
+      "entity_operations": [
+        "create",
+        "select"
+      ],
+      "entity_fields": [
+        "name",
+        "node-count"
+      ],
+      "browsable_entity": "timeline-events",
+      "destinations": [
+        "canvas",
+        "saved-workflows-panel",
+        "timeline-panel"
+      ],
+      "filters": [
+        "timeline-status"
+      ],
+      "visible_postconditions": [
+        "node-status-badges",
+        "run-rollup-n-of-m",
+        "configuration-badge"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Node drag positioning, canvas pan/zoom, and palette drag-to-drop coordinates stay Playwright-driven; editor add creates nodes but drop-position mechanics are gesture-graded",
+      "Edge-handle drag drawing and incompatible-connection toast visuals stay Playwright; editor add(edge) only proves the state command",
+      "Retry backoff countdown, pulsing running border, and edge flow-pulse animations are timed visuals observed live via Playwright",
+      "Keyboard node cycling (Tab/Enter/Delete) is graded via real Playwright keyboard input"
     ]
   }
 ]

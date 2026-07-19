@@ -1,0 +1,119 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "dashboard_shell_composition"
+description = "The app presents an operations-dashboard shell: a fixed left navigation listing Repositories, Timeline, and Analytics destinations plus a Create task control, and a main canvas that changes per destination, with the pipeline view rendered as a dense table register containing the inline stage strip per row"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "stage_status_color_system"
+description = "Stage statuses use one consistent color system everywhere they appear — pending in a muted neutral, running in an accented treatment, complete in green, failed in red, skipped in a dimmed or hatched treatment — always paired with a readable label or tooltip rather than color alone"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "verdict_hue_consistency"
+description = "The five trial verdicts use five distinct hues, and the distribution bar segments, verdict chips, and legend swatches use the same hue for the same verdict"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "typography_hierarchy"
+description = "Typography shows a clear hierarchy: page titles visibly larger than section headings, which are larger than table body and chip text, applied consistently across views; numeric rollups (counts, yield percentages) render in an aligned, tabular style"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "monospace_code_surfaces"
+description = "The task manifest block and expanded log excerpts render on a visually distinct monospaced surface, while check cards, trial panels, and chart cards use cards with hairline borders and subtle shadows and one consistent icon set is used across nav, chips, and controls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "responsive_reflow_clean"
+description = "At 768 pixels and below the left navigation collapses behind a menu control that opens an overlay drawer, and at 375 pixel width no content clips or overflows the viewport, no page-level horizontal scrolling appears, and dense tables and stage strips scroll within their own containers"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "overlap_or_default_controls"
+description = "At 1440 pixel width, text or chips overlap other elements or are clipped by their containers, or form controls and dialogs render with unstyled browser-default appearance that clashes with the rest of the interface"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

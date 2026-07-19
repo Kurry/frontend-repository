@@ -1,0 +1,183 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_tasks_and_trial_table"
+description = "On load, the task list shows exactly 3 seeded benchmark tasks; selecting one shows its definition (instruction text as formatted rich text, a config summary, an environment file tree, and at least 3 named tests) and a trial table of 3 trials with columns for model (fictional names, no real vendor or product names), reward, pass or fail outcome, duration, step count, and an adjudication badge"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "split_layout_pane_switcher"
+description = "The review workspace presents the agent trajectory and the judge trajectory either side by side at a wide viewport or in switchable panes with a persistent pane switcher, the focused trajectory is visibly indicated, and switching panes never triggers a full page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "trajectory_step_counts_and_types"
+description = "Every trial's agent trajectory lists at least 12 ordered steps of mixed types (reasoning, tool call, observation, terminal output, screenshot) and its judge trajectory lists at least 8 probe steps carrying tool invocation panels with name, status, input summary, and expandable output, observation text, and placeholder screenshot frames"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "step_activation_and_arrow_keys"
+description = "Clicking any step in either trajectory highlights it as that trajectory's active step and shows its detail (message, an expandable reasoning region collapsed by default that opens and closes on activation, tool panels, observations) in the same interaction, and with a trajectory's timeline focused the arrow keys move its active step to the previous or next step with the entry scrolled into view; verdict reasoning longer than its row truncates with an ellipsis and expands on activation to show the full text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "file_badge_accumulation_probe"
+description = "Scripted probe: on the agent trajectory, activate an early step and record which files carry Added/Modified/Deleted/Truncated badges, advance several steps and confirm badges accumulate for newly changed files, then step backward and confirm the badge set recomputes to reflect only changes at or before the now-active step"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "renderers_copy_and_terminal"
+description = "Selecting files in the agent-side tree renders markdown as formatted rich text, code in a monospaced block with syntax-aware coloring, a language label, and a copy control that shows visible confirmation and places the exact text on the clipboard, images scaled to fit, and tabular files as a grid with column headers; activating a terminal-bearing agent step streams its output progressively with a status affordance distinguishing streaming from complete"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "verdict_table_structure"
+description = "The trial's verdict table is grouped by four fictional rubric dimensions with at least 3 criteria each and at least 12 criteria total, and every row shows a criterion id, title, weight, a yes or no verdict, and judge reasoning text with an evidence link"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "linked_highlighting_both_sides"
+description = "Clicking a verdict row's evidence link jumps the judge trajectory to the probe step that produced it and highlights that step, selecting the criterion also scrolls to and outlines any implicated agent step at the same time, and clearing the selection removes both highlights"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "rollup_bar_derives_from_verdicts"
+description = "The dimension rollup bar shows one score per dimension derived from the verdicts and weights currently displayed, and it always agrees with the visible verdict table — including immediately after the active label changes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "label_switcher_swaps_results"
+description = "Every trial offers at least 2 named scoring results (and one trial offers 3) each with per-dimension scores, a total, and a cost; the label switcher always shows the active label, and switching labels swaps the verdicts and reasoning in the table and recomputes the rollup bar without a reload, with at least one criterion differing between two labels of the same trial"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "comparison_strip_deltas"
+description = "Picking any two labels in the comparison strip shows signed per-dimension deltas and a total delta between them, visibly distinguishing improvement from regression"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "flip_flags_and_filter"
+description = "Criteria whose verdict flipped between the two compared labels are visually flagged in the verdict table, a flips-only filter narrows the table to only flipped criteria and restores the full table when disabled, and a label pair with no flips shows a designed empty state with a control that clears the filter"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "adjudication_form_validation"
+description = "The adjudicate control on a flipped or failed criterion opens a form with a classification select offering exactly agent-bug, rubric-bug, and judge-error plus a rationale text field; submitting with the select unset or the rationale shorter than 20 characters shows inline per-field messages naming each invalid field and records nothing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "adjudication_rolls_up_and_badges"
+description = "Scripted probe: record the summary panel counts and the trial's adjudication badge in the task's trial table, submit a valid adjudication on one criterion, then confirm the criterion row shows its classification, the matching summary count increased by exactly one, and the trial's badge in the task table reflects the new review progress — all without a reload; re-adjudicating the same criterion replaces the record instead of double-counting"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "verdict_links_are_dead"
+description = "Clicking evidence links or selecting criterion rows leaves both trajectories unchanged — the verdict table is static markup with no linked highlighting"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.18"
+name = "double_submit_double_counts"
+description = "Rapidly double-activating the adjudication submit control records the same criterion twice, inflating the summary panel counts"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

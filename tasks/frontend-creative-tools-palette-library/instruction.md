@@ -125,7 +125,7 @@ Module specs:
 Bindings:
 - Browsable entity: palettes
 - Destinations: library-grid; palette-detail; search
-- Filters: period
+- Filters: artist; era
 - Entity: palette
 - Entity operations: create; select; update; delete; toggle
 - Entity fields: name; swatches; favorite

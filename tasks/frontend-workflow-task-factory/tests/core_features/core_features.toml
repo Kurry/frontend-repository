@@ -1,0 +1,204 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_repositories_complete"
+description = "On load, the Repositories view shows at least 4 fictional repositories, each with a name, primary language, pull-requests-processed count, tasks-produced count, and a yield percentage that equals tasks produced divided by pull requests processed (rounded to a whole percent)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "repo_opens_pipeline_view"
+description = "Selecting a repository swaps the main canvas to that repository's pipeline view without a full page reload, showing at least 8 seeded pull-request rows, each with a pull-request number, title, source-file count, and a linked-issue chip or a visible no-linked-issue marker; a visible control returns to the Repositories view"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "stage_strip_five_stages"
+description = "Every pull-request row renders a stage strip of exactly 5 named stages in the fixed order Fetch, Evaluate, Skeleton, Generate, Validate, and each stage shows exactly one of the statuses pending, running, complete, failed, or skipped with visually distinct treatments plus a readable label or tooltip"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "rejection_reason_taxonomy"
+description = "Rejected pull requests show a rejection reason chip whose text is one of exactly five values — docs-only, formatting-only, too-few-files, too-many-files, no-linked-issue — and no rejection reason text outside that taxonomy appears anywhere in the app"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "paired_check_cards"
+description = "A task detail for a pull request that reached Validate shows two paired check cards side by side — a baseline check described as tests must fail on the reproduced bug and a reference check described as tests must pass with the fix applied — each with its own status, an attempt count, and a log excerpt that is collapsed by default and expands and collapses on activation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "accepted_badge_derives_from_checks"
+description = "A task shows an accepted badge only when both the baseline check and the reference check show passing status; a seeded or created task with either check failing or pending shows no accepted badge, and when a created run's checks both turn green the badge appears without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "trial_panel_distribution_bar"
+description = "An accepted task's detail shows a trial analysis panel with at least 6 seeded trials, each carrying exactly one verdict from good-success, bad-success, good-failure, bad-failure, or infrastructure-error, plus a distribution bar whose segment widths are proportional to the verdict counts"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "verdict_filter_round_trip"
+description = "Activating a verdict in the distribution bar or its legend narrows the trial list to only trials with that verdict, and a clear control restores the full trial list exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "needs_review_banner_on_bad_success"
+description = "A needs-review banner is visible on the detail of an accepted task that has at least one bad-success trial, and no such banner appears on an accepted task with zero bad-success trials"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "create_form_validation_rules"
+description = "Submitting the create-task form with an empty or non-numeric pull-request number shows an inline message naming the pull-request number field and starts no run; entering a minimum source-file bound greater than the maximum shows a cross-field message naming both bounds, and the submit control stays disabled while the form is invalid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "created_run_stages_advance"
+description = "Submitting a valid create-task form adds a new row to the chosen repository's pipeline view whose stage strip advances visibly through Fetch, Evaluate, Skeleton, Generate, and Validate, each stage moving from pending to running to complete over a perceivable interval rather than snapping instantly to a finished state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "retry_resumes_from_failed_stage"
+description = "During a created run, a failing stage shows a visible attempt count that increments on retry, and when the retry succeeds the run resumes from that stage while every earlier completed stage keeps its completed status and timestamp unchanged (no restart from the first stage)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "timeline_appends_live"
+description = "The factory event timeline shows ordered, timestamped entries for stage transitions, gains entries live while a created run advances without a reload, supports filtering by event status, and restores the full list when the filter is cleared"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "charts_update_on_completion"
+description = "The analytics area renders a tasks-per-week chart, a language distribution chart, and a difficulty histogram with hover tooltips showing underlying values, and after a created run completes as accepted, the tasks-per-week and language distribution charts change to include the new task without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "manifest_copy_confirmation"
+description = "An accepted task's detail renders a task manifest in a monospaced code block with a format label and a copy control; activating copy places the exact manifest text on the clipboard and shows visible confirmation (icon swap or toast)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "double_submit_single_run"
+description = "Rapidly double-activating the create-task form's submit control starts exactly one run: exactly one new row appears in the pipeline view"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "empty_states_on_no_match"
+description = "When a verdict filter or timeline filter matches nothing, the filtered region shows an empty state message with a control that clears the filter, instead of a blank or broken panel"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "stage_strip_static_decoration"
+description = "Stage strips are static decoration: after starting a run from the create-task form, every stage status remains frozen with no visible progression from pending through running to complete"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.20"
+name = "derived_rollups_hardcoded"
+description = "Derived rollups are hardcoded: after a created run completes as accepted, the owning repository's tasks-produced count, yield percentage, or the analytics charts render exactly the same values as before the run"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

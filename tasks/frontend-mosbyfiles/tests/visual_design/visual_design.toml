@@ -62,28 +62,28 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
+name = "filing_cabinet_stack_perspective"
 description = "The home presents a filing-cabinet stack of four stacked colored category covers with attached paper architect tags, with three-dimensional perspective, not a flat equal-width list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
+name = "portrait_sheet_under_colored_cover"
 description = "Case pages present the folder as a portrait-proportion sheet with a texture overlay under a colored cover that opens away from the sheet"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
-description = "The palette uses the near-black #191919 background with cream #fdfaf7 text and a translucent blurred dark header bar with a hairline bottom border"
+name = "three_tier_palette_and_header_bar"
+description = "The palette uses the near-black #191919 background with cream #fdfaf7 text and a translucent blurred dark header bar with a hairline bottom border; category cover fills and accent yellow #FFE927 stay scarce (covers and page-background variants only) rather than flooding general chrome"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.4"
-name = "3_4"
+name = "flat_list_without_folder_stack"
 description = "The home stack renders as an equal-width flat list with no colored category folders or paper tags"
 type = "binary"
 weight = 1.0
@@ -91,7 +91,7 @@ negate = true
 
 [[criterion]]
 id = "3.5"
-name = "3_5"
+name = "wrong_category_cover_colors"
 description = "Category covers render in wrong or placeholder colors that do not match the four required hex values"
 type = "binary"
 weight = 0.5
@@ -107,14 +107,14 @@ weight = 1.0
 
 [[criterion]]
 id = "3.7"
-name = "3_7"
+name = "folder_sheet_header_and_close_metrics"
 description = "The case folder sheet computes an aspect-ratio of 210 / 297 (measured ratio about 0.707), the fixed header and case sub-header each compute a height of 3.75rem (60px at the desktop root), and the circular close button computes a 54px diameter"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.8"
-name = "3_8"
+name = "root_font_and_container_offset_breakpoints"
 description = "The root font-size and container offset scale by breakpoint: about 16px root with a 34px container offset at 1440 width, and about 13px root with an 18px container offset at 390 width where the hero paragraph drops to a 16px override"
 type = "binary"
 weight = 0.5
@@ -191,6 +191,42 @@ name = "real_brand_assets_shipped"
 description = "The shipped app includes real third-party brand assets or credits: the live site's actual wordmark or logo, licensed Founders Grotesk or Signifier font files, photographs, portraits, videos, or signature graphics lifted from the source site, or a credit naming a real person or agency (for example Tubik Studio), instead of original or generated placeholders"
 type = "binary"
 weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.19"
+name = "case_broken_grid_composition"
+description = "On a case route at desktop width, the layout reads as a controlled broken grid: the oversized display architect name layers behind or around the portrait folder sheet, sibling tags sit at rotated vertical offsets beside the sheet, and scrapbook items sit at irregular rotated positions while remaining legible and operable — not an equal-width card stack"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.20"
+name = "fluid_clamp_type_scaling"
+description = "Resizing the viewport between 390 and 1440 pixels scales display and body typography continuously through fluid clamp-driven sizes, with no abrupt locked size jumps that only change at breakpoint thresholds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.21"
+name = "baseline_aligned_spacing_tokens"
+description = "Header height, stack offsets, and major section paddings land on a consistent rem baseline (multiples of 0.25rem at the desktop root) rather than arbitrary one-off pixel values that break the spacing rhythm"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.22"
+name = "wcag_aa_text_contrast"
+description = "Cream primary text on the dark #191919 surface and white text on the saturated category covers meet WCAG AA contrast"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.23"
+name = "case_mobile_loses_filing_metaphor"
+description = "At a 390px width the case route collapses into a plain static stack that loses the layered folder, rotated sibling tags, and scrapbook filing-cabinet relationship"
+type = "binary"
+weight = 0.5
 negate = true
 
 [[criterion]]

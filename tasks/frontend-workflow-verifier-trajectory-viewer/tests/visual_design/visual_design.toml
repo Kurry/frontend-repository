@@ -1,0 +1,134 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "split_instrument_composition"
+description = "At a 1440px viewport the review workspace composes as a split instrument: two trajectory panes with a strong vertical divider and persistent headers naming the agent and judge sides, the verdict table and rollup bar docked below or beside them, all separated by hairline borders with subtle panel shadows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "type_roles_and_hierarchy"
+description = "A monospaced face is used for code, terminal output, file paths, criterion ids, and step indices while a UI sans is used elsewhere, and page titles are visibly larger than section headings, which are larger than body and label text, consistently across views"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "verdict_status_labeling_system"
+description = "One color system covers verdicts and statuses everywhere they appear — green for yes/pass, red for no/fail, amber for running or in-review, one accent for the active step and selected criterion — and flip flags, adjudication classifications, and change badges each render a distinct treatment that always includes its word (Flipped, agent-bug, rubric-bug, judge-error, Added, Modified, Deleted, Truncated) so color is never the only indicator"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "rollup_bar_proportional"
+description = "The dimension rollup bar renders one segment per dimension with its score, the segment fill is visually proportional to that score, and the bar restyles when the active label changes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "dense_register_icons_states"
+description = "The verdict table, trial table, and both timelines use compact dense rows matching a review-console register, one consistent icon set is used across the chrome, and loading and empty surfaces (including the no-flips state) are deliberately designed with explanatory copy rather than blank regions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "responsive_pane_collapse"
+description = "At widths of 1024 pixels and below the workspace collapses to one trajectory pane at a time with the pane switcher always visible, and the criterion selection and active steps persist across pane switches"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "mobile_375_overflow"
+description = "At 375px viewport width, content clips, overflows the viewport, or page-level horizontal scrolling appears instead of the verdict table, code blocks, and terminal scrolling within their own containers"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.8"
+name = "copy_conventions_specific_labels"
+description = "Headings, buttons, and labels follow one consistent capitalization convention throughout, and action labels are specific verbs (Adjudicate criterion, Compare labels) rather than generic labels where a specific one is possible"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.9"
+name = "placeholder_text_visible"
+description = "Lorem ipsum, 'TODO', template variable names, real product or model-vendor brand names, or other placeholder text is visible somewhere in the shipped UI"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant, browser-observable defect in visual design, responsiveness, or UI copy that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, viewport, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

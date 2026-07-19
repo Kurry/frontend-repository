@@ -1,0 +1,148 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "shared_state_coherence"
+description = "All surfaces derive from one shared state: a step advancing during a run updates the step list, the event timeline, and the rollup together; a completed run updates the suite entry, results table, and both charts together; and a suite edit or delete is reflected in every view where the suite appears, all without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "no_storage_reload_seeded"
+description = "No browser storage is used: localStorage and sessionStorage remain empty after creating, editing, deleting, running, pausing, and scheduling suites, and a page reload returns the app to its seeded state (seeded suites, historical runs, default view, no night-mode schedules)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "storage_persistence_used"
+description = "localStorage or sessionStorage holds suites, runs, schedules, or UI state after exercising the app"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.4"
+name = "external_network_requests"
+description = "The devtools network log shows requests to external origins or third-party CDNs (scripts, styles, fonts, icons, or data) during load or a full exercise of the app"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.5"
+name = "console_clean"
+description = "The console is free of errors and warnings on first load and stays clean while creating, editing, deleting, running, pausing, retrying, and scheduling suites and switching views"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "cold_load_interactive_2s"
+description = "The app is interactive (suite list and toolbar controls respond) within 2 seconds of a local cold load"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "responsive_during_streaming"
+description = "While a run is streaming its log and advancing steps, the UI stays responsive under rapid repeated input — quick suite switches, rapid sort clicks, fast view toggles — with no hangs, dropped interactions, or views showing stale data another view already updated"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "keyboard_operability_focus"
+description = "Every interactive control — suite entries, toolbar controls, table headers, row actions, step retry and pause/resume controls, form fields — is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space), with a visible focus indicator at each stop"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "modal_focus_trap_escape"
+description = "The New Suite, Edit Suite, and confirmation modals trap keyboard focus while open, close on the Escape key, and return focus to the control that opened them"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "aria_live_run_announcements"
+description = "The completion of an eval run and a step entering the failed state are announced through an aria-live region in addition to their visual indication"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "labels_and_error_association"
+description = "Form fields in the New Suite, Edit Suite, and night-window forms have visible labels, and each validation message names the field it belongs to and renders in association with that field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

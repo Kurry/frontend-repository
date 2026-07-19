@@ -1,0 +1,197 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_suites_and_queue_anatomy"
+description = "On load, a suite switcher reaches at least 3 seeded suites of at least 10 tests each, and every test row shows a test identifier, a 5-cell pass/fail matrix with per-cell result colors and run index labels 1 through 5, a verdict chip, and an assigned reason identifier"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "verdict_derives_from_matrix"
+description = "Verdict chips agree with the visible matrix on every inspected row: all-pass rows show keep, mixed rows show flaky, and all-fail rows show fail, with all three verdicts represented across the seeded data (at least 2 tests each)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "reason_select_constrained_to_vocabulary"
+description = "The reason control is a select offering exactly the 7 vocabulary entries (timing-sensitive, environment-dependent, ordering-dependent, resource-quota, locale-dependent, filesystem-path, parallelism) with no way to enter free text, and choosing a different reason updates that row immediately and appends a reason-change entry to the suite's audit timeline"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "detail_panel_condition_schedule"
+description = "Selecting a test opens a detail panel without a full page navigation showing the 5-run condition schedule: for each run, the varied condition (CPU quota, terminal size, hostname, timezone, temp-dir length, or parallel execution) and that run's pass or fail result, plus the same matrix and verdict chip as the queue row"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "diverging_run_highlighted"
+description = "For a flaky test, the detail panel visibly highlights the run or runs whose result diverged from the majority together with the condition varied on that run, while non-diverging runs are not highlighted"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "filters_narrow_and_combine"
+description = "Filtering by verdict, by reason, and by suite each narrows the queue to matching rows, the filters combine, and clearing them restores the full queue exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "divergence_sort_round_trip"
+description = "Scripted probe: activating the divergence sort orders tests by how many of their 5 runs diverged from the majority, activating it again reverses that order relative to the first, and the visible row count never changes while sorting"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "filter_empty_state_with_clear"
+description = "When active filters match no tests, the queue region shows an empty state message with a clear-filters control that restores the full queue"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "quarantine_lists_derive_with_counts"
+description = "The quarantine map shows two lists — all-fail tests and flaky tests — whose membership matches the current verdicts in the queue, each with a live count in its header, and an empty list shows an empty state naming what belongs there"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "quarantine_updates_on_verdict_change"
+description = "Scripted probe: after a re-run changes a test's verdict, both quarantine lists and their counts update immediately in the same session without a reload, and the test appears in (or leaves) exactly the list its new verdict dictates"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "export_block_copy_matches"
+description = "The quarantine export renders as a monospaced block listing the quarantined test identifiers grouped under all-fail and flaky headings and matching the lists currently shown; activating its copy control places exactly that block text on the clipboard and shows a visible confirmation that resets after a moment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "rerun_form_schema_constrained"
+description = "The re-run form's run-count select offers exactly 3, 5, and 10, the submit control stays disabled (or an inline message names the run-count field) until a count is chosen, and no other run count can be submitted"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "rerun_ticks_with_condition_labels"
+description = "A re-run started from its real control ticks each run in one at a time, showing that run's condition label and pass or fail result in sequence with an overall progress indicator advancing, and a stop control is visible while runs remain"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "stop_freezes_completed_runs_only"
+description = "Scripted probe: activating stop mid-re-run keeps every already-completed run's result on screen, no further runs fill in afterward, the re-run is marked stopped, and the timeline records the stopped re-run"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "rerun_result_surfaces_coherent"
+description = "Scripted probe: after a re-run completes, the test's matrix cells, verdict chip, quarantine membership, and detail panel all agree with the new results in the same session without a reload, and repeating a re-run on a flaky test can yield different results rather than an identical hardcoded outcome"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "audit_timeline_ordered_and_filterable"
+description = "Each suite's audit timeline lists verdict changes, reason changes, and re-run events as ordered, timestamped entries naming the affected test; it filters by entry type, a type with no entries shows an empty state, and clearing the filter restores all entries in order"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n1"
+name = "free_text_reason_possible"
+description = "Some path in the UI lets a reason value outside the 7-item vocabulary be attached to a test (a free-text input, an editable select, or a row displaying a non-vocabulary reason)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n2"
+name = "queue_is_static_markup"
+description = "The matrix, verdict chips, or quarantine lists are static HTML only: re-runs produce no visible change, verdicts contradict their matrices after a re-run, or the quarantine lists and export block disagree with the queue's verdicts"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

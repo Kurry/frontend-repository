@@ -1,0 +1,126 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "hover_washes_required"
+description = "Hovering with the real pointer shows a full-width hover wash on verdict rows, trial table rows, timeline entries, and tree rows, buttons ease background and shadow with a slight press effect, and form controls show focus rings — verified while hovering, not from static styles"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "linked_highlight_eases_in"
+description = "Selecting a criterion through the real verdict-table controls scrolls each trajectory smoothly to its linked step and fades the outline in rather than snapping, and switching between the agent and judge panes transitions with a short slide or cross-fade"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "label_switch_rollup_animation"
+description = "Switching the active label through the real label switcher cross-fades the verdict table content and animates the rollup bar segments to their new proportions over roughly 200 to 300 milliseconds rather than snapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "flips_filter_row_animation"
+description = "Enabling the flips-only filter through the real control animates non-flipped rows out of the table and animates them back in when the filter is disabled, rather than the table snapping between states"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "disclosure_and_streaming_motion"
+description = "Reasoning regions and tool output panels expand and collapse with an eased height transition while the chevron rotates over roughly 0.2 seconds, and terminal output streams incrementally with a streaming indicator that visibly changes when complete"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "adjudication_mark_emphasis"
+description = "Submitting a valid adjudication through the real form animates the classification mark onto the criterion row and the summary panel count updates with a brief emphasis transition rather than changing silently"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "terminal_pops_in_complete"
+description = "Activating a terminal-bearing agent step renders its entire output instantly as one finished block with no progressive appearance and no streaming affordance"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.8"
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion set, animations are removed and state changes apply instantly, while every flow (criterion selection, label switching, filtering, adjudication) remains complete and usable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction performed, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

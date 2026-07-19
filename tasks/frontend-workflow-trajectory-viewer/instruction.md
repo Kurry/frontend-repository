@@ -1,0 +1,247 @@
+<summary>
+Build a trajectory viewer for an agent-benchmark trials platform using React, Zustand, Tailwind CSS 4.3.2, and Radix UI headless primitives styled with Tailwind.
+</summary>
+
+<core_features>
+Core features (each line is an observable behavior the finished app must exhibit):
+
+Feature: Task catalog and trial table —
+- The app opens into a task catalog listing exactly 3 seeded benchmark tasks; each entry shows the task name, a one-line description, the number of trials (3 each), and the best reward among its trials
+- Selecting a task opens that task's page showing the task definition: the full instruction text rendered as formatted rich text, a config summary panel, the reference environment file tree, and a test listing with at least 3 named tests
+- The task page lists all 3 of that task's trials in a comparison table with columns: model (fictional model names such as Larkspur-9, Quillon-2, and Basalt-Mini), reward (a number between 0 and 1 with two decimals), pass or fail outcome, duration, and step count
+- Clicking the reward column header sorts the trial table by reward; clicking again reverses the order relative to ascending
+- A two-position toggle above the file tree switches between the reference filesystem and the selected trial's final agent filesystem; switching swaps the visible tree contents without a full page reload, and the active side is always visibly indicated
+- Clicking a trial row opens the trial viewer; while the trial loads, a simulated ingest checklist (with at least 4 items such as parsing steps, indexing files, and building the timeline) ticks items complete one by one with per-item status icons and an overall progress indicator before the viewer content appears
+
+Feature: Trial viewer layout and timeline —
+- The trial viewer opens as a three-pane workspace: a left rail step timeline, a center file workspace, and a right rail step detail panel; a header strip shows the trial's model name, reward, pass or fail badge, and duration
+- Every trial's timeline lists at least 12 ordered steps of mixed types — reasoning, tool call, observation, terminal output, and screenshot steps all appear at least once per trial — and each timeline entry shows its step index, a type glyph, a one-line summary, a timestamp, and a status marker
+- Clicking any timeline entry makes that step active: the entry is visibly highlighted, and both the center file workspace and the right rail update to reflect that step in the same interaction
+- With the timeline focused, pressing the arrow keys moves the active step to the previous or next step; the newly active entry scrolls into view and the center and right panes follow
+- A scrubber control spanning the timeline lets the user drag through the trial; dragging it updates the active step continuously as the handle moves, not only on release
+
+Feature: File workspace and renderers —
+- The center pane shows the trial's evolving file tree as of the active step: every file changed at or before the active step carries a change badge reading Added, Modified, Deleted, or Truncated, and stepping forward accumulates badges while stepping backward recomputes them so badges reflect only the steps up to the active one
+- Selecting a file in the tree renders its content inline by type: markdown files render as formatted rich text, code files render in a monospaced block with syntax-aware coloring, a visible language label, and a copy control that gives visible confirmation and places the exact text on the clipboard, image files render scaled to fit their pane, and tabular data files render as a grid with column headers
+- Selecting a file whose badge is Deleted shows a deleted-file notice in the content pane instead of stale content
+
+Feature: Step detail and terminal —
+- The right rail shows the active step's message text, an expandable reasoning region collapsed by default that opens and closes on activation with a rotating chevron cue and remembers its open state per step while the app is open, tool invocation panels showing the tool name, a status of pending, running, complete, or error, an input summary, and an expandable output, and the step's observation text where one exists
+- A terminal panel renders the active step's terminal output progressively — text appears incrementally rather than all at once — with a status affordance that distinguishes streaming from complete; while streaming, the panel auto-follows the latest line, scrolling up pauses the auto-follow and reveals a jump-to-latest control, and activating that control resumes following
+- Activating a step with no terminal output shows a designed empty state in the terminal panel naming that this step produced no terminal output
+
+Feature: Annotations —
+- An annotate control on the active step opens a note form with a note text field; submitting a valid note attaches it to that step and it appears immediately in an annotations list showing the note text and its step index
+- Submitting the note form with an empty note shows an inline validation message naming the note field and attaches nothing
+- Clicking an entry in the annotations list jumps the viewer to that note's step: the timeline highlight, center workspace, and right rail all move to that step without a reload
+- Each annotation has a remove control that deletes exactly that note from the list
+
+Feature: Failure classification —
+- Each trial has a failure classification form with four select fields — stage, root cause, behavior, and impact, each offering at least 3 options — an evidence text field, and a picker for one or more implicated step numbers
+- Submitting the form with any select unset or the evidence text shorter than 20 characters shows inline per-field messages naming each invalid field, and no report is created; the messages appear without a page reload
+- Submitting a valid classification renders a report card on the trial showing all four chosen classifications, the evidence text, and one link per implicated step; clicking an implicated-step link jumps the viewer to that step
+- Re-submitting the form updates the existing report card in place rather than adding a second card
+</core_features>
+
+<user_flows>
+- Comparing and opening a trial end to end: open a task from the catalog, sort its trial table by reward descending, click the top row, watch the ingest checklist complete, and land in the viewer with step 1 active and the header showing that trial's model, reward, outcome, and duration
+- Scrubbing and inspecting files: drag the scrubber to a mid-trial step, confirm the file tree badges reflect only changes up to that step, select a badged code file and see it rendered with coloring and a working copy control, then advance one step and see any new change badge appear
+- Annotating and returning: activate a late step, attach a note to it, navigate back to an early step, then click the note in the annotations list and land back on the annotated step with all three panes in sync
+- Classifying a failure: submit the classification form with fields missing and see per-field messages, correct every field, submit, and see the report card with implicated-step links that jump the viewer when clicked
+- A page reload returns the app to its seeded state: the task catalog with 3 tasks, no annotations, and no classification reports
+</user_flows>
+
+<edge_cases>
+- A trial containing a failed step shows an error status on that step in the timeline and an error-styled output in its tool invocation panel, and the viewer keeps working when that step is activated
+- When a trial has no annotations yet, the annotations region shows a designed empty state explaining that notes attach to steps and naming the annotate control
+- Double-activating the classification submit control produces exactly one report card
+- File names longer than their tree row truncate with an ellipsis in the tree and show the full name in the content pane header when selected
+- Arrow-key navigation stops at the first and last steps without wrapping or throwing errors
+</edge_cases>
+
+<visual_design>
+- The trial viewer composes as a fixed three-pane workspace: the left timeline rail roughly one fifth of the width, the center file workspace the widest pane, and the right detail rail roughly one quarter, separated by hairline borders; the panes read as one instrument, not stacked cards
+- Two type families with strict roles: a monospaced face for code, terminal output, file paths, and step indices, and a UI sans for everything else, with page titles visibly larger than section headings, which are larger than body and label text
+- One status color system used consistently everywhere a status appears — timeline markers, tool panels, and outcome badges: a single accent for the active step, green for complete and pass, red for error and fail, amber for running and streaming; every status also carries a text label or glyph so color is never the only indicator
+- Change badges are visually distinct per kind — Added, Modified, Deleted, and Truncated each get their own treatment — and always render their word, not a color chip alone
+- Dense data register throughout: the trial table, timeline, and tree use compact rows with full-width hover washes; cards and panels carry subtle shadows and hairline borders rather than heavy outlines
+- One consistent icon set is used across the chrome, and every loading and empty surface (ingest checklist, empty terminal, empty annotations) is deliberately designed rather than blank
+- Headings, buttons, and labels follow one consistent capitalization convention, and action labels are specific verbs such as Add note and Classify failure rather than generic labels
+</visual_design>
+
+<motion>
+- Hover animations (required): timeline entries, trial table rows, and file tree rows take a full-width hover wash; buttons ease background and shadow with a slight press effect; form controls show focus rings
+- Changing the active step through the timeline or arrow keys eases the highlight to the new entry and cross-fades the center and right pane content over roughly 150 to 250 milliseconds rather than snapping
+- The reasoning region and tool output panels expand and collapse with an eased height transition, and the disclosure chevron rotates over roughly 0.2 seconds
+- Terminal output streams visibly: characters or lines appear incrementally with a cursor or streaming indicator while active, and the indicator changes when streaming completes; the output never pops in as one finished block when a step is first activated
+- A newly added annotation animates into the annotations list and a removed one animates out rather than appearing or vanishing instantly
+- Ingest checklist items tick complete with an animated check transition as the simulation advances
+- The copy control swaps to a confirmation state briefly after copying, and the classification report card enters with a short opacity and scale transition
+- With prefers-reduced-motion set, animations are removed and state changes apply instantly while every surface and flow remains complete and usable
+</motion>
+
+<responsiveness>
+- At widths of 1024 pixels and below, the three panes collapse into a tabbed arrangement where the timeline, workspace, and detail panes are switchable one at a time, and the active step stays consistent across tab switches
+- At 375 pixel width no content clips or overflows the viewport and no page-level horizontal scrolling appears; code blocks and the terminal scroll horizontally within their own containers
+</responsiveness>
+
+<accessibility>
+- Every interactive control — catalog entries, table rows, the filesystem toggle, timeline entries, the scrubber, tree rows, disclosure toggles, form fields, and annotation links — is reachable and operable with the keyboard alone, with a visible focus indicator at each stop
+- The timeline is fully keyboard operable: arrow keys move the active step, Home and End jump to the first and last steps, and the active entry is programmatically marked as current
+- Opening the note form moves focus to its first field; closing it returns focus to the control that opened it; overlays and expanded panels close on Escape
+- Validation messages are associated with their fields so each message names the field it belongs to, and images rendered in the file workspace carry descriptive alternative text
+</accessibility>
+
+<performance>
+- The app is interactive within 2 seconds of a local cold load
+- No console errors or warnings appear on load or during a full exercise of the app
+- Rapidly scrubbing back and forth across all steps of a trial stays smooth, with no hangs, no dropped interactions, and no pane showing a step other than the active one
+- Terminal streaming never blocks interaction: the timeline, tree, and forms remain responsive while output is streaming
+</performance>
+
+<requirements>
+Shared application state must live in Zustand (in-memory only): the tasks, trials, and steps collections, the active task, active trial, and active step, the filesystem toggle side, per-step disclosure open flags, terminal streaming status and follow flag, annotations, classification reports, ingest progress, and trial table sort. Do not use localStorage, sessionStorage, or other browser storage APIs.
+State contracts (behavioral, not storage keys):
+- Changing the active step from any control (timeline click, arrow keys, scrubber, annotation link, report link) updates the timeline highlight, file tree badges, and right rail from the same shared state in one interaction
+- Adding or removing an annotation updates the annotations list immediately; annotations survive navigating between steps and trials while the app is open
+- Submitting a valid classification creates or updates exactly one report per trial; derived surfaces read the same record
+- The filesystem toggle, sort order, and streaming status are shared client state; changing them never reloads the document
+- A page reload returns the app to its seeded state
+Build tooling: Vite or an equivalent SPA setup. Radix UI primitives (dialogs, popovers, tabs, select, toggle groups) styled entirely with Tailwind CSS 4.3.2 (pinned, design tokens in the theme layer) are the component layer; no other component library. Motion for React and AutoAnimate allowed for animation; no other animation libraries. Phosphor icons only, installed via its npm package — no raw copy-pasted SVG icon sets. All forms — the note form and the failure classification form — are driven by React Hook Form validating through a Zod schema: the schema defines the rules and inline per-field errors render before submit. A markdown rendering library and a syntax highlighting library are allowed for the file renderers. All libraries installed via npm and bundled locally; no CDN imports. No backend or authentication.
+- Seed exactly 3 benchmark tasks with 3 trials each; every trial has at least 12 steps including at least one reasoning, tool call, observation, terminal output, and screenshot step, and at least one trial contains a failed step; screenshots may be seeded placeholder images bundled locally
+- Seed every trial with file changes covering all four badge kinds across its steps, and every task with a reference file tree containing at least one markdown, one code, one image, and one tabular file
+- All model names, task names, and agent names in seed data are fictional
+- Zero navigational outbound links for app chrome; view changes via shared client state
+</requirements>
+
+<integrity>
+- Work only from this instruction and `/app`; do not use `/solution`, `/tests`, or verifier artifacts.
+</integrity>
+
+<delivery>
+- Produce an original self-contained app in `/app`; scaffold under `/app` as needed for the stack in `<summary>`; `/app/package.json` MUST define npm scripts named exactly `start` (serves the app on port 3000) and `verify:build` (exits 0 when the app entry/build is present and succeeds); run via `npm start` on port 3000; do not iframe, proxy, or fetch the product from another origin.
+- WebMCP is a required delivery step, not a scoring criterion; implement exactly the `<webmcp_action_contract>` below; register tools yourself from `<module_spec>` + Bindings using the same handlers as the visible UI; honor mechanics exclusions; optional self-test via `webmcp_session_info` / `webmcp_list_tools` / `webmcp_invoke_tool` only.
+</delivery>
+
+<webmcp_action_contract>
+Contract version: zto-webmcp-v1
+
+Modules:
+- browse-query-v1
+- command-session-v1
+- entity-collection-v1
+- form-workflow-v1
+
+Module specs:
+<module_spec id="browse-query-v1">
+{
+  "id": "browse-query-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Browse / query",
+  "purpose": "Content sites, catalogs, feeds, dashboards, and navigation.",
+  "permitted_operations": ["open", "search", "apply_filter", "clear_filter", "sort", "set_locale", "set_theme"],
+  "binding_keys": {
+    "required_any_of": [["destinations"]],
+    "optional": ["browsable_entity", "filters", "sorts", "locales", "themes", "visible_postconditions"]
+  },
+  "restrictions": [
+    "No arbitrary URL, selector, or undeclared route.",
+    "Destinations and filters come from bounded PRD declarations.",
+    "Visible navigation state must update via the same handlers as UI controls."
+  ],
+  "tool_name_prefix": "browse"
+}
+</module_spec>
+
+<module_spec id="command-session-v1">
+{
+  "id": "command-session-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Command / session",
+  "purpose": "Media, games, presentations, simulations, demos, and remote-control shells.",
+  "permitted_operations": ["start", "pause", "resume", "stop", "restart", "advance", "trigger_demo", "connect", "disconnect"],
+  "binding_keys": {
+    "required_any_of": [["session_operations"]],
+    "optional": ["demos", "visible_postconditions"]
+  },
+  "restrictions": [
+    "No batching or replay of gameplay.",
+    "Timing, animation, collision, repeated input, and transient UI require immediate Playwright observation.",
+    "Tool output cannot prove successful playback or connection."
+  ],
+  "tool_name_prefix": "session"
+}
+</module_spec>
+
+<module_spec id="entity-collection-v1">
+{
+  "id": "entity-collection-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Entity collection",
+  "purpose": "Carts, records, favorites, calendar events, list items, and local entities.",
+  "permitted_operations": ["create", "select", "update", "delete", "toggle", "quantity", "reorder"],
+  "binding_keys": {
+    "required_any_of": [["entity"], ["entity_operations"]],
+    "optional": ["entity_fields", "value_bounds", "visible_postconditions"]
+  },
+  "restrictions": [
+    "Closed entity and field enums only.",
+    "Bounded string and numeric values.",
+    "No generic state setter or arbitrary patch object.",
+    "Invokes the same domain command used by the visible control.",
+    "Delete requires explicit confirm=true.",
+    "Reorder only when gesture mechanics are not being evaluated."
+  ],
+  "tool_name_prefix": "entity"
+}
+</module_spec>
+
+<module_spec id="form-workflow-v1">
+{
+  "id": "form-workflow-v1",
+  "contract_version": "zto-webmcp-v1",
+  "title": "Form workflow",
+  "purpose": "Forms, setup flows, authentication shells, and multi-step workflows.",
+  "permitted_operations": ["validate", "submit", "cancel", "reset", "advance", "return"],
+  "binding_keys": {
+    "required_any_of": [["form_fields"], ["form_operations"]],
+    "optional": ["workflow_steps", "value_bounds", "visible_postconditions"]
+  },
+  "restrictions": [
+    "Declared fields only.",
+    "Normal validation and visible errors remain active.",
+    "Cannot manufacture authentication or bypass guarded routes.",
+    "Backend-free apps must surface honest unavailable state through product handlers."
+  ],
+  "tool_name_prefix": "form"
+}
+</module_spec>
+
+Bindings:
+- Browsable entity: trials
+- Destinations: task-catalog; task-page; trial-viewer; reference-filesystem; trial-filesystem; annotations-list; classification-report
+- Sorts: reward-asc; reward-desc
+- Session operations: start; advance
+- Demos: trial-ingest; step-playback
+- Entity: annotation
+- Entity operations: create; select; delete
+- Entity fields: note-text; step-index
+- Form fields: note-text; stage; root-cause; behavior; impact; evidence; implicated-steps
+- Form operations: validate; submit
+- Workflow completion: active-step-index
+- Workflow completion: file-change-badges
+- Workflow completion: report-card-present
+
+Mechanics exclusions:
+- Scrubber continuous-drag updating is a gesture-fidelity criterion — Playwright-only; session advance covers discrete step state
+- Terminal progressive streaming, auto-follow, and jump-to-latest visuals are streaming mechanics observed live via Playwright
+- Ingest checklist tick animation and per-item pacing stay Playwright-observed (session start trial-ingest only initiates it)
+- File renderer visuals — syntax coloring, copy-to-clipboard confirmation, image scaling, markdown rendering — are Playwright/clipboard observations; no file contents in WebMCP results
+- Cross-fade pane transitions and reasoning-disclosure chevron animation stay Playwright-observed
+
+Implementation:
+- Register browser WebMCP tools for every permitted operation in the selected module specs, bound to the product values in Bindings.
+- Tool handlers must call the same application logic as the visible UI.
+- Do not invent extra modules, destinations, or operations beyond this block.
+- WebMCP is not graded; missing tools must not create fake UI success paths.
+</webmcp_action_contract>

@@ -1,0 +1,133 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "hover_feedback_required"
+description = "Hovering with the real pointer (verify computed styles while hovering): buttons ease background/shadow with a slight press effect, cards lift subtly, toolbar controls and menu rows take a visible hover wash, and form controls show focus rings"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "drop_settle_transition"
+description = "After a real pointer drag, the dropped card settles into its new position with a transition of roughly 200 milliseconds rather than snapping, and surrounding cards in both columns animate to their new positions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "keyboard_move_animates"
+description = "Moving a card via its keyboard move control (not a drag) animates the card to its destination with the same settle motion as a drop, rather than teleporting instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "create_card_animates_in"
+description = "Submitting the Add Card form makes the new card animate in from opacity 0 over roughly 150 milliseconds at the top of its column"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "modal_and_panel_transitions"
+description = "The create and detail modals enter and exit with a short opacity/scale transition of roughly 200 to 300 milliseconds, and the prompt side panel slides in from the edge and slides out on close"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "subitem_tick_animation"
+description = "During a real Run triggered from the card's Run control, each sub-item completion animates its check state (tick or fill transition) and the card's progress indicator animates its increment rather than flipping instantly; status chip changes transition their color rather than hard-swapping and the retry backoff countdown visibly ticks down once per second"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "toasts_slide_and_dismiss"
+description = "Feedback toasts after create, save, and failed runs slide in, remain readable, and auto-dismiss with a fade"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion set, card movements, modal transitions, and check animations apply instantly while all state changes and countdown text still occur"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "no_transition_snapping"
+description = "Card drops, column reflows, or modal open/close snap instantly with no transition anywhere in the app under default motion settings"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable motion or microinteraction defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

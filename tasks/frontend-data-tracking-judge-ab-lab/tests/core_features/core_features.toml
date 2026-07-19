@@ -1,0 +1,202 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_dataset_present"
+description = "On load, the Experiments view shows exactly 12 trial rows spread across 4 named benchmark tasks (3 trials per task), each row showing a trial id and task name, and the label picker offers exactly 4 labels: Baseline plus three named rescore labels"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "table_cells_and_header_metadata"
+description = "Each experiment-table cell shows the selected label's total reward for that trial with a distinct pass or fail badge at the 0.70 threshold, and each label column header shows the label name, judge model (a fictional name), config note, mean reward, and total judge cost that match the underlying results"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "label_column_switch_no_reload"
+description = "Changing which labels are shown as columns through the label picker swaps the cells and column headers to the newly selected labels without a full page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "sort_and_filter_recompute_rows"
+description = "Scripted probe: sort the experiment table by a label's reward ascending then descending and confirm the row order reverses; filter by one task and by pass/fail under a chosen label and confirm only matching rows remain; click a suggestion chip and confirm it applies exactly its named filter with the active chip visibly marked; clear all filters and confirm exactly 12 rows return"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "compare_paired_delta_table"
+description = "After picking two distinct labels as A and B in the Compare view, a paired table lists every trial with results under both labels, showing A's reward, B's reward, and a per-trial delta colored by direction and carrying a direction glyph"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "summary_strip_derives_live"
+description = "The Compare summary strip shows mean delta, win/loss/tie counts, total judge cost under each label, and the cost delta, all consistent with the visible paired rows, and switching to a different label pair changes these numbers accordingly without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "compare_chart_hover_tooltip"
+description = "The Compare view renders a scatter or dumbbell chart of label A's reward against label B's reward per trial, and hovering a mark with the real pointer shows a tooltip naming the trial and both scores"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "criterion_diff_groups_by_dimension"
+description = "Opening a trial from the paired table shows its per-criterion verdict diff for the selected pair, grouped by the four dimensions (correctness, visual, motion, technical), with three visibly distinct groups: fails only under A, fails only under B, and agreements"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "flip_reasoning_side_by_side"
+description = "Activating a flip row expands it to show both judges' reasoning snippets side by side, each labeled with its label name, and activating it again collapses them"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "attribution_form_validates_and_tags"
+description = "Submitting the attribution form with no cause selected shows an inline message naming the cause field and saves nothing; saving with a cause (judge noise, rubric change effect, or harness change effect) tags the flip visibly on its row, the pair's attribution rollup total and per-cause counts update immediately by exactly one without a reload, and reopening the form allows changing the cause"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "rescore_form_unique_label_validation"
+description = "Submitting the rescore form with a label name matching an existing label (including a different letter case) shows an inline message naming the label field, creates no label, and starts no run; the judge model select offers exactly the three fictional models and is required; rapidly double-activating a valid submit starts exactly one run and creates exactly one label"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "run_steps_progress_and_retry"
+description = "Submitting a valid rescore form starts a simulated run in which all 12 trial steps advance visibly from pending to running to complete, an overall progress indicator shows n of 12 complete, exactly one step shows a retrying state with an attempt counter and a visible wait before completing, and the run finishes in under 20 seconds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "event_timeline_filter_highlight"
+description = "During or after a rescore run, an event timeline lists step transitions in order with timestamps, filtering the timeline by status narrows its entries, and selecting an entry highlights the corresponding step"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "new_label_propagates_everywhere"
+description = "Scripted probe: run a rescore to completion with a new unique label, then confirm that label appears with derived results in the experiment table's label picker, in both Compare pickers (and produces paired deltas when selected), and as a series in the cost chart — all without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "cost_chart_and_sources_disclosure"
+description = "The Cost view charts cumulative judge cost per label across rescore events with a legend that toggles each series, each series' end value equals that label's total cost shown elsewhere, and activating a cost total's disclosure in Compare opens a list of contributing trials whose entries highlight or scroll to the trial's row in-app"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "config_block_copy_confirmation"
+description = "Each label's config summary renders as a monospaced code-style block with a copy control; activating copy gives visible confirmation and places exactly the block's text on the clipboard"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "self_compare_blocked_and_designed_states"
+description = "Selecting the same label for both A and B in Compare is impossible (the already-chosen label is disabled in the other picker or the selection is rejected with a visible message, and no self-comparison table ever renders); before a full pair is picked the Compare region shows a designed empty state naming what to pick; a trial pair with zero flips shows a designed agreement state; a pair with no tagged flips shows a zero-state rollup naming how to tag one; and deselecting every Cost series leaves a designed empty chart state that returns when a series is re-enabled"
+
+[[criterion]]
+id = "1.22"
+name = "summary_static_regardless_of_pair"
+description = "The Compare summary strip or attribution rollup renders identical numbers regardless of which label pair is selected, revealing hardcoded rather than derived values"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.23"
+name = "instant_run_without_steps"
+description = "The rescore run completes instantly or near-instantly with no visible pending/running step progression, no progress indicator, or no retry behavior — the new label simply appears without an observable simulated run"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.catchall"
+name = "core_features_catchall"
+description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

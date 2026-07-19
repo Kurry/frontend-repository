@@ -225,3 +225,34 @@ Note kept exception: **mosbyfiles stays Nuxt** — its PRD is explicitly an SSR/
 - Per updated task: `node scripts/capture_reference_screenshots.mjs <slug>` passes (oracle serves clean, zero console errors); for migrated stacks this requires the rebuilt oracle.
 - Spot `harbor run` one task per phase; confirm the builder installs the assigned kit and the judge confirms the new observable lines.
 - Corpus recount after each phase against the framework table above: React exactly 7, Astro 9, static 0; every task's requirements name Tailwind 4.3.2, exactly one component library, one framework-respective icon package, ≥1 animation library, a form library + schema validator, and the feature-appropriate rich-text/viz libraries.
+
+## Batch 3 additions (authored 2026-07-19) — 24 tasks, corpus at 89
+
+| Task | Category | Framework + state | Component library | Notes |
+|---|---|---|---|---|
+| data-tracking-eval-dashboard | data-tracking | React + Zustand | Carbon | AI-platform suite; Recharts |
+| productivity-prompt-library | productivity | React + Zustand | Carbon | AI-platform suite |
+| data-tracking-command-center | data-tracking | React + Zustand | Carbon | AI-platform suite; Recharts |
+| productivity-repository-scanner | productivity | React + Zustand | Carbon | AI-platform suite |
+| creative-tools-prompt-workbench | creative-tools | React + Zustand | Carbon | CodeMirror 6 editor |
+| workflow-template-forms | workflow | React + Zustand | Carbon | RHF+Zod schema-driven forms |
+| data-tracking-model-monitor | data-tracking | React + Zustand | Carbon | Recharts |
+| workflow-agent-management | workflow | React + Zustand | Carbon | durability vocabulary |
+| planning-execution-kanban | planning | React + Zustand | Carbon | @dnd-kit/core |
+| workflow-workflow-builder | workflow | React + Zustand | Carbon | @xyflow/react |
+| workflow-trajectory-viewer | workflow | React + Zustand | Radix UI (headless) | trial replay |
+| workflow-verifier-trajectory-viewer | workflow | React + Zustand | React Aria (headless) | verifier review |
+| data-tracking-judge-ab-lab | data-tracking | React + Zustand | Mantine | Recharts |
+| creative-tools-rubric-studio | creative-tools | Vue 3 + Pinia | PrimeVue | version-gated editing |
+| workflow-submission-qc-queue | workflow | Vue 3 + Pinia | Naive UI | QC state machine |
+| data-tracking-release-diff | data-tracking | Vue 3 + Pinia | shadcn-vue | release governance |
+| data-tracking-calibration-matrix | data-tracking | Vue 3 + Pinia | Vuetify | vue-echarts |
+| workflow-gate-console | workflow | Svelte 5 + runes stores | shadcn-svelte | what-if mode |
+| workflow-flake-triage | workflow | Svelte 5 + runes stores | Skeleton | closed reason vocabulary |
+| workflow-leak-review | workflow | Svelte 5 + runes stores | Flowbite Svelte | similarity evidence |
+| data-tracking-sourcing-console | data-tracking | Svelte 5 + runes stores | Carbon Components Svelte | quotas + pinning |
+| workflow-task-factory | workflow | React + Zustand | shadcn/ui | Recharts |
+| workflow-eval-job-queue | workflow | React + Zustand | Chakra UI | provider lanes |
+| workflow-research-pipeline-console | workflow | React + Zustand | Mantine | 3-phase chaining |
+
+Framework tally at 89: React 20, Svelte 18, Vue 16, Astro 9, Qwik 7, Solid 7, Preact 5, Angular 4, plus 3 misc. All batch-3 tasks await oracle solutions and reference screenshots (later phase); their WebMCP assignments live in schemas/webmcp-assignments.json with per-feature-group coverage.
