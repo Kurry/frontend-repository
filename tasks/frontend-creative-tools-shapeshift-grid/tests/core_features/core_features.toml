@@ -145,27 +145,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.13"
-name = "1_13"
-description = "After selecting QR Brush with the white swatch and painting a cell, the cell shows a black QR mask on white; selecting the black swatch and painting shows a white QR on black"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.14"
-name = "1_14"
-description = "After clicking Download or Share, the exported PNG includes a black footer band reading '/MADE WITH SHAPESHIFT GRID TOOL' and '<SHAPESHIFTFESTIVAL.COM>'"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.15"
-name = "1_15"
-description = "After painting at least one cell, the cell-size slider becomes locked/disabled, and clicking Clear re-enables it while resetting the board"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.16"
 name = "1_16"
 description = "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session"
@@ -337,6 +316,13 @@ name = "color_brush_fill_and_eraser_clear"
 description = "Color Brush fills a painted cell solid with the active swatch color, and Eraser clears a painted cell back to blank"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "slider_resize_before_paint_keeps_blank"
+description = "Moving the cell-size slider before any painting rebuilds the grid at the new cell size while the board stays completely blank, with no stray painted cells appearing"
+type = "binary"
+weight = 0.5
 
 [[criterion]]
 id = "1.catchall"

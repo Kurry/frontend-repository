@@ -62,147 +62,112 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
+name = "opens_into_workspace_no_auth_wall"
 description = "On load, the app opens with no auth wall directly into a workspace with a top bar showing an account name and a '3/2020' period control, and a bottom nav with Dashboard, Expenses, and Settings"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
+name = "seeded_dashboard_totals_and_category_rows"
 description = "On load, the Dashboard shows 'Total budget' $6700.00, 'Total expenses' $1756.68, and 'Total left' $4943.32, plus a 'Budgets by category' list with Food, Shopping, Entertainment, Transport, and Cloths rows, each with a filled progress bar"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
+name = "seeded_expenses_table_ten_rows"
 description = "On load, the Expenses table for period 3/2020 shows 10 rows with columns Date, Counterparty, Category, Value, Actions, including a 2020-03-01 Rocky bowling Entertainment $235.42 row and a 2020-03-24 Mcdonalds Food $169.33 row"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
+name = "shopping_filter_shows_only_shopping_rows"
 description = "Filtering the Expenses table to the Shopping category shows only the 3 Shopping rows (Wallmart $218.69, $51.74, $92.31) and hides all other categories"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
-description = "Opening the add-expense control and submitting amount 25.00, date 2020-03-05, category Food adds a 2020-03-05 / Food / $25.00 row to the Expenses table"
+name = "valid_submit_closes_dialog_adds_one_row"
+description = "Opening the add-expense control and submitting amount 25.00, date 2020-03-05, category Food closes the dialog and inserts exactly one new 2020-03-05 / Food / $25.00 row into the Expenses table"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
+name = "add_updates_food_total_and_summary"
 description = "After adding that 25.00 Food expense, the Dashboard's Food row reads $460.66 / $2000.00 with 'left $1539.34', and the Total expenses reads $1781.68"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.7"
-name = "1_7"
-description = "Submitting the add-expense form with the amount field empty (or 0) shows a visible validation error and adds no new row to the Expenses table"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.8"
-name = "1_8"
+name = "prev_period_swaps_to_february_rows"
 description = "Clicking the period control's previous arrow switches the period label to '2/2020' and the Expenses table shows the 5 February rows (Kfc, Kaufland, Johnys pub, Tube machine, Primark) instead of the March rows"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
+name = "february_dashboard_totals_correct"
 description = "On period 2/2020, the Dashboard's Food row reads $45.20 / $2000.00 and Total expenses reads $405.69"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
+name = "delete_kfc_zeroes_february_food"
 description = "Deleting the 2020-02-05 Kfc Food $45.20 row removes it from the Expenses table and the Dashboard's Food row for 2/2020 drops to $0.00 / $2000.00"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
+name = "reload_preserves_period_delete_and_addition"
 description = "Reloading the page keeps the period at '2/2020', keeps the Kfc row deleted, and keeps the earlier 25.00 Food addition present when the period is switched back to 3/2020"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
+name = "new_category_appears_in_list_and_filter"
 description = "In Settings, the Categories tab lists Food, Shopping, Entertainment, Transport, and Cloths; adding a new category named 'Travel' makes it appear in both the Categories list and the Expenses filter control"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.13"
-name = "1_13"
-description = "window.webmcp_list_tools() returns tool entries including expense_create, expense_delete, browse_open, and browse_apply_filter with non-empty inputSchema objects"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.14"
-name = "1_14"
-description = "Invoking window.webmcp_invoke_tool('browse_apply_filter', { month: 2, year: 2020 }) switches the visible period to 2/2020 and the Expenses table to the February rows, matching what clicking the period control does"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.15"
-name = "1_15"
-description = "No console errors or uncaught exceptions occur while loading the app, adding an expense, changing the period, deleting an expense, and reloading"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.16"
-name = "1_16"
-description = "The app opens with no authentication wall directly into a workspace recognisably a personal expense and budget tracker — a top bar with account name and period control, and a bottom nav for Dashboard, Expenses, Settings — not a generic dashboard or starter page"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.17"
-name = "1_17"
+name = "dashboard_nonzero_totals_five_categories"
 description = "On first load the Dashboard shows a non-zero Total budget, Total expenses, and Total left, and a Budgets by category list covering at least 5 categories (Food, Shopping, Entertainment, Transport, Cloths), each with a progress bar"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.18"
-name = "1_18"
+name = "seeded_rows_populated_not_placeholder"
 description = "On first load the Expenses table for the initial period shows at least 10 seeded rows with Date, Counterparty, Category, and Value populated, not placeholder or lorem text"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.19"
-name = "1_19"
+name = "add_raises_food_total_by_exact_amount"
 description = "Adding a 25.00 Food expense on 2020-03-05 through the add-expense control adds that exact row to the Expenses table, raises the Dashboard's Food total by exactly 25.00, and advances the Food progress bar by the same amount"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.20"
-name = "1_20"
+name = "period_change_recomputes_all_dashboard_figures"
 description = "Changing the reporting period to the prior seeded month swaps the visible Expenses rows to that period's expenses and recomputes every Dashboard category total, progress bar, and the Total budget/expenses/left summary from that period alone"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.21"
-name = "1_21"
+name = "delete_lowers_only_its_own_category"
 description = "Deleting one expense removes its row from the Expenses table and lowers its category's Dashboard total and progress bar by exactly that expense's amount, leaving every other category and period unaffected"
 type = "binary"
 weight = 1.0
@@ -215,22 +180,15 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.23"
-name = "1_23"
-description = "Filtering the Expenses table by category shows only that category's rows for the current period and hides all others"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.24"
-name = "1_24"
+name = "invalid_submit_blocks_and_names_fields"
 description = "Submitting the add/edit expense form with an empty or non-positive amount, a missing date, or no category shows visible validation feedback and adds or changes no row"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.25"
-name = "1_25"
+name = "category_crud_reflects_in_filter_and_dashboard"
 description = "Settings' Categories tab lets a category be added by name, renamed, or deleted, with every change immediately reflected in the Expenses category filter and the Dashboard's per-category list"
 type = "binary"
 weight = 0.5
@@ -246,7 +204,7 @@ negate = true
 
 [[criterion]]
 id = "1.27"
-name = "1_27"
+name = "dashboard_totals_static_regardless_of_changes"
 description = "The Dashboard's category totals and progress bars stay a constant value regardless of adding, editing, deleting expenses, or changing the period"
 type = "binary"
 weight = 1.0
@@ -254,7 +212,7 @@ negate = true
 
 [[criterion]]
 id = "1.28"
-name = "1_28"
+name = "delete_hits_wrong_category_or_row_persists"
 description = "Deleting an expense removes its amount from a category other than the one it belonged to, or leaves the deleted row visible in the table"
 type = "binary"
 weight = 1.0

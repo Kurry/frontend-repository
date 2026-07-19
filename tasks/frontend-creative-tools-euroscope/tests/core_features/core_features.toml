@@ -83,8 +83,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
-description = "After selecting the base theme Grey, the Backdrop main swatch reads #262626 and the live Preview panels recolour to the Grey palette"
+name = "base_theme_replaces_all_swatches"
+description = "After selecting the base theme Grey, all six working swatch values change to that set's palette and the live Preview panels recolour to match immediately"
 type = "binary"
 weight = 1.0
 
@@ -220,6 +220,27 @@ name = "reload_restores_all_wizard_facets"
 description = "After selecting a base theme, editing one swatch, choosing the Vector icon set, and advancing to the Update embedded bitmaps step: reloading the page restores the same highlighted stage in the progress bar, the same base theme selection, all six swatch values including the edit, and the same icon set choice and replaced count — all facets together, never a mix"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "progress_stage_state_affordances"
+description = "In the progress bar, the current stage is highlighted with its full text label, each completed stage shows a check mark, and each upcoming stage shows a muted number"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "six_swatch_rows_picker_and_hex"
+description = "The Update theme colours step shows exactly six named swatch rows (Backdrop darkest, Backdrop darker, Backdrop main, Backdrop lighter, Backdrop lightest, Foreground secondary), each exposing a colour picker and a hex text field showing the current value"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "upload_step_optional_exe_input"
+description = "Step one offers an optional file input that accepts .exe files alongside the loaded EuroScope.exe sample, and continuing without picking a file shows no error"
+type = "binary"
+weight = 0.5
 
 [[criterion]]
 id = "1.25"

@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "3.2"
 name = "responsive_panel_reflow"
-description = "Across desktop and narrow mobile viewports, the three workspace regions remain identifiable and usable, reflowing toward one column without clipped controls, unreadable text, or page-wide horizontal overflow"
+description = "At 768px width and below the themes, editor, and preview regions reflow vertically and remain fully usable, and at 375px width no content clips or overflows the viewport and no page-wide horizontal scrolling appears"
 type = "binary"
 weight = 1.0
 
@@ -127,6 +127,42 @@ description = "A selectable built-in theme or edited token combination makes ess
 type = "binary"
 negate = true
 weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "distinct_control_state_treatments"
+description = "Buttons, inputs, and segmented choices show visibly distinct default, hover, focus (visible ring), active-selection, and error treatments rather than a single unchanging style"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "small_width_overlays_operable"
+description = "At small viewport widths, the chrome dropdowns, the CSS-export modal, and the color pickers stay fully visible and operable within the viewport rather than rendering off-screen or clipped"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.12"
+name = "consistent_specific_labels"
+description = "Chrome labels, editor section titles, and buttons follow one consistent capitalization convention, and action labels are specific—Hold to add theme, Reset theme, Remove theme, Copy—rather than generic where a specific label is possible"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.13"
+name = "empty_state_and_validation_copy"
+description = "The My themes empty state explains that no custom themes exist yet and how to add one, and theme-name validation messages name the field and the fix rather than a bare rejection"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.14"
+name = "placeholder_copy_shipped"
+description = "Lorem ipsum, 'TODO', template-variable, or other placeholder text is visible somewhere in the shipped UI"
+type = "binary"
+negate = true
+weight = 0.5
 
 [[criterion]]
 id = "3.catchall"

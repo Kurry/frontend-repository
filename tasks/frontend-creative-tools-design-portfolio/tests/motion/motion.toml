@@ -110,6 +110,20 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "4.10"
+name = "board_card_enter_exit_animation"
+description = "Creating a project through the visible form or command animates its new card or row into the Projects Board, and deleting one through the visible control animates it out, rather than the board snapping rows in or out with no transition"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "feedback_message_transition"
+description = "Validation errors and confirmation messages appear with a brief fade or slide transition rather than popping in with no motion"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "4.3"
 name = "missing_or_snapping_microinteractions"
 description = "Required boot, output, skill-bar, window, canvas, or hover feedback snaps with no perceptible transition, or one of the specified pointer targets remains visually inert"

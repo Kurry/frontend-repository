@@ -119,6 +119,42 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "3.9"
+name = "narrow_viewport_docked_toolbar"
+description = "At a 375px-wide viewport the toolbar docks as a fixed panel instead of floating free, every tool, swatch, and action remains visible and reachable, and no content clips or forces horizontal scrolling"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "touch_drag_paint_parity"
+description = "On a narrow touch viewport, a real touch drag across the canvas paints continuously across every crossed cell, matching the desktop pointer-drag behavior"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "component_state_treatments"
+description = "Toolbar buttons, palette swatches, and the save/rename form fields show visually distinct default, hover, focus, disabled, and error treatments rather than one static look"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.12"
+name = "consistent_actionable_copy"
+description = "Toolbar labels, gallery actions, and form labels follow one consistent capitalization convention, validation messages name the field and the fix, and empty states explain what belongs there and how to add it"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.13"
+name = "placeholder_text_shipped"
+description = "Placeholder or lorem-ipsum text (e.g. 'Lorem', 'TODO', 'asdf', or template variable names) is visible somewhere in the shipped UI"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
 id = "3.catchall"
 name = "visual_design_catchall"
 description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick or taste disagreement. If present, name the defect and cite the concrete browser evidence (element, page state, viewport, or screenshot) that demonstrates it. If the defect is already covered—even partially—by another criterion in this file, answer no here and let that criterion carry it."

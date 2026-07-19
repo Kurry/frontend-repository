@@ -99,7 +99,7 @@ optional = true
 [[criterion]]
 id = "vd-order"
 name = "section_rhythm_in_order"
-description = "Sections appear in order: hero, locations, red marquee, living, blue marquee, typical-unit, community, blue arrows-header, what-we-stand-for, insta-feed, orange arrows-header, footer"
+description = "Sections appear in order: hero, locations, red marquee, living, blue marquee, typical-studio, community, blue arrows-header, what-we-stand-for, social-feed, orange arrows-header, footer"
 type = "binary"
 weight = 0.5
 optional = true
@@ -138,7 +138,7 @@ weight = 0.5
 [[criterion]]
 id = "vd-mobilestack"
 name = "mobile_single_column_no_overflow"
-description = "Below 1024px the sidebar is replaced by a mobile bar showing the placeholder wordmark, a \"Book your Unit\" button, and a hamburger; the locations and typical-unit sections collapse from two columns to one; and at 390px width no content clips or overflows the viewport and no horizontal scrollbar appears while the marquee bands keep looping full-width"
+description = "Below 1024px the sidebar is replaced by a mobile bar showing the placeholder Noma wordmark, a \"Book your Studio\" button, and a hamburger; the locations and typical-studio sections collapse from two columns to one; and at 390px width no content clips or overflows the viewport and no horizontal scrollbar appears while the marquee bands keep looping full-width"
 type = "binary"
 weight = 1.0
 

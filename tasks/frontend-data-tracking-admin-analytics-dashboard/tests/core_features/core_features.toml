@@ -173,23 +173,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.17"
-name = "two_views_switchable"
-description = "At least two distinct views exist (Operations Overview and All Users) switchable from the sidebar without full page navigation"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.18"
 name = "domain_state_beyond_crud"
 description = "Domain state beyond CRUD is implemented: status badges, role assignment, list filters/sort that recompute visible users, and bulk status/role/delete on selected rows"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.19"
-name = "empty_required_fields_validation"
-description = "Renders visible validation/feedback when Create user is submitted with empty required fields, and the users count does not increase"
 type = "binary"
 weight = 1.0
 
@@ -332,6 +318,13 @@ weight = 1.0
 id = "1.39"
 name = "empty_state_on_no_match"
 description = "When filters and search combine to match zero users, the list region shows an empty state message instead of an empty or broken table"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "reload_resets_all_facets_to_seed"
+description = "Scripted probe: toggle the theme to the non-default theme, switch to a Users view, create one user, and change one sort or filter setting; then reload the page and confirm every facet coherently returns to the seeded baseline — at least 8 seeded users with the created user gone, the default theme, and the default view — never a mix of reset and surviving facets"
 type = "binary"
 weight = 1.0
 

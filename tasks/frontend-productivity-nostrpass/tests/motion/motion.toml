@@ -114,6 +114,34 @@ negate = true
 optional = true
 
 [[criterion]]
+id = "4.8"
+name = "new_identity_card_entrance_animates"
+description = "Creating an identity through the real UI form makes the new card animate into the Identities grid with a brief entrance ease of roughly 150 to 300 milliseconds rather than appearing instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "audit_entry_animates_in_at_top"
+description = "With the Audit log view visible, performing an action that records an entry makes the new entry animate in at the top of the list rather than snapping into place"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.10"
+name = "confirmation_toast_slides_and_autodismisses"
+description = "Creating an identity or changing a permission grant surfaces a brief confirmation toast that slides in, stays readable, and auto-dismisses with a fade"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "reduced_motion_removes_animations"
+description = "With prefers-reduced-motion set, entrance and toggle animations are removed and state changes apply instantly, while every feature (create, select, toggle, reveal, theme switch) remains fully usable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "4.catchall"
 name = "motion_catchall"
 description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction performed, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

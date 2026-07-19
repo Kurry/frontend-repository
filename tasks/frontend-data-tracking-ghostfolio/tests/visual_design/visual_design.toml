@@ -83,11 +83,10 @@ weight = 1.0
 
 [[criterion]]
 id = "3.4"
-name = "3_4"
-description = "At 375 by 667 pixels the summary, allocation, and holdings reflow without clipped text or overlapping controls."
+name = "narrow_single_column_stacking"
+description = "At a 375-pixel-wide viewport the two-column grid collapses to a single column with the summary stacked above, with no clipped text, no overlapping controls, and no horizontal page scrolling."
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "3.5"

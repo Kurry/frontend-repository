@@ -166,13 +166,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.18"
-name = "1_18"
-description = "Domain state beyond CRUD is present: clicking a channel filters the list and the search field combines with it using AND semantics so a memo must match both to remain visible, and Show All Channels clears the channel restriction"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.20"
 name = "1_20"
 description = "The Theme Core control offers exactly five named cores (Matrix Green, Neon Cyan, Blood Red, Ghost White, Amber Terminal) and choosing one recolors the accent app-wide immediately with no reload"
@@ -313,6 +306,14 @@ name = "selection_marking_toolbar_actions"
 description = "Selecting a range of text inside an open memo body reveals a small toolbar near the selection offering Mark Classified, which renders the selection blurred until hovered, and Mark Priority, which renders the selection bold in the current theme accent color"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "pre_seeded_demo_data_shipped"
+description = "On a first visit with cleared browser storage, the app ships with pre-seeded demo memos or channels already present instead of opening blank with the three empty states"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "1.catchall"

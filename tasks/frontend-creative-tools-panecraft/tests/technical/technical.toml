@@ -165,6 +165,20 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "2.15"
+name = "dialog_keyboard_and_announcements"
+description = "The source preview modal, pane wizard, Share panel, and confirmation dialogs trap focus while open, close on Escape, and return focus to their opening control, and the transient Copied confirmation and inline validation errors are exposed through an aria-live polite region"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.16"
+name = "fast_interactive_cold_load"
+description = "On a local cold load the workspace renders its seeded content and responds to a first interaction within roughly 2 seconds"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence that demonstrates it. If the defect is already covered even partially by another criterion, answer no here and let that criterion carry it."

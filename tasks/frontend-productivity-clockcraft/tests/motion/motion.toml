@@ -76,8 +76,8 @@ weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
-description = "Starting a timer, saving a manual entry, and deleting an entry each raise a transient toast that appears after the action and then dismisses"
+name = "toasts_ease_in_and_auto_dismiss"
+description = "Starting a timer, saving a manual entry, and deleting an entry each surface a transient toast that eases in after the action and then dismisses on its own without user interaction"
 type = "binary"
 weight = 1.0
 
@@ -96,6 +96,41 @@ description = "Interactive chrome such as buttons, entry rows, and filter chips 
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "4.6"
+name = "list_add_delete_filter_animations"
+description = "Driven through the real UI controls: adding an entry animates the new row into the All entries list and the new block into the timeline, deleting an entry animates its row out rather than snapping, and switching category filters animates the surviving rows into their new positions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "timer_tick_stable_layout"
+description = "While the live timer runs, its elapsed display updates about once per second and stays legible without visibly jittering or reflowing the rest of the page"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "ratio_lean_animates_in_place"
+description = "When entries change, the Meaningful ratio and its colored lean bar animate their update in place rather than snapping to the new value or requiring a reload"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.9"
+name = "overlays_enter_transition_and_dismiss"
+description = "The edit dialog, delete confirmation, tag manager, and history panel each appear as overlays anchored above the page with a brief enter transition, and each dismisses on cancel, on backdrop click, and on Escape"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "reduced_motion_instant_and_usable"
+description = "With prefers-reduced-motion enabled on a fresh load, list, toast, and overlay animations are removed and state changes apply instantly while every feature remains fully usable"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "4.catchall"

@@ -135,6 +135,56 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "2.12"
+name = "keyboard_only_operation"
+description = "Every interactive control—theme rows, token pickers, segmented choices, toggles, chrome dropdowns, and preview tabs—is reachable and operable with the keyboard alone with a visible focus indicator; within dropdowns and tabs, arrow keys move through options, Enter or Space selects, and the selected option is exposed as active to assistive technology"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.13"
+name = "export_dialog_focus_management"
+description = "The open CSS-export modal exposes role dialog with aria-modal true, keeps Tab focus trapped inside it, closes on Escape, and returns focus to the control that opened it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.14"
+name = "validation_message_a11y_association"
+description = "The theme-name validation message is rendered visually and programmatically associated with the name field (for example via aria-describedby or an equivalent exposed relation) so assistive technology announces it"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.15"
+name = "token_picker_accessible_names"
+description = "Each color picker and each content 'A' badge carries an accessible name identifying which semantic token it edits (for example 'primary content'), verifiable in the accessibility tree"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.16"
+name = "interactive_within_two_seconds"
+description = "On a local cold load the app is interactive within 2 seconds, with all 35 built-in presets already listed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.17"
+name = "lag_free_token_editing"
+description = "Token edits re-theme the live preview immediately with no visible lag, including while dragging a color picker, and rapid repeated edits leave the UI responsive rather than hanging"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.18"
+name = "post_load_layout_jumps"
+description = "After first paint, panels or the preview grid visibly jump, reflow, or shift position as the app settles"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick or unverifiable implementation preference. If present, name the defect and cite the concrete browser evidence (console entry, network request, storage entry, runtime state, or interaction result) that demonstrates it. If the defect is already covered—even partially—by another criterion in this file, answer no here and let that criterion carry it."

@@ -136,6 +136,49 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "4.11"
+name = "interactive_within_two_seconds"
+description = "On a local cold load, the app renders its interactive shell (folder tree, note list, editor region) and responds to a first click within 2 seconds."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "confirm_dialogs_trap_focus"
+description = "The folder-delete and Empty Trash confirm dialogs trap keyboard Tab focus while open and return focus to the invoking control when closed."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "toolbar_pressed_state_exposed"
+description = "The Bold, Italic, and Bulleted List toolbar controls expose their active state programmatically in the DOM (aria-pressed or an equivalent state attribute) that matches their visual treatment when the cursor sits inside matching formatted text."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.14"
+name = "keyboard_operable_controls"
+description = "Checklist checkboxes can be toggled from the keyboard, and the Pin toggle and color swatches are reachable and operable with the keyboard alone."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "virtualized_scroll_stays_smooth"
+description = "Rapidly scrolling the 10,000-item virtualized view shows no sustained blank regions and the UI remains responsive throughout the scroll."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.16"
+name = "external_network_requests_present"
+description = "During load and a full exercise of the app, devtools shows outbound network requests to external origins (CDN scripts, fonts, images, or APIs) beyond the app's own origin."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

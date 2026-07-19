@@ -273,6 +273,27 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "1.40"
+name = "reminder_note_label_on_card"
+description = "After setting a habit's free-text Remind me at field (e.g. 7:00 AM), the note appears as a static label on that habit's card without any system-notification behavior, and the label is still shown after a full page refresh"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "invalid_target_count_inline_error"
+description = "Submitting the New Habit form with an invalid numeric daily count (e.g. empty or non-numeric with the numeric target selected) shows an inline error message naming that target field before submit completes, and no phantom habit is added to the list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "flame_treatment_matches_streak_tier"
+description = "With habits whose current streaks fall below 7 days, between 7 and 29 days, and at 30 or more days (set up via the import path or real history), each habit's flame renders the treatment matching its tier — plain, bright, and gold respectively — not the same treatment for all three"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core habit-tracking functionality (creation, check-ins, categories, history views, reminders, ordering, pause, stats, or import/export) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

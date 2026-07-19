@@ -2,6 +2,8 @@
 
 Hilden & Kaira social-media agency homepage fidelity eval.
 
+**Reference site:** [https://www.hildenkaira.fi/](https://www.hildenkaira.fi/) — for layout, visual-density, and interaction study only; its copyrighted assets and branding must not be copied into the submission.
+
 A frontend-only Harbor eval task. A builder agent recreates the application
 described in `instruction.md` (an observable-behavior PRD for an opaque
 reference app), delivering a self-contained SPA in `/app` with npm scripts

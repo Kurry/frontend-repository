@@ -69,28 +69,28 @@ weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
+name = "canvas_is_primary_visual_focus"
 description = "The document canvas and its placed fields are the primary visual focus, with secondary metadata (template summary, counts) kept visually subordinate in the side panels"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
+name = "fields_tinted_by_submitter_colour"
 description = "Each submitter owns a distinct colour and placed fields are tinted with their submitter's colour (fill, border, and label) so a field's owner is readable at a glance"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.4"
-name = "3_4"
+name = "selected_field_ring_not_colour_alone"
 description = "The selected field is visually distinguished from unselected fields by a selection ring or handle, not by colour alone"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "3_5"
+name = "status_and_required_have_text_cues"
 description = "The signing status is communicated with a text label in addition to colour, and a field's required state carries a non-colour cue"
 type = "binary"
 weight = 0.5
@@ -145,6 +145,21 @@ weight = 1.0
 id = "3.12"
 name = "mobile_viewport_clipping_or_overflow"
 description = "At 375px width, content clips or overflows the viewport, or horizontal scrolling of the page appears"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.13"
+name = "ui_copy_specific_and_consistent"
+description = "Where the app renders headings, button labels, validation messages, and status text, the copy is specific and consistent — action labels name the action (e.g. 'Send for signing', 'Delete field'), validation messages name the problem field, terminology for the same concept (template, field, submitter) matches across the rail, canvas, and panel, and prominent copy is free of spelling errors"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.14"
+name = "placeholder_or_lorem_text_visible"
+description = "Lorem ipsum, 'TODO', template-variable names (e.g. {{title}}), or other unfinished placeholder text is visible somewhere in the shipped UI chrome (the faux document-body text lines on the page sheets are part of the design and do not count)"
 type = "binary"
 weight = 1.0
 negate = true

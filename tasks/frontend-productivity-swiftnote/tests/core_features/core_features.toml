@@ -139,8 +139,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
-description = "When Delete is used, an explicit confirm step appears; cancelling keeps the note, and confirming removes it permanently from the sidebar while other notes remain."
+name = "delete_confirm_cancel_preserves_state"
+description = "When Delete is used, an explicit confirm step appears; cancelling leaves the note, the editor selection, and all visible note counts exactly as they were, and confirming removes it permanently from the sidebar while other notes remain."
 type = "binary"
 weight = 1.0
 
@@ -307,6 +307,21 @@ optional = true
 id = "1.45"
 name = "duplicate_adds_exactly_one_note"
 description = "Counting the sidebar rows immediately before and after using Duplicate: exactly one new note is added, and editing the duplicate's body changes only the duplicate's sidebar preview while the original's row text is untouched"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "1.46"
+name = "edit_flow_multi_surface"
+description = "Starting with two notes: typing a title and body into the open note updates that note's sidebar row title, preview, and timestamp live, re-sorts it to the top, and the word and character counters recompute to match the exact text; then editing the other note moves that note's row above the first while the first note's own text and preview stay unchanged, all without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "extreme_input_preserves_last_valid_state"
+description = "An oversized paste into the note body and leaving a note completely empty are each handled with visible, specific feedback (or rendered cleanly without breakage), and afterwards the previously entered content of other notes and the app's controls remain intact and responsive — the last valid state is undamaged"
 type = "binary"
 weight = 0.5
 optional = true

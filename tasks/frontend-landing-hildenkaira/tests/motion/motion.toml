@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "3.1"
 name = "line_mask_reveal_on_scroll"
-description = "On a fresh load, scrolling an unseen heading or paragraph to about 80% of the viewport plays a line-by-line upward mask reveal once (each line rising from below its mask with a pronounced ease-out), then it stays revealed"
+description = "On a fresh load, scrolling an unseen heading or paragraph to about 80% of the viewport plays a line-by-line upward mask reveal once (each line rising from below its mask with a pronounced ease-out — headings about 0.8s with a 0.08s per-line stagger, paragraphs about 0.6s with a 0.04s stagger), then it stays revealed"
 type = "binary"
 weight = 1.0
 

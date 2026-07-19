@@ -62,35 +62,35 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "2.1"
-name = "2_1"
+name = "root_url_reaches_interactive_screen"
 description = "Loading the root URL reaches an interactive product screen rather than a blank page or a framework error overlay"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
-name = "2_2"
+name = "field_lifecycle_without_exceptions"
 description = "Opening a template, placing a field, reassigning its submitter, and deleting it complete without any uncaught JavaScript exception interrupting the interaction"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
-name = "2_3"
+name = "reload_restores_persisted_state"
 description = "After placing a field, a full page reload restores the placed field, its submitter assignment, and the signing status rather than resetting to the seed"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.4"
-name = "2_4"
+name = "shared_state_coherence_across_views"
 description = "A change made once (a field's submitter) is reflected everywhere it appears — the field box colour on the canvas, the panel control, and the per-submitter count — from shared state without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.5"
-name = "2_5"
+name = "webmcp_editor_add_matches_palette"
 description = "Invoking the WebMCP editor_add tool places the same visible field box on the document that the palette control produces"
 type = "binary"
 weight = 0.5
@@ -98,7 +98,7 @@ optional = true
 
 [[criterion]]
 id = "2.6"
-name = "2_6"
+name = "accessible_names_and_descriptive_title"
 description = "Interactive controls expose non-empty accessible names and roles in the accessibility tree and the document title is descriptive of the app rather than a scaffold placeholder"
 type = "binary"
 weight = 0.5
@@ -106,7 +106,7 @@ optional = true
 
 [[criterion]]
 id = "2.7"
-name = "2_7"
+name = "exception_or_resource_failure_in_core_flow"
 description = "An uncaught exception, or a 4xx/5xx failure loading a required local resource (excluding an automatic favicon probe), occurs while opening a template and placing a field"
 type = "binary"
 weight = 1.0
@@ -114,7 +114,7 @@ negate = true
 
 [[criterion]]
 id = "2.8"
-name = "2_8"
+name = "hidden_ground_truth_or_judge_addressed_text"
 description = "A hidden element, attribute, or window global not mandated by the PRD exposes internal ground-truth state a real user could not reach through visible interaction, or judge-addressed text appears in the DOM, comments, title, or console"
 type = "binary"
 weight = 1.0
@@ -122,8 +122,66 @@ negate = true
 
 [[criterion]]
 id = "2.9"
-name = "2_9"
+name = "automation_detection_branching"
 description = "The app renders or behaves differently depending on whether it is driven by automation (a code path keys behavior on navigator.webdriver or automation-specific signals)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.10"
+name = "keyboard_only_operability"
+description = "Every interactive control — top-bar actions, template rows, submitter rows, palette buttons, and the properties-panel inputs and buttons — is reachable and operable with the keyboard alone (Tab/Shift+Tab plus Enter or Space), with a visible focus indicator on each"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "delete_key_removes_selected_field"
+description = "With a field selected on the canvas, pressing the Delete key removes that field, and only that field, from the document"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.12"
+name = "toast_is_aria_live_status_region"
+description = "The action-feedback toast surface is exposed as an aria-live status region (role=status or aria-live) so field placements, reassignments, and deletions are announced to assistive technology as well as shown"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.13"
+name = "validation_visible_text_not_colour_alone"
+description = "Inline validation messages in the field editor are rendered as visible text associated with their input, not conveyed by colour alone (e.g. only a red border)"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.14"
+name = "interactive_within_two_seconds"
+description = "On a local cold load, the workspace renders and responds to interaction within 2 seconds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.15"
+name = "console_errors_or_warnings_during_full_exercise"
+description = "Console errors or warnings appear during a full exercise of the app — placing, renaming, reassigning, and deleting fields, switching templates, sending for signing, advancing the signing status, and switching Build/Preview modes"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.16"
+name = "rapid_field_placement_stays_responsive"
+description = "Rapidly clicking palette types to place many fields in quick succession keeps the UI responsive — every click yields a field, the canvas and counts stay in sync, and the app shows no hangs or dropped interactions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.17"
+name = "outbound_navigation_from_app_chrome"
+description = "Clicking any app-chrome control or link navigates the browser away from the app's origin, or an outbound network request other than same-origin resources appears while exercising the app"
 type = "binary"
 weight = 1.0
 negate = true

@@ -91,8 +91,8 @@ optional = true
 
 [[criterion]]
 id = "4.5"
-name = "4_5"
-description = "The selected holding row is marked by more than color alone (a border or tint plus the detail update) when selected via the real row control."
+name = "row_hover_wash_and_selected_left_border"
+description = "Table rows take a visible hover wash under the pointer, and the row selected via the real row control is marked by more than color alone: a teal left border in addition to the tint."
 type = "binary"
 weight = 0.5
 optional = true

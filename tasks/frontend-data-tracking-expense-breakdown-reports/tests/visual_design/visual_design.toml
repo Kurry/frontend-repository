@@ -62,21 +62,21 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
+name = "reports_workspace_density"
 description = "Ledger sidebar + metrics + chart + transactions density remains a reports workspace, not a marketing landing"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
+name = "empty_state_visually_present"
 description = "Empty transactions state is visually present when the collection or filter result is empty"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
+name = "static_mockups_instead_of_live_ui"
 description = "Shows only static chart mockups with a non-interactive transactions table"
 type = "binary"
 weight = 1.0
@@ -84,11 +84,90 @@ negate = true
 
 [[criterion]]
 id = "3.4"
-name = "3_4"
+name = "income_positive_expense_neutral_multi_hue_charts"
 description = "Income amounts read as positive (green with a leading +) while expenses read neutral, and the breakdown sankey and trends doughnut use multi-hue category fills"
 type = "binary"
 weight = 0.5
 optional = true
+
+[[criterion]]
+id = "3.5"
+name = "soft_mint_palette_and_ledger_mark"
+description = "The UI uses the soft mint finance palette — light page and sidebar washes with brand teal (#0F3D3E) and accent mint (#7BC4B8) visible in chrome, accents, or branding — and a Ledger mark appears in the sidebar"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "sidebar_plus_main_column_structure"
+description = "The layout shows a persistent left sidebar beside a main column containing, in order: page chrome actions (Filters / Date / Save), four statistic cards, the chart card, the transactions table/list, and the transaction summary tile strip"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "sankey_bars_curved_links_doughnut_legend"
+description = "The Breakdown sankey renders its income-source, Income hub, Net Income, and expense-category nodes as colored bars connected by curved, proportionally sized links with amount labels on the nodes, and the Trends view renders a multi-hue doughnut accompanied by a category legend"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "single_consistent_icon_set"
+description = "One icon set is used consistently across the sidebar, chrome actions, and table controls, with no visibly mixed icon styles"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.9"
+name = "sidebar_persistent_at_desktop_widths"
+description = "At viewport widths of 1024 pixels and above, the left sidebar stays persistently visible beside the main reports column"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "narrow_width_stacking_without_overflow"
+description = "At a narrow viewport width (e.g. 375px), the main column content (metric cards, chart card, table, summary strip) stacks vertically with no horizontal scrolling and no clipped content"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "narrow_width_layout_breaks"
+description = "At a narrow viewport width, content overflows the viewport horizontally, overlaps, or is clipped so parts of the reports UI become unreadable or unreachable"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.12"
+name = "consistent_capitalization_convention"
+description = "Headings, buttons, and nav labels use one consistent capitalization convention (title case or sentence case) throughout the app"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.13"
+name = "consistent_currency_formatting"
+description = "Currency values use the same symbol and decimal treatment across the metric cards, table, legends, tooltips, and summary strip"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.14"
+name = "toast_and_empty_state_copy_quality"
+description = "Toasts name the action they confirm, and empty states explain what belongs in the region and how to add it"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.15"
+name = "placeholder_text_in_shipped_ui"
+description = "Placeholder or lorem text (e.g. 'Lorem', 'TODO', 'asdf', template variable names) is visible somewhere in the shipped UI"
+type = "binary"
+weight = 1.0
+negate = true
 
 [[criterion]]
 id = "3.catchall"

@@ -62,8 +62,8 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
-description = "Pressing the Draw card button animates the card panel in with a short flip-and-fade transition rather than the card content snapping into place instantly."
+name = "draw_card_flip_fade_transition"
+description = "Pressing the Draw card button animates the card panel in with a short flip-and-fade transition of roughly 0.2 to 0.4 seconds rather than the card content snapping into place instantly."
 type = "binary"
 weight = 1.0
 

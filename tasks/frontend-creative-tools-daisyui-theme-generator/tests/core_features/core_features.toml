@@ -260,6 +260,13 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "1.29"
+name = "double_remove_deletes_exactly_one"
+description = "Rapidly double-activating a custom theme's Remove control deletes exactly that one theme: the My themes count decreases by one, not two, and no other theme disappears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in a specified core behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence (control, action sequence, or resulting page state) that demonstrates it. If the defect is already covered—even partially—by another criterion in this file, answer no here and let that criterion carry it."

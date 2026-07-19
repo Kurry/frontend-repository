@@ -62,21 +62,21 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
+name = "reports_workspace_density_not_landing"
 description = "Ledger sidebar + metrics + chart + transactions density remains a reports workspace, not a marketing landing"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
+name = "empty_state_visually_present"
 description = "Empty transactions state is visually present when the collection or filter result is empty"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
+name = "static_chart_mockups_only"
 description = "Shows only static chart mockups with a non-interactive transactions table"
 type = "binary"
 weight = 1.0
@@ -84,7 +84,7 @@ negate = true
 
 [[criterion]]
 id = "3.4"
-name = "3_4"
+name = "multi_hue_category_chart_fills"
 description = "Breakdown renders a category sankey/flow and Trends renders a category pie, both using multi-hue category fills aggregated from the transactions"
 type = "binary"
 weight = 0.5

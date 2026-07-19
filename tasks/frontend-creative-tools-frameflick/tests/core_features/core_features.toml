@@ -270,6 +270,20 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "1.40"
+name = "preset_save_disabled_until_valid"
+description = "While the preset name field is empty, the Save preset control is disabled and an inline validation message naming the name field appears before any submit; once a valid name is entered the control becomes enabled."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "caption_position_above_below_switch"
+description = "With caption text present, switching the caption position control between Above and Below moves the rendered caption from above the screenshot to below it on the canvas, and back."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in a specified core feature or end-to-end user flow that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, resulting page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

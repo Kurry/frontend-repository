@@ -62,15 +62,15 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "2.1"
-name = "2_1"
-description = "Jotai holds events, year window, filters, and active mode — shared across components"
+name = "shared_state_coherence_across_surfaces"
+description = "A change made in one surface — creating, editing, or deleting an event, toggling a category, moving the year window, or switching modes — is immediately reflected in every other surface that shows the same data (Library list, stage pins, counts, detail panel) without a reload; no surface ever shows stale data another surface already updated"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
-name = "2_2"
-description = "No browser storage is used for persistence: localStorage and sessionStorage remain empty after a full exercise of the app, and a reload returns the seeded state"
+name = "seeded_reset_multi_facet_round_trip"
+description = "Scripted probe: create an event, toggle a category off, type a search, narrow the year window, and switch mode; confirm localStorage and sessionStorage remain empty throughout; then reload — every facet coherently returns to the seeded baseline (seeded corpus, default categories, empty search, default year window), never a mix of surviving and reset facets"
 type = "binary"
 weight = 1.0
 
@@ -78,6 +78,56 @@ weight = 1.0
 id = "2.3"
 name = "2_3"
 description = "Uses localStorage or sessionStorage to persist events or filters"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.4"
+name = "keyboard_operable_chrome_controls"
+description = "Every chrome control (mode switch, Filters, About, Reset filters, form fields, scrubber thumbs) is reachable and operable with the keyboard alone, showing a visible focus indicator on each"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "dialogs_trap_and_return_focus"
+description = "The About modal and Filters drawer expose dialog semantics, trap keyboard focus while open, and return focus to the control that opened them on close"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "validation_exposed_to_assistive_tech"
+description = "Form validation messages are exposed to assistive technology (e.g. an aria-live region, role=alert, or aria-describedby wiring on the field) in addition to being shown visually"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.7"
+name = "interactive_within_two_seconds"
+description = "On a local cold load, the app renders and is interactive (a pin or chrome control responds) within 2 seconds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "console_clean_during_full_exercise"
+description = "No console errors or warnings appear during a full exercise of the app — panning, zooming, filtering, creating, editing, deleting, and stepping through details"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "stage_and_library_stay_smooth"
+description = "Panning and scrubbing the stage stay smooth with no visible hitching while the pins reposition, and scrolling the Library list fast stays smooth through the full seeded corpus"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "outbound_network_requests_present"
+description = "After load and during use, the network log shows requests to non-local origins — CDN scripts, remote fonts or icons, analytics, or any other outbound request"
 type = "binary"
 weight = 1.0
 negate = true

@@ -159,6 +159,14 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "2.14"
+name = "outbound_navigation_leaves_app"
+description = "Activating any control during a full exercise of the app navigates the browser away from / — to another route, another origin, or an external page — instead of acting through in-app state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical defect — console health, state coherence, persistence, accessibility, or performance — that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, console output, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

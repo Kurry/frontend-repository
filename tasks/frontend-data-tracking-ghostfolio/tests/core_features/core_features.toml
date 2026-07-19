@@ -69,8 +69,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
-description = "On load, the holdings table lists at least four seeded holdings, each row showing name, symbol, asset class, quantity, and market value."
+name = "seeded_holdings_span_four_classes"
+description = "On load, the holdings table lists at least four seeded holdings spanning the classes Equity, ETF, Cash, and Crypto, each row showing name, symbol, asset class, quantity, and market value."
 type = "binary"
 weight = 1.0
 
@@ -132,29 +132,15 @@ weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
-description = "After adding a holding and reloading the page, the same holdings and the updated net-worth total reappear from client storage with no login step."
+name = "reload_restores_persisted_holdings"
+description = "After adding a holding and reloading the page, the same holdings, the updated net-worth total, and the newly added row all reappear from client storage with no login step."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
-description = "After filtering to one class, adding a holding in a different class, then returning to All classes, both the prior and the new holdings are identifiable with no duplicates."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.13"
-name = "1_13"
-description = "When adding a holding using only the keyboard, focus stays visible on the form controls and the form submits on Enter."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.14"
-name = "1_14"
-description = "At 375 by 667 pixels the summary, allocation, and holdings reflow to a single column with no clipped text, no overlapping controls, and no horizontal page scrolling."
+name = "cross_class_add_filter_roundtrip"
+description = "After filtering to one class, adding a holding in a different class, then returning to All classes, both the prior and the new holdings are identifiable exactly once each with no duplicates, and the net-worth total, meta line, and allocation percentages recompute over the full set."
 type = "binary"
 weight = 1.0
 

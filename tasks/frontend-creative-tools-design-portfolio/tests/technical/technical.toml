@@ -103,6 +103,27 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "2.10"
+name = "keyboard_operability_and_focus"
+description = "The command input, autocomplete rows (arrow keys move the highlight, Tab or Enter completes), board cards and filters, banner buttons, titlebar dots, and overlay CTAs are all reachable and operable with the keyboard alone with a visible focus indicator, and the exit overlay keeps focus within it while open and can be dismissed from the keyboard"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "live_region_and_decorative_canvases"
+description = "Form and command validation messages are exposed to assistive technology through a polite live region as well as visually, while the matrix-rain and confetti canvases are hidden from the accessibility tree and leave keyboard focus and the command input unblocked"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.12"
+name = "load_and_rapid_input_performance"
+description = "The app is interactive within 2 seconds of a local cold load with boot starting promptly, rapid repeated command entry stays responsive with no hangs or dropped keystrokes, and the matrix-rain canvas animates while the command input remains responsive with /clear or dismissal stopping its work"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "2.3"
 name = "forbidden_browser_storage"
 description = "Project, command, theme, mode, filter, output, autocomplete, or consent data appears in localStorage, sessionStorage, IndexedDB, or another persistent browser storage surface after exercise"

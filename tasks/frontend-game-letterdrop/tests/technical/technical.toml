@@ -62,42 +62,42 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "2.1"
-name = "2_1"
+name = "best_score_survives_reload"
 description = "After a completed run, a full page refresh restores the exact Best Score from localStorage."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
-name = "2_2"
+name = "match_history_survives_reload"
 description = "After a completed run, a full page refresh restores the exact Match History rows (score, tiles-cleared, duration) in the same order."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
-name = "2_3"
+name = "achievements_survive_reload"
 description = "After unlocking an achievement, a full page refresh keeps that achievement unlocked and still-locked ones locked."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.4"
-name = "2_4"
+name = "rapid_repetition_robustness"
 description = "The main run withstands at least 25 rapid deterministic repetitions through the normal controls with an exact final visible state and no blank screen, uncaught error, or sustained freeze."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.5"
-name = "2_5"
+name = "stale_input_and_illegal_action_rejection"
 description = "Stale input from a paused or ended phase does not mutate the current run, and illegal actions are rejected with specific visible feedback."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.6"
-name = "2_6"
+name = "branching_history_state_region"
 description = "Undo, Redo and a visible History state region let an undo-then-different-edit create a selectable branch, and restoring a branch restores the exact prior visible state."
 type = "binary"
 weight = 1.0
@@ -189,6 +189,13 @@ negate = true
 id = "2.18"
 name = "cross_view_state_coherence"
 description = "A change made in one surface (score, streak, Best Score, history, achievements, saved settings) is immediately reflected in every other surface showing that datum, without a reload and with no view left showing a stale value."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.19"
+name = "saved_settings_survive_reload"
+description = "After saving a player name and starting tier in the settings form, a full page refresh restores the saved settings: reopening the form shows the saved name and tier, and a new run still starts at the chosen tier."
 type = "binary"
 weight = 1.0
 

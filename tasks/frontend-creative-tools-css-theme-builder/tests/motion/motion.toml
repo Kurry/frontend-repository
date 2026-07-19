@@ -106,6 +106,27 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "4.7"
+name = "remove_row_animates_out"
+description = "Removing a custom theme through its real Remove control animates the row out of the My themes list rather than the list snapping instantly to its new arrangement"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "export_modal_enter_exit_transition"
+description = "Opening the CSS-export modal through its real control and dismissing it each show a brief opacity/scale transition rather than the dialog appearing and disappearing in a single frame"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.9"
+name = "reduced_motion_flows_completable"
+description = "With prefers-reduced-motion enabled on a fresh load, animations are removed or reduced to instant state changes while every flow—including hold-to-add, Random, export, and remove—remains completable through the same controls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "4.catchall"
 name = "motion_catchall"
 description = "The app exhibits a significant, browser-observable defect in motion or microinteraction quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence (real control path, animated element, timing, or resulting state) that demonstrates it. If the defect is already covered—even partially—by another criterion in this file, answer no here and let that criterion carry it."

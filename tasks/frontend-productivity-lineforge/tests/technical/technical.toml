@@ -140,6 +140,13 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "ti-13"
+name = "cross_view_state_coherence"
+description = "A change made in one surface is immediately reflected in every other surface showing that datum without a reload: starring an opening updates both the library star and the Favorites Only filter, and saving a line updates both the header saved-line count and the My Saved Lines list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "ti-neg-1"
 name = "hidden_ground_truth_exposed"
 description = "A hidden element, attribute, or window global not mandated by the PRD exposes internal ground-truth state (the expected practice move, computed answers) a real user could not reach through visible interaction"
@@ -183,6 +190,14 @@ negate = true
 id = "ti-neg-6"
 name = "session_only_state_persists"
 description = "After a full page refresh, the session-only Your Line deviation branch, the practice streak or accuracy, or a notable-game replay position is still present instead of having been reset"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "ti-neg-7"
+name = "outbound_requests_or_navigation"
+description = "The running app issues outbound network requests to external origins (CDN scripts, fonts, icons, or APIs), or activating app chrome navigates the browser away from the app's origin"
 type = "binary"
 weight = 1.0
 negate = true

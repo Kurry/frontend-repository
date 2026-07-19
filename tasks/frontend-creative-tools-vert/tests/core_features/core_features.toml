@@ -62,175 +62,105 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
+name = "workspace_renders_on_load"
 description = "On load, the converter workspace opens directly with no login or splash: a centered pill navbar (VERT, Upload, Convert, Settings, About, theme toggle), the hero headline \"The file converter you'll love.\", a drop zone titled \"Drop or click to convert\", the conversion queue, and the \"VERT supports...\" catalog are all visible."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
+name = "empty_queue_initial_state"
 description = "On load, the conversion queue shows the empty state \"Your conversion queue is empty\" with guidance that a local file is needed and the counts line \"0 files queued\", and shows no progress bar, checkmark, or enabled Download control."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
+name = "catalog_four_category_cards"
 description = "On load, the \"VERT supports...\" section renders four category cards (Images, Audio, Documents, Video); the Images card lists real image extensions including .png, .jpeg, .webp, and .svg, and the Video card reads \"Server supported\" while the others read \"Local supported\"."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
+name = "dropzone_keyboard_activation"
 description = "When the drop zone is focused with the keyboard and Enter or Space is pressed, the native file picker opens, matching the behavior of clicking the drop zone, and the focused drop zone shows a visible focus ring."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
-description = "After clicking \"Add sample png\", a file row appears in the queue showing the filename, a \".png\" source format, a \"Convert to\" selector, the input size, and a Ready status, and the counts line updates to include 1 queued and 1 ready."
+name = "sample_png_adds_queue_row"
+description = "After clicking \"Add sample png\", a file row appears in the queue showing the filename, a \".png\" source format, a \"Convert to\" selector defaulting to a sensible target, the input size, and a Ready status, and the counts line updates to include 1 queued and 1 ready."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
-description = "After adding a sample file and clicking Convert, the row moves to a Done status showing a green check and a converted output size, the counts line updates to \"1 queued, 0 ready, 1 done\", and the row's Download control becomes enabled."
+name = "add_convert_download_chain"
+description = "Starting from the empty queue, clicking \"Add sample png\" makes the empty-state message disappear and the counts line leave \"0 files queued\"; clicking Convert then moves that row through Converting to Done with a converted output size shown, updates the counts line to \"1 queued, 0 ready, 1 done\", and enables that row's Download control — all without a page reload."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
-description = "After a file reaches Done, changing its \"Convert to\" selector to a different target returns the row to a Ready status so it can be reconverted, and clearing that row's prior result."
+name = "retarget_done_row_resets_ready"
+description = "After a file reaches Done, changing its \"Convert to\" selector to a different target returns the row to a Ready status, disables its Download control, and updates the counts line; running Convert again completes it to Done with an output size shown for the new target."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
-description = "After adding a sample png with target jpeg and converting it, then adding another sample png with target webp and converting it, the two completed rows show different output sizes, confirming the conversion is real rather than a constant hardcoded result."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.9"
-name = "1_9"
-description = "After clicking a queued file row it becomes the selected row with a visible inset ring, and clicking its Remove control drops the row from the queue and decrements the counts line."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.10"
-name = "1_10"
-description = "When window.webmcp_invoke_tool('entity_create', {sample:'png'}) then window.webmcp_invoke_tool('artifact_convert', {}) are called, the visible queue gains a file row that reaches a Done status, matching what the UI Convert control produces."
+name = "dual_target_outputs_differ"
+description = "After converting the same source file twice, once to webp and once to jpeg, the two completed rows show different output sizes (confirming the conversion is real rather than a constant hardcoded result), and each row's Download saves a file whose extension matches its selected target."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
-description = "After opening Settings and changing the Output quality control, then reloading the page, the Settings view still shows the changed quality value and the theme choice, confirming these persist in client storage."
+name = "multi_surface_persistence_chain"
+description = "After selecting a catalog category, switching the theme, and changing the Settings quality value, reloading the page restores the active category, the theme, and the quality value, while the conversion queue returns to a single empty state with \"0 files queued\" and no phantom row, progress, or download success."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
+name = "fresh_reload_single_empty_queue"
 description = "After reloading the app before adding any file, exactly one empty conversion queue with the empty-state message is shown and no phantom file row or false Done state appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "1_13"
+name = "theme_toggle_switches_surface"
 description = "When the theme toggle in the navbar is activated, the whole surface switches between light and dark and every text-on-surface pairing remains legible; toggling again returns to the original theme."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.14"
-name = "1_14"
-description = "When the viewport is resized to 375 by 667 pixels, the hero stacks, the catalog collapses to one column, and the drop zone, queue controls, and format selectors remain operable with no horizontal page scrolling."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.15"
-name = "1_15"
-description = "On load the converter workspace opens directly (no login or splash) with the pill navbar (VERT, Upload, Convert, Settings, About, theme toggle), the hero headline \"The file converter you'll love.\", the \"Drop or click to convert\" drop zone, the conversion queue, and the \"VERT supports...\" catalog all visible."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.16"
-name = "1_16"
-description = "On load the conversion queue shows the empty state \"Your conversion queue is empty\" with guidance that a local file is needed and the counts line \"0 files queued\", with no progress bar, checkmark, or enabled Download control."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.17"
-name = "1_17"
-description = "On load the \"VERT supports...\" section renders four category cards (Images, Audio, Documents, Video); the Images card lists real extensions including .png, .jpeg, .webp and .svg, and the Video card reads \"Server supported\" while the others read \"Local supported\"."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.18"
-name = "1_18"
-description = "When the drop zone is focused and Enter or Space is pressed the local file picker opens, matching a click on the drop zone, and the focused drop zone shows a visible focus ring."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.19"
-name = "1_19"
-description = "After clicking \"Add sample png\" a file row appears showing the filename, a .png source format, a \"Convert to\" selector, the input size, and a Ready status, and the counts line updates to 1 queued and 1 ready."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.20"
-name = "1_20"
-description = "After adding a sample file and clicking Convert the row reaches a Done status with a green check and a converted output size, the counts line reads \"1 queued, 0 ready, 1 done\", and the Download control becomes enabled."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.21"
-name = "1_21"
-description = "After a file reaches Done, changing its \"Convert to\" selector to a different target returns the row to a Ready status so it can be reconverted and clears the prior result."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.22"
-name = "1_22"
+name = "download_saves_correct_extension"
 description = "Clicking a completed row's Download saves a real converted file to disk with the correct target extension; the Download control stays disabled until that row is Done."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.23"
-name = "1_23"
-description = "A file whose format cannot be decoded is added with an Unsupported status and a plain-language reason, and is never shown a Done or download-ready state."
+name = "undecodable_file_marked_unsupported"
+description = "A file whose format cannot be decoded is added with an Unsupported status and a plain-language reason, and is never shown a Done or download-ready state; its Download control never enables."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.24"
-name = "1_24"
+name = "row_select_remove_and_clear"
 description = "After clicking a queued row it becomes the selected row with a visible inset ring, and clicking its Remove control drops the row from the queue and decrements the counts line; Clear queue empties the whole queue."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.25"
-name = "1_25"
+name = "active_category_marked_and_persists"
 description = "Selecting a \"VERT supports...\" category card marks it active (accent ring, aria-pressed) and the active category is remembered after a reload."
 type = "binary"
 weight = 0.5
@@ -238,33 +168,90 @@ optional = true
 
 [[criterion]]
 id = "1.26"
-name = "1_26"
-description = "Settings exposes an Output quality control (1 to 100) that changes jpeg and webp output bytes, a keep-metadata toggle, and a light/dark theme choice; About and Privacy explain conversion is local and remain reachable with no file selected."
+name = "settings_and_about_content"
+description = "Settings exposes an Output quality control (1 to 100) that changes jpeg and webp output bytes, a keep-metadata toggle, and a light/dark theme choice; About and Privacy explain conversion is local and files are never uploaded, and remain reachable with no file selected."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.27"
-name = "1_27"
+name = "multi_file_independent_targets"
 description = "Adding multiple files and converting processes each to its own selected target, moving each row independently through Converting to Done and keeping the counts line consistent with the rows."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.28"
-name = "1_28"
-description = "At 375 by 667 pixels the hero stacks, the catalog collapses to one column, and the drop zone, queue controls, and format selectors remain operable with no horizontal page scrolling."
+id = "1.29"
+name = "false_success_shown"
+description = "The app presents a conversion success (Done, checkmark, output size, or enabled Download) for a file that has not actually been converted, or the empty queue displays a file row or progress while no file has been added."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.30"
+name = "route_urls_share_chrome_and_theme"
+description = "Navigating to Convert, Settings, or About by entering its URL directly renders the same view as reaching it through the navbar, with the shared pill navbar and the current theme intact on every route."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "dropzone_helper_names_inputs"
+description = "Before any file is chosen, the drop zone's helper text names the supported local input formats (png, jpg, jpeg, webp, gif, bmp, and svg)."
 type = "binary"
 weight = 0.5
 optional = true
 
 [[criterion]]
-id = "1.29"
-name = "1_29"
-description = "The app must not present a conversion success (Done, checkmark, output size, or enabled Download) for a file that has not actually been converted, and the empty queue must not display any file row or progress while no file has been added."
+id = "1.32"
+name = "sample_svg_adds_and_converts"
+description = "Clicking \"Add sample svg\" adds a queue row with an .svg source format without opening the local file picker, and running Convert transcodes it to its selected raster target, reaching Done with an output size shown."
 type = "binary"
 weight = 1.0
-negate = true
+
+[[criterion]]
+id = "1.33"
+name = "cancel_stops_in_progress_run"
+description = "Activating Cancel during an in-progress conversion run stops the run: no row left mid-run shows Done, and the counts line matches the rows actually completed."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "double_convert_runs_each_file_once"
+description = "With ready files queued, activating Convert twice in quick succession converts each ready file exactly once: the done count increases only by the number of ready rows and no duplicate rows are created."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "long_filename_truncates_cleanly"
+description = "A queued file with a long filename is truncated with an ellipsis in its queue row without breaking the row layout, and its download still uses the full name with the correct extension."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "1.36"
+name = "quality_setting_affects_output_size"
+description = "After lowering the output quality in Settings, reconverting the same file to jpeg yields a smaller output size on the completed row than the same conversion at quality 100, showing the setting flows into the conversion result."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "remove_last_file_restores_empty_state"
+description = "Removing the only queued file restores the explicit empty state and the \"0 files queued\" counts line, and adding a file again works immediately from that state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "quality_field_inline_validation"
+description = "Entering an output-quality value outside 1 to 100 in Settings shows an inline validation message naming the quality field before submit, and the invalid value is never applied to conversions."
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "1.catchall"

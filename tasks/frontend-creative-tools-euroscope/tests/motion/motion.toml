@@ -126,6 +126,13 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "4.12"
+name = "live_recolour_without_reload"
+description = "Editing a swatch or changing the icon set recolours the live colour Preview and the bitmap tiles immediately, with no page reload and no perceptible delay"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "4.5"
 name = "4_5"
 description = "Interactive controls show no hover or focus feedback, so buttons and rows read as static under pointer and keyboard interaction"

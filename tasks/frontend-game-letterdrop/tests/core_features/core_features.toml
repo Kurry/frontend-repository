@@ -62,105 +62,105 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
+name = "initial_load_shell"
 description = "On load, the app opens at / with the title LetterDrop, view tabs Game, History and Achievements, a HUD showing Best Score, and a canvas board reading \"Press Start game to begin!\" with no login or backend."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
-description = "When Start game is pressed, letter tiles spawn at the top of the canvas board and fall downward through the columns at a steady rate, and more tiles keep spawning on a repeating interval."
+name = "tiles_spawn_and_fall_six_columns"
+description = "When Start game is pressed, letter tiles spawn at the top of the canvas board and fall downward through six columns at a steady rate, and more tiles keep spawning on a repeating interval so the board fills over time."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
+name = "tile_tap_builds_tray"
 description = "After tapping two or more falling tiles, each tapped letter appears in the current-word tray beneath the board, and tapping an already selected tile removes it from the tray."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
+name = "valid_word_clears_and_scores"
 description = "When Submit Word is pressed on tiles that spell a bundled-dictionary word, those tiles clear from the board, the score increases by an amount scaled to word length, and a transient confirmation such as +30 for \"CAT\"! appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
+name = "invalid_word_feedback_and_streak_reset"
 description = "When Submit Word is pressed on letters that are not a dictionary word, the word tray shakes and an inline Not a word style message appears instead of a silent rejection, and the streak resets to zero."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
+name = "board_cleared_bonus_multiplier"
 description = "After clearing every tile on the board through valid submissions, a Board Cleared! confirmation appears and the next scored word receives the bonus multiplier."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
+name = "danger_line_game_over"
 description = "When an uncleared tile falls across the visible danger line, the run ends and a Game Over screen shows the final score with a Play again control."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
+name = "streak_meter_thresholds"
 description = "After several consecutive valid submissions, a visible streak meter grows and reaching thresholds of 3, 5 and 8 shows a temporary score-multiplier badge next to the score."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
+name = "bomb_and_slow_power_tiles"
 description = "When a submitted word includes a Bomb tile its whole column clears and a \"Bomb! Column cleared\" toast appears; when it includes a Slow tile the fall speed drops for a few seconds and a named Slow toast appears."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
+name = "undo_last_tile_removes_recent"
 description = "When Undo Last Tile is pressed, the most recently tapped tile is removed from the current-word tray without submitting the word."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
+name = "pause_resume_freezes_state"
 description = "When Pause is pressed the tiles and timer freeze and the board dims with a Paused overlay; when Resume is pressed play continues from the exact same state."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
+name = "history_list_and_empty_state"
 description = "After finishing a run, the History tab lists that run most-recent-first with its score, tiles-cleared count and duration, and before any run finishes History shows a friendly empty-state message."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "1_13"
+name = "achievements_locked_unlocked_states"
 description = "On the Achievements tab, locked achievements appear muted or grayscale and named achievements such as Clean Sweep, Marathon and Combo Master turn to full color once their milestone is met, with a transient unlock confirmation."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.14"
-name = "1_14"
+name = "reload_restores_persisted_state"
 description = "After a completed run, a full page refresh restores the exact Best Score, Match History rows, and unlocked achievements from localStorage, and never-created runs are not fabricated."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.15"
-name = "1_15"
+name = "branching_history_undo_redo"
 description = "During an active run, using Apply Scenario Change adds a transition to the History state region; pressing Undo then applying a different change creates a selectable branch, and restoring a branch restores the exact prior visible board state."
 type = "binary"
 weight = 1.0
@@ -274,6 +274,13 @@ description = "Clicks on the board after Game Over, or tile taps issued while pa
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "1.43"
+name = "common_short_words_accepted"
+description = "The bundled word list accepts everyday short words: submitting a tray spelling a common three-letter word such as CAT, DOG, or SUN is scored as valid rather than rejected."
+type = "binary"
+weight = 0.5
 
 [[criterion]]
 id = "1.catchall"

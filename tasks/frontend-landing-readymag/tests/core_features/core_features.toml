@@ -119,7 +119,7 @@ weight = 1.0
 [[criterion]]
 id = "1.10"
 name = "footer_groups_copyright_email"
-description = "The footer is a dark multi-column layout with four link groups carrying the exact labels — company (about, careers, reviews, terms of service, privacy policy, cookie policy), product (pricing, templates, product updates, affiliate program, referral program, npo discount), resources (examples, design almanac, design stories, help, forum, status, blog), solutions (portfolios, presentations, editorials, companies, freelancers, students) — ending with \"© 2026 Canvasly Inc.\" and \"support@canvasly.example\""
+description = "The footer is a dark multi-column layout with four link groups carrying the exact labels — company (about, careers, reviews, terms of service, privacy policy, cookie policy), product (pricing, templates, product updates, affiliate program, referral program, npo discount), resources (examples, design almanac, design stories, help, forum, status, blog), solutions (portfolios, presentations, editorials, companies, freelancers, students) — ending with \"© 2026 Canvasly Studio\" and \"support@canvasly.example\""
 type = "binary"
 weight = 1.0
 
@@ -133,7 +133,7 @@ weight = 1.0
 [[criterion]]
 id = "1.13"
 name = "reduced_motion_resting_state"
-description = "When prefers-reduced-motion is enabled, path travel, tilt, and reveal animation stop while every section remains visible in its final resting position"
+description = "When prefers-reduced-motion is enabled, path travel, tilt, and reveal animation stop while every section remains visible in its final resting position, and the custom cursor is disabled so the system cursor is restored"
 type = "binary"
 weight = 1.0
 

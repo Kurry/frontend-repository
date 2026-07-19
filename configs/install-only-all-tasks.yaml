@@ -1,0 +1,48 @@
+# Install-only sweep over every task under tasks/ (no slug enumeration).
+# Discovers each immediate child that has a task.toml (~89 tasks); skips
+# non-task files like tasks/_pins.py. Runs agent setup for each of:
+# claude-code, codex, kimi-cli, mini-swe-agent.
+#
+# Usage (from frontend-repository root):
+#   harbor run -y -c configs/install-only-all-tasks.yaml
+#
+# Equivalent CLI-only form (if you omit install_only in the YAML):
+#   harbor run -y -c configs/install-only-all-tasks.yaml --install-only
+#
+# Host env expectations (per agent):
+#   claude-code: CLAUDE_CODE_OAUTH_TOKEN (Claude subscription)
+#   codex:       ~/.codex/auth.json from `codex login` (CODEX_FORCE_AUTH_JSON)
+#   kimi-cli:    KIMI_API_KEY
+#   mini-swe-agent: ANTHROPIC_API_KEY (or whatever the model_name provider needs)
+jobs_dir: jobs
+n_attempts: 1
+n_concurrent_trials: 50
+install_only: true
+
+environment:
+  type: docker
+  delete: true
+
+agents:
+  - name: claude-code
+    model_name: anthropic/claude-sonnet-5
+    env:
+      CLAUDE_FORCE_OAUTH: "1"
+
+  - name: codex
+    model_name: openai/gpt-5-codex
+    env:
+      CODEX_FORCE_AUTH_JSON: "1"
+
+  - name: kimi-cli
+    model_name: kimi/k3
+    env:
+      KIMI_API_KEY: ${KIMI_API_KEY}
+    extra_allowed_hosts:
+      - api.kimi.com
+
+  - name: mini-swe-agent
+    model_name: anthropic/claude-sonnet-5
+
+datasets:
+  - path: ./tasks

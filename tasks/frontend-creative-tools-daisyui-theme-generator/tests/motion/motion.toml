@@ -114,6 +114,13 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "4.8"
+name = "remove_row_exit_motion"
+description = "Removing a custom theme through its real Remove control animates the row out of the My themes list rather than snapping it away instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "4.catchall"
 name = "motion_catchall"
 description = "The app exhibits a significant, browser-observable defect in motion or microinteraction quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence (real control path, animated element, timing, or resulting state) that demonstrates it. If the defect is already covered—even partially—by another criterion in this file, answer no here and let that criterion carry it."

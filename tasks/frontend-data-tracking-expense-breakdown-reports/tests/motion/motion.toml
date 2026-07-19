@@ -62,14 +62,14 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
-description = "Required hover animations are present; chart tab and toast motion behave as specified"
+name = "hover_washes_and_pointer_cursors"
+description = "Hovering (with the real pointer) sidebar/nav items and action controls shows a pointer cursor and a hover wash, transaction rows take a light mint wash on hover, and chart sectors keep a pointer cursor"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "4_2"
+name = "mode_switch_keeps_page_alive"
 description = "Chart/list mode switches update without full reload and keep hover feedback"
 type = "binary"
 weight = 0.5
@@ -77,8 +77,51 @@ optional = true
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
+name = "static_chrome_missing_hover_feedback"
 description = "Omits hover washes on rows or nav so the reports chrome feels static on pointer hover"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.4"
+name = "chart_tab_pill_toggle_swaps_in_place"
+description = "Clicking the Breakdown / Trends pill toggle (via the real UI control) swaps the chart panels in place without a page reload, and the active pill gains visibly stronger weight"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "row_create_and_delete_animate"
+description = "When a transaction is created or deleted through the real UI controls (not a state shortcut), the new row animates into the table and the deleted row animates out rather than snapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "bulk_delete_rows_animate_out"
+description = "Bulk deleting several selected rows through the real UI control animates each removed row out rather than snapping the list to its new state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "toast_enter_hold_exit_cycle"
+description = "A demo toast enters from below with a short ease, holds briefly (roughly 1.5s), then exits; toasts fire both on chart-tab switches and on clicking inert chrome actions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "pie_slice_hover_tooltip_and_lift"
+description = "Hovering a Trends pie slice with the real pointer reveals a tooltip showing that category's amount and percentage, and the hovered slice may lift or offset slightly"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.9"
+name = "list_changes_snap_without_transition"
+description = "Row insertions, deletions, or bulk removals snap instantly with no transition, or the toast appears and disappears abruptly with no enter/exit motion"
 type = "binary"
 weight = 1.0
 negate = true

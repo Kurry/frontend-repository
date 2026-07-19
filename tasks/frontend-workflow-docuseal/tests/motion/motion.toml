@@ -62,28 +62,28 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
+name = "hover_wash_and_press_down"
 description = "Buttons, template rows, submitter rows, and palette buttons ease a hover wash on hover and show a slight press-down on click"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "4_2"
+name = "focus_ring_distinct_from_hover"
 description = "Interactive controls show a visible keyboard focus ring on focus that is distinct from their hover treatment"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
+name = "canvas_updates_in_place_no_reload"
 description = "Placing, selecting, reassigning, and deleting a field update the document canvas in place without a full page reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "4_4"
+name = "selection_ring_and_submitter_hover_halo"
 description = "Selecting a field applies a selection ring and reveals its handle, and hovering a field box shows a soft colour halo in the field's submitter colour"
 type = "binary"
 weight = 0.5
@@ -91,7 +91,7 @@ optional = true
 
 [[criterion]]
 id = "4.5"
-name = "4_5"
+name = "toast_fades_in_and_out"
 description = "Action feedback appears in a short-lived toast that fades in and out and is exposed as an aria-live status region"
 type = "binary"
 weight = 0.5

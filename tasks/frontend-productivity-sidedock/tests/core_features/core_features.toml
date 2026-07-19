@@ -159,128 +159,37 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.15"
-name = "1_15"
-description = "On load with empty storage, the app shows the Welcome to SideDock empty state with a Create workspace button and no workspace tabs"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.16"
-name = "1_16"
-description = "Creating a workspace adds a color-coded tab, makes it active, and shows its empty folder tree with the Add bookmark form below"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.17"
-name = "1_17"
-description = "Adding a bookmark with only a URL derives its title from the URL, and adding a second with an explicit title uses that title verbatim"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.18"
-name = "1_18"
-description = "Creating a folder, a subfolder, and a further subfolder renders a three-level nested structure with each folder indented under its parent"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.19"
-name = "1_19"
-description = "Inline renaming a bookmark title and pressing Enter saves the new value, and pressing Escape on another inline rename leaves that title unchanged"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.20"
-name = "1_20"
-description = "Pinning a bookmark places it in the Pinned row above the tree, and unpinning from its tile removes it from the row while it remains in its folder"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.21"
-name = "1_21"
-description = "Confirming deletion of a folder that contains a bookmark removes both the folder and the bookmark it contained from the tree"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.22"
-name = "1_22"
-description = "Creating a workspace, folder, bookmark with a note, and a pin, then performing a full page reload restores all of them exactly as created"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.23"
-name = "1_23"
-description = "Typing a query filters bookmarks to matches, toggling scope to all workspaces surfaces a match from another workspace, and a no-match query shows a no results message"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.24"
-name = "1_24"
-description = "Toggling Show sidebar view constrains the content column to a narrow fixed width with no horizontal scrolling, and toggling back restores the full view"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.25"
-name = "1_25"
-description = "Activating Load 10,000 items makes the Virtualized items region report 10000 total while the Rendered item count region stays far below 10,000"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.26"
-name = "1_26"
-description = "With 10,000 items loaded, a selected item that scrolls out of the rendered window and back remains selected after a filter is applied and cleared"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.27"
-name = "1_27"
-description = "Importing a Netscape-format bookmarks HTML file appends its folder structure and links into the active workspace's tree"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.28"
-name = "1_28"
-description = "Exporting the active workspace runs without error and, together with add, import, and delete, produces a transient toast confirmation"
+name = "export_active_and_all_workspaces_download"
+description = "Activating Export bookmarks downloads the active workspace as a Netscape-format bookmarks HTML file, activating Export all downloads every workspace, and each export shows a confirmation toast"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.29"
-name = "1_29"
-description = "Submitting the Add bookmark form with an empty URL is rejected with a visible message and adds no bookmark"
+name = "empty_url_rejected_with_named_message"
+description = "Submitting the Add bookmark form with an empty URL is rejected with the visible message Enter a URL to add a bookmark plus a warning toast, and no bookmark row is created"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.30"
-name = "1_30"
-description = "Submitting a URL that already exists at the same location is idempotent, surfacing a message and creating no duplicate row"
+name = "duplicate_bookmark_idempotent"
+description = "Submitting a bookmark whose URL already exists at the same location creates no duplicate row, surfaces the message Bookmark already exists at this location, and leaves the existing bookmark unchanged"
 type = "binary"
 weight = 0.5
 optional = true
 
 [[criterion]]
 id = "1.31"
-name = "1_31"
-description = "Repeating the Add bookmark action 25 times through the form yields an exact final count with controls staying responsive and no blank screen or freeze"
+name = "rapid_add_burst_exact_count"
+description = "Repeating the Add bookmark action 25 times through the normal form controls yields an exact final visible count with controls staying responsive and no blank screen, uncaught error, or sustained freeze"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.32"
-name = "1_32"
+name = "invalid_url_still_adds_row"
 description = "Submitting the Add bookmark form with a blank or clearly invalid URL still adds a bookmark row to the tree"
 type = "binary"
 weight = 1.0
@@ -288,11 +197,109 @@ negate = true
 
 [[criterion]]
 id = "1.33"
-name = "1_33"
+name = "folder_delete_orphans_contained_bookmarks"
 description = "Deleting a folder leaves the bookmarks it contained still visible in the tree instead of removing them with the folder"
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "1.34"
+name = "accent_color_picker_applies_immediately"
+description = "The color swatch picker on a workspace tab offers nine preset colors, and picking a different swatch immediately recolors that tab and the workspace header bar to the chosen color without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "invalid_url_inline_error_clears_on_fix"
+description = "Typing a URL value that is not a valid web address shows the inline message Enter a complete web address, such as https://example.com directly under the Bookmark URL field while still in the form, and correcting the value clears the message without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "monogram_deterministic_per_domain"
+description = "Two bookmarks added for the same domain render monogram squares with the identical background color and the same first letter of the domain, while a bookmark for a different domain renders a monogram derived from that other domain, with no network request for icon generation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "note_preview_renders_under_title"
+description = "After editing and saving a multi-line note inline on a bookmark, a preview snippet of that note renders under the bookmark title"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "drag_moves_item_into_and_out_of_folder"
+description = "Dragging a bookmark onto a folder moves it inside that folder, and dragging it back out to the workspace root returns it to the root level of the tree"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "pin_limit_of_eight_enforced"
+description = "With eight bookmarks pinned, attempting to pin a ninth is prevented, the pin control communicates the eight-item limit, and no ninth tile appears in the Pinned row"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "cancel_delete_keeps_item_unchanged"
+description = "Opening a Delete confirmation and canceling it leaves the folder or bookmark in place with its title, position, and contents unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "malformed_import_handled_gracefully"
+description = "Importing a malformed or unexpected Netscape-format file appends whatever valid entries can be parsed and the app keeps working with no blank screen or uncaught error"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "flow_add_bookmark_search_reload_roundtrip"
+description = "Starting from a workspace with a known bookmark count: submit the Add bookmark form with a valid URL and confirm the list gains exactly one row measured immediately around the submit, search for the new bookmark's title and confirm it appears in results, then perform a full page reload and confirm the same workspace, folder placement, and bookmark with the same title and URL are restored"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "flow_search_scope_toggle_cross_workspace"
+description = "After creating a second workspace and adding a bookmark to it, with the first workspace active: switching search scope to all workspaces shows that bookmark in the results, and switching scope back to the current workspace removes it from the results without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "flow_pin_rename_syncs_and_survives_reload"
+description = "Pinning a bookmark adds its tile to the Pinned row while the bookmark stays visible in its folder, renaming that bookmark inline updates both the folder row and the pinned tile to the new title without a reload, and after a full page reload the Pinned row still shows the renamed tile"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "flow_folder_delete_search_and_reload_no_revival"
+description = "Deleting a folder through its Delete control and confirmation removes the folder and every bookmark it contained from the tree, a search for a contained bookmark's title then returns no match, and a full page reload does not revive the deleted folder or its bookmarks"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "flow_updown_reorder_persists_reload"
+description = "Reordering a bookmark with the up and down controls changes its rendered position immediately, and a full page reload shows the list in the same reordered sequence"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "flow_sidebar_view_survives_reload"
+description = "Toggling Show sidebar view narrows the content column to the fixed 375px width without horizontal scrolling, and after a full page reload the app reopens still in sidebar view with the same active workspace"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "1.catchall"

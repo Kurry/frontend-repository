@@ -173,16 +173,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.17"
-name = "1_17"
-description = "Starting the Live timer increases the elapsed display about once per second, and clicking Stop timer saves a new entry whose duration reflects the elapsed time rather than zero or a fixed placeholder"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.18"
-name = "1_18"
-description = "Starting a new timer while one is already running automatically stops and saves the previous activity as a completed entry with a nonzero duration and leaves only the new timer live"
+name = "timer_switch_autosaves_with_toast"
+description = "Starting a new timer while one is already running automatically stops and saves the previous activity as a completed entry with a nonzero duration, shows a toast noting the switch, and leaves only the new timer live"
 type = "binary"
 weight = 1.0
 
@@ -197,20 +190,6 @@ weight = 1.0
 id = "1.20"
 name = "1_20"
 description = "Every entry shows exactly one category as a visually distinct colored chip everywhere it appears, and the category selector is required and defaults to a valid Meaningful, Neutral, or Draining value"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.21"
-name = "1_21"
-description = "A custom tag created in the tag manager can be assigned to an entry and is then visible on or beside that entry"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.22"
-name = "1_22"
-description = "The category filter buttons narrow the timeline and list to the chosen category, and the search input narrows the list by activity name or tag with an explicit no-results message when nothing matches"
 type = "binary"
 weight = 1.0
 
@@ -232,13 +211,6 @@ weight = 1.0
 id = "1.25"
 name = "1_25"
 description = "The history panel exposes Undo, Redo, a region labelled History state, a snapshot list, and an Apply scenario change action, and Undo and Redo restore the exact adjacent visible states while an invalid Undo or Redo control is disabled"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.26"
-name = "1_26"
-description = "Undoing one or more steps and then making a different change through the real controls creates a selectable alternate branch, and selecting that branch restores its exact prior visible state"
 type = "binary"
 weight = 1.0
 
@@ -281,6 +253,69 @@ description = "A success signal such as a toast, a saved entry, or an updated ra
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "1.32"
+name = "manual_form_inline_validation_blocks_submit"
+description = "Submitting the manual form with an empty name or a zero, negative, or non-numeric duration is rejected: an inline message appears beside the specific offending field naming what is wrong, the submit control stays disabled while a required field is invalid, and no entry is added"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "double_submit_creates_single_entry"
+description = "Double-activating the manual form's submit control in quick succession creates exactly one entry: the All entries list count increases by exactly one and exactly one new row appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "weekly_segment_hover_tooltip"
+description = "Hovering a bar segment in the Weekly overview surfaces a tooltip identifying that segment's day, category, and minutes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "last_delete_restores_empty_states"
+description = "Deleting the last remaining entry returns the timeline and the All entries list to their friendly empty states and the Today's minutes stat to zero"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "timer_round_trip_multi_surface"
+description = "Timer round trip: starting the Live timer with a name and a Meaningful category, letting it run several seconds, and clicking Stop timer adds exactly one row to the All entries list and exactly one block to the Today's timeline (counts measured immediately before and after), increases the Today's minutes stat by the elapsed amount, recalculates the Meaningful ratio, and grows a matching Meaningful segment on today's bar in the Weekly overview — all without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "manual_add_updates_all_surfaces"
+description = "Manual add echo: submitting the Add entry manually form with a valid name, category, start time, and duration adds exactly one row to the All entries list, renders a proportional block in the Today's timeline, and updates the Meaningful ratio, Today's minutes, and today's Weekly overview bar in the same interaction; selecting that entry's category filter afterwards still shows the new entry"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "edit_category_change_propagates"
+description = "Edit propagation: changing an entry's category from Draining to Meaningful in the edit dialog and saving updates that entry's chip color in both the timeline and the list, moves the corresponding minutes between segments on today's chart bar, and shifts the Meaningful ratio and its colored lean toward Meaningful, all without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "delete_confirm_recomputes_derived"
+description = "Delete propagation: confirming a delete decreases the All entries list count by exactly one (measured immediately before and after the confirmation), removes the matching timeline block, and immediately recomputes the Meaningful ratio, the streak, and the Weekly overview chart"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "persistence_multi_facet_round_trip"
+description = "Persistence round trip: after creating several entries with different categories, one custom tag assignment, and one deletion, a full page reload restores every facet coherently — the same entries, tags, stats, and streak reappear together, the deleted entry stays gone, and no facet reverts while others survive"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "1.catchall"

@@ -16,40 +16,90 @@ On load with empty storage the workspace opens directly at the root with no logi
 The app ships three bundled mock data sources that are present immediately and never depend on storage: Website Analytics (90 daily rows with date, pageViews, sessions, bounceRatePct), Sales Sheet (60 order rows with orderId, product, category one of Hardware/Software/Services, unitsSold, revenue, orderDate), and Support Tickets (50 rows with ticketId, category one of Billing/Bug/Feature Request/Account, status one of Open/In Progress/Resolved, createdDate, and resolutionHours present only when status is Resolved).
 Clicking a source in the Data Source Library opens a preview modal listing that source's raw rows in a table with the column headers; a Filter preview rows text input narrows the visible rows to those matching the typed text as the user types, and a counter shows how many of the total rows match.
 Create Pane opens a three-step wizard: step 1 choose a data source; step 2 choose a pane type from exactly five options (Line Chart, Bar Chart, Donut Chart, Data Table, Counter); step 3 configure it by picking a metric column, and for chart panes also a grouping dimension column. Completing the wizard adds the finished pane to the current page rendering that source's data.
+In the wizard and every other form, the advance and submit controls stay disabled until the current step's fields are valid, and an invalid field shows an inline error naming that field before submit rather than a silent failure or a generic banner.
 Each pane exposes an Edit control that reopens its configuration (source, type, metric, dimension, size, refresh interval) and applies changes in place without deleting the pane or losing its grid position.
 Each pane exposes a Delete control that asks for confirmation first; cancelling keeps the pane, confirming removes it from the page.
-Add Page creates a new named page tab and makes it active; each page holds its own independent set of panes. A page can be renamed inline and deleted after a confirmation, and deleting the last remaining page is not allowed.
+Add Page creates a new named page tab and makes it active; each page holds its own independent set of panes. A page can be renamed inline and deleted after a confirmation.
 Each pane exposes labeled Move Up, Move Down, Move Left, and Move Right controls that reposition it within a four-column grid; a direction's control is disabled when the pane is already at that grid boundary.
 Each pane exposes a Small / Medium / Large size toggle that immediately changes how many grid columns the pane spans (small one column, medium two, large the full four).
 Each pane exposes a Refresh dropdown with Off, Every 30s, and Every 5m. When set to a non-Off value the pane shows a Last updated Xs ago label that counts up on its own, and on each simulated refresh tick recomputes its displayed value with a small deterministic jitter (documented in-app as a simulated refresh, not a live network fetch); returning it to Off stops the label and the value changes.
 The simulated jitter is deterministic, derived from the pane's tick count as round(value * (1 + ((tick*7+13) mod 11 - 5)/100)), so repeated refreshes stay consistent rather than random.
 A Share control opens a panel showing a read-only mock link of the form panecraft.local/view/<page-id> rendered in a monospace bordered box, a Public/Private access toggle, and a Copy Link control that copies the link to the clipboard and shows a transient Copied! confirmation that clears on its own.
 A shared date-range control offers Today Only, Last 7 Days, Last 30 Days, and Last 90 Days and filters every time-series chart/table pane on the current page simultaneously; changing it recomputes all affected panes at once, not one in isolation.
-A page with zero panes shows the empty-state message Create your first pane to build this page. A pane whose metric/dimension/date-range combination yields no matching rows shows No data for this range centered inside the pane instead of a blank chart, and widening the range back to one with real rows restores the chart without recreating the pane.
-A Saved analysis collection workspace supports creating, editing, and deleting named saved analyses (each a source plus metric), with two views (Overview cards and Table) and combined Search, Source filter, Sort, and single-selection drill-down controls plus a Clear controls action that restores the unfiltered list; duplicate names are rejected without creating a duplicate record and without altering the bundled source data.
-A visible Collaboration Scenario control opens a modal with a Go Offline / Go Online toggle, a Shared editor labeled textarea for Author A, an independent editor for Author B, and a Shared content region. Queueing two independently authored non-conflicting changes while offline and then reconnecting merges both by stable operation identity so both appear in the converged Shared content; applying the two queued changes in either offered order (Apply A then B, Apply B then A) converges to the same visible result with neither change dropped; replaying an already-applied operation is ignored as a duplicate rather than applied twice; and a conflicting change surfaces an explicit resolution choice (Keep Author A, Keep Author B, Merge Both) instead of silently overwriting.
+Hovering a data point or bar in a chart pane shows a tooltip with that point's label and value, and the tooltip follows to the newly hovered point rather than sticking to the first one.
+A Saved analysis collection workspace supports creating, editing, and deleting named saved analyses (each a source plus metric), with two views (Overview cards and Table) and combined Search, Source filter, Sort, and single-selection drill-down controls plus a Clear controls action that restores the unfiltered list.
+A visible Collaboration Scenario control opens a modal with a Go Offline / Go Online toggle, a Shared editor labeled textarea for Author A, an independent editor for Author B, and a Shared content region where queued offline changes merge on reconnect.
 </core_features>
+
+<user_flows>
+Starting from the visible pane count on the active page, completing the Create Pane wizard adds exactly one pane rendering the chosen source's data: the pane count increases by exactly one immediately, switching to another page tab and back still shows the new pane, and a full page reload restores it with the same type, source, metric, dimension, size, and grid position.
+After creating a new page, renaming it, adding a pane to it, moving that pane, resizing it to Large, and setting its refresh to Every 30s, switching between page tabs shows each page's own independent panes, and a full reload restores the page list, the active tab, and every pane facet (type, source, metric, dimension, size, order, refresh interval) together rather than a partial mix.
+With at least two time-series panes on the current page, switching the shared date range from Last 30 Days to Today Only recomputes every affected pane at once with visibly different marks or values, and switching back to Last 30 Days restores the wider rendering without recreating any pane.
+Creating a valid named saved analysis increases the saved-analysis count by exactly one and the same item appears in both the Overview cards view and the Table view without a reload; editing it updates both views, deleting it removes it from both and decreases the count by one, and a full reload restores the remaining saved analyses exactly.
+In the Collaboration Scenario, going offline, queueing one non-conflicting change from Author A and one from Author B, then reconnecting merges both into the converged Shared content; applying the two queued changes in either offered order (Apply A then B, Apply B then A) converges to the same visible result with neither change dropped, and replaying an already-applied operation is ignored as a duplicate rather than applied twice.
+Deleting a pane after confirmation decreases the active page's pane count by exactly one, the pane no longer appears after switching tabs and back, and a full reload does not resurrect it.
+</user_flows>
+
+<edge_cases>
+A page with zero panes shows the empty-state message Create your first pane to build this page.
+A pane whose metric/dimension/date-range combination yields no matching rows shows No data for this range centered inside the pane instead of a blank chart, and widening the range back to one with real rows restores the chart without recreating the pane.
+Deleting the last remaining page is not allowed: the app blocks the action with the delete control disabled or a visible explanation, and the page survives.
+A saved analysis with a duplicate name is rejected with inline feedback naming the problem, creates no duplicate record, and leaves the bundled source data unchanged.
+Double-activating a create or submit control creates exactly one record: the relevant count increases by one and exactly one new item appears.
+Invalid or extreme input in any form is rejected with specific visible feedback and the last valid state stays intact and rendered.
+When persistent storage is unavailable, the root still renders the bundled sources and a usable seeded workspace, mutations keep working for the session, and a specific visible warning explains that changes will not persist, with no crash or blank screen.
+</edge_cases>
 
 <visual_design>
 Color tokens are defined as CSS custom properties on :root: --color-primary #E8536B (primary actions), --color-secondary #051441 (dark navy header/nav), --color-accent #1ABF68 (success and Resolved badges), --color-background #FFFFFF, --color-surface #F7F8FC (pane card background), --color-border #E3E6F0, --color-text-primary #051441, --color-text-secondary #677294. Radius base is 6px; spacing unit 4px.
 Typography uses the Poppins family with system fallbacks. The app title is 26 to 32px at weight 600 in text-primary; pane titles are 15px at weight 600; body and table text are 14px at weight 400 in text-secondary; a counter pane's big number is 30px at weight 700 in text-primary; the Last updated label is 12px in text-secondary.
 Primary actions (Add Page, Create Pane, Copy Link) use a primary background with white text and 6px corners. Secondary and utility controls (Edit, Share, Refresh dropdown) use a white background, a 1px border in border color, and text-primary text.
-Each pane renders on a surface card with 6px corners and a 1px border; its control row (Edit/Move/Resize/Delete) is reachable by keyboard and becomes visible on hover or focus.
+Each pane renders on a surface card with 6px corners and a 1px border; its control row (Edit/Move/Resize/Delete) becomes visible on hover or focus.
 Support Tickets status values render as colored pill badges that are distinguishable at a glance: Resolved uses the accent green, Open uses the primary pink, In Progress uses a neutral amber.
 The active page tab is visually distinguished from inactive tabs by a bottom border in the primary color and bold text.
 The Share panel's mock link renders in a monospace font inside a bordered box distinct from the rest of the panel so it reads as a copyable value.
 A page with zero panes shows Create your first pane to build this page; a pane with no rows for the current range shows No data for this range centered inside it.
-At roughly 375px wide the pane grid collapses to a single column, the page tabs stay scrollable and usable, and nothing scrolls horizontally at the page level.
 </visual_design>
 
 <motion>
-Every interactive control (buttons, page tabs, table rows, dropdowns, Data Source Library cards, pane cards) shows a visible hover response. Keyboard Tab focus is visible as a 2px outline in the primary color on every interactive control.
+Every interactive control (buttons, page tabs, table rows, dropdowns, Data Source Library cards, pane cards) shows a visible hover response.
 A pane's control row is hidden at rest on wider viewports and fades in on hover or keyboard focus of the pane.
+A newly created pane animates into the grid rather than appearing instantly, and a deleted pane animates out rather than vanishing in a single frame; the surrounding panes settle into their new positions smoothly.
+The preview modal, pane wizard, Share panel, and confirmation dialogs enter and exit with a brief opacity and scale transition of roughly 200 to 300 milliseconds.
 The active page tab transition and the primary-action opacity shift on hover give immediate feedback.
 Clicking Copy Link shows a transient Copied! confirmation (the button briefly turns accent green) that clears on its own after about two seconds without trapping the user in the panel.
 When a pane's refresh interval is non-Off, the Last updated Xs ago label advances on its own and the recomputed value updates in place without a layout jump or a manual reload.
+Changing a pane's source, metric, dimension, or the shared date range transitions the chart's marks to the new data rather than snapping through a blank or stale frame.
 Status pill badges and the size-toggle selected state give an at-a-glance visual change when their state changes.
+With prefers-reduced-motion enabled, pane, dialog, tab, feedback, and chart transitions are removed or substantially reduced while every final state remains clear and reachable.
 </motion>
+
+<responsiveness>
+At roughly 375px wide the pane grid collapses to a single column, the page tabs stay scrollable and usable, and nothing scrolls horizontally at the page level.
+At 375px wide the preview modal, pane wizard, Share panel, and saved-analysis views remain readable and operable without clipped controls.
+At desktop widths of 1024px and above, the four-column grid, the Data Source Library, and the header controls are all visible without overlap.
+</responsiveness>
+
+<accessibility>
+Every interactive control, including each pane's Edit, Move, Resize, Delete, Refresh, and Share controls, is reachable and operable with the keyboard alone; keyboard Tab focus is visible as a 2px outline in the primary color on every interactive control.
+Keyboard focus on a pane reveals its control row without requiring a pointer hover.
+The source preview modal, pane wizard, Share panel, and confirmation dialogs trap focus while open, close on Escape, and return focus to the control that opened them.
+The transient Copied! confirmation and inline validation errors are announced through an aria-live polite region as well as shown visually.
+</accessibility>
+
+<performance>
+The app is interactive within 2 seconds of a local cold load.
+No console errors or warnings appear during a full exercise of the app.
+Simulated refresh ticks and date-range recomputes update pane content in place without shifting surrounding panes or the page layout.
+The UI stays responsive under rapid repeated input with no hangs or dropped interactions.
+</performance>
+
+<writing>
+Headings, buttons, and tab labels use one consistent capitalization convention throughout the app.
+Action labels are specific verbs such as Add Page, Create Pane, and Copy Link rather than generic labels like OK or Go where a specific one is possible.
+Error messages name the field and the fix; empty states use the exact specified messages and make the next action clear.
+No placeholder text, lorem ipsum, or debugging copy appears anywhere in the shipped UI.
+</writing>
 
 <requirements>
 Framework and state: Svelte 5 components in runes mode; shared application state lives in a single runes-based store module using $state and $derived (pages, active page, panes, date range, dialog visibility, and the collaboration offline flag), imported by every component so all views stay coherent. Styling is Tailwind CSS 4.3.2 (pinned), with design tokens in @theme and its Vite plugin. Use shadcn-svelte components for dialogs, the pane wizard, tabs, toggles, selects, tables, confirmations, and transient feedback; no other external component library. Use LayerChart for line, bar, donut, and other chart panes, with d3 available for scales and helpers, and yjs for collaboration merge helpers; no other charting or collaboration libraries may be added. svelte-motion is allowed for pane, control-row, tab, feedback, and state-change transitions; no other animation libraries. Phosphor icons via phosphor-svelte only; no raw pasted SVG icon sets and no icon CDNs. All forms, including pane create/edit, page naming, saved analyses, and collaboration conflict resolution, validate through a Zod schema driven by Felte or TanStack Form for Svelte and render inline per-field errors before submit. All libraries are installed via npm and bundled locally; no CDN imports.
@@ -57,9 +107,8 @@ Persistence: user-configured state persists to localStorage under the key panecr
 Create/edit/delete: creating a pane appends it to the active page; editing updates it in place preserving grid position; deleting removes it after a confirmation. Pages can be created, renamed, and deleted (with confirmation, never the last one). Panes reorder through Move controls within a four-column grid with boundary controls disabled, and resize through the Small/Medium/Large toggle.
 Filtering and views: the shared date-range control filters every time-series pane on the current page at once; the data-source preview has its own independent row filter; the saved-analysis workspace offers two views and combined search/filter/sort/selection with a clear action.
 Seed and empty rules: Website Analytics seeds 90 daily rows, Sales Sheet 60 order rows across all three categories, Support Tickets 50 rows across all categories and statuses; every source has enough volume that any offered metric/dimension/date-range combination renders non-empty for at least the default range. Empty states show the specified messages instead of blank areas.
-Robustness: the primary pane and saved-analysis workflows withstand 25 rapid deterministic repetitions through the normal controls with an exact final count, responsive controls, and no blank screen or uncaught error; invalid or extreme input is rejected with specific visible feedback without damaging the last valid state; duplicate submissions are idempotent rather than creating duplicate records. The Collaboration Scenario merges queued changes by stable operation identity so both delivery orders converge to the same visible result with no dropped non-conflicting change, ignores duplicate replays of an operation, and surfaces conflicts with an explicit user choice.
+Robustness: the primary pane and saved-analysis workflows withstand 25 rapid deterministic repetitions through the normal controls with an exact final count, responsive controls, and no blank screen or uncaught error; invalid or extreme input is rejected with specific visible feedback without damaging the last valid state; duplicate submissions are idempotent rather than creating duplicate records. The Collaboration Scenario merges queued changes by stable operation identity so both delivery orders converge to the same visible result with no dropped non-conflicting change, ignores duplicate replays of an operation, and surfaces conflicts with an explicit user choice (Keep Author A, Keep Author B, Merge Both) instead of silently overwriting.
 Navigation: single user, single route at the root; any other route may redirect home; the app performs no outbound network navigation and makes no backend or external API calls.
-Responsive: at roughly 375px the grid is a single column, tabs stay usable, and nothing scrolls horizontally.
 </requirements>
 
 <integrity>

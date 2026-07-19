@@ -103,6 +103,20 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "3.9"
+name = "large_diagram_containment"
+description = "Rendering a sample with many nodes keeps the drawing contained inside the preview region without overflowing the page or forcing horizontal scrolling of the whole document"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.10"
+name = "consistent_icon_set"
+description = "Icons in the header and panels come from one consistent visual set, rendered at consistent sizes and weights rather than a mix of mismatched icon styles"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "3.7"
 name = "buried_or_unbalanced_workspace"
 description = "Unrelated chrome overwhelms the editor-preview pair, the preview is too small to inspect, or source and actions lack clear grouping and hierarchy"

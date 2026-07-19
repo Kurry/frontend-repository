@@ -62,21 +62,21 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
-description = "The drop zone gives immediate feedback through the real control: a highlighted border on dragover, a pressed feedback on click, a visible focus ring when tabbed to, and identical activation from Enter, Space, and a pointer click."
+name = "dropzone_immediate_feedback"
+description = "The drop zone gives immediate feedback through the real control: a highlighted border and slight scale on dragover, a pressed feedback on click, a visible focus ring when tabbed to, and identical activation from Enter, Space, and a pointer click."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "4_2"
+name = "hover_wash_distinct_from_focus"
 description = "Navbar items, buttons, list rows, and cards take a hover wash that is a different visual treatment from their focus ring, applied consistently across controls of the same kind."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
+name = "pressed_state_before_result"
 description = "Pressed feedback appears immediately on pointer-down, before the triggered action completes, so the Convert and Download controls never feel unresponsive in the gap before their result."
 type = "binary"
 weight = 0.5
@@ -84,33 +84,62 @@ optional = true
 
 [[criterion]]
 id = "4.4"
-name = "4_4"
+name = "selection_rings_reverse_same_control"
 description = "Selecting a queue row (inset ring) and selecting a category card (accent ring, aria-pressed) are marked beyond color alone, and each selection reverses through the same control that set it."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "4_5"
-description = "Status transitions and the counts line update live through an aria-live region as each file moves Ready to Converting to Done, so the change is announced without moving focus, and the full convert-and-download flow is completable with keyboard alone and with pointer alone."
+name = "status_pill_transitions_not_snap"
+description = "Driven through the real Convert control, each file's status pill visibly moves Ready to Converting to Done (or Failed) with a brief transition rather than an instant swap, and the counts line updates live alongside the status changes."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.6"
-name = "4_6"
-description = "No conventional action (add file, change format, convert, download, remove) is available only through a drag or other gesture without a discoverable button or keyboard equivalent."
+name = "gesture_only_action_present"
+description = "A conventional action (add file, change format, convert, download, remove) is available only through a drag or other gesture, with no discoverable button or keyboard equivalent."
 type = "binary"
 weight = 1.0
 negate = true
 
 [[criterion]]
 id = "4.7"
-name = "4_7"
-description = "Interactive-state feedback (hover, focus, pressed, selected) must be produced by exercising the real UI controls, not appear only when state is changed through a WebMCP call or other non-UI shortcut."
+name = "feedback_only_via_state_shortcut"
+description = "Interactive-state feedback (hover, focus, pressed, selected) appears only when state is changed through a WebMCP call or other non-UI shortcut, and is absent when the real UI controls are exercised directly."
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "4.8"
+name = "queue_rows_animate_in_and_out"
+description = "Triggered through the real UI controls, adding a file animates its new row into the queue rather than snapping in, removing a file animates its row out, and Clear queue clears the rows with the same animated treatment."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "route_view_transition_soft"
+description = "Switching between Convert, Settings, and About through the navbar transitions the view content with a short fade or slide rather than a hard cut."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "reduced_motion_flows_completable"
+description = "With prefers-reduced-motion set, row and view animations are removed and state changes apply instantly, while the full add-convert-download flow remains completable."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "theme_toggle_icon_reflects_theme"
+description = "The theme toggle's icon reflects the current theme and updates when toggled, while the whole surface swaps between light and dark."
+type = "binary"
+weight = 0.5
+optional = true
 
 [[criterion]]
 id = "4.catchall"

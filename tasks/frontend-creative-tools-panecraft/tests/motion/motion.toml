@@ -133,6 +133,13 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "4.11"
+name = "dialog_wizard_enter_exit_transition"
+description = "Opening and closing the source preview modal, pane wizard, Share panel, and confirmation dialogs each show a brief opacity and scale transition of roughly 200 to 300 milliseconds rather than an instant pop"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "4.catchall"
 name = "motion_catchall"
 description = "The app exhibits a significant, browser-observable motion or microinteraction defect that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence that demonstrates it. If the defect is already covered even partially by another criterion, answer no here and let that criterion carry it."

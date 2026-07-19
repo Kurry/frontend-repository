@@ -62,8 +62,8 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "hover_theme_popover_animations"
-description = "Required hover animations are present on buttons, table/list rows, and sidebar nav; theme swap and popovers animate as specified"
+name = "hover_press_breadcrumb_focus_states"
+description = "Verified with the real pointer and keyboard: hovering buttons eases their background/border/shadow with a slight press effect on activation, hovering breadcrumbs underlines them, table rows, list rows, and sidebar items take a full-width hover wash, and focusing form controls shows a visible focus ring"
 type = "binary"
 weight = 1.0
 

@@ -246,6 +246,20 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "1.34"
+name = "stage_map_chrome_complete"
+description = "The Stage-select map at / shows a title, a row of Stage nodes named Plaza del Sol, Mercado Nocturno, and Fortaleza Roja, a Pesos balance, an owned-Masks count, and visible controls that open the Cantina, the Masks screen, Fighter Settings, the History panel, and Reset progress — all without any login"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "session_five_lifecycle_transitions"
+description = "In one session driven through visible controls, the app crosses at least five legal lifecycle transitions — starting a run, an active-state change during combat, reaching a terminal or checkpoint screen (Victory or Derrota), restarting, and a pause or return-to-Stage-select mode switch — with no reload, blank screen, or dead end between them"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

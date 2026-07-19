@@ -204,6 +204,13 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "1.34"
+name = "chart_hover_tooltip_follows_point"
+description = "Hovering a data point or bar in a chart pane shows a tooltip with that point's label and value, and moving to another point moves the tooltip to the newly hovered point"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable core-feature defect that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence that demonstrates it. If the defect is already covered even partially by another criterion, answer no here and let that criterion carry it."

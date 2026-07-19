@@ -105,6 +105,27 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "3.7"
+name = "note_row_animates_create_delete_restore"
+description = "Driven through the real UI controls (never a state shortcut), creating a note animates its row into the list, deleting a note to Trash animates the row out, and restoring it from Trash animates it back into place rather than snapping instantly."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "folder_chevron_expand_transition"
+description = "Clicking a folder's expand/collapse control rotates its chevron and reveals or hides its child rows with a visible transition rather than an instant toggle."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "mobile_folder_panel_slides"
+description = "At approximately 375px wide, activating the Folders button slides the folder panel in and out over or beside the content rather than instantly reflowing the whole page."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "4.catchall"
 name = "motion_catchall"
 description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction performed, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

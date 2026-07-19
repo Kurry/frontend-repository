@@ -62,8 +62,8 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
-description = "Required hover animations are present; pan/scrub and mode switches animate as specified"
+name = "hover_wash_and_focus_rings"
+description = "Real pointer hover on a pin or list row shows a scale, glow, or hover wash; hovering scrubber thumbs and chrome buttons brightens them; and keyboard focus shows a visible focus-visible ring on interactive controls (verify hover via computed style while hovering)"
 type = "binary"
 weight = 1.0
 
@@ -97,6 +97,41 @@ description = "Dragging or wheel-scrolling the stage does nothing because pins a
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "4.6"
+name = "detail_panel_settle_transition"
+description = "Opening and closing the event detail panel via the real UI (clicking a pin or row, then closing) plays a short opacity/transform settle rather than appearing and disappearing instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "list_row_add_remove_animates"
+description = "Creating an event through the create form animates its row into the Library list, and deleting an event through the UI animates the row out rather than snapping, with the surrounding rows sliding smoothly into place"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "drawer_and_modal_slide_fade"
+description = "The Filters drawer and the About modal enter and exit with a short slide/fade transition rather than appearing and disappearing instantly (opened via their chrome buttons)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "feedback_messages_animate"
+description = "Feedback messages (validation errors, confirmation toasts) appear with visible motion — a short slide or fade — and dismiss the same way"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.10"
+name = "reduced_motion_preference_respected"
+description = "With prefers-reduced-motion: reduce emulated, non-essential fades and settles are shortened or removed while panning, scrubbing, and filtering remain fully functional"
+type = "binary"
+weight = 0.5
 
 [[criterion]]
 id = "4.catchall"

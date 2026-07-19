@@ -253,6 +253,13 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "1.36"
+name = "create_submit_disabled_until_valid"
+description = "In the Add Scene create form, the submit control is disabled while the required title or description field is empty or invalid, and becomes enabled once both fields hold valid values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

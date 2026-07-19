@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "hero_h1_exact_and_http_200"
-description = "On load, the single homepage at / returns HTTP 200, the document title reads Cinder & Bloom (with the é), and the hero shows the exact H1 \"If you can't reach a million people with 0€ ad spend, your branding sucks.\" with the exact lead \"We will 10x your social presence or work for free until it's done.\""
+description = "On load, the single homepage at / returns HTTP 200, the document title reads Cinder & Bloom, and the hero shows the exact H1 \"If you can't reach a million people with 0€ ad spend, your branding sucks.\" with the exact lead \"We will 10x your social presence or work for free until it's done.\""
 type = "binary"
 weight = 1.0
 

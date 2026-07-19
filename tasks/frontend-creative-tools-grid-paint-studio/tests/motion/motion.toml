@@ -122,6 +122,20 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "4.9"
+name = "gallery_card_enter_exit_animation"
+description = "Through the real UI controls, saving a valid board animates the new card into the gallery list and deleting a board animates its card out of the list rather than either card snapping instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "feedback_entrance_and_fade"
+description = "Validation and save feedback (toasts or inline confirmations) appear with a short entrance motion and dismiss with a fade rather than popping in and vanishing abruptly"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "4.catchall"
 name = "motion_catchall"
 description = "The app exhibits a significant, browser-observable defect in motion or microinteraction quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence (real control path, gesture, animated element, timing, or resulting state) that demonstrates it. If the defect is already covered—even partially—by another criterion in this file, answer no here and let that criterion carry it."

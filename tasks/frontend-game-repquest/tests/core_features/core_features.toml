@@ -177,8 +177,7 @@ id = "1.28"
 name = "apply_scenario_change_snapshot"
 description = "The Apply scenario change control in the History state region visibly mutates state (rotating through a small set of scenario effects) and is recorded as its own snapshot in the same undo/redo history as other state-changing actions"
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "1.29"

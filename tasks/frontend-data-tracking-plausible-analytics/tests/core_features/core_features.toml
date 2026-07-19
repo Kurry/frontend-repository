@@ -91,7 +91,7 @@ weight = 1.0
 [[criterion]]
 id = "1.5"
 name = "google_filter_pill_and_tiles"
-description = "After clicking the Google row in Top Sources, a filter pill reading Source: Google appears and the metric tiles change from the unfiltered values to the Google segment (Unique visitors 7,200)"
+description = "After clicking the Google row in Top Sources, a filter pill reading Source: Google appears and all four metric tiles change away from their unfiltered values (16,840 / 47,220 / 44% / 98s) to the Google segment's numbers"
 type = "binary"
 weight = 1.0
 
@@ -111,8 +111,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "clear_filter_restores_unfiltered"
-description = "After clicking Clear filter, the metric tiles return to 16,840 / 47,220 / 44% / 98s and no filter pill remains"
+name = "pill_and_clear_control_both_remove_filter"
+description = "Both removal paths work: clicking the filter pill itself and clicking the Clear filter control each remove the active segment filter, returning the metric tiles to 16,840 / 47,220 / 44% / 98s with no stale filter pill left behind"
 type = "binary"
 weight = 1.0
 
@@ -221,6 +221,20 @@ weight = 1.0
 id = "1.35"
 name = "multi_facet_reload_round_trip"
 description = "After selecting a non-default site, a non-default date range, and a non-default sort, applying a segment filter, and switching the theme, a full page reload restores the same site, range, sort, theme, and filter pill together with the same recomputed numbers on the tiles, chart, and panels — all facets coherently, never a mix of restored and reverted facets"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "seeded_selector_breadth"
+description = "The site selector lists at least three selectable sites and the date-range selector offers at least four date ranges, each producing a non-empty dashboard when selected on the default site"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "range_change_clears_active_filter_chain"
+description = "Scripted with the Source: Google filter active on example.com: changing the date range to a different range recomputes the metric tiles, trend chart, and all three breakdown panels together for the new range, clears the segment filter and its pill, and leaves no rows from the previous selection in any panel"
 type = "binary"
 weight = 1.0
 

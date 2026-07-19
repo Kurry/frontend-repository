@@ -152,6 +152,20 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "1.30"
+name = "code_editor_affordances"
+description = "The source pane behaves as a real code editor: it renders monospace source with visible line numbers and syntax coloring that distinguishes keywords from node text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "empty_source_stability"
+description = "Clearing the source to empty keeps the workspace stable: the preview shows the error treatment or an empty-source message rather than a stale diagram presented as current, and export controls become unavailable"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "1.27"
 name = "non_editor_scaffold"
 description = "The primary screen is a static scaffold, authentication page, unrelated dashboard, or fixed illustration rather than an editable Mermaid source-and-preview workspace"

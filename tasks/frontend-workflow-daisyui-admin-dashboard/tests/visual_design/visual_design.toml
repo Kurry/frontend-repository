@@ -62,21 +62,21 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
+name = "mosaic_overview_dense_users_views"
 description = "Operations Overview keeps an asymmetric 12-column mosaic with a primary inverse Revenue run rate card; Users views use dense admin tables/forms"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
+name = "badges_distinct_empty_state_visible"
 description = "Role and status use distinct badge treatments; empty list state is visually present when the collection or filter result is empty"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.4"
-name = "3_4"
+name = "chart_accent_palette_radial_wash"
 description = "Operations Overview chart cards use the teal/amber/sky/rose/orange accent palette and a soft radial accent wash sits on the main canvas"
 type = "binary"
 weight = 0.5

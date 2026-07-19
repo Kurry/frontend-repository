@@ -184,6 +184,13 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "3.18"
+name = "why_ridge_static_list_below_768"
+description = "At a viewport narrower than 768px, the Why Ridge pillars render as a static vertical list — all four pillars fully readable in document order with no sticky stacking or cards covering one another"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "3.catchall"
 name = "visual_design_catchall"
 description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

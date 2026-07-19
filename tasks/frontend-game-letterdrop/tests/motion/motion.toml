@@ -62,35 +62,35 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
+name = "tile_fall_smooth_gradual_acceleration"
 description = "Tiles animate downward smoothly and the fall rate increases gradually rather than snapping between speeds."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "4_2"
+name = "invalid_word_tray_shake"
 description = "Submitting an invalid word (by clicking real tiles and Submit Word) shakes the word tray as its rejection feedback."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
+name = "transient_toasts_fade"
 description = "Valid-word scoring, power-tile activation, Board Cleared, and achievement unlocks each surface a transient toast that fades on its own without blocking play."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
-name = "4_4"
+name = "pause_overlay_freeze_resume"
 description = "Pressing the real Pause control dims the board with a Paused overlay and freezes tile motion, and Resume restarts motion from the frozen state."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.5"
-name = "4_5"
+name = "hover_and_focus_visible_states"
 description = "All buttons show a visible hover state and keyboard Tab focus is visible on every interactive control."
 type = "binary"
 weight = 0.5

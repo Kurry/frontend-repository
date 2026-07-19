@@ -145,13 +145,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.13"
-name = "chrome_theme_picker"
-description = "After choosing a chrome theme option (light / dark / cupcake / synthwave), the app shell recolors and that option is marked active"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.14"
 name = "css_export_copy_and_dismiss"
 description = "Opening CSS export shows a [data-theme=\"name\"] CSS block containing the active values; Copy writes that block to the clipboard and confirms the copy, and each of Close, backdrop click, and Escape can dismiss a freshly opened modal"
@@ -161,7 +154,7 @@ weight = 1.0
 [[criterion]]
 id = "1.15"
 name = "builtin_edit_forks_copy"
-description = "After recording a built-in preset's name and swatches and editing one of its tokens, My themes gains exactly one selected editable copy while reselecting the built-in shows its original name and swatches unchanged"
+description = "After recording a built-in preset's name and swatches and editing one of its tokens, My themes gains exactly one selected editable copy that the live preview now tracks, the built-in catalog still lists all 35 presets, and reselecting the built-in shows its original name and swatches unchanged"
 type = "binary"
 weight = 1.0
 
@@ -205,7 +198,7 @@ weight = 1.0
 [[criterion]]
 id = "1.21"
 name = "builtin_removal_protection"
-description = "Editing a built-in preset forks an editable custom copy rather than mutating the preset, and attempting to remove a built-in preset surfaces a notice instead of deleting it"
+description = "Attempting to remove a built-in preset through the UI removes nothing—the catalog still lists all 35 presets afterward—and a visible notice explains that built-ins cannot be removed"
 type = "binary"
 weight = 1.0
 
@@ -242,6 +235,34 @@ negate = true
 id = "1.26"
 name = "remove_all_then_repopulate_flow"
 description = "Starting with at least one custom theme, remove every custom theme and observe the empty My themes hint while all 35 built-ins remain, then create a valid replacement and observe the hint disappear, the count become one, and the replacement become active in the editor and preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "plain_reload_restores_seed"
+description = "After creating a custom theme and editing several tokens, a plain page reload without a #theme= payload returns the app to its seeded baseline: 35 built-in presets listed, no custom themes beyond the seed, and the default theme active in the editor and preview—never a partial mix of old and new state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "malformed_hash_payload_fallback"
+description = "Loading a URL whose #theme= payload is malformed or undecodable renders the default seeded theme with a fully usable interface and no console error"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "long_theme_name_truncation"
+description = "A custom theme given a very long name shows that name truncated with an ellipsis in its sidebar row while the editor name field shows the full value"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.30"
+name = "rapid_random_stays_coherent"
+description = "After clicking Random five or more times in quick succession, exactly one coherent token set remains applied: the editor color rows, live preview, and Color Palette tab values all agree with each other"
 type = "binary"
 weight = 1.0
 

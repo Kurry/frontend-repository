@@ -165,6 +165,14 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "4.15"
+name = "hydrated_content_visibly_replaced"
+description = "Statically delivered content visibly flashes and is replaced by different client content after the island scripts hydrate — mismatched text, reflowing layout, or restyled elements between first paint and interactive on a fresh load of /sprint/26."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "4.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical defect (console health, network hygiene, accessibility, performance, or routing) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, console or network log) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

@@ -110,6 +110,28 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "3.10"
+name = "breakpoint_reflow_768_and_mobile"
+description = "At 768px and below the terminal window expands toward full width and the two-column welcome box stacks into a single column, while Projects Board cards reflow from a multi-column grid at desktop widths to a single column at narrow widths without clipping card content"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "terminal_copy_quality"
+description = "Terminal output, /help descriptions, and section copy use one consistent capitalization and tone, command descriptions state specifically what each command does, and error or validation messages name the problem and the fix rather than a bare failure word"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.12"
+name = "filler_or_real_identity_copy"
+description = "Rendered copy contains lorem ipsum or template filler, or the displayed identity details (name, email, phone, socials) read as real personal data rather than clearly placeholder values"
+type = "binary"
+weight = 0.5
+negate = true
+
+[[criterion]]
 id = "3.3"
 name = "marketing_layout_replaces_terminal"
 description = "A conventional marketing hero, navigation, and stacked promotional sections replace or visually overwhelm the required single terminal-over-wallpaper composition"

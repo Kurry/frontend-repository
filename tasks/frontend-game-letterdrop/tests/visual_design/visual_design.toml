@@ -62,14 +62,14 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "3.1"
-name = "3_1"
-description = "The layout uses the light #F5F5F7 background with #007AFF reserved for the primary Submit Word action and key highlights."
+name = "palette_background_and_accent"
+description = "The layout uses the light #F5F5F7 background with dark #1D1D1E primary text, and the vivid blue #007AFF is reserved for the primary Submit Word action, links, and key highlights such as the active streak badge and current tier readout."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.2"
-name = "3_2"
+name = "button_styles_primary_secondary"
 description = "Primary buttons (Submit Word, Pause) use blue #007AFF fill with light text and a full pill shape; secondary buttons (Undo Last Tile, Resume) use the light #E6EEF7 fill with blue text."
 type = "binary"
 weight = 0.5
@@ -77,28 +77,28 @@ optional = true
 
 [[criterion]]
 id = "3.3"
-name = "3_3"
+name = "power_tiles_visually_distinct"
 description = "Bomb and Slow power tiles are visually distinct from ordinary letter tiles and from each other in shape and color."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.4"
-name = "3_4"
+name = "danger_line_hazard_styling"
 description = "The danger line is always visible and reads as a hazard distinct from the board background."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.5"
-name = "3_5"
+name = "state_highlights_and_locked_achievements"
 description = "The active streak badge and difficulty tier are visually highlighted, and locked achievements are muted or grayscale turning to full color when unlocked."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "3.6"
-name = "3_6"
+name = "mobile_scaling_and_tap_targets"
 description = "At roughly 375px wide the board and HUD scale to fit without horizontal scrolling and tiles stay comfortably tappable."
 type = "binary"
 weight = 0.5

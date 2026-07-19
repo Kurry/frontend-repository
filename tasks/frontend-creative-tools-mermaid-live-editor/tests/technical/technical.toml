@@ -117,6 +117,20 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "2.15"
+name = "aria_states_and_announcements"
+description = "The active editor tab is programmatically distinguishable from the inactive one through its ARIA state, the syntax-error message is exposed through a live region so its appearance is announced, and the preview region carries an accessible label identifying it as the diagram preview"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.16"
+name = "responsive_load_and_typing"
+description = "The workspace is interactive with seeded source and rendered diagram within roughly 2 seconds of a local cold load, and rapid typing in the editor stays responsive during preview re-renders without dropped keystrokes or visible freezes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "2.7"
 name = "hidden_ground_truth_exposure"
 description = "A hidden node, attribute, or unmandated window global exposes parsed diagram answers, expected output, or internal state that a real user cannot reach through visible interaction"

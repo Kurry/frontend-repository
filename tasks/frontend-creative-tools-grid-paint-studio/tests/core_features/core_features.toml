@@ -97,8 +97,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "rename_board"
-description = "After renaming a saved board to 'Evening Grid', that same gallery record shows the new name, its old name disappears, and its thumbnail, tag, and favorite state remain attached"
+name = "rename_board_in_place"
+description = "After renaming a saved board to 'Evening Grid', that same gallery card shows the new name in place with its thumbnail, tag, and favorite state attached, the old name disappears, the gallery count stays exactly the same, and no duplicate card appears"
 type = "binary"
 weight = 1.0
 
@@ -125,8 +125,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "favorite_and_tag_filters"
-description = "With mixed seeded boards visible, favoriting one board updates its control immediately, the favorites filter shows exactly favorited boards, and choosing a tag shows exactly boards carrying that tag; clearing filters restores the full collection"
+name = "favorite_marker_and_tag_filter"
+description = "With the seeded boards visible, favoriting one board toggles a visible favorite marker on its card immediately, choosing a tag filter shows exactly the boards carrying that tag, and clearing the filter restores the full list exactly"
 type = "binary"
 weight = 1.0
 
@@ -189,13 +189,6 @@ weight = 1.0
 negate = true
 
 [[criterion]]
-id = "1.19"
-name = "qr_mask_fixed_payload_and_colors"
-description = "With QR Brush active, painting a cell fills it with a QR-glyph mask that recolors with the active swatch: a white swatch yields a black glyph on white, a black swatch a white glyph on black, and a colored swatch that color's glyph on a white ground"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.20"
 name = "exact_seven_color_palette"
 description = "Exactly seven square palette swatches (black, white, red, yellow, green, blue, pink) select the active color, the active swatch is visibly ringed, and the choice tints both solid fills and QR cells"
@@ -255,7 +248,7 @@ weight = 1.0
 [[criterion]]
 id = "1.28"
 name = "paint_save_filter_load_flow"
-description = "Starting from a recorded gallery count: paint one multicolor stroke pattern, save it as 'Harbor Signal' with a tag, favorite it, filter by that tag and favorites, load it, and return to Paint; the count is exactly one higher, filtered Gallery shows the same record and thumbnail, and the canvas reproduces the saved pattern without reload"
+description = "Starting from a recorded gallery count: paint one multicolor stroke pattern, save it as 'Harbor Signal' with a tag, favorite it, filter by that tag, load it, and return to Paint; the count is exactly one higher, the filtered Gallery shows the same card with its favorite marker and matching thumbnail, and the canvas reproduces the saved pattern without reload"
 type = "binary"
 weight = 1.0
 
@@ -270,6 +263,55 @@ weight = 1.0
 id = "1.30"
 name = "tool_palette_undo_clear_flow"
 description = "Starting on a blank board, choose a numbered colored swatch, use B to paint one multi-cell stroke, use E for a second erasing stroke, press Backspace once, then Clear; each active indicator matches the shortcut, the undo restores the whole erased stroke only, Clear blanks the board, and Cell is enabled again"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "load_flow_locks_cell_and_gallery_unchanged"
+description = "Load-and-verify chain: from Gallery, load a seeded board; the app returns to Paint mode with that board's artwork visible on the canvas, the Cell control is visibly disabled because the board now holds art, and reopening Gallery still lists the same board with its name, thumbnail, and tag unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "delete_loaded_board_keeps_canvas"
+description = "Delete chain: load a board onto the canvas, return to Gallery, and delete that same board; its card disappears, the gallery count decreases by exactly one, and switching back to Paint shows the canvas still holding the loaded pixels — only the collection changed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "filter_echo_favorite_live_update"
+description = "Filter-echo chain: favorite a board, filter the gallery by that board's tag, and confirm the filtered list shows the card with its favorite marker intact; then toggle the favorite off while the filter is still active and confirm the same visible card's marker updates immediately without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "no_match_tag_filter_empty_state"
+description = "When the tag filter matches no boards, the list region shows an empty state instead of a blank area, and clearing the filter restores the full list exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "undo_noop_without_history"
+description = "Pressing Undo (or Backspace) on a fresh blank board with no strokes recorded changes nothing on the canvas or toolbar and produces no visible error"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "camera_denied_visible_message"
+description = "When camera access is denied, the app shows a visible message explaining the camera is unavailable instead of a broken or empty overlay, and the board is left unchanged"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.37"
+name = "double_save_single_entry"
+description = "Rapidly double-activating the Save board submit with a valid name creates exactly one gallery entry: the count increases by exactly one and only one new card appears"
 type = "binary"
 weight = 1.0
 

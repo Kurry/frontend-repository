@@ -62,126 +62,112 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "1.1"
-name = "1_1"
-description = "On load, the transactions list shows at least 8 seeded rows with payee, category, and amount visible"
+name = "seeded_transactions_visible_on_load"
+description = "On load, the transactions list shows at least 8 seeded rows with date, payee, category, account, and amount visible, spanning enough expense categories (roughly 8-10) that the breakdown legend and pie are visibly multi-category"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
-name = "1_2"
+name = "created_transaction_appears_in_list"
 description = "After creating a transaction with payee 'Ada Books' and a valid amount, the text 'Ada Books' is visible in the transactions list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.3"
-name = "1_3"
+name = "three_creates_add_exactly_three_rows"
 description = "After adding 3 new transactions on top of the seed set, the list shows exactly 3 more rows than the initial seeded count"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.4"
-name = "1_4"
+name = "expense_create_updates_kpi"
 description = "After creating an expense transaction, Total Expenses (or Net) KPI updates to reflect the new amount"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.5"
-name = "1_5"
+name = "edited_payee_replaces_old_value"
 description = "After editing a payee from the seeded value to 'Evening Market', the text 'Evening Market' is visible and the previous payee is not"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "1_6"
+name = "deleted_transaction_removed_from_list"
 description = "After deleting a transaction, that payee is no longer visible in the transactions list"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
-name = "1_7"
-description = "After deleting all transactions, an empty state message is visible and no transaction rows remain"
+name = "empty_state_after_deleting_all"
+description = "After deleting all transactions, the list region shows an empty state message with no transaction rows remaining, and the summary metric cards and transaction summary strip reflect zero/empty"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.8"
-name = "1_8"
-description = "After submitting create with an empty required payee or amount, the transactions count does not increase and validation feedback is visible"
+name = "invalid_create_blocked_with_messages"
+description = "After submitting create with an empty payee or missing amount, no row is added, the transactions count is unchanged, and inline validation messages naming the offending fields are visible"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
+name = "category_filter_narrows_list"
 description = "After filtering transactions by a category (with mixed categories present), only matching rows remain visible"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.10"
-name = "1_10"
+name = "chart_tab_switch_stays_in_page"
 description = "After switching between Breakdown and Trends chart tabs, the chart panel swaps without full page navigation"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.11"
-name = "1_11"
+name = "chart_and_list_modes_coexist"
 description = "After focusing the transactions list versus the chart panel (list vs chart interaction modes), both remain usable without leaving the page"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.12"
-name = "1_12"
+name = "hover_feedback_on_interactive_chrome"
 description = "When hovering sidebar items, transaction rows, or primary buttons, a visible hover wash or shadow change appears"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "1_13"
+name = "bulk_action_updates_rows_and_aggregates"
 description = "After selecting multiple transaction rows and running bulk categorize or bulk delete, the selected rows update category together or disappear from the list and KPIs/charts reflect the change"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.14"
-name = "1_14"
-description = "In Breakdown view, the flow shows income-source nodes feeding an Income hub that splits into a Net Income node and expense-category nodes, with a per-category legend listing amount and share percentage"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.15"
-name = "1_15"
-description = "In Trends view, hovering a doughnut slice reveals a tooltip showing that category's amount and percentage of total expenses"
+name = "sankey_flow_structure_and_legend"
+description = "In Breakdown view, the sankey-style flow shows income-source nodes feeding an Income hub that splits into a Net Income node and expense-category nodes, with node labels showing amounts and a per-category legend listing each expense category's amount and share percentage"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.16"
-name = "1_16"
-description = "The transaction summary strip (count, largest, average, total income, first/last dates) reflects the current collection and updates after a transaction is added or deleted"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.17"
-name = "1_17"
-description = "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session"
+name = "summary_strip_tracks_collection"
+description = "The transaction summary strip (total count, largest transaction, average transaction, total income, first/last transaction dates) reflects the current collection and updates after a transaction is added or deleted"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.18"
-name = "1_18"
+name = "static_list_without_working_crud"
 description = "Transactions list is static HTML only with no working create/edit/delete against shared state"
 type = "binary"
 weight = 1.0
@@ -189,7 +175,7 @@ negate = true
 
 [[criterion]]
 id = "1.19"
-name = "1_19"
+name = "outbound_links_replace_in_app_views"
 description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
 type = "binary"
 weight = 1.0
@@ -197,54 +183,110 @@ negate = true
 
 [[criterion]]
 id = "1.20"
-name = "1_20"
-description = "Summary metric cards (Total Income, Total Expenses, Net Income, Savings Rate) derive from the transactions collection, with Net Income equal to income minus expenses, and they update when a transaction is created, edited, or deleted"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.21"
-name = "1_21"
-description = "Breakdown view renders a sankey-style flow (income-source nodes feeding an Income hub that splits into a Net Income node plus expense-category nodes) with node amount labels and a per-category legend showing each category's amount and share percentage"
+name = "kpi_cards_derive_from_collection"
+description = "Summary metric cards (Total Income, Total Expenses, Net Income, Savings Rate) derive from the transactions collection, with Net Income equal to income minus expenses and Savings Rate equal to net divided by income as a percentage, and they update when a transaction is created, edited, or deleted"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.22"
-name = "1_22"
+name = "trends_doughnut_legend_and_tooltip"
 description = "Trends view renders a doughnut of expense categories with a legend showing each category's amount and percentage of total expenses, and hovering a slice reveals a tooltip with that amount and percentage"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.23"
-name = "1_23"
-description = "A transaction summary strip below the table shows total count, largest transaction, average transaction, total income, and first/last transaction dates derived from the current collection"
-type = "binary"
-weight = 0.5
-optional = true
-
-[[criterion]]
 id = "1.24"
-name = "1_24"
-description = "Category and income-vs-expense filters recompute the visible list from the shared collection, and a filter matching nothing shows an empty state"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.25"
-name = "1_25"
-description = "Submitting create with an empty payee or missing amount does not add a row and shows visible validation feedback"
+name = "filters_recompute_and_show_empty_state"
+description = "Category and income-vs-expense filters recompute the visible list from the shared collection, and a filter matching nothing shows an empty state message instead of a blank table"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.26"
-name = "1_26"
+name = "kpi_cards_static_or_hardcoded"
 description = "Summary metric cards show static or hardcoded totals that do not change when transactions are added or deleted"
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "1.27"
+name = "create_flow_multi_surface_chain"
+description = "Starting from the seeded state: note the table row count and the four summary metric card values, then create a valid transaction via the form. Confirm the table gains exactly one row (count delta measured immediately around the action), the four summary metric cards recompute to include its amount, the transaction summary strip updates its count and average, and switching to the Breakdown or Trends chart shows that transaction's category reflected in the node labels, slices, and legend amounts — all without a page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "edit_amount_propagates_to_both_legends"
+description = "After editing an existing transaction's amount via the UI, that same row shows the new amount in the table, the summary metric cards change by exactly the difference, and the matching category's amount and percentage update in both the pie legend and the sankey flow legend without a page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "delete_flow_clears_row_selection_and_aggregates"
+description = "After selecting a transaction row and then deleting that transaction: its row disappears from the table and from the current selection, the summary strip count decreases by exactly one, and its amount is dropped from the summary metric cards and from every chart legend"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "filter_clear_restores_full_list_exactly"
+description = "Applying the category filter narrows the visible table rows to that category and clearing the filter restores the full list exactly (same rows and count as before filtering); the income vs expense filter narrows and restores the same way"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "double_submit_creates_exactly_one_row"
+description = "Double-activating the create form's submit control in quick succession creates exactly one transaction: the row count increases by one and exactly one new row appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "ledger_sidebar_shell_with_inert_nav"
+description = "The sidebar shows a branded Ledger nav of roughly a dozen items (Dashboard, Accounts, Transactions, Cash Flow, Reports, Budget, Recurring, Goals, Investments, Forecasting, Advice) with Reports as the active item, a 'Shared demo report' eyebrow, 'Demo mode'/'Sample data' chips, notification and settings icons, and an Alex Rivera profile; clicking any other nav item is an inert demo control that does not navigate away from the reports page"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "inert_chrome_and_tab_switch_fire_toasts"
+description = "Clicking inert chrome actions (Filters, Date, Save, Sort, Columns, Export CSV) and switching chart tabs each fire a demo toast confirming the action, while real create, edit, and delete perform actual state changes rather than being replaced by a toast"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "charts_redraw_on_filter_change"
+description = "After applying the category or income-vs-expense filter, the sankey node labels, pie slices, legends, and summary tiles redraw to the new filtered totals without a page reload, and the redrawn values meaningfully differ from the unfiltered ones"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "charts_identical_regardless_of_inputs"
+description = "The sankey flow, pie slices, or their legends render identical values regardless of changes to the transactions collection or active filters (a derived chart surface that ignores its inputs)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.36"
+name = "form_submit_disabled_until_valid"
+description = "The transaction create/edit form presents date, payee, category, account, and amount fields; the submit control stays disabled until every required field is valid, and each invalid field shows an inline message naming that field before submit"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "income_rows_styled_positive"
+description = "In the transactions list, income amounts render with a leading + and a distinct positive (green) color while expense amounts render neutral"
+type = "binary"
+weight = 0.5
 
 [[criterion]]
 id = "1.catchall"

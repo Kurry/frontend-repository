@@ -156,6 +156,49 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "2.14"
+name = "keyboard_reachability_and_focus_visible"
+description = "Every toolbar control, palette swatch, gallery action, and save/rename form field can be reached and operated with the keyboard alone (Tab/Shift+Tab plus Enter/Space), and the focused control always shows a visible focus indicator"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.15"
+name = "camera_overlay_focus_trap"
+description = "While the camera overlay is open, Tab keeps focus inside the overlay (modal focus trap), and closing it via Cancel or capture returns keyboard focus to the Camera button"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.16"
+name = "accessible_names_and_selected_state"
+description = "Palette swatches and tool toggles expose accessible names and a programmatically discernible selected state (e.g. aria-pressed or aria-selected) in the accessibility tree, so the active choice is not conveyed by color alone"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.17"
+name = "validation_announced_aria_live"
+description = "Save and rename validation messages are exposed through an aria-live polite region in the DOM in addition to being shown visually"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.18"
+name = "cold_load_interactive_2s"
+description = "On a local cold load, the app renders and responds to a first interaction (e.g. selecting a tool) within 2 seconds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.19"
+name = "grid_rebuild_freezes_page"
+description = "Moving the Cell control to the largest allowed cell count freezes or visibly hangs the page while the grid rebuilds"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick or unverifiable implementation preference. If present, name the defect and cite the concrete browser evidence (console entry, network request, storage entry, runtime state, performance trace, or interaction result) that demonstrates it. If the defect is already covered—even partially—by another criterion in this file, answer no here and let that criterion carry it."

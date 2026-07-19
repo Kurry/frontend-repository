@@ -129,6 +129,56 @@ negate = true
 optional = true
 
 [[criterion]]
+id = "3.10"
+name = "consistent_icon_set_across_views"
+description = "Navigation items, stat tiles, and permission rows each carry a small crisp icon, and all icons across the app share one consistent visual style — no two views mix visibly different icon sets"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "dashboard_identity_card_anatomy"
+description = "The dashboard renders a single security-focused identity card containing an 'Active identity' label, the identity nickname, a 'Key ready' status badge, a labelled monospace public-key surface with the full npub visible, a labelled masked private-key surface with an adjacent reveal/hide button, and a row of per-application pill badges showing Granted or Revoked"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.12"
+name = "audit_entries_show_timestamps"
+description = "The Audit log view renders a reverse-chronological list of short activity lines, each entry carrying a visible timestamp"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.13"
+name = "control_state_treatments_both_themes"
+description = "Buttons, inputs, and toggles show visibly distinct default, hover, focus (visible ring), and disabled treatments in both the light and dark themes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.14"
+name = "sidebar_collapses_to_compact_nav_on_mobile"
+description = "At viewport widths of 768 pixels and below, the persistent sidebar collapses to a compact navigation control that still opens all five destinations (Dashboard, Identities, Permissions, Audit log, Settings); at desktop widths the sidebar is open by default"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.15"
+name = "identities_grid_single_column_at_375"
+description = "The Identities grid renders multiple columns at desktop width and reflows to a single column at 375 pixel viewport width"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.16"
+name = "content_overflows_viewport_at_375"
+description = "At 375 pixel viewport width, content clips or overflows the viewport, horizontal scrolling appears, or npub/nsec strings force overflow instead of wrapping or truncating within their surfaces"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "3.catchall"
 name = "visual_design_catchall"
 description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

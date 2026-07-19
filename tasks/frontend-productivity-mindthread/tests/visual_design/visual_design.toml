@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "3.1"
 name = "palette_tokens_match"
-description = "The palette matches the tokens: primary indigo #4a5fc1 for thread accents and primary buttons, warm rose #e0708a for spark markers and highlights, cool off-white #f5f6fb app background, white #ffffff card and panel surfaces, primary text #262a3d, and secondary meta text #6b6f85 for timestamps, counts, and breadcrumbs"
+description = "The palette matches the tokens: primary indigo #4a5fc1 for thread accents and primary buttons, warm rose #e0708a for spark markers and highlights, cool off-white #f5f6fb app background, white #ffffff card and panel surfaces, error red #c4534a for destructive delete controls and merge confirmations, primary text #262a3d, and secondary meta text #6b6f85 for timestamps, counts, and breadcrumbs"
 type = "binary"
 weight = 1.0
 

@@ -238,6 +238,13 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "1.34"
+name = "palette_view_cards_title_artist"
+description = "In Palette view, each palette renders as a card of its swatches together with that palette's title and artist, and hovering a card swatch reveals its hex label"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core functionality or an end-to-end user flow that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

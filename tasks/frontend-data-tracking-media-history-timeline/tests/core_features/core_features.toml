@@ -194,13 +194,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.20"
-name = "1_20"
-description = "Renders visible validation feedback when create is submitted with empty required fields, and the collection count does not increase"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.21"
 name = "1_21"
 description = "Timeline events list is static HTML only with no working create/edit/delete against shared state"
@@ -252,6 +245,111 @@ description = "Timeline pins are non-interactive so clicking a pin opens no deta
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "1.28"
+name = "create_flow_pin_appears_cross_mode"
+description = "Scripted create flow: in Library/Filter mode, note the visible event count, then submit a valid new event whose year lies inside the current year window and whose category is active. Exactly one new row appears in the Library list and any visible count increases by exactly one (measured immediately around the submit); switching back to Scrub/Explore mode then shows a new pin for that event on the stage — all without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "edit_flow_updates_list_pin_and_detail"
+description = "Scripted edit flow: edit an event's title and year, then confirm the same record updated everywhere it appears — the Library row shows the new title, the pin's position on the stage moved to reflect the new year, and an open detail panel for that event shows the edited values — without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "delete_flow_clears_all_surfaces"
+description = "Scripted delete flow: with an event selected (detail open), delete it. Its Library row disappears, its pin leaves the stage, the selection/detail panel clears, and the visible count decreases by exactly one (measured immediately around the delete)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "filter_flow_stage_and_list_in_sync"
+description = "Scripted filter flow: toggling a category off removes that category's pins from the stage and its rows from the Library list at the same time; toggling it back on restores both; narrowing the year window with the scrubber drops out-of-range events from both surfaces simultaneously — the two surfaces never disagree about what is visible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "filtered_detail_stepping_wraps_with_highlight"
+description = "Scripted stepping flow: with a search or category filter active, open an event's detail and press Next repeatedly — stepping visits only the currently filtered events in chronological order, wraps from the last back to the first, and the stage highlight follows the stepped selection"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "chrome_controls_drawer_modal_reset"
+description = "Filters opens a drawer, About opens an in-page modal, and Reset filters restores the default categories, clears the search, and returns to the default year window"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "default_year_window_bounded"
+description = "On a fresh load the visible year window opens on a bounded default range (for example roughly 1450-1920) rather than the full ~3200 BCE to 2024 CE span, as shown by the range readout and the plotted pins"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "seed_corpus_scale_and_span"
+description = "The seeded corpus is substantial — on the order of dozens of events (target roughly 60) — spanning roughly 3200 BCE to 2024 CE, categorized under about a dozen categories (verify by fitting the full span and inspecting the Library list)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "double_submit_adds_exactly_one"
+description = "Double-activating the create form's submit control in quick succession adds exactly one event: the visible count increases by one and exactly one new row appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "full_span_after_narrow_zoom"
+description = "After zooming the year window to a narrow slice, activating the Full span control fits the entire corpus range again, as shown by the readout and pins across the whole span"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "long_title_truncates_with_ellipsis"
+description = "An event with a very long title is truncated with an ellipsis in its Library row and shown in full in the detail panel"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.39"
+name = "empty_state_offers_recovery_control"
+description = "When the filters, search, and year window match nothing, the list/stage region shows a visible empty state with a message and a working control to reset filters or create an event, and using that control recovers from the empty state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "inline_errors_and_disabled_submit"
+description = "In the create/edit form, an inline error message naming the field appears next to an empty title or an invalid year before submit, and the submit control stays disabled until every required field is valid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "library_rows_stream_in_on_fast_scroll"
+description = "Scrolling fast through the full seeded corpus in the Library list shows rows appearing as they enter the viewport, with no blank gaps left behind"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "shift_scroll_slides_year_window"
+description = "Shift-scroll (or horizontal scroll) over the stage slides the visible year window earlier or later in time, live and without reload"
+type = "binary"
+weight = 0.5
 
 [[criterion]]
 id = "1.catchall"

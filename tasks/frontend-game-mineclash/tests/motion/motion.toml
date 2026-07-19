@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "4.1"
 name = "rival_thinking_visibly_animated"
-description = "During real play the Rival's thinking delay is visibly animated (a pulsing thinking indicator for roughly a second) before its tile resolves, rather than an instant silent jump"
+description = "During real play the Rival's thinking delay is visibly animated (a pulsing 'Rival is thinking' indicator shown for roughly 0.9 to 1.6 seconds) before its tile resolves, rather than an instant silent jump"
 type = "binary"
 weight = 1.0
 

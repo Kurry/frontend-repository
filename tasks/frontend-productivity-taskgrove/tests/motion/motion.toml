@@ -82,13 +82,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.4"
-name = "4_4"
-description = "Before any root task exists, before anything is archived, and when a search or tag filter matches nothing, each area shows its own explicit empty or no-results message rather than a blank area"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "4.5"
 name = "4_5"
 description = "Submitting a blank root or child title is blocked and explained with a visible inline error or shake, not merely a silently disabled button"

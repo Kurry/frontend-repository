@@ -76,8 +76,8 @@ weight = 1.0
 
 [[criterion]]
 id = "2.3"
-name = "no_uncaught_exceptions_during_flows"
-description = "Applying a filter and changing the site or date range completes with no uncaught JavaScript exception in the console"
+name = "console_clean_during_full_exercise"
+description = "A full exercise of the app (apply and clear a filter, change sort, site, date range, and theme, open and submit the Add site form) completes with no console errors, no warnings, and no unhandled promise rejections"
 type = "binary"
 weight = 1.0
 

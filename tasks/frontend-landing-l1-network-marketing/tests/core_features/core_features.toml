@@ -173,13 +173,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.17"
-name = "console_clean_during_session"
-description = "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.18"
 name = "static_list_without_crud"
 description = "Events list is static HTML only with no working create/edit/delete against shared state"

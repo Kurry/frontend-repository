@@ -62,21 +62,21 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
+name = "hover_wash_and_ripple_feedback"
 description = "Bottom-nav items, table action icons, and dialog buttons show a hover wash and a Material ripple/press feedback when actually hovered or clicked through the real control path"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "4_2"
+name = "dialog_and_backdrop_animate_in_out"
 description = "Opening and closing the add/edit expense dialog animates the dialog and its backdrop in and out rather than appearing or disappearing instantly"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
+name = "snackbar_slides_in_and_autodismisses"
 description = "Add, update, and delete actions show a snackbar that slides in from the bottom edge and auto-dismisses after a short delay"
 type = "binary"
 weight = 0.5
@@ -84,7 +84,7 @@ optional = true
 
 [[criterion]]
 id = "4.4"
-name = "4_4"
+name = "progress_bar_fill_animates_to_new_value"
 description = "A budget progress bar's fill animates toward its new value when an expense is added, edited, deleted, or the period changes, rather than jumping instantly"
 type = "binary"
 weight = 0.5
@@ -92,7 +92,7 @@ optional = true
 
 [[criterion]]
 id = "4.5"
-name = "4_5"
+name = "expansion_panel_height_opacity_transition"
 description = "Expanding and collapsing a Settings category row animates its height/opacity via the Material expansion panel transition when toggled through the real control"
 type = "binary"
 weight = 0.5
@@ -100,7 +100,7 @@ optional = true
 
 [[criterion]]
 id = "4.6"
-name = "4_6"
+name = "no_hover_feedback_on_interactive_chrome"
 description = "Interactive chrome shows no hover feedback at all — buttons, nav items, and table actions look identical when hovered as when idle"
 type = "binary"
 weight = 1.0

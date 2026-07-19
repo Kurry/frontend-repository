@@ -99,7 +99,7 @@ optional = true
 [[criterion]]
 id = "3.6"
 name = "sentence_case_numeral_labels"
-description = "UI labels, headings, buttons, and counts use sentence case and numerals, action labels are specific (Clear filter, Add site) rather than generic, and short labels carry no terminal period"
+description = "UI labels, headings, buttons, and counts use sentence case and numerals, action labels are specific (Clear filter, Add site) rather than generic, short labels carry no terminal period, and empty states explain what belongs there rather than showing bare nothing-text"
 type = "binary"
 weight = 0.5
 optional = true

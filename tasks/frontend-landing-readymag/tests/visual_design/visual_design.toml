@@ -106,7 +106,7 @@ weight = 1.0
 [[criterion]]
 id = "2.7"
 name = "copy_matches_prd_exactly"
-description = "All rendered copy matches the PRD exactly with no invented claims (headline, subtitle, feature titles and bodies including the Attract card's \"Lottie\" wording, tile labels, support and closing copy)"
+description = "All rendered copy matches the PRD exactly with no invented claims (headline, subtitle, feature titles and bodies including the Attract card body naming video and vector motion, tile labels, support and closing copy, footer link labels)"
 type = "binary"
 weight = 1.0
 
@@ -207,6 +207,13 @@ description = "A required Canvasly surface is omitted, empty, broken, reused whe
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "2.21"
+name = "underline_gradient_treatments"
+description = "By computed style, muted link underlines use the repeat-x background pattern linear-gradient(to right, rgba(0, 0, 0, 0.31) 0%, rgba(0, 0, 0, 0.31) 100%) sized 1px 2px positioned at 0 90%, and the active black underline uses the same pattern at 0 100% sized 1px 1px"
+type = "binary"
+weight = 0.5
 
 [[criterion]]
 id = "2.catchall"

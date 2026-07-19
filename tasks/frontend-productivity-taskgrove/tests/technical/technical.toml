@@ -69,8 +69,8 @@ weight = 1.0
 
 [[criterion]]
 id = "2.2"
-name = "2_2"
-description = "No uncaught JavaScript errors or unhandled promise rejections appear in the console during initial load or while exercising the core workflow (create, nest, toggle, zoom, archive)"
+name = "console_clean_during_full_exercise"
+description = "No console errors, warnings, or unhandled promise rejections appear during initial load or a full exercise of the app: creating, nesting, toggling, tagging, filtering, searching, zooming, moving, archiving, restoring, exporting, and theme switching"
 type = "binary"
 weight = 1.0
 

@@ -180,6 +180,41 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "1.32"
+name = "filter_flow_round_trip"
+description = "Applying a status or tag filter in Projects Board recomputes the visible cards from the shared collection, clearing the filter restores the full set exactly, and editing a project's status moves it between the corresponding filter results without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "theme_mode_state_continuity"
+description = "Running /retro then toggling into Projects Board keeps the retro theme applied, switching back to Terminal CLI preserves the prior output buffer and up-arrow command history, and no step in the chain reloads the document"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "unknown_command_feedback"
+description = "Typing an unrecognized command echoes the input and prints a command-not-found style message pointing at /help, while existing output stays intact and no exception is thrown"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "clear_preserves_session_state"
+description = "After /clear wipes prior output, the prompt remains usable, pressing the up arrow still recalls earlier commands, and a subsequent /work still lists the full seeded project collection"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "double_submit_single_create"
+description = "Double-activating the project create submit control adds exactly one project: the board card count increases by one and exactly one new entry appears in subsequent /work output"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.27"
 name = "stubbed_terminal_commands"
 description = "One or more required section, project, clear, or easter-egg commands behaves as a decorative stub, prints unrelated output, or leaves the promised visible state unchanged"

@@ -62,8 +62,8 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
-description = "Required hover animations are present; tab indicator and preview updates animate as specified"
+name = "hover_suite_matches_spec"
+description = "Verified via computed styles while each hover is active: buttons and icon buttons show a brightness lift on hover, Palette accordion summaries take a subtle hover wash, saved theme rows take a hover wash, and inert link-like controls (version chip, Docs affordances) underline on hover"
 type = "binary"
 weight = 1.0
 

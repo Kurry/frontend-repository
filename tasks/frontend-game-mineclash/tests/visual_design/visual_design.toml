@@ -92,7 +92,7 @@ weight = 1.0
 [[criterion]]
 id = "3.5"
 name = "grid_scales_and_stacks_at_375"
-description = "At roughly a 375px-wide viewport the grid scales down and stays tappable without horizontal scrolling while the score and strike panels stack above the grid"
+description = "At roughly a 375px-wide viewport the grid scales down to smaller tiles (roughly a 28px minimum) and stays tappable without horizontal scrolling while the score and strike panels stack above the grid"
 type = "binary"
 weight = 0.5
 optional = true
@@ -177,6 +177,13 @@ description = "At a 375px-wide viewport, the setup screen, HUD, history panel, o
 type = "binary"
 weight = 1.0
 negate = true
+
+[[criterion]]
+id = "3.17"
+name = "score_panels_show_label_target_strikes"
+description = "During a round each of the two score panels (You and Rival) shows the side label, the live score displayed against the Target Score, and a row of 3 Strike icons"
+type = "binary"
+weight = 1.0
 
 [[criterion]]
 id = "3.catchall"

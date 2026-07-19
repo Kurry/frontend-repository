@@ -143,6 +143,49 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "2.12"
+name = "keyboard_operable_with_visible_focus"
+description = "Every interactive control (nav items, Select, reveal/hide, permission toggles, form fields, theme switch) is reachable and operable with the keyboard alone, and the focused control shows a visible focus indicator"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.13"
+name = "toggle_and_reveal_expose_state_to_assistive_tech"
+description = "Permission toggles expose their on/off state to assistive technology as real switch controls (e.g. role switch with a current checked state), and the reveal/hide control's accessible name reflects whether the key is currently revealed or hidden"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.14"
+name = "validation_announced_via_live_region"
+description = "The create-identity form's validation message is exposed through a polite ARIA live region in addition to being shown visually"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.15"
+name = "interactive_within_two_seconds"
+description = "On a local cold load, the app renders and becomes interactive within 2 seconds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.16"
+name = "rapid_input_stays_coherent"
+description = "Rapidly toggling permissions and switching identities in quick succession produces no hangs, dropped updates, or mixed-identity states — the dashboard, Permissions view, and Audit log all settle on one coherent identity's data"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.17"
+name = "outbound_network_requests_made"
+description = "The app makes outbound network requests beyond its own origin (external fonts, icons, scripts, APIs, or simulated relay connections visible in the network log)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

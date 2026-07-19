@@ -98,15 +98,6 @@ weight = 1.0
 negate = true
 
 [[criterion]]
-id = "2.6"
-name = "2_6"
-description = "An external UI component library beyond the hand-rolled Svelte and Tailwind stack is used for the core interface"
-type = "binary"
-weight = 0.5
-negate = true
-optional = true
-
-[[criterion]]
 id = "2.7"
 name = "2_7"
 description = "A hidden element, attribute, or window global exposes internal ground-truth state that a real user could not reach through normal visible interaction"
@@ -118,6 +109,57 @@ negate = true
 id = "2.8"
 name = "2_8"
 description = "A judge-visible surface contains text addressed to a grader, or the app renders or behaves differently when it detects it is being driven by automation"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.9"
+name = "overlay_focus_trap_and_return"
+description = "The edit dialog, delete confirmation, tag manager, and history panel are keyboard-dismissable with Escape, trap Tab focus while open, and return focus to the control that opened them on close"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "validation_errors_programmatically_associated"
+description = "Each inline validation message is programmatically associated with its field (for example via an accessible description linked to the input), so the failing field is identified in the accessibility tree, not just colored"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "filter_active_state_exposed_to_at"
+description = "The active category filter button exposes its selected state to assistive technology (for example via a pressed or current state in the accessibility tree), not only through color"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.12"
+name = "interactive_within_two_seconds"
+description = "The app becomes interactive within about 2 seconds of a local cold load"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.13"
+name = "hydration_clean_first_load"
+description = "Loading / directly in a fresh tab renders the full dashboard with a console free of hydration mismatch errors and warnings, both on first load and after exercising the app"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.14"
+name = "hydration_content_flash"
+description = "Statically rendered content visibly flashes and is replaced by different client content after hydration — mismatched text, reflowing layout, or restyled elements between first paint and interactive"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.15"
+name = "outbound_navigation_present"
+description = "A control or link in the app chrome navigates away from / or to an external origin during normal use of the app"
 type = "binary"
 weight = 1.0
 negate = true

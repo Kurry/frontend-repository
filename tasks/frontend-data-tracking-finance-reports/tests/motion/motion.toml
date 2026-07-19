@@ -69,7 +69,7 @@ weight = 1.0
 
 [[criterion]]
 id = "4.2"
-name = "4_2"
+name = "mode_switch_keeps_hover_feedback"
 description = "Chart/list mode switches update without full reload and keep hover feedback"
 type = "binary"
 weight = 0.5
@@ -77,7 +77,7 @@ optional = true
 
 [[criterion]]
 id = "4.3"
-name = "4_3"
+name = "hover_washes_missing_on_rows_nav"
 description = "Omits hover washes on rows or nav so the reports chrome feels static on pointer hover"
 type = "binary"
 weight = 1.0

@@ -91,8 +91,8 @@ weight = 1.0
 
 [[criterion]]
 id = "2.5"
-name = "2_5"
-description = "Each category chip and each intensity badge has its own distinguishable color visible at a glance on a drawn card, and the selected intensity and toggled-on chips are filled or inverted versus unselected ones."
+name = "category_intensity_color_coding"
+description = "Category chips and intensity badges follow the assigned hues — Icebreaker blue, Truth teal, Dare orange, Wild magenta; Mild green, Spicy amber, Wild red — legible at a glance on a drawn card, and the selected intensity and toggled-on chips are filled or inverted versus unselected ones."
 type = "binary"
 weight = 1.0
 

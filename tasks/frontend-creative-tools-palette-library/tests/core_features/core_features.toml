@@ -233,7 +233,7 @@ weight = 1.0
 [[criterion]]
 id = "1.25"
 name = "subscribe_trigger_and_dismiss"
-description = "The subscribe popup stays hidden on first paint and appears only after idle (~45s) or scrolling past ~50%, and closing or submitting dismisses it with no outbound navigation"
+description = "The subscribe popup stays hidden on first paint and appears only after idle (~45s) or scrolling past ~50%, closing or submitting dismisses it with no outbound navigation, and it does not reappear on further idle or scrolling during the same session"
 type = "binary"
 weight = 0.5
 optional = true
@@ -264,6 +264,20 @@ weight = 1.0
 id = "1.29"
 name = "view_filter_copy_round_trip"
 description = "Choose a period, switch Nomenclature→Palette→Swatch→Nomenclature, copy one matching swatch, then choose All Periods; exactly one layout is visible throughout, the filtered set is consistent across layouts, copied feedback clears, and the full deduped hue ordering returns without reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "submit_disabled_until_valid"
+description = "In the palette create/edit form, typing an invalid or empty required value shows an inline error next to that field naming what to fix, and the submit control remains disabled until every required field is valid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "double_submit_single_create"
+description = "Rapidly double-activating the editor's submit control with a valid palette creates exactly one palette: the collection count increases by exactly one and exactly one new card appears"
 type = "binary"
 weight = 1.0
 

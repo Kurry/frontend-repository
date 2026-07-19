@@ -126,6 +126,13 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "2.11"
+name = "document_title_matches"
+description = "After load and settle, the browser document title reads 'Material UI Theme Creator'"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical defect (console, storage rule, state coherence, load, or accessibility) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action, page state, screenshot) that demonstrates it. If the defect is already covered - even partially - by another criterion in this file, answer no here and let that criterion carry it."

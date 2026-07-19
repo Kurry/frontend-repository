@@ -76,8 +76,8 @@ weight = 1.0
 
 [[criterion]]
 id = "TI-3"
-name = "TI-3"
-description = "Driving the core flow (send with a tag, pin, archive, search) logs no uncaught console errors at any point"
+name = "console_clean_during_full_exercise"
+description = "Driving a full exercise of the app's features (send with a tag, edit, pin, archive, delete, filter, search, calendar, undo/redo) logs no console errors or warnings at any point"
 type = "binary"
 weight = 1.0
 
@@ -97,11 +97,10 @@ weight = 1.0
 
 [[criterion]]
 id = "TI-6"
-name = "TI-6"
-description = "The send workflow withstands at least 25 rapid deterministic submissions with an exact final count, responsive controls, and no blank screen, uncaught error, or sustained freeze"
+name = "rapid_25_send_burst_stability"
+description = "The send workflow withstands at least 25 rapid deterministic submissions through the Send control with the final visible note count exact, controls responsive, and no blank screen, uncaught error, or sustained freeze"
 type = "binary"
-weight = 0.5
-optional = true
+weight = 1.0
 
 [[criterion]]
 id = "TI-NEG-1"

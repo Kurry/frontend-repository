@@ -118,8 +118,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.9"
-name = "1_9"
-description = "After using Zoom In on a non-root node, everything outside its branch is hidden and a breadcrumb trail shows the path back to the true root; clicking an ancestor segment zooms back to exactly that level"
+name = "zoom_breadcrumb_and_unzoom"
+description = "After using Zoom In on a non-root node, everything outside its branch is hidden and a breadcrumb trail shows every ancestor down to the true root; clicking an ancestor segment zooms back to exactly that level, and clicking the trailing unzoom control returns the view to the true root"
 type = "binary"
 weight = 1.0
 
@@ -146,15 +146,8 @@ weight = 1.0
 
 [[criterion]]
 id = "1.13"
-name = "1_13"
-description = "Submitting the New Root Task input with a blank title is rejected with a visible inline error or shake hint, and no blank-titled root is added to the tree"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.14"
-name = "1_14"
-description = "At approximately 375px viewport width with a multi-level tree, the app shows no horizontal scrolling and deeply nested rows truncate or wrap their text rather than forcing the page wider"
+name = "blank_title_rejected_root_and_child"
+description = "Submitting the New Root Task input with a blank title is rejected with a visible inline error or shake hint and no blank-titled root is added; submitting Add Child with a blank title is rejected the same way and adds nothing"
 type = "binary"
 weight = 1.0
 

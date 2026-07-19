@@ -340,6 +340,13 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
+id = "1.44"
+name = "shift_wheel_translates_year_window"
+description = "In Scrub/Explore mode, Shift+wheel (or a dominant horizontal wheel gesture) over the stage translates the year window — the from/to readout shifts and pins move accordingly — rather than zooming or scrolling the page"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "A specified core behavior of the app is broken or missing in a way that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

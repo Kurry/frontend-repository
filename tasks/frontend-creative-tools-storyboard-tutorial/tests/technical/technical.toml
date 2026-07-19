@@ -62,22 +62,80 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "2.1"
-name = "2_1"
-description = "Preact Signals holds scenes, view mode, slide index, and edit focus — shared across components"
+name = "shared_state_coherence_across_views"
+description = "A change made in one view is immediately reflected in every other surface showing that data without a reload: creating, editing, or deleting a scene updates the board, the scene numbering, and the Slide N / total counter together, with no view showing stale data another view already updated"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.2"
-name = "2_2"
+name = "storage_empty_and_reload_reseeds"
 description = "No browser storage is used for persistence: localStorage and sessionStorage remain empty after a full exercise of the app, and a reload returns the seeded state"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "2.3"
-name = "2_3"
-description = "Uses localStorage or sessionStorage to persist scenes or view mode"
+name = "browser_storage_persists_state"
+description = "localStorage or sessionStorage is non-empty after exercising the app, persisting scenes, view mode, or other app state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.4"
+name = "keyboard_operable_with_visible_focus"
+description = "Every interactive control — header tools, view toggles, scene actions, the create form, and slide navigation — is reachable and operable with the keyboard alone (Tab/Shift+Tab plus Enter/Space or arrows), and the focused control shows a visible focus indicator"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "active_toggle_exposes_pressed_state"
+description = "The active Tile/List/Slide view toggle exposes its pressed/selected state to assistive technology (e.g. aria-pressed, aria-selected, or an equivalent role state in the accessibility tree), not just a visual treatment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "validation_announced_via_aria_live"
+description = "Create-form validation messages are announced through an aria-live polite region (present in the DOM and populated when validation fires) in addition to being shown inline"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "scene_thumbnails_have_descriptive_alt"
+description = "Every scene thumbnail image carries descriptive alternative text (non-empty alt that describes the scene, not a filename or generic placeholder)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "interactive_within_two_seconds"
+description = "On a local cold load, the app renders and responds to interaction within 2 seconds"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "console_errors_during_full_exercise"
+description = "Console errors or warnings appear during a full exercise of the app (view switching, create, edit, delete, slide navigation)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.10"
+name = "rapid_interaction_stays_responsive"
+description = "Rapidly switching view modes and rapidly advancing slides stays responsive with no hangs, frozen frames, or dropped interactions, and the UI state stays consistent afterward"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "outbound_cdn_requests_present"
+description = "Devtools network activity shows outbound cross-origin requests for fonts, icons, scripts, or styles (CDN imports) instead of all assets being served from the app's own origin"
 type = "binary"
 weight = 1.0
 negate = true

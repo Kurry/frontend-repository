@@ -290,6 +290,13 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "1.36"
+name = "opens_directly_on_home_board_no_gate"
+description = "Loading the app opens straight onto the Home board — left nav rail, central multi-day board, and right calendar rail all visible — with no login, signup, or onboarding gate blocking the board"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "A specified core behavior of the app is broken or missing in a significant, browser-observable way that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

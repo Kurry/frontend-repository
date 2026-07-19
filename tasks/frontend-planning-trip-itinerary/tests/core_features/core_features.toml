@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "seeded_multi_day_stops_visible"
-description = "On load, Plan List mode shows multi-day itinerary sections with at least 8 seeded French Riviera stops (e.g. Nice, Monaco, Cannes, Antibes, Eze) and place names visible"
+description = "On load, Plan List mode shows multi-day itinerary sections with at least 8 seeded French Riviera stops (e.g. Nice, Monaco, Cannes, Antibes, Eze), and each stop row shows a name, its day assignment, and a category (with an optional time or note where seeded)"
 type = "binary"
 weight = 1.0
 
@@ -279,6 +279,20 @@ name = "planner_direct_entry_no_gate"
 description = "The trip plan workspace (sidebar + plan column + map) renders immediately on load with no marketing landing, login, signup, or booking gate before it"
 type = "binary"
 weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "top_plan_chrome_contents"
+description = "The top plan chrome shows a Trip / Travel Planner brand mark, Trip plan / Trip journal mode labels, and Share and edit toolbar affordances rendered as in-app chrome (no outbound navigation)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "map_pane_static_snapshot_affordances"
+description = "The map pane renders as a static snapshot with visible Export, Optimize, and layers affordances, and activating Optimize route or layers shows a demo toast rather than driving a live tile map or navigating away"
+type = "binary"
+weight = 0.5
 
 [[criterion]]
 id = "1.catchall"

@@ -138,13 +138,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.12"
-name = "hover_feedback_on_rows_and_chrome"
-description = "When hovering place rows, sidebar items, or map chrome controls, a visible hover lift, wash, or press feedback appears"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "1.13"
 name = "row_pin_two_way_sync"
 description = "Starting with the seeded plan visible: click a stop row and confirm the map flies to that stop's pin and the row highlights; then click a different stop's map pin and confirm that stop becomes selected and the plan list scrolls/highlights its row; after each direction the highlighted row and the enlarged pin refer to the same stop"
@@ -162,13 +155,6 @@ weight = 1.0
 id = "1.15"
 name = "detail_card_dismiss_closes"
 description = "The place-detail card opened over the map can be closed with its dismiss control"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.16"
-name = "console_clean_during_session"
-description = "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session"
 type = "binary"
 weight = 1.0
 
@@ -299,6 +285,20 @@ weight = 0.5
 id = "1.38"
 name = "plan_hero_title_and_dates"
 description = "The plan hero shows a cover image, an editable title reading 'Trip to the French Riviera - Cote d'Azur', and the date range 7/5–7/11"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "top_plan_chrome_inert_affordances"
+description = "The top plan chrome shows a Trip / Travel Planner brand mark, Trip plan / Trip journal mode labels, and Share and edit toolbar affordances that behave as inert in-app chrome (a toast or no-op) rather than navigating away"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "sidebar_nav_anatomy_complete"
+description = "The left nav sidebar shows an Overview entry, an Itinerary day list for Sun 7/5 through Sat 7/11 with a distinct day-color dot per day, a Budget row, and Support and Hide sidebar controls"
 type = "binary"
 weight = 1.0
 

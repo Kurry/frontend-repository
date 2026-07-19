@@ -62,8 +62,8 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "4.1"
-name = "4_1"
-description = "Required hover animations are present; dial/meter/preview and mode switches animate as specified"
+name = "hover_and_focus_treatments_per_spec"
+description = "Verified with the real pointer: the help trigger brightens on hover, enabled stepper buttons keep a pointer cursor, preset rows and primary buttons take a visible hover wash, and steppers/controls show focus-visible rings when keyboard-focused"
 type = "binary"
 weight = 1.0
 
@@ -85,8 +85,8 @@ negate = true
 
 [[criterion]]
 id = "4.4"
-name = "4_4"
-description = "Stepping a dial eases the exposure meter along the track by one increment (not an instant jump) and crossfades the shutter motion frame, driven through the real stepper controls"
+name = "meter_eases_one_increment_per_stop"
+description = "Driven through the real stepper controls, each stop change eases the exposure meter indicator along the vertical track by one increment over roughly half a second — continuous travel that stops at the track ends — and crossfades the shutter motion frame"
 type = "binary"
 weight = 0.5
 optional = true

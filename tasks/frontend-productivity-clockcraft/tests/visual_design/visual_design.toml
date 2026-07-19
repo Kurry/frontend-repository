@@ -135,6 +135,56 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "3.11"
+name = "coherent_icon_family"
+description = "The timer, filter, search, delete, and history controls carry icons from one visually coherent icon family, with no mixed icon styles across the chrome"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.12"
+name = "weekly_chart_legend_and_separation"
+description = "The Weekly overview's stacked day segments stay individually legible with visible separation between days, and a small legend maps the colors to the three categories"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.13"
+name = "inline_error_distinct_treatment"
+description = "Inline validation messages render in a distinct error treatment beside the field they name, visually separate from helper text"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.14"
+name = "narrow_single_column_reflow"
+description = "At approximately 375px wide the layout reflows to a single column with the weekly chart and timeline readable within the column and the Start timer and Add entry controls fully usable and legible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.15"
+name = "consistent_capitalization_convention"
+description = "Headings, buttons, and filter labels use one consistent capitalization convention throughout the app"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.16"
+name = "toasts_name_the_action"
+description = "Toasts name the specific action that just happened — for example confirming a saved entry or a timer switch — rather than showing a generic success message"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.17"
+name = "placeholder_text_shipped"
+description = "Lorem ipsum, 'TODO', template variable names, or other placeholder text is visible somewhere in the shipped UI"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "3.catchall"
 name = "visual_design_catchall"
 description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
