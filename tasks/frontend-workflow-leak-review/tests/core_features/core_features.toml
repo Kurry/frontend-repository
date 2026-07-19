@@ -219,6 +219,13 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "1.23"
+name = "score_band_boundaries_exact"
+description = "The three score bands honor their exact boundaries: a row scoring below 0.40 renders in the low-band color, a row scoring from 0.40 up to (but below) the current threshold renders in the mid-band color, and a row at or above the threshold renders in the high-band color — verified against specific visible row scores on both sides of 0.40 and of the threshold"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
