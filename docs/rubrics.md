@@ -581,6 +581,80 @@ This dimension is app-agnostic **by design** — the same criteria apply verbati
 | 14 Behavioral | R | A — toggle/form/reveal probes instead of CRUD probes | A — reference's stateful behaviors | R | R |
 | 15 Writing | R | R — heaviest weight here | A — copy must match the reference | A — self-scoping covers text-light play | R |
 
+## Showcase-Grade Design Extensions
+
+The best sites on the web are not graded against corporate design-kit compliance — they are judged the way a design jury judges: **Design 40%, Usability 30%, Creativity 20%, Content 10%**. For tasks that target that caliber of visual ambition (landing pages, website-fidelity rebuilds of showcase-class sites, 3D-forward apps), layer the extension criteria below on top of the base dimensions. They extend — never replace — the base criteria: a broken-grid layout that fails contrast or keyboard access still fails Accessibility, and a scroll-narrative that hides core flows still fails UX.
+
+Quality-weight mapping onto this doc's dimensions:
+
+| Quality axis | Weight | Primary dimensions here |
+|---|---|---|
+| Design | 40% | 2 UI Design, 3 Design Fidelity |
+| Usability | 30% | 4 UX, 6 User Flow, 7 Responsiveness |
+| Creativity | 20% | 8 Motion, 11 Innovation |
+| Content | 10% | 15 Writing |
+
+Technical execution is reviewed on its own axis, independent of the visual score — beautiful work that lags, breaks across devices, or excludes keyboard users does not clear the bar. That is why the technical and accessibility extensions below carry as much weight as the visual ones.
+
+Extension criteria (ids suffixed `.aN` so base numbering stays stable; all browser-observable):
+
+**Accessibility (1.a) — creative tech stays accessible:**
+
+1. (1.a1, positive) Split-text headlines keep the original string as an aria-label on the container while the individual character/word spans are hidden from the accessibility tree (aria-hidden), so kinetic type reads as one phrase to assistive tech.
+2. (1.a2, positive) Canvas/3D scenes are accessible by at least one of: role="img" with a descriptive aria-label on the canvas; structured fallback content inside the canvas element; or a visually hidden sibling DOM that mirrors the interactive controls with working keyboard focus.
+3. (1.a3, positive) State changes driven from canvas or scene interactions are announced via an aria-live region (e.g. "Color changed to Midnight Black").
+4. (1.a4, negative) A split/kinetic headline is exposed to the accessibility tree as character soup — no aria-label on the container and the split spans are not hidden.
+5. (1.a5, negative) A canvas-only interactive control is unreachable by keyboard and has no representation in the accessibility tree.
+
+**UI Design (2.a) — Advanced structural & grid frameworks:**
+
+1. (2.a1, positive) The layout uses proportion-based, intentionally asymmetric composition (golden-canon-style spacing, mixed spans, focal structural objects) rather than equal-width block stacks — asymmetry reads as deliberate hierarchy, not accident.
+2. (2.a2, positive) Broken-grid moments are executed with control: elements cross section borders, text overlays imagery with preserved legibility, and asymmetric whitespace functions as a compositional element rather than leftover gap.
+3. (2.a3, positive) Typography is treated as a core visual asset: a high-personality display face rendered at immense scale anchors the visual weight of minimalist sections, with a disciplined scale contrast between display and body text; where a variable font is used, its axes (weight, width, slant) morph continuously with interaction or scroll rather than snapping between static weights.
+4. (2.a4, negative) Broken-grid or brutalist styling degrades function: overlapped text becomes unreadable, crossed borders clip interactive controls, or the asymmetry collapses into visual noise at any specified breakpoint.
+5. (2.a5, negative) Display typography is ambitious in the hero but abandoned elsewhere — inner sections fall back to generic, unstyled type that breaks the visual system.
+6. (2.a6, positive) Typography scales fluidly: resizing the viewport scales type smoothly and continuously, with no abrupt size jumps at breakpoint boundaries.
+7. (2.a7, positive) Broken-grid asymmetry stays mathematically controlled: spacing and offsets align to one consistent baseline unit (e.g. multiples of 4 or 8 pixels), so the brutalism reads as deliberate composition rather than chaos.
+8. (2.a8, positive) 3D materials read as physically lit: scene objects show visible environment reflections and distinct material responses (glossy vs. matte vs. glass surfaces react differently to the lighting), not flat unlit shading.
+9. (2.a9, positive) Text rendered inside a 3D or canvas scene stays crisp at every scale and zoom level — no blurry or pixelated glyph edges as the camera or layout moves.
+
+**Motion (8.a) — Kinetic typography & high-fidelity interaction:**
+
+1. (8.a1, positive) Kinetic typography: headline text animates at the character or word level (staggered reveals, scale/morph/perspective shifts) driven by scroll position or pointer, verified through real scrolling/pointer movement on a fresh load.
+2. (8.a2, positive) Scroll-triggered storytelling: scrolling drives a sequential narrative — pinned sections, mask reveals, section-wipe transitions, or canvas translations advance in a choreographed order tied to scroll progress.
+3. (8.a3, positive) Pointer-reactive depth: elements respond to cursor position with parallax, magnetic hover, or perspective shifts that feel continuous (no stepping), while remaining fully usable.
+4. (8.a4, positive) 3D / spatial environments where the task allows them: browser-rendered 3D scenes or shader-driven surfaces respond to input in real time at a stable frame rate.
+5. (8.a5, negative) Scroll capture breaks usability: hijacked scrolling traps the user, prevents reaching content, fights native scroll direction, or ignores keyboard/reduced-motion paths.
+6. (8.a6, negative) Kinetic effects are decorative jank: text-splitting animations stutter, reflow mid-animation, or leave characters misaligned after settling.
+7. (8.a7, negative) Signature motion uses purely linear tweens — movement starts and stops mechanically with no inertial easing, momentum, or physical settling.
+8. (8.a8, positive) Interactive vector animation: animated UI elements (buttons, icons, illustrative graphics) remain perfectly crisp at every viewport size and zoom level and respond to input state (hover, press, progress) rather than looping identically regardless of interaction.
+9. (8.a9, negative) A "signature animation" is actually a pre-rendered video or raster loop passed off as interactive: it pixelates when scaled, ignores pointer and state changes, and restarts identically on every encounter.
+
+**Performance (9.a) — Perceptual speed:**
+
+1. (9.a1, positive) Scroll-linked animation holds a smooth frame rate through the full page length — no visible hitching during continuous scroll on the specified viewport.
+2. (9.a2, positive) Smooth-scrolling or inertia effects, where present, feel continuous and settle naturally without lag between input and motion.
+3. (9.a3, negative) Heavy visual assets or shaders cause frame-rate collapse, delayed first render, or input latency during the signature interactions.
+4. (9.a4, positive) Layout is stable after load: no visible reflow jumps as fonts, images, or scenes finish loading — media and embed regions reserve their space from first paint.
+5. (9.a5, positive) 3D/WebGL features detect capability before initializing and fall back to a complete static or 2D experience when GPU support is missing — the page remains whole, navigable, and visually coherent without the scene.
+6. (9.a6, positive) Heavy assets load progressively: the page becomes interactive before 3D models, textures, and animation files finish loading, scene regions hold their reserved space while streaming in, and no interaction is blocked waiting on an asset.
+
+**Innovation (11.a) — Showcase-grade differentiation:**
+
+1. (11.a1, positive) The page reads as a designed experience with a narrative arc — sections build on each other visually and the signature interaction is memorable, not a template with effects sprinkled on.
+2. (11.a2, positive) Impeccable execution across distinct breakpoints: the showcase composition is re-choreographed (not merely stacked) for smaller viewports.
+
+Guardrails when authoring showcase-grade criteria:
+
+- Every effect criterion is verified through the **real control path** on a **fresh load** (scroll state pollutes reveal state; pointer effects need actual pointer movement).
+- `prefers-reduced-motion` still binds: the reduced experience must remain complete and navigable.
+- Assets stay local (fonts, textures, models); an outbound font/CDN request is a Technical Quality failure, not a style choice.
+- Libraries that typically power these effects (animation/scroll/3D engines) are permitted only where the task's requirements allowlist them.
+- Smooth-scroll engines must preserve native platform behavior: native touch physics stay intact on mobile, position:sticky keeps working, and the engine never fights the user's scroll direction.
+- The WebGL fallback (9.a5) is effectively mandatory for any 3D task in this harness: the judge's headless chromium may software-render or lack GPU features, so a scene-only page risks being unjudgeable, not just inaccessible.
+- Contrast floor stays WCAG AA everywhere (including text over imagery and canvas). AAA (7:1 body text, 4.5:1 large text) is a showcase-tier stretch for high-contrast designs — guidance, not a base criterion.
+- Asset-pipeline mandates (3D model formats, compressed textures, HDR lighting environments, vector-animation runtimes, in-scene text atlases, wasm decoders) belong in the task's builder-facing requirements, not in criteria — the judge grades their observable results (2.a8, 2.a9, 8.a8, 9.a6), and every one of those files, decoders included, must ship locally in /app.
+
 ## Crosswalk: This Doc ↔ Judged Dimensions ↔ zto Test Shapes
 
 | Dimension (this doc) | Repo judged dimension (core_features / technical / visual_design / motion) | zto-phase2 test shape |
