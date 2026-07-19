@@ -1,0 +1,83 @@
+# Full corpus run: claude-code builder on Sonnet 5 (Claude subscription OAuth),
+# codex judge on ChatGPT-plan OAuth (auth.json passed as CODEX_AUTH_JSON).
+# Usage:
+#   export CODEX_AUTH_JSON="$(cat ~/.codex/auth.json)"   # judge OAuth
+#   harbor run -y -c configs/sonnet5-codex-oauth.yaml    # CLAUDE_CODE_OAUTH_TOKEN from host env
+jobs_dir: jobs
+n_attempts: 1
+n_concurrent_trials: 4
+
+environment:
+  type: docker
+  delete: true
+
+agents:
+  - name: claude-code
+    model_name: anthropic/claude-sonnet-5
+    env:
+      CLAUDE_FORCE_OAUTH: "1"          # subscription token wins over any API key
+
+verifier:
+  env:
+    CODEX_AUTH_JSON: "${CODEX_AUTH_JSON}"   # rewardkit codex judge -> isolated temp CODEX_HOME
+    REWARDKIT_MODEL: "${REWARDKIT_MODEL:-}" # unset -> toml default gpt-5.6-sol
+
+tasks:
+  - path: ./tasks/frontend-admin-analytics-dashboard
+  - path: ./tasks/frontend-avax-network
+  - path: ./tasks/frontend-budget-angular
+  - path: ./tasks/frontend-camera-exposure
+  - path: ./tasks/frontend-cipherlog
+  - path: ./tasks/frontend-color-palette-archive
+  - path: ./tasks/frontend-daily-planner-board
+  - path: ./tasks/frontend-daisyui-theme-generator
+  - path: ./tasks/frontend-dare-night
+  - path: ./tasks/frontend-design-portfolio
+  - path: ./tasks/frontend-docuseal
+  - path: ./tasks/frontend-euroscope
+  - path: ./tasks/frontend-exposure-control-lab
+  - path: ./tasks/frontend-fandangofury
+  - path: ./tasks/frontend-feltrun
+  - path: ./tasks/frontend-finance-reports
+  - path: ./tasks/frontend-focuspath
+  - path: ./tasks/frontend-frameflick
+  - path: ./tasks/frontend-ghostfolio
+  - path: ./tasks/frontend-ghostty-config
+  - path: ./tasks/frontend-grid-paint-studio
+  - path: ./tasks/frontend-hildenkaira
+  - path: ./tasks/frontend-l1-network-marketing
+  - path: ./tasks/frontend-landonorris
+  - path: ./tasks/frontend-letterdrop
+  - path: ./tasks/frontend-lineforge
+  - path: ./tasks/frontend-loopdaily
+  - path: ./tasks/frontend-material-theme-studio
+  - path: ./tasks/frontend-material-ui-theme-creator
+  - path: ./tasks/frontend-md-uy
+  - path: ./tasks/frontend-media-history-timeline
+  - path: ./tasks/frontend-media-timeline
+  - path: ./tasks/frontend-mermaid-live-editor
+  - path: ./tasks/frontend-mindthread
+  - path: ./tasks/frontend-mineclash
+  - path: ./tasks/frontend-mosbyfiles
+  - path: ./tasks/frontend-nostrpass
+  - path: ./tasks/frontend-notenest
+  - path: ./tasks/frontend-palette-library
+  - path: ./tasks/frontend-panecraft
+  - path: ./tasks/frontend-plausible-analytics
+  - path: ./tasks/frontend-portfolioframe
+  - path: ./tasks/frontend-razorpay-sprint-26
+  - path: ./tasks/frontend-readymag
+  - path: ./tasks/frontend-repquest
+  - path: ./tasks/frontend-scribblespace
+  - path: ./tasks/frontend-shapeshift-grid
+  - path: ./tasks/frontend-sidedock
+  - path: ./tasks/frontend-story-docs
+  - path: ./tasks/frontend-storyboard-tutorial
+  - path: ./tasks/frontend-swiftnote
+  - path: ./tasks/frontend-tagnote
+  - path: ./tasks/frontend-taskgrove
+  - path: ./tasks/frontend-terminal-portfolio
+  - path: ./tasks/frontend-units-gr
+  - path: ./tasks/frontend-vert
+  - path: ./tasks/frontend-weblink
+  - path: ./tasks/frontend-wolverineworldwide
