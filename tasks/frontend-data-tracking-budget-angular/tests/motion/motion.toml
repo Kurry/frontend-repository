@@ -144,6 +144,20 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "4.12"
+name = "bulk_tray_and_csv_screen_transitions"
+description = "The bulk action tray slides or fades in when the second row is selected and out when selection clears, and the CSV import diagnostic screen animates in and out with row statuses updating with a brief transition when excluded or inline-fixed (unless prefers-reduced-motion is set)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "overage_labels_animate_on_real_change"
+description = "Projected overage and Over threshold labels fade or slide in when a category crosses the line and out when it crosses back, driven by a real spending or threshold change through the UI rather than snapping"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "4.catchall"
 name = "motion_catchall"
 description = "The app exhibits a significant, browser-observable defect in motion or microinteractions (missing, jarring, janky, or broken animation and feedback, verified through the real UI control path on a fresh load where relevant) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

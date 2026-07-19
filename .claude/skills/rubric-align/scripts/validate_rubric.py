@@ -22,6 +22,15 @@ IMPL_PHRASES = re.compile(
     r"motion|autoanimate|tiptap|prosekit|codemirror|recharts|layerchart|echarts|"
     r"chart\.js|zod|valibot)\b", re.I)
 CATCHALL_REQUIRED = ["not covered", "evidence"]
+# A description that asserts a FAILURE/bad condition but is not negated rewards
+# the failure (the annotation-studio class). Heuristic: failure verbs without
+# negate=true, excluding catch-alls (which carry their own "significant defect"
+# language legitimately) and self-scoping writing phrasings.
+FAILURE_LANGUAGE = re.compile(
+    r"\b(fails to|is broken|is unreachable|cannot be (dismissed|reached|closed|reopened)|"
+    r"throws an? (error|exception)|is not (reachable|operable|dismissible)|"
+    r"silently (fails|reverts|drops))\b",
+    re.I)
 
 def check_file(path):
     fails = []
@@ -79,6 +88,14 @@ def check_file(path):
         cid = c.get("id") or c.get("name")
         if c.get("negate") and ABSENCE_OPENERS.search(d.strip()):
             fails.append(f"{path.name}:{cid}: negated criterion phrased as an absence (double-inverts)")
+        # Failure-language without negate=true rewards the failure. Skip catch-alls
+        # (legit "significant defect" wording) and writing's self-scoping "has no ... text".
+        if (not c.get("negate")
+                and not str(cid).endswith("catchall")
+                and dim != "writing"
+                and FAILURE_LANGUAGE.search(d)):
+            warns.append(f"{path.name}:{cid}: positive criterion uses failure language "
+                         f"— should this be negate=true? ('{FAILURE_LANGUAGE.search(d).group(0)}')")
         m = IMPL_PHRASES.search(d)
         if m:
             fails.append(f"{path.name}:{cid}: internal-implementation phrasing: '{m.group(0)}'")

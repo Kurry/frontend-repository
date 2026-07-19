@@ -232,6 +232,34 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "4.14"
+name = "csv_commit_with_zero_valid_rows_inert"
+description = "Committing a CSV import when no row is valid changes nothing: the Expenses table, Dashboard totals, and export previews stay exactly as before and the summary reports zero imported"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "recurring_rule_contract_rejected"
+description = "Adding or editing a recurring rule with an empty name, non-positive amount, unknown category, or day of month outside 1 through 28 shows validation naming that field and does not add or change a rule"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "threshold_boundary_and_zero_projection"
+description = "A category whose spent is exactly the threshold percent of its limit shows the Over threshold label, and a reporting period with no expenses shows every category's projected total as 0 with no Projected overage flag and no console error"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.17"
+name = "report_import_missing_sections_rejected"
+description = "Importing a Budget report JSON missing meta, totals, recurringRules, or settings, or whose totals disagree with its own expenses, shows an inline error naming the offending key and leaves expenses, categories, rules, threshold, and totals unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"
 description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

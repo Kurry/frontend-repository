@@ -211,6 +211,13 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "7.11"
+name = "bulk_csv_recurring_variance_at_375"
+description = "At 375px width the bulk action tray, the CSV import diagnostic table, the recurring rule list and form, the Dashboard variance and projection figures, and the Undo, Redo, Export, and Import controls remain fully visible and operable without page-level horizontal scrolling"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "responsiveness.catchall"
 name = "responsiveness_catchall"
 description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

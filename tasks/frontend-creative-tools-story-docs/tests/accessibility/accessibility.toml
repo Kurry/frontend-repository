@@ -233,6 +233,27 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "1.14"
+name = "checklist_checkboxes_real_keyboard_controls"
+description = "Rendered checklist checkboxes inside scene bodies are real keyboard-operable controls: they can be focused and toggled with the keyboard, and toggling updates the checklist progress readout"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "version_panel_keyboard_and_diff_text_marks"
+description = "The Version history panel and its Restore controls are keyboard reachable, and diff additions and removals carry visible plus and minus text marks rather than color alone"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "template_injection_announced_live"
+description = "Template injection announces its result (template name and scene count) through a polite live region as well as a toast"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "accessibility.catchall"
 name = "accessibility_catchall"
 description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

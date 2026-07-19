@@ -211,6 +211,13 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "7.11"
+name = "goals_funnel_custom_range_usable_375"
+description = "At 375px width the Goals panel, the funnel, the Segments menu and Save segment control, the custom date-range from/to inputs, and each panel's per-panel export control remain fully visible and operable in the stacked column without page-level horizontal scrolling"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "responsiveness.catchall"
 name = "responsiveness_catchall"
 description = "The app exhibits a significant, browser-observable responsiveness or layout defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

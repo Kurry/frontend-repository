@@ -169,6 +169,13 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
+id = "4.16"
+name = "funnel_and_goals_eased_updates"
+description = "When the site, range, or filter stack changes through the real controls, the funnel step bars animate their width and the Goals conversion figures update with a short eased transition rather than snapping instantly (unless prefers-reduced-motion is set)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "4.catchall"
 name = "motion_catchall"
 description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

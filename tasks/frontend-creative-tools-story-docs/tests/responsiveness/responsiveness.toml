@@ -227,6 +227,13 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "7.12"
+name = "canvas_templates_version_usable_at_375"
+description = "At 375px width the Canvas view, the Templates control, Undo/Redo, and the Version history panel remain usable without page-level horizontal scrolling, and the version diff wraps or scrolls inside its own panel"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "responsiveness.catchall"
 name = "responsiveness_catchall"
 description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

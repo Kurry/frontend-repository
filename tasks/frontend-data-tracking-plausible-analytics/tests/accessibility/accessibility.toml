@@ -211,6 +211,13 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "1.11"
+name = "segments_range_and_panel_exports_keyboard"
+description = "The Segments menu, the Save segment control, the custom date-range inputs, and each panel's per-panel export control are reachable and operable with the keyboard alone, and each filter pill's remove affordance is a focusable control with an accessible name"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "accessibility.catchall"
 name = "accessibility_catchall"
 description = "The app exhibits a significant, browser-observable accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

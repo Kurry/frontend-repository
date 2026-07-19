@@ -225,6 +225,56 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "6.13"
+name = "bulk_categorize_then_undo"
+description = "Selecting at least two expenses in different categories and bulk-categorizing them to one category updates both rows and the Dashboard totals; Undo then restores the prior categories and totals exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "bulk_delete_then_undo_multi_surface"
+description = "Selecting at least two rows and activating Bulk delete removes them and drops the affected categories' totals, progress bars, variance figures, and chart segments together; Undo restores every deleted row and every one of those figures in one step"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "recurring_rule_generates_period_instance"
+description = "After adding a recurring rule (for example Rent, 1200, an existing category, day 1), switching to a reporting period shows exactly one rule-generated row dated that day, marked as recurring, with the period's Total expenses and that category's spent including it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.16"
+name = "csv_import_diagnostic_commit_valid_only"
+description = "Importing a CSV that mixes valid and invalid rows shows a diagnostic screen listing each row's validity and naming the failing field on invalid rows while the table and totals stay unchanged; Commit then adds only the valid rows and the summary reports imported versus skipped counts"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.17"
+name = "threshold_flow_label_and_export"
+description = "Setting the spending threshold to a percent a seeded category already exceeds gives that category's row the Over threshold label, and the exported Budget report JSON settings.thresholdPercent and that category's overThreshold reflect it; raising the threshold above the category's ratio clears the label"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.18"
+name = "projection_sensitivity_flow"
+description = "A category's projected end-of-period total changes after adding a valid expense to that category in the current period, and two categories with different spent-so-far amounts show different projected totals"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "bulk_or_recurring_leaves_stale_dashboard"
+description = "After a bulk categorize, bulk delete, or recurring-rule mutation, the Dashboard totals, progress bars, variance figures, or chart segments still show the pre-mutation values until a reload"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "user_flows.catchall"
 name = "user_flows_catchall"
 description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

@@ -177,6 +177,21 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "2.19"
+name = "checkbox_version_canvas_store_coherence"
+description = "Toggling a rendered checkbox rewrites that line in the scene's stored body source (the next markdown export shows the new mark) without creating a version snapshot; committed creates, edits, and restores append version snapshots; and canvas card positions never change any scene's order number or the exported scene order"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.20"
+name = "canvas_or_checkbox_desyncs_exports"
+description = "After a checkbox toggle or a canvas drag, the export previews desync from the visible board — the markdown export shows a stale checklist mark, or the json scenes order follows canvas positions instead of the scene order fields"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical defect (console, storage, state coherence, accessibility, or load behavior) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, console line, network entry, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

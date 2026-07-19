@@ -239,6 +239,13 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "2.24"
+name = "recurring_variance_threshold_one_store"
+description = "Rule-generated expense instances, variance figures, projections, and Over threshold flags all derive from the same shared store as the Expenses table: a rule, threshold, or expense mutation updates every one of those surfaces together without a reload, and committed CSV rows behave like manually added expenses (they filter, edit, and undo the same way)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical defect (console health, state coherence, persistence, accessibility, performance, or serving behavior) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

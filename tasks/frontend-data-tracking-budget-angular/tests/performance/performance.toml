@@ -211,6 +211,13 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "9.11"
+name = "csv_diagnostic_200_rows_responsive"
+description = "Loading a Transactions CSV of roughly 200 rows into the diagnostic screen validates and renders the per-row table without freezing the UI, and scrolling, excluding, or inline-fixing rows stays responsive"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "performance.catchall"
 name = "performance_catchall"
 description = "The app exhibits a significant, browser-observable defect in performance or stability that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
