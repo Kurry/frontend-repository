@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Frontend Harbor eval tasks — pins harbor to the Kurry/harbor fork (harbor score, codex judge auth, cost recording)"
 requires-python = ">=3.12"
 dependencies = [
-    "harbor",
+    "harbor[modal]",
 ]
 
 [tool.uv]
