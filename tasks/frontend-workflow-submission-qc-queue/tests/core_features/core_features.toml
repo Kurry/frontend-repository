@@ -212,6 +212,20 @@ negate = true
 
 
 [[criterion]]
+id = "1.19"
+name = "undo_redo_keyboard_shortcuts"
+description = "Pressing Ctrl+Z (Cmd+Z on macOS) reverses the most recent mutating action exactly as the header Undo control does, and Ctrl+Shift+Z reapplies it — verified by adding a finding, pressing Ctrl+Z to remove it from the detail list and queue chips, and Ctrl+Shift+Z to restore it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "qc_package_schema_header_and_summary_counts"
+description = "The QC package JSON carries schemaVersion exactly the number 1 and exported_at as an ISO-8601 timestamp ending in Z, and its queue_summary total, per-stage counts, and per-payout-state counts equal the counts derivable from the visible queue at the same moment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

@@ -180,6 +180,20 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "9.11"
+name = "audit_package_aggregate_arrays_exact"
+description = "Audit Package JSON has schemaVersion quality-audit-package-v1 and exportedAt ending in Z; datasetSummary contains integer admitted, held, escalated, resolved, and total; checkPassRates has exactly nine check-ordered objects with closed-set check, integer passes/fails, and numeric passRate; criterionFailureRanking has exactly ten closed-set criteria ordered by failures descending; reviewerActivity entries use seeded reviewer names, integer entryCount, and verdictMix integer counts for Approve, Approve with caveats, Needs edit, and Reject"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.12"
+name = "audit_package_task_and_history_contract_exact"
+description = "Every session-touched Audit Package task has slug, one of the seven lifecycle stages, exactly nine closed-set checks with status pass/fail/not-run, failedCriteria records with criterion/fail/15-character rationale, feedback records with seeded reviewer/closed verdict/20-character findings, null-or-valid escalation and resolution records, and exportHistory entries whose exportedAt ends in Z and format is json or markdown"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "9.n7"
 name = "export_preview_is_static_snapshot"
 description = "The Report export preview ignores live store mutations and remains a static snapshot after runs, verdicts, or feedback entries"

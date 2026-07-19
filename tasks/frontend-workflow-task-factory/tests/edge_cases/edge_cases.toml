@@ -211,6 +211,20 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "4.11"
+name = "long_pr_title_truncates"
+description = "A pull-request title longer than 60 characters renders truncated with an ellipsis in its pipeline row and appears in full in the task or PR detail"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "create_cancel_changes_nothing"
+description = "Cancel or close on the create-task form leaves all collections unchanged: the pipeline row count, repository counts, and timeline are identical before and after"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"
 description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

@@ -149,6 +149,13 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "14.9"
+name = "reload_resets_factory_baseline"
+description = "After starting a create-task run, applying a trial-verdict filter, and expanding a log excerpt, a page reload coherently returns the app to its seeded baseline — seeded repositories, pull requests, trials, and timeline with the default view active, the created run's row gone, and no filters or expansions surviving — never a mix of kept and reset facets"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "behavioral.catchall"
 name = "behavioral_catchall"
 description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

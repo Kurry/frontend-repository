@@ -208,6 +208,27 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "1.29"
+name = "node_cards_show_identity_config_and_run_state"
+description = "Every canvas node visibly shows its node type, display title, and a configuration badge summarizing its saved type-specific configuration; after execution touches the node, the same card also shows a text status badge naming its current execution state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "saved_workflow_request_body_contract"
+description = "Saving a workflow produces a browser-visible record with a trimmed name 2–80 characters, a non-empty nodes array whose entries have id, type exactly Prompt|Agent|Eval|Condition|Output, numeric position x/y, and matching config, plus edges whose source and target each reference an included node id; a disconnected graph may save, but Run visibly refuses a graph without a valid source-to-sink path"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "workflow_exports_include_envelope_and_live_graph"
+description = "Export workflow, Download workflow.json, and Copy JSON expose schemaVersion exactly 1 and generatedAt as an ISO-8601 datetime ending in Z together with the active graph under the save-workflow field contract; Export Mermaid labels match the canvas node labels, and both formats update after node, edge, configuration, or Save mutations without reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.22"
 name = "canvas_static_no_authoring"
 description = "The canvas is a static picture: nodes cannot actually be created from the palette, repositioned, or connected — authoring interactions leave the graph unchanged"

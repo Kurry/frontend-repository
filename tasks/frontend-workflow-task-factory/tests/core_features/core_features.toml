@@ -218,6 +218,13 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "1.21"
+name = "seed_covers_three_pipeline_situations"
+description = "In at least one repository the seeded pull requests include at least one fully complete and accepted PR, at least one rejected PR showing a taxonomy reason chip, and at least one mid-pipeline PR whose stage strip still shows a pending or running stage"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

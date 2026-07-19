@@ -317,6 +317,13 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "1.33"
+name = "persona_pack_schema_and_field_bounds"
+description = "The Persona pack JSON carries top-level schemaVersion exactly 1 and generatedAt as an ISO-8601 datetime ending in Z, and the editor enforces the payload bounds with inline errors naming the field: a name shorter than 2 or longer than 80 characters, more than 12 tags, constraints or goals over 2000 characters, or zero example exchanges keeps Save disabled and stores nothing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "core_features.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
