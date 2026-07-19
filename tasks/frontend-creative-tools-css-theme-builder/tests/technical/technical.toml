@@ -206,6 +206,13 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "2.22"
+name = "document_title_reflects_theme_builder"
+description = "The browser document title reflects the CSS theme builder product rather than a scaffold default such as 'Vite App' or an empty title"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "2.n20"
 name = "import_accepts_schema_invalid_payload"
 description = "Import accepts a parseable JSON document that violates the Theme JSON field contract (missing required keys, invalid oklch/#RRGGBB color, out-of-enum radius/size/border/depth/noise/color-scheme, or cross-field disagreement) and still mutates My themes or editor tokens"

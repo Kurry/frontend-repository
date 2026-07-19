@@ -240,6 +240,13 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "6.15"
+name = "year_window_updates_count_era_markdown_and_inputs"
+description = "Narrow the visible year window through the real dual-handle scrubber; the N events in view readout counts only events inside the bounds, the current-era label matches the new midpoint, Window Markdown names and reflects that window, and the numeric from/to inputs show the same bounds without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "user_flows.catchall"
 name = "user_flows_catchall"
 description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

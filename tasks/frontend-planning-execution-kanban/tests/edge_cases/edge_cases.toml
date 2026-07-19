@@ -191,6 +191,13 @@ type = "binary"
 negate = true
 weight = 1.0
 [[criterion]]
+id = "4.11"
+name = "redo_stack_cleared_by_new_action"
+description = "After an Undo, performing a new mutating action (for example a create) disables Redo and the cleared redo stack cannot resurrect the undone change"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"
 description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

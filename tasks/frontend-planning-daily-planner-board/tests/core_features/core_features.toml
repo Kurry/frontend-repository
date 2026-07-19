@@ -384,6 +384,20 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "1.49"
+name = "ics_allday_and_duration_semantics"
+description = "In the ICS preview, a task without a startTime renders as an all-day VEVENT with DTSTART;VALUE=DATE on its day, a task with a startTime renders DTSTART matching that day plus clock time, and a task with a plannedTime carries a DURATION or DTEND consistent with that planned duration; the payload ends with END:VCALENDAR"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "task_upper_bound_validation"
+description = "The task form rejects upper-bound violations with an inline error naming the field and no task saved: a title longer than 120 characters, notes longer than 500 characters, more than 12 subtasks, or a startTime that is not an h:mm am/pm clock string"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "A specified core behavior of the app is broken or missing in a significant, browser-observable way that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

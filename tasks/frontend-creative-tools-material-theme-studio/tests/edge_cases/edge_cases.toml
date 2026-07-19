@@ -277,6 +277,20 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "4.17"
+name = "command_palette_empty_query_state"
+description = "A command palette query that matches no tabs, tools, themes, templates, or gallery sections shows an empty result state; pressing Escape closes the palette and returns focus to the control that opened it."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.18"
+name = "color_blindness_modes_nondestructive"
+description = "Color-blindness modes never permanently alter theme options: after choosing Protanopia and then None, the framed sample renders the same unfiltered colors that match the live editor options, and the editor source and Export text carry no filter-induced changes."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"
 description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

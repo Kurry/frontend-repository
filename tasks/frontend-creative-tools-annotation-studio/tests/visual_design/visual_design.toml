@@ -149,6 +149,7 @@ id = "2.n1"
 name = "palette_incoherent_or_offspec"
 description = "Colors are random or inconsistent relative to the specified mappings — for example a Disputed chip that is not red in one view, or brand-blue used for destructive actions"
 type = "binary"
+negate = true
 weight = 1.0
 
 [[criterion]]
@@ -156,6 +157,7 @@ id = "2.n2"
 name = "text_overlap_or_clipping"
 description = "At 1440px width, any heading, table cell, badge, or preview text overlaps another element or is clipped by its container"
 type = "binary"
+negate = true
 weight = 1.0
 
 [[criterion]]
@@ -163,6 +165,7 @@ id = "2.n3"
 name = "default_unstyled_controls"
 description = "Form or button controls render with browser default styling where the spec styles them, or the annotation card reads as an unstyled wireframe rather than a designed surface"
 type = "binary"
+negate = true
 weight = 1.0
 
 [[criterion]]

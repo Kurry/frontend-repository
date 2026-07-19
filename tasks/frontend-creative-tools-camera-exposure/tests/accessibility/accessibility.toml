@@ -170,6 +170,27 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "1.12"
+name = "scene_and_zebra_state_programmatic"
+description = "Scene chips and zebra toggles expose their selected or pressed state programmatically (for example aria-pressed or aria-selected), not only by color"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "wipe_handle_keyboard_operable"
+description = "The Compare wipe handle is keyboard-operable: arrow keys move the split while it is focused"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "bracket_base_name_labeled_and_associated"
+description = "The bracket base-name field has an associated label and its validation message is programmatically associated with the field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "accessibility.catchall"
 name = "accessibility_catchall"
 description = "The app exhibits a significant accessibility defect not covered by any other criterion in this file. If present, name the defect and cite evidence. If already covered, answer no."

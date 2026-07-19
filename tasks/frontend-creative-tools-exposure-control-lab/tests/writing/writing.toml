@@ -159,6 +159,13 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
+id = "15.10"
+name = "slider_and_look_names_exact"
+description = "Where develop sliders and looks appear, the slider names Exposure, Contrast, Highlights, Shadows, Whites, Blacks, Texture, Clarity, Vignette, and Grain and the look names Punch, Matte, Golden, and Mono render exactly and consistently"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "writing.catchall"
 name = "writing_catchall"
 description = "The app's rendered text exhibits a significant copy-quality defect not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

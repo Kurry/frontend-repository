@@ -277,6 +277,49 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "6.18"
+name = "develop_slider_then_grain_flow"
+description = "Dragging Exposure to +60 brightens the preview, shifts histogram mass toward the right, and updates the readout to 60 on the same gesture; then raising Grain to 80 adds visible grain to the preview — both without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.19"
+name = "copy_paste_light_only_selective"
+description = "After setting distinctive Light values and distinctive Effects values, Copy settings with only the Light group checked, then changing sliders in both groups, then Paste settings: every Light slider returns to the copied values while every Effects slider keeps its changed value"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.20"
+name = "look_apply_then_manual_clear_flow"
+description = "Activating Punch changes at least three develop sliders, the preview, and the histogram together and shows Punch as selected; dragging any one slider manually then clears the active-look indication while the other sliders keep Punch's values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.21"
+name = "reset_then_undo_flow"
+description = "After dial and slider edits, Reset to original returns dials to f/16, 1/60, ISO 100 and every develop slider to default in one press; pressing Undo restores the exact pre-reset dials and slider values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.22"
+name = "edited_image_differencing_flow"
+description = "From the seeded state, Download edited PNG; then apply the Mono look (or drag Exposure to -60), confirm the preview changed, and Download edited PNG again — the two downloaded files are visibly different images and the second matches the current on-screen preview's tonal look"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n13"
+name = "reset_clears_presets_or_snapshots"
+description = "Reset to original wipes the presets or snapshots collections along with the dials and sliders instead of leaving both collections intact"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "user_flows.catchall"
 name = "user_flows_catchall"
 description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

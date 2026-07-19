@@ -240,6 +240,48 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "1.26"
+name = "quota_oversubscription_names_exact_excess"
+description = "For a quota cell whose achieved count exceeds 1.5 times its target, the cell shows an oversubscription indicator that names the numerical excess achieved minus target; cells at or below 1.5 times target do not show that indicator."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "undo_redo_covers_every_sourcing_mutation"
+description = "Using header controls and Control-Z/Control-Shift-Z (or Command-Z/Command-Shift-Z), Undo and Redo correctly reverse and reapply a status transition, pin confirm, queue append, queue removal, queue reorder, bulk action, and accepted import, restoring chips, rollups, quota cells, queue order, and timeline length each time; blocked guards and cancelled pin/rejection forms add no undo step."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "command_palette_runs_flows_and_row_actions"
+description = "With a focused or selected eligible candidate, the command palette fuzzy-matches Score, Select, Reject, Pin, and Queue as applicable and each result invokes the same visible row handler; choosing Fetch more, Export sourcing pack, or Import sourcing pack starts that flow and closes the palette."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "queue_json_exact_nested_entry_contracts"
+description = "Queue JSON uses exactly the declared nested shapes: queue entries have position/name/difficulty/clusterId/commit with contiguous integer positions and 12-lowercase-hex commits; candidates have name/language/stars/difficulty/category/clusterId/license/status plus only the applicable rejectionReason, commit, notes, and queuePosition fields; quota entries have language/band/achieved/target with valid bands and bounds; timeline entries have at/name/fromStatus/toStatus plus rejectionReason only when applicable."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "csv_and_sourcing_report_exact_content"
+description = "Candidates CSV starts with name,language,stars,difficulty,category,clusterId,license,status,rejectionReason,commit,notes,queuePosition and has one line per candidate currently visible under filters/search; Sourcing report is markdown with a title, live quota-fill percentage, numbered queue in panel order, per-status counts matching rollups, and every below-target quota cell named."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "import_success_notice_names_applied_counts"
+description = "After a valid sourcing-pack import, the success notice names the exact applied candidate count and applied queue-entry count, matching the imported candidates and queue arrays while the table, queue panel, rollups, quota grid, and import timeline entry show the applied state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

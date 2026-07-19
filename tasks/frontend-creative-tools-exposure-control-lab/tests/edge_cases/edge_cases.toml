@@ -292,6 +292,35 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "4.19"
+name = "develop_sliders_clamp_at_bounds"
+description = "Dragging a develop slider past -100, past 100, or past 0 for the Vignette and Grain lower bound leaves the value at the bound and the readout shows that bound"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.20"
+name = "paste_disabled_before_any_copy"
+description = "Before any copy has happened in the session, Paste settings is a disabled control; activating it changes no slider or dial value"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.21"
+name = "copy_dialog_zero_groups_disables_confirm"
+description = "In the Copy settings dialog, unchecking all three group checkboxes disables the confirm control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n14"
+name = "repeat_look_activation_drifts_values"
+description = "Activating the same look chip twice in a row stacks or drifts the develop-slider values instead of leaving them at that look's stored values"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"
 description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

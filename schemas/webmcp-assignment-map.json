@@ -494,7 +494,18 @@
       ],
       "editor_properties": [
         "stop",
-        "brightness"
+        "brightness",
+        "exposure",
+        "contrast",
+        "highlights",
+        "shadows",
+        "whites",
+        "blacks",
+        "texture",
+        "clarity",
+        "vignette",
+        "grain",
+        "look"
       ],
       "editor_operations": [
         "select",
@@ -523,7 +534,8 @@
         "copy"
       ],
       "export_formats": [
-        "json"
+        "json",
+        "png"
       ],
       "import_modes": [
         "lab-package"

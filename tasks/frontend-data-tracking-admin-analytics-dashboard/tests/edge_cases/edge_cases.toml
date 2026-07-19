@@ -211,6 +211,20 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "4.11"
+name = "bulk_export_zero_selected_opens_drawer"
+description = "With zero rows checkbox-selected, activating bulk Export still opens the export drawer with both format tabs available"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "correcting_field_clears_inline_error"
+description = "After an invalid Add User submit attempt, correcting the offending field clears that field's inline error without a reload and submit becomes available once all required fields are valid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"
 description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

@@ -151,6 +151,13 @@ negate = true
 weight = 0.5
 
 [[criterion]]
+id = "15.9"
+name = "scene_names_exact_everywhere"
+description = "The five scene names Daylight Courtyard, Alpine Midday, Stadium Floodlights, Candlelit Study, and Neon Alley Night render exactly and consistently wherever they appear, including the settings card and the edit-stack JSON"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "writing.catchall"
 name = "writing_catchall"
 description = "The app's rendered text exhibits a significant copy-quality defect not covered by any other criterion in this file. If present, name the defect and cite evidence. If already covered, answer no."

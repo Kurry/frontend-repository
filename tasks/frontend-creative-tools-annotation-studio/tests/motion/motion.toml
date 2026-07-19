@@ -135,6 +135,7 @@ id = "8.n1"
 name = "no_hover_or_press_feedback"
 description = "Buttons, queue entries, or table rows show no hover, focus, or press feedback beyond browser defaults"
 type = "binary"
+negate = true
 weight = 1.0
 
 [[criterion]]
@@ -142,6 +143,7 @@ id = "8.n2"
 name = "transitions_snap_or_jank"
 description = "The card advance, dialogs, or the export confirmation snap with no transition, or animations cause visible layout jank or flicker during a run"
 type = "binary"
+negate = true
 weight = 1.0
 
 [[criterion]]
@@ -149,6 +151,7 @@ id = "8.n3"
 name = "reduced_motion_ignored"
 description = "With prefers-reduced-motion set, the card transition, list animations, or chip transitions still animate"
 type = "binary"
+negate = true
 weight = 1.0
 
 [[criterion]]

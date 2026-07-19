@@ -120,6 +120,13 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "7.6"
+name = "scene_bracket_zebra_ab_reachable_375"
+description = "At 375px width the Scenes strip, the Bracket panel, the zebra toggles, and the A/B compare controls remain reachable — they may scroll within their own containers but do not force page-level horizontal scrolling"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "responsiveness.catchall"
 name = "responsiveness_catchall"
 description = "The app exhibits a significant responsiveness defect not covered by any other criterion in this file. If present, name the defect and cite evidence. If already covered, answer no."

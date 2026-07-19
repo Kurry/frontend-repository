@@ -202,6 +202,50 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "14.13"
+name = "chained_edit_to_export_png_differs"
+description = "Chained pixel-proof probe: from the seeded state Download edited PNG; drag Exposure to +60 (preview brightens, readout shows 60, histogram mass shifts right), raise Grain to 80 (visible grain appears), then Download edited PNG again — the two exposure-lab-edit.png files are visibly different images and the second matches the current preview's tonal look"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.14"
+name = "look_then_export_png_reflects_mono"
+description = "Apply the Mono look (preview loses visible color, at least three sliders move, Mono shows selected), then Download edited PNG — the exported image is desaturated to match the preview; manually moving one slider clears the Mono active indication while the other sliders keep Mono's values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.15"
+name = "copy_paste_selective_group_probe"
+description = "Set distinctive Light and Effects values, Copy settings with only Light checked, change sliders in both groups, Paste settings: every Light slider returns to the copied values, every Effects slider keeps its changed value, and a single Undo reverses the paste"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.16"
+name = "reset_to_original_then_undo_probe"
+description = "With dials and at least two sliders off default and a look active, Reset to original returns dials to f/16, 1/60, ISO 100, all sliders to defaults, and clears the look in one press while presets and snapshots survive; Undo restores the exact pre-reset edit state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n8"
+name = "exported_png_identical_across_edit_states"
+description = "Two clearly different edit states (for example seeded state versus Mono look or Exposure -60) produce visually identical exported edited-PNG files"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "14.n9"
+name = "before_release_loses_edit_state"
+description = "After holding and releasing the Before control, the off-default dial stops or develop-slider values are lost instead of being restored exactly"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "behavioral.catchall"
 name = "behavioral_catchall"
 description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

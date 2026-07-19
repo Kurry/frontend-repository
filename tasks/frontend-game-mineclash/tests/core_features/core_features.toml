@@ -371,6 +371,13 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "1.42"
+name = "archive_import_reconstructs_match_log"
+description = "Importing a previously exported match-archive JSON reconstructs the Match log from its matches array: the exported-then-reimported records reappear with the same playerName, difficulty, winner, round wins, totals, and endedAt values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in its core game features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

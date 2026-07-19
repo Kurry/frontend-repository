@@ -181,6 +181,13 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "2.18"
+name = "storage_unavailable_keeps_session_usable"
+description = "When browser localStorage access is made unavailable before a fresh load, the root still renders the interactive CipherLog workspace without a blank screen or uncaught console error, and creating/editing a memo continues to work coherently for the current session"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical, accessibility, or performance defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, console line, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

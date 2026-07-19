@@ -215,6 +215,20 @@ type = "binary"
 weight = 1.0
 negate = true
 [[criterion]]
+id = "1.30"
+name = "seeded_libraries_populate_selects"
+description = "The Add Card modal's attached prompt select lists at least 5 seeded prompts and its assignee select lists at least 4 distinct seeded assignees, matching the seeded libraries"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "undo_covers_comment_and_import"
+description = "Undo also reverses a comment submit (the comment disappears from the thread and any comment count restores) and a successful board import (the board returns to its pre-import cards, order, and counts); Redo reapplies each with the same completeness"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

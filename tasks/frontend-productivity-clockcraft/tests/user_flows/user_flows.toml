@@ -211,6 +211,27 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "6.11"
+name = "manual_add_updates_list_timeline_stats_chart_heatmap"
+description = "Submit Add entry manually with a valid name, category, start time, and duration; exactly one row appears in All entries, a proportional timeline block appears, Meaningful ratio and Today's minutes recompute, today's Weekly overview bar and heat-map cell update, and the entry remains visible under its matching category filter"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "interruption_reason_echoes_into_both_exports"
+description = "Start a timer, stop it before 25 minutes, choose External in the required interruption step, and confirm the saved entry shows an External chip; after reopening Export, that entry has interruptionReason External in Session JSON and External in the final Timesheet CSV column"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "reload_returns_complete_empty_baseline"
+description = "After creating entries, tags, and history transitions, a full page reload returns to no entries and no tags, explicit empty states in the timeline and list, zero Today's minutes, an empty heat-map, and disabled Undo/Redo with empty history"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "user_flows.catchall"
 name = "user_flows_catchall"
 description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

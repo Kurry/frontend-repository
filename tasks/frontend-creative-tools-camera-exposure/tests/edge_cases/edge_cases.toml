@@ -209,6 +209,42 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "4.13"
+name = "bracket_empty_base_name_creates_nothing"
+description = "Generate bracket with an empty base-name field creates no presets: the visible preset count stays the same and inline validation names the base-name field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "bracket_clamps_at_shutter_list_ends"
+description = "Generating a bracket at the shutter list's fastest or slowest stop clamps out-of-range frames at the end stop and visibly marks those rows as clamped instead of inventing stops outside the discrete list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "zebras_on_without_clipping_show_no_stripes"
+description = "With both zebra toggles on but no clipped regions in the current render (default dials in Daylight Courtyard), no striped hatching appears anywhere on the preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "wipe_handle_clamps_at_preview_edges"
+description = "The Compare wipe handle cannot be dragged past either preview edge — at the extremes one slot's render fills the preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n9"
+name = "compare_available_with_unfilled_slots"
+description = "The Compare control activates and opens the comparison while fewer than two A/B slots are filled"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"
 description = "The app exhibits a significant edge-case failure not covered by any other criterion in this file. Name the defect and cite concrete evidence. If already covered, answer no."

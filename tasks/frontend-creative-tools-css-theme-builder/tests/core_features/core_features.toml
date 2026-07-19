@@ -337,6 +337,13 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "1.41"
+name = "base_rows_share_single_base_content"
+description = "In Change Colors, base-100, base-200, and base-300 share one paired base-content: changing the content 'A' color on any one of the three base rows updates the shared base-content value shown on all three base rows and the preview's base text color together, while each of the other eight semantic rows keeps its own independent paired content color"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.n31"
 name = "export_omits_session_mutations"
 description = "After editing primary color and box radius on the active theme, an open Export format preview (CSS, Theme JSON, or theme-extension) omits those edited values"

@@ -366,6 +366,27 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "1.44"
+name = "users_csv_exact_header_and_rows"
+description = "The Users CSV preview starts with the exact header line firstName,lastName,email,phone,role,status,payments,products,lastActive and includes one data line per user; after creating a user with a distinctive firstName, that firstName appears in a CSV data line before copy or download"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "users_csv_import_updates_collection"
+description = "Importing pasted Users CSV text whose rows satisfy the UserCreate field names and enums merges or replaces the users collection so All Users and the next Users CSV preview match the imported rows; malformed CSV or rows violating the enums show an inline error naming the field and leave the users count unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "exported_at_timestamp_regenerates"
+description = "The Session JSON exportedAt field is an ISO-8601 timestamp string that updates when the preview regenerates: after a further user mutation, reopening Export shows a newer exportedAt value than the earlier preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

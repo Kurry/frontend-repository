@@ -232,6 +232,27 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "6.14"
+name = "badge_toast_panel_and_reload_persistence"
+description = "Earn a badge through real play and observe its transient toast at unlock, then confirm it remains listed in the Badges panel as another badge is earned; after a full page reload, the same earned badges remain listed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "three_hand_reload_restores_full_session"
+description = "After at least 3 completed hands, record chip stacks, blind level, Session stats, Hand history entries, badges, and difficulty; a full page reload restores every recorded facet exactly rather than a partial mixture"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.16"
+name = "same_note_conflict_requires_explicit_choice"
+description = "In Collaboration scenario, create two offline edits to the same note and reconnect; the UI presents an explicit keep-mine / keep-peer choice instead of silently overwriting, and Shared content shows exactly the version selected"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "user_flows.catchall"
 name = "user_flows_catchall"
 description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

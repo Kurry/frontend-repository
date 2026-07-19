@@ -246,6 +246,69 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "1.27"
+name = "pricing_estimator_live_and_model_sensitive"
+description = "With the editor empty the pricing estimate beside the token count reads a zero or free amount; typing text grows the estimated cost on every keystroke, and switching the selected model changes the cost estimate for the same editor text without any other action"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "persona_drawer_seeded_and_replaceable"
+description = "The Persona control opens a drawer listing at least 4 seeded persona templates with role and context text; selecting one attaches its preface and shows the persona name as a chip near the editor; attaching a different persona replaces the previous preface text immediately in the preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "run_step_panel_advances_with_rollup"
+description = "Each run decomposes into at least 3 visible named steps whose statuses advance through pending, running, and complete or failed during the simulation; a run-level rollup shows steps complete out of total and updates as steps advance; selecting an older history entry shows that run's step statuses and outputs"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "command_palette_full_behavior"
+description = "Pressing Cmd+K (Ctrl+K on non-Mac) opens a command palette whose results fuzzy-match seeded models, library prompt titles, persona templates, and actions (Export package, Save, Switch to Library, Switch to Workbench); choosing a model selects it in the toolbar, a library prompt loads into the workbench, a persona attaches, and an action runs; with an empty query a short set of top actions is listed, with no matches an empty state names that nothing matched, and Escape closes the palette and returns focus to the prior control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "undo_redo_reverts_workbench_mutations"
+description = "Toolbar Undo and Redo revert and reapply the most recent workbench mutations — editor text edits, persona attach or clear, binding value changes, attachment add or remove, and library save or delete; undoing a library save removes the created entry and restores the prior library count, redo re-adds it identically, and both controls disable when their stacks are empty"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "bulk_export_selected_library_prompts"
+description = "Selecting two or more library rows via their checkboxes reveals a bulk Export selected control, and activating it packages exactly those prompts as a JSON array of LibraryPrompt records (title, technique from the closed enum, promptText, bindings, attachments, personaId) listing exactly the selected titles"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "technique_filter_narrows_library"
+description = "The Library technique filter narrows the list to rows whose technique tag matches the chosen closed-enum value, and clearing the filter restores the full list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "markdown_export_full_contents"
+description = "The Markdown export includes the active persona preface when one is attached, the prompt body with placeholders, a bindings table of variable names and values, the selected model name, attachment filenames, and — after a completed run — a short response summary for the active variant"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "latest_run_request_chat_completions_shape"
+description = "After a run completes, the Export JSON preview's latestRun.request shows the chat-completions would-be body assembled from the workbench: model matching the run's selected model, a messages array with a system message when a persona was attached plus a user message carrying the prompt text, temperature between 0 and 2, and maxTokens between 1 and 4096"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

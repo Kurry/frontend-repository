@@ -241,6 +241,27 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "1.14"
+name = "develop_sliders_keyboard_and_at_value"
+description = "Each develop slider is adjustable with arrow keys while focused and exposes its current value as text to assistive technology"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "copy_settings_dialog_focus_trap"
+description = "The Copy settings dialog traps focus while open, closes on Escape, and returns focus to the Copy settings trigger on close"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "look_chips_selected_state_programmatic"
+description = "Look chips expose their selected state programmatically (for example aria-pressed or aria-selected), not only by color"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "accessibility.catchall"
 name = "accessibility_catchall"
 description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

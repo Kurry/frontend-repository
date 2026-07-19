@@ -322,13 +322,13 @@ Module specs:
 Bindings:
 - Session operations: start; stop; restart; advance
 - Editor object types: exposure
-- Editor properties: stop; brightness
+- Editor properties: stop; brightness; exposure; contrast; highlights; shadows; whites; blacks; texture; clarity; vignette; grain; look
 - Editor operations: select; update_property; preview
 - Entity: preset
 - Entity operations: create; select; update; delete; toggle
 - Entity fields: name; aperture; shutter; iso; lookTag; favorite
 - Artifact operations: export; import; copy
-- Export formats: json
+- Export formats: json; png
 - Import modes: lab-package
 
 Mechanics exclusions:

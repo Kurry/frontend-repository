@@ -550,6 +550,13 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "1.62"
+name = "jsonl_line_full_field_contract"
+description = "Each line of the downloaded JSONL is an AnnotationsJsonlLine object carrying all seven required keys — prompt, response, rating (up or down), scores (object with Accuracy, Clarity, and Relevance integers 1–5), comment (string of at most 500 characters), metadata (object keyed by field name), and regions (array of RegionCreate objects) — including for annotations that carried metadata values or region boxes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "core_features.catchall"
 name = "core_features_catchall"
 description = "A specified core behavior is broken or missing in a way NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

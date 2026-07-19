@@ -365,6 +365,13 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "1.49"
+name = "load_sample_brief_restores_state"
+description = "Activating Load sample brief in the Sprint launch brief panel loads the built-in contract-valid sample through the same restore path as Import: Shortlist tray, Compare tray, Watch log, pinned marks, and both preview tabs reflect the sample's contents"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

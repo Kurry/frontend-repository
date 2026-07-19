@@ -147,6 +147,13 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "4.11"
+name = "only_fictional_arbiter_names_rendered"
+description = "Across the arbiter selector, seeded rubric metadata, Tune view, preview, history, and export previews, model or arbiter names are limited to quartz-arbiter-2, sable-jury-9, and cinder-panel-1; no real product, company, or model name is rendered anywhere in the UI."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "4.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

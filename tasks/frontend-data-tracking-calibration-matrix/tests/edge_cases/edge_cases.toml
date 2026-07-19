@@ -131,6 +131,13 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "4.11"
+name = "bulk_action_requires_two_divergent_rows"
+description = "With zero or one divergent row selected, Apply classification is hidden or disabled; selecting a second divergent row reveals and enables it, and clearing the selection hides the bulk action bar again."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "4.n1"
 name = "empty_filter_has_no_feedback"
 description = "A no-match filter state leaves the heatmap or variance region blank with no empty-state message or clear-filters control"

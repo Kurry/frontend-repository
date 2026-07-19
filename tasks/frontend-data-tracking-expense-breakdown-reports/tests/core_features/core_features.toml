@@ -339,6 +339,27 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "1.45"
+name = "command_palette_filter_and_escape"
+description = "With the command palette open, typing filters the command list by title; Escape closes the palette without performing any action; choosing a command (for example New transaction or Clear filters) closes the palette and performs that action through the same handlers as the visible controls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "export_mirrors_burnrate_and_filters"
+description = "The Export report JSON includes a filters object mirroring the active category, type, date-range, and payee controls and a burnRate object (ceiling, monthToDate, projectedMonthEnd, over) mirroring the Burn rate panel; the Markdown tab includes a Burn rate section naming ceiling, month-to-date, projected month-end, and over status"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "import_append_mode_adds_rows"
+description = "Import CSV with the Append mode commits valid rows on top of the existing collection: the table row count increases by exactly the number of committed valid rows and the KPIs, charts, burn rate, and a subsequent export include both the prior and appended transactions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

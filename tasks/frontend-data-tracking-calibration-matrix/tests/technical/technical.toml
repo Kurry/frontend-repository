@@ -148,6 +148,13 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "2.13"
+name = "seeded_dataset_meets_required_distribution"
+description = "On first load the browser-visible data contains at least 6 fictional models, at least 4 fictional harnesses, at least 12 variance tasks spanning at least 3 categories, and each heatmap cell exposes 3 through 6 trials with varied rewards; at the default threshold both stable and divergent rows are visible."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

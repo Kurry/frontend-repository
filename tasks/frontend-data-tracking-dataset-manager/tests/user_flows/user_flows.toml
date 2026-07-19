@@ -233,6 +233,48 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "6.13"
+name = "csv_import_pipeline_updates_all_surfaces"
+description = "Choose a seeded sample CSV, adjust one column mapping, fix a flagged diagnostic cell, exclude one bad row, and Commit through the real wizard controls; the sidebar count rises by exactly the included-row count, the new rows appear in the grid, the capacity gauge grows, pivot summaries change, and both export tabs change without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "numeric_edit_ripple_reaches_snapshot_diff"
+description = "Take a snapshot, then edit a numeric cell through the inline grid editor so it crosses a threshold cap; the formula result, threshold flag, Dataset Package JSON numeric stats, and a diff against that snapshot all update, with the diff showing that exact changed cell"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "duplicate_merge_rescan_round_trip"
+description = "Run the duplicate scan to surface the seeded groups, merge one group through the real Merge flow, verify the row count decreases by exactly the group size minus one, then rerun the scan and confirm that merged group is absent"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.16"
+name = "bulk_verify_then_undo_restores_five_rows"
+description = "Select 5 rows, apply Mark verified through the bulk tray, and measure the Verified badge increase by exactly the number that were newly verified; one real Undo restores all five rows' prior verified states and the prior badge count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.17"
+name = "split_distribution_stays_coherent_after_delete"
+description = "Apply an 80/10/10 split, confirm every grid row has a split label and the proportion bar plus verified/unverified stratification match those labels, then delete rows and confirm both derived split surfaces update to the remaining grid rows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.18"
+name = "reload_restores_seeded_dataset_baseline"
+description = "After adding rows, rules, snapshots, and undo history, a full page reload returns every facet to the seeded datasets and row counts, only seeded snapshots and threshold rules remain, and Undo is disabled because history is empty"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "user_flows.catchall"
 name = "user_flows_catchall"
 description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

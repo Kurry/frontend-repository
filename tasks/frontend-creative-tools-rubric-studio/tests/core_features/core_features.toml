@@ -187,6 +187,20 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "1.20"
+name = "patch_bump_gate_on_name_weight_or_importance_edit"
+description = "Editing an existing criterion changes only its name, weight, or importance in the prefilled CriterionUpsert form; save stays disabled until the rubric version's third number is increased, then the patch-bumped save updates that same row, the header rollups when weight crosses a boundary, the rail version badge, and exactly one newest history entry without creating a duplicate criterion."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "seeded_history_has_three_newest_first_entries"
+description = "On first load, Response Quality's version history contains at least 3 entries ordered newest first, and every visible entry shows a semantic version, timestamp, and one-line per-change summary."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.n1"
 name = "version_gate_bypassed"
 description = "A description, type, or delete change can be saved without the required version bump — the save control activates, or the change lands in the rubric, while the version field still shows an insufficient bump"

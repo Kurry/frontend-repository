@@ -310,6 +310,20 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "1.36"
+name = "seed_depth_populates_charts_first_load"
+description = "On first load, without running anything, each seeded suite carries at least 5 prompts (visible in its prompt count) and at least 7 historical runs, so the selected suite's results table, bar chart, and trend line chart are all non-empty before any session run"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "export_json_run_metadata_keys"
+description = "The export JSON tab's document carries the full normative run metadata: a suite object with name, promptCount, and nightMode; a run object with id, startedAt and finishedAt as ISO-8601 datetime strings, averageScore between 0 and 100 matching the suite's badge, passCount and failCount consistent with the visible Pass/Fail badges, and non-negative totalLatencyMs and totalTokens"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

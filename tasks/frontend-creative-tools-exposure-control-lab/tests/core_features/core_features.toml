@@ -420,6 +420,71 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "1.51"
+name = "develop_slider_groups_live_readouts"
+description = "The Develop panel presents a Light group with Exposure, Contrast, Highlights, Shadows, Whites, and Blacks sliders and an Effects group with Texture, Clarity, Vignette, and Grain, each with a live integer readout defaulting to 0; dragging any slider updates its readout on the same gesture, visibly changes the preview (raising Grain adds visible film grain; raising Vignette darkens the frame corners while the center stays brighter), and reshapes the live histogram (raising Exposure shifts mass toward the right, lowering it shifts mass left)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.52"
+name = "per_slider_reset_returns_only_that_slider"
+description = "With at least two develop sliders off default, activating one slider row's per-slider reset affordance returns only that slider to its default value while every other slider keeps its value, and the preview, readout, and histogram update on the same action"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.53"
+name = "reset_to_original_single_undoable_action"
+description = "Reset to original returns every develop slider to its default and the dials to f/16, 1/60, ISO 100 in one press, clears the active look, and leaves the presets and snapshots collections intact; a single Undo afterwards restores the exact pre-reset dials and slider values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.54"
+name = "look_chips_apply_and_manual_clear"
+description = "Each of the four look chips Punch, Matte, Golden, and Mono applies a stored multi-slider develop state in a single press with at least three develop sliders moving together and readouts, preview, and histogram updating on the same press; Mono removes visible color while the other three keep a color image; the active chip shows a selected treatment; and manually moving any develop slider afterwards clears the active-look indication while the other sliders keep the look's values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.55"
+name = "copy_settings_dialog_group_checkboxes"
+description = "Copy settings opens a dialog listing exactly three group checkboxes — Dials, Light, and Effects — all checked by default; the confirm control is disabled while zero groups are checked; confirming shows a confirmation naming the copied groups"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.56"
+name = "paste_settings_selective_and_undoable"
+description = "Paste settings applies only the copied groups to the current edit state — every slider and dial in an uncopied group stays exactly as it was — the paste is a single undoable action, and Paste settings is visibly disabled until a copy has happened in this session"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.57"
+name = "download_edited_png_bakes_current_edits"
+description = "Download edited PNG triggers a real file download named exposure-lab-edit.png whose image carries the current dial and develop-slider edits — the exported file matches the tonal look of the on-screen preview at export time rather than showing the unedited source photo"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n41"
+name = "exported_png_ignores_current_edits"
+description = "Two clearly different edit states produce visually identical exported edited-PNG files, or the exported image shows the unedited photo while the on-screen preview shows the edits"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n42"
+name = "paste_settings_overwrites_uncopied_groups"
+description = "Paste settings changes slider or dial values in a group whose checkbox was not checked at copy time"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core functionality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

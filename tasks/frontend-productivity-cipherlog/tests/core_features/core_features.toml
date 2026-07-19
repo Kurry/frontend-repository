@@ -352,6 +352,34 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "1.46"
+name = "transmission_payload_includes_complete_contract"
+description = "Create a memo with a valid title, empty body, priority, existing case-sensitive channel, unlocked state, and then add both Classified and Priority marks to body text; Export session shows that transmission with title, body, priority as high|standard|low, channel, locked, null-or-absent passcode while unlocked, ISO-8601 firstTransmitted and lastModified, and marks whose non-negative start/end ranges fall within the body and whose kinds are classified or priority"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "transmission_bounds_and_cross_fields_rejected"
+description = "Through the visible create/edit controls, a 121-character title, a body over 20000 characters, a channel not present in the sidebar, a priority outside high|standard|low, or a text mark whose range lies outside the body is rejected with an inline error naming the offending field, and the memo collection and last valid record remain unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "session_archive_exact_top_level_contract"
+description = "The visible Export session JSON is one object with exactly the top-level keys version, themeCore, channels, memos, decommissioned, and exportedAt: version is numeric 1, themeCore is one of matrix-green|neon-cyan|blood-red|ghost-white|amber-terminal, channel and transmission entries conform to their field contracts in sidebar/list order, and exportedAt is an ISO-8601 timestamp"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "session_import_rejects_all_contract_violations_atomically"
+description = "Import session rejects, one at a time, a payload missing version/channels/memos/decommissioned, version other than 1, themeCore outside its five-value enum, priority outside high|standard|low, a locked memo without an exactly 4-character passcode, a blank or over-40-character channel name, or a mark with end less than or equal to start; each attempt names the offending field or rule and leaves channels, memos, decommissioned, and Theme Core unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core functionality or an end-to-end user flow that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

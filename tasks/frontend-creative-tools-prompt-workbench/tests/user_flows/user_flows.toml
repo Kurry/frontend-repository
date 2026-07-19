@@ -218,6 +218,20 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "6.12"
+name = "undo_round_trip_persona_and_binding"
+description = "Undo round-trip: attach a persona, change a binding value, then activate Undo twice and confirm the binding value and the persona preface return to their prior states in the panel and the live preview together; Redo twice restores both"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "command_palette_loads_library_prompt"
+description = "Command palette flow: open the palette with Cmd+K or Ctrl+K, select a library prompt result, and confirm the workbench loads that prompt's text without a reload and the palette closes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "user_flows.catchall"
 name = "user_flows_catchall"
 description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

@@ -121,6 +121,76 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "4.8"
+name = "skill_chip_enters_without_duplicate_motion"
+description = "Using the real Skills input to add a distinct skill animates the new chip into the preview's Skills section, while attempting a case-insensitive duplicate creates no second chip and triggers no chip-entry motion"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "section_reorder_animates_through_controls"
+description = "Using the real Move Up or Move Down control animates the affected preview section from its old position to its new position rather than snapping instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "theme_and_density_transition_in_place"
+description = "Using the real Theme and Density controls visibly transitions preview accent colors and block spacing in place without a page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "section_visibility_updates_immediately"
+description = "Using a section's real show/hide toggle updates the assembled preview immediately, with no reload or stale intermediate section state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "download_pdf_opens_native_print_preview"
+description = "Activating Download PDF through the real top-bar control opens the browser's native print preview for the assembled document"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "reduced_motion_removes_list_and_reorder_animation"
+description = "With prefers-reduced-motion enabled, project, testimonial, skill, draft-list, and section-reorder animations are removed while every corresponding state change still applies immediately through the real controls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "disabled_history_controls_read_inactive"
+description = "When no adjacent history snapshot is available, the real Undo or Redo control has a visibly non-interactive disabled state; when available, Undo, Redo, Apply Scenario Change, and branch selection update the preview immediately"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.15"
+name = "history_preset_and_palette_results_hover"
+description = "History entries, layout preset controls, and command-palette results each show a visible background, border, or shadow transition when hovered through the real pointer path"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "single_card_delete_exit_motion"
+description = "Deleting a single project or testimonial through its real Delete control animates that card out of the preview rather than removing it in an instantaneous snap"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.17"
+name = "draft_entry_animates_on_save"
+description = "Saving a valid draft through Save As Draft animates the new entry into the drafts list and gives immediate visible success feedback"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "4.catchall"
 name = "motion_catchall"
 description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction performed, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

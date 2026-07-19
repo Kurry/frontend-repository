@@ -227,6 +227,13 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "9.12"
+name = "slider_drag_and_png_export_responsive"
+description = "Dragging a develop slider end to end keeps the preview and readout tracking the gesture without multi-second freezes, and Download edited PNG completes without freezing the UI for more than a brief moment with the lab operable afterwards"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "performance.catchall"
 name = "performance_catchall"
 description = "The app exhibits a significant, browser-observable defect in performance or stability that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

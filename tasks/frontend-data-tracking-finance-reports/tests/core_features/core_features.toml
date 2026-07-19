@@ -410,6 +410,48 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "1.54"
+name = "complete_transaction_field_contract"
+description = "Create and edit enforce the full Transaction payload: ISO YYYY-MM-DD date; trimmed label/payee length 1–80; category limited to Groceries, Restaurants, Transport, Housing, Utilities, Entertainment, Healthcare, Shopping, Salary, or Freelance; account limited to Checking, Savings, Credit Card, or Cash; nonzero amount with absolute value at most 1000000 and at most 2 decimals; optional status limited to cleared, pending, or reconciled; optional note at most 200 characters; Salary/Freelance positive and every other category negative. Each violation shows an inline error naming the field and commits no invalid record."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.55"
+name = "exact_fx_rates_preserve_usd_base_amounts"
+description = "For a transaction with a known USD base amount, switching to EUR displays exactly base × 0.92 and switching to GBP displays exactly base × 0.78 across cards, table, legends, thresholds, and export preview; returning to USD restores the identity value, and the transaction's stored/exported base amount is unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.56"
+name = "threshold_contract_and_status_boundaries"
+description = "Threshold rows accept only expense categories excluding Salary/Freelance and ceilings greater than 0 through 1000000 with at most 2 decimals; invalid ceilings preserve the prior value with a named inline error. At spend below 80% status is under, from exactly 80% through exactly 100% it is near, and above 100% it is over with a textual overage; transaction edits, ceiling edits, and currency switches recompute these values live."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.57"
+name = "undo_redo_covers_all_ledger_mutations"
+description = "For each mutation kind — edit, delete, bulk categorize, bulk delete, and threshold ceiling edit — performing the mutation then Undo restores the exact prior collection or ceiling plus cards, charts, strip, thresholds, selection, and export preview; Redo reapplies the same mutation across those surfaces."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.58"
+name = "ledger_json_complete_normative_shape"
+description = "The JSON preview visibly contains schemaVersion 1, reportTitle Finance Reports, generatedAt, displayCurrency, filters with category/type/dateStart/dateEnd, totals with income/expenses/net/savingsRate/count matching the current filtered cards and strip, every threshold with category/ceiling/monthToDate/status, and every filtered transaction with date/label/category/account/amount/status/note where label equals the UI payee."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.59"
+name = "csv_uses_filtered_rows_and_usd_base_amounts"
+description = "The CSV preview starts exactly with date,label,category,account,amount,status,note and contains one row per current filtered transaction; after selecting EUR or GBP, its amount cells still equal the stored USD base amounts rather than display-converted values."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core functionality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, action sequence) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
