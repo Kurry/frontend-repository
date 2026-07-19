@@ -158,6 +158,7 @@ End-to-end flows with tracked state (every step names its visible evidence):
 - No console errors or warnings appear on load or during a full exercise of the app, including no hydration errors or warnings on the workspace route
 - The workspace renders its content directly on load with no post-load content flash or visible layout jump as fonts and scene images finish loading; image regions hold their space
 - Rapid view-mode switching, filter/search changes, and repeated create/delete/undo/export actions stay responsive with no hangs or dropped interactions
+- Checklist toggles, canvas card drags, version diff rendering, and template injection complete without console errors, hangs, or dropped updates
 </performance>
 
 <writing>
@@ -165,11 +166,12 @@ End-to-end flows with tracked state (every step names its visible evidence):
 - Headings, buttons, and toasts use one consistent capitalization convention; demo-only toasts use consistent wording across all inert controls
 - The empty board state explains that no scenes remain and how to add one; the filtered-empty state explains that no scenes match and how to clear filters
 - Validation and import errors name the field and the fix
+- Version timestamps use one consistent format throughout the Version history panel; checklist progress readouts use one consistent n/m format; template names and their toasts use the same wording in the Templates list and the confirmation
 </writing>
 
 <requirements>
 Stack: Astro with static output; the interactive workspace regions (header tools, sidebar, scene board, drawers, create/edit forms, export drawer, command palette) are client islands built with React. All interactivity lives in client state after load; no server actions, loaders, or API routes.
-Shared application state must live in Nanostores (in-memory only), shared across all islands: the scenes collection, view mode, slide index, status filter, search query, undo/redo stacks, drawers/toast state, export artifact text, command-palette open state, and edit focus. Views derive from the one store — never a second disconnected copy. Do not use localStorage, sessionStorage, or other browser storage APIs.
+Shared application state must live in Nanostores (in-memory only), shared across all islands: the scenes collection, per-scene version histories, canvas card positions, view mode, slide index, status filter, search query, undo/redo stacks, drawers/toast state, export artifact text, command-palette open state, and edit focus. Views derive from the one store — never a second disconnected copy. Do not use localStorage, sessionStorage, or other browser storage APIs.
 State contracts (behavioral, not storage keys):
 - Creating a valid scene increases the collection and shows it on the board
 - Editing a scene updates that same record in Tile/List/Slide
@@ -177,13 +179,18 @@ State contracts (behavioral, not storage keys):
 - Status filter and search recompute the visible subset from the shared collection; Tile/List/Slide agree on that subset
 - Reorder updates order fields and renumbers contiguously; Undo/Redo restore prior collection snapshots
 - View mode and slide index are shared client state; switching modes does not reload the document
+- Rendered markdown (headings, bold, lists, checkboxes) derives from each scene's body source; toggling a rendered checkbox rewrites that line in the body source and updates the progress readout from the same store
+- Version histories append on committed create/edit/restore (never on checkbox toggles); Restore writes a new current version and every surface follows
+- Canvas positions are per-scene view state that never feeds numbering, order fields, or exports; template injection appends contract-valid scenes atomically and is one undo step
 - End-state contract: Download/Copy of markdown, json, and outline MUST reflect the session's actual scenes under the field contracts above — an export that omits session work is invalid; Import of a previously exported StoryboardPackage MUST restore the same visible collection (round-trip). Persistence for this good-app genre is the portable StoryboardPackage plus the MCP query surface — never browser storage
 Styling: Tailwind CSS 4.3.2 (pinned), with design tokens in the theme layer. DaisyUI is the component library for base chrome — buttons, kebab dropdown menus, drawers, toasts, and form controls — restyled with the app's own light/yellow tokens.
-Animation: GSAP allowed for animation (load stagger, scroll reveals, card and view-mode microinteractions); no other animation libraries.
+Animation: GSAP allowed for animation (load stagger, scroll reveals, card and view-mode microinteractions, canvas drag settle); no other animation libraries.
+Markdown: a markdown parsing/rendering utility library (for example marked or markdown-it) is allowed for rendering scene bodies and compiling the markdown export; no other additions to the allowlist.
 Icons: Remix Icon via the astro-icon package only; no other icon sets, no raw copy-pasted SVGs, no icon CDN.
 Forms: the Add Scene create form, the scene edit flow, and Import package validation are driven by React Hook Form with a Zod schema — schemas are API-shaped and mirror the field contracts above (the record each form creates IS the would-be request body; markdown/json/outline exports and Import package conform to those same contracts). The schema defines the required-field rules and the form surfaces inline per-field errors naming the field before submit, with submit disabled until valid.
 All libraries installed via npm and bundled locally; no CDN imports. Local Gabarito fonts bundled in /app; no font CDN.
-- Seed at least eight imaged scenes plus placeholders/Add Scene
+- Seed at least eight imaged scenes plus placeholders/Add Scene; seeded statuses span draft, review, and ready, at least two seeded bodies contain markdown checklists with a mix of checked and unchecked items, and each seeded scene starts with a one-entry version history
+- Ship at least two local named scene templates for the Templates control, each with at least three contract-valid scenes
 - Empty required fields on create must not increase the scenes count; show visible validation feedback
 - After deleting all scenes, show an empty state on the board
 - Zero navigational outbound links; inert controls toast demo only

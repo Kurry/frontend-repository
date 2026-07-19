@@ -256,6 +256,28 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "4.15"
+name = "single_version_and_identical_diff"
+description = "A scene with only one version shows no enabled Restore action, and comparing a version with itself (or one identical to current) shows an explicit no-differences state rather than an empty or broken diff."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "checkbox_toggle_no_side_effects"
+description = "Toggling a rendered checklist checkbox changes only that line's checked state and the progress readout — the scene count, numbering, and version count stay unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n13"
+name = "canvas_drag_renumbers"
+description = "Dragging a card on the Canvas renumbers the board or alters the order shown in Tile/List/Slide."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"
 description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

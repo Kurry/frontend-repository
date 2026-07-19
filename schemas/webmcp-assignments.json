@@ -7057,16 +7057,17 @@
           "resolve-task"
         ],
         "value_bounds": [
-          "checks in {package-shape, task-config, rubric-wiring, file-modes, harvest, container-parity, dependency-pinning, foils, judge-contract}",
+          "checks in {package-shape, task-config, rubric-wiring, file-modes, harvest, container-parity, dependency-pinning, foils, scoring-contract}",
           "admission criteria in {runtime-crux-load-bearing, premise-truthful, question-non-leaking, rubric-scope-alignment, positive-criteria-grade-meaning, negative-criteria-grounded, golden-answer-faithful, foils-discriminating, difficulty-substantive, trial-evidence-valid}",
           "lifecycle stage in {pending, checked, held, admitted, escalated, re-audited, resolved}",
           "reviewers limited to the nine seeded names Dana Whitfield, Marcus Okafor, Elena Vasquez, Priya Nair, Jonas Keller, Ruth Alvarez, Samir Haddad, Ingrid Larsen, Felix Moreau",
           "feedback verdict in {Approve, Approve with caveats, Needs edit, Reject}",
-          "escalation category in {Spec conflict, Tooling gap, Dataset defect, Judge disagreement}",
-          "fail rationale minimum 15 characters; findings and escalation summary minimum 20 characters",
+          "escalation category in {Spec conflict, Tooling gap, Dataset defect, Scoring disagreement}",
+          "fail rationale minimum 15 characters; findings and escalation summary minimum 20 characters; resolution note minimum 15 characters",
           "criterion verdict toggles disabled until the task's first completed check run",
           "escalate only from held; resolve only from escalated or from a re-audited task with 9 of 9 checks and 10 of 10 criteria passing",
-          "repositories limited to the 7 seeded orgs meridian/copperbeam, quartzlab/hollybush, silverpine/driftnet, bluegate/ironvale, cedarworks/lanternfish, foxglove/marrowgrid, oakhaven/pebblecourt"
+          "repositories limited to the 7 seeded orgs meridian/copperbeam, quartzlab/hollybush, silverpine/driftnet, bluegate/ironvale, cedarworks/lanternfish, foxglove/marrowgrid, oakhaven/pebblecourt",
+          "Audit Package JSON field contract: schemaVersion exactly quality-audit-package-v1; exportedAt ISO-8601 ending in Z; required keys datasetSummary, checkPassRates, criterionFailureRanking, reviewerActivity, tasks, exportHistory; nested feedback matches FeedbackEntry; nested failedCriteria matches CriterionFailVerdict; nested escalation/resolution match Escalation/Resolution field contracts"
         ],
         "session_operations": [
           "start",
@@ -7079,10 +7080,13 @@
           "re-audit-run"
         ],
         "artifact_operations": [
-          "copy"
+          "copy",
+          "export",
+          "import"
         ],
         "export_formats": [
-          "audit-report-text"
+          "audit-package-json",
+          "audit-report-markdown"
         ],
         "visible_postconditions": [
           "a finished run coherently updates the task's nine check chips, queue row checks summary, stage badge (pending to checked, or held on any failure), the rollup strip and both ECharts bar charts, and the audit timeline from one outcome",
@@ -7090,7 +7094,8 @@
           "a valid feedback entry appends exactly one thread entry, increments the queue row entry count, updates that reviewer's rollup cell and detail view, and stamps the timeline",
           "criterion verdicts recompute the Admitted/Held outcome banner naming each failing criterion, the queue criteria summary, and the criterion failure-ranking chart without a reload",
           "rollup cell activation applies the matching queue filter and its removable chip",
-          "Copy report gives visible confirmation, appends a timestamped Report exported entry to the export history, and stamps a report-export event on the timeline of every appendix record"
+          "Copy or Download of the active export format gives visible confirmation, appends a timestamped export-history entry naming the format, and stamps a report-export event on the timeline of every session-touched appendix record",
+          "Import of contract-valid Audit Package JSON reconstructs records, stages, checks, criteria, feedback, and rollups so the next JSON export preview matches; contract-invalid import leaves the desk unchanged"
         ]
       },
       "mechanics_exclusions": [

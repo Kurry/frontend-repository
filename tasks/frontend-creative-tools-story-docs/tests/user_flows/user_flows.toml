@@ -270,6 +270,42 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "6.17"
+name = "checklist_flow"
+description = "Checklist flow: click an unchecked rendered checkbox on a scene with a checklist — the box checks, the scene's progress readout increments, and the next markdown export shows that line as - [x]; toggling back restores - [ ] and the prior readout, all without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.18"
+name = "version_history_flow"
+description = "Version flow: after two distinct body edits, the scene's Version history lists three timestamped versions newest first; selecting version 1 shows marked additions and removals; Restore makes version 1 current on the board and in Slide mode and enables Undo to reverse the restore."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.19"
+name = "canvas_flow"
+description = "Canvas flow: switch to Canvas, drag a card to a new spot, switch to List (order unchanged), return to Canvas (position kept), then Reset layout returns the cards to a tidy grid — with no reload and no change to numbering."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.20"
+name = "template_flow"
+description = "Template flow: injecting a named template appends its scenes at the end with status draft, shows a toast naming the template and scene count, and a single Undo removes the whole injection restoring the prior count."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n13"
+name = "version_panel_dead_end"
+description = "The Version history panel cannot be dismissed, or Restore corrupts the scene so the board and Slide disagree about its content."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "user_flows.catchall"
 name = "user_flows_catchall"
 description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

@@ -218,6 +218,13 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "2.20"
+name = "compare_and_rename_share_state"
+description = "The compare surface's A and B selections and profile renames operate on the same shared state as the direct controls: Apply from compare produces exactly the state a direct theme pick would, and a renamed profile keeps one stored override set with no stale duplicate under the old name"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable defect in technical quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered - even partially - by another criterion in this file, answer no here and let that criterion carry it."

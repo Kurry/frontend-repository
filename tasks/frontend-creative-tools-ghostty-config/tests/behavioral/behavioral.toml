@@ -193,6 +193,28 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "14.13"
+name = "compare_apply_isolation_probe"
+description = "Compare isolation probe: record the generated configuration text, open Compare themes, set sides A and B to two different themes (both previews recolor differently), and confirm the recorded text is unchanged; Apply side B and confirm a theme = line naming B's theme appears; reopen compare and close it without applying — the configuration text stays byte-identical"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.14"
+name = "profile_rename_round_trip_probe"
+description = "Rename round-trip probe: save a profile holding two overrides, rename it to a new valid name, Reset all, then apply the renamed profile — the same two overrides reappear on the controls, preview, and generated panel, and the profile list shows only the new name with the same override count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n7"
+name = "compare_previews_identical_for_different_themes"
+description = "With two different themes selected on sides A and B, the two compare previews render visually identical colors."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "behavioral.catchall"
 name = "behavioral_catchall"
 description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

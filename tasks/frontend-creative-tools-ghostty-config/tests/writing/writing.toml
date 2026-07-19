@@ -166,6 +166,13 @@ weight = 0.5
 negate = true
 
 [[criterion]]
+id = "15.10"
+name = "compare_labels_and_conflict_copy"
+description = "Where the app renders the compare surface and profile rename, the A and B labels stay consistent across selectors, panes, and Apply controls, and the rename conflict message names the conflicting profile name."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "writing.catchall"
 name = "writing_catchall"
 description = "The app's rendered text exhibits a significant copy-quality defect not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

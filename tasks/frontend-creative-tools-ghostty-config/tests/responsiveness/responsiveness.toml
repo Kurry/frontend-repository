@@ -213,7 +213,7 @@ negate = true
 [[criterion]]
 id = "7.11"
 name = "overlays_operable_at_375"
-description = "At about 375px width, the command palette, Diff panel, Import surface, and Profiles panel remain fully visible and operable rather than rendering off-screen."
+description = "At about 375px width, the command palette, Diff panel, Import surface, Profiles panel, and Compare themes surface (its two previews stacking vertically) remain fully visible and operable rather than rendering off-screen."
 type = "binary"
 weight = 1.0
 

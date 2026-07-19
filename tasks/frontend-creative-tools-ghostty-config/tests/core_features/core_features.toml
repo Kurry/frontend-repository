@@ -354,6 +354,56 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "1.50"
+name = "profile_rename_updates_name_only"
+description = "A saved profile's Rename control opens an inline form pre-filled with the current name; submitting a valid new name updates the profile's name in the list while its stored override set and override count stay unchanged, and applying the renamed profile still re-applies the same overrides"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "profile_rename_conflict_rejected"
+description = "Renaming a profile to another saved profile's name is rejected with a message naming the conflict, leaving both profiles' names and overrides unchanged; renaming a profile to its own current name is not treated as a conflict"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.52"
+name = "profile_rows_show_override_count"
+description = "Each saved profile row shows the profile name and its stored override count alongside Apply, Rename, and Delete controls"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.53"
+name = "compare_themes_side_by_side"
+description = "The Compare themes control on the Colors page opens a surface with two live terminal previews labelled A and B, each with its own selector offering exactly the six declared themes; changing one side's selection recolors only that side's preview, and neither the generated configuration nor the override count changes before an Apply"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.54"
+name = "compare_apply_commits_theme"
+description = "Choosing Apply on one compare side adds theme = that side's theme to the generated configuration, recolors the main live preview, and updates the override count exactly as a direct theme pick would; closing the compare surface without applying leaves overrides unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.55"
+name = "import_then_diff_reviewable"
+description = "After applying a valid Import, Diff mode lists every imported key with its default value beside the imported current value in the changed treatment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n43"
+name = "compare_mutates_without_apply"
+description = "Opening the Compare themes surface or changing a side's selector alters the generated configuration text or the override count before any Apply is chosen"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core functionality (a specified core behavior broken or missing) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered - even partially - by another criterion in this file, answer no here and let that criterion carry it."

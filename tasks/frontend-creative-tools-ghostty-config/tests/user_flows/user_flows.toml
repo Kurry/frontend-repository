@@ -262,6 +262,35 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "6.16"
+name = "profile_rename_flow"
+description = "Profile rename flow: save a profile, rename it via its Rename control to a new valid name — the list shows the new name with the same override count and applying it still restores the overrides; renaming it to another saved profile's name shows the conflict message and leaves both names unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.17"
+name = "theme_ab_compare_flow"
+description = "Theme A/B flow: open Compare themes, select two different themes for sides A and B — both previews recolor differently; Apply side B adds theme = that theme to the generated configuration, recolors the main preview, and updates the override count; reopening and closing compare without applying leaves the configuration and count identical"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.18"
+name = "import_then_diff_flow"
+description = "Import-then-diff flow: from zero overrides, Import config text containing at least two in-contract keys, then open Diff mode — each imported key appears with its default beside the imported value in the changed treatment, and the override count equals the number of imported keys"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n13"
+name = "rename_or_compare_controls_noop"
+description = "The profile Rename control or the Compare themes surface (selectors or Apply) is missing, or activating it changes no visible name, preview, or configuration state."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "user_flows.catchall"
 name = "user_flows_catchall"
 description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

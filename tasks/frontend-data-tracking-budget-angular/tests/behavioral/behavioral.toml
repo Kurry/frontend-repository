@@ -171,6 +171,57 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "14.11"
+name = "csv_import_pipeline_tracks_to_export"
+description = "Full CSV pipeline: load a Transactions CSV mixing valid and invalid rows, confirm the diagnostic screen leaves Dashboard totals unchanged, press Commit, then confirm the Dashboard Total expenses rose by exactly the sum of the committed valid rows and the JSON export's expenses array now contains those rows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.12"
+name = "recurring_rule_pipeline_tracks_to_export"
+description = "Rule pipeline: create a recurring rule, switch to a period, confirm exactly one rule-generated row appears and the period's Total expenses and that category's variance include the rule value, then open Export and confirm the instance appears in expenses with recurring true and the rule appears in recurringRules"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.13"
+name = "projection_input_sensitivity"
+description = "Projection sensitivity: note a category's projected total, add a valid expense to that category in the current period, and confirm the projected total changes rather than repeating; two categories with different spent-so-far show different projected totals"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.14"
+name = "bulk_delete_then_undo_round_trip"
+description = "Bulk delete round-trip: select at least two rows, Bulk delete, confirm the rows and the affected categories' totals, progress bars, variance, and chart segments drop, then Undo and confirm every deleted row and every one of those figures is restored in one step"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.15"
+name = "export_import_round_trip_restores_rules_threshold"
+description = "Extended round-trip: after creating a recurring rule and setting the threshold, Download the Budget report JSON, delete the rule and change the threshold, then Import the downloaded document — the recurring rule, threshold, expenses, and Dashboard variance restore to the exported values without reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n6"
+name = "committed_csv_rows_desync_from_totals"
+description = "After a committed CSV import, the new rows appear in the Expenses table but the Dashboard totals or JSON export preview do not include them until a reload"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n7"
+name = "bulk_undo_partial_restore"
+description = "Undo of a bulk delete restores only some of the deleted rows or leaves Dashboard totals, progress bars, or variance at their post-delete values instead of the exact prior state"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
 id = "behavioral.catchall"
 name = "behavioral_catchall"
 description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

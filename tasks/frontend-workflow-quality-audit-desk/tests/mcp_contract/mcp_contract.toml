@@ -70,14 +70,14 @@ weight = 1.0
 [[criterion]]
 id = "12.2"
 name = "handlers_match_audit_ui_logic"
-description = "Exposed tool handlers call the same application logic as the visible UI: browse navigation and filtering, feedback and verdict form flows, check-run session controls, and the report copy change the same queue rows, check chips, stage badges, rollup strip, bar charts, and timeline the visible controls use."
+description = "Exposed tool handlers call the same application logic as the visible UI: browse navigation and filtering, feedback and verdict form flows, check-run session controls, and artifact copy/export/import change the same queue rows, check chips, stage badges, rollup strip, bar charts, export previews, and timeline the visible controls use."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.3"
 name = "only_declared_ops_and_bindings"
-description = "Only documented operations from the bindings are available: browse open/apply_filter/clear_filter/sort over destinations queue, task-detail, reviewers, reviewer-detail, and report with filters check-outcome, criterion-outcome, lifecycle-stage, and reviewer and column sorts; form validate/submit/cancel over reviewer, feedback-verdict, findings, criterion-verdict, fail-rationale, escalation-category, escalation-summary, and resolution-note across workflow steps add-feedback-entry, set-criterion-verdict, escalate-task, apply-simulated-fixes, and resolve-task; session start/pause/resume with demos check-run, batch-run-filtered, and re-audit-run; artifact copy of audit-report-text — no invented routes."
+description = "Only documented operations from the bindings are available: browse open/apply_filter/clear_filter/sort over destinations queue, task-detail, reviewers, reviewer-detail, and report with filters check-outcome, criterion-outcome, lifecycle-stage, and reviewer and column sorts; form validate/submit/cancel over reviewer, feedback-verdict, findings, criterion-verdict, fail-rationale, escalation-category, escalation-summary, and resolution-note across workflow steps add-feedback-entry, set-criterion-verdict, escalate-task, apply-simulated-fixes, and resolve-task; session start/pause/resume with demos check-run, batch-run-filtered, and re-audit-run; artifact copy/export/import over formats audit-package-json and audit-report-markdown — no invented routes."
 type = "binary"
 weight = 1.0
 
@@ -112,7 +112,7 @@ weight = 1.0
 [[criterion]]
 id = "12.8"
 name = "capabilities_stay_declared"
-description = "No extra or undeclared capabilities are exposed: reviewers stay limited to the nine seeded names, checks and admission criteria to their declared closed sets, repositories to the seven seeded orgs, and copy of audit-report-text is the only artifact operation."
+description = "No extra or undeclared capabilities are exposed: reviewers stay limited to the nine seeded names, checks and admission criteria to their declared closed sets, repositories to the seven seeded orgs, and artifact operations stay limited to copy, export, and import of audit-package-json and audit-report-markdown."
 type = "binary"
 weight = 1.0
 
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n3"
 name = "undeclared_audit_capabilities_exposed"
-description = "Undeclared capabilities are exposed, such as reviewers outside the nine seeded names, lifecycle stages outside the declared seven-value set, export operations beyond the single report copy, or a generic state setter."
+description = "Undeclared capabilities are exposed, such as reviewers outside the nine seeded names, lifecycle stages outside the declared seven-value set, artifact formats beyond audit-package-json and audit-report-markdown, or a generic state setter."
 type = "binary"
 negate = true
 weight = 1.0

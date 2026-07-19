@@ -269,6 +269,28 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "4.17"
+name = "rename_conflict_rejected_self_allowed"
+description = "Renaming a profile to another saved profile's name shows a message naming the conflict and changes nothing, while renaming a profile to its own current name is not flagged as a conflict"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.18"
+name = "compare_same_theme_both_sides"
+description = "In Compare themes, selecting the same theme on both sides renders two matching previews, and Apply still commits exactly one theme = line with no duplicate theme lines"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.n13"
+name = "compare_close_leaks_state"
+description = "Closing the Compare themes surface without choosing Apply leaves the generated configuration text or the override count different from their pre-open values."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"
 description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

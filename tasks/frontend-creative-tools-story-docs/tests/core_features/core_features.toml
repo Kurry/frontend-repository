@@ -368,6 +368,58 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "1.46"
+name = "markdown_bodies_render_with_checklists"
+description = "Scene bodies render as formatted markdown on cards and in Slide mode (headings, bold, bullet lists, not raw markup); checklist lines (- [ ] / - [x]) render as real checkboxes, clicking one toggles it and updates the stored body source, and a per-scene checklist progress readout (for example 2/5) appears on every scene whose body contains a checklist and updates immediately on toggle"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "canvas_card_sorting_view"
+description = "A Canvas view toggle presents every scene as a draggable card on a freeform tabletop surface: dragging moves only that card, the position survives switching to another mode and back within the session, board order and numbering never change from canvas drags, and a Reset layout control returns the cards to a tidy grid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "version_history_with_diff_and_restore"
+description = "Committed creates and edits append timestamped version snapshots per scene (create is version 1); the kebab's version history action opens a panel listing that scene's versions newest first with timestamps; selecting an older version shows a diff marking added text with a plus and removed text with a minus; Restore makes that version current (as a new version) and the board, Slide mode, and export previews all show the restored content without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "template_injector_atomic_append"
+description = "A Templates control lists at least two named templates with scene counts; injecting one appends all of its scenes (each contract-valid, status draft) to the end of the board in one atomic step with contiguous renumbering and a toast naming the template and count, and a single Undo removes the entire injection"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n_checkbox_versions_or_reorders"
+name = "checkbox_toggle_side_effects"
+description = "Toggling a rendered checklist checkbox creates a version snapshot, changes the scene count or order, or fails to update the stored body so the next export still shows the pre-toggle mark"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n_canvas_mutates_order"
+name = "canvas_drag_mutates_order"
+description = "Dragging a card on the Canvas renumbers scenes, changes a scene's order field, or reorders the Tile/List board"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n_restore_not_propagated"
+name = "restore_leaves_stale_surfaces"
+description = "After Restore of an older version, the board card, Slide mode, or an export preview still shows the pre-restore content"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core functionality or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

@@ -194,6 +194,42 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "14.13"
+name = "checklist_toggle_to_export_pipeline"
+description = "On a seeded scene with a checklist, note its progress readout, click one unchecked rendered checkbox, and confirm the readout increments by exactly one; open Export markdown and confirm that line now reads - [x]; toggle it back and confirm the readout and the next export return to the prior state — the checkbox, readout, and artifact all derive from one body source."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.14"
+name = "version_diff_restore_probe"
+description = "Edit a scene's body from text A to text B, then to text C. Open its Version history: three versions list newest first with timestamps; selecting the A version shows C-only text marked as removals and A-only text as additions (input-dependent diff, not a constant rendering); Restore A, confirm the board and Slide show A, and a fresh markdown and json export carry A."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.15"
+name = "canvas_position_vs_order_probe"
+description = "In Canvas, drag one card far from its start; switch to List and confirm the numbering and order are exactly as before the drag; switch back to Canvas and confirm the dragged card kept its position while the others did not move; Reset layout returns all cards to the grid — canvas position and board order are independent facets of live state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.16"
+name = "template_injection_count_delta"
+description = "Note the scene count and the advertised scene count of a named template; inject it and immediately confirm the board count increased by exactly that number, the new scenes sit at the end with status draft and contiguous numbers, and the json export's scenes array grew by the same number; a single Undo restores the prior count."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n7"
+name = "diff_constant_regardless_of_inputs"
+description = "The version diff renders the same additions/removals regardless of which version is selected or what the edits contained, or comparing identical versions shows spurious differences."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "behavioral.catchall"
 name = "behavioral_catchall"
 description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

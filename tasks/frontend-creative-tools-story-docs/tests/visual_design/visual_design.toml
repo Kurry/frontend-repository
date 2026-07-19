@@ -171,6 +171,28 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
+id = "3.16"
+name = "canvas_tabletop_and_version_panel"
+description = "Canvas mode reads as a distinct tabletop surface (open work area, cards with lifted drag shadow, visible Reset layout control), and the Version history panel presents timestamped versions with green-tinted additions and red-tinted removals each prefixed by a plus or minus mark"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.17"
+name = "checklist_progress_and_templates_chrome"
+description = "Checklist progress readouts on cards and the Templates control integrate into the light/yellow board chrome, with rendered markdown bodies (headings, bold, lists, checkboxes) visually formatted rather than raw markup"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.n16"
+name = "raw_markdown_or_unstyled_diff"
+description = "Scene bodies display raw markdown markup (visible ##, **, or - [ ] as plain text where formatting is required), or the version diff renders as an unstyled dump with no addition/removal distinction"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "3.catchall"
 name = "visual_design_catchall"
 description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

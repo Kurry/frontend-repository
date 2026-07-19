@@ -319,7 +319,7 @@ weight = 1.0
 [[criterion]]
 id = "1.42"
 name = "export_json_contains_session_mutations"
-description = "After stepping dials off defaults and creating a valid preset: the Export panel monospaced JSON is API-shaped with visible field names schemaVersion (exactly exposure-control-lab.package.v1), aperture, shutter, iso, ev, presets, and snapshots; it includes the current aperture/shutter/iso/ev and a presets entry carrying name, aperture, shutter, iso, lookTag, and favorite for the new preset; an export that still shows only the pre-mutation seeded package fails"
+description = "After stepping dials off defaults, moving develop sliders, applying a look, and creating a valid preset: the Export panel monospaced JSON is API-shaped with visible field names schemaVersion (exactly exposure-control-lab.package.v1), aperture, shutter, iso, ev, light, effects, look, presets, and snapshots; it includes the current aperture/shutter/iso/ev, the live light and effects slider values, the active look name, and a presets entry carrying name, aperture, shutter, iso, lookTag, and favorite for the new preset; an export that still shows only the pre-mutation seeded package fails"
 type = "binary"
 weight = 1.0
 
@@ -333,7 +333,7 @@ weight = 1.0
 [[criterion]]
 id = "1.44"
 name = "import_lab_package_reconstructs_session"
-description = "After exporting a mutated session (dials + a created preset + a created snapshot), reloading to seed, then importing that package: dials, the new preset, the new snapshot, EV, histogram, and Export panel text all match the pre-export session"
+description = "After exporting a mutated session (dials + develop sliders + active look + a created preset + a created snapshot), reloading to seed, then importing that package: dials, the develop sliders, the active look chip, the new preset, the new snapshot (including its light and effects values), EV, histogram, and Export panel text all match the pre-export session"
 type = "binary"
 weight = 1.0
 
@@ -385,14 +385,14 @@ weight = 1.0
 [[criterion]]
 id = "1.48"
 name = "dial_snapshot_field_contract_enforced"
-description = "The snapshot form enforces the DialSnapshot field contract: name required non-empty max 40 and unique among snapshots; aperture/shutter/iso restricted to their discrete stop lists; invalid fields show inline errors naming that field and no snapshot row is added until valid"
+description = "The snapshot form enforces the DialSnapshot field contract: name required non-empty max 40 and unique among snapshots; aperture/shutter/iso restricted to their discrete stop lists; the record carries a required light object (exposure, contrast, highlights, shadows, whites, blacks) and a required effects object (texture, clarity, vignette, grain) within their stated bounds; invalid fields show inline errors naming that field and no snapshot row is added until valid"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.49"
 name = "lab_package_api_shaped_field_names"
-description = "The Export panel JSON visibly uses the lab-package field contract: top-level schemaVersion exactly exposure-control-lab.package.v1 plus aperture, shutter, iso, and ev; each presets element shows name, aperture, shutter, iso, lookTag, and favorite; each snapshots element shows name, aperture, shutter, and iso — and a newly created preset or snapshot appears in the matching array with those same field names"
+description = "The Export panel JSON visibly uses the lab-package field contract: top-level schemaVersion exactly exposure-control-lab.package.v1 plus aperture, shutter, iso, ev, a light object (exposure, contrast, highlights, shadows, whites, blacks), an effects object (texture, clarity, vignette, grain), and look (null or one of Punch, Matte, Golden, Mono); each presets element shows name, aperture, shutter, iso, lookTag, and favorite; each snapshots element shows name, aperture, shutter, iso, light, and effects — and a newly created preset or snapshot appears in the matching array with those same field names"
 type = "binary"
 weight = 1.0
 

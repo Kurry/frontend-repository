@@ -112,7 +112,7 @@ weight = 1.0
 [[criterion]]
 id = "6.8"
 name = "reload_returns_seeded_baseline"
-description = "After dial edits, creating a preset, saving a snapshot, and applying a look pack, a page reload returns defaults (f/16, 1/60, ISO 100), zeroed sliders, centered meter, empty snapshots, empty undo/redo, and exactly the seeded presets"
+description = "After dial edits, a scene change, turning on a zebra toggle, filling an A/B slot, creating a preset, saving a snapshot, and applying a look pack, a page reload returns defaults (f/16, 1/60, ISO 100), zeroed sliders, scene Daylight Courtyard, no zebra overlays, empty A/B slots, centered meter, empty snapshots, empty undo/redo, and exactly the seeded presets"
 type = "binary"
 weight = 1.0
 
@@ -141,6 +141,41 @@ weight = 1.0
 id = "6.12"
 name = "create_preset_then_export_edit_stack"
 description = "Create a valid preset, then Download edit stack — the export still reflects current dial/slider state and snapshots; creating a preset does not clear the edit buffer"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "scene_shift_flow"
+description = "With dials at defaults in Daylight Courtyard, selecting Neon Alley Night drops the EV readout by 3, moves the meter toward under-exposed, darkens the preview, and shifts the histogram left while all three dial readouts stay at f/16, 1/60, 100; then selecting Alpine Midday raises EV above default and brightens the preview — all without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "bracket_then_inspect_flow"
+description = "Setting frame count 5, step 1, base name Dusk, then Generate bracket increases the preset count by exactly five, adds rows Dusk -2 EV through Dusk +2 EV, and shows five bracket thumbnails ordered darkest to brightest; applying the Dusk +2 EV preset writes its shifted shutter into the dials"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "zebra_discovery_flow"
+description = "At defaults in Daylight Courtyard with both zebra toggles on, no stripes cover the preview; opening the aperture and raising ISO until highlight zebras appear over the brightest regions lights the histogram's right-edge clipping indicator; reversing to a strongly under-exposed combination makes shadow zebras appear and lights the left-edge indicator"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.16"
+name = "ab_wipe_compare_flow"
+description = "Capturing a bright exposure state with Set A, changing to a clearly darker state and capturing with Set B, then opening Compare shows the preview split with A's brighter render left of the handle and B's darker render right of it; dragging the handle right reveals more of A's render and the split follows the pointer continuously; leaving Compare restores the live state with both slots intact"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.17"
+name = "settings_card_differencing_flow"
+description = "Download settings card, then change ISO two stops and select a different scene, then Download settings card again — the two card files are visibly different and the second card's rendered text matches the new aperture, shutter, ISO, EV, and scene readouts"
 type = "binary"
 weight = 1.0
 
@@ -204,6 +239,22 @@ weight = 1.0
 id = "6.n8"
 name = "flow_dead_ends_without_export"
 description = "After completing an edit session there is no reachable Download PNG, Download JPEG, or Download edit stack control that produces a downloadable artifact"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n9"
+name = "scene_select_also_moves_dials"
+description = "Selecting a scene changes the aperture, shutter, or ISO dial readouts instead of leaving all three dials on their current stops while only EV, meter, preview, and histogram shift"
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.n10"
+name = "leaving_compare_loses_slots_or_live_state"
+description = "Leaving the Compare view clears or alters the stored A/B slots, or fails to return the lab to the live edit state it held before Compare"
 type = "binary"
 negate = true
 weight = 1.0

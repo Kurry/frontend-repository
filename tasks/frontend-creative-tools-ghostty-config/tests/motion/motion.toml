@@ -194,6 +194,13 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "4.18"
+name = "compare_and_rename_surfaces_transition"
+description = "Driven through real controls, the Compare themes surface enters and dismisses with a brief transition, each side's preview recolors immediately when its own selector changes, and the profile rename form appears inline with a brief transition rather than popping"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "4.catchall"
 name = "motion_catchall"
 description = "The app exhibits a significant, browser-observable defect in motion and microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered - even partially - by another criterion in this file, answer no here and let that criterion carry it."

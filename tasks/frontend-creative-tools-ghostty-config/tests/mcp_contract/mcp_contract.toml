@@ -220,7 +220,7 @@ weight = 1.0
 [[criterion]]
 id = "12.12"
 name = "editor_switch_mode_edit_diff"
-description = "Editor switch_mode between edit and diff updates the visible Diff/Edit surface via the same handlers as the Diff mode toggle."
+description = "Editor switch_mode among edit, diff, and compare updates the visible Diff/Edit/Compare surface via the same handlers as the Diff mode toggle and the Compare themes control."
 type = "binary"
 weight = 1.0
 

@@ -369,6 +369,122 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "1.48"
+name = "dashboard_variance_surface_per_category"
+description = "The Dashboard shows a per-category variance surface: each category displays its budget limit, its actual spent for the current period, and its variance (limit minus spent) shown with a sign so an over-spent category reads negative"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "projected_total_matches_formula"
+description = "Each Dashboard category shows a projected end-of-period total equal to (spent divided by days elapsed in the period) times the number of calendar days in the period's month, where days elapsed is the day-of-month of the most recent expense in that period; the shown projection matches this computation for the seeded amounts (for example a category spent $435.66 by 2020-03-24 in a 31-day month projects about $562.73)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "projected_overage_flag_when_projection_exceeds_limit"
+description = "A category whose projected total exceeds its budget limit shows a 'Projected overage' flag on its Dashboard row, and the flag appears or clears live when spending or the reporting period changes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "threshold_setting_and_over_threshold_label"
+description = "Settings exposes a spending threshold percent defaulting to 80 that is inline-validated to an integer 0 to 100 (a value below 0, above 100, or non-integer is rejected naming the threshold field and not saved); when a category's spent reaches or exceeds that percent of its limit, its Dashboard row shows an 'Over threshold' text label that clears when spent falls back below the threshold"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.52"
+name = "recurring_rule_create_with_validation"
+description = "The Settings Recurring tab creates a rule from a form with Name (1 to 60 characters), Amount (greater than 0), Category (existing), and Day of month (integer 1 to 28); each field validates inline against those bounds, and an out-of-bounds field (non-positive amount or day of month outside 1 to 28) is rejected naming that field and does not add a rule"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.53"
+name = "recurring_rule_generates_counted_marked_instance"
+description = "Adding an active recurring rule (for example Rent, 1200, an existing category, day 1) makes exactly one rule-generated row dated that day appear in the Expenses table for every viewed period, marked as rule-generated with a distinct badge or icon, and its value is included in that period's Total expenses, the category's spent, progress bar, and variance"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.54"
+name = "recurring_rule_edit_and_delete_behavior"
+description = "A recurring rule can be edited (form pre-filled) and deleted; deleting a rule removes its generated instances from every period, except an instance the user has edited (amount, date, or category changed), which remains as a standalone manual expense after the rule is deleted"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.55"
+name = "csv_import_diagnostic_before_commit"
+description = "Import CSV accepts a Transactions CSV (header date,counterparty,category,value) and shows a diagnostic screen with a per-row valid/invalid table naming the failing field on invalid rows (date not YYYY-MM-DD, unknown category, value not greater than 0, or missing counterparty); until Commit is pressed the Expenses table, Dashboard totals, and export previews are unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.56"
+name = "csv_commit_applies_only_valid_rows_by_date"
+description = "On the CSV diagnostic screen, excluding or inline-fixing rows re-validates live, and pressing Commit adds only the currently valid rows as new expenses each routed to the reporting period matching its row date, then shows an imported-versus-skipped count summary"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.57"
+name = "csv_export_all_periods_toggle"
+description = "The Export drawer's Transactions CSV tab offers a toggle between the current reporting period only and all periods; switching to all periods adds data lines for expenses outside the current period"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.58"
+name = "budget_report_json_extended_keys"
+description = "The JSON export (Budget report JSON) preview includes, beyond displayName/activePeriod/categories/expenses, the required keys meta (with exportedAt, period, expenseCount), totals (budget, spent, left), recurringRules (array), settings (thresholdPercent, accountName), each categories entry carrying limit, spent, variance, projected, and overThreshold, and each expenses entry carrying a recurring boolean"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.59"
+name = "import_json_restores_rules_and_threshold"
+description = "Importing a Budget report JSON restores the recurring rules and the spending threshold percent along with expenses and categories, so the Recurring list, the Settings threshold, and the Dashboard variance match the imported document without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n42"
+name = "csv_import_mutates_before_commit"
+description = "Selecting a Transactions CSV or interacting with the diagnostic screen changes the Expenses table, Dashboard totals, or export previews before the Commit control is pressed"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n43"
+name = "recurring_instance_omitted_from_totals_or_export"
+description = "A rule-generated expense instance is shown in the Expenses table but is not counted in the period's Dashboard totals or is missing from the JSON export's expenses array"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n44"
+name = "projection_static_after_new_spending"
+description = "A category's projected end-of-period total renders the same value after a new expense is added to that category in the current period, ignoring the changed spending"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n45"
+name = "export_omits_threshold_rules_or_label_never_shows"
+description = "The JSON export omits thresholdPercent or recurringRules, or the 'Over threshold' label never appears for any category even when spent exceeds the threshold percent of its limit"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core functionality or a broken end-to-end flow that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, action sequence) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

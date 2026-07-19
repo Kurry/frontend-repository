@@ -240,6 +240,13 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "1.14"
+name = "compare_sides_have_accessible_names"
+description = "In Compare themes, each side's theme selector and Apply control carry accessible names identifying side A or side B, and both are keyboard operable"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
 id = "accessibility.catchall"
 name = "accessibility_catchall"
 description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
