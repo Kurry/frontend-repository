@@ -44,6 +44,21 @@ Production quality in one shot comes from proven libraries, not hand-rolled prim
 
 **Corpus diversity rule:** no single framework appears on more than roughly one third of tasks, and the corpus mixes styled kits, headless primitives, and utility-first styling. Two tasks sharing a framework should differ in component library or motion stack.
 
+### Corpus-wide kit mandates
+
+Every task's kit includes, non-negotiably:
+
+1. **Tailwind CSS 4.3.2** (pinned) as the styling base — design tokens in `@theme`; styled component kits keep their component styles, Tailwind owns layout and custom surfaces.
+2. **Exactly one component library** from the task's framework ecosystem (games satisfy this via chrome: menus, HUD, dialogs, settings).
+3. **At least one dedicated animation library** — framework-native transitions alone don't qualify.
+4. **One icon library via the framework-respective package** (Phosphor: @phosphor-icons/react//vue, phosphor-svelte; Tabler: @tabler/icons-react//vue//svelte//solidjs; Iconify via @iconify/tailwind4 or unplugin-icons for any set — Remix Icon, Solar, Carbon; Heroicons; kit-native sets like Material Symbols/PrimeIcons on Material/Prime stacks) — never raw copy-paste SVGs, never a CDN. Avoid defaulting every task to one fashionable set; vary sets across the corpus.
+5. **Forms with schemas — all forms**: every form, including settings panels and config editors, is driven by a form library paired with a schema validator (Zod or Valibot) — the schema defines the rules, the form library surfaces inline per-field errors.
+6. **Rich text library** when the app edits formatted text; **data visualization library** when it renders charts — feature-appropriate, not optional where the feature exists.
+7. **State tracking**: all shared application state lives in the assigned state library — collection, active view/route, filters/sort/selection, theme, chrome. Views derive from the one store; WebMCP handlers invoke the same store commands as the visible controls.
+8. **WebMCP contract**: every task ships its `<webmcp_action_contract>` (delivery requirement, not a scoring criterion). Every state-changing feature a criterion needs to set up must be reachable through the assigned modules' bindings; if a library category adds state the modules can't express, extend the contract (see distribution.md, WebMCP contract coverage) rather than skipping it.
+
+Per-task assignments across the current 65-task corpus live in [distribution.md](distribution.md), including the per-framework defaults for icons and forms.
+
 ### The extended stack assignment
 
 The stack table historically assigned framework + state + styling. Each task now also assigns a **component library** and a **motion stack**, carried in the same places as the rest of the kit: framework, state, styling, and component library in `<summary>`; motion and domain libraries in the `<requirements>` allowlist.
@@ -56,10 +71,12 @@ Build a field-service dispatch board using Vue 3, Pinia, Tailwind CSS, and Prime
 
 ```
 (in <requirements>)
-Build tooling: Vite or an equivalent SPA setup. PrimeVue components for tables, dialogs, selects, and toasts. Motion for Vue and AutoAnimate allowed for animation; GSAP allowed for the board intro timeline; no other animation libraries. Lucide icons only. All libraries installed via npm and bundled locally.
+Build tooling: Vite or an equivalent SPA setup. PrimeVue components for tables, dialogs, selects, and toasts. Motion for Vue and AutoAnimate allowed for animation; GSAP allowed for the board intro timeline; no other animation libraries. Phosphor icons only. All libraries installed via npm and bundled locally.
 ```
 
 Framework menu: React, Vue 3, Svelte 5, Solid, Preact, Qwik, Angular. For landing pages and content-heavy sites, prefer static-first delivery — Astro or vanilla + Vite with islands of interactivity — and minimize client-side JavaScript to what the interactions actually need.
+
+Delivery modes: a task may additionally assign a meta-framework — Next.js (React), Nuxt (Vue), SvelteKit (Svelte), Astro — **pinned to static export or SSR-with-client-hydration**. All interactivity lives in client state after load: loaders, server actions, and API routes are forbidden in this harness and invisible to the judge. Meta-framework tasks add the delivery-mode observable lines (hydration-clean console, deep-link parity, no post-hydration content flash — rubrics.md 10.m) to their instruction and technical toml. Gatsby is excluded (maintenance-mode; its data layer is noise without a backend); React Router 7 framework mode is skipped for the same server-centric reason.
 
 ### Component libraries
 
@@ -116,7 +133,7 @@ Microinteraction mandate: every state change the user causes gets visible motion
 
 ### Icons and asset pipeline
 
-- Icons: one set per app, used consistently. Menu (all npm-local): Lucide (lucide-react, lucide-vue-next, @lucide/svelte), Iconify via @iconify/tailwind4 or @unocss/preset-icons (pure-CSS icons on UnoCSS stacks), Heroicons, Phosphor, Tabler. Never an icon CDN.
+- Icons: one set per app, used consistently, varied across the corpus. Menu (all npm-local): Phosphor (@phosphor-icons/react//vue, phosphor-svelte), Tabler (@tabler/icons-* per framework), Iconify via @iconify/tailwind4 or unplugin-icons (any set — Remix Icon, Solar, Carbon), Heroicons, kit-native sets (Material Symbols, PrimeIcons). Never an icon CDN.
 - Fonts: @fontsource packages or vendored woff2 in /app. No font CDNs.
 - Animation and 3D assets: .riv/.lottie files, GLB models, and their decoders (Draco, Basis/KTX2) all ship locally; heavy assets lazy-load on demand while the page stays interactive.
 

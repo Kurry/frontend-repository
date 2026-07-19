@@ -559,6 +559,16 @@ This dimension is app-agnostic **by design** — the same criteria apply verbati
 
 ---
 
+## Meta-Framework Delivery Criteria (10.m)
+
+For tasks whose assigned kit uses a meta-framework delivery mode (Next.js, Nuxt, SvelteKit, Astro — static export or SSR with client hydration), add these Technical Quality extension criteria. All are browser-observable and target the failure modes meta-frameworks introduce:
+
+1. (10.m1, positive) The console is hydration-clean: no hydration mismatch errors or warnings on first load of any route, and none after client-side navigation between routes.
+2. (10.m2, positive) Deep-link parity: loading any route URL directly renders the same view, state baseline, and chrome as reaching it through in-app navigation — no route 404s, no half-rendered shells.
+3. (10.m3, negative) Server-rendered or statically exported content visibly flashes and is replaced by different client content after hydration (mismatched text, reflowing layout, or restyled elements between first paint and interactive).
+
+These extend §10 Technical Quality; the base criteria (console cleanliness, reload behavior, storage rule) still apply unchanged. Interactivity must live in client state after load — a criterion must never depend on server mutations, loaders, or API routes, which this harness forbids and a browser judge cannot observe.
+
 ## Genre-Applicability Matrix
 
 **R** = Required as written · **A** = Adapted (see note) · **—** = Not applicable
