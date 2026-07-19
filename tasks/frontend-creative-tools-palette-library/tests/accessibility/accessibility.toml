@@ -63,14 +63,14 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "1.1"
 name = "library_controls_keyboard_operable"
-description = "Every interactive control — Nomenclature/Palette/Swatch view toggles, Filter by Period, swatches, painting-title controls, palette editor fields and submit, MENU, CART, and favorite/featured toggles — is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space), each showing a visible focus indicator when focused."
+description = "Every interactive control — Nomenclature/Palette/Swatch view toggles, Filter by Period, swatches, painting-title controls, palette editor fields and submit, MENU, CART, Export, Import, Layout simulator, Add to cart, and favorite/featured toggles — is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space), each showing a visible focus indicator when focused."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.2"
 name = "overlay_dialogs_trap_and_return_focus"
-description = "The cart drawer, subscribe popup, and Detail/Editor overlay behave as dialogs: focus moves into them when opened, stays trapped while open, and returns to the invoking control on close."
+description = "The cart drawer, subscribe popup, Detail/Editor overlay, and export drawer behave as dialogs: focus moves into them when opened, stays trapped while open, and returns to the invoking control on close."
 type = "binary"
 weight = 1.0
 
@@ -91,7 +91,7 @@ weight = 1.0
 [[criterion]]
 id = "1.5"
 name = "editor_fields_explicitly_labeled"
-description = "Palette create/edit form fields (name, period, swatches) and the subscribe email field use explicit label elements associated with their controls."
+description = "Palette create/edit form fields (name, period, swatches), the subscribe email field, CartAdd paletteName and quantity fields, and Import package controls use explicit label elements associated with their controls."
 type = "binary"
 weight = 1.0
 

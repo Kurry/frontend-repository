@@ -11,7 +11,7 @@
     "dev": "ASTRO_TELEMETRY_DISABLED=1 astro dev --host 0.0.0.0 --port ${PORT:-3000}",
     "build": "ASTRO_TELEMETRY_DISABLED=1 astro build",
     "verify:build": "ASTRO_TELEMETRY_DISABLED=1 astro build",
-    "start": "ASTRO_TELEMETRY_DISABLED=1 astro build && HOST=0.0.0.0 PORT=${PORT:-3000} node ./dist/server/entry.mjs",
+    "start": "HOST=0.0.0.0 PORT=${PORT:-3000} node ./dist/server/entry.mjs",
     "preview": "astro preview",
     "astro": "astro"
   },

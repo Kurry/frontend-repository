@@ -78,7 +78,7 @@ weight = 0.5
 [[criterion]]
 id = "15.3"
 name = "errors_name_problem"
-description = "Where the app renders error messages, the syntax-error region surfaces the parser's actual message, and config or Session JSON validation messages name the offending field (theme, schemaVersion, appTheme, activeTab, diagramType, or the config document) and the rule that failed, not only a bare rejection like 'Invalid'."
+description = "Where the app renders error messages, the syntax-error region surfaces the parser's actual message, and Mermaid Config or MermaidSession validation messages name the offending field (theme, schemaVersion, appTheme, activeTab, diagramType, or the config document) and the rule that failed, not only a bare rejection like 'Invalid'."
 type = "binary"
 weight = 0.5
 

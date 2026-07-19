@@ -282,6 +282,63 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "1.32"
+name = "palette_field_contract_bounds"
+description = "Palette create/edit enforces the request-body field contract: name length 2–80, period one of the named Filter by Period values (never All Periods), swatches 3–8 unique #RRGGBB values; out-of-contract input shows inline errors naming the field and does not change the collection count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "export_drawer_live_format_previews"
+description = "Opening Export shows live CSS, Tailwind, and SCSS previews plus palette package JSON that regenerate from the current user-manageable palettes; after creating a named palette with distinct swatches, those name and #RRGGBB values appear in the active format preview and the package JSON palettes array"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "palette_package_json_required_keys"
+description = "Download palette package JSON (or its live preview) exposes required keys schemaVersion equal to number 1, library exactly 'O&A Palette Library', palettes as an array of palette request-body objects, and generatedAt as an ISO-8601 datetime ending in Z"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "import_package_round_trip"
+description = "After exporting a palette package that includes a session-created palette, deleting user palettes to diverge, then Import package of that JSON, the collection count, Browse layouts, and a fresh export reconstruct to match the imported package without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "cart_add_request_body"
+description = "Submitting a valid CartAdd with an existing paletteName and quantity between 1 and 5 adds one cart line showing that name and quantity; the cart drawer never exposes checkout"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "subscribe_request_body_email"
+description = "When the subscribe popup is visible, submitting an invalid email keeps it open with an inline error naming the email field; submitting a valid email-shaped value dismisses it in memory with no network subscribe"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "layout_simulator_recolors_from_palette"
+description = "Opening Layout simulator shows a mock blog/dashboard/landing surface whose colors update from the selected palette's swatches (or the first library palette when none is selected) without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "export_omits_session_mutations"
+description = "After creating or editing a user palette, the Export CSS/Tailwind/SCSS preview or palette package JSON omits that palette's name or swatches — an incomplete session export"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in a specified core behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence (control, action sequence, clipboard result, or resulting page state) that demonstrates it. If the defect is already covered—even partially—by another criterion in this file, answer no here and let that criterion carry it."

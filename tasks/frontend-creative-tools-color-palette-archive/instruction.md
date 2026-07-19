@@ -106,7 +106,7 @@ Feature: Subscribe popup —
 - Invalid create (empty palette name, empty artist, period outside the closed list, fewer than 3 or more than 12 swatches, or a swatch that is not a six-digit hex with a leading number-sign) does not add a palette — the palette count is unchanged — and shows visible validation feedback naming the problem
 - After deleting all user palettes, the library region shows a clear empty state with a way to start a new palette; Export drawer previews still compile for an empty collection — archive JSON shows version palette-archive.v1 and an empty palettes array
 - A period filter that matches nothing shows an empty state in the library region; choosing all periods again restores the full collection
-- Clicking several swatches in quick succession shows each copied confirmation on the swatch that was clicked, and every confirmation clears on its own after about 1 second with no stuck labels
+- Clicking three or more swatches in quick succession shows each copied confirmation on the swatch that was clicked, and every confirmation clears on its own after about 1 second with no stuck labels
 - Dismissing the subscribe popup keeps it dismissed for the rest of the session; further idle time or scrolling does not bring it back
 - With zero palettes selected, Batch delete does nothing and shows no confirmation; the selection tray stays hidden until at least one card is selected
 - Importing malformed archive JSON shows an inline error naming the import field, leaves the palette count and names unchanged, and does not apply a successful-import state

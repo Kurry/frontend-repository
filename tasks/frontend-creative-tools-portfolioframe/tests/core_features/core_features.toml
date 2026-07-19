@@ -328,7 +328,7 @@ weight = 1.0
 [[criterion]]
 id = "1.38"
 name = "project_status_and_featured_pin"
-description = "Submitting a project with Status WIP shows a WIP chip on its preview card; pinning Featured on a project renders it first with a Featured treatment, and pinning a different project moves the Featured treatment so exactly one featured project is visible"
+description = "Submitting a project with Status wip shows a WIP chip on its preview card; pinning Featured on a project renders it first with a Featured treatment, and pinning a different project moves the Featured treatment so exactly one featured project is visible"
 type = "binary"
 weight = 1.0
 
@@ -352,6 +352,50 @@ negate = true
 id = "1.n34"
 name = "bulk_delete_leaves_stale_export"
 description = "After Delete selected removes projects from the preview, the Export package tabs still list the deleted project titles as if they remained"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.39"
+name = "project_field_contract_enforced"
+description = "Add Project enforces the Project field contract: empty Title or Category Tag, Status outside shipped|wip|concept, or Title over 80 characters keeps submit disabled or shows an inline error naming that field and appends no card; a valid submit with Status wip creates a card whose WIP chip and exported project object use status wip"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "testimonial_and_draft_field_contracts"
+description = "Add Testimonial rejects empty Quote/Name/Role or Quote over 400 characters with an inline error naming that field; Save As Draft rejects empty, over-60-character, or case-insensitive duplicate names with an inline error naming the name field and adds no draft"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "contact_and_profile_field_contracts"
+description = "Contact rejects a non-empty email missing @ with an inline error naming email; Profile Header rejects empty or over-80-character Name with an inline error naming name; valid Contact email/location/links and Profile name appear in the preview and in Portfolio JSON under the same field names"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "portfolio_json_field_contract_shape"
+description = "After adding a project and setting a profile Name, the visible Portfolio JSON preview shows schemaVersion exactly portfolioframe-v1 plus top-level keys profile, projects, skills, testimonials, contact, sections, theme, and density; each projects element includes title, categoryTag, status, and featured matching the Project field contract"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n35"
+name = "invalid_status_accepted_as_project"
+description = "Add Project accepts a Status outside shipped|wip|concept and still appends a project card, or the Portfolio JSON shows a project status outside that closed enum"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n36"
+name = "export_missing_schema_version_or_keys"
+description = "The visible Portfolio JSON export omits schemaVersion portfolioframe-v1 or is missing a required top-level key among profile, projects, skills, testimonials, contact, sections, theme, density"
 type = "binary"
 weight = 1.0
 negate = true

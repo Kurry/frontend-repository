@@ -78,7 +78,7 @@ weight = 0.5
 [[criterion]]
 id = "11.3"
 name = "guided_first_run_for_builder"
-description = "A brief guided first-run or coachmark flow introduces Create Pane, the Data Source Library, and date-range filtering without blocking the tool (bonus beyond required empty-state copy)."
+description = "A brief guided first-run or coachmark flow introduces Create Pane, the Data Source Library, date-range filtering, or Export after a pane edit without blocking the tool (bonus beyond required empty-state copy)."
 type = "binary"
 weight = 0.5
 

@@ -211,6 +211,42 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "6.11"
+name = "export_session_then_omit_on_delete"
+description = "Export flow: create a valid palette, open Export, confirm CSS/Tailwind/SCSS and palette package JSON include its name and swatches, then delete it and confirm the next export omits it."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "import_round_trip_restores_collection"
+description = "Import flow: export a palette package after a create, delete palettes to diverge, Import the JSON, and confirm collection count, Browse layouts, and a fresh export match the imported package."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "cart_add_valid_then_invalid_quantity"
+description = "Cart flow: submit CartAdd for an existing palette with quantity 2 and see the line in the drawer; submit quantity 0 or 6 and see an inline quantity error with no extra line."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "subscribe_invalid_then_valid_dismiss"
+description = "Subscribe flow: after the popup appears, invalid email keeps it open with an email-field error; valid email dismisses it and it does not return on further scroll."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n11"
+name = "export_preview_ignores_create"
+description = "After creating a valid palette, opening Export shows CSS/Tailwind/SCSS or package JSON that still omit the new palette's name and swatches."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
 id = "user_flows.catchall"
 name = "user_flows_catchall"
 description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

@@ -78,7 +78,7 @@ weight = 0.5
 [[criterion]]
 id = "15.3"
 name = "validation_names_problem_and_fix"
-description = "Where the app renders palette create/edit or subscribe validation messages, they name the field and the fix, not only a bare rejection like 'Invalid'."
+description = "Where the app renders palette create/edit, subscribe, CartAdd, or Import package validation messages, they name the field and the fix, not only a bare rejection like 'Invalid'."
 type = "binary"
 weight = 0.5
 

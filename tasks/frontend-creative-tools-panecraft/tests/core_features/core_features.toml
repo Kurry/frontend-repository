@@ -182,7 +182,7 @@ weight = 1.0
 [[criterion]]
 id = "1.35"
 name = "workspace_json_api_shaped_field_contract"
-description = "The Workspace JSON export preview is a single object whose visible text includes the WorkspaceDocument field contract: schemaVersion exactly panecraft-workspace-v1; activePageId; dateRange exactly one of today, last-7-days, last-30-days, last-90-days; pages with id/name/panes; savedAnalyses; and pane entries carrying source, type, metric, size, and refreshInterval from their closed enums"
+description = "The Workspace JSON export preview is a single object whose visible text includes the WorkspaceDocument field contract: schemaVersion exactly panecraft-workspace-v1; activePageId; dateRange exactly one of today, last-7-days, last-30-days, last-90-days; pages with id/name/panes; savedAnalyses; and pane entries carrying source (website-analytics/sales-sheet/support-tickets), type (line/bar/donut/table/counter), metric, size (small/medium/large), and refreshInterval (off/30s/5m) from their closed enums"
 type = "binary"
 weight = 1.0
 

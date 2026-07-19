@@ -214,14 +214,14 @@ weight = 1.0
 [[criterion]]
 id = "6.11"
 name = "export_package_end_to_end_flow"
-description = "Export package flow: filling Profile Header Name with a unique string, adding a uniquely titled project, switching to Portfolio JSON, and activating Copy export puts text containing both unique strings on the clipboard with visible confirmation; Markdown resume shows the same Name and project title; Download export matches the visible tab."
+description = "Export package flow: filling Profile Header Name with a unique string, adding a uniquely titled project with Status wip, switching to Portfolio JSON, and activating Copy export puts text containing both unique strings, schemaVersion portfolioframe-v1, and status wip on the clipboard with visible confirmation; Markdown resume shows the same Name and project title; Download export matches the visible tab."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.12"
 name = "import_round_trip_flow"
-description = "Import round trip: after building content, downloading Portfolio JSON, clearing or replacing working state, and importing that JSON, the preview, editor fields, theme, density, section order, and Completeness count match the pre-export state and the export preview again contains the same project titles."
+description = "Import round trip: after building content, downloading Portfolio JSON, clearing or replacing working state, and importing that JSON, the preview, editor fields, theme, density, section order, statuses, Completeness count, and both export tabs match the pre-export state and the Portfolio JSON again shows schemaVersion portfolioframe-v1 with the same project titles."
 type = "binary"
 weight = 1.0
 
@@ -251,6 +251,21 @@ weight = 1.0
 id = "6.n12"
 name = "export_preview_desyncs_after_edit"
 description = "After editing the profile Name or adding a project, the Export package preview still shows stale text that omits the new values until a reload."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "field_contract_create_then_export_flow"
+description = "Field-contract flow: submit a valid Add Project (Title, Category Tag, Status shipped), a valid Add Testimonial (Quote, Name, Role), and a valid Contact email; confirm preview cards show those values and Portfolio JSON projects/testimonials/contact objects use the same field names and enum values from the field contracts."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n13"
+name = "export_json_violates_field_contract"
+description = "After a valid create flow, the visible Portfolio JSON uses different field names than the Project/Testimonial/Contact contracts, omits schemaVersion portfolioframe-v1, or shows a status outside shipped|wip|concept."
 type = "binary"
 negate = true
 weight = 1.0

@@ -187,7 +187,7 @@ weight = 1.0
 [[criterion]]
 id = "14.n6"
 name = "undo_fails_batch_or_delete_restore"
-description = "After Batch delete or a single delete, Undo does not restore the prior collection and export favorite/membership fields."
+description = "After Batch delete or a single delete, Undo leaves the deleted palettes gone and the export favorite/membership fields stuck at the post-delete state."
 type = "binary"
 negate = true
 weight = 1.0

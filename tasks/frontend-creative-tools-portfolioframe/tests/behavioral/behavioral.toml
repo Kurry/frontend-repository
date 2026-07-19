@@ -152,14 +152,14 @@ weight = 1.0
 [[criterion]]
 id = "14.9"
 name = "mutate_then_export_contains_session_work"
-description = "Full-pipeline probe: set Profile Header Name to 'Ada Lovelace', add project titled 'Portfolio Site' with Status WIP, pin it Featured, select Forest, then open Export package Portfolio JSON and Markdown resume. Confirm both export texts contain 'Ada Lovelace' and 'Portfolio Site', and Completeness summary strip matches the Completeness panel count — ending at the produced artifact."
+description = "Full-pipeline probe: set Profile Header Name to 'Ada Lovelace', add project titled 'Portfolio Site' with Status wip, pin it Featured, select Forest, then open Export package Portfolio JSON and Markdown resume. Confirm both export texts contain 'Ada Lovelace' and 'Portfolio Site', Portfolio JSON shows schemaVersion portfolioframe-v1 with that project's status wip and featured true, and Completeness summary strip matches the Completeness panel count — ending at the produced artifact."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "14.10"
 name = "export_import_round_trip_state"
-description = "Round-trip probe: build distinctive content (unique Name, two projects, Compact density, Blossom theme), Download Portfolio JSON, clear working content, Import the file, and confirm editor, preview, theme, density, section order, statuses, and both export tabs reconstruct the same visible state."
+description = "Round-trip probe: build distinctive content (unique Name, two projects with statuses from the closed enum, Compact density, Blossom theme), Download Portfolio JSON, clear working content, Import the file, and confirm editor, preview, theme, density, section order, statuses, featured pin, and both export tabs reconstruct the same visible state with schemaVersion portfolioframe-v1."
 type = "binary"
 weight = 1.0
 
@@ -182,6 +182,21 @@ weight = 1.0
 id = "14.n6"
 name = "export_stale_after_mutations"
 description = "After mutating profile or projects, the Export package preview remains identical to its pre-mutation text (derived surface ignoring inputs)."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.12"
+name = "import_rejects_contract_breaking_payload"
+description = "Contract-integrity probe: attempt Import of JSON with schemaVersion other than portfolioframe-v1 (or two featured true projects); confirm a visible error names the problem, session state is unchanged, and a subsequent valid Import still round-trips correctly."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n7"
+name = "round_trip_drops_field_contract_fields"
+description = "After Export then Import of a valid package, status, featured, theme, density, or schemaVersion portfolioframe-v1 is missing or altered relative to the pre-export state."
 type = "binary"
 negate = true
 weight = 1.0

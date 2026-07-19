@@ -64,21 +64,21 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "15.1"
 name = "consistent_capitalization_chrome_and_panels"
-description = "Where the app renders headings, buttons, and panel titles (PortfolioFrame, Profile Header, Projects, Skills, Testimonials, Contact, Completeness, History, Drafts, Download PDF), they use one consistent capitalization convention throughout."
+description = "Where the app renders headings, buttons, and panel titles (PortfolioFrame, Profile Header, Projects, Skills, Testimonials, Contact, Completeness, History, Drafts, Export package, Download PDF), they use one consistent capitalization convention throughout."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.2"
 name = "specific_verbs_on_actions"
-description = "Where the app renders button or action labels, they use specific labels such as Add Project, Save As Draft, Download PDF, Undo, Redo, Move Up, and Move Down rather than generic Submit/OK when a specific label is possible."
+description = "Where the app renders button or action labels, they use specific labels such as Add Project, Save As Draft, Download PDF, Copy export, Download export, Import package, Undo, Redo, Move Up, and Move Down rather than generic Submit/OK when a specific label is possible."
 type = "binary"
 weight = 0.5
 
 [[criterion]]
 id = "15.3"
 name = "validation_names_problem_and_fix"
-description = "Where the app renders Add Project Title validation or duplicate-skill rejection messages, they name the field/problem and the fix, not only a bare rejection like 'Invalid'."
+description = "Where the app renders Add Project, Add Testimonial, Contact, Draft, or Import validation messages, they name the field/problem and the fix including the field contract rule when relevant (title length, status enum, schemaVersion, email format), not only a bare rejection like 'Invalid'."
 type = "binary"
 weight = 0.5
 
@@ -100,7 +100,7 @@ weight = 0.5
 [[criterion]]
 id = "15.6"
 name = "terminology_consistent_across_surfaces"
-description = "Where the app renders labels for the same concept in multiple places (Projects vs project card, Testimonials, Completeness, Drafts, History), terminology stays consistent rather than inventing conflicting names."
+description = "Where the app renders labels for the same concept in multiple places (Projects vs project card, Testimonials, Completeness, Drafts, History, Export package, Import), terminology stays consistent rather than inventing conflicting names."
 type = "binary"
 weight = 0.5
 

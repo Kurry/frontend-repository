@@ -36,9 +36,9 @@ Core features:
   - quantity: required integer from 1 to 5 inclusive
   - Invalid paletteName or quantity shows an inline error naming that field and adds no line; a valid submit appends one line item showing the palette name and quantity; removing a line updates the drawer immediately; the drawer never exposes checkout or payment
 - Feature: Layout simulator — a Layout simulator control opens a mock blog / dashboard / landing surface recolored live from the selected palette's swatches (or the first library palette when none is selected); switching the selected palette updates the simulator colors without a reload
-- Feature: Export drawer and schema-mirrored artifacts — an Export control opens the export drawer with three live-derived format tabs (CSS, Tailwind, SCSS) plus Download palette package JSON and Import package. Every tab and the JSON regenerate from the current user-manageable palettes collection without a reload; creating, editing, or deleting a palette updates all four artifacts. Download CSS / Tailwind / SCSS and Copy for the active tab emit the visible text. Format contracts (field names and tokens visible in the preview text):
+- Feature: Export drawer and schema-mirrored artifacts — an Export control opens the export drawer with three live-derived format tabs (CSS, utility-theme, SCSS) plus Download palette package JSON and Import package. Every tab and the JSON regenerate from the current user-manageable palettes collection without a reload; creating, editing, or deleting a palette updates all four artifacts. Download CSS / utility-theme / SCSS and Copy for the active tab emit the visible text. Format contracts (field names and tokens visible in the preview text):
   - CSS: a :root block declaring one --swatch-N custom property per exported swatch whose value is that swatch's #RRGGBB, plus comments or selectors that include each palette's name
-  - Tailwind: a theme.extend.colors (or equivalent theme colors) snippet whose color keys include each palette name (slug-safe) and whose values are the palette's #RRGGBB list
+  - utility-theme: a theme.extend.colors (or equivalent theme colors) snippet whose color keys include each palette name (slug-safe) and whose values are the palette's #RRGGBB list
   - SCSS: a $palettes map (or equivalent) keyed by palette name whose values are lists of #RRGGBB swatches
   - Palette package JSON: required keys schemaVersion (number exactly 1), library (exactly the string O&A Palette Library), palettes (array of palette request-body objects in collection order, each conforming to the create/edit field contract), and generatedAt (ISO-8601 datetime ending in Z). All keys and nesting are REQUIRED; example values are illustrative only
   - An export that omits a session create/edit/delete is invalid
@@ -51,7 +51,7 @@ Core features:
 - Delete: deleting a palette decreases the collection count by exactly one, removes its card from Palette view and its swatches from the Nomenclature and Swatch views, clears it from any active selection, and the period filter recomputes so the deleted palette matches nothing
 - Favorite: toggling the favorite/featured flag on a palette in one view shows the same flag state when the same palette is viewed in another view or opened in Detail, without a reload
 - A page reload returns the app to its seeded state: the seeded palettes, the Nomenclature view as default, All Periods, and no selection
-- Export session flow: create a valid palette, open Export, confirm the CSS/Tailwind/SCSS previews and the palette package JSON include that palette's name and swatches under the format contracts, Download or Copy the active format, then delete the palette and confirm the next export omits it
+- Export session flow: create a valid palette, open Export, confirm the CSS/utility-theme/SCSS previews and the palette package JSON include that palette's name and swatches under the format contracts, Download or Copy the active format, then delete the palette and confirm the next export omits it
 - Import round-trip flow: export the palette package after a create, note the palettes length, delete palettes to diverge, Import the JSON, and confirm the collection count, Browse layouts, and a fresh export reconstruct to match the imported package
 - Cart add flow: submit a valid CartAdd for an existing palette name with quantity 2, confirm the cart drawer shows that line, then submit an invalid quantity (0 or 6) and confirm an inline quantity error with no extra line
 - Subscribe flow: after the popup appears, submit an invalid email and confirm it stays open with an email-field error; submit a valid email and confirm it dismisses and does not return on further scroll
@@ -93,6 +93,7 @@ Core features:
 - The Palette-view card grid reflows across widths: multiple columns at desktop widths narrowing to a single column at phone widths with no clipped cards
 - At 375 pixel width no content clips or overflows the viewport and no horizontal scrolling appears; the two-column monospace intro collapses to a single column
 - At narrow widths the controls row stacks or wraps so the view toggles and the period filter both remain fully visible and operable
+- At 375 pixel width Export, Import, Layout simulator, and the cart drawer remain reachable and operable without page-level horizontal scrolling
 </responsiveness>
 
 <accessibility>
@@ -124,8 +125,8 @@ State contracts (behavioral, not storage keys):
 - Period filter and view mode recompute visible items from the shared collection; nomenclature ordering (hue sort + hex dedupe) derives from the shared collection
 - Copy feedback and subscribe-popup dismissal are ephemeral in-memory state; the popup stays hidden on first paint and appears only after idle (~45s) or deep scroll (~50%)
 - A page reload returns the app to its seeded state
-- End-state contract: Download CSS / Tailwind / SCSS / palette package JSON and Copy MUST reflect the session's actual user-manageable palettes under the field contracts above — an export that omits session work is invalid; Import of a previously exported package MUST restore the same visible collection (round-trip). Persistence for this good-app genre is the portable palette package plus the MCP query surface — never browser storage
-Stack: Vue 3 with Pinia, built with Vite or an equivalent SPA setup. Styling is Tailwind CSS 4.3.2 (pinned), with design tokens in @theme. Ark UI for Vue components provide the menu, cart drawer, period select, palette editor, subscribe dialog, export drawer, layout simulator chrome, and toasts; no other external component library. @vueuse/motion is allowed for animation; no other animation libraries. Iconify via @iconify/tailwind4 only; no raw pasted SVG icon sets and no icon CDNs. All forms — palette create and edit, SubscribeRequest, CartAdd, and Import package — validate through a Zod schema driven by VeeValidate: schemas are API-shaped and mirror the field contracts above (the record each form creates IS the would-be request body; CSS/Tailwind/SCSS/package exports and Import package conform to those same contracts). Inline per-field errors render before submit; submit stays disabled while required fields are invalid. A nearest-name color helper is allowed. All libraries are installed via npm and bundled locally; no CDN imports.
+- End-state contract: Download CSS / utility-theme / SCSS / palette package JSON and Copy MUST reflect the session's actual user-manageable palettes under the field contracts above — an export that omits session work is invalid; Import of a previously exported package MUST restore the same visible collection (round-trip). Persistence for this good-app genre is the portable palette package plus the MCP query surface — never browser storage
+Stack: Vue 3 with Pinia, built with Vite or an equivalent SPA setup. Styling is Tailwind CSS 4.3.2 (pinned), with design tokens in @theme. Ark UI for Vue components provide the menu, cart drawer, period select, palette editor, subscribe dialog, export drawer, layout simulator chrome, and toasts; no other external component library. @vueuse/motion is allowed for animation; no other animation libraries. Iconify via @iconify/tailwind4 only; no raw pasted SVG icon sets and no icon CDNs. All forms — palette create and edit, SubscribeRequest, CartAdd, and Import package — validate through a Zod schema driven by VeeValidate: schemas are API-shaped and mirror the field contracts above (the record each form creates IS the would-be request body; CSS/utility-theme/SCSS/package exports and Import package conform to those same contracts). Inline per-field errors render before submit; submit stays disabled while required fields are invalid. A nearest-name color helper is allowed. All libraries are installed via npm and bundled locally; no CDN imports.
 - Seed at least 6 user-manageable palettes plus any historical dataset so first load is non-empty
 - Empty required fields on create must not increase the palettes count; show visible validation feedback
 - After deleting all user palettes (or filtering to zero matches), show an empty state in the library region
@@ -220,8 +221,9 @@ Bindings:
 - Entity: palette
 - Entity operations: create; select; update; delete; toggle
 - Entity fields: name; swatches; favorite; period
-- Artifact operations: export; copy
-- Export formats: css; tailwind; scss
+- Artifact operations: export; import; copy
+- Export formats: css; utility-theme; scss; library-json
+- Import modes: library-json
 
 Mechanics exclusions:
 - Raw file paths/blobs forbidden in WebMCP args

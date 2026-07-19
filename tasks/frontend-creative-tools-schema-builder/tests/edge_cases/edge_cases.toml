@@ -70,21 +70,21 @@ weight = 1.0
 [[criterion]]
 id = "4.2"
 name = "forms_validate_inline_before_submit"
-description = "The configuration constraints, Save version, metadata field builder, and import panel validate inline before submit, with required-field and rule errors naming the field"
+description = "The FieldDefinition configuration constraints, Save version, metadata field builder, Import from example, and Import package validate inline before submit, with required-field and field-contract rule errors naming the field"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.3"
 name = "errors_are_actionable"
-description = "Error copy is actionable: the JSON parse error names the position, constraint errors name the rule and bound, and the rename-conflict message names the colliding sibling"
+description = "Error copy is actionable: the JSON parse error names the position, constraint errors name the FieldDefinition rule and bound, SchemaPackage import errors name schemaVersion or the offending key, and the rename-conflict message names the colliding sibling"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "4.4"
 name = "actions_show_confirmation"
-description = "Copying, saving a version, inserting into the prompt draft, applying an import, and deleting each produce visible success feedback (toast or inline confirmation)"
+description = "Copying, saving a version, inserting into the prompt draft, applying an import, importing a package, and deleting each produce visible success feedback (toast or inline confirmation)"
 type = "binary"
 weight = 1.0
 
@@ -205,7 +205,22 @@ negate = true
 [[criterion]]
 id = "4.n10"
 name = "affordances_hidden_or_inaccessible"
-description = "A specified affordance (nest/un-nest, bulk action bar, template library, import review toggles) is visually hidden or unreachable in practice"
+description = "A specified affordance (nest/un-nest, bulk action bar, template library, import review toggles, Import package) is visually hidden or unreachable in practice"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.11"
+name = "schema_package_import_rejects_nonconforming"
+description = "Importing parseable JSON that fails the SchemaPackage field contract — schemaVersion not exactly schema-package-v1, missing required name/jsonSchema/fields/metadata/examplePayload/formatInstruction keys, or a fields element outside the FieldDefinition contract — shows visible validation naming the offending field and leaves the working schema unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n11"
+name = "nonconforming_package_mutates_tree"
+description = "Importing JSON that fails the SchemaPackage field contract still mutates the working tree, compiled text, example payload, or format instruction"
 type = "binary"
 weight = 1.0
 negate = true

@@ -8,7 +8,7 @@
     "build": "vite build",
     "verify:build": "vite build",
     "preview": "vite preview --port 3000 --strictPort --host",
-    "start": "vite build && vite preview --port 3000 --strictPort --host"
+    "start": "vite preview --port 3000 --strictPort --host"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^5.0.3",

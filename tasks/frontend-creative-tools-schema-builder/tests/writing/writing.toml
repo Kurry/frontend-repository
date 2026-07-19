@@ -78,7 +78,7 @@ weight = 0.5
 [[criterion]]
 id = "15.3"
 name = "errors_name_problem_and_fix"
-description = "Where the app renders errors, they name the field path and the violated rule with its bound (score must be at most 100; pattern is not a valid expression), not just a rejection"
+description = "Where the app renders FieldDefinition, Save version, or Import package validation messages, they name the field and the field-contract fix (for example allowed key pattern, type enum, minimum versus maximum, or schemaVersion schema-package-v1), not only a bare rejection like 'Invalid'"
 type = "binary"
 weight = 0.5
 
@@ -100,7 +100,7 @@ weight = 0.5
 [[criterion]]
 id = "15.6"
 name = "terminology_is_consistent"
-description = "Where the app names the same concept in multiple places, terminology is consistent — always fields (not properties here and keys there), the same type names, the same version terminology across the tree, panel, diff, and exports"
+description = "Where the app names the same concept in multiple places, terminology is consistent — always fields (not properties here and keys there), the same type names, the same version and package terminology across the tree, panel, diff, and exports"
 type = "binary"
 weight = 0.5
 

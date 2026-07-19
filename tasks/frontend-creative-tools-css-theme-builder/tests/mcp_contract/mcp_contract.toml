@@ -77,7 +77,7 @@ weight = 1.0
 [[criterion]]
 id = "12.3"
 name = "only_declared_ops_and_bindings"
-description = "Only documented operations from the bindings are available: editor select/update_property/preview on css-theme (properties token, value); entity create/select/update/delete on theme (fields name, tokens); artifact export/import/copy with export formats css, json, and the theme-extension format and import mode declared-theme — no invented destinations."
+description = "Only documented operations from the bindings are available: editor select/update_property/preview on css-theme (properties token, value); entity create/select/update/delete on theme (fields name, tokens); artifact export/import/copy with export formats css, json, and theme-extension and import mode declared-theme — no invented destinations."
 type = "binary"
 weight = 1.0
 
@@ -105,7 +105,7 @@ weight = 1.0
 [[criterion]]
 id = "12.7"
 name = "artifact_export_import_copy_formats"
-description = "Artifact operations export, import (mode declared-theme), and copy with export formats css, json, and the theme-extension format are bound and invoke without throwing when called through WebMCP (clipboard/file contents remain Playwright responsibilities)."
+description = "Artifact operations export, import (mode declared-theme), and copy with export formats css, json, and theme-extension are bound and invoke without throwing when called through WebMCP (clipboard/file contents remain Playwright responsibilities)."
 type = "binary"
 weight = 1.0
 

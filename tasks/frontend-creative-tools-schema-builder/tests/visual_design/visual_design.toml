@@ -91,7 +91,7 @@ weight = 1.0
 [[criterion]]
 id = "2.5"
 name = "code_surfaces_syntax_styled"
-description = "The compiled schema text and example payload render in monospaced, syntax-styled read-only code surfaces with visible structure indentation"
+description = "The compiled schema text, example payload, and SchemaPackage JSON preview render in monospaced, syntax-styled read-only code surfaces with visible structure indentation"
 type = "binary"
 weight = 1.0
 

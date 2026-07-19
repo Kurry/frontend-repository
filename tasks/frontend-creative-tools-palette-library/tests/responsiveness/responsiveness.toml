@@ -126,7 +126,14 @@ weight = 1.0
 [[criterion]]
 id = "7.10"
 name = "overlays_remain_operable_at_small_widths"
-description = "The cart drawer, Detail/Editor overlay, and subscribe popup stay fully visible and operable at 375px rather than rendering off-screen."
+description = "The cart drawer, Detail/Editor overlay, subscribe popup, and export drawer stay fully visible and operable at 375px rather than rendering off-screen."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.11"
+name = "export_and_simulator_usable_at_375"
+description = "At 375px width, Export format tabs, Copy/Download controls, Import package, and Layout simulator remain reachable and operable without page-level horizontal scrolling."
 type = "binary"
 weight = 1.0
 

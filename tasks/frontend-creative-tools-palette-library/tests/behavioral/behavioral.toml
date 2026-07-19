@@ -149,6 +149,28 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "14.9"
+name = "export_contains_session_create"
+description = "Full-pipeline export probe: measure collection, create a valid palette with a unique name and swatches, open Export immediately — CSS/Tailwind/SCSS previews and palette package JSON palettes array contain that exact name and those #RRGGBB values (session work product, not a seed-only snapshot)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "import_export_round_trip_probe"
+description = "Round-trip probe: create a palette, Download/copy palette package JSON, delete all user palettes (empty state), Import the package — collection count, Palette-view cards, and a fresh package export reconstruct to the imported document without reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n5"
+name = "export_identical_after_create"
+description = "Creating a palette with a unique name and swatches leaves the Export CSS/Tailwind/SCSS or package JSON visually identical to the pre-create export (derived artifact ignoring session mutations)."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
 id = "behavioral.catchall"
 name = "behavioral_catchall"
 description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

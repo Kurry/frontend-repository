@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "6.n3"
 name = "token_edits_desync_surfaces"
-description = "After editing a custom theme's name or primary color, My themes swatches, editor rows, live preview, Color Palette, and CSS-export block disagree about the same tokens."
+description = "After editing a custom theme's name or primary color, My themes swatches, editor rows, live preview, Color Palette, Contrast, and Export format previews disagree about the same tokens."
 type = "binary"
 negate = true
 weight = 1.0

@@ -97,15 +97,15 @@ weight = 1.0
 
 [[criterion]]
 id = "1.6"
-name = "config_panel_type_dependent"
-description = "Clicking a node opens a side configuration panel with type select, description, and type-dependent constraint inputs — enum values and pattern for string, minimum and maximum for number — and the visible constraint inputs change when the type changes"
+name = "config_panel_field_definition_contract"
+description = "Clicking a node opens a side configuration panel that edits a FieldDefinition payload with key (1 to 40 characters, letters/digits/underscores, sibling-unique), type (closed enum string|number|boolean|object|array), required boolean, optional description, and type-dependent constraints — enumValues and pattern for string, minimum and maximum for number — and the visible constraint inputs change when the type changes"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "1.7"
 name = "constraint_validation_blocks_invalid"
-description = "Entering a minimum greater than the maximum, or an invalid pattern expression, shows an inline message naming the field and the offending rule, and the invalid value is not applied to the compiled schema"
+description = "Entering a minimum greater than the maximum, an invalid pattern expression, a sibling-duplicate or illegal key, or an empty enum entry shows an inline message naming the field and the FieldDefinition rule, and the invalid value is not applied to the compiled schema"
 type = "binary"
 weight = 1.0
 
@@ -238,7 +238,7 @@ weight = 1.0
 [[criterion]]
 id = "1.26"
 name = "export_modal_live_and_copyable"
-description = "The Export modal offers the compiled schema text and, after a completed run, a validation report with the payload summary, per-field outcomes, and failure count; both reflect the latest edits and run when reopened, and each Copy control puts the exact text on the clipboard with visible confirmation"
+description = "The Export modal offers the compiled schema text, a SchemaPackage JSON preview, and, after a completed run, a validation report with the payload summary, per-field outcomes, and failure count; each format reflects the latest edits and run when reopened, and each Copy control puts the exact text on the clipboard with visible confirmation"
 type = "binary"
 weight = 1.0
 
@@ -246,6 +246,20 @@ weight = 1.0
 id = "1.27"
 name = "boundary_states_handled"
 description = "Deleting every child of the root yields a valid empty object schema (compiled text shows an object with no properties, the example shows an empty object), a sibling-duplicate rename shows a conflict message and is not applied, and an empty enum entry shows a message and is not added"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "schema_package_export_field_contract"
+description = "Opening Export shows a live SchemaPackage JSON preview whose visible text includes schemaVersion exactly schema-package-v1 plus name, jsonSchema, fields, metadata, examplePayload, and formatInstruction; after adding a constrained field, reopening Export shows that field in fields and jsonSchema, and Copy and Download are available for the package format"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "schema_package_import_round_trip_and_reject"
+description = "Exporting then importing a conforming SchemaPackage JSON reconstructs the same visible tree, compiled text, example payload, and format instruction; importing parseable JSON that fails the field contract (wrong schemaVersion, missing required keys, or a fields element outside the FieldDefinition contract) shows validation naming the offending field and leaves the working schema unchanged"
 type = "binary"
 weight = 1.0
 
@@ -269,6 +283,14 @@ negate = true
 id = "1.n3"
 name = "identical_annotations_for_different_payloads"
 description = "Validating two clearly different payloads against the same schema produces identical per-field pass/fail annotations and an identical validation report, indicating hardcoded rather than computed validation"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.n4"
+name = "export_omits_session_or_fails_contract"
+description = "After a tree or constraint edit, the SchemaPackage export omits the session mutation, lacks schemaVersion schema-package-v1, or is missing a required SchemaPackage key (name, jsonSchema, fields, metadata, examplePayload, or formatInstruction)"
 type = "binary"
 weight = 1.0
 negate = true

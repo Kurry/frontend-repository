@@ -63,14 +63,14 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "6.1"
 name = "edit_flow_reaches_every_pane"
-description = "The core editing flow works end to end: adding, renaming, requiring, and constraining a field lands in the tree, compiled text, example payload, and format instruction within a beat of each edit and without a reload"
+description = "The core editing flow works end to end: adding, renaming, requiring, and constraining a field via a valid FieldDefinition lands in the tree, compiled text, example payload, format instruction, and SchemaPackage export within a beat of each edit and without a reload"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.2"
 name = "invalid_forms_validate_inline"
-description = "Submitting Save version with an empty name, entering min greater than max, an invalid pattern, or a metadata field with no label triggers immediate inline validation naming the field and applies nothing"
+description = "Submitting Save version with an empty name, entering min greater than max, an invalid pattern, a sibling-duplicate key, or a metadata field with no label triggers immediate inline validation naming the field and the FieldDefinition or VersionSnapshot rule and applies nothing"
 type = "binary"
 weight = 1.0
 
@@ -126,14 +126,21 @@ weight = 1.0
 [[criterion]]
 id = "6.10"
 name = "flow_recovers_without_reload"
-description = "Every dead-end candidate recovers in-app: an invalid pasted payload, a failed validation step, a rejected import draft, and an emptied library all leave working controls to continue without a reload"
+description = "Every dead-end candidate recovers in-app: an invalid pasted payload, a failed validation step, a rejected import draft, a rejected SchemaPackage import, and an emptied library all leave working controls to continue without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "export_package_flow_with_field_contract"
+description = "Export package flow: edit the schema by adding a constrained field, open Export, confirm the SchemaPackage JSON preview shows schemaVersion schema-package-v1 plus name, jsonSchema, fields, metadata, examplePayload, and formatInstruction with the new field present, then Import package that JSON and confirm the tree, compiled text, example, and format instruction restore the same session work"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "6.n1"
 name = "primary_flows_unavailable_from_ui"
-description = "A primary flow — editing the tree, running validation, saving a version, importing an example, or exporting — is not reachable from the visible UI"
+description = "A primary flow — editing the tree, running validation, saving a version, importing an example, exporting a SchemaPackage, or importing a package — is not reachable from the visible UI"
 type = "binary"
 weight = 1.0
 negate = true

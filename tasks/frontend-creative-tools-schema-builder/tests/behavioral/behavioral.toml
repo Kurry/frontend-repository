@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "14.2"
 name = "edit_to_all_derivations_pipeline"
-description = "Full pipeline probe: add a number field with minimum 1 and maximum 5 and mark it required, then confirm without a reload that the tree shows it, the compiled text gains its property with minimum, maximum, and the required entry, the example payload shows it with a value between 1 and 5, and the format instruction names it as a required number — all four surfaces track the one edit"
+description = "Full pipeline probe: add a number field with a FieldDefinition key matching the allowed pattern, minimum 1 and maximum 5, mark it required, then confirm without a reload that the tree shows it, the compiled text gains its property with minimum, maximum, and the required entry, the example payload shows it with a value between 1 and 5, the format instruction names it as a required number, and the SchemaPackage export fields/jsonSchema contain that same field — all surfaces track the one edit"
 type = "binary"
 weight = 1.0
 
@@ -117,9 +117,16 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "14.9"
+name = "export_import_pipeline_preserves_session_contract"
+description = "Full pipeline probe: add a constrained field, open Export and confirm the SchemaPackage JSON shows schemaVersion schema-package-v1 with that field in fields and jsonSchema, copy or download the package, Import package it into a blank or different schema, and confirm the tree, compiled text, example payload, and format instruction match the exported session — then Import package a payload with schemaVersion not schema-package-v1 and confirm the tree is unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "14.n1"
 name = "derived_pane_ignores_inputs"
-description = "A derived pane — compiled text, example payload, format instruction, diff, or a validation report — renders identically after its inputs change (an edit, a different version pair, or a different payload)"
+description = "A derived pane — compiled text, example payload, format instruction, SchemaPackage export, diff, or a validation report — renders identically after its inputs change (an edit, a different version pair, or a different payload)"
 type = "binary"
 weight = 1.0
 negate = true
@@ -127,7 +134,7 @@ negate = true
 [[criterion]]
 id = "14.n2"
 name = "example_or_export_stale_after_edit"
-description = "After an edit, the example payload or an export still reflects the pre-edit schema until a reload or manual refresh"
+description = "After an edit, the example payload or a SchemaPackage / compiled-schema export still reflects the pre-edit schema until a reload or manual refresh"
 type = "binary"
 weight = 1.0
 negate = true
@@ -144,6 +151,14 @@ negate = true
 id = "14.n4"
 name = "partial_reset_incoherent"
 description = "After a reload, some user-made facets survive (for example versions or playground content) while others reset, producing incoherent partial persistence in this in-memory task"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "14.n5"
+name = "package_round_trip_loses_session_work"
+description = "Exporting then re-importing a SchemaPackage drops a field, constraint, example value, or format-instruction content that was present in the export preview"
 type = "binary"
 weight = 1.0
 negate = true

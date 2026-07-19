@@ -62,29 +62,29 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "12.1"
-name = "two_mandated_modules_bound"
-description = "Both contract-mandated modules are initialized and bound: browse-query-v1 and entity-collection-v1 (tools discoverable via webmcp_list_tools with browse_* and entity_* prefixes)."
+name = "three_mandated_modules_bound"
+description = "All three contract-mandated modules are initialized and bound: browse-query-v1, entity-collection-v1, and artifact-transfer-v1 (tools discoverable via webmcp_list_tools with browse_*, entity_*, and artifact_* prefixes)."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.2"
 name = "handlers_match_visible_library_ui_logic"
-description = "Exposed tool handlers call the same application logic as the visible UI: browse/entity operations change the same palettes collection, Browse destinations, period filters, and Detail selection the view toggles, Filter by Period, and create/edit/delete controls use."
+description = "Exposed tool handlers call the same application logic as the visible UI: browse/entity/artifact operations change the same palettes collection, Browse destinations, period filters, Detail selection, and export/import surfaces the visible controls use."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.3"
 name = "only_declared_ops_and_bindings"
-description = "Only documented operations from the bindings are available: browse destinations library-grid, palette-detail, and search; filters artist and era; entity palette with create/select/update/delete/toggle and fields name, swatches, favorite — no invented destinations."
+description = "Only documented operations from the bindings are available: browse destinations library-grid, palette-detail, export-drawer, layout-simulator; filter period; entity palette with create/select/update/delete/toggle and fields name, swatches, favorite, period; artifact export/import/copy with formats css, tailwind, scss, library-json and import mode library-json — no invented destinations."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.4"
 name = "contract_exercisable_via_webmcp"
-description = "The contract can be fully exercised via automation: webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool succeed for the bound browse and entity tools."
+description = "The contract can be fully exercised via automation: webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool succeed for the bound browse, entity, and artifact tools."
 type = "binary"
 weight = 1.0
 
@@ -98,21 +98,21 @@ weight = 1.0
 [[criterion]]
 id = "12.6"
 name = "browse_destinations_and_filters_bound"
-description = "Browse operations for destinations library-grid, palette-detail, and search, plus apply_filter/clear_filter for artist and era, update the visible Browse layout and filtered results."
+description = "Browse operations for destinations library-grid, palette-detail, export-drawer, and layout-simulator, plus apply_filter/clear_filter for period, update the visible Browse layout, export drawer, layout simulator, and filtered results."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.7"
-name = "entity_fields_name_swatches_favorite"
-description = "Entity field updates for name, swatches, and favorite are bound and invoke without throwing when called through WebMCP, reflecting in the same UI surfaces as manual edits."
+name = "entity_fields_name_swatches_favorite_period"
+description = "Entity field updates for name, swatches, favorite, and period are bound and invoke without throwing when called through WebMCP, reflecting in the same UI surfaces as manual edits."
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "12.8"
 name = "no_undeclared_modules_or_ops"
-description = "No extra modules beyond browse-query-v1 and entity-collection-v1, and no undeclared operations beyond the Bindings list, are exposed on the WebMCP surface."
+description = "No extra modules beyond browse-query-v1, entity-collection-v1, and artifact-transfer-v1, and no undeclared operations beyond the Bindings list, are exposed on the WebMCP surface."
 type = "binary"
 weight = 1.0
 
@@ -133,7 +133,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n1"
 name = "mcp_tools_missing_or_noop"
-description = "WebMCP tooling for browse-query-v1 or entity-collection-v1 is unbound, missing, or a no-op when invoked."
+description = "WebMCP tooling for browse-query-v1, entity-collection-v1, or artifact-transfer-v1 is unbound, missing, or a no-op when invoked."
 type = "binary"
 negate = true
 weight = 1.0
@@ -149,7 +149,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n3"
 name = "undeclared_capabilities_exposed"
-description = "Undeclared modules, destinations, or operations beyond the Bindings (browse library-grid/palette-detail/search; filters artist/era; entity create/select/update/delete/toggle on palette) are exposed."
+description = "Undeclared modules, destinations, or operations beyond the Bindings (browse library-grid/palette-detail/export-drawer/layout-simulator; filter period; entity create/select/update/delete/toggle on palette; artifact export/import/copy with css/tailwind/scss/library-json) are exposed."
 type = "binary"
 negate = true
 weight = 1.0
@@ -189,7 +189,7 @@ weight = 1.0
 [[criterion]]
 id = "12.n8"
 name = "required_modules_not_implemented"
-description = "One or more of browse-query-v1 or entity-collection-v1 is not implemented despite being declared required in the contract."
+description = "One or more of browse-query-v1, entity-collection-v1, or artifact-transfer-v1 is not implemented despite being declared required in the contract."
 type = "binary"
 negate = true
 weight = 1.0
@@ -205,9 +205,16 @@ weight = 1.0
 [[criterion]]
 id = "12.n10"
 name = "mechanics_exclusion_faked_via_mcp"
-description = "Scroll-reveal or hover-wash timing evidence is faked via WebMCP state shortcuts instead of remaining Playwright-observed real UI control paths, violating the mechanics exclusion."
+description = "Color-wheel drag or layout-simulator hover timing evidence is faked via WebMCP state shortcuts instead of remaining Playwright-observed real UI control paths, violating the mechanics exclusion."
 type = "binary"
 negate = true
+weight = 1.0
+
+[[criterion]]
+id = "12.11"
+name = "artifact_export_import_library_json"
+description = "Artifact operations export, import, and copy are bound for formats css, tailwind, scss, and library-json with import mode library-json, and invoking them drives the same export drawer / import path as the visible UI without returning raw file/blob contents in WebMCP results."
+type = "binary"
 weight = 1.0
 
 [[criterion]]

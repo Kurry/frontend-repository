@@ -256,6 +256,42 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "4.15"
+name = "project_status_enum_and_title_bounds"
+description = "Submitting Add Project with Status outside shipped|wip|concept, an empty Category Tag, or a Title longer than 80 characters shows an inline error naming that field and appends no card."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.16"
+name = "testimonial_quote_bound_and_draft_duplicate_name"
+description = "Submitting Add Testimonial with a Quote longer than 400 characters shows an inline error naming quote; Save As Draft with a case-insensitive duplicate name shows an inline error naming name and adds no second draft."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.17"
+name = "import_wrong_schema_version_rejected"
+description = "Importing parseable JSON whose schemaVersion is not exactly portfolioframe-v1, or that has two projects with featured true, shows a visible error naming the import problem or offending field and leaves Name, projects, theme, and density unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.18"
+name = "contact_email_missing_at_rejected"
+description = "Entering a non-empty Contact email that lacks @ shows an inline error naming the email field and does not commit that invalid email into the preview Contact section."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.n13"
+name = "field_contract_violations_silently_accepted"
+description = "Empty Title, out-of-enum Status, over-length Quote, invalid Contact email, or wrong schemaVersion Import is accepted without a visible named-field error."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
 id = "edge_cases.catchall"
 name = "edge_cases_catchall"
 description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

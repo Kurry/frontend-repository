@@ -1063,12 +1063,17 @@
       ],
       "artifact_operations": [
         "export",
+        "import",
         "copy"
       ],
       "export_formats": [
         "css",
-        "tailwind",
-        "scss"
+        "utility-theme",
+        "scss",
+        "library-json"
+      ],
+      "import_modes": [
+        "library-json"
       ]
     },
     "mechanics_exclusions": [
@@ -1118,6 +1123,11 @@
           "donut",
           "table",
           "counter"
+        ],
+        "source": [
+          "website-analytics",
+          "sales-sheet",
+          "support-tickets"
         ]
       },
       "form_fields": [
@@ -1524,6 +1534,7 @@
     "modules": [
       "structured-editor-v1",
       "command-session-v1",
+      "entity-collection-v1",
       "artifact-transfer-v1"
     ],
     "bindings": {
@@ -1552,7 +1563,8 @@
         "metadata-field-options",
         "playground-payload",
         "import-example-json",
-        "import-field-accept"
+        "import-field-accept",
+        "schema-package-json"
       ],
       "editor_operations": [
         "select",
@@ -1574,12 +1586,25 @@
       "session_operations": [
         "start",
         "pause",
-        "resume"
+        "resume",
+        "advance"
       ],
       "demos": [
         "validation-run",
         "regenerate-example",
         "apply-import-draft"
+      ],
+      "entity": "schema",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete"
+      ],
+      "entity_fields": [
+        "name",
+        "fields",
+        "metadata"
       ],
       "artifact_operations": [
         "export",
@@ -1588,28 +1613,34 @@
       ],
       "export_formats": [
         "compiled-schema-json",
+        "schema-package-json",
         "validation-report-text",
         "format-instruction-text"
       ],
       "import_modes": [
-        "example-json"
+        "example-json",
+        "schema-package"
       ],
       "value_bounds": [
-        "node type in {string, number, boolean, object, array}",
-        "minimum must not exceed maximum; invalid patterns are rejected inline",
-        "node name unique among siblings, truncated past 40 chars in the tree row",
+        "FieldDefinition.type in {string, number, boolean, object, array}",
+        "FieldDefinition.key 1 to 40 chars, unique among siblings, letters digits underscores only",
+        "FieldDefinition: minimum must not exceed maximum; invalid patterns rejected; enumValues reject empty entries",
+        "SchemaPackage.schemaVersion exactly schema-package-v1; required keys schemaVersion, name, jsonSchema, fields, metadata, examplePayload, formatInstruction",
         "constraint templates in {Email pattern, Percentage 0 to 100, ISO date pattern, Non-empty string, Status enum}",
-        "metadata field type in {text, number, date, dropdown}; label required",
-        "version name required; versions are never edited in place",
+        "MetadataField.type in {text, number, date, dropdown}; label required 1 to 40 chars; options required when dropdown",
+        "VersionSnapshot.name required 1 to 80 chars; versions are never edited in place",
         "root node has no Delete; delete of a node with descendants requires confirm=true"
       ],
       "visible_postconditions": [
-        "every tree or configuration edit updates the compiled draft-07 schema text, the example payload, and the format instruction within a beat, from the one shared tree",
+        "every tree or configuration edit updates the compiled draft-07 schema text, the example payload, the format instruction, and the SchemaPackage export within a beat, from the one shared tree",
         "the compiled text is valid JSON carrying $schema, type, properties, required, enum, minimum, maximum, and pattern for the nodes that define them",
+        "SchemaPackage JSON preview shows schemaVersion schema-package-v1 plus name, jsonSchema, fields, metadata, examplePayload, and formatInstruction reflecting the session",
+        "exporting then importing a schema-package reconstructs the same tree, compiled text, example payload, and format instruction; non-conforming packages are rejected without mutation",
         "a completed validation run maps per-field pass/fail annotations onto the tree, naming the field path and violated constraint keyword with its bound",
         "pausing a validation run freezes at the current step and resuming continues there; the rollup and event timeline agree with the step list",
-        "applying a reviewed import draft replaces the tree with exactly the accepted fields; rejected fields are omitted",
-        "diffing two saved versions color-codes added, removed, and changed fields; a self-diff shows the explicit no-differences state"
+        "applying a reviewed import-from-example draft replaces the tree with exactly the accepted fields; rejected fields are omitted",
+        "diffing two saved versions color-codes added, removed, and changed fields; a self-diff shows the explicit no-differences state",
+        "entity create/select/update/delete on schema updates the library list and active tree the same as the visible sidebar controls"
       ]
     },
     "mechanics_exclusions": [
@@ -1617,7 +1648,7 @@
       "History-timeline slider scrubbing (continuous tree updates while dragging) and undo/redo keyboard shortcuts are graded through the real controls via Playwright",
       "Field add height-expansion, delete collapse, configuration-panel slide, tab crossfade, and step-order annotation pop-in animations stay Playwright-observed",
       "Retry backoff countdown ticking and running-step activity indicators stay Playwright-observed",
-      "Clipboard contents of the Copy controls are verified via Playwright, never returned in WebMCP results"
+      "Clipboard contents and downloaded export files remain Playwright responsibilities; no raw file/blob contents in WebMCP arguments or results"
     ]
   },
   {

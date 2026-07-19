@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "9.2"
 name = "console_clean_during_full_exercise"
-description = "No console errors or warnings appear during a full exercise: browsing all three views, filtering by period, creating, editing, deleting, copying a swatch, and dismissing the subscribe popup."
+description = "No console errors or warnings appear during a full exercise: browsing all three views, filtering by period, creating, editing, deleting, copying a swatch, exporting, importing, cart add, and dismissing the subscribe popup."
 type = "binary"
 weight = 1.0
 

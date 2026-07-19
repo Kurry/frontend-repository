@@ -91,7 +91,7 @@ weight = 1.0
 [[criterion]]
 id = "1.5"
 name = "forms_have_explicit_labels"
-description = "The configuration panel, Save version, metadata builder, and import fields have visible labels, and validation messages are programmatically associated with their fields"
+description = "The FieldDefinition configuration panel, Save version, metadata builder, Import from example, and Import package fields have visible labels, and validation messages are programmatically associated with their fields"
 type = "binary"
 weight = 1.0
 

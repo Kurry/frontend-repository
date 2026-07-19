@@ -77,7 +77,7 @@ weight = 1.0
 [[criterion]]
 id = "12.3"
 name = "only_declared_ops_and_bindings"
-description = "Only documented operations from the bindings are available: entity pane create/select/update/delete/reorder with fields source, type, metric, dimension, size, refresh-interval and the declared value bounds; form fields data-source, pane-type, metric-column, dimension-column with validate/submit/cancel/advance/return and steps choose-source/choose-type/configure; session start/pause/stop/connect/disconnect/advance with demos refresh-tick, collaboration-scenario, go-offline, go-online; artifact export/import/copy with export formats workspace-json and markdown-report and import mode workspace — no invented destinations."
+description = "Only documented operations from the bindings are available: entity pane create/select/update/delete/reorder with fields source, type, metric, dimension, size, refresh-interval and value bounds size small/medium/large, refresh-interval off/30s/5m, type line/bar/donut/table/counter, source website-analytics/sales-sheet/support-tickets; form fields data-source, pane-type, metric-column, dimension-column with validate/submit/cancel/advance/return and steps choose-source/choose-type/configure; session start/pause/stop/connect/disconnect/advance with demos refresh-tick, collaboration-scenario, go-offline, go-online; artifact export/import/copy with export formats workspace-json and markdown-report and import mode workspace — no invented destinations."
 type = "binary"
 weight = 1.0
 

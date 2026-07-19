@@ -84,7 +84,7 @@ weight = 1.0
 [[criterion]]
 id = "3.4"
 name = "specified_state_changes_have_motion"
-description = "State changes the spec calls out — creating a palette card into the grid, deleting a card out, view/mode switches, copy confirmation, and subscribe overlay fade — show the specified transitions rather than hard cuts (verified via real UI controls)."
+description = "State changes the spec calls out — creating a palette card into the grid, deleting a card out, view/mode switches, copy confirmation, subscribe overlay fade, and export drawer / layout simulator open-close — show the specified transitions rather than hard cuts (verified via real UI controls)."
 type = "binary"
 weight = 1.0
 

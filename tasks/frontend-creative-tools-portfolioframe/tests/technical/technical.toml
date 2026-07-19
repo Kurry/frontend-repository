@@ -123,6 +123,28 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "2.9"
+name = "api_shaped_forms_and_export_coherence"
+description = "Add Project, Add Testimonial, Contact, Save As Draft, and Import paste show inline per-field errors for field-contract violations before commit; after a valid create, the Portfolio JSON preview uses the same field names and closed enums (status shipped|wip|concept, theme sunrise|slate|forest|blossom, density compact|spacious, schemaVersion portfolioframe-v1) as the forms — export and import stay coherent with shared store state without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "export_import_localstorage_coherence"
+description = "After mutating profile/projects, exporting Portfolio JSON, and reloading, the restored working content and a fresh Export package preview still agree with the persisted session; Import of that package after clearing content restores the same fields without console errors"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n9"
+name = "form_export_field_names_diverge"
+description = "Form-created project or testimonial fields appear under different names or enums in the Portfolio JSON export than in the editor controls (form/export schema desync)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

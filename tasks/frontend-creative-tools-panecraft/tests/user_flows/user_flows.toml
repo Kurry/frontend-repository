@@ -63,7 +63,7 @@ aggregation = "weighted_mean"
 [[criterion]]
 id = "6.1"
 name = "create_pane_wizard_persists_across_tabs_and_reload"
-description = "Starting from the visible pane count on the active page, completing the Create Pane wizard adds exactly one pane rendering the chosen source's data: the count increases by exactly one immediately, switching to another page tab and back still shows the new pane, and a full page reload restores it with the same type, source, metric, dimension, size, and grid position."
+description = "Starting from the visible pane count on the active page, completing the Create Pane wizard with a valid PaneConfig adds exactly one pane rendering the chosen source's data: the count increases by exactly one immediately, the pane's visible fields match the submitted PaneConfig, switching to another page tab and back still shows the new pane, and a full page reload restores it with the same type, source, metric, dimension, size, and grid position."
 type = "binary"
 weight = 1.0
 

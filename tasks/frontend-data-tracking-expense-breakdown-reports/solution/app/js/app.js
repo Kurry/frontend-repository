@@ -91,7 +91,7 @@
     },
     {
       date: "Mar 14, 2025",
-      payee: "Harbor Market",
+      payee: "Corner Market",
       category: "Shopping",
       account: "Primary Checking (…4821)",
       amount: 198.5,

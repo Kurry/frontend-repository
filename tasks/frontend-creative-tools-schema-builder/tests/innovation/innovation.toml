@@ -120,7 +120,7 @@ weight = 1.0
 [[criterion]]
 id = "11.9"
 name = "schema_intelligence_extras"
-description = "The app offers schema intelligence beyond the spec — inline constraint documentation hints, a shareable one-line schema summary, or suggested constraints from example values"
+description = "The app offers schema intelligence beyond the spec — inline constraint documentation hints, a shareable one-line schema summary, suggested constraints from example values, or a short first-run coachmark for Export package"
 type = "binary"
 weight = 1.0
 

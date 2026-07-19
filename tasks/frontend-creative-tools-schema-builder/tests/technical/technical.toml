@@ -70,7 +70,7 @@ weight = 1.0
 [[criterion]]
 id = "10.2"
 name = "shared_state_coherence"
-description = "A single edit propagates everywhere at once: renaming a field updates the tree, compiled text, example payload, and format instruction together — the same datum never shows different values in two panes without a reload"
+description = "A single edit propagates everywhere at once: renaming a field updates the tree, compiled text, example payload, format instruction, and SchemaPackage export together — the same datum never shows different values in two panes without a reload"
 type = "binary"
 weight = 1.0
 
@@ -84,14 +84,14 @@ weight = 1.0
 [[criterion]]
 id = "10.4"
 name = "console_stays_clean"
-description = "No console errors or unhandled promise rejections appear on load or during a full exercise of editing, drag reorder, validation runs, versioning, import, undo/redo scrubbing, and exports"
+description = "No console errors or unhandled promise rejections appear on load or during a full exercise of editing, drag reorder, validation runs, versioning, import from example, SchemaPackage import, undo/redo scrubbing, and exports"
 type = "binary"
 weight = 1.0
 
 [[criterion]]
 id = "10.5"
 name = "compiled_output_parses_as_json"
-description = "The compiled schema text is valid JSON at all times — after any sequence of edits it parses without error and carries the draft-07 $schema declaration and standard keywords"
+description = "The compiled schema text and the SchemaPackage JSON preview are valid JSON at all times — after any sequence of edits the package parses without error, carries schemaVersion schema-package-v1, and its jsonSchema carries the draft-07 $schema declaration and standard keywords"
 type = "binary"
 weight = 1.0
 
@@ -99,6 +99,13 @@ weight = 1.0
 id = "10.6"
 name = "rapid_interaction_stays_synced"
 description = "Rapid interleaved interaction — fast renames, quick history-slider scrubs, tab switches during a validation run — leaves all panes consistent with each other, with no desynced or stale derivations"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.7"
+name = "api_shaped_exports_round_trip"
+description = "SchemaPackage export and Import package use the same field contract: a package exported from the session can be re-imported to reconstruct the same tree and derived panes, and browser storage remains unused for that persistence"
 type = "binary"
 weight = 1.0
 

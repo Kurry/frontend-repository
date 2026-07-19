@@ -72,7 +72,7 @@ End-to-end flows (each chain must hold without a page reload unless the step say
 - After removing all custom themes, My themes shows an empty-state hint while the 35 built-ins remain listed and selectable
 - Loading a URL whose #theme= payload is malformed or undecodable falls back to the default seeded theme with no console error and no broken UI
 - A very long theme name is truncated with an ellipsis in its sidebar row while the editor name field shows the full value
-- Rapidly clicking Random several times in a row leaves exactly one coherent token set applied — the editor rows, preview, and palette tab agree with each other
+- Rapidly clicking Random at least three times in a row leaves exactly one coherent token set applied — the editor rows, preview, and palette tab agree with each other
 - Undo and Redo are visibly disabled when their stacks are empty and activating them at that boundary never throws or corrupts themes
 - Saving a snapshot with an empty, whitespace-only, or over-length (greater than 64) name adds nothing to the Snapshots list and shows validation naming the name field
 - Importing malformed Theme JSON leaves My themes, editor, preview, and Export unchanged and shows visible validation feedback

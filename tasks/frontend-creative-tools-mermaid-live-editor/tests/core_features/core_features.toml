@@ -168,7 +168,7 @@ weight = 0.5
 [[criterion]]
 id = "1.32"
 name = "session_json_field_contract_export"
-description = "Session JSON preview/Copy/Download is a single object with required schemaVersion exactly mermaid-session-v1 plus code, config (theme closed enum default|base|dark|forest|neutral), appTheme (light|dark), activeTab (code|config), and diagramType (flowchart|class|sequence|entity-relationship|state|mindmap|pie|gantt); after editing source, config.theme, sample type, and dark app theme, the preview contains those live values and every required key"
+description = "Session JSON preview/Copy/Download conforms to the MermaidSession field contract: a single object with required schemaVersion exactly mermaid-session-v1 plus code, config (theme closed enum default|base|dark|forest|neutral), appTheme (light|dark), activeTab (code|config), and diagramType (flowchart|class|sequence|entity-relationship|state|mindmap|pie|gantt); after editing source, config.theme, sample type, and dark app theme, the preview contains those live values and every required key"
 type = "binary"
 weight = 1.0
 
