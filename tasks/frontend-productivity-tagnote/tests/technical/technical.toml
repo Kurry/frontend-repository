@@ -201,6 +201,13 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "TI-14"
+name = "note_text_rendered_safely"
+description = "A note whose text contains HTML-like markup (for example <img src=x onerror=alert(1)> or <b>hi</b>) renders that markup as literal escaped text inside the bubble — no injected element executes or restyles the page — while parsed http(s) links still render as safe anchors"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "TI.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical defect (console health, state coherence, persistence, stability) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, storage state, desynced views) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

@@ -301,6 +301,27 @@ type = "binary"
 negate = true
 weight = 1.0
 [[criterion]]
+id = "1.49"
+name = "saved_line_ply_tag_and_side_rules"
+description = "The save form enforces the remaining SavedLine bounds: a ply outside 0 through the moves length, a tag outside the closed chip set (study, sharp, solid, trap, endgame), or a tag longer than 24 characters each show an inline error naming that field and save nothing; sideToMove is derived from ply (even ply white, odd ply black) and appears correctly in the form or Study pack JSON record"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "bulk_remove_tag_applies_to_selection"
+description = "With two or more saved lines selected that carry a common tag, the bulk Remove tag action strips that tag from every selected entry at once (visible on the entries and in Study pack JSON savedLines) and then clears the selection"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "artifact_downloads_match_previews"
+description = "Download study pack downloads a .json file whose contents match the Study pack JSON preview — including formatVersion exactly the string 1 and a generatedAt timestamp that updates when the pack regenerates — and Download PGN downloads a .pgn file whose contents match the Current line PGN preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

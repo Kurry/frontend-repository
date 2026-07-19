@@ -211,6 +211,20 @@ negate = true
 weight = 1.0
 
 [[criterion]]
+id = "7.11"
+name = "toolbar_collapses_below_768"
+description = "At widths of 768 pixels and below, the toolbar wraps or collapses its controls behind an overflow control while the search input stays directly reachable, and the history side panel presents as a full-width overlay"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.12"
+name = "table_scrolls_in_container_at_375"
+description = "At 375 pixel width the library table scrolls within its own container with no page-level horizontal scrolling and no clipped viewport content"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "responsiveness.catchall"
 name = "responsiveness_catchall"
 description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
