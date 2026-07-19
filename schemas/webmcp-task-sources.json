@@ -1,135 +1,135 @@
 {
-  "frontend-daisyui-admin-dashboard": {
+  "frontend-workflow-daisyui-admin-dashboard": {
     "source": "DaisyUI",
     "instruction": "DaisyUI/instruction.md",
     "description": "DaisyUI admin user-management dashboard good-app eval."
   },
-  "frontend-daisyui-theme-generator": {
+  "frontend-creative-tools-daisyui-theme-generator": {
     "source": "DaisyUI/theme-generator",
     "instruction": "DaisyUI/theme-generator/instruction.md",
     "description": "daisyUI theme generator good-app eval."
   },
-  "frontend-camera-exposure": {
+  "frontend-creative-tools-camera-exposure": {
     "source": "CameraExposure",
     "instruction": "CameraExposure/instruction.md",
     "description": "Camera exposure simulator good-app eval."
   },
-  "frontend-design-portfolio": {
+  "frontend-creative-tools-design-portfolio": {
     "source": "DesignPortfolio",
     "instruction": "DesignPortfolio/instruction.md",
     "description": "CLI terminal product designer portfolio good-app eval."
   },
-  "frontend-finance-reports": {
+  "frontend-data-tracking-finance-reports": {
     "source": "FinanceReports",
     "instruction": "FinanceReports/instruction.md",
     "description": "Personal finance reports page good-app eval."
   },
-  "frontend-material-ui-theme-creator": {
+  "frontend-creative-tools-material-ui-theme-creator": {
     "source": "MaterialUI",
     "instruction": "MaterialUI/instruction.md",
     "description": "Material UI theme creator good-app eval."
   },
-  "frontend-media-timeline": {
+  "frontend-data-tracking-media-timeline": {
     "source": "MediaTimeline",
     "instruction": "MediaTimeline/instruction.md",
     "description": "Media history timeline explorer good-app eval."
   },
-  "frontend-palette-library": {
+  "frontend-creative-tools-palette-library": {
     "source": "PaletteLibrary",
     "instruction": "PaletteLibrary/instruction.md",
     "description": "Fine-art color palette library good-app eval."
   },
-  "frontend-shapeshift-grid": {
+  "frontend-creative-tools-shapeshift-grid": {
     "source": "Shapeshift",
     "instruction": "Shapeshift/instruction.md",
     "description": "SHAPESHIFT QR color grid painter good-app eval."
   },
-  "frontend-story-docs": {
+  "frontend-creative-tools-story-docs": {
     "source": "StoryDocs",
     "instruction": "StoryDocs/instruction.md",
     "description": "Storyboard getting-started tutorial good-app eval."
   },
-  "frontend-trip-itinerary": {
+  "frontend-planning-trip-itinerary": {
     "source": "TripItinerary",
     "instruction": "TripItinerary/instruction.md",
     "description": "French Riviera trip itinerary planner good-app eval."
   },
-  "frontend-admin-analytics-dashboard": {
+  "frontend-data-tracking-admin-analytics-dashboard": {
     "source": "variants/AdminAnalyticsDashboard",
     "instruction": "variants/AdminAnalyticsDashboard/instruction.md",
     "description": "Commerce ops admin analytics dashboard variant."
   },
-  "frontend-color-palette-archive": {
+  "frontend-creative-tools-color-palette-archive": {
     "source": "variants/ColorPaletteArchive",
     "instruction": "variants/ColorPaletteArchive/instruction.md",
     "description": "Fine-art color palette archive variant."
   },
-  "frontend-css-theme-builder": {
+  "frontend-creative-tools-css-theme-builder": {
     "source": "variants/CssThemeBuilder",
     "instruction": "variants/CssThemeBuilder/instruction.md",
     "description": "CSS theme builder variant."
   },
-  "frontend-expense-breakdown-reports": {
+  "frontend-data-tracking-expense-breakdown-reports": {
     "source": "variants/ExpenseBreakdownReports",
     "instruction": "variants/ExpenseBreakdownReports/instruction.md",
     "description": "Personal finance expense breakdown reports variant."
   },
-  "frontend-exposure-control-lab": {
+  "frontend-creative-tools-exposure-control-lab": {
     "source": "variants/ExposureControlLab",
     "instruction": "variants/ExposureControlLab/instruction.md",
     "description": "Camera exposure control lab variant."
   },
-  "frontend-grid-paint-studio": {
+  "frontend-creative-tools-grid-paint-studio": {
     "source": "variants/GridPaintStudio",
     "instruction": "variants/GridPaintStudio/instruction.md",
     "description": "QR color grid paint studio variant."
   },
-  "frontend-l1-network-marketing": {
+  "frontend-landing-l1-network-marketing": {
     "source": "variants/L1NetworkMarketing",
     "instruction": "variants/L1NetworkMarketing/instruction.md",
     "description": "Layer-1 blockchain network marketing site good-app eval."
   },
-  "frontend-material-theme-studio": {
+  "frontend-creative-tools-material-theme-studio": {
     "source": "variants/MaterialThemeStudio",
     "instruction": "variants/MaterialThemeStudio/instruction.md",
     "description": "Material theme design studio variant."
   },
-  "frontend-media-history-timeline": {
+  "frontend-data-tracking-media-history-timeline": {
     "source": "variants/MediaHistoryTimeline",
     "instruction": "variants/MediaHistoryTimeline/instruction.md",
     "description": "Media history timeline explorer variant."
   },
-  "frontend-storyboard-tutorial": {
+  "frontend-creative-tools-storyboard-tutorial": {
     "source": "variants/StoryboardTutorial",
     "instruction": "variants/StoryboardTutorial/instruction.md",
     "description": "Storyboard getting-started tutorial variant."
   },
-  "frontend-terminal-portfolio": {
+  "frontend-creative-tools-terminal-portfolio": {
     "source": "variants/TerminalPortfolio",
     "instruction": "variants/TerminalPortfolio/instruction.md",
     "description": "CLI terminal product designer portfolio variant."
   },
-  "frontend-travel-itinerary-planner": {
+  "frontend-planning-travel-itinerary-planner": {
     "source": "variants/TravelItineraryPlanner",
     "instruction": "variants/TravelItineraryPlanner/instruction.md",
     "description": "French Riviera trip itinerary planner variant."
   },
-  "frontend-daily-planner-board": {
+  "frontend-planning-daily-planner-board": {
     "source": "DailyPlannerBoard",
     "instruction": "DailyPlannerBoard/instruction.md",
     "description": "Cadence multi-day daily planner board good-app eval."
   },
-  "frontend-avax-network": {
+  "frontend-landing-avax-network": {
     "source": "AvaxNetwork",
     "instruction": "AvaxNetwork/instruction.md",
     "description": "Avalanche network marketing homepage fidelity eval."
   },
-  "frontend-hildenkaira": {
+  "frontend-landing-hildenkaira": {
     "source": "Hildenkaira",
     "instruction": "Hildenkaira/instruction.md",
     "description": "Hilden & Kaira social-media agency homepage fidelity eval."
   },
-  "frontend-landonorris": {
+  "frontend-landing-landonorris": {
     "source": "LandoNorris",
     "instruction": "LandoNorris/instruction.md",
     "description": "Lando Norris F1 driver homepage fidelity eval."
@@ -139,187 +139,187 @@
     "instruction": "MosbyFiles/instruction.md",
     "description": "Mosby's Files American Modernist architecture editorial archive fidelity eval."
   },
-  "frontend-razorpay-sprint-26": {
+  "frontend-landing-razorpay-sprint-26": {
     "source": "RazorpaySprint26",
     "instruction": "RazorpaySprint26/instruction.md",
     "description": "Razorpay Sprint 2026 marketing microsite fidelity eval."
   },
-  "frontend-readymag": {
+  "frontend-landing-readymag": {
     "source": "Readymag",
     "instruction": "Readymag/instruction.md",
     "description": "Readymag design-tool marketing homepage fidelity eval."
   },
-  "frontend-units-gr": {
+  "frontend-landing-units-gr": {
     "source": "UnitsGr",
     "instruction": "UnitsGr/instruction.md",
     "description": "units.gr all-inclusive student-housing marketing homepage fidelity eval."
   },
-  "frontend-wolverineworldwide": {
+  "frontend-landing-wolverineworldwide": {
     "source": "WolverineWorldwide",
     "instruction": "WolverineWorldwide/instruction.md",
     "description": "Wolverine Worldwide corporate marketing homepage fidelity eval."
   },
-  "frontend-focuspath": {
+  "frontend-productivity-focuspath": {
     "source": "Focuspath",
     "instruction": "Focuspath/instruction.md",
     "description": "FocusPath goal decomposition and roadmap tool good-app eval."
   },
-  "frontend-mineclash": {
+  "frontend-game-mineclash": {
     "source": "Mineclash",
     "instruction": "Mineclash/instruction.md",
     "description": "Dueling minefield puzzle game good-app eval."
   },
-  "frontend-letterdrop": {
+  "frontend-game-letterdrop": {
     "source": "Letterdrop",
     "instruction": "Letterdrop/instruction.md",
     "description": "LetterDrop falling-tile canvas word game good-app eval."
   },
-  "frontend-frameflick": {
+  "frontend-creative-tools-frameflick": {
     "source": "Frameflick",
     "instruction": "Frameflick/instruction.md",
     "description": "FrameFlick screenshot-dressing canvas compositor good-app eval."
   },
-  "frontend-dare-night": {
+  "frontend-game-dare-night": {
     "source": "DareNight",
     "instruction": "DareNight/instruction.md",
     "description": "Dare Night pass-the-device party card game good-app eval."
   },
-  "frontend-lineforge": {
+  "frontend-productivity-lineforge": {
     "source": "Lineforge",
     "instruction": "Lineforge/instruction.md",
     "description": "LineForge chess opening study app good-app eval."
   },
-  "frontend-notenest": {
+  "frontend-productivity-notenest": {
     "source": "Notenest",
     "instruction": "Notenest/instruction.md",
     "description": "Nested-folder note-taking app good-app eval."
   },
-  "frontend-feltrun": {
+  "frontend-game-feltrun": {
     "source": "Feltrun",
     "instruction": "Feltrun/instruction.md",
     "description": "Single-player Texas hold'em poker table good-app eval."
   },
-  "frontend-cipherlog": {
+  "frontend-productivity-cipherlog": {
     "source": "Cipherlog",
     "instruction": "Cipherlog/instruction.md",
     "description": "CipherLog covert-transmissions memo log good-app eval."
   },
-  "frontend-tagnote": {
+  "frontend-productivity-tagnote": {
     "source": "Tagnote",
     "instruction": "Tagnote/instruction.md",
     "description": "TagNote inline-tag note timeline good-app eval."
   },
-  "frontend-markupflow": {
+  "frontend-creative-tools-markupflow": {
     "source": "Markupflow",
     "instruction": "Markupflow/instruction.md",
     "description": "Solid.js image annotation and markup studio good-app eval."
   },
-  "frontend-swiftnote": {
+  "frontend-productivity-swiftnote": {
     "source": "Swiftnote",
     "instruction": "Swiftnote/instruction.md",
     "description": "Keyboard-first SwiftNote note app good-app eval."
   },
-  "frontend-sidedock": {
+  "frontend-productivity-sidedock": {
     "source": "Sidedock",
     "instruction": "Sidedock/instruction.md",
     "description": "SideDock color-coded workspace bookmark manager good-app eval."
   },
-  "frontend-mindthread": {
+  "frontend-productivity-mindthread": {
     "source": "Mindthread",
     "instruction": "Mindthread/instruction.md",
     "description": "MindThread thought-capture and idea-threading good-app eval."
   },
-  "frontend-scribblespace": {
+  "frontend-productivity-scribblespace": {
     "source": "Scribblespace",
     "instruction": "Scribblespace/instruction.md",
     "description": "ScribbleSpace freeform infinite-canvas notes board good-app eval."
   },
-  "frontend-panecraft": {
+  "frontend-creative-tools-panecraft": {
     "source": "Panecraft",
     "instruction": "Panecraft/instruction.md",
     "description": "PaneCraft mock-data dashboard builder good-app eval."
   },
-  "frontend-repquest": {
+  "frontend-game-repquest": {
     "source": "Repquest",
     "instruction": "Repquest/instruction.md",
     "description": "RepQuest fitness-quest canvas game-sim good-app eval."
   },
-  "frontend-loopdaily": {
+  "frontend-productivity-loopdaily": {
     "source": "Loopdaily",
     "instruction": "Loopdaily/instruction.md",
     "description": "LoopDaily habit tracker with malformed-data recovery good-app eval."
   },
-  "frontend-taskgrove": {
+  "frontend-productivity-taskgrove": {
     "source": "Taskgrove",
     "instruction": "Taskgrove/instruction.md",
     "description": "TaskGrove hierarchical task-tree planner good-app eval."
   },
-  "frontend-clockcraft": {
+  "frontend-productivity-clockcraft": {
     "source": "Clockcraft",
     "instruction": "Clockcraft/instruction.md",
     "description": "Personal time-tracking productivity app with branching edit history good-app eval."
   },
-  "frontend-fandangofury": {
+  "frontend-game-fandangofury": {
     "source": "Fandangofury",
     "instruction": "Fandangofury/instruction.md",
     "description": "FandangoFury side-scrolling hack-and-slash festival combat game good-app eval."
   },
-  "frontend-portfolioframe": {
+  "frontend-creative-tools-portfolioframe": {
     "source": "Portfolioframe",
     "instruction": "Portfolioframe/instruction.md",
     "description": "Resume-and-portfolio builder good-app eval."
   },
-  "frontend-euroscope": {
+  "frontend-creative-tools-euroscope": {
     "source": "Euroscope",
     "instruction": "Euroscope/instruction.md",
     "description": "Custom EuroScope air-traffic-client theme and icon patcher good-app eval."
   },
-  "frontend-docuseal": {
+  "frontend-workflow-docuseal": {
     "source": "Docuseal",
     "instruction": "Docuseal/instruction.md",
     "description": "Docuseal PDF form builder and document signing workspace good-app eval."
   },
-  "frontend-mermaid-live-editor": {
+  "frontend-creative-tools-mermaid-live-editor": {
     "source": "MermaidLiveEditor",
     "instruction": "MermaidLiveEditor/instruction.md",
     "description": "Mermaid live diagram source editor with preview good-app eval."
   },
-  "frontend-md-uy": {
+  "frontend-productivity-md-uy": {
     "source": "MdUy",
     "instruction": "MdUy/instruction.md",
     "description": "md.uy collaborative markdown editor good-app eval."
   },
-  "frontend-ghostfolio": {
+  "frontend-data-tracking-ghostfolio": {
     "source": "Ghostfolio",
     "instruction": "Ghostfolio/instruction.md",
     "description": "Ghostfolio wealth portfolio dashboard good-app eval."
   },
-  "frontend-plausible-analytics": {
+  "frontend-data-tracking-plausible-analytics": {
     "source": "PlausibleAnalytics",
     "instruction": "PlausibleAnalytics/instruction.md",
     "description": "Plausible privacy web-analytics dashboard good-app eval."
   },
-  "frontend-ghostty-config": {
+  "frontend-creative-tools-ghostty-config": {
     "source": "GhosttyConfig",
     "instruction": "GhosttyConfig/instruction.md",
     "description": "Ghostty terminal configuration generator with live preview good-app eval."
   },
-  "frontend-vert": {
+  "frontend-creative-tools-vert": {
     "source": "Vert",
     "instruction": "Vert/instruction.md",
     "description": "VERT private local file converter good-app eval."
   },
-  "frontend-nostrpass": {
+  "frontend-productivity-nostrpass": {
     "source": "Nostrpass",
     "instruction": "Nostrpass/instruction.md",
     "description": "Native local Nostr identity and key manager good-app eval."
   },
-  "frontend-weblink": {
+  "frontend-productivity-weblink": {
     "source": "Weblink",
     "instruction": "Weblink/instruction.md",
     "description": "Weblink peer-to-peer WebRTC chat and file-transfer client good-app eval."
   },
-  "frontend-budget-angular": {
+  "frontend-data-tracking-budget-angular": {
     "source": "BudgetAngular",
     "instruction": "BudgetAngular/instruction.md",
     "description": "Native personal expense and budget tracker good-app eval."

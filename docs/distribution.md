@@ -2,12 +2,29 @@
 
 Planning document for rolling the extended stack assignment ([instructions.md](instructions.md), Implementation Technology Guidelines) across the 65 tasks, ahead of updating `tasks/*/instruction.md`. This revision includes real stack migration, not just additive kit assignment.
 
+## Task naming convention (category prefixes) — applied corpus-wide
+
+Task slugs carry their archetype category: `frontend-<category>-<name>`. All 65 tasks are renamed (task dir, task.toml `name`, the three webmcp schema files + canonical map, `TASK_SPECS`, run configs, unit-test fixtures, and this doc updated together):
+
+| Prefix | Count | Category |
+|---|---|---|
+| `frontend-creative-tools-*` | 22 | Theme/palette/config builders, editors, annotation and portfolio tools |
+| `frontend-productivity-*` | 15 | Habits, tasks, notes, time, focus, bookmarks, personal utilities |
+| `frontend-landing-*` | 8 | Landing/marketing homepages (incl. the fidelity conversions) |
+| `frontend-data-tracking-*` | 8 | Expense/finance/analytics/portfolio dashboards and timelines |
+| `frontend-game-*` | 6 | Playable games and game-sims (no archetype column fits a game loop) |
+| `frontend-planning-*` | 3 | Day planners and trip itineraries |
+| `frontend-workflow-*` | 2 | Admin/user-management and document-workflow apps |
+| (unprefixed) | 1 | frontend-mosbyfiles — ten-route editorial fidelity site; flagged as the one open categorization call |
+
+Judgment calls worth knowing: framework rebuilds carry their archetype, not a rebuild prefix (ghostfolio/plausible → data-tracking, docuseal → workflow, mermaid-live-editor/vert/ghostty-config/euroscope → creative-tools, loopdaily/md-uy/nostrpass/weblink → productivity); repquest is a game-sim → game; lineforge (chess study) → productivity. Renames invalidate references in pre-rename harbor job artifacts — `harbor score --task` must use the new paths.
+
 ## Corpus-wide mandates (every task)
 
 1. **Tailwind CSS 4.3.2, pinned, everywhere.** All other styling systems are migrated: UnoCSS (5 tasks), CSS Modules (2), Styled Components (1), Emotion (1), and the fidelity tasks' bespoke CSS token systems all convert to Tailwind 4.3.2 (design tokens live in `@theme`). Component libraries with their own styling layer (Angular Material, PrimeNG, MUI, Mantine, PrimeVue, Naive UI) keep their component styles; Tailwind owns layout, spacing, and custom surfaces.
 2. **Exactly one component library per task**, drawn from the task's framework ecosystem. No task ships zero; games satisfy this through their chrome (menus, HUD panels, dialogs, settings) even when the play surface is custom canvas.
 3. **Rich text editing library** wherever the app edits formatted/structured text (notes, memos, editors): TipTap, ProseKit, Lexical/svelte-lexical, CodeMirror 6 for source panes.
-4. **Data visualization library** wherever the app renders charts/trends/breakdowns: Recharts, LayerChart, ECharts/ngx-echarts, Chart.js, or the corpus-proven trendchart-elements. (Single carve-out: repquest's PRD mandates hand-written Canvas 2D — the mandate is the task.)
+4. **Data visualization library** wherever the app renders charts/trends/breakdowns: Recharts, LayerChart, ECharts/ngx-echarts, Chart.js, or the corpus-proven trendchart-elements. (Single carve-out: game-repquest's PRD mandates hand-written Canvas 2D — the mandate is the task.)
 5. **At least one dedicated animation library per task** — AutoAnimate, Motion (React/Vue/vanilla), @vueuse/motion, svelte-motion, GSAP — framework-native transitions alone don't satisfy this. Celebration effects (canvas-confetti, neoconfetti, tsparticles) added where the archetype has win moments.
 6. **One icon library per task, via the framework-respective package** — never raw SVG copy-paste, never a CDN. Defaults per framework below; Iconify's Tailwind plugin (@iconify/tailwind4) and unplugin-icons (Vite, on-demand) are the any-framework routes.
 7. **Forms with schemas, every task, every form.** Every task has at least one form (create/edit, settings, config — games included via their settings/start screens), and **all** forms — including settings panels and config editors — are driven by a form library paired with a schema validator (Zod or Valibot): the schema defines the rules, the form library renders inline per-field errors before submit. Defaults per framework below.
@@ -34,17 +51,17 @@ React drops from 16 to **7**. The 5 static/legacy stacks (jQuery Webflow export,
 |---|---|---|---|
 | React | 16 | **7** | −9 (moves below) |
 | Svelte (incl. 2 Astro+Svelte-island games) | 14 | 14 | — |
-| Vue 3 (incl. Nuxt) | 11 | 12 | +scribblespace |
-| Astro | 2 | **9** | +l1-network-marketing, +story-docs, +readymag, +landonorris, +razorpay-sprint-26, +units-gr, +wolverineworldwide |
-| Qwik | 6 | 7 | +letterdrop |
-| Solid | 6 | 7 | +camera-exposure |
-| Preact | 3 | 5 | +daisyui-admin-dashboard, +terminal-portfolio |
-| Angular | 3 | 4 | +expense-breakdown-reports |
+| Vue 3 (incl. Nuxt) | 11 | 12 | +productivity-scribblespace |
+| Astro | 2 | **9** | +landing-l1-network-marketing, +creative-tools-story-docs, +landing-readymag, +landing-landonorris, +landing-razorpay-sprint-26, +landing-units-gr, +landing-wolverineworldwide |
+| Qwik | 6 | 7 | +game-letterdrop |
+| Solid | 6 | 7 | +creative-tools-camera-exposure |
+| Preact | 3 | 5 | +workflow-daisyui-admin-dashboard, +creative-tools-terminal-portfolio |
+| Angular | 3 | 4 | +data-tracking-expense-breakdown-reports |
 | Static / jQuery / custom elements | 4 | **0** | all → Astro |
 
-React keeps (7): admin-analytics-dashboard (flagship DaisyUI admin), material-theme-studio + material-ui-theme-creator (MUI is React-native — domain-tied), media-history-timeline (Mantine representation), and the three React-named framework rebuilds: ghostfolio, plausible-analytics, loopdaily.
+React keeps (7): data-tracking-admin-analytics-dashboard (flagship DaisyUI admin), creative-tools-material-theme-studio + creative-tools-material-ui-theme-creator (MUI is React-native — domain-tied), data-tracking-media-history-timeline (Mantine representation), and the three React-named framework rebuilds: data-tracking-ghostfolio, data-tracking-plausible-analytics, productivity-loopdaily.
 
-React moves (9): camera-exposure→Solid, daisyui-admin-dashboard→Preact, expense-breakdown-reports→Angular, l1-network-marketing→Astro, letterdrop→Qwik, scribblespace→Vue 3, story-docs→Astro, terminal-portfolio→Preact, readymag→Astro.
+React moves (9): creative-tools-camera-exposure→Solid, workflow-daisyui-admin-dashboard→Preact, data-tracking-expense-breakdown-reports→Angular, landing-l1-network-marketing→Astro, game-letterdrop→Qwik, productivity-scribblespace→Vue 3, creative-tools-story-docs→Astro, creative-tools-terminal-portfolio→Preact, landing-readymag→Astro.
 
 ## Delivery modes (meta-frameworks inside the framework quotas)
 
@@ -52,9 +69,9 @@ Meta-framework tasks count within their base framework's quota — delivery mode
 
 | Delivery mode | Count | Tasks |
 |---|---|---|
-| Next.js (static export or hydration) | 3 of 7 React | admin-analytics-dashboard, ghostfolio, plausible-analytics |
-| Nuxt (SSG/SSR + hydration) | 3 of 12 Vue | mosbyfiles (already Nuxt SSR), daily-planner-board, trip-itinerary |
-| SvelteKit (adapter-static) | 4 of 14 Svelte | mermaid-live-editor, vert (both real apps ARE SvelteKit — fidelity gain), md-uy, clockcraft |
+| Next.js (static export or hydration) | 3 of 7 React | data-tracking-admin-analytics-dashboard, data-tracking-ghostfolio, data-tracking-plausible-analytics |
+| Nuxt (SSG/SSR + hydration) | 3 of 12 Vue | mosbyfiles (already Nuxt SSR), planning-daily-planner-board, planning-trip-itinerary |
+| SvelteKit (adapter-static) | 4 of 14 Svelte | creative-tools-mermaid-live-editor, creative-tools-vert (both real apps ARE SvelteKit — fidelity gain), productivity-md-uy, productivity-clockcraft |
 | Astro | 9 | the Astro lane above |
 | React Router 7 framework mode (Remix successor) | 0 | skipped — most server-centric of the set; with loaders/actions neutered, little remains over plain client routing |
 | Gatsby | 0 | excluded — maintenance-mode ecosystem; its GraphQL data layer is noise in a no-backend harness; fails the "active maintenance" selection criterion |
@@ -80,12 +97,12 @@ Coverage check against the new kit categories:
 
 Proposed contract adjustments (a `zto-webmcp-v1.1` additive rev of `packages/webmcp-contracts` — new operations are optional, so existing tasks stay valid):
 
-1. **structured-editor-v1: add rich-text operations** `apply_format` (closed enum: bold, italic, heading, list, link, code), `insert_block`, `undo`, `redo`; new optional binding keys `formats`, `block_types`. Needed by: mindthread, notenest, scribblespace, swiftnote, tagnote, md-uy, mermaid-live-editor. Restriction to keep: invokes the same editor commands as the visible toolbar — no direct HTML injection.
+1. **structured-editor-v1: add rich-text operations** `apply_format` (closed enum: bold, italic, heading, list, link, code), `insert_block`, `undo`, `redo`; new optional binding keys `formats`, `block_types`. Needed by: productivity-mindthread, productivity-notenest, productivity-scribblespace, productivity-swiftnote, productivity-tagnote, productivity-md-uy, creative-tools-mermaid-live-editor. Restriction to keep: invokes the same editor commands as the visible toolbar — no direct HTML injection.
 2. **entity-collection-v1: add graph operations** `connect` (source, target — closed entity refs) and `set_position` (bounded coordinates); optional binding key `connectable`. Needed by any future node-UI task; harmless elsewhere.
-3. **browse-query-v1: add optional binding keys** `timeframes` and `series` with a `set_timeframe` / `toggle_series` operation pair, so chart-heavy tasks (admin-analytics, ghostfolio, plausible, finance/expense reports) can declare chart controls first-class instead of overloading filters.
+3. **browse-query-v1: add optional binding keys** `timeframes` and `series` with a `set_timeframe` / `toggle_series` operation pair, so chart-heavy tasks (admin-analytics, data-tracking-ghostfolio, plausible, finance/expense reports) can declare chart controls first-class instead of overloading filters.
 4. **No new modules.** All gaps fit as additive operations on existing modules; a new module would ripple through `schemas/webmcp-assignments.json`, the h3 renderer, and every stdio-server copy for no expressive gain.
 
-Sequencing: contract rev lands before Phase 1 of the migration (it changes `packages/webmcp-contracts` specs + `webmcp_h3.py` rendering + `versioning.json`); per-task binding updates ride each task's migration phase. The stdio bridge (`tests/mcp/webmcp_stdio_server.mjs`) is operation-agnostic and needs no change beyond the vendored copy refresh that packaging already does.
+Sequencing: contract rev lands before Phase 1 of the migration (it changes `packages/webmcp-contracts` specs + `webmcp_h3.py` rendering + `versioning.json`); per-task binding updates ride each task's migration phase. The stdio bridge (`tests/webmcp_stdio_server.mjs`) is operation-agnostic and needs no change beyond the vendored copy refresh that packaging already does.
 
 ## Per-task assignments
 
@@ -95,31 +112,31 @@ Framework column shows the post-migration stack; **bold** = migrated. State libr
 
 | Task | Framework | Component library | Animation stack | Rich text / Data viz / Domain | Icons |
 |---|---|---|---|---|---|
-| admin-analytics-dashboard | React (Next.js static export) | DaisyUI | Motion for React + AutoAnimate | viz: trendchart-elements; TanStack Table | Heroicons |
-| budget-angular | Angular | Angular Material | AutoAnimate + Angular animations | viz: ngx-echarts; Reactive Forms | Material Symbols |
-| camera-exposure | **Solid** (stores) | Kobalte | motion (vanilla) | — | Phosphor (unplugin-icons) |
-| color-palette-archive | Qwik | DaisyUI | AutoAnimate | — | Iconify |
-| css-theme-builder | Vue 3 | Reka UI | Motion for Vue | forms: VeeValidate + Zod | Remix Icon (unplugin-icons) |
-| daily-planner-board | Vue 3 (Nuxt SSG) | shadcn-vue | Motion for Vue + AutoAnimate | @event-calendar/core | Phosphor (@phosphor-icons/vue) |
-| daisyui-admin-dashboard | **Preact** (Signals) | DaisyUI (named by task) | AutoAnimate | viz: Chart.js sparklines; forms | Heroicons |
-| daisyui-theme-generator | Svelte | DaisyUI (named by task) | AutoAnimate + Svelte transitions | — | Iconify |
-| design-portfolio | Angular | Angular Material (light) | GSAP (terminal type) | — | Material Symbols |
-| expense-breakdown-reports | **Angular** (NgRx) | PrimeNG | AutoAnimate + Angular animations | viz: ngx-echarts | PrimeIcons |
-| exposure-control-lab | Vue 3 | Naive UI | Motion for Vue | — | Solar (unplugin-icons) |
-| finance-reports | Preact | DaisyUI | AutoAnimate | viz: Chart.js | Iconify |
-| grid-paint-studio | Svelte | Bits UI (chrome) | svelte-motion | — | phosphor-svelte |
-| l1-network-marketing | **Astro** (islands) | DaisyUI | GSAP + ScrollTrigger; Lenis | — | astro-icon (Phosphor set) |
-| material-theme-studio | React | MUI | Motion for React | — | Material Symbols |
-| material-ui-theme-creator | React | MUI (named by task) | Motion for React | forms: React Hook Form + Zod | Material Symbols |
-| media-history-timeline | React | Mantine | Motion for React + AutoAnimate | TanStack Virtual | Tabler |
-| media-timeline | Solid | Kobalte | motion (vanilla) | virtua | Tabler (@tabler/icons-solidjs) |
-| palette-library | Vue 3 (**UnoCSS→TW 4.3.2**) | Ark UI (Vue) | @vueuse/motion | — | Iconify (TW plugin) |
-| story-docs | **Astro** (islands) | DaisyUI | GSAP scroll reveals | — | astro-icon (Remix Icon set) |
-| storyboard-tutorial | Preact | DaisyUI | AutoAnimate | — | Iconify |
-| swiftnote | Angular | PrimeNG | AutoAnimate + Angular animations | rich text: ProseKit | PrimeIcons |
-| terminal-portfolio | **Preact** (Signals) | DaisyUI (chrome) | GSAP (typewriter) | — | Iconify CSS (Tabler set) |
-| travel-itinerary-planner | Qwik | DaisyUI | AutoAnimate | maps: MapLibre local tiles (phase 2 flag) | Iconify |
-| trip-itinerary | Vue 3 (Nuxt SSG; **UnoCSS→TW 4.3.2**) | PrimeVue | Motion for Vue | maps: MapLibre local tiles (phase 2 flag) | Tabler (@tabler/icons-vue) |
+| data-tracking-admin-analytics-dashboard | React (Next.js static export) | DaisyUI | Motion for React + AutoAnimate | viz: trendchart-elements; TanStack Table | Heroicons |
+| data-tracking-budget-angular | Angular | Angular Material | AutoAnimate + Angular animations | viz: ngx-echarts; Reactive Forms | Material Symbols |
+| creative-tools-camera-exposure | **Solid** (stores) | Kobalte | motion (vanilla) | — | Phosphor (unplugin-icons) |
+| creative-tools-color-palette-archive | Qwik | DaisyUI | AutoAnimate | — | Iconify |
+| creative-tools-css-theme-builder | Vue 3 | Reka UI | Motion for Vue | forms: VeeValidate + Zod | Remix Icon (unplugin-icons) |
+| planning-daily-planner-board | Vue 3 (Nuxt SSG) | shadcn-vue | Motion for Vue + AutoAnimate | @event-calendar/core | Phosphor (@phosphor-icons/vue) |
+| workflow-daisyui-admin-dashboard | **Preact** (Signals) | DaisyUI (named by task) | AutoAnimate | viz: Chart.js sparklines; forms | Heroicons |
+| creative-tools-daisyui-theme-generator | Svelte | DaisyUI (named by task) | AutoAnimate + Svelte transitions | — | Iconify |
+| creative-tools-design-portfolio | Angular | Angular Material (light) | GSAP (terminal type) | — | Material Symbols |
+| data-tracking-expense-breakdown-reports | **Angular** (NgRx) | PrimeNG | AutoAnimate + Angular animations | viz: ngx-echarts | PrimeIcons |
+| creative-tools-exposure-control-lab | Vue 3 | Naive UI | Motion for Vue | — | Solar (unplugin-icons) |
+| data-tracking-finance-reports | Preact | DaisyUI | AutoAnimate | viz: Chart.js | Iconify |
+| creative-tools-grid-paint-studio | Svelte | Bits UI (chrome) | svelte-motion | — | phosphor-svelte |
+| landing-l1-network-marketing | **Astro** (islands) | DaisyUI | GSAP + ScrollTrigger; Lenis | — | astro-icon (Phosphor set) |
+| creative-tools-material-theme-studio | React | MUI | Motion for React | — | Material Symbols |
+| creative-tools-material-ui-theme-creator | React | MUI (named by task) | Motion for React | forms: React Hook Form + Zod | Material Symbols |
+| data-tracking-media-history-timeline | React | Mantine | Motion for React + AutoAnimate | TanStack Virtual | Tabler |
+| data-tracking-media-timeline | Solid | Kobalte | motion (vanilla) | virtua | Tabler (@tabler/icons-solidjs) |
+| creative-tools-palette-library | Vue 3 (**UnoCSS→TW 4.3.2**) | Ark UI (Vue) | @vueuse/motion | — | Iconify (TW plugin) |
+| creative-tools-story-docs | **Astro** (islands) | DaisyUI | GSAP scroll reveals | — | astro-icon (Remix Icon set) |
+| creative-tools-storyboard-tutorial | Preact | DaisyUI | AutoAnimate | — | Iconify |
+| productivity-swiftnote | Angular | PrimeNG | AutoAnimate + Angular animations | rich text: ProseKit | PrimeIcons |
+| creative-tools-terminal-portfolio | **Preact** (Signals) | DaisyUI (chrome) | GSAP (typewriter) | — | Iconify CSS (Tabler set) |
+| planning-travel-itinerary-planner | Qwik | DaisyUI | AutoAnimate | maps: MapLibre local tiles (phase 2 flag) | Iconify |
+| planning-trip-itinerary | Vue 3 (Nuxt SSG; **UnoCSS→TW 4.3.2**) | PrimeVue | Motion for Vue | maps: MapLibre local tiles (phase 2 flag) | Tabler (@tabler/icons-vue) |
 
 ### Hard browser apps / games (21)
 
@@ -127,27 +144,27 @@ Icons and forms+schema follow the per-framework defaults table for every row (ga
 
 | Task | Framework | Component library (chrome) | Animation stack | Rich text / Data viz / Domain |
 |---|---|---|---|---|
-| cipherlog | Svelte | Melt | svelte-motion | — |
-| clockcraft | Svelte (SvelteKit static) | Skeleton | AutoAnimate + Svelte transitions | viz: LayerChart |
-| dare-night | Astro+Svelte islands | Bits UI (cards/dialogs) | svelte-motion; canvas-confetti | — |
-| fandangofury | Astro+Svelte islands | Bits UI (menus/HUD) | canvas loop; tsparticles | — |
-| feltrun | Vue 3 | Reka UI (table chrome) | Motion for Vue; canvas-confetti | — |
-| focuspath | Qwik | DaisyUI | AutoAnimate | — |
-| frameflick | Vue 3 (**UnoCSS→TW 4.3.2**) | Ark UI (Vue) | @vueuse/motion | — |
-| letterdrop | **Qwik** (stores) | DaisyUI (chrome) | GSAP (tile physics); canvas-confetti | — |
-| lineforge | Preact | DaisyUI (chrome) | AutoAnimate | — |
-| markupflow | Solid | Kobalte | motion (vanilla) | — |
-| mindthread | Vue 3 (**UnoCSS→TW 4.3.2**) | Reka UI | @vueuse/motion + AutoAnimate | rich text: TipTap |
-| mineclash | Qwik | DaisyUI (chrome) | AutoAnimate; canvas-confetti | — |
-| notenest | Svelte | Bits UI | AutoAnimate + Svelte transitions | rich text: TipTap; virtua (10k mandate) |
-| panecraft | Svelte | shadcn-svelte | svelte-motion | viz: LayerChart |
-| portfolioframe | Qwik | DaisyUI | AutoAnimate | — |
-| repquest | Svelte | Skeleton (meta screens) | canvas; @neoconfetti/svelte | — (hand-canvas mandated) |
-| scribblespace | **Vue 3** (Pinia) | Reka UI (toolbars) | Motion for Vue | rich text: TipTap (text blocks) |
-| shapeshift-grid | Solid | Kobalte (chrome) | motion (vanilla) | — |
-| sidedock | Vue 3 (**UnoCSS→TW 4.3.2**) | Naive UI | @vueuse/motion + AutoAnimate | — |
-| tagnote | Qwik | DaisyUI | AutoAnimate | rich text: ProseKit (vanilla core) |
-| taskgrove | Svelte | Melt | AutoAnimate + Svelte transitions | — |
+| productivity-cipherlog | Svelte | Melt | svelte-motion | — |
+| productivity-clockcraft | Svelte (SvelteKit static) | Skeleton | AutoAnimate + Svelte transitions | viz: LayerChart |
+| game-dare-night | Astro+Svelte islands | Bits UI (cards/dialogs) | svelte-motion; canvas-confetti | — |
+| game-fandangofury | Astro+Svelte islands | Bits UI (menus/HUD) | canvas loop; tsparticles | — |
+| game-feltrun | Vue 3 | Reka UI (table chrome) | Motion for Vue; canvas-confetti | — |
+| productivity-focuspath | Qwik | DaisyUI | AutoAnimate | — |
+| creative-tools-frameflick | Vue 3 (**UnoCSS→TW 4.3.2**) | Ark UI (Vue) | @vueuse/motion | — |
+| game-letterdrop | **Qwik** (stores) | DaisyUI (chrome) | GSAP (tile physics); canvas-confetti | — |
+| productivity-lineforge | Preact | DaisyUI (chrome) | AutoAnimate | — |
+| creative-tools-markupflow | Solid | Kobalte | motion (vanilla) | — |
+| productivity-mindthread | Vue 3 (**UnoCSS→TW 4.3.2**) | Reka UI | @vueuse/motion + AutoAnimate | rich text: TipTap |
+| game-mineclash | Qwik | DaisyUI (chrome) | AutoAnimate; canvas-confetti | — |
+| productivity-notenest | Svelte | Bits UI | AutoAnimate + Svelte transitions | rich text: TipTap; virtua (10k mandate) |
+| creative-tools-panecraft | Svelte | shadcn-svelte | svelte-motion | viz: LayerChart |
+| creative-tools-portfolioframe | Qwik | DaisyUI | AutoAnimate | — |
+| game-repquest | Svelte | Skeleton (meta screens) | canvas; @neoconfetti/svelte | — (hand-canvas mandated) |
+| productivity-scribblespace | **Vue 3** (Pinia) | Reka UI (toolbars) | Motion for Vue | rich text: TipTap (text blocks) |
+| creative-tools-shapeshift-grid | Solid | Kobalte (chrome) | motion (vanilla) | — |
+| productivity-sidedock | Vue 3 (**UnoCSS→TW 4.3.2**) | Naive UI | @vueuse/motion + AutoAnimate | — |
+| productivity-tagnote | Qwik | DaisyUI | AutoAnimate | rich text: ProseKit (vanilla core) |
+| productivity-taskgrove | Svelte | Melt | AutoAnimate + Svelte transitions | — |
 
 ### Framework rebuilds (11)
 
@@ -155,17 +172,17 @@ Icons and forms+schema follow the per-framework defaults table for every row.
 
 | Task | Framework | Component library | Animation stack | Rich text / Data viz / Domain |
 |---|---|---|---|---|
-| docuseal | Vue 3 | Reka UI | Motion for Vue | forms: VeeValidate + Zod |
-| euroscope | Solid | Kobalte | motion (vanilla) | — |
-| ghostfolio | React (Next.js) | shadcn/ui | Motion for React | viz: Recharts (named); TanStack Table |
-| ghostty-config | Svelte 5 | Bits UI | AutoAnimate + Svelte transitions | — |
-| loopdaily | React | shadcn/ui | Motion for React + AutoAnimate; canvas-confetti (streaks) | viz: Recharts (habit heatmap/trend) |
-| md-uy | Svelte 5 (SvelteKit static) | Bits UI | Svelte transitions + AutoAnimate | CodeMirror 6 |
-| mermaid-live-editor | Svelte 5 (SvelteKit — matches real app) | DaisyUI (matches real app) | Svelte transitions + AutoAnimate | CodeMirror 6; mermaid (mandated) |
-| nostrpass | Solid | Ark UI (Solid) | motion (vanilla) | forms: Felte + Zod |
-| plausible-analytics | React (Next.js) | Headless UI | Motion for React | viz: charting lib (named); TanStack Table |
-| vert | Svelte 5 (SvelteKit — matches real app) | Bits UI (queue chrome) | AutoAnimate + Svelte transitions | — |
-| weblink | Solid | Kobalte | motion (vanilla) | — |
+| workflow-docuseal | Vue 3 | Reka UI | Motion for Vue | forms: VeeValidate + Zod |
+| creative-tools-euroscope | Solid | Kobalte | motion (vanilla) | — |
+| data-tracking-ghostfolio | React (Next.js) | shadcn/ui | Motion for React | viz: Recharts (named); TanStack Table |
+| creative-tools-ghostty-config | Svelte 5 | Bits UI | AutoAnimate + Svelte transitions | — |
+| productivity-loopdaily | React | shadcn/ui | Motion for React + AutoAnimate; canvas-confetti (streaks) | viz: Recharts (habit heatmap/trend) |
+| productivity-md-uy | Svelte 5 (SvelteKit static) | Bits UI | Svelte transitions + AutoAnimate | CodeMirror 6 |
+| creative-tools-mermaid-live-editor | Svelte 5 (SvelteKit — matches real app) | DaisyUI (matches real app) | Svelte transitions + AutoAnimate | CodeMirror 6; mermaid (mandated) |
+| productivity-nostrpass | Solid | Ark UI (Solid) | motion (vanilla) | forms: Felte + Zod |
+| data-tracking-plausible-analytics | React (Next.js) | Headless UI | Motion for React | viz: charting lib (named); TanStack Table |
+| creative-tools-vert | Svelte 5 (SvelteKit — matches real app) | Bits UI (queue chrome) | AutoAnimate + Svelte transitions | — |
+| productivity-weblink | Solid | Kobalte | motion (vanilla) | — |
 
 ### Website-fidelity (8) — all converted to Astro + Tailwind 4.3.2 (visual output unchanged)
 
@@ -173,25 +190,25 @@ The recreated *look and motion* stay pixel-faithful to the source sites; only th
 
 | Task | Old stack → New | Component library | Animation stack (kept) | Notes |
 |---|---|---|---|---|
-| avax-network | Astro (already) | DaisyUI (base chrome) | GSAP | TW already; pin to 4.3.2 |
-| hildenkaira | Astro (already) | DaisyUI (base chrome) | GSAP | TW already; pin to 4.3.2 |
-| landonorris | **static Webflow-style → Astro** | Bits UI via Svelte islands (menus/overlays) | GSAP + Lenis + Three.js (Draco/KTX2) + Rive | fonts stay self-hosted (Mona Sans Variable, Brier) |
+| landing-avax-network | Astro (already) | DaisyUI (base chrome) | GSAP | TW already; pin to 4.3.2 |
+| landing-hildenkaira | Astro (already) | DaisyUI (base chrome) | GSAP | TW already; pin to 4.3.2 |
+| landing-landonorris | **static Webflow-style → Astro** | Bits UI via Svelte islands (menus/overlays) | GSAP + Lenis + Three.js (Draco/KTX2) + Rive | fonts stay self-hosted (Mona Sans Variable, Brier) |
 | mosbyfiles | Nuxt 3 (keep — SSR is the task) | Reka UI | GSAP + Lenis + Plyr | styling → TW 4.3.2 tokens |
-| razorpay-sprint-26 | **jQuery Webflow export → Astro** | DaisyUI (base chrome) | GSAP + ScrollTrigger + Three.js (GLTF/Draco) + Rive | drop jQuery entirely |
-| readymag | **Vite+React+Emotion → Astro** | Radix UI via React islands | GSAP; Motion | Emotion → TW 4.3.2 |
-| units-gr | **static Node → Astro** | DaisyUI (base chrome) | GSAP family + Lenis + Swiper + lottie-web | Barba page transitions → Astro view transitions |
-| wolverineworldwide | **custom elements → Astro** | Radix UI via React islands (menu/carousel chrome) | GSAP + SplitText; focus-trap | Swup → Astro view transitions; CSS custom-property tokens → TW `@theme` |
+| landing-razorpay-sprint-26 | **jQuery Webflow export → Astro** | DaisyUI (base chrome) | GSAP + ScrollTrigger + Three.js (GLTF/Draco) + Rive | drop jQuery entirely |
+| landing-readymag | **Vite+React+Emotion → Astro** | Radix UI via React islands | GSAP; Motion | Emotion → TW 4.3.2 |
+| landing-units-gr | **static Node → Astro** | DaisyUI (base chrome) | GSAP family + Lenis + Swiper + lottie-web | Barba page transitions → Astro view transitions |
+| landing-wolverineworldwide | **custom elements → Astro** | Radix UI via React islands (menu/carousel chrome) | GSAP + SplitText; focus-trap | Swup → Astro view transitions; CSS custom-property tokens → TW `@theme` |
 
 Note kept exception: **mosbyfiles stays Nuxt** — its PRD is explicitly an SSR/Storyblok-model reproduction; converting it to Astro would change what the task tests. If a hard "zero non-Astro fidelity" rule is wanted, flag it and we'll convert it too.
 
 ## Flags and open questions
 
-1. **Fidelity conversions are the expensive row.** Each of the 5 conversions (landonorris, razorpay, readymag, units-gr, wolverineworldwide) invalidates its solution oracle, reference screenshots, and parts of its technical rubric (stack-mandate lines in instructions). Budget these as full re-authoring tasks, not edits.
+1. **Fidelity conversions are the expensive row.** Each of the 5 conversions (landing-landonorris, razorpay, landing-readymag, landing-units-gr, landing-wolverineworldwide) invalidates its solution oracle, reference screenshots, and parts of its technical rubric (stack-mandate lines in instructions). Budget these as full re-authoring tasks, not edits.
 2. **The 9 React moves also invalidate their oracles** (solution/app is per-stack). Instructions/rubrics change little (behaviors are stack-agnostic by design); oracles must be rebuilt on the new stack before `capture_reference_screenshots` and `solve.sh` work again.
 3. **Tailwind 4.3.2 pin**: verify the exact version exists on npm at migration time and add it to `tasks/_pins.py` alongside the other pins so test.sh and instructions stay in lockstep.
 4. **Preact = DaisyUI monoculture** (5/5 Preact tasks) — ecosystem limitation; differentiate via theme + motion. Revisit if a maintained Preact-compat headless kit emerges.
 5. **MapLibre on the two trip planners** stays a phase-2 flag (offline tile bundling needs one proving task first).
-6. **swiftnote gains ProseKit** (rich-text mandate: it's a note app) — its keyboard-first PRD needs a check that ProseKit shortcuts don't conflict with the app's own keymap.
+6. **productivity-swiftnote gains ProseKit** (rich-text mandate: it's a note app) — its keyboard-first PRD needs a check that ProseKit shortcuts don't conflict with the app's own keymap.
 
 ## Migration mechanics (per task)
 

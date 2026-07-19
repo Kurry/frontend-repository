@@ -1,0 +1,172 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "3_1"
+description = "Scrolling an unseen heading or paragraph into about 80% of the viewport plays a line-by-line upward mask reveal once, then it stays revealed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "3_2"
+description = "Clicking a client deck's Next/Previous control animates the stacked flick cards to new offset/rotation/scale positions with an elastic settle"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "3_3"
+description = "Advancing the client carousel keeps the active slide at full scale and shrinks neighbors to about 0.94 over roughly 600ms"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "3_4"
+description = "Hero case thumbnails drift on continuous 12–15 second bottom-to-top loops in left and right zones, fading in and out at the loop edges"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "3_5"
+description = "Nav link dots scale up from nothing on hover and for the current link with a slight overshoot"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.6"
+name = "3_6"
+description = "Hovering a primary button on a fine-pointer device slides its label upward, rotates its icon backing, translates its arrow, and wipes the background"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "3_7"
+description = "The Organic views and Likes counters tick upward on their own beginning about half a second after load, with space thousands separators"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "3_8"
+description = "The fixed nav's theme swaps to match whichever section sits under the top-of-viewport probe as the page scrolls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "3_9"
+description = "The active card's video player interface fades and lifts out of view while playing and returns on hover, with a paused/hover dark overlay"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "3_10"
+description = "Eligible cards throw with momentum/inertia when the pointer enters and leaves them on desktop fine-pointer devices"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.11"
+name = "3_11"
+description = "The cookie banner eases into view shortly after load, and the mobile lime menu slides in from the top when the hamburger is tapped"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.12"
+name = "3_12"
+description = "The footer's brand lettermark animates its individual letters into place"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.13"
+name = "3_13"
+description = "Reveals, flick reshuffles, counters, and button feedback that appear instantly or are only reachable by snapping state (no real scroll/click/hover gesture, or no hover feedback on chrome) are a failure"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.14"
+name = "3_14"
+description = "When hovering a primary button, its animated targets transition transform over 0.525s with easing cubic-bezier(0.625, 0.05, 0, 1); when hovering/current, the nav link dot scales over 0.525s with easing cubic-bezier(0.175, 0.885, 0.32, 1.275)"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.15"
+name = "3_15"
+description = "The active card's video player interface transitions over 0.6s with easing cubic-bezier(0.625, 0.05, 0, 1) as it hides while playing and returns on hover"
+type = "binary"
+weight = 0.5
+optional = true

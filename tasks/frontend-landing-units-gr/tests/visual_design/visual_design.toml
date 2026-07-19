@@ -1,0 +1,122 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "vd-canvas"
+name = "vd-canvas"
+description = "The body background computes to exactly #f4e9e1 (rgb(244, 233, 225)) with black body text rgb(0, 0, 0)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "vd-bands"
+name = "vd-bands"
+description = "The full-bleed brand bands render with their exact computed colors: the red marquee at rgb(234, 55, 55), the blue marquee at rgb(0, 114, 227), and the orange Book band at rgb(255, 92, 56)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "vd-type"
+name = "vd-type"
+description = "The hero H1 renders at 72px font-size / 72px line-height in the Alfabet family weight 850 with color rgb(255, 255, 255) at the 1440px desktop viewport, against long-form Aeonik Pro body copy"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "vd-shell"
+name = "vd-shell"
+description = "On desktop a fixed left sidebar (about 122px wide) sits beside a right-offset main column whose left margin is about 167px at 1440px width, and below 1024px the layout collapses to a single stacked column (main left margin 0) with a mobile bar and hamburger"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "vd-cards"
+name = "vd-cards"
+description = "Content cards use rounded corners (border radius about 37.5px at 1440px, 30px at <=1023px) with hairline black borders and pill-shaped labels/chips (transparent fill, 1px solid rgb(0, 0, 0) border, 100px radius)"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "vd-order"
+name = "vd-order"
+description = "Sections appear in order: hero, locations, red marquee, living, blue marquee, typical-unit, community, blue arrows-header, what-we-stand-for, insta-feed, orange arrows-header, footer"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "vd-neg-canvas"
+name = "vd-neg-canvas"
+description = "The body background is not #f4e9e1 / rgb(244, 233, 225) (for example a plain white or gray canvas)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "vd-neg-flat"
+name = "vd-neg-flat"
+description = "The marquee and arrows-header bands are not full-bleed colored bands, or the brand palette is rendered flat/monochrome instead of the documented brand hexes"
+type = "binary"
+weight = 0.5
+negate = true
+optional = true

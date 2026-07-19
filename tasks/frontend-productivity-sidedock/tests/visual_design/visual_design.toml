@@ -1,0 +1,120 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "3_1"
+description = "Computed styles use --color-background #FAF4F2 for the page, --color-surface #EDE0DA for panels, --color-text-primary #1C1412 for text, --color-accent #E54610 for links and primary buttons, and --color-border #E4DEDC for borders"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "3_2"
+description = "Workspace titles and folder headings render in Cormorant Upright (or its serif fallback) at roughly 24 to 28px while body text and inputs use the Inter stack at roughly 15px"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "3_3"
+description = "Cards, buttons, and inputs use a 12px radius; primary buttons are solid --color-accent with white text and no shadow, and secondary buttons are white with a 1px border and a subtle shadow"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "3_4"
+description = "Two workspaces with different accent colors each show their color on their own tab and as the header bar color on their folder tree"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "3_5"
+description = "Monogram tiles across several generated hues render their letter in readable, sufficiently contrasting text against the generated background color"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.6"
+name = "3_6"
+description = "The zero-workspace welcome, the empty-workspace prompt, and the no-search-results message each render as a distinct, worded empty state rather than a blank region"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "3_7"
+description = "Body text renders below roughly 14px or a single flat text size is used everywhere with no visible size or weight hierarchy"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.8"
+name = "3_8"
+description = "At roughly 375px wide the page scrolls horizontally or bookmark titles, monogram tiles, and notes overflow or are clipped illegibly"
+type = "binary"
+weight = 1.0
+negate = true

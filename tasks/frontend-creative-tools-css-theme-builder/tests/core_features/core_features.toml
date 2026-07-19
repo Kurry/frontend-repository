@@ -1,0 +1,239 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "1_1"
+description = "On load, the Themes sidebar lists My themes and a built-in theme catalog with swatch preview chips, and the three-panel workspace (themes | editor | preview) is visible at a wide viewport"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "1_2"
+description = "After creating a custom theme named 'Harbor Dawn' with valid required fields (hold-to-add or New), the text 'Harbor Dawn' is visible under My themes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "1_3"
+description = "After adding 3 new custom themes on top of any existing custom set, My themes shows exactly 3 more rows than before those creates"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "1_4"
+description = "After changing a semantic color or radius control on the active custom theme, the live preview re-themes to match the new tokens without reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "1_5"
+description = "After editing a custom theme name to 'Evening Tide', the text 'Evening Tide' is visible in My themes and the previous name is not"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "1_6"
+description = "After deleting/removing a custom theme, that theme name is no longer visible under My themes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "1_7"
+description = "After removing all custom themes, My themes shows an empty state while built-in catalog themes remain available"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "1_8"
+description = "After submitting create with an empty required theme name, the custom themes count does not increase and validation feedback is visible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "1_9"
+description = "After switching from Components Demo to Color Palette (or Component Variants) preview tab, the preview pane swaps dense demos without leaving the page"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "1_10"
+description = "After switching focus between Themes list selection and Editor/Generator controls, both modes remain usable and the active theme stays in sync across panels"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "1_11"
+description = "After clicking Random on a custom (or forked) theme, editor color tokens and the live preview change"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "1_12"
+description = "When hovering theme rows, chrome controls, swatch chips, or primary buttons, a visible hover wash, tilt, or fill/border transition appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "1_13"
+description = "After choosing a chrome theme option (light / dark / cupcake / synthwave), the app shell recolors and that option is marked active"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "1_14"
+description = "After opening the CSS-export control, a modal shows a [data-theme] CSS block and Copy shows a brief copied confirmation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "1_15"
+description = "After editing a built-in preset, an editable custom copy is created and the built-in preset itself is unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "1_16"
+description = "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "1_17"
+description = "Saved themes list is static HTML only with no working create/edit/delete against shared state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.18"
+name = "1_18"
+description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.19"
+name = "1_19"
+description = "Choosing a chrome theme option (light / dark / cupcake / synthwave) recolors the app shell and marks that option active, and the version, chrome-theme, and language dropdowns open in place without navigating"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "1_20"
+description = "Pressing and holding the Hold to add theme control for its full duration completes a progress fill and adds a new custom theme, while releasing early adds nothing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "1_21"
+description = "Editing a built-in preset forks an editable custom copy rather than mutating the preset, and attempting to remove a built-in preset surfaces a notice instead of deleting it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "1_22"
+description = "The CSS-export control opens a modal previewing a [data-theme=\"name\"] { … } CSS block, Copy writes it to the clipboard with a brief copied confirmation, and Close, the backdrop, or Escape dismiss the modal"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "1_23"
+description = "Clicking Random replaces the theme's color tokens with a fresh randomized set, re-themes the live preview, and shows a brief confirmation toast"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "1_24"
+description = "Submitting create with an empty or whitespace-only theme name does not add a custom theme and shows visible validation feedback"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "1_25"
+description = "Editing a built-in preset mutates the preset in place instead of forking an editable custom copy"
+type = "binary"
+weight = 1.0
+negate = true

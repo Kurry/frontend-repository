@@ -1,0 +1,199 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "4_1"
+description = "Clicking the theme toggle cross-fades the sun/moon icons and transitions surface, text, border, and accent colors together rather than snapping instantly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "4_2"
+description = "Hovering navigation labels and mega-menu link rows produces an accent shift and hover wash, and hovering buttons eases their fill and cut-corner frame"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "hero_intro_and_video_layer_cycle"
+description = "On a fresh load the hero panels enter with a clipped-panel reveal and the center cycles through stacked placeholder video layers (nine on desktop, five below 1025px), starting after about 1.5s and advancing when each layer ends, wrapping past layer one after the first pass"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "4_4"
+description = "Both looping HUD overlays fade in over the hero after about four seconds"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.5"
+name = "section_split_line_reveal_on_scroll"
+description = "On a fresh load, really scrolling a lower section such as Network or Contact into view (no state shortcut) triggers its reveal, its split paragraphs rising line by line"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "heading_glyph_flash_on_reveal"
+description = "On a fresh load, when a split heading really scrolls into view its characters flash through random glyphs before settling to the final uppercase letters"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "4_7"
+description = "Smooth Lenis scrolling and the desktop quick-link card scrub are active above 1024px, and hash/anchor navigation eases over about two seconds; below 1025px native scrolling is used with Lenis off"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "4_8"
+description = "The trusted-business logo marquee loops continuously and the footer wordmark marquee repeats on a fast loop, and both pause on hover"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.9"
+name = "4_9"
+description = "Paging the blog carousel with its previous/next arrows moves the slides, arrow enabled state follows the start and end of the track, and scrolling back above it resets it to the first slide"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "newsletter_step_and_field_animation"
+description = "Moving through the newsletter steps animates the progress bar and step counter as the step wrapper slides between the five steps, and the form chips, floating labels, and custom selects animate their open/selected states"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.11"
+name = "4_11"
+description = "Interactive chrome shows no hover feedback: buttons, nav labels, and marquees stay static under the pointer"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.12"
+name = "4_12"
+description = "Sections, headings, and the hero appear fully pre-shown with no scroll reveal, no heading flash, and no hero sequence, or the animations only advance when state is set directly rather than by the real scroll and hover path"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.13"
+name = "4_13"
+description = "The running trusted-logo marquee reports a cycle duration near 31500ms and the footer wordmark marquee near 5000ms, both linear and infinite (readable via getAnimations on the loaded page)"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.14"
+name = "4_14"
+description = "When a section is scrolled into view, its split-line reveal runs about 2000ms with an ease-out-cubic curve, and the hero clipped-panel entrance runs about 2000ms with ease-in-out-quart"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.15"
+name = "4_15"
+description = "The marquees or reveals run at clearly wrong speeds (e.g. an instant or multi-minute marquee) or the theme cross-fade is instant instead of about 0.3s"
+type = "binary"
+weight = 0.5
+negate = true
+optional = true
+
+[[criterion]]
+id = "4.16"
+name = "reduced_motion_suppresses_effects"
+description = "With a reduced-motion preference emulated and the page freshly loaded, the smooth scrolling, split-line reveals, heading glyph flashes, and marquees are suppressed while section visibility triggers and the hero sequence still run"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.17"
+name = "section_reveal_replays_on_reentry"
+description = "After a section has revealed, really scrolling back above it and then back into view replays its entrance animation rather than showing it pre-settled"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant, browser-observable defect in motion or animation behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+negate = true

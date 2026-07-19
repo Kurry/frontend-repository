@@ -14,7 +14,7 @@ The verifier serves the built app and grades it in a real browser across
 four weighted dimensions — core_features, technical, visual_design, motion
 — with `pass` at reward >= 0.7. The judge observes via Playwright MCP and
 drives state-changing setup through the app's registered WebMCP tools (a
-task-local CDP bridge in `tests/mcp/`). Criteria live in
+task-local CDP bridge in `tests/webmcp_stdio_server.mjs`). Criteria live in
 `tests/<dimension>/<dimension>.toml`.
 
 ## Running

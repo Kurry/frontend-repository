@@ -1,6 +1,6 @@
 [
   {
-    "task": "frontend-daisyui-admin-dashboard",
+    "task": "frontend-workflow-daisyui-admin-dashboard",
     "modules": [
       "browse-query-v1",
       "entity-collection-v1",
@@ -69,7 +69,7 @@
     ]
   },
   {
-    "task": "frontend-daisyui-theme-generator",
+    "task": "frontend-creative-tools-daisyui-theme-generator",
     "modules": [
       "structured-editor-v1",
       "entity-collection-v1",
@@ -119,7 +119,7 @@
     ]
   },
   {
-    "task": "frontend-camera-exposure",
+    "task": "frontend-creative-tools-camera-exposure",
     "modules": [
       "command-session-v1",
       "structured-editor-v1"
@@ -149,7 +149,7 @@
     ]
   },
   {
-    "task": "frontend-design-portfolio",
+    "task": "frontend-creative-tools-design-portfolio",
     "modules": [
       "browse-query-v1",
       "entity-collection-v1"
@@ -179,7 +179,7 @@
     ]
   },
   {
-    "task": "frontend-finance-reports",
+    "task": "frontend-data-tracking-finance-reports",
     "modules": [
       "browse-query-v1",
       "entity-collection-v1"
@@ -218,7 +218,7 @@
     ]
   },
   {
-    "task": "frontend-material-ui-theme-creator",
+    "task": "frontend-creative-tools-material-ui-theme-creator",
     "modules": [
       "structured-editor-v1",
       "entity-collection-v1",
@@ -269,7 +269,7 @@
     ]
   },
   {
-    "task": "frontend-media-timeline",
+    "task": "frontend-data-tracking-media-timeline",
     "modules": [
       "browse-query-v1",
       "entity-collection-v1"
@@ -304,7 +304,7 @@
     ]
   },
   {
-    "task": "frontend-palette-library",
+    "task": "frontend-creative-tools-palette-library",
     "modules": [
       "browse-query-v1",
       "entity-collection-v1"
@@ -339,7 +339,7 @@
     ]
   },
   {
-    "task": "frontend-shapeshift-grid",
+    "task": "frontend-creative-tools-shapeshift-grid",
     "modules": [
       "structured-editor-v1",
       "command-session-v1"
@@ -376,7 +376,7 @@
     ]
   },
   {
-    "task": "frontend-story-docs",
+    "task": "frontend-creative-tools-story-docs",
     "modules": [
       "browse-query-v1",
       "form-workflow-v1",
@@ -422,7 +422,7 @@
     "mechanics_exclusions": []
   },
   {
-    "task": "frontend-trip-itinerary",
+    "task": "frontend-planning-trip-itinerary",
     "modules": [
       "browse-query-v1",
       "entity-collection-v1",
@@ -470,7 +470,7 @@
     ]
   },
   {
-    "task": "frontend-admin-analytics-dashboard",
+    "task": "frontend-data-tracking-admin-analytics-dashboard",
     "modules": [
       "browse-query-v1",
       "entity-collection-v1"
@@ -524,7 +524,7 @@
     ]
   },
   {
-    "task": "frontend-color-palette-archive",
+    "task": "frontend-creative-tools-color-palette-archive",
     "modules": [
       "browse-query-v1",
       "entity-collection-v1"
@@ -557,7 +557,7 @@
     "mechanics_exclusions": []
   },
   {
-    "task": "frontend-css-theme-builder",
+    "task": "frontend-creative-tools-css-theme-builder",
     "modules": [
       "structured-editor-v1",
       "entity-collection-v1",
@@ -604,7 +604,7 @@
     ]
   },
   {
-    "task": "frontend-expense-breakdown-reports",
+    "task": "frontend-data-tracking-expense-breakdown-reports",
     "modules": [
       "browse-query-v1",
       "entity-collection-v1"
@@ -641,7 +641,7 @@
     ]
   },
   {
-    "task": "frontend-exposure-control-lab",
+    "task": "frontend-creative-tools-exposure-control-lab",
     "modules": [
       "command-session-v1",
       "structured-editor-v1"
@@ -671,7 +671,7 @@
     ]
   },
   {
-    "task": "frontend-grid-paint-studio",
+    "task": "frontend-creative-tools-grid-paint-studio",
     "modules": [
       "structured-editor-v1",
       "command-session-v1"
@@ -704,7 +704,7 @@
     ]
   },
   {
-    "task": "frontend-l1-network-marketing",
+    "task": "frontend-landing-l1-network-marketing",
     "modules": [
       "browse-query-v1",
       "form-workflow-v1",
@@ -743,7 +743,7 @@
     ]
   },
   {
-    "task": "frontend-material-theme-studio",
+    "task": "frontend-creative-tools-material-theme-studio",
     "modules": [
       "structured-editor-v1",
       "entity-collection-v1",
@@ -792,7 +792,7 @@
     ]
   },
   {
-    "task": "frontend-media-history-timeline",
+    "task": "frontend-data-tracking-media-history-timeline",
     "modules": [
       "browse-query-v1",
       "entity-collection-v1"
@@ -826,7 +826,7 @@
     ]
   },
   {
-    "task": "frontend-storyboard-tutorial",
+    "task": "frontend-creative-tools-storyboard-tutorial",
     "modules": [
       "browse-query-v1",
       "form-workflow-v1",
@@ -870,7 +870,7 @@
     "mechanics_exclusions": []
   },
   {
-    "task": "frontend-terminal-portfolio",
+    "task": "frontend-creative-tools-terminal-portfolio",
     "modules": [
       "browse-query-v1",
       "entity-collection-v1"
@@ -899,7 +899,7 @@
     ]
   },
   {
-    "task": "frontend-travel-itinerary-planner",
+    "task": "frontend-planning-travel-itinerary-planner",
     "modules": [
       "browse-query-v1",
       "entity-collection-v1",
@@ -945,7 +945,7 @@
     ]
   },
   {
-    "task": "frontend-daily-planner-board",
+    "task": "frontend-planning-daily-planner-board",
     "modules": [
       "browse-query-v1",
       "entity-collection-v1"
@@ -978,7 +978,7 @@
     ]
   },
   {
-    "task": "frontend-avax-network",
+    "task": "frontend-landing-avax-network",
     "modules": [
       "browse-query-v1",
       "form-workflow-v1"
@@ -1043,7 +1043,7 @@
     ]
   },
   {
-    "task": "frontend-hildenkaira",
+    "task": "frontend-landing-hildenkaira",
     "modules": [
       "browse-query-v1",
       "form-workflow-v1",
@@ -1094,7 +1094,7 @@
     ]
   },
   {
-    "task": "frontend-landonorris",
+    "task": "frontend-landing-landonorris",
     "modules": [
       "browse-query-v1",
       "command-session-v1"
@@ -1160,7 +1160,7 @@
     ]
   },
   {
-    "task": "frontend-razorpay-sprint-26",
+    "task": "frontend-landing-razorpay-sprint-26",
     "modules": [
       "browse-query-v1",
       "command-session-v1"
@@ -1194,7 +1194,7 @@
     ]
   },
   {
-    "task": "frontend-readymag",
+    "task": "frontend-landing-readymag",
     "modules": [
       "browse-query-v1",
       "command-session-v1"
@@ -1224,7 +1224,7 @@
     ]
   },
   {
-    "task": "frontend-units-gr",
+    "task": "frontend-landing-units-gr",
     "modules": [
       "browse-query-v1"
     ],
@@ -1251,7 +1251,7 @@
     ]
   },
   {
-    "task": "frontend-wolverineworldwide",
+    "task": "frontend-landing-wolverineworldwide",
     "modules": [
       "browse-query-v1"
     ],
@@ -1281,7 +1281,7 @@
     ]
   },
   {
-    "task": "frontend-focuspath",
+    "task": "frontend-productivity-focuspath",
     "modules": [
       "entity-collection-v1",
       "browse-query-v1",
@@ -1325,7 +1325,7 @@
     ]
   },
   {
-    "task": "frontend-mineclash",
+    "task": "frontend-game-mineclash",
     "modules": [
       "command-session-v1",
       "browse-query-v1"
@@ -1355,7 +1355,7 @@
     ]
   },
   {
-    "task": "frontend-letterdrop",
+    "task": "frontend-game-letterdrop",
     "modules": [
       "command-session-v1",
       "browse-query-v1"
@@ -1382,7 +1382,7 @@
     ]
   },
   {
-    "task": "frontend-frameflick",
+    "task": "frontend-creative-tools-frameflick",
     "modules": [
       "structured-editor-v1",
       "entity-collection-v1"
@@ -1444,7 +1444,7 @@
     ]
   },
   {
-    "task": "frontend-dare-night",
+    "task": "frontend-game-dare-night",
     "modules": [
       "command-session-v1",
       "entity-collection-v1",
@@ -1503,7 +1503,7 @@
     ]
   },
   {
-    "task": "frontend-lineforge",
+    "task": "frontend-productivity-lineforge",
     "modules": [
       "browse-query-v1",
       "entity-collection-v1",
@@ -1556,7 +1556,7 @@
     ]
   },
   {
-    "task": "frontend-notenest",
+    "task": "frontend-productivity-notenest",
     "modules": [
       "entity-collection-v1",
       "browse-query-v1",
@@ -1599,7 +1599,7 @@
     ]
   },
   {
-    "task": "frontend-feltrun",
+    "task": "frontend-game-feltrun",
     "modules": [
       "command-session-v1",
       "browse-query-v1",
@@ -1636,7 +1636,7 @@
     ]
   },
   {
-    "task": "frontend-cipherlog",
+    "task": "frontend-productivity-cipherlog",
     "modules": [
       "entity-collection-v1",
       "browse-query-v1"
@@ -1686,7 +1686,7 @@
     ]
   },
   {
-    "task": "frontend-tagnote",
+    "task": "frontend-productivity-tagnote",
     "modules": [
       "entity-collection-v1",
       "browse-query-v1"
@@ -1723,7 +1723,7 @@
     ]
   },
   {
-    "task": "frontend-markupflow",
+    "task": "frontend-creative-tools-markupflow",
     "modules": [
       "structured-editor-v1",
       "entity-collection-v1"
@@ -1794,7 +1794,7 @@
     ]
   },
   {
-    "task": "frontend-swiftnote",
+    "task": "frontend-productivity-swiftnote",
     "modules": [
       "entity-collection-v1",
       "browse-query-v1"
@@ -1829,7 +1829,7 @@
     ]
   },
   {
-    "task": "frontend-sidedock",
+    "task": "frontend-productivity-sidedock",
     "modules": [
       "browse-query-v1",
       "entity-collection-v1",
@@ -1878,7 +1878,7 @@
     ]
   },
   {
-    "task": "frontend-mindthread",
+    "task": "frontend-productivity-mindthread",
     "modules": [
       "browse-query-v1",
       "entity-collection-v1",
@@ -1928,7 +1928,7 @@
     ]
   },
   {
-    "task": "frontend-scribblespace",
+    "task": "frontend-productivity-scribblespace",
     "modules": [
       "structured-editor-v1",
       "entity-collection-v1",
@@ -1987,7 +1987,7 @@
     ]
   },
   {
-    "task": "frontend-panecraft",
+    "task": "frontend-creative-tools-panecraft",
     "modules": [
       "entity-collection-v1",
       "form-workflow-v1",
@@ -2070,7 +2070,7 @@
     ]
   },
   {
-    "task": "frontend-repquest",
+    "task": "frontend-game-repquest",
     "modules": [
       "browse-query-v1",
       "entity-collection-v1",
@@ -2117,7 +2117,7 @@
     ]
   },
   {
-    "task": "frontend-loopdaily",
+    "task": "frontend-productivity-loopdaily",
     "modules": [
       "browse-query-v1",
       "entity-collection-v1",
@@ -2183,7 +2183,7 @@
     ]
   },
   {
-    "task": "frontend-taskgrove",
+    "task": "frontend-productivity-taskgrove",
     "modules": [
       "entity-collection-v1",
       "browse-query-v1"
@@ -2226,7 +2226,7 @@
     ]
   },
   {
-    "task": "frontend-clockcraft",
+    "task": "frontend-productivity-clockcraft",
     "modules": [
       "entity-collection-v1",
       "browse-query-v1",
@@ -2269,7 +2269,7 @@
     ]
   },
   {
-    "task": "frontend-fandangofury",
+    "task": "frontend-game-fandangofury",
     "modules": [
       "command-session-v1",
       "browse-query-v1",
@@ -2306,7 +2306,7 @@
     ]
   },
   {
-    "task": "frontend-portfolioframe",
+    "task": "frontend-creative-tools-portfolioframe",
     "modules": [
       "structured-editor-v1",
       "entity-collection-v1"
@@ -2362,7 +2362,7 @@
     ]
   },
   {
-    "task": "frontend-euroscope",
+    "task": "frontend-creative-tools-euroscope",
     "modules": [
       "form-workflow-v1",
       "structured-editor-v1",
@@ -2413,7 +2413,7 @@
     ]
   },
   {
-    "task": "frontend-docuseal",
+    "task": "frontend-workflow-docuseal",
     "modules": [
       "structured-editor-v1",
       "entity-collection-v1",
@@ -2471,7 +2471,7 @@
     ]
   },
   {
-    "task": "frontend-mermaid-live-editor",
+    "task": "frontend-creative-tools-mermaid-live-editor",
     "modules": [
       "structured-editor-v1",
       "browse-query-v1",
@@ -2518,7 +2518,7 @@
     ]
   },
   {
-    "task": "frontend-md-uy",
+    "task": "frontend-productivity-md-uy",
     "modules": [
       "structured-editor-v1",
       "artifact-transfer-v1"
@@ -2550,7 +2550,7 @@
     ]
   },
   {
-    "task": "frontend-ghostfolio",
+    "task": "frontend-data-tracking-ghostfolio",
     "modules": [
       "browse-query-v1",
       "entity-collection-v1"
@@ -2582,7 +2582,7 @@
     ]
   },
   {
-    "task": "frontend-plausible-analytics",
+    "task": "frontend-data-tracking-plausible-analytics",
     "modules": [
       "browse-query-v1"
     ],
@@ -2614,7 +2614,7 @@
     ]
   },
   {
-    "task": "frontend-ghostty-config",
+    "task": "frontend-creative-tools-ghostty-config",
     "modules": [
       "structured-editor-v1",
       "artifact-transfer-v1",
@@ -2694,7 +2694,7 @@
     ]
   },
   {
-    "task": "frontend-vert",
+    "task": "frontend-creative-tools-vert",
     "modules": [
       "artifact-transfer-v1",
       "entity-collection-v1",
@@ -2748,7 +2748,7 @@
     ]
   },
   {
-    "task": "frontend-nostrpass",
+    "task": "frontend-productivity-nostrpass",
     "modules": [
       "browse-query-v1",
       "entity-collection-v1"
@@ -2787,7 +2787,7 @@
     ]
   },
   {
-    "task": "frontend-weblink",
+    "task": "frontend-productivity-weblink",
     "modules": [
       "command-session-v1",
       "artifact-transfer-v1"
@@ -2807,7 +2807,7 @@
     ]
   },
   {
-    "task": "frontend-budget-angular",
+    "task": "frontend-data-tracking-budget-angular",
     "modules": [
       "entity-collection-v1",
       "form-workflow-v1",

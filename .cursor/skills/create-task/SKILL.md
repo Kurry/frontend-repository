@@ -2,7 +2,7 @@
 name: create-task
 description: >-
   Create a brand-new frontend Harbor eval task in this repo end-to-end: authoring
-  folder (instruction/checklist/rubric/reference app), WebMCP assignment,
+  folder (instruction/rubrics/reference app), WebMCP assignment,
   packaged tasks/frontend-<slug>/ tree, oracle validation, reference screenshots,
   and a smoke scoring run. Use whenever the user asks to add a new task, package
   a new app into an eval, or turn a reference app / inspiration URL into a
@@ -12,7 +12,7 @@ description: >-
 # Create a new frontend Harbor eval task
 
 End-to-end recipe for adding `tasks/frontend-<slug>/`. Authoring content rules
-(instruction register, checklist, rubric) live in the sibling skill
+(instruction register, rubric conventions) live in docs/instructions.md and docs/rubrics.md
 `frontend-good-app-eval` — this skill is the pipeline around them.
 
 ## Prerequisite: restore archived authoring sources
@@ -31,10 +31,10 @@ Create at repo root (e.g. `MyNewApp/` or `variants/MyNewApp/`):
 - `instruction.md` — content sections only (`<summary>` … `<requirements>`),
   written per `frontend-good-app-eval`. No delivery/integrity/webmcp blocks —
   packaging adds those.
-- `verifier_checklist.json` — `[{"id": "1", "title": "On load, ..."}, ...]`
-  (~10–14 browser-observable walkthrough steps; becomes core criteria 1.1..1.N).
-- `rubric.json` — HLI criteria (exact annotation strings; ≥1 positive and
-  ≥1 negative per dimension or packaging fails `verify_polarity`).
+- Dimension tomls (`tests/<dim>/<dim>.toml`) — criteria authored directly per
+  docs/rubrics.md: the outcome/walkthrough list (~10–14 browser-observable
+  On load/After/When behaviors) leads `core_features` (or `behavioral` when the
+  task ships it); ≥1 positive and ≥1 negative per dimension; one catch-all each.
 - `README.md` — PRD naming the inspiration URL and specifying the reference
   exactly (node labels, seeded counts, motion params).
 - The reference implementation files (static HTML/CSS/JS or built app) — these
@@ -63,10 +63,9 @@ python3 scripts/package_frontend_tasks.py   # full pipeline, rebuilds task dirs
 This writes: `instruction.md` (content + delivery + webmcp contract),
 `task.toml` (canonical template: codex judge env, artifact excludes),
 `environment/Dockerfile`, `solution/` (oracle copy + `solve.sh`),
-`tests/` (test.sh, system_prompt.md, `mcp/webmcp_stdio_server.mjs`, four
-dimension tomls). If only rubric/checklist changed later, use
-`python3 scripts/regen_dimension_tomls.py <slug>` instead of full packaging
-(full packaging wipes hand-curated task files).
+`tests/` (test.sh, system_prompt.md, `webmcp_stdio_server.mjs`, four
+dimension tomls). For criterion changes later, edit the dimension tomls
+directly (full packaging wipes hand-curated task files).
 
 ## Step 4 — Oracle validation + reference screenshots
 

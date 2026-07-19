@@ -3,7 +3,7 @@
 # Pins: @playwright/mcp@0.0.76; playwright 1.61.0.
 # tests/test.sh starts the shared headless Chrome and exports WEBMCP_CDP_ENDPOINT /
 # WEBMCP_CDP_PORT before the judge process. The webmcp server is the task-local
-# CDP bridge (tests/mcp/webmcp_stdio_server.mjs): playwright-core attaches over
+# CDP bridge (tests/webmcp_stdio_server.mjs): playwright-core attaches over
 # CDP and calls the app's registered window.webmcp_* surface on the SAME page
 # the Playwright MCP drives. WebMCP is never a scoring criterion.
 
@@ -12,7 +12,7 @@ name = "webmcp"
 transport = "stdio"
 command = "node"
 args = [
-  "/tests/mcp/webmcp_stdio_server.mjs",
+  "/tests/webmcp_stdio_server.mjs",
 ]
 allowed_tools = [
   "webmcp_session_info",

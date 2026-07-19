@@ -1,0 +1,122 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "3_1"
+description = "The workspace reads as a focused, styled converter surface (magenta gradient background, floating rounded navbar pill, prominent white drop-zone card) rather than generic unstyled cards or framework defaults."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "3_2"
+description = "The first viewport gives greater visual emphasis to the drop zone and conversion workspace than to supporting metadata, the catalog, or the footer."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "3_3"
+description = "Per-file status is shown as a pill coded by both color and glyph and text (muted Ready, amber Converting, green Done, red Failed and Unsupported), applied consistently across rows."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "3_4"
+description = "Typography uses at least three distinguishable roles (oversized hero, section/card headings, body and muted captions) and spacing clusters on a consistent 4 and 8 pixel scale."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.5"
+name = "3_5"
+description = "Both light and dark themes keep every text-on-surface pairing legible (body text meets AA contrast), and interactive controls show a visible focus indicator."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "3_6"
+description = "UI microcopy is concise and consistent: sentence-case verb-first buttons (Convert, Download, Remove, Clear queue), numeral counters (\"1 queued, 0 ready, 1 done\"), second-person help text, and no terminal periods on short labels."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.7"
+name = "3_7"
+description = "Status, category, and validity must not be conveyed by color alone: each status and each error carries a text label or glyph so meaning survives without color perception."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.8"
+name = "3_8"
+description = "The interface must not read as framework-default or unstyled, and headings, buttons, and labels must not use Title Case or ALL-CAPS for emphasis or underline text purely for emphasis."
+type = "binary"
+weight = 0.5
+negate = true
+optional = true

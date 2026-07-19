@@ -1,0 +1,129 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "vd-1"
+name = "vd-1"
+description = "The page background reads as parchment (#F4F1EA) with white panel surfaces (#FFFFFF), and the active tree node, primary buttons, and star toggle use the navy (#1E3A5F) and/or brass gold (#C9A24B) accents"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "vd-2"
+name = "vd-2"
+description = "Headings render in a serif stack at 1.5rem or larger while the move tree, statistics, and body copy use a sans-serif stack near 16px"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "vd-4"
+name = "vd-4"
+description = "Cycling all 3 board themes keeps light and dark squares clearly legible and distinguishable under every theme"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "vd-5"
+name = "vd-5"
+description = "The selected tree node keeps a persistent accent-colored left border that follows the selection, and the Your Line badge is visibly distinct from bundled main-line and branch styling"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "vd-6"
+name = "vd-6"
+description = "At approximately 375px wide the board, move tree, and statistics panel stack vertically without horizontal scrolling or truncated data-dense text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "vd-7"
+name = "vd-7"
+description = "Enabling Favorites Only with nothing favorited shows a friendly empty-state message rather than a blank list"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "vd-neg-1"
+name = "vd-neg-1"
+description = "Board squares are indistinguishable, overlapping, or unreadable under one or more board themes"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "vd-neg-2"
+name = "vd-neg-2"
+description = "No selected tree node is visually marked, so the current position in the tree cannot be identified"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "vd-neg-3"
+name = "vd-neg-3"
+description = "At approximately 375px wide the page scrolls horizontally or key text clips, truncates, or overflows its container"
+type = "binary"
+weight = 1.0
+negate = true

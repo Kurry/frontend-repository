@@ -19,4 +19,4 @@ verifier:
     REWARDKIT_MODEL: "${REWARDKIT_MODEL:-}"
 
 tasks:
-  - path: ./tasks/frontend-daily-planner-board
+  - path: ./tasks/frontend-planning-daily-planner-board

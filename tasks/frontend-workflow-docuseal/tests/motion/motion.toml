@@ -1,0 +1,115 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "4_1"
+description = "Buttons, template rows, submitter rows, and palette buttons ease a hover wash on hover and show a slight press-down on click"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "4_2"
+description = "Interactive controls show a visible keyboard focus ring on focus that is distinct from their hover treatment"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "4_3"
+description = "Placing, selecting, reassigning, and deleting a field update the document canvas in place without a full page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "4_4"
+description = "Selecting a field applies a selection ring and reveals its handle, and hovering a field box shows a soft colour halo in the field's submitter colour"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.5"
+name = "4_5"
+description = "Action feedback appears in a short-lived toast that fades in and out and is exposed as an aria-live status region"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.6"
+name = "4_6"
+description = "Interactive chrome (top-bar buttons, template rows, submitter rows, palette buttons, field boxes) shows no hover feedback"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.7"
+name = "4_7"
+description = "Changing a field's submitter through the visible properties control produces no recolour of the field box on the canvas (the recolour happens only via a state shortcut, not the real control path)"
+type = "binary"
+weight = 0.5
+negate = true
+optional = true

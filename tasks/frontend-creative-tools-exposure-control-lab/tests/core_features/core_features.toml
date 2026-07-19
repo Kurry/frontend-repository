@@ -1,0 +1,239 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "1_1"
+description = "On load, Meter/Lab mode shows the photo preview with aperture, shutter, and ISO dials plus the exposure meter"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "1_2"
+description = "On load (or after opening Presets/Compare), the presets list shows at least 6 seeded exposure looks with names and stop readouts"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "1_3"
+description = "After creating a preset named 'Golden Hour Soft' with valid stops, the text 'Golden Hour Soft' is visible in the presets list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "1_4"
+description = "After adding 3 new presets on top of the seed set, the presets list shows exactly 3 more rows than the initial seeded count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "1_5"
+description = "After applying a seeded preset, the dial labels update to that preset's aperture/shutter/ISO and the preview meter/brightness respond"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "1_6"
+description = "After editing a preset name to 'Night Street Grain', the text 'Night Street Grain' is visible in the list and the previous name is not"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "1_7"
+description = "After deleting a preset, that preset's name is no longer visible in the presets list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "1_8"
+description = "After deleting all presets, an empty state message is visible and no preset rows remain"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "1_9"
+description = "After submitting create with an empty required preset name, the presets count does not increase and validation feedback is visible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "1_10"
+description = "After filtering presets by favorites or a look tag (with mixed items present), only matching presets remain visible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "1_11"
+description = "After switching between Meter/Lab and Presets/Compare modes, the main canvas shows the other mode without full page navigation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "1_12"
+description = "When hovering steppers, preset rows, or primary controls, a visible hover wash, brightness, or shadow change appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "1_13"
+description = "After pressing the aperture, shutter, or ISO steppers, the preview brightness, depth-of-field blur, or noise and the exposure meter position respond to the new stops"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "1_14"
+description = "At a stop-list edge, the corresponding up or down stepper is faded and non-interactive and does not change the dial value further"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "1_15"
+description = "After opening the help panel, an aperture / shutter / ISO explainer is visible on-page without leaving the simulator"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "1_16"
+description = "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "1_17"
+description = "Exposure presets list is static HTML only with no working create/edit/delete against shared state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.18"
+name = "1_18"
+description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.19"
+name = "1_19"
+description = "Pressing a stepper updates its dial value instantly, and the aperture up control raises the f-number (narrows the aperture) while its down control lowers it (widens the aperture)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "1_20"
+description = "Pressing the steppers visibly changes the live preview: it brightens as the aperture widens, the shutter slows, or ISO rises (and darkens for the opposite moves), depth-of-field blur increases as the aperture widens, and the ISO noise overlay grows more opaque as ISO climbs"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "1_21"
+description = "The vertical exposure meter dot climbs toward OVER EXPOSED when overexposed and drops toward UNDER EXPOSED when underexposed, clamping within the track at the extremes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "1_22"
+description = "Applying a preset writes its aperture, shutter, and ISO into the shared dial state so the Meter/Lab dials and preview update to the saved stops"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "1_23"
+description = "At a stop-list edge, the corresponding up or down stepper fades out and becomes non-interactive"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "1_24"
+description = "Submitting create with an empty preset name does not add a row and shows visible validation feedback"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "1_25"
+description = "Pressing the dial steppers does not visibly change the preview brightness, blur, noise, or exposure meter position"
+type = "binary"
+weight = 1.0
+negate = true

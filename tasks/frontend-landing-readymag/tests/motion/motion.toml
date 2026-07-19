@@ -1,0 +1,134 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "3_1"
+description = "On load the hero title, subtitle, and CTA row rise upward from 24px and fade in; getAnimations reports duration 800ms with delays 0ms, 80ms, and 160ms (grade by loading and reading getAnimations, not a static snapshot)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "3_2"
+description = "Scrolling the workflow section into view triggers the four feature cards to fade and rise from translateY(28px); computed transition is opacity 0.45s cubic-bezier(.56,.86,.59,1), transform 0.45s cubic-bezier(.56,.86,.59,1), staggered ~80ms per card (grade via the real scroll-into-view path, not a state shortcut)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "3_3"
+description = "The three hero gallery rows travel continuously along CSS offset-path motion (offset-distance ending at 1496px, 1655px, 1696px; getAnimations reports linear infinite durations ~40s/46s/52s) and loop seamlessly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "3_4"
+description = "The lower use-case marquee row travels along path('M 0 40 L 2000 40') from 0px to 1496px; getAnimations reports a linear infinite duration of 28000ms"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "3_5"
+description = "Letting the six-image slideshow run advances the active (opacity 1.0) frame every ~2200ms while neighbors stay at 0.35, with computed slide transition opacity 0.35s ease-in-out (grade by observing the timed advance, not a WebMCP shortcut)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "3_6"
+description = "The orange support orb travels along path('M 0 0 C 120 80, 240 -40, 480 60 S 820 20, 960 80') across ~1561px; getAnimations reports a linear infinite duration of 18000ms"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "3_7"
+description = "Hovering a use-case tile with the real pointer rotates it -2deg and scales it to 1.02 (grade by hovering the actual tile)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "3_8"
+description = "Hovering a primary/CTA button with the real pointer lifts it 1 to 2px and shifts its background from #282828 toward orange (grade by hovering the actual button)"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.9"
+name = "3_9"
+description = "The four feature cards appear already in their final state with no reveal animation when their section scrolls into view"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.10"
+name = "3_10"
+description = "Hovering a use-case tile or a primary button with the real pointer produces no visible transform, lift, or color change"
+type = "binary"
+weight = 1.0
+negate = true

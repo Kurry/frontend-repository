@@ -1,0 +1,112 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "4_1"
+description = "Hovering a habit row, a category filter chip, and a stepper control produces a clearly visible hover response on each"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "4_2"
+description = "Pressing Tab repeatedly through the main list shows a clearly visible focus indicator on every focused interactive element"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "4_3"
+description = "Creating a habit, completing a check-in, exporting, and importing each produce a transient visible confirmation (toast or equivalent) immediately after the action"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "4_5"
+description = "The milestone flame's treatment change on crossing 7 or 30 days happens live from the real check-in/stepper action, not a hidden shortcut, and is visible immediately after"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "4_6"
+description = "The recovery banner and its Retry/Reset controls appear and are announced through the role=alert live region without requiring focus to move to them"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "4_7"
+description = "Buttons, habit rows, and category filter chips show no hover response at all, feeling static under pointer hover"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.8"
+name = "4_8"
+description = "The stepper's +1/-1 taps or the milestone flame's threshold change are only reflected after a full page reload rather than updating live in the running UI"
+type = "binary"
+weight = 1.0
+negate = true

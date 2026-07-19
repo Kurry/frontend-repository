@@ -1,0 +1,98 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "mo-1"
+name = "mo-1"
+description = "Playing the correct move in Practice through the real board control flashes the board green and shows a Correct! toast; an incorrect legal move flashes red and shows Try again"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "mo-2"
+name = "mo-2"
+description = "Hovering (without clicking) a button, an opening list item, a move-tree chip, and a board control each produces a visible hover change distinct from the resting state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "mo-3"
+name = "mo-3"
+description = "Tabbing through interactive controls shows a clearly visible focus indicator on each focused element"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "mo-neg-1"
+name = "mo-neg-1"
+description = "Interactive controls (buttons, list items, tree chips, board controls) show no hover feedback anywhere"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "mo-neg-2"
+name = "mo-neg-2"
+description = "Keyboard focus is never visibly indicated as focus moves through interactive controls"
+type = "binary"
+weight = 1.0
+negate = true

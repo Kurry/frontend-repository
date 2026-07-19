@@ -1,0 +1,149 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "2_1"
+description = "The page uses an off-white default surface with per-section theme swaps (lime #ecfdad, turquoise, chrome-metallic, dark media) rather than one flat background"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "2_2"
+description = "Oversized editorial display headings are visually distinct from the medium grotesque used for body and eyebrow text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "2_3"
+description = "Each client card shows two stat tiles: a lime Organic views tile and a chrome Likes tile with a metallic heart"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.4"
+name = "2_4"
+description = "The cookie banner uses a dark theme and the contact popup uses a chrome-metallic panel with floating-label fields"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "2.5"
+name = "2_5"
+description = "The Finlayson and Autoliitto slots (no dedicated image) and the deck's video slots (only two case videos) use substitutes and reuse, showing real rendered media"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "2_6"
+description = "A generic equal-width stacked layout with a single flat background and no per-section theme swap is a failure of the editorial composition"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.7"
+name = "2_7"
+description = "Broken image or video references (missing-file placeholders, failed loads) in the client deck slots are a failure"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.8"
+name = "2_8"
+description = "The home body default surface renders off-white (computed background near rgb(234, 233, 230) / #eae9e6) with near-black text rgb(24, 24, 24)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "2_9"
+description = "The statement band (theme-media) renders background rgb(24, 24, 24) with lime text rgb(236, 253, 173), and the footer (theme-chrome) renders a dark-grey base rgb(43, 43, 43) with white text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "2_10"
+description = "Accent colors render exactly: the Organic views tile lime rgb(236, 253, 173) (#ecfdad), the Training service card turquoise rgb(63, 174, 134) (#3fae86), and the nav link dot red rgb(255, 69, 69) (#ff4545)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.11"
+name = "2_11"
+description = "The hero H1 renders in PP Editorial New at weight 400 (about 62.8px at 1440 with a tight line-height), and paragraph/nav text renders in PP Neue Montreal at weight 500"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.12"
+name = "2_12"
+description = "A default surface rendered as a flat black/dark background (not the measured off-white ~rgb(234,233,230)) or theme surfaces whose computed colors do not match the measured per-section values are a failure"
+type = "binary"
+weight = 1.0
+negate = true

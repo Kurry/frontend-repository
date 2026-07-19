@@ -1,0 +1,233 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "1_1"
+description = "On load, Browse mode shows a non-empty palette library (nomenclature, palette cards, or swatches) with multiple seeded items"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "1_2"
+description = "On load (or after opening the manage/detail list), at least 6 user-manageable palettes are available with names visible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "1_3"
+description = "After creating a palette named 'Harbor Coastal' with valid swatches, the text 'Harbor Coastal' is visible in the library"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "1_4"
+description = "After adding 3 new palettes on top of the seed set, the manage/list count shows exactly 3 more than the initial seeded count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "1_5"
+description = "After filtering by a period tag (with mixed periods present), only matching palettes/swatches remain visible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "1_6"
+description = "After editing a palette name to 'Evening Ochre', the text 'Evening Ochre' is visible and the previous name is not"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "1_7"
+description = "After deleting a palette, that palette name is no longer visible in the library"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "1_8"
+description = "After deleting all user-manageable palettes, an empty state is visible in the library region"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "1_9"
+description = "After submitting create with an empty required palette name, the palettes count does not increase and validation feedback is visible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "1_10"
+description = "After switching among Nomenclature, Palette, and Swatch browse layouts, the active view indicator updates without full page navigation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "1_11"
+description = "After opening Detail/Editor for a palette and returning to Browse, both modes work without leaving the page"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "1_12"
+description = "When hovering swatches, palette cards, or view toggles, a visible hover outline, wash, or label fade appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "1_13"
+description = "After clicking a swatch, its hex value is copied and a brief on-swatch copied confirmation appears and then clears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "1_14"
+description = "In Nomenclature or Swatch view, each swatch shows a nearest historical color name derived from the bundled dataset"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "1_15"
+description = "After toggling a palette's favorite/featured flag and switching views or modes, the favorite state is preserved"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "1_16"
+description = "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "1_17"
+description = "Palettes list is static HTML only with no working create/edit/delete against shared state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.18"
+name = "1_18"
+description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.19"
+name = "1_19"
+description = "Switching among Nomenclature, Palette, and Swatch views updates the canvas in place, and the active view toggle shows a filled circular indicator while the other options show an outline-only circle"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "1_20"
+description = "Clicking a swatch in any view copies its hex to the clipboard and shows a brief on-swatch copied confirmation that clears after about a second"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "1_21"
+description = "Each swatch shows a nearest historical color name (with a short note) derived from the bundled color-name dataset in the Nomenclature and Swatch views"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "1_22"
+description = "Choosing a period filter hides non-matching items across all three views, the default all-periods choice shows everything, and a period matching nothing shows an empty state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "1_23"
+description = "Submitting an invalid create (empty palette name or fewer than 3 swatches) does not add a palette and shows visible validation feedback"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "1_24"
+description = "Clicking a swatch does not copy its hex or shows no copied confirmation"
+type = "binary"
+weight = 0.5
+negate = true
+optional = true

@@ -11,7 +11,7 @@ name = "webmcp"
 transport = "stdio"
 command = "node"
 args = [
-  "/tests/mcp/webmcp_stdio_server.mjs",
+  "/tests/webmcp_stdio_server.mjs",
 ]
 allowed_tools = [
   "webmcp_session_info",

@@ -14,7 +14,7 @@ description: >-
 # Create a task from a source HTML capture
 
 Nine stages. The sibling skills own the generics — `frontend-good-app-eval`
-(instruction register, checklist and rubric conventions) and `create-task`
+(instruction register and rubric conventions per docs/instructions.md + docs/rubrics.md) and `create-task`
 (registration, packaging, validation mechanics). This skill owns what only a
 capture-sourced task needs: losing zero detail, refusing to invent unshown
 product, and turning a dead capture into a living oracle.
@@ -70,7 +70,7 @@ observed in this repo's real captures):
   vendor genuinely needed libraries under `vendor/`.
 - Neutralize outbound `href`s into non-navigating controls.
 - Debrand product strings to the assigned brand, consistently across capture,
-  PRD, instruction, checklist, and rubric (they must never drift apart).
+  PRD, instruction, and dimension rubrics (they must never drift apart).
   Synthetic personal/billing seed strings may stay.
 - Local assets only; the page must render fully offline.
 
@@ -111,7 +111,7 @@ Written from the inventory, not from product memory: provenance/URL, the
 stage-2 scope classification, exact seed tables, per-region specs. Bar: the
 PRD alone recreates the page; the page alone finds every detail in the PRD.
 
-## Stage 6 — Instruction, checklist, rubric
+## Stage 6 — Instruction and rubrics
 
 Follow `frontend-good-app-eval` for register and conventions. Capture-specific
 additions:
@@ -133,7 +133,7 @@ modules, bindings, mechanics_exclusions), plus `schemas/webmcp-task-sources.json
 and `schemas/webmcp-assignments.json`. Package ONLY the new slug (call
 `package_task(slug, spec)` directly — full `main()` requires every archived
 authoring source). Check `copy_solution_app`/`should_skip` so INVENTORY.md,
-README.md, and rubric/checklist files stay out of `solution/app`.
+README.md, and rubric files stay out of `solution/app`.
 
 Growing the corpus breaks count assertions: update
 `test_assignment_map_covers_23`-style hard counts in

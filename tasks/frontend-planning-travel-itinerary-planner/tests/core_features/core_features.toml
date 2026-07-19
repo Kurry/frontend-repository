@@ -1,0 +1,254 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "1_1"
+description = "On load, Plan List mode shows multi-day itinerary sections with at least 8 seeded stops and place names visible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "1_2"
+description = "After creating a stop named 'Harbor Lookout' on a day with valid required fields, the text 'Harbor Lookout' is visible in the plan list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "1_3"
+description = "After adding 3 new stops on top of the seed set, the plan list shows exactly 3 more stops than the initial seeded count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "1_4"
+description = "After selecting a stop, the place detail overlay or panel shows that stop's name and tab chrome (About or equivalent)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "1_5"
+description = "After editing a stop name to 'Evening Promenade', the text 'Evening Promenade' is visible and the previous name is not"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "1_6"
+description = "After deleting a stop, that stop name is no longer visible in the plan list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "1_7"
+description = "After deleting all stops, an empty state is visible in the plan list region"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "1_8"
+description = "After submitting create with an empty required stop name, the stops count does not increase and validation feedback is visible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "1_9"
+description = "After filtering or focusing a single day (with multi-day stops present), only that day's stops remain emphasized or visible in the filtered list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "1_10"
+description = "After switching emphasis between Plan List and Map modes (or Trip plan / map focus), the workspace shows the other mode without full page navigation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "1_11"
+description = "After switching place detail tabs (About / Reviews or equivalent), the panel content swaps without leaving the page"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "1_12"
+description = "When hovering place rows, sidebar items, or map chrome controls, a visible hover lift, wash, or press feedback appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "1_13"
+description = "Clicking a map pin selects that stop and scrolls/highlights its row in the plan list, and clicking a plan-list row flies the map to and enlarges that pin"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "1_14"
+description = "Selecting a day in the sidebar focuses the map on that day and selects the day's first stop"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "1_15"
+description = "The place-detail card opened over the map can be closed with its dismiss control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "1_16"
+description = "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "1_17"
+description = "Itinerary stops collection supports create, edit, and delete with list rows and derived counts updating from shared application state"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "1_18"
+description = "At least two distinct views or interaction modes are switchable without full page navigation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "1_19"
+description = "Domain state beyond CRUD is implemented (filters, status/priority/mode, or equivalent) and recomputes visible results from the shared collection"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "1_20"
+description = "Renders visible validation feedback when create is submitted with empty required fields, and the collection count does not increase"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "1_21"
+description = "Itinerary stops list is static HTML only with no working create/edit/delete against shared state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.22"
+name = "1_22"
+description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.23"
+name = "1_23"
+description = "Clicking a stop row flies the map to that stop's pin and highlights the row, and clicking a map pin selects that stop and scrolls the plan list to it (two-way sync)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "1_24"
+description = "Selecting a day in the sidebar focuses the map on that day and selects that day's first stop"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "1_25"
+description = "Selecting a stop opens a place-detail card over the map, and its dismiss control closes the card"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "1_26"
+description = "Clicking a map pin does not select the stop or scroll the plan list to it (pin-to-list sync is missing)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.27"
+name = "1_27"
+description = "The place-detail card over the map has no working dismiss control, so it cannot be closed once opened"
+type = "binary"
+weight = 1.0
+negate = true

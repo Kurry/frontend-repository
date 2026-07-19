@@ -19,7 +19,7 @@ import webmcp_h3  # noqa: E402
 
 # slug -> (source relative path, description, webmcp assignment)
 TASK_SPECS: dict[str, dict] = {
-    "frontend-daisyui-admin-dashboard": {
+    "frontend-workflow-daisyui-admin-dashboard": {
         "source": "DaisyUI",
         "description": "DaisyUI admin user-management dashboard good-app eval.",
         "modules": ["browse-query-v1", "entity-collection-v1", "form-workflow-v1"],
@@ -35,7 +35,7 @@ TASK_SPECS: dict[str, dict] = {
             "Drawer overlay slide on small viewports stays Playwright-observed",
         ],
     },
-    "frontend-daisyui-theme-generator": {
+    "frontend-creative-tools-daisyui-theme-generator": {
         "source": "DaisyUI/theme-generator",
         "description": "daisyUI theme generator good-app eval.",
         "modules": ["structured-editor-v1", "entity-collection-v1", "artifact-transfer-v1"],
@@ -51,7 +51,7 @@ TASK_SPECS: dict[str, dict] = {
             "Color-picker drag gestures stay Playwright when mechanism matters",
         ],
     },
-    "frontend-camera-exposure": {
+    "frontend-creative-tools-camera-exposure": {
         "source": "CameraExposure",
         "description": "Camera exposure simulator good-app eval.",
         "modules": ["command-session-v1", "structured-editor-v1"],
@@ -64,7 +64,7 @@ TASK_SPECS: dict[str, dict] = {
             "Continuous hold-to-repeat on edge buttons stays Playwright-observed",
         ],
     },
-    "frontend-design-portfolio": {
+    "frontend-creative-tools-design-portfolio": {
         "source": "DesignPortfolio",
         "description": "CLI terminal product designer portfolio good-app eval.",
         "modules": ["browse-query-v1", "entity-collection-v1"],
@@ -75,7 +75,7 @@ TASK_SPECS: dict[str, dict] = {
         },
         "mechanics_exclusions": ["Terminal typing animation timing stays Playwright-observed"],
     },
-    "frontend-finance-reports": {
+    "frontend-data-tracking-finance-reports": {
         "source": "FinanceReports",
         "description": "Personal finance reports page good-app eval.",
         "modules": ["browse-query-v1", "entity-collection-v1"],
@@ -86,7 +86,7 @@ TASK_SPECS: dict[str, dict] = {
         },
         "mechanics_exclusions": ["Chart geometry / pie segment hover stays Playwright-observed"],
     },
-    "frontend-material-ui-theme-creator": {
+    "frontend-creative-tools-material-ui-theme-creator": {
         "source": "MaterialUI",
         "description": "Material UI theme creator good-app eval.",
         "modules": ["structured-editor-v1", "entity-collection-v1", "artifact-transfer-v1"],
@@ -101,7 +101,7 @@ TASK_SPECS: dict[str, dict] = {
             "Color picker drag stays Playwright when mechanism matters",
         ],
     },
-    "frontend-media-timeline": {
+    "frontend-data-tracking-media-timeline": {
         "source": "MediaTimeline",
         "description": "Media history timeline explorer good-app eval.",
         "modules": ["browse-query-v1", "entity-collection-v1"],
@@ -112,7 +112,7 @@ TASK_SPECS: dict[str, dict] = {
         },
         "mechanics_exclusions": ["Scroll-linked parallax / scrub timing stays Playwright-observed"],
     },
-    "frontend-palette-library": {
+    "frontend-creative-tools-palette-library": {
         "source": "PaletteLibrary",
         "description": "Fine-art color palette library good-app eval.",
         "modules": ["browse-query-v1", "entity-collection-v1"],
@@ -123,7 +123,7 @@ TASK_SPECS: dict[str, dict] = {
         },
         "mechanics_exclusions": ["Scroll reveal / hover wash timing stays Playwright-observed"],
     },
-    "frontend-shapeshift-grid": {
+    "frontend-creative-tools-shapeshift-grid": {
         "source": "Shapeshift",
         "description": "SHAPESHIFT QR color grid painter good-app eval.",
         "modules": ["structured-editor-v1", "command-session-v1"],
@@ -136,7 +136,7 @@ TASK_SPECS: dict[str, dict] = {
             "Drag-paint / brush stroke geometry stays Playwright (gesture mechanics)",
         ],
     },
-    "frontend-story-docs": {
+    "frontend-creative-tools-story-docs": {
         "source": "StoryDocs",
         "description": "Storyboard getting-started tutorial good-app eval.",
         "modules": ["browse-query-v1", "form-workflow-v1", "entity-collection-v1"],
@@ -148,7 +148,7 @@ TASK_SPECS: dict[str, dict] = {
         },
         "mechanics_exclusions": [],
     },
-    "frontend-trip-itinerary": {
+    "frontend-planning-trip-itinerary": {
         "source": "TripItinerary",
         "description": "French Riviera trip itinerary planner good-app eval.",
         "modules": ["browse-query-v1", "entity-collection-v1", "form-workflow-v1"],
@@ -160,7 +160,7 @@ TASK_SPECS: dict[str, dict] = {
         },
         "mechanics_exclusions": ["Map pan/zoom / marker drag stays Playwright"],
     },
-    "frontend-admin-analytics-dashboard": {
+    "frontend-data-tracking-admin-analytics-dashboard": {
         "source": "variants/AdminAnalyticsDashboard",
         "description": "Commerce ops admin analytics dashboard variant.",
         "modules": ["browse-query-v1", "entity-collection-v1"],
@@ -174,7 +174,7 @@ TASK_SPECS: dict[str, dict] = {
         },
         "mechanics_exclusions": ["Chart hover tooling stays Playwright-observed"],
     },
-    "frontend-color-palette-archive": {
+    "frontend-creative-tools-color-palette-archive": {
         "source": "variants/ColorPaletteArchive",
         "description": "Fine-art color palette archive variant.",
         "modules": ["browse-query-v1", "entity-collection-v1"],
@@ -185,7 +185,7 @@ TASK_SPECS: dict[str, dict] = {
         },
         "mechanics_exclusions": [],
     },
-    "frontend-css-theme-builder": {
+    "frontend-creative-tools-css-theme-builder": {
         "source": "variants/CssThemeBuilder",
         "description": "CSS theme builder variant.",
         "modules": ["structured-editor-v1", "entity-collection-v1", "artifact-transfer-v1"],
@@ -197,7 +197,7 @@ TASK_SPECS: dict[str, dict] = {
         },
         "mechanics_exclusions": ["Raw file paths/blobs forbidden in WebMCP args"],
     },
-    "frontend-expense-breakdown-reports": {
+    "frontend-data-tracking-expense-breakdown-reports": {
         "source": "variants/ExpenseBreakdownReports",
         "description": "Personal finance expense breakdown reports variant.",
         "modules": ["browse-query-v1", "entity-collection-v1"],
@@ -208,7 +208,7 @@ TASK_SPECS: dict[str, dict] = {
         },
         "mechanics_exclusions": ["Chart hover stays Playwright-observed"],
     },
-    "frontend-exposure-control-lab": {
+    "frontend-creative-tools-exposure-control-lab": {
         "source": "variants/ExposureControlLab",
         "description": "Camera exposure control lab variant.",
         "modules": ["command-session-v1", "structured-editor-v1"],
@@ -219,7 +219,7 @@ TASK_SPECS: dict[str, dict] = {
         },
         "mechanics_exclusions": ["Hold-to-repeat control timing stays Playwright-observed"],
     },
-    "frontend-grid-paint-studio": {
+    "frontend-creative-tools-grid-paint-studio": {
         "source": "variants/GridPaintStudio",
         "description": "QR color grid paint studio variant.",
         "modules": ["structured-editor-v1", "command-session-v1"],
@@ -230,7 +230,7 @@ TASK_SPECS: dict[str, dict] = {
         },
         "mechanics_exclusions": ["Drag-paint gestures stay Playwright"],
     },
-    "frontend-l1-network-marketing": {
+    "frontend-landing-l1-network-marketing": {
         "source": "variants/L1NetworkMarketing",
         "description": "Layer-1 blockchain network marketing site good-app eval.",
         "modules": ["browse-query-v1", "form-workflow-v1", "entity-collection-v1"],
@@ -242,7 +242,7 @@ TASK_SPECS: dict[str, dict] = {
         },
         "mechanics_exclusions": ["Outbound marketing CTAs must remain in-app (no origin navigation)"],
     },
-    "frontend-material-theme-studio": {
+    "frontend-creative-tools-material-theme-studio": {
         "source": "variants/MaterialThemeStudio",
         "description": "Material theme design studio variant.",
         "modules": ["structured-editor-v1", "entity-collection-v1", "artifact-transfer-v1"],
@@ -254,7 +254,7 @@ TASK_SPECS: dict[str, dict] = {
         },
         "mechanics_exclusions": ["Raw file paths/blobs forbidden in WebMCP args"],
     },
-    "frontend-media-history-timeline": {
+    "frontend-data-tracking-media-history-timeline": {
         "source": "variants/MediaHistoryTimeline",
         "description": "Media history timeline explorer variant.",
         "modules": ["browse-query-v1", "entity-collection-v1"],
@@ -265,7 +265,7 @@ TASK_SPECS: dict[str, dict] = {
         },
         "mechanics_exclusions": ["Scroll/scrub timing stays Playwright-observed"],
     },
-    "frontend-storyboard-tutorial": {
+    "frontend-creative-tools-storyboard-tutorial": {
         "source": "variants/StoryboardTutorial",
         "description": "Storyboard getting-started tutorial variant.",
         "modules": ["browse-query-v1", "form-workflow-v1", "entity-collection-v1"],
@@ -277,7 +277,7 @@ TASK_SPECS: dict[str, dict] = {
         },
         "mechanics_exclusions": [],
     },
-    "frontend-terminal-portfolio": {
+    "frontend-creative-tools-terminal-portfolio": {
         "source": "variants/TerminalPortfolio",
         "description": "CLI terminal product designer portfolio variant.",
         "modules": ["browse-query-v1", "entity-collection-v1"],
@@ -288,7 +288,7 @@ TASK_SPECS: dict[str, dict] = {
         },
         "mechanics_exclusions": ["Terminal typing animation timing stays Playwright-observed"],
     },
-    "frontend-travel-itinerary-planner": {
+    "frontend-planning-travel-itinerary-planner": {
         "source": "variants/TravelItineraryPlanner",
         "description": "French Riviera trip itinerary planner variant.",
         "modules": ["browse-query-v1", "entity-collection-v1", "form-workflow-v1"],
@@ -300,7 +300,7 @@ TASK_SPECS: dict[str, dict] = {
         },
         "mechanics_exclusions": ["Map pan/zoom / marker drag stays Playwright"],
     },
-    "frontend-daily-planner-board": {
+    "frontend-planning-daily-planner-board": {
         "source": "DailyPlannerBoard",
         "description": "Cadence multi-day daily planner board good-app eval.",
         "modules": ["browse-query-v1", "entity-collection-v1"],
@@ -319,7 +319,7 @@ TASK_SPECS: dict[str, dict] = {
 
 # Website-fidelity tasks converted from website-prds (pixel-perfect genre).
 TASK_SPECS.update({
-    "frontend-avax-network": {
+    "frontend-landing-avax-network": {
         "source": "AvaxNetwork",
         "description": "Avalanche network marketing homepage fidelity eval.",
         "modules": [
@@ -385,7 +385,7 @@ TASK_SPECS.update({
             "Desktop links card scrub / companies rise stays Playwright-observed"
         ]
     },
-    "frontend-hildenkaira": {
+    "frontend-landing-hildenkaira": {
         "source": "Hildenkaira",
         "description": "Hilden & Kaira social-media agency homepage fidelity eval.",
         "modules": [
@@ -437,7 +437,7 @@ TASK_SPECS.update({
             "SplitText line-mask reveals stay Playwright-only"
         ]
     },
-    "frontend-landonorris": {
+    "frontend-landing-landonorris": {
         "source": "LandoNorris",
         "description": "Lando Norris F1 driver homepage fidelity eval.",
         "modules": [
@@ -505,7 +505,7 @@ TASK_SPECS.update({
             "Overscroll scroll-linked motion stays Playwright-observed"
         ]
     },
-    "frontend-razorpay-sprint-26": {
+    "frontend-landing-razorpay-sprint-26": {
         "source": "RazorpaySprint26",
         "description": "Razorpay Sprint 2026 marketing microsite fidelity eval.",
         "modules": [
@@ -540,7 +540,7 @@ TASK_SPECS.update({
             "Video-modal scroll lock stays Playwright-observed"
         ]
     },
-    "frontend-readymag": {
+    "frontend-landing-readymag": {
         "source": "Readymag",
         "description": "Readymag design-tool marketing homepage fidelity eval.",
         "modules": [
@@ -571,7 +571,7 @@ TASK_SPECS.update({
             "Custom cursor follow / hover-swap stays Playwright-observed"
         ]
     },
-    "frontend-units-gr": {
+    "frontend-landing-units-gr": {
         "source": "UnitsGr",
         "description": "units.gr all-inclusive student-housing marketing homepage fidelity eval.",
         "modules": [
@@ -599,7 +599,7 @@ TASK_SPECS.update({
             "Swiper drag/slide transition stays Playwright-observed"
         ]
     },
-    "frontend-wolverineworldwide": {
+    "frontend-landing-wolverineworldwide": {
         "source": "WolverineWorldwide",
         "description": "Wolverine Worldwide corporate marketing homepage fidelity eval.",
         "modules": [
@@ -635,7 +635,7 @@ TASK_SPECS.update({
 
 # Hard browser_* and framework-rebuild conversions (2026-07-19 wave).
 TASK_SPECS.update({
-    "frontend-focuspath": {
+    "frontend-productivity-focuspath": {
         "source": "Focuspath",
         "description": "FocusPath goal decomposition and roadmap tool good-app eval.",
         "modules": [
@@ -680,7 +680,7 @@ TASK_SPECS.update({
             "Hover/focus washes on nodes, rows, and toggles stay Playwright-observed"
         ]
     },
-    "frontend-mineclash": {
+    "frontend-game-mineclash": {
         "source": "Mineclash",
         "description": "Dueling minefield puzzle game good-app eval.",
         "modules": [
@@ -711,7 +711,7 @@ TASK_SPECS.update({
             "Narrow-viewport grid scaling stays Playwright-observed"
         ]
     },
-    "frontend-letterdrop": {
+    "frontend-game-letterdrop": {
         "source": "Letterdrop",
         "description": "LetterDrop falling-tile canvas word game good-app eval.",
         "modules": [
@@ -739,7 +739,7 @@ TASK_SPECS.update({
             "Undo Last Tile and narrow-viewport canvas scaling stay Playwright-observed"
         ]
     },
-    "frontend-frameflick": {
+    "frontend-creative-tools-frameflick": {
         "source": "Frameflick",
         "description": "FrameFlick screenshot-dressing canvas compositor good-app eval.",
         "modules": [
@@ -802,7 +802,7 @@ TASK_SPECS.update({
             "Collaboration Scenario merge convergence stays Playwright-only"
         ]
     },
-    "frontend-dare-night": {
+    "frontend-game-dare-night": {
         "source": "DareNight",
         "description": "Dare Night pass-the-device party card game good-app eval.",
         "modules": [
@@ -862,7 +862,7 @@ TASK_SPECS.update({
             "Live-stream tick timing stays Playwright-observed"
         ]
     },
-    "frontend-lineforge": {
+    "frontend-productivity-lineforge": {
         "source": "Lineforge",
         "description": "LineForge chess opening study app good-app eval.",
         "modules": [
@@ -916,7 +916,7 @@ TASK_SPECS.update({
             "Board move animation, piece-lift, and practice green/red flash timing stay Playwright-observed (gesture/transient mechanics)"
         ]
     },
-    "frontend-notenest": {
+    "frontend-productivity-notenest": {
         "source": "Notenest",
         "description": "Nested-folder note-taking app good-app eval.",
         "modules": [
@@ -960,7 +960,7 @@ TASK_SPECS.update({
             "Raw image blobs / file paths must not appear in WebMCP args"
         ]
     },
-    "frontend-feltrun": {
+    "frontend-game-feltrun": {
         "source": "Feltrun",
         "description": "Single-player Texas hold'em poker table good-app eval.",
         "modules": [
@@ -998,7 +998,7 @@ TASK_SPECS.update({
             "Concurrent-merge delivery ordering and same-note conflict resolution stay Playwright-driven"
         ]
     },
-    "frontend-cipherlog": {
+    "frontend-productivity-cipherlog": {
         "source": "Cipherlog",
         "description": "CipherLog covert-transmissions memo log good-app eval.",
         "modules": [
@@ -1049,7 +1049,7 @@ TASK_SPECS.update({
             "Cipher-lock passcode set/reveal gesture stays Playwright-observed"
         ]
     },
-    "frontend-tagnote": {
+    "frontend-productivity-tagnote": {
         "source": "Tagnote",
         "description": "TagNote inline-tag note timeline good-app eval.",
         "modules": [
@@ -1087,7 +1087,7 @@ TASK_SPECS.update({
             "Undo/Redo branch traversal in the History panel stays Playwright-observed"
         ]
     },
-    "frontend-markupflow": {
+    "frontend-creative-tools-markupflow": {
         "source": "Markupflow",
         "description": "Solid.js image annotation and markup studio good-app eval.",
         "modules": [
@@ -1159,7 +1159,7 @@ TASK_SPECS.update({
             "Layer-reorder drag-and-drop gesture stays Playwright-observed"
         ]
     },
-    "frontend-swiftnote": {
+    "frontend-productivity-swiftnote": {
         "source": "Swiftnote",
         "description": "Keyboard-first SwiftNote note app good-app eval.",
         "modules": [
@@ -1195,7 +1195,7 @@ TASK_SPECS.update({
             "10,000-item virtualization scroll windowing stays Playwright-observed"
         ]
     },
-    "frontend-sidedock": {
+    "frontend-productivity-sidedock": {
         "source": "Sidedock",
         "description": "SideDock color-coded workspace bookmark manager good-app eval.",
         "modules": [
@@ -1245,7 +1245,7 @@ TASK_SPECS.update({
             "Virtualized scroll windowing stays Playwright-observed"
         ]
     },
-    "frontend-mindthread": {
+    "frontend-productivity-mindthread": {
         "source": "Mindthread",
         "description": "MindThread thought-capture and idea-threading good-app eval.",
         "modules": [
@@ -1296,7 +1296,7 @@ TASK_SPECS.update({
             "Badge-color and reflection-tint treatments stay Playwright-observed"
         ]
     },
-    "frontend-scribblespace": {
+    "frontend-productivity-scribblespace": {
         "source": "Scribblespace",
         "description": "ScribbleSpace freeform infinite-canvas notes board good-app eval.",
         "modules": [
@@ -1356,7 +1356,7 @@ TASK_SPECS.update({
             "Live-tick timing stays Playwright-observed"
         ]
     },
-    "frontend-panecraft": {
+    "frontend-creative-tools-panecraft": {
         "source": "Panecraft",
         "description": "PaneCraft mock-data dashboard builder good-app eval.",
         "modules": [
@@ -1440,7 +1440,7 @@ TASK_SPECS.update({
             "Page-tab reorder/scroll stays Playwright-driven"
         ]
     },
-    "frontend-repquest": {
+    "frontend-game-repquest": {
         "source": "Repquest",
         "description": "RepQuest fitness-quest canvas game-sim good-app eval.",
         "modules": [
@@ -1488,7 +1488,7 @@ TASK_SPECS.update({
             "Zone-unlock palette and boss-defeated marker stay Playwright-observed"
         ]
     },
-    "frontend-loopdaily": {
+    "frontend-productivity-loopdaily": {
         "source": "Loopdaily",
         "description": "LoopDaily habit tracker with malformed-data recovery good-app eval.",
         "modules": [
@@ -1555,7 +1555,7 @@ TASK_SPECS.update({
             "Toast/hover/focus timing stays Playwright-observed"
         ]
     },
-    "frontend-taskgrove": {
+    "frontend-productivity-taskgrove": {
         "source": "Taskgrove",
         "description": "TaskGrove hierarchical task-tree planner good-app eval.",
         "modules": [
@@ -1599,7 +1599,7 @@ TASK_SPECS.update({
             "Move Up/Down sibling reorder stays Playwright-only (not exposed as a tool)"
         ]
     },
-    "frontend-clockcraft": {
+    "frontend-productivity-clockcraft": {
         "source": "Clockcraft",
         "description": "Personal time-tracking productivity app with branching edit history good-app eval.",
         "modules": [
@@ -1643,7 +1643,7 @@ TASK_SPECS.update({
             "Duration-proportional timeline block sizing stays Playwright-observed"
         ]
     },
-    "frontend-fandangofury": {
+    "frontend-game-fandangofury": {
         "source": "Fandangofury",
         "description": "FandangoFury side-scrolling hack-and-slash festival combat game good-app eval.",
         "modules": [
@@ -1681,7 +1681,7 @@ TASK_SPECS.update({
             "Reset Progress (confirmation-guarded) stays Playwright-driven"
         ]
     },
-    "frontend-portfolioframe": {
+    "frontend-creative-tools-portfolioframe": {
         "source": "Portfolioframe",
         "description": "Resume-and-portfolio builder good-app eval.",
         "modules": [
@@ -1738,7 +1738,7 @@ TASK_SPECS.update({
             "Section reorder animation stays Playwright-observed when gesture matters"
         ]
     },
-    "frontend-euroscope": {
+    "frontend-creative-tools-euroscope": {
         "source": "Euroscope",
         "description": "Custom EuroScope air-traffic-client theme and icon patcher good-app eval.",
         "modules": [
@@ -1790,7 +1790,7 @@ TASK_SPECS.update({
             "Native file-picker / download interaction stays Playwright-driven"
         ]
     },
-    "frontend-docuseal": {
+    "frontend-workflow-docuseal": {
         "source": "Docuseal",
         "description": "Docuseal PDF form builder and document signing workspace good-app eval.",
         "modules": [
@@ -1849,7 +1849,7 @@ TASK_SPECS.update({
             "Hover halo / press feedback and toast fade timing stay Playwright-observed"
         ]
     },
-    "frontend-mermaid-live-editor": {
+    "frontend-creative-tools-mermaid-live-editor": {
         "source": "MermaidLiveEditor",
         "description": "Mermaid live diagram source editor with preview good-app eval.",
         "modules": [
@@ -1897,7 +1897,7 @@ TASK_SPECS.update({
             "Preview pan/zoom and rendered-diagram hover stay Playwright-observed"
         ]
     },
-    "frontend-md-uy": {
+    "frontend-productivity-md-uy": {
         "source": "MdUy",
         "description": "md.uy collaborative markdown editor good-app eval.",
         "modules": [
@@ -1930,7 +1930,7 @@ TASK_SPECS.update({
             "Live-sync/peer collaboration stays chrome-only and Playwright-observed; Present-mode slide gestures stay Playwright-driven"
         ]
     },
-    "frontend-ghostfolio": {
+    "frontend-data-tracking-ghostfolio": {
         "source": "Ghostfolio",
         "description": "Ghostfolio wealth portfolio dashboard good-app eval.",
         "modules": [
@@ -1963,7 +1963,7 @@ TASK_SPECS.update({
             "Allocation bars and hover feedback stay Playwright-observed"
         ]
     },
-    "frontend-plausible-analytics": {
+    "frontend-data-tracking-plausible-analytics": {
         "source": "PlausibleAnalytics",
         "description": "Plausible privacy web-analytics dashboard good-app eval.",
         "modules": [
@@ -1996,7 +1996,7 @@ TASK_SPECS.update({
             "Chart bar hover/tooltip stays Playwright-observed"
         ]
     },
-    "frontend-ghostty-config": {
+    "frontend-creative-tools-ghostty-config": {
         "source": "GhosttyConfig",
         "description": "Ghostty terminal configuration generator with live preview good-app eval.",
         "modules": [
@@ -2077,7 +2077,7 @@ TASK_SPECS.update({
             "Color-picker/slider drag stays Playwright-driven"
         ]
     },
-    "frontend-vert": {
+    "frontend-creative-tools-vert": {
         "source": "Vert",
         "description": "VERT private local file converter good-app eval.",
         "modules": [
@@ -2132,7 +2132,7 @@ TASK_SPECS.update({
             "Queue reorder is not offered"
         ]
     },
-    "frontend-nostrpass": {
+    "frontend-productivity-nostrpass": {
         "source": "Nostrpass",
         "description": "Native local Nostr identity and key manager good-app eval.",
         "modules": [
@@ -2172,7 +2172,7 @@ TASK_SPECS.update({
             "Reveal-key and theme-toggle animation stay Playwright-observed"
         ]
     },
-    "frontend-weblink": {
+    "frontend-productivity-weblink": {
         "source": "Weblink",
         "description": "Weblink peer-to-peer WebRTC chat and file-transfer client good-app eval.",
         "modules": [
@@ -2193,7 +2193,7 @@ TASK_SPECS.update({
             "Tool output cannot prove a peer connected"
         ]
     },
-    "frontend-budget-angular": {
+    "frontend-data-tracking-budget-angular": {
         "source": "BudgetAngular",
         "description": "Native personal expense and budget tracker good-app eval.",
         "modules": [
@@ -2770,7 +2770,7 @@ TEST_SH = textwrap.dedent(
 
     # Shared headless Chrome for the judge's MCP servers (contract in
     # scripts/canonical/mcp/reward_mcp_servers.toml): Playwright MCP and the
-    # webmcp bridge (tests/mcp) both attach via $WEBMCP_CDP_ENDPOINT. rewardkit
+    # webmcp bridge (tests/webmcp_stdio_server.mjs) both attach via $WEBMCP_CDP_ENDPOINT. rewardkit
     # expands these with os.path.expandvars, so they must be exported here.
     WEBMCP_CDP_PORT=9222
     CHROME_BIN="$(find /ms-playwright -type f \\( -name chrome -o -name chromium \\) -not -path '*headless*' 2>/dev/null | head -n1)"
@@ -2822,7 +2822,7 @@ TASK_README_TMPL = textwrap.dedent(
     four weighted dimensions — core_features, technical, visual_design, motion
     — with `pass` at reward >= 0.7. The judge observes via Playwright MCP and
     drives state-changing setup through the app's registered WebMCP tools (a
-    task-local CDP bridge in `tests/mcp/`). Criteria live in
+    task-local CDP bridge vendored at `tests/webmcp_stdio_server.mjs`). Criteria live in
     `tests/<dimension>/<dimension>.toml`.
 
     ## Running
@@ -3144,11 +3144,9 @@ def package_task(slug: str, spec: dict) -> list[str]:
     # MCP servers are inlined into dimension TOMLs via judge_mcp_servers_block()
     # from scripts/canonical/mcp/reward_mcp_servers.toml. The webmcp entry runs the
     # task-local CDP bridge below (vendored per task; playwright-core only).
-    mcp_dir = out / "tests" / "mcp"
-    mcp_dir.mkdir(exist_ok=True)
     shutil.copy2(
         ROOT / "scripts" / "canonical" / "mcp" / "webmcp_stdio_server.mjs",
-        mcp_dir / "webmcp_stdio_server.mjs",
+        out / "tests" / "webmcp_stdio_server.mjs",
     )
 
     try:
@@ -3321,8 +3319,8 @@ def main(argv: list[str] | None = None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
     sync_only = "--sync-criteria" in args
 
-    order = ["frontend-daisyui-admin-dashboard"] + [
-        s for s in TASK_SPECS if s != "frontend-daisyui-admin-dashboard"
+    order = ["frontend-workflow-daisyui-admin-dashboard"] + [
+        s for s in TASK_SPECS if s != "frontend-workflow-daisyui-admin-dashboard"
     ]
     all_errors: dict[str, list[str]] = {}
     polarity_ok: list[str] = []

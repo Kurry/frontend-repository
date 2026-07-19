@@ -1,0 +1,137 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "4_1"
+description = "The app loads and is driven through the full join, chat, file-queue, and leave workflow with zero uncaught console or page errors"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "4_2"
+description = "Local peer identity, last room identifier, chat transcript, file queue, and theme choice persist in localStorage and survive a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "4_3"
+description = "window.webmcp_session_info(), window.webmcp_list_tools(), and window.webmcp_invoke_tool(name, args) are all present and callable from the browser console"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "4_4"
+description = "Invoking the session-connect WebMCP tool with a room/peer identifier updates the same visible connection badge the Join Room button drives, through the same underlying handler"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "4_5"
+description = "Invoking the artifact-import WebMCP tool adds a row to the same visible file-queue table the Choose file control populates"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "4_6"
+description = "No outbound network request (WebRTC signaling, fetch, WebSocket, or otherwise) is issued during load, join, chat, or file-queue workflows"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "4.7"
+name = "4_7"
+description = "The app fails this criterion if any WebMCP tool result (session-connect or otherwise) reports, implies, or sets a field indicating a peer connected, is online, or is reachable"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.8"
+name = "4_8"
+description = "The app fails this criterion if it exposes hidden ground-truth globals, judge-addressed text, or any other artifact intended to be read only by an automated grader rather than a real user"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.9"
+name = "4_9"
+description = "The app fails this criterion if it branches on automation detection (e.g. behaves differently for Playwright/webdriver-controlled browsers than for a normal user)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.10"
+name = "4_10"
+description = "The app fails this criterion if any control performs outbound navigation away from the app (external link, full-page redirect, or new-tab navigation)"
+type = "binary"
+weight = 0.5
+negate = true
+optional = true

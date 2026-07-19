@@ -1,0 +1,128 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "VD-1"
+name = "VD-1"
+description = "The page background renders near-black (#000000), primary text renders white (#FFFFFF), and a primary control uses the coral accent family (#F45B69 / #F45B68)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "VD-2"
+name = "VD-2"
+description = "Type resolves to Roboto (or its declared fallback) with the primary heading at 55px, a secondary heading at 24px, and body text at 16px"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "VD-3"
+name = "VD-3"
+description = "The Search Notes input and its adjoining Create note button form one pill: a white input with black text rounded only on the left and square on the right, beside a dark (#1A1A1A) button with white text rounded only on the right and square on the left, neither with a drop shadow"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "VD-4"
+name = "VD-4"
+description = "The Quick Switcher renders layered above the app over a dimmed backdrop, with the highlighted result clearly distinguished by a background fill or outline from the other results"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "VD-5"
+name = "VD-5"
+description = "Explicit empty and no-results states appear: a sidebar empty-state before any note, a no-results message on a non-matching search, and a welcome panel when no note is selected"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "VD-6"
+name = "VD-6"
+description = "Sidebar row text stays clearly legible against the near-black background in both the hovered and the selected states"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "VD-7"
+name = "VD-7"
+description = "At approximately 375px wide the layout renders with no horizontal scrolling and no overlapping content, the sidebar collapses behind a reachable toggle, and the open note stays usable"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "VD-8"
+name = "VD-8"
+description = "Sidebar rows, the title and body-preview, and the word/character counter overflow or clip at approximately 375px wide, or the page scrolls horizontally at that width"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "VD-9"
+name = "VD-9"
+description = "Sidebar rows or previews render at low contrast against the dark background when hovered or selected, making text hard to read"
+type = "binary"
+weight = 0.5
+negate = true
+optional = true

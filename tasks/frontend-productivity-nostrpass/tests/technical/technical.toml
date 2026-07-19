@@ -1,0 +1,143 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "2_1"
+description = "Identities, the active identity, per-identity per-app permission grants, and theme all survive a full page reload with identical npub/nsec values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "2_2"
+description = "Public and private keys are real bech32-encoded values (npub1.../nsec1... prefixes with well-formed bodies), not placeholder or truncated strings"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "2_3"
+description = "A change made in one view (e.g. toggling a permission in Permissions) is immediately reflected in every other view that shows the same data (Dashboard's granted-app badges) without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.4"
+name = "2_4"
+description = "window.webmcp_list_tools() returns a non-empty tool list including an identity-create tool, an identity-select tool, and an application-permission toggle tool"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "2_5"
+description = "Invoking the application-permission toggle tool via window.webmcp_invoke_tool for the active identity and one named app changes the same visible toggle state the UI control would change"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "2_6"
+description = "No console errors or unhandled page errors occur during load, identity creation, identity selection, permission toggling, key reveal, theme switching, or reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "2_7"
+description = "All app assets (script, stylesheet, icon) load without 4xx/5xx responses"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "2.8"
+name = "2_8"
+description = "The app exposes a hidden ground-truth state object in the DOM or on window that a real user cannot reach through the UI but a judge could read to fabricate a pass"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.9"
+name = "2_9"
+description = "Any visible text is addressed to a grader/judge/model rather than to an end user (e.g. instructions on how to score the app)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.10"
+name = "2_10"
+description = "A success indicator (toast, badge, checkmark) is shown for an action without the underlying state actually changing, or without that state surviving a reload"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.11"
+name = "2_11"
+description = "The app branches its behavior based on navigator.webdriver or other automation-detection signals"
+type = "binary"
+weight = 1.0
+negate = true

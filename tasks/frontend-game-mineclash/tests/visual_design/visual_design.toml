@@ -1,0 +1,114 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "3_1"
+description = "The interface uses the dark stone theme with amber ore accents, a sky-blue You panel, and a warm-orange Rival panel"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "3_2"
+description = "The active side's score panel is outlined and softly glows in that side's identity color while the other side's panel is muted"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.3"
+name = "3_3"
+description = "A revealed mine tile is marked with a distinct mine icon and a red-tinted background that persists for the rest of the round"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "3_4"
+description = "Each side's row of 3 Strike icons shows a visibly distinct 0, 1, 2, and 3 state, with the 2-strike near-loss state in a warning color"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "3_5"
+description = "At roughly a 375px-wide viewport the grid scales down and stays tappable without horizontal scrolling while the score and strike panels stack above the grid"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.6"
+name = "3_6"
+description = "Flag Mode being active is not visually distinguishable from normal reveal mode, so the player cannot tell which mode is active"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "3.7"
+name = "3_7"
+description = "Whose turn it is is not visually unmistakable (no clear active-turn indicator distinguishing the Player's turn from the Rival's)"
+type = "binary"
+weight = 1.0
+negate = true

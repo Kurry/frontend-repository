@@ -1,0 +1,127 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "2_1"
+description = "Nested folders are visibly indented under their parent, a folder with children shows an expand/collapse control, and the currently selected folder is highlighted distinctly from unselected folders."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "2_2"
+description = "A note's assigned color renders as the same colored left-edge bar in its folder view, All Notes, the Pinned section, and search results."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "2_3"
+description = "Checked checklist items show a strikethrough and muted color while unchecked items remain full-strength and visually distinct at a glance."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.4"
+name = "2_4"
+description = "When at least one note is pinned, a clearly labeled Pinned section appears above the regular list, separated from it by a divider or heading."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "2_5"
+description = "An empty folder, an empty Trash, and a no-match search each show their own distinct deliberately styled message rather than a blank area."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "2_6"
+description = "At approximately 375px wide the app has no horizontal scrolling, the folder tree collapses behind a togglable Folders control instead of squeezing the note view, and note title, body, folder labels, and count badges stay legible."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "2_7"
+description = "The three regions read as a deliberate layout with a clear text hierarchy (distinct title, body, and caption/label roles) rather than one flat text size, with related controls grouped and aligned to a consistent spacing rhythm."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "2.8"
+name = "2_8"
+description = "At approximately 375px wide the app forces horizontal page scrolling or the folder tree stays wedged beside the note view compressing it into an unusable width."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.9"
+name = "2_9"
+description = "The color-label bar for the same note differs between lists or is missing in one of the folder, All Notes, Pinned, or search views, so the label is not applied consistently."
+type = "binary"
+weight = 1.0
+negate = true

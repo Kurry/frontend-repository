@@ -1,0 +1,267 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "1_1"
+description = "On load, the app shows a sidebar with a folder tree, a permanent All Notes entry, a permanent Trash entry, and New Folder and New Note controls, with no login wall."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "1_2"
+description = "After clicking New Folder and renaming it inline to Work, then nesting a second folder Clients inside Work, the tree shows Clients indented beneath Work and a folder-path control lists it as Work / Clients."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "1_3"
+description = "After selecting a folder and clicking New Note, giving it a title and body, the note appears filed under that folder and also under All Notes."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "1_4"
+description = "When creating a note with a blank title, creation is blocked and a visible inline error states a title is required, and the note count does not increase."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "1_5"
+description = "After using Insert Checklist and typing three lines, each line renders as its own toggleable checkbox, and toggling one item immediately shows that line with a strikethrough and muted color without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "1_6"
+description = "After using Add Image twice on one note, both images render inline, and using the first image's own Remove Image control removes only that image while the second image and the note content remain."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "1_7"
+description = "After pinning a note, a clearly labeled Pinned section appears above the regular list; after unpinning, the note leaves the Pinned section but stays in its normal list."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "1_8"
+description = "After opening the color-label swatch picker, it presents six color choices; assigning one shows a matching colored left-edge bar on the note's list row and on its open detail view."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "1_9"
+description = "When searching a body-only word, the matching note is returned with a folder-path breadcrumb, and clearing the search box restores the full note list."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "1_10"
+description = "After deleting a note it moves to Trash instead of being erased; Restore returns it to its original folder, and Delete Forever plus Empty Trash (after confirm) leaves Trash empty."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "1_11"
+description = "After filing two notes directly in a folder and one note in its subfolder, the parent folder's count badge shows 2, not 3."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "1_12"
+description = "After bolding one word and italicizing another in the note body then doing a full page refresh, both the bold and italic formatting are still visibly applied, and the Bold or Italic toolbar control shows an active/pressed state only when the cursor sits inside the matching formatted word."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "1_13"
+description = "After creating a folder and a note with a checklist, image, pin, and color label and performing a full page refresh, the folder, note, checklist state, image, pin, and color label are all restored exactly."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "1_14"
+description = "After clicking Load 10,000 Items, the view labels the total as Virtualized items 10000 while the Rendered item count stays far below 10,000 as the list is scrolled."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "1_15"
+description = "Clicking New Folder adds a folder to the sidebar tree; renaming it inline updates the name in place, and nesting a second folder inside it shows the child indented under the parent with a folder-path control listing it as Parent / Child."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "1_16"
+description = "Selecting a folder and clicking New Note creates a titled note filed under that folder that also appears in the All Notes view."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "1_17"
+description = "Insert Checklist adds a checklist block whose typed lines each render as an independently toggleable checkbox, and toggling one checkbox via the UI marks only that line done immediately without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "1_18"
+description = "Add Image attaches a local image that renders inline, a note can hold two images at once, and each image's own Remove Image control removes only that image while the rest of the note stays intact."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "1_19"
+description = "A note's Move to Folder control relocates it via a dropdown of full folder paths so it appears under the chosen folder and no longer under the previous one."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "1_20"
+description = "Global search filters notes by both title and body text across all folders, each result shows its folder-path breadcrumb, and clearing the box restores the full list."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "1_21"
+description = "Pinning a note places it in a dedicated Pinned section at the top of the current view regardless of selected folder, and unpinning removes it from that section while it stays in its normal list."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "1_22"
+description = "The color-label swatch picker offers six distinct colors and assigning one shows a matching colored left-edge bar on both the note's list row and its open detail view."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "1_23"
+description = "Deleting a note moves it to Trash rather than erasing it; Restore returns it to its folder, and Delete Forever plus Empty Trash after a confirm step leaves Trash empty."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "1_24"
+description = "A folder's live count badge counts only notes filed directly in that folder and not notes in its subfolders (two direct plus one in a subfolder reads 2)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "1_25"
+description = "Selecting a word and clicking Bold renders it bold immediately, selecting another word and clicking Italic renders it italic, and selecting several lines and clicking Bulleted List renders them as bulleted indented items."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "1_26"
+description = "Creating a note with a blank title is rejected with a visible inline error and adds no note, and completing it with a valid title then adds the note."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "1_27"
+description = "Load 10,000 Items produces a navigable virtualized collection, and applying a filter, selecting an item, and using keyboard navigation each produce a visible outcome matching the selected logical item."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "1.28"
+name = "1_28"
+description = "The note list is a static or hardcoded set that does not change when notes are created, moved, pinned, or deleted through the controls."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.29"
+name = "1_29"
+description = "Search matches only note titles and fails to return a note whose keyword appears only in its body, or the folder count badge includes subfolder notes so it overcounts direct notes."
+type = "binary"
+weight = 1.0
+negate = true

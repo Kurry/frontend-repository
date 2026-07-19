@@ -40,12 +40,27 @@ If the task has no row in distribution.md, stop and report that instead of inven
 - `<reference_screenshots>` — keep as-is unless the framework changed; screenshots still describe the target UI.
 - The app's identity, seed sizes, view inventory, and domain behaviors — migration adds a kit, it does not redesign the product.
 
+## Fidelity-genre tasks (website-fidelity rows)
+
+Fidelity tasks recreate a real site's composition and motion, which makes them the one genre where copyright discipline is part of the migration. Two extra rule sets apply:
+
+**No copyrighted assets — substitute, never ship.** The builder must not be asked to reproduce brand-owned assets. Sweep the instruction for these and rewrite them as original stand-ins with the same visual role and metrics:
+- Trademarked logos and wordmarks (the site's own mark, partner/client logo walls) → "an original placeholder wordmark/mark of the same size and placement"; logo marquees become "a marquee of N distinct original placeholder logos".
+- Licensed fonts (Aeonik, Brier, Neue Montreal, and any face not under an open license) → "a bundled open-license display face with similar width/weight character", self-hosted. Open-license faces (Inter, and other OFL fonts) may stay by name.
+- Brand photography, illustrations, and video layers → original or generated placeholder media at the same aspect ratios, dimensions, and layer counts. The *choreography* (how many layers, when they advance) is the fidelity target, not the footage.
+- Real partner/brand color marks tied to logos can go; the site's own design-token palette (accent hexes, surface colors) is a design fact and stays.
+Keep structural copy (section headings, nav labels, button text) — rubrics already grade those exact strings — but never require shipping a third party's media files. The reference screenshots remain advisory-only and already carry the "do not copy into /app" rule; keep it.
+
+**The kit still applies, gently.** Fidelity rows keep their mandated motion runtime (GSAP/Lenis/Swiper pins etc.) as the animation stack; add only what the row and mandates require: the Tailwind 4.3.2 pin, the assigned base-chrome component library, Zod/Valibot schema validation behind the page's existing forms, and the icon route (fidelity pages usually keep their local SVG set — the mandate is npm-local or bundled-original, not a restyle). Never redesign the page to fit the kit; the source site's look wins.
+
+Also sweep `<motion>`/`<visual_design>` for runtime names that leaked in (the smooth-scroll engine, the carousel library) and reword them library-anonymously — the runtime belongs in `<requirements>`; the behavior ("smooth scrolling with eased anchor navigation above 1024px") belongs in the behavioral sections.
+
 ## Register rules (these are graded by the validator)
 
 - Plain text inside sections: no `**`, no `#`/`##`, no backticks, no markdown links. Dash lists and plain sentences only.
 - Library names appear ONLY in `<summary>` and `<requirements>`. Behavior lines in `<core_features>`/`<motion>`/`<visual_design>` describe observable results ("reordering a row animates it to its new position"), never tools ("AutoAnimate animates the list").
 - Every added line is an observable behavior: action → browser-visible evidence, quantifiers resolved.
-- All tags closed, canonical order preserved (summary, reference_screenshots, core_features, visual_design, motion, requirements, integrity, delivery, webmcp_action_contract — skip sections the task doesn't have).
+- All tags closed, canonical order preserved. Migrations RESTRUCTURE to the full canonical shape from docs/instructions.md — summary, reference_screenshots, core_features, user_flows, edge_cases, visual_design, motion, responsiveness, accessibility, performance, writing, innovation, requirements, integrity, delivery, webmcp_action_contract — not just the legacy six sections. Concretely: end-to-end flow chains move OUT of core_features into `<user_flows>`; boundary/empty/error behaviors into `<edge_cases>`; breakpoint/reflow rules out of visual_design into `<responsiveness>`; keyboard/ARIA/focus/announcement behaviors into `<accessibility>`; load/console/frame-rate/layout-stability budgets into `<performance>`; copy-quality rules into `<writing>` when the app renders real copy (landing/fidelity pages: yes). Omit a section only when the app genuinely has nothing for it (a text-light game may skip writing) — never because the old file didn't have it. Content moves to its home section rather than being duplicated; requirements keeps contracts, behavioral sections keep evidence.
 - Framework-changed tasks (bold rows): update stack-specific phrasing everywhere it leaks (e.g. "Redux Toolkit slices" in requirements), but do not translate the product.
 
 ## Workflow

@@ -1,0 +1,282 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "1_1"
+description = "On load, the app opens at / with the title LetterDrop, view tabs Game, History and Achievements, a HUD showing Best Score, and a canvas board reading \"Press Start game to begin!\" with no login or backend."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "1_2"
+description = "When Start game is pressed, letter tiles spawn at the top of the canvas board and fall downward through the columns at a steady rate, and more tiles keep spawning on a repeating interval."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "1_3"
+description = "After tapping two or more falling tiles, each tapped letter appears in the current-word tray beneath the board, and tapping an already selected tile removes it from the tray."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "1_4"
+description = "When Submit Word is pressed on tiles that spell a bundled-dictionary word, those tiles clear from the board, the score increases by an amount scaled to word length, and a transient confirmation such as +30 for \"CAT\"! appears."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "1_5"
+description = "When Submit Word is pressed on letters that are not a dictionary word, the word tray shakes and an inline Not a word style message appears instead of a silent rejection, and the streak resets to zero."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "1_6"
+description = "After clearing every tile on the board through valid submissions, a Board Cleared! confirmation appears and the next scored word receives the bonus multiplier."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "1_7"
+description = "When an uncleared tile falls across the visible danger line, the run ends and a Game Over screen shows the final score with a Play again control."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "1_8"
+description = "After several consecutive valid submissions, a visible streak meter grows and reaching thresholds of 3, 5 and 8 shows a temporary score-multiplier badge next to the score."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "1_9"
+description = "When a submitted word includes a Bomb tile its whole column clears and a \"Bomb! Column cleared\" toast appears; when it includes a Slow tile the fall speed drops for a few seconds and a named Slow toast appears."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "1_10"
+description = "When Undo Last Tile is pressed, the most recently tapped tile is removed from the current-word tray without submitting the word."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "1_11"
+description = "When Pause is pressed the tiles and timer freeze and the board dims with a Paused overlay; when Resume is pressed play continues from the exact same state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "1_12"
+description = "After finishing a run, the History tab lists that run most-recent-first with its score, tiles-cleared count and duration, and before any run finishes History shows a friendly empty-state message."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "1_13"
+description = "On the Achievements tab, locked achievements appear muted or grayscale and named achievements such as Clean Sweep, Marathon and Combo Master turn to full color once their milestone is met, with a transient unlock confirmation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "1_14"
+description = "After a completed run, a full page refresh restores the exact Best Score, Match History rows, and unlocked achievements from localStorage, and never-created runs are not fabricated."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "1_15"
+description = "During an active run, using Apply Scenario Change adds a transition to the History state region; pressing Undo then applying a different change creates a selectable branch, and restoring a branch restores the exact prior visible board state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "1_16"
+description = "Pressing Start game spawns letter tiles at the top of the canvas board that fall downward through the columns at a steady rate."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "1_17"
+description = "Tapping falling tiles appends each letter to a visible current-word tray beneath the board, and tapping a selected tile removes it."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "1_18"
+description = "Submit Word on a valid dictionary word clears those tiles and increases the score by an amount scaled to word length."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "1_19"
+description = "Submitting non-dictionary letters shows an inline Not a word style rejection rather than clearing tiles or awarding points."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "1_20"
+description = "Clearing every tile on the board triggers a Board Cleared! confirmation and a bonus multiplier applied to the next scored word."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "1_21"
+description = "An uncleared tile crossing the visible danger line ends the run and shows a Game Over screen with the final score."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "1_22"
+description = "Consecutive valid submissions build a streak meter and reaching thresholds 3, 5 and 8 shows a temporary multiplier badge next to the score."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "1_23"
+description = "A submitted word containing a Bomb tile clears that whole column and shows a named Bomb toast."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "1_24"
+description = "A submitted word containing a Slow tile temporarily reduces fall speed and shows a named Slow toast."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "1.25"
+name = "1_25"
+description = "Undo Last Tile removes only the most recently tapped tile from the tray without submitting the word."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "1_26"
+description = "Fall speed and spawn rate increase as the score crosses thresholds and the current tier (Tier 1, Tier 2, Tier 3) is shown in a status readout."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "1_27"
+description = "Match History lists past runs most-recent-first with score, tiles-cleared count and duration, and shows a friendly empty state before any run finishes."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "1_28"
+description = "Named achievements (Clean Sweep, Marathon, Combo Master) unlock when their milestone is met and a panel shows each badge's locked or unlocked state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "1_29"
+description = "Best Score is displayed at all times and updates only when a run's final score beats the previous best."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "1.30"
+name = "1_30"
+description = "The app does not present a scored word or Board Cleared bonus for letters that are not in the bundled dictionary."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.31"
+name = "1_31"
+description = "Word validation does not depend on any external dictionary API or network call; validity is resolved entirely in-browser."
+type = "binary"
+weight = 1.0
+negate = true

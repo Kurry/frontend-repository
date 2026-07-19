@@ -198,7 +198,7 @@ class TestWebmcpContract(unittest.TestCase):
     def test_admin_analytics_bindings_are_product_specific(self) -> None:
         data = json.loads((ROOT / "schemas/webmcp-assignments.json").read_text())
         entry = next(
-            a for a in data["assignments"] if a["task"] == "frontend-admin-analytics-dashboard"
+            a for a in data["assignments"] if a["task"] == "frontend-data-tracking-admin-analytics-dashboard"
         )
         self.assertEqual(entry["bindings"]["browsable_entity"], "users")
         self.assertEqual(entry["bindings"]["entity"], "user")

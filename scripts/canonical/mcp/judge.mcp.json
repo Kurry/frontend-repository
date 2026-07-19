@@ -1,5 +1,5 @@
 {
-  "$comment": "Ephemeral Claude Code --strict-mcp-config payload. Pins: @playwright/mcp@0.0.76, playwright 1.61.0. The webmcp server is the task-local CDP bridge (tests/mcp/webmcp_stdio_server.mjs) attaching to the shared Chrome at $WEBMCP_CDP_ENDPOINT; Playwright MCP attaches to the same endpoint. Expand $WEBMCP_CDP_* at materialize time (rewardkit ephemeral config).",
+  "$comment": "Ephemeral Claude Code --strict-mcp-config payload. Pins: @playwright/mcp@0.0.76, playwright 1.61.0. The webmcp server is the task-local CDP bridge (tests/webmcp_stdio_server.mjs) attaching to the shared Chrome at $WEBMCP_CDP_ENDPOINT; Playwright MCP attaches to the same endpoint. Expand $WEBMCP_CDP_* at materialize time (rewardkit ephemeral config).",
   "mcpServers": {
     "playwright": {
       "type": "stdio",
@@ -20,7 +20,7 @@
       "type": "stdio",
       "command": "node",
       "args": [
-        "/tests/mcp/webmcp_stdio_server.mjs"
+        "/tests/webmcp_stdio_server.mjs"
       ]
     }
   }

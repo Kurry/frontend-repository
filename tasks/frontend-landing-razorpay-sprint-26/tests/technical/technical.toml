@@ -1,0 +1,106 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "4_1"
+description = "Using browser_network_requests, every request the page makes is same-origin with http://127.0.0.1:3000 or a data:/blob:/about: URL."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "4_2"
+description = "A font, script, stylesheet, image, video, GLB, or Draco asset loads from an external CDN host (for example jsDelivr, unpkg, gstatic, Cloudflare, or an object-storage bucket) instead of same-origin."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "4.3"
+name = "4_3"
+description = "The settled page produces no uncaught JavaScript console errors and no failed asset request (no 4xx/5xx and no net::ERR for scripts, styles, images, fonts, or media)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "4_4"
+description = "The /sprint/26 route returns a full document whose title is exactly 'Razorpay Sprint 2026: The Age of AI-Native Payments'."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "4_5"
+description = "Resizing to 390px wide reflows the page with no horizontal overflow (documentElement.scrollWidth minus clientWidth at most 2px) and swaps in the hamburger nav with Roman-numeral labels I.AGENTIC STACK through VI.BUSINESS BANKING."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "4_6"
+description = "The page uses localStorage or sessionStorage, or a page-chrome control navigates the origin away to a route other than the declared Typeform/Razorpay outbound links."
+type = "binary"
+weight = 0.5
+negate = true
+optional = true

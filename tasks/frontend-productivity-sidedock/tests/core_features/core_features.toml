@@ -1,0 +1,295 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "1_1"
+description = "On load with empty storage, the app shows the Welcome to SideDock empty state with a Create workspace button and no workspace tabs"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "1_2"
+description = "After creating a workspace, a color-coded tab appears, it becomes active, and an empty folder tree with the Add bookmark form is shown below"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "1_3"
+description = "After adding a bookmark with only a URL, it appears with a title derived from the URL, and adding a second with an explicit title uses that title verbatim"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "1_4"
+description = "After creating a folder, a subfolder inside it, and a further subfolder, the three-level nested structure renders with each folder indented under its parent"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "1_5"
+description = "After renaming a bookmark inline (click title, type, Enter) the new title is shown, and pressing Escape on another inline rename leaves that title unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "1_6"
+description = "After pinning a bookmark it appears in the Pinned row above the tree, and after unpinning from its tile it leaves the Pinned row while remaining in its folder"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "1_7"
+description = "After confirming deletion of a folder that contains a bookmark, the folder and the bookmark it contained are both removed from the tree"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "1_8"
+description = "After creating data (workspace, folder, bookmark with a note, and a pin) and performing a full page reload, the workspace, folder, bookmark, note, and pinned state all survive exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "1_9"
+description = "After typing a query, the bookmarks filter to matches, toggling scope to all workspaces surfaces a match from another workspace, and a query matching nothing shows a no results message"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "1_10"
+description = "After toggling Show sidebar view, the content column constrains to a narrow fixed width with no horizontal scrolling, and toggling back restores the full view"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "1_11"
+description = "After activating Load 10,000 items, the Virtualized items region reports 10000 total while the Rendered item count region stays far below 10,000"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "1_12"
+description = "With 10,000 items loaded, after selecting an item, scrolling it out of the rendered window, applying then clearing a filter, the same item remains selected"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "1_13"
+description = "After importing a Netscape-format bookmarks HTML file, its folder structure and links appear in the active workspace, and each of add, import, export, and delete shows a transient toast"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "1_14"
+description = "After exercising create, edit, delete, drag, import, export, reload, and virtualization, no console errors or unhandled promise rejections have appeared"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "1_15"
+description = "On load with empty storage, the app shows the Welcome to SideDock empty state with a Create workspace button and no workspace tabs"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "1_16"
+description = "Creating a workspace adds a color-coded tab, makes it active, and shows its empty folder tree with the Add bookmark form below"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "1_17"
+description = "Adding a bookmark with only a URL derives its title from the URL, and adding a second with an explicit title uses that title verbatim"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "1_18"
+description = "Creating a folder, a subfolder, and a further subfolder renders a three-level nested structure with each folder indented under its parent"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "1_19"
+description = "Inline renaming a bookmark title and pressing Enter saves the new value, and pressing Escape on another inline rename leaves that title unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "1_20"
+description = "Pinning a bookmark places it in the Pinned row above the tree, and unpinning from its tile removes it from the row while it remains in its folder"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "1_21"
+description = "Confirming deletion of a folder that contains a bookmark removes both the folder and the bookmark it contained from the tree"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "1_22"
+description = "Creating a workspace, folder, bookmark with a note, and a pin, then performing a full page reload restores all of them exactly as created"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "1_23"
+description = "Typing a query filters bookmarks to matches, toggling scope to all workspaces surfaces a match from another workspace, and a no-match query shows a no results message"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "1_24"
+description = "Toggling Show sidebar view constrains the content column to a narrow fixed width with no horizontal scrolling, and toggling back restores the full view"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "1_25"
+description = "Activating Load 10,000 items makes the Virtualized items region report 10000 total while the Rendered item count region stays far below 10,000"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "1_26"
+description = "With 10,000 items loaded, a selected item that scrolls out of the rendered window and back remains selected after a filter is applied and cleared"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "1_27"
+description = "Importing a Netscape-format bookmarks HTML file appends its folder structure and links into the active workspace's tree"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "1_28"
+description = "Exporting the active workspace runs without error and, together with add, import, and delete, produces a transient toast confirmation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "1_29"
+description = "Submitting the Add bookmark form with an empty URL is rejected with a visible message and adds no bookmark"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "1_30"
+description = "Submitting a URL that already exists at the same location is idempotent, surfacing a message and creating no duplicate row"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "1.31"
+name = "1_31"
+description = "Repeating the Add bookmark action 25 times through the form yields an exact final count with controls staying responsive and no blank screen or freeze"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "1_32"
+description = "Submitting the Add bookmark form with a blank or clearly invalid URL still adds a bookmark row to the tree"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.33"
+name = "1_33"
+description = "Deleting a folder leaves the bookmarks it contained still visible in the tree instead of removing them with the folder"
+type = "binary"
+weight = 1.0
+negate = true

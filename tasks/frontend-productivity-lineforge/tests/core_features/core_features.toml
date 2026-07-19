@@ -1,0 +1,288 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "1_1"
+description = "On load, the app opens at / directly into the study interface with the Opening Library and no login or registration prompt"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "1_2"
+description = "On load, the Opening Library lists at least 12 openings grouped under family headings (Open Games, Semi-Open Games, Closed Games, Flank Openings), each showing a name, a short code, and a move sequence in algebraic notation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "1_3"
+description = "After typing a bundled opening name into the library search field, the list narrows to matching openings"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "1_4"
+description = "After selecting an opening, the move tree renders as an indented clickable structure with a Main line and labeled branch variations and the board shows that opening's position"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "1_5"
+description = "After clicking a non-root move-tree node, the board jumps to that exact position and the clicked node is visibly marked as selected"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "1_6"
+description = "After clicking an own piece and then a highlighted destination square, a legal move is played and the board updates; an illegal target is rejected and the piece stays put"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "1_7"
+description = "After playing a legal move that matches no bundled continuation, a New Line badge appears and the move is appended under a Your Line branch labeled session-only"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "1_8"
+description = "When an opening is selected, the Statistics panel shows a three-segment stacked bar (White/Draw/Black), the numeric percentages, a Games in database count, and an Illustrative sample data label"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "1_9"
+description = "After Loading one of the 3 notable games and using Previous move / Next move, the board steps through the game move-by-move"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "1_10"
+description = "After starting Practice this line and playing the correct move, the board flashes green and a Correct! toast appears; after an incorrect legal move the board flashes red, shows Try again, and reverts to retry"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "1_11"
+description = "After a correct and an incorrect Practice attempt the streak and accuracy readouts update, and loading a different opening resets both to their starting values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "1_12"
+description = "After Saving the current line under a name it appears in My Saved Lines, Loading it restores the exact saved position and highlighted node, and Deleting it removes it from the list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "1_13"
+description = "After starring openings and enabling Favorites Only, the list narrows to starred openings and updates live when a star is unmarked"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "1_14"
+description = "After selecting a non-default Board theme, favoriting an opening, saving a line, and opening a specific opening, a full page refresh restores the theme, the favorite, the saved line, and the last-opened opening exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "1_15"
+description = "When the Live relay is Started, then events are Delivered out of order and Reconnected, the applied events resolve into logical-timestamp order with duplicates ignored and catch-up applied exactly once"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "1_16"
+description = "The Opening Library lists at least 12 bundled openings grouped under family headings (Open Games, Semi-Open Games, Closed Games, Flank Openings), each showing a name, a short code, and an algebraic move sequence"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "1_17"
+description = "Typing a bundled opening name into the library search field narrows the list to matching openings, each still showing its name, code, and move preview"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "1_18"
+description = "Selecting an opening renders its move tree as an indented clickable structure with a Main line and labeled branch variations, and the board shows the opening's position"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "1_19"
+description = "Clicking a non-root move-tree node jumps the board to that exact position and marks only that node as selected"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "1_20"
+description = "Playing a legal move on the board that matches a bundled continuation updates the position and advances the selected tree node, and a capturing move increments the running captured-piece tally cumulatively"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "1_21"
+description = "Playing a legal move that matches no bundled continuation shows a New Line badge and appends the move under a Your Line session-only branch"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "1_22"
+description = "The Statistics panel shows a three-segment proportional stacked bar (White/Draw/Black), the numeric percentages, a Games in database count, and an Illustrative sample data label"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "1_23"
+description = "Each opening lists 3 notable games with Players, Event, Year, and Result, and Loading one replays it move-by-move via Previous move / Next move"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "1_24"
+description = "Practice this line hides upcoming moves and shows a Your move prompt; a correct move advances the drill and an incorrect legal move reverts the board so it can be retried"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "1_25"
+description = "The Practice streak and session accuracy update after each attempt and both reset to starting values when a different opening is loaded"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "1_26"
+description = "Flip board reverses orientation, Reset to start returns the board to the opening's first position, and the Previous/Next scrubber steps through the loaded line"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "1_27"
+description = "Save this line adds the current sequence to My Saved Lines under an editable name, Load restores its exact saved position and highlighted node, and Delete removes it from the list"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "1_28"
+description = "The star toggle marks an opening as a Favorite and the Favorites Only filter narrows the library to starred openings, updating live as stars are toggled"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "1_29"
+description = "The Live relay resolves Deliver-out-of-order events into logical-timestamp order, ignores duplicate ids, and Reconnect catches up buffered events exactly once"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "1_30"
+description = "The opening list is a static display with a non-functional move tree — clicking a node does not move the board or mark a selection"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.31"
+name = "1_31"
+description = "A legal move that departs from every bundled continuation produces no New Line badge and no Your Line branch (deviation detection is absent)"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.32"
+name = "1_32"
+description = "Practice mode reports a wrong move as Correct, or accepts any move as correct regardless of the expected move"
+type = "binary"
+weight = 1.0
+negate = true

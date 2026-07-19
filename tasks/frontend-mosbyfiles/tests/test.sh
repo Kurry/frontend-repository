@@ -15,7 +15,7 @@ uv tool install "harbor-rewardkit @ git+https://github.com/Kurry/harbor@49ac8885
 
 # Shared headless Chrome for the judge's MCP servers (contract in
 # scripts/canonical/mcp/reward_mcp_servers.toml): Playwright MCP and the
-# webmcp bridge (tests/mcp) both attach via $WEBMCP_CDP_ENDPOINT. rewardkit
+# webmcp bridge (tests/webmcp_stdio_server.mjs) both attach via $WEBMCP_CDP_ENDPOINT. rewardkit
 # expands these with os.path.expandvars, so they must be exported here.
 WEBMCP_CDP_PORT=9222
 CHROME_BIN="$(find /ms-playwright -type f \( -name chrome -o -name chromium \) -not -path '*headless*' 2>/dev/null | head -n1)"

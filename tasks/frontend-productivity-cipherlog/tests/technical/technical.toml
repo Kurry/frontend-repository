@@ -1,0 +1,130 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "2_1"
+description = "The app root reaches an interactive memo interface rather than a blank page, framework error overlay, or noscript fallback"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "2_2"
+description = "During load and the core workflow no same-origin request returns a 4xx or 5xx status, ignoring the browser's own favicon probe"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "2_3"
+description = "A full page refresh restores the exact committed state: channels and their custom drag order, memos with lock state, priority, text marks and both timestamps, the Decommissioned list, and the selected Theme Core"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.4"
+name = "2_4"
+description = "Editing a memo updates that same record everywhere it appears and the channel filter and search recompute the visible list from the shared collection rather than diverging into a second disconnected copy"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "2_5"
+description = "After a revealed locked memo, a full page refresh re-hides it as [ENCRYPTED] while its lock state and passcode requirement persist, confirming the reveal is session-only and not persisted"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "2.6"
+name = "2_6"
+description = "Repeating the create workflow 25 times through its normal controls keeps the final visible count exact, the UI responsive, and produces no blank screen, uncaught error, or sustained freeze"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "2.7"
+name = "2_7"
+description = "A hidden element, attribute, or window global not mandated by the app exposes internal ground-truth (such as a memo's passcode or concealed body) that a real user could not reach through visible interaction"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.8"
+name = "2_8"
+description = "The app renders or behaves differently depending on whether it is driven by automation, keying UI on navigator.webdriver or automation-specific signals"
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.9"
+name = "2_9"
+description = "The app imports or uses a disallowed external component library for core UI instead of hand-rolled styling on the stack"
+type = "binary"
+weight = 0.5
+negate = true
+optional = true

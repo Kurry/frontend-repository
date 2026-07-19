@@ -1,0 +1,260 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/app"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "1_1"
+description = "On load, the root URL shows the portfolio overview (net-worth summary, allocation, holdings table, detail panel) with no login, signup, or onboarding gate."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "1_2"
+description = "On load, the holdings table lists at least four seeded holdings, each row showing name, symbol, asset class, quantity, and market value."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "1_3"
+description = "On load, the net-worth figure equals the sum of the visible holdings' market values (the seeded portfolio totals $37,769)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "1_4"
+description = "On load, the allocation breakdown shows a percentage per visible asset class and those percentages sum to 100."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "1_5"
+description = "After filtering to one asset class, the table narrows to that class and the net worth, meta line, and allocation recompute over the visible set."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "1_6"
+description = "After clearing the filter back to All classes, the full list of holdings reappears with no duplicated rows."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "1_7"
+description = "After selecting a holding, the detail panel shows that holding's symbol, class, quantity, unit price, and market value and the row is visibly marked as selected."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "1_8"
+description = "After selecting one holding and then another, every field in the detail panel switches to the second holding with no stale values from the first."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "1_9"
+description = "After using Add holding and saving a valid holding, the new row appears in the table and the net worth and allocation percentages update together."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "1_10"
+description = "After submitting the Add holding form with an empty name, an inline validation message appears at the form and no new row is added."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "1_11"
+description = "After adding a holding and reloading the page, the same holdings and the updated net-worth total reappear from client storage with no login step."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "1_12"
+description = "After filtering to one class, adding a holding in a different class, then returning to All classes, both the prior and the new holdings are identifiable with no duplicates."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "1_13"
+description = "When adding a holding using only the keyboard, focus stays visible on the form controls and the form submits on Enter."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "1_14"
+description = "At 375 by 667 pixels the summary, allocation, and holdings reflow to a single column with no clipped text, no overlapping controls, and no horizontal page scrolling."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "1_15"
+description = "The root URL shows the portfolio overview (net-worth summary, allocation, holdings table, detail panel) with no login, signup, or onboarding gate."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "1_16"
+description = "The holdings table lists at least four seeded holdings, each row showing name, symbol, asset class, quantity, and market value."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "1_17"
+description = "The net-worth figure equals the sum of the visible holdings' market values, and market value equals quantity times unit price."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "1_18"
+description = "The allocation breakdown shows a percentage per visible asset class and those percentages sum to 100."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "1_19"
+description = "Filtering to one asset class narrows the table to that class and recomputes the net worth, meta line, and allocation over the visible set."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "1_20"
+description = "Clearing the filter back to All classes restores the full list of holdings with no duplicated rows."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "1_21"
+description = "Selecting a holding shows its symbol, class, quantity, unit price, and market value in the detail panel and marks the row as selected."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "1_22"
+description = "Selecting one holding then another fully switches every detail-panel field to the second holding with no stale values from the first."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "1_23"
+description = "Saving a valid new holding through Add holding appends its row and updates the net worth and allocation percentages together."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "1_24"
+description = "Submitting the Add holding form with an empty name or symbol, or a non-positive quantity, shows an inline validation message and adds no row."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "1_25"
+description = "Adding a holding and reloading restores the same holdings and the updated net-worth total from client storage with no login step."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "1_26"
+description = "Filtering to one class, adding a holding in a different class, then returning to All classes leaves both the prior and the new holdings identifiable with no duplicates."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "1_27"
+description = "The net-worth total does not stay frozen when the visible holdings change; adding, editing, or deleting a holding moves the total accordingly."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "1.28"
+name = "1_28"
+description = "Switching the selected holding does not leave any stale field from the previously selected holding in the detail panel."
+type = "binary"
+weight = 0.5
+negate = true
+optional = true
