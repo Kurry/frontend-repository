@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
 """Validate a task's dimension tomls for rubric-align conventions.
 
-Usage: validate_rubric.py <task>/tests   (checks each <dim>/<dim>.toml found)
+Usage: validate_rubric.py <task>/tests [--require-15]
+       (checks each canonical <dim>/<dim>.toml found)
 """
 import pathlib, re, sys, tomllib
 
-DIMS = ["core_features", "visual_design", "motion", "technical"]
+EXISTING_DIMS = ["core_features", "visual_design", "motion", "technical"]
+NEW_DIMS = [
+    "user_flows", "edge_cases", "responsiveness", "accessibility", "performance",
+    "writing", "innovation", "design_fidelity", "mcp_contract", "anticheat",
+    "behavioral",
+]
+DIMS = EXISTING_DIMS + NEW_DIMS
 ABSENCE_OPENERS = re.compile(
     r"^(the app |the page |it )?(does not|doesn't|never|no longer|fails to)\b", re.I)
 IMPL_PHRASES = re.compile(
@@ -32,10 +39,17 @@ def check_file(path):
         fails.append(f"{path.name}: duplicate ids {dupes}")
     pos = [c for c in crits if not c.get("negate")]
     neg = [c for c in crits if c.get("negate")]
-    if not pos:
+    dim = path.stem
+    if not pos and dim != "anticheat":
         fails.append(f"{path.name}: no positive criterion")
-    if not neg:
+    if not neg and dim != "innovation":
         fails.append(f"{path.name}: no negative (negate=true) criterion")
+    if dim == "anticheat":
+        if data.get("scoring", {}).get("aggregation") != "all_pass":
+            fails.append(f"{path.name}: [scoring].aggregation must be 'all_pass'")
+        non_negated = [c.get("id") or c.get("name") for c in crits if c.get("negate") is not True]
+        if non_negated:
+            fails.append(f"{path.name}: every criterion must set negate=true: {non_negated}")
     catchalls = [c for c in crits
                  if "catchall" in str(c.get("id", "")) or "catchall" in str(c.get("name", ""))
                  or "not covered by any other criterion" in c.get("description", "").lower()]
@@ -44,8 +58,12 @@ def check_file(path):
     else:
         ca = catchalls[0]
         d = ca.get("description", "").lower()
-        if not ca.get("negate") and "innovation" not in path.name:
+        if dim == "innovation" and ca.get("negate"):
+            fails.append(f"{path.name}: innovation catch-all must be positive")
+        elif not ca.get("negate") and dim != "innovation":
             fails.append(f"{path.name}: catch-all must be negate=true")
+        if dim == "anticheat" and "unambiguous" not in d:
+            fails.append(f"{path.name}: catch-all description missing 'unambiguous' strictness")
         for token in CATCHALL_REQUIRED:
             if token not in d:
                 fails.append(f"{path.name}: catch-all description missing '{token}' clause")
@@ -69,12 +87,21 @@ def check_file(path):
     return fails, warns
 
 def main():
-    root = pathlib.Path(sys.argv[1])
+    args = [arg for arg in sys.argv[1:] if arg != "--require-15"]
+    if len(args) != 1:
+        print("Usage: validate_rubric.py <task>/tests [--require-15]", file=sys.stderr)
+        sys.exit(2)
+    require_15 = "--require-15" in sys.argv[1:]
+    root = pathlib.Path(args[0])
     total_fails = 0
     for dim in DIMS:
         f = root / dim / f"{dim}.toml"
         if not f.exists():
-            print(f"SKIP  {dim} (no file)")
+            if dim in EXISTING_DIMS or require_15:
+                print(f"FAIL  {dim} (no file)")
+                total_fails += 1
+            else:
+                print(f"WARN  {dim} (no file; transitional 15-dimension rollout)")
             continue
         fails, warns = check_file(f)
         for w in warns:

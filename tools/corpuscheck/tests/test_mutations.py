@@ -5,6 +5,8 @@ import re
 
 from corpuscheck.drift import DriftKind, detect_corpus_drift, detect_drift
 from corpuscheck.validate import (
+    FULL_DIMENSIONS,
+    NEW_DIMENSIONS,
     validate_contract,
     validate_eval_validity,
     validate_instruction,
@@ -12,11 +14,73 @@ from corpuscheck.validate import (
     validate_oracle,
     validate_rubric,
     validate_shared_shape,
+    validate_task,
 )
 
 
 EVAL_SLUG = "frontend-data-tracking-eval-dashboard"
 DOCUSEAL_SLUG = "frontend-workflow-docuseal"
+
+
+def _dimension_toml(header: str, dim: str) -> str:
+    judge_weight = (
+        "weight = 0.5\n" if dim == "writing"
+        else "weight = 0.25\n" if dim == "innovation"
+        else ""
+    )
+    header = header.replace("[judge]\n", f"[judge]\n{judge_weight}", 1)
+    aggregation = "all_pass" if dim == "anticheat" else "weighted_mean"
+    if dim == "anticheat":
+        criteria = f'''[[criterion]]
+id = "{dim}.1"
+name = "confirmed_deception"
+description = "The rendered app contains fabricated success evidence intended to deceive grading."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "{dim}.catchall"
+name = "{dim}_catchall"
+description = "The app exhibits unambiguous deception not covered by any other criterion; name it and cite concrete browser evidence."
+type = "binary"
+negate = true
+weight = 1.0
+'''
+    else:
+        catchall_negate = "" if dim == "innovation" else "negate = true\n"
+        criteria = f'''[[criterion]]
+id = "{dim}.1"
+name = "{dim}_positive"
+description = "The browser-visible result satisfies the dimension's primary observable requirement."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "{dim}.n1"
+name = "{dim}_failure"
+description = "The browser-visible result exhibits a significant defect in this dimension."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "{dim}.catchall"
+name = "{dim}_catchall"
+description = "The app exhibits a significant browser-observable {'enhancement' if dim == 'innovation' else 'defect'} not covered by any other criterion; name it and cite concrete browser evidence."
+type = "binary"
+{catchall_negate}weight = 1.0
+'''
+    return f'{header}[scoring]\naggregation = "{aggregation}"\n\n{criteria}'
+
+
+def _add_new_dimensions(task):
+    source = task / "tests/core_features/core_features.toml"
+    header = source.read_text().split("[scoring]", 1)[0]
+    for dim in NEW_DIMENSIONS:
+        path = task / "tests" / dim / f"{dim}.toml"
+        path.parent.mkdir(exist_ok=True)
+        path.write_text(_dimension_toml(header, dim))
 
 
 def test_missing_test_sh_fails_layout(copy_task, tmp_path):
@@ -76,6 +140,40 @@ def test_missing_dimension_catchall_fails_rubric(copy_task, tmp_path):
 
     assert not result.passed
     assert any("catch" in message.lower() for message in result.messages)
+
+
+def test_all_15_valid_dimensions_pass_strict_validation(copy_task, tmp_path):
+    _, task = copy_task(EVAL_SLUG, tmp_path)
+    _add_new_dimensions(task)
+
+    result = validate_task(task, strict_dimensions=True)
+
+    assert len(FULL_DIMENSIONS) == 15
+    assert result.passed, result.messages
+
+
+def test_anticheat_non_negated_criterion_fails(copy_task, tmp_path):
+    _, task = copy_task(EVAL_SLUG, tmp_path)
+    _add_new_dimensions(task)
+    path = task / "tests/anticheat/anticheat.toml"
+    path.write_text(path.read_text().replace("negate = true\n", "", 1))
+
+    result = validate_rubric(task)
+
+    assert not result.passed
+    assert any(
+        "every criterion must set negate=true" in message
+        for message in result.messages
+    )
+
+
+def test_innovation_positive_catchall_passes(copy_task, tmp_path):
+    _, task = copy_task(EVAL_SLUG, tmp_path)
+    _add_new_dimensions(task)
+
+    result = validate_rubric(task)
+
+    assert result.passed, result.messages
 
 
 def test_stack_identity_description_fails_eval_validity(copy_task, tmp_path):

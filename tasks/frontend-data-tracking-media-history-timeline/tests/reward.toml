@@ -2,6 +2,7 @@
 [[reward]]
 name = "reward"
 aggregation = "weighted_mean"
+gate_dimensions = ["anticheat"]
 
 [[reward]]
 name = "pass"

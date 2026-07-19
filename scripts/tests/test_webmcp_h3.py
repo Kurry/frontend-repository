@@ -14,6 +14,31 @@ import webmcp_h3  # noqa: E402
 
 
 class TestWebmcpContract(unittest.TestCase):
+    def test_every_task_has_dimension_tomls(self) -> None:
+        existing = {"core_features", "visual_design", "motion", "technical"}
+        full = existing | {
+            "user_flows", "edge_cases", "responsiveness", "accessibility",
+            "performance", "writing", "innovation", "design_fidelity",
+            "mcp_contract", "anticheat", "behavioral",
+        }
+        task_dirs = sorted(
+            path for path in (ROOT / "tasks").iterdir()
+            if path.is_dir() and path.name.startswith("frontend-")
+            and (path / "instruction.md").is_file()
+        )
+        self.assertTrue(task_dirs)
+        anticheat_count = sum(
+            (task / "tests" / "anticheat").is_dir() for task in task_dirs
+        )
+        required = full if anticheat_count > len(task_dirs) / 2 else existing
+        missing = [
+            f"{task.name}/tests/{dim}/{dim}.toml"
+            for task in task_dirs
+            for dim in sorted(required)
+            if not (task / "tests" / dim / f"{dim}.toml").is_file()
+        ]
+        self.assertEqual(missing, [], f"tasks missing required dimension tomls: {missing}")
+
     def test_task_toml_artifact_excludes(self) -> None:
         """Every task.toml must carry the full canonical artifact-exclude set
         (build outputs like dist/ must never be collected into artifacts)."""

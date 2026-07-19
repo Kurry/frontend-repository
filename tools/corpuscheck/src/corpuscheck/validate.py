@@ -15,7 +15,21 @@ from types import ModuleType
 from typing import Iterable
 
 
-DIMENSIONS = ("core_features", "visual_design", "motion", "technical")
+EXISTING_DIMENSIONS = ("core_features", "visual_design", "motion", "technical")
+NEW_DIMENSIONS = (
+    "user_flows",
+    "edge_cases",
+    "responsiveness",
+    "accessibility",
+    "performance",
+    "writing",
+    "innovation",
+    "design_fidelity",
+    "mcp_contract",
+    "anticheat",
+    "behavioral",
+)
+FULL_DIMENSIONS = EXISTING_DIMENSIONS + NEW_DIMENSIONS
 REQUIRED_FILES = (
     "instruction.md",
     "task.toml",
@@ -24,7 +38,7 @@ REQUIRED_FILES = (
     "tests/system_prompt.md",
     "tests/reward.toml",
     "tests/webmcp_stdio_server.mjs",
-    *(f"tests/{dim}/{dim}.toml" for dim in DIMENSIONS),
+    *(f"tests/{dim}/{dim}.toml" for dim in EXISTING_DIMENSIONS),
 )
 ORACLE_PATHS = ("solution/app", "environment/reference-screenshots")
 DEFAULT_BRAND_DENYLIST = (
@@ -139,7 +153,12 @@ def source_metadata() -> dict[str, dict]:
     return webmcp.load_sources()
 
 
-def validate_layout(task_dir: Path, *, strict_oracle: bool = False) -> CheckResult:
+def validate_layout(
+    task_dir: Path,
+    *,
+    strict_oracle: bool = False,
+    strict_dimensions: bool = False,
+) -> CheckResult:
     messages = [
         f"missing required file: {rel}"
         for rel in REQUIRED_FILES
@@ -147,6 +166,13 @@ def validate_layout(task_dir: Path, *, strict_oracle: bool = False) -> CheckResu
     ]
     missing_oracle = [rel for rel in ORACLE_PATHS if not (task_dir / rel).is_dir()]
     warnings: list[str] = []
+    missing_new = [
+        dim for dim in NEW_DIMENSIONS
+        if not (task_dir / "tests" / dim / f"{dim}.toml").is_file()
+    ]
+    if missing_new:
+        notice = f"missing new dimension tomls: {missing_new}"
+        (messages if strict_dimensions else warnings).append(notice)
     if strict_oracle:
         messages.extend(f"missing oracle path: {rel}" for rel in missing_oracle)
     else:
@@ -319,7 +345,23 @@ def _read_dimension(path: Path) -> tuple[dict | None, str | None]:
 def _judge_header(text: str) -> str:
     """Return the complete judge table and all judge.mcp_servers arrays."""
     match = re.search(r"(?m)^\[(?!\[?judge(?:\.|\]))", text)
-    return text[: match.start()] if match else text
+    header = text[: match.start()] if match else text
+    judge_table_end = re.search(r"(?m)^\[\[?judge\.", header)
+    end = judge_table_end.start() if judge_table_end else len(header)
+    judge_table = re.sub(
+        r"(?m)^weight[ \t]*=[ \t]*[+-]?(?:\d+(?:\.\d*)?|\.\d+)[ \t]*\n?",
+        "",
+        header[:end],
+    )
+    return (judge_table + header[end:]).rstrip() + "\n"
+
+
+def _present_dimensions(task_dir: Path) -> list[tuple[str, Path]]:
+    return [
+        (dim, path)
+        for dim in FULL_DIMENSIONS
+        if (path := task_dir / "tests" / dim / f"{dim}.toml").is_file()
+    ]
 
 
 def validate_rubric(task_dir: Path) -> CheckResult:
@@ -328,10 +370,7 @@ def validate_rubric(task_dir: Path) -> CheckResult:
     warnings: list[str] = []
     headers: dict[str, str] = {}
     total_criteria = 0
-    for dim in DIMENSIONS:
-        path = task_dir / "tests" / dim / f"{dim}.toml"
-        if not path.is_file():
-            continue
+    for dim, path in _present_dimensions(task_dir):
         failures, validator_warnings = rubric_validator.check_file(path)
         messages.extend(failures)
         warnings.extend(validator_warnings)
@@ -350,8 +389,32 @@ def validate_rubric(task_dir: Path) -> CheckResult:
         duplicates = sorted({cid for cid in ids if cid is not None and ids.count(cid) > 1})
         if duplicates and not any("duplicate ids" in item for item in failures):
             messages.append(f"{path.name}: duplicate criterion ids {duplicates}")
+        if dim == "anticheat":
+            if (data.get("scoring") or {}).get("aggregation") != "all_pass":
+                messages.append("anticheat.toml: [scoring].aggregation must be 'all_pass'")
+            non_negated = [
+                str(criterion.get("id") or criterion.get("name") or "<unknown>")
+                for criterion in criteria
+                if criterion.get("negate") is not True
+            ]
+            if non_negated:
+                messages.append(
+                    "anticheat.toml: every criterion must set negate=true "
+                    f"(non-negated: {non_negated})"
+                )
+            catchalls = [
+                criterion for criterion in criteria
+                if "catchall" in str(criterion.get("id", ""))
+                or "catchall" in str(criterion.get("name", ""))
+            ]
+            if len(catchalls) == 1 and "unambiguous" not in str(
+                catchalls[0].get("description", "")
+            ).casefold():
+                messages.append(
+                    "anticheat.toml: catch-all description must contain 'unambiguous'"
+                )
         headers[dim] = _judge_header(path.read_text())
-    if len(headers) == len(DIMENSIONS) and len(set(headers.values())) != 1:
+    if len(headers) > 1 and len(set(headers.values())) != 1:
         messages.append("[judge] header block is not byte-identical across dimensions")
     if total_criteria < 25:
         warnings.append(f"criteria total {total_criteria} is below 25")
@@ -367,10 +430,7 @@ def validate_eval_validity(task_dir: Path) -> CheckResult:
         + r")\b",
         re.I,
     )
-    for dim in DIMENSIONS:
-        path = task_dir / "tests" / dim / f"{dim}.toml"
-        if not path.is_file():
-            continue
+    for _, path in _present_dimensions(task_dir):
         data, error = _read_dimension(path)
         if error:
             continue  # rubric tier owns parse failures
@@ -486,11 +546,18 @@ def validate_task(
     task_dir: str | Path,
     *,
     strict_oracle: bool = False,
+    strict_dimensions: bool = False,
     brand_denylist: Iterable[str] = DEFAULT_BRAND_DENYLIST,
 ) -> TaskValidation:
     task_dir = Path(task_dir)
     result = TaskValidation(task_dir=str(task_dir))
-    result.checks.append(validate_layout(task_dir, strict_oracle=strict_oracle))
+    result.checks.append(
+        validate_layout(
+            task_dir,
+            strict_oracle=strict_oracle,
+            strict_dimensions=strict_dimensions,
+        )
+    )
     result.checks.append(validate_shared_shape(task_dir))
     instruction_path = task_dir / "instruction.md"
     try:

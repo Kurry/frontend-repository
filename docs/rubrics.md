@@ -667,23 +667,25 @@ Guardrails when authoring showcase-grade criteria:
 
 ## Crosswalk: This Doc ↔ Judged Dimensions ↔ zto Test Shapes
 
-| Dimension (this doc) | Repo judged dimension (core_features / technical / visual_design / motion) | zto-phase2 test shape |
+| Dimension (this doc) | Repo judged dimension | zto-phase2 test shape |
 |---|---|---|
-| 1 Accessibility | technical | accessibility |
+| 1 Accessibility | accessibility | accessibility |
 | 2 UI Design | visual_design | design |
-| 3 Design Fidelity | visual_design | design (+ foundations) |
-| 4 UX & Accessibility | core_features | ux (+ foundations) |
+| 3 Design Fidelity | design_fidelity | design (+ foundations) |
+| 4 UX & Accessibility | edge_cases | ux (+ foundations) |
 | 5 Functional & Core | core_features | functional |
-| 6 User Flow | core_features | functional / behavioral |
-| 7 Responsiveness | visual_design | design / ux |
+| 6 User Flow | user_flows | functional / behavioral |
+| 7 Responsiveness | responsiveness | design / ux |
 | 8 Motion | motion | design / ux |
-| 9 Performance | technical | technical |
+| 9 Performance | performance | technical |
 | 10 Technical Quality | technical | technical |
-| 11 Innovation | visual_design / motion | design |
-| 12 MCP Contract | technical | technical |
-| 13 Anti-Cheat | technical | anticheat |
-| 14 Behavioral | core_features / technical | behavioral |
-| 15 Writing | visual_design | writing |
+| 11 Innovation | innovation | design |
+| 12 MCP Contract | mcp_contract | technical |
+| 13 Anti-Cheat | anticheat | anticheat |
+| 14 Behavioral | behavioral | behavioral |
+| 15 Writing | writing | writing |
+
+Each instruction tag maps 1:1 to its judged dimension: `<accessibility>`, `<visual_design>`, `<reference_screenshots>`, `<edge_cases>`, `<core_features>`, `<user_flows>`, `<responsiveness>`, `<motion>`, `<performance>`, `<requirements>`, `<innovation>`, and `<webmcp_action_contract>` map respectively to the folders in rows 1–12 above, while `<writing>` maps to `writing`. `anticheat` and `behavioral` are deliberately tag-less.
 
 ---
 
