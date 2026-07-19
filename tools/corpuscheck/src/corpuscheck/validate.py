@@ -422,8 +422,12 @@ def validate_rubric(task_dir: Path) -> CheckResult:
 def validate_eval_validity(task_dir: Path) -> CheckResult:
     messages: list[str] = []
     warnings: list[str] = []
+    # Only flag a framework name in an IDENTITY context (a browser judge can't
+    # verify the stack). A bare name is not enough: "solid" (border style), "react"
+    # (English verb) etc. collide with ordinary criterion prose, so the name must
+    # follow an identity verb. Mirrors rubric-align's IMPL_PHRASES gating.
     stack_pattern = re.compile(
-        r"\b(?:implemented with|built with)\b|\b(?:"
+        r"\b(?:uses|using|implemented with|built with|powered by|via)\s+(?:"
         + "|".join(re.escape(name) for name in STACK_NAMES)
         + r")\b",
         re.I,
