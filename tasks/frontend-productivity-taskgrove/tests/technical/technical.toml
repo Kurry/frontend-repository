@@ -195,6 +195,20 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "2.19"
+name = "grove_json_nested_contract_and_invariants"
+description = "Grove JSON has numeric schemaVersion 1, exportedAt as an ISO-8601 datetime ending in Z, theme light/dark/forest, tags containing non-empty ids plus unique case-insensitive 1–40 character names and closed-enum colors, and tree-ordered tasks plus archive; every nested task has non-empty id, valid title/status/priority/dueDate, null-or-existing parentId expressed consistently by children nesting, 0–5 unique existing tag names, boolean completed and collapsed, and children, with leaf completed equivalent to status done and parent completed derived from descendant leaves"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.20"
+name = "grove_csv_complete_depth_first_contract"
+description = "Grove CSV uses the exact header id,title,status,priority,dueDate,parentId,completed,collapsed,tags,archived and one depth-first row per task across the main tree and archive; roots have empty parentId, children reference a present parent id, completed/collapsed are true or false, tags are pipe-delimited existing tag names with at most five entries, and archived is true exactly for archived-branch rows and false otherwise, with all task fields matching Grove JSON"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical defect (console health, state coherence, persistence behavior, stability) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, console line, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

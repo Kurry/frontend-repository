@@ -216,6 +216,13 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "2.22"
+name = "workspace_json_exact_types_order_and_references"
+description = "The exported Workspace document has exactly schemaVersion loopdaily.workspace.v1, ISO-8601 exportedAt, habits in visible list order, categories in creation order, and activeCategoryFilter as null or an imported category id; every habit includes a non-empty id, valid name/icon/targetType/targetCount/categoryId/reminder, boolean paused, non-negative integer order, ISO-8601 createdAt, and a completions object whose YYYY-MM-DD keys map to non-negative integers, while each category contains a non-empty id and trimmed 1–40 character name and every non-null habit categoryId resolves to that categories array"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical defect (console errors, storage misuse, state desync between views, accessibility barrier, or load/stability failure) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, console line, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

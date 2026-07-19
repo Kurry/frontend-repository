@@ -216,6 +216,20 @@ weight = 1.0
 negate = true
 
 [[criterion]]
+id = "2.22"
+name = "template_and_submitter_payload_contract_exact"
+description = "Template JSON is one object with trimmed non-empty name at most 120 characters, status exactly draft/pending/completed, a non-empty submitters array, and fields; every submitter has a trimmed non-empty name at most 64 characters and a color matching #RRGGBB, and field submitter strings resolve exactly to one of those names"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.23"
+name = "field_payload_type_geometry_contract_exact"
+description = "Every Template JSON field has a trimmed non-empty name at most 80 characters, type exactly text/signature/initials/date/number/checkbox/radio/select/image/file/phone/cells/stamp, boolean required, a resolved non-empty submitter, integer page at least 0, finite numeric x and y, and finite numeric w and h greater than 0; the property form and imported/rendered field use those same values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "2.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

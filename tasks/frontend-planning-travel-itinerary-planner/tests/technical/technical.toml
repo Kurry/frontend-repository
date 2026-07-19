@@ -213,6 +213,20 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "2.22"
+name = "complete_stop_payload_contract"
+description = "A created stop and its matching trip JSON element use the same complete payload: title trimmed length 1–120; day one of the seven 2025-07-05 through 2025-07-11 dates or unscheduled; location trimmed length 1–200; optional startTime/endTime as valid HH:MM with endTime only when startTime exists and strictly later; category lodging/food/transit/activity/idea; costTier 1/2/3/4; status to-visit/reserved/completed; optional tags as at most 8 unique trimmed strings of length 1–24; optional notes length at most 500; numeric lat -90 through 90 and lng -180 through 180"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.23"
+name = "ics_event_date_time_semantics"
+description = "For the live scheduled stops, each ICS VEVENT has SUMMARY exactly equal to its title; a timed stop has DTSTART matching its day and startTime, an untimed stop has DTSTART;VALUE=DATE on its day, and a stop with endTime has DTEND matching that same-day endTime; unscheduled ideas produce no VEVENT"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "2.n5"
 name = "exports_use_divergent_field_names"
 description = "Trip JSON stop objects use different field names than the create/edit form (for example name instead of title) or status values outside to-visit, reserved, and completed"

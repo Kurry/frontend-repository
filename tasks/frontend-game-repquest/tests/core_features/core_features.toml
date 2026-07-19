@@ -311,6 +311,30 @@ type = "binary"
 negate = true
 weight = 1.0
 [[criterion]]
+id = "1.53"
+name = "challenge_checkpoint_exact_field_contract"
+description = "After starting a challenge run, choosing Hard, logging at least one set, and pausing, Save Progress produces a checkpoint whose browser-visible values show runStatus paused, the active bossWaypointId, difficulty Hard, repsLogged and targetReps matching the panel, and savedAt as a timestamp; after reload Resume Saved Run restores every one of those values exactly"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "1.54"
+name = "quest_log_nested_schema_matches_live_state"
+description = "Export Quest Log JSON contains schemaVersion, exportedAt, dailyGoal, streak, lifetimeReps, questPoints, unlockedZones, unlockedGearIds, equippedGearId, defeatedBossIds, and sets; every set contains setId, reps, loggedAt, and note when present, and all exported values match the live session"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "1.55"
+name = "workout_csv_is_chronological"
+description = "After logging sets at distinguishable times, Export Workout CSV uses the exact header date,reps,note and contains one row per History set in oldest-to-newest chronological order, with reps and notes matching the corresponding exported JSON sets"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "1.56"
+name = "import_restores_complete_quest_state"
+description = "After exporting a session with workout sets, an unlocked zone, a defeated boss, equipped gear, and changed daily-goal state, resetting and importing restores dailyGoal, streak, lifetimeReps, questPoints, unlockedZones, unlockedGearIds, equippedGearId, defeatedBossIds, full History, and derived records and heatmap state; a fresh export matches the restored state"
+type = "binary"
+weight = 1.0
+[[criterion]]
 id = "1.catchall"
 name = "core_features_catchall"
 description = "A specified core behavior of RepQuest is broken or missing in a way that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence (element, page state, action sequence) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

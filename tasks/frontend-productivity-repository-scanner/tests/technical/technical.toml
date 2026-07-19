@@ -135,6 +135,20 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
+id = "5.11"
+name = "scan_index_repository_contract_exact"
+description = "Scan Index JSON is one object with schemaVersion exactly repo-scan-index/v1, non-empty ISO-8601 exportedAt, patterns containing exactly boolean keys claude-md, agents-md, cursorrules, and readme with at least one true, and repositories; each repository has a trimmed non-empty path at most 260 characters, non-negative integer documentCount exactly matching its documents length, a documents array, optional trimmed displayName at most 80 characters, and optional lastScanned that is ISO-8601 or null"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.12"
+name = "scan_index_document_and_finding_contract_exact"
+description = "Every exported document has a trimmed non-empty path, type exactly CLAUDE.md, AGENTS.md, .cursorrules, or README, string content, and a findings array; every finding has severity exactly info, warning, or error, a trimmed non-empty message, and when line is present it is a positive integer"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
 id = "5.catchall"
 name = "technical_catchall"
 description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
