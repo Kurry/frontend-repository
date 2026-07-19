@@ -8,12 +8,12 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
 RUN apt-get update && apt-get install -y --no-install-recommends build-essential \
  && rm -rf /var/lib/apt/lists/*
 
-RUN npm install -g \
-      @anthropic-ai/claude-code@2.1.183 \
-      serve@14.2.4
+# serve is pinned globally so the 25 oracles whose start script is
+# "npx --yes serve ..." resolve it deterministically without a registry
+# fetch at verify time. The claude-code CLI is NOT baked here: Harbor's
+# agent installer provisions the requested version at run time, and a
+# baked pin drifts against it.
+RUN npm install -g serve@14.2.4
 
 WORKDIR /app
 EXPOSE 3000
-
-# Reference screenshots for the builder (never shipped in /app)
-COPY reference-screenshots/ /reference-screenshots/
