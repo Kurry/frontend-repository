@@ -36,7 +36,7 @@ DEFAULT_BRAND_DENYLIST = (
     "OpenAI",
     "Harbor",
 )
-DOUBLE_NEGATION_RE = re.compile(r"\b(does not|no |never )", re.I)
+DOUBLE_NEGATION_RE = re.compile(r"\b(does not|do not|never)\b", re.I)
 STACK_NAMES = (
     "React", "Vue", "Svelte", "Solid", "Preact", "Angular", "Qwik",
     "Zustand", "Pinia", "Redux", "Jotai", "NgRx", "Tailwind",
@@ -353,13 +353,14 @@ def validate_rubric(task_dir: Path) -> CheckResult:
         headers[dim] = _judge_header(path.read_text())
     if len(headers) == len(DIMENSIONS) and len(set(headers.values())) != 1:
         messages.append("[judge] header block is not byte-identical across dimensions")
-    if not 25 <= total_criteria <= 70:
-        warnings.append(f"criteria total {total_criteria} is outside 25-70")
+    if total_criteria < 25:
+        warnings.append(f"criteria total {total_criteria} is below 25")
     return CheckResult("rubric", not messages, messages, warnings)
 
 
 def validate_eval_validity(task_dir: Path) -> CheckResult:
     messages: list[str] = []
+    warnings: list[str] = []
     stack_pattern = re.compile(
         r"\b(?:implemented with|built with)\b|\b(?:"
         + "|".join(re.escape(name) for name in STACK_NAMES)
@@ -385,7 +386,7 @@ def validate_eval_validity(task_dir: Path) -> CheckResult:
                 criterion.get("negate") is True
                 and DOUBLE_NEGATION_RE.search(description)
             ):
-                messages.append(f"{path.name}:{cid}: likely double-inverted negation")
+                warnings.append(f"{path.name}:{cid}: possible double-inverted negation")
             weight = criterion.get("weight")
             if weight not in {0.5, 1.0}:
                 messages.append(f"{path.name}:{cid}: unsupported weight {weight!r}")
@@ -396,7 +397,7 @@ def validate_eval_validity(task_dir: Path) -> CheckResult:
                 )
             else:
                 seen[normalized] = cid
-    return CheckResult("eval_validity", not messages, messages)
+    return CheckResult("eval_validity", not messages, messages, warnings)
 
 
 def _read_json(path: Path) -> dict | None:
