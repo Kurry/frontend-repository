@@ -2934,17 +2934,8 @@ TASK_TOML_TMPL = textwrap.dedent(
     [agent]
     timeout_sec = 3600.0
 
-    [agent.env]
-    CLAUDE_FORCE_OAUTH = "1"
-    CLAUDE_CODE_OAUTH_TOKEN = "${{CLAUDE_CODE_OAUTH_TOKEN}}"
-
     [verifier]
     timeout_sec = 14400.0
-
-    [verifier.env]
-    OPENAI_API_KEY = "${{OPENAI_API_KEY:-}}"
-    CODEX_AUTH_JSON = "${{CODEX_AUTH_JSON:-}}"
-    REWARDKIT_MODEL = "${{REWARDKIT_MODEL:-}}"
 
     [environment]
     workdir = "/app"
