@@ -20,6 +20,7 @@ agents:
 verifier:
   env:
     CODEX_AUTH_JSON: "${CODEX_AUTH_JSON}"   # rewardkit codex judge -> isolated temp CODEX_HOME
+    REWARDKIT_JUDGE: codex
     REWARDKIT_MODEL: "${REWARDKIT_MODEL:-}" # unset -> toml default gpt-5.6-sol
 
 datasets:

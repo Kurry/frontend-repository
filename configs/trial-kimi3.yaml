@@ -27,7 +27,7 @@ retry:
 
 agents:
   - name: kimi-cli
-    model_name: kimi/k3
+    model_name: kimi/kimi-k3
     env:
       KIMI_API_KEY: ${KIMI_API_KEY}
     # Agent-specific runtime host: Kimi coding API (api.kimi.com).
@@ -37,6 +37,7 @@ agents:
 verifier:
   env:
     OPENAI_API_KEY: "${OPENAI_API_KEY}"
+    REWARDKIT_JUDGE: codex
     REWARDKIT_MODEL: "${REWARDKIT_MODEL:-}"
 
 datasets:

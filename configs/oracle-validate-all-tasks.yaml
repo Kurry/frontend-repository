@@ -1,0 +1,42 @@
+# Oracle validation sweep over every task under tasks/ (no slug enumeration).
+# Discovers each immediate child that has a task.toml. Runs the oracle agent
+# (solution/solve.sh) then the rewardkit verifier with the Codex agent judge
+# (API key auth) on gpt-5.6-luna-pro — cheap all-corpus check that reference
+# solutions still pass. Rubric tomls already set judge = "codex"; this config
+# re-asserts REWARDKIT_JUDGE and pins the cheap model override.
+#
+# Setup (API keys — preferred over ChatGPT-plan OAuth for this sweep):
+#   export OPENAI_API_KEY=sk-...
+#   unset CODEX_AUTH_JSON CODEX_AUTH_JSON_PATH CODEX_ACCESS_TOKEN CODEX_FORCE_AUTH_JSON
+#
+# Usage (from frontend-repository root):
+#   uv run harbor run -y -c configs/oracle-validate-all-tasks.yaml --yes
+#
+# Optional one-task smoke first with -i/--include-task-name, e.g.:
+#   uv run harbor run -y -c configs/oracle-validate-all-tasks.yaml \
+#     -i frontend-landing-avax-network --job-name smoke-oracle-luna --yes
+#
+# Host env expectations:
+#   verifier (codex / rewardkit): OPENAI_API_KEY
+#   (rewardkit logs into codex via `codex login --with-api-key`; codex does
+#    not read OPENAI_API_KEY on its own)
+job_name: oracle-validate-all-tasks
+jobs_dir: jobs
+n_attempts: 1
+n_concurrent_trials: 100
+
+environment:
+  type: modal
+  delete: true
+
+agents:
+  - name: oracle
+
+verifier:
+  env:
+    OPENAI_API_KEY: "${OPENAI_API_KEY}"
+    REWARDKIT_JUDGE: codex
+    REWARDKIT_MODEL: gpt-5.6-luna-pro
+
+datasets:
+  - path: ./tasks

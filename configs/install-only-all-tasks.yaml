@@ -4,45 +4,46 @@
 # claude-code, codex, kimi-cli, mini-swe-agent.
 #
 # Usage (from frontend-repository root):
-#   harbor run -y -c configs/install-only-all-tasks.yaml
+#   uv run harbor run -y -c configs/install-only-all-tasks.yaml --yes
 #
 # Equivalent CLI-only form (if you omit install_only in the YAML):
 #   harbor run -y -c configs/install-only-all-tasks.yaml --install-only
 #
-# Host env expectations (per agent):
-#   claude-code: CLAUDE_CODE_OAUTH_TOKEN (Claude subscription)
-#   codex:       ~/.codex/auth.json from `codex login` (CODEX_FORCE_AUTH_JSON)
-#   kimi-cli:    KIMI_API_KEY
-#   mini-swe-agent: ANTHROPIC_API_KEY (or whatever the model_name provider needs)
+# Host env expectations (API keys only — no OAuth / auth.json force flags):
+#   claude-code:    ANTHROPIC_API_KEY
+#   codex:          OPENAI_API_KEY
+#   kimi-cli:       KIMI_API_KEY
+#   mini-swe-agent: ANTHROPIC_API_KEY (matches model_name provider)
+job_name: install-only-all-tasks
 jobs_dir: jobs
 n_attempts: 1
-n_concurrent_trials: 50
+n_concurrent_trials: 100
 install_only: true
 
 environment:
-  type: docker
+  type: modal
   delete: true
 
 agents:
   - name: claude-code
     model_name: anthropic/claude-sonnet-5
     env:
-      CLAUDE_FORCE_OAUTH: "1"
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
 
   - name: codex
-    model_name: openai/gpt-5-codex
+    model_name: openai/gpt-5.6-sol-pro
     env:
-      CODEX_FORCE_AUTH_JSON: "1"
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
 
   - name: kimi-cli
-    model_name: kimi/k3
+    model_name: kimi/kimi-k3
     env:
       KIMI_API_KEY: ${KIMI_API_KEY}
-    extra_allowed_hosts:
-      - api.kimi.com
 
   - name: mini-swe-agent
     model_name: anthropic/claude-sonnet-5
+    env:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
 
 datasets:
   - path: ./tasks

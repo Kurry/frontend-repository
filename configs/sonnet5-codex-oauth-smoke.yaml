@@ -16,6 +16,7 @@ agents:
 verifier:
   env:
     CODEX_AUTH_JSON: "${CODEX_AUTH_JSON}"
+    REWARDKIT_JUDGE: codex
     REWARDKIT_MODEL: "${REWARDKIT_MODEL:-}"
 
 tasks:
