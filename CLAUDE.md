@@ -18,11 +18,10 @@ python3 -m unittest scripts.tests.test_webmcp_h3
 harbor run -p tasks/frontend-data-tracking-admin-analytics-dashboard -a claude-code -m sonnet
 
 # Re-score an existing trial's artifacts without re-running the builder.
-# `harbor score` exists ONLY in the local fork at ~/harbor (not in the
-# pip-installed harbor) — invoke it via uv from that checkout:
-cd ~/harbor && uv run harbor score <trial-or-job-dir> \
-  --task /Users/kurrytran/frontend-repository/tasks/<slug> \
-  --label my-label --action append
+# `harbor score` exists ONLY in the Kurry/harbor fork (not upstream). The repo's
+# pyproject.toml + uv.lock pin harbor to that fork by SHA, so run from repo root:
+uv run harbor score <trial-or-job-dir> \
+  --task tasks/<slug> --label my-label --action append
 
 # Cheap dev-tier judging (no file edits): export REWARDKIT_MODEL=gpt-5.6-luna
 # Production judging uses the toml default (gpt-5.6-sol). Verifier needs
