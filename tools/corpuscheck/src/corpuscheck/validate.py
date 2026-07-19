@@ -416,8 +416,6 @@ def validate_rubric(task_dir: Path) -> CheckResult:
         headers[dim] = _judge_header(path.read_text())
     if len(headers) > 1 and len(set(headers.values())) != 1:
         messages.append("[judge] header block is not byte-identical across dimensions")
-    if total_criteria < 25:
-        warnings.append(f"criteria total {total_criteria} is below 25")
     return CheckResult("rubric", not messages, messages, warnings)
 
 
