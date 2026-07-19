@@ -36,6 +36,15 @@ python3 scripts/install_reference_screenshots.py [slug ...]   # install into tas
 
 Dimension tomls (`tests/<dim>/<dim>.toml`) are the single source of truth for criteria and are edited directly (see `docs/rubrics.md` for criterion conventions; the `rubric-align` skill does the alignment work). Outcome / user-flow lists are authored as criteria in a dimension toml — the `behavioral` dimension covers them when a task ships it; until then they live in `core_features`. There is no separate outcomes file.
 
+## Non-negotiable invariants (hard-won; see AGENTS.md for the full list)
+
+Every one of these is a corpus defect if violated, and each has a guard:
+- **Consistency is scripted**: after any canonical edit run `python3 scripts/propagate_canonical.py` (`--check` = zero drift). Never hand-copy shared files.
+- **15 tag-aligned dimensions** per task (`scripts/generate_dimension_scaffolds.py` baselines them; `create-rubrics` specializes; `rubric-align` aligns). anticheat is verbatim/all-negative/`all_pass`; `reward.toml` gates reward AND pass on it.
+- **Judge integrity** (canonical `system_prompt.md`, cwd `/logs/verifier`): observer never repairer, never reads app source, `browser_evaluate` read-only, `BLOCKED:`/`FAIL:` prefixes.
+- **Criteria are LLM-judge only, never code checks**; every PRD promise must be tested by a criterion a violating build would FAIL; negatives carry `negate=true` and state the defect as present; only ADD criteria, never renumber/delete (ids are provenance).
+- **API-shaped schemas** and a **useful downloadable end state** are authoring mandates, not extras.
+
 **Legacy authoring archive.** Historic per-task authoring folders were moved to `~/Documents/frontend-repository-authoring-backup-2026-07-18`; `regen_dimension_tomls.py` and full `package_frontend_tasks.py` runs are legacy paths that need them restored. Do not route new work through that pipeline — edit instruction.md and the dimension tomls directly. The mapping slug→source lives in `schemas/webmcp-task-sources.json` and `TASK_SPECS` in `scripts/package_frontend_tasks.py`.
 
 ## Architecture
