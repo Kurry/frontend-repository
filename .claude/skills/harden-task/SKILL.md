@@ -43,6 +43,15 @@ absence of a backend. The end state of the application must be useful:
 4. **Round-trip where import exists:** if the task gains an import, exporting
    then re-importing must reconstruct the same visible state (behavioral probe
    material).
+5. **API-shaped schemas even without a backend:** the data layer is modeled as
+   if the backend existed — form schemas (Zod/Valibot) mirror the payload
+   shapes the domain's real APIs define (a PR object, a chat-completions
+   request, an ICS event, a PGN game, a dataset record), the record a form
+   creates IS the would-be request body, and exports/imports conform to those
+   same schemas. Instructions state the field contract observably (required
+   fields, formats, bounds, enums, cross-field rules) so validation is
+   judgeable against the modeled API. This is a core frontend skill the task
+   must exercise, not plumbing to hide.
 
 **Worked example — the daisyui-theme-generator standard.** A theme generator
 whose sliders only recolor a preview is a demo. The useful version is explicit
