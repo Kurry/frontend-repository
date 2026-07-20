@@ -2797,15 +2797,17 @@ DOCKERFILE = textwrap.dedent(
     # against the shared CDP Chrome the entrypoint starts on 127.0.0.1:9222.
     COPY webmcp_stdio_server.mjs /opt/webmcp/webmcp_stdio_server.mjs
 
-    # Entrypoint starts the shared headless CDP Chrome (judge MCP servers and
-    # builder self-tests attach to it); HEALTHCHECK goes green only when Chrome
-    # answers CDP, so `harbor run --install-only` exposes a broken judge env
+    # Entrypoint starts the shared headless CDP Chrome (9222) plus the
+    # forced-reduced-motion Chrome (9223, playwright_reduced_motion server);
+    # HEALTHCHECK goes green only when both answer CDP, so
+    # `harbor run --install-only` exposes a broken judge env
     # before any agent trial burns 45 minutes.
     COPY entrypoint.sh /opt/verifier/entrypoint.sh
     RUN chmod 0755 /opt/verifier/entrypoint.sh
     ENTRYPOINT ["/opt/verifier/entrypoint.sh"]
     HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=5 \\
-      CMD curl -fsS http://127.0.0.1:9222/json/version > /dev/null || exit 1
+      CMD curl -fsS http://127.0.0.1:9222/json/version > /dev/null \\
+       && curl -fsS http://127.0.0.1:9223/json/version > /dev/null || exit 1
 
     WORKDIR /app
     EXPOSE 3000
@@ -2849,6 +2851,18 @@ TEST_SH = textwrap.dedent(
     done
     curl -fsS "$WEBMCP_CDP_ENDPOINT/json/version" > /dev/null 2>&1 \\
       || {{ echo "[test] judge Chrome unreachable (infra); see /logs/verifier/chrome.log" >&2; exit 1; }}
+
+    # Reduced-motion Chrome (entrypoint's second instance, --force-prefers-reduced-motion):
+    # backs the playwright_reduced_motion judge MCP server so reduced-motion criteria
+    # are verifiable. Same infra gate: unreachable = infra error, never a 0.0.
+    export WEBMCP_RM_CDP_PORT=9223
+    export WEBMCP_RM_CDP_ENDPOINT="http://127.0.0.1:$WEBMCP_RM_CDP_PORT"
+    for _ in $(seq 1 30); do
+      curl -fsS "$WEBMCP_RM_CDP_ENDPOINT/json/version" > /dev/null 2>&1 && break
+      sleep 1
+    done
+    curl -fsS "$WEBMCP_RM_CDP_ENDPOINT/json/version" > /dev/null 2>&1 \\
+      || {{ echo "[test] reduced-motion judge Chrome unreachable (infra); see /logs/verifier/chrome-rm.log" >&2; exit 1; }}
 
     # Requires /app/package.json scripts named exactly: verify:build (exit 0), start (port 3000).
     # When grading restored artifacts (harbor score), node_modules is excluded — reinstall.

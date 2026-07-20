@@ -27,15 +27,17 @@ RUN PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install -g \
 # against the shared CDP Chrome the entrypoint starts on 127.0.0.1:9222.
 COPY webmcp_stdio_server.mjs /opt/webmcp/webmcp_stdio_server.mjs
 
-# Entrypoint starts the shared headless CDP Chrome (judge MCP servers and
-# builder self-tests attach to it); HEALTHCHECK goes green only when Chrome
-# answers CDP, so `harbor run --install-only` exposes a broken judge env
+# Entrypoint starts the shared headless CDP Chrome (9222) plus the
+# forced-reduced-motion Chrome (9223, playwright_reduced_motion server);
+# HEALTHCHECK goes green only when both answer CDP, so
+# `harbor run --install-only` exposes a broken judge env
 # before any agent trial burns 45 minutes.
 COPY entrypoint.sh /opt/verifier/entrypoint.sh
 RUN chmod 0755 /opt/verifier/entrypoint.sh
 ENTRYPOINT ["/opt/verifier/entrypoint.sh"]
 HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=5 \
-  CMD curl -fsS http://127.0.0.1:9222/json/version > /dev/null || exit 1
+  CMD curl -fsS http://127.0.0.1:9222/json/version > /dev/null \
+   && curl -fsS http://127.0.0.1:9223/json/version > /dev/null || exit 1
 
 WORKDIR /app
 EXPOSE 3000

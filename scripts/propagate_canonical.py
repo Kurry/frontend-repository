@@ -18,6 +18,10 @@ Surfaces:
                                    schemas/webmcp-task-sources.json descriptions
   [judge] cwd                   <- enforced to "/logs/verifier" in every
                                    tests/<dim>/<dim>.toml
+  [[judge.mcp_servers]] block   <- scripts/canonical/mcp/reward_mcp_servers.toml
+                                   (the inlined region between the first
+                                   [[judge.mcp_servers]] and [scoring] in every
+                                   tests/<dim>/<dim>.toml)
 
 Usage: python3 scripts/propagate_canonical.py [slug ...] [--check]
 --check reports files that would change and exits 1 if any (no writes).
@@ -70,6 +74,29 @@ def desired_files(task: Path, sources: dict) -> dict[Path, bytes]:
     return out
 
 
+def fix_mcp_servers_block(task: Path, check: bool) -> list[Path]:
+    """Re-inline the canonical judge MCP servers fragment into dimension tomls.
+
+    Dimension tomls carry the fragment inlined (rubric_to_tomls emits it at
+    generation time); this keeps the region between the first
+    [[judge.mcp_servers]] and [scoring] in sync with the canonical source.
+    """
+    desired = pkg.judge_mcp_servers_block().rstrip() + "\n\n"
+    changed = []
+    for toml in task.glob("tests/*/*.toml"):
+        text = toml.read_text()
+        start = text.find("[[judge.mcp_servers]]")
+        end = text.find("[scoring]")
+        if start < 0 or end < 0 or end < start:
+            continue
+        fixed = text[:start] + desired + text[end:]
+        if fixed != text:
+            changed.append(toml)
+            if not check:
+                toml.write_text(fixed)
+    return changed
+
+
 def fix_judge_cwd(task: Path, check: bool) -> list[Path]:
     changed = []
     for toml in task.glob("tests/*/*.toml"):
@@ -109,6 +136,8 @@ def main() -> int:
                     path.write_bytes(want)
                     if path.name in ("test.sh", "entrypoint.sh"):
                         path.chmod(0o755)
+        for toml in fix_mcp_servers_block(task, args.check):
+            drift.append(str(toml.relative_to(ROOT)))
         for toml in fix_judge_cwd(task, args.check):
             drift.append(str(toml.relative_to(ROOT)))
 

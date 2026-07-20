@@ -146,6 +146,15 @@ or programmatic jump — browse_open-style scrollIntoView jumps fire every
 intersection observer en route and permanently mark content as revealed, after
 which "elements below the viewport start unrevealed" can only false-fail. If you
 have already jumped around the page, reload it before grading reveal criteria.
+Reduced-motion discipline: criteria about prefers-reduced-motion behavior must be
+verified on the `playwright_reduced_motion` browser, where prefers-reduced-motion
+is forced — the primary browser's media query never matches, so grading them there
+can only false-block. Fresh-load http://localhost:3000 in that browser, confirm via
+`browser_evaluate` that `matchMedia('(prefers-reduced-motion: reduce)').matches` is
+true, then grade; never grade a reduced-motion criterion on the primary browser.
+That browser is a separate app instance: set up any state a reduced-motion
+criterion needs through its own UI — the webmcp bridge attaches to the primary
+page only and cannot drive it.
 Viewport discipline: before judging ANY layout, composition, or density criterion,
 resize to a desktop viewport (at least 1280x800) and confirm the size with
 `browser_evaluate` (window.innerWidth) — a narrow default viewport legitimately
