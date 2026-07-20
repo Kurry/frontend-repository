@@ -48,7 +48,7 @@ export default function Portfolio() {
       <div className="view-heading">
         <div>
           <Text className="eyebrow">Certification queue</Text>
-          <Title order={1}>Task bundle portfolio</Title>
+          <Title order={1}>Task Bundle Portfolio</Title>
           <Text c="dimmed" mt={5}>Twelve evidence-backed tasks awaiting benchmark certification.</Text>
         </div>
         <Badge variant="outline" size="lg" leftSection={<IconSparkles size={15} />}>Sable-4 calibration active</Badge>
@@ -64,7 +64,7 @@ export default function Portfolio() {
 
       <Paper className="calibration-strip" component="section" aria-labelledby="calibration-title">
         <div className="calibration-heading">
-          <div><Text id="calibration-title" fw={750}>Sable-4 trial validity</Text><Text size="xs" c="dimmed">Valid trials / total trials by bundle</Text></div>
+          <div><Text id="calibration-title" fw={750}>Sable-4 Trial Validity</Text><Text size="xs" c="dimmed">Valid trials / total trials by bundle</Text></div>
           <div className="calibration-overall"><span>{rollup.sable4ValidityPercent.toFixed(1)}%</span><Text size="xs">overall validity</Text></div>
         </div>
         <div className="calibration-cells">

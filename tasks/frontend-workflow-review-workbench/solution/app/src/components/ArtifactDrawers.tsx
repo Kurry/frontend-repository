@@ -41,6 +41,7 @@ export function ArtifactDrawers() {
     notifications.show({ title: 'Download started', message: anchor.download, color: 'teal', icon: <IconDownload size={16} /> });
   };
   const submitImport = ({ packageText }: { packageText: string }) => {
+    clearErrors('packageText');
     const result = importPackage(packageText);
     if (!result.ok) {
       setError('packageText', { message: result.error });
@@ -50,7 +51,7 @@ export function ArtifactDrawers() {
   };
   return (
     <>
-      <Drawer opened={ui.exportOpen} onClose={() => setExportOpen(false)} position="right" size="min(760px, 94vw)" title={<div><Text className="eyebrow">LIVE STORE ARTIFACT</Text><Title order={2}>Export certification package</Title></div>} overlayProps={{ backgroundOpacity: 0.35, blur: 2 }}>
+      <Drawer opened={ui.exportOpen} transitionProps={{ transition: 'slide-left', duration: 250 }} onClose={() => setExportOpen(false)} position="right" size="min(760px, 94vw)" title={<div><Text className="eyebrow">LIVE STORE ARTIFACT</Text><Title order={2}>Export Certification Package</Title></div>} overlayProps={{ backgroundOpacity: 0.35, blur: 2 }}>
         <Stack gap="md" className="export-drawer-content">
           <SegmentedControl fullWidth value={ui.exportFormat} onChange={(value) => setExportFormat(value as 'json' | 'markdown')} data={[{ value: 'json', label: 'Review Package JSON' }, { value: 'markdown', label: 'Review Summary Markdown' }]} />
           <Group justify="space-between"><Text size="sm" c="dimmed">Preview regenerates from live session state.</Text><Text size="xs" fw={700}>{preview.length.toLocaleString()} characters</Text></Group>
@@ -58,11 +59,11 @@ export function ArtifactDrawers() {
           <Group justify="flex-end"><Button variant="default" leftSection={<IconClipboard size={16} />} onClick={copy}>Copy</Button><Button leftSection={<IconDownload size={16} />} onClick={download}>Download</Button></Group>
         </Stack>
       </Drawer>
-      <Modal opened={ui.importOpen} onClose={() => setImportOpen(false)} size="lg" title={<div><Text className="eyebrow">REVIEW PACKAGE JSON</Text><Title order={2}>Import certification package</Title></div>} overlayProps={{ backgroundOpacity: 0.4, blur: 2 }}>
+      <Modal opened={ui.importOpen} transitionProps={{ transition: 'pop', duration: 250 }} onClose={() => setImportOpen(false)} size="lg" title={<div><Text className="eyebrow">REVIEW PACKAGE JSON</Text><Title order={2}>Import Certification Package</Title></div>} overlayProps={{ backgroundOpacity: 0.4, blur: 2 }}>
         <form onSubmit={handleSubmit(submitImport)} className="import-form">
           <Text size="sm" c="dimmed">Paste a complete <code>review-certification/v1</code> document. Invalid attempts do not mutate the portfolio.</Text>
-          <Controller name="packageText" control={control} render={({ field }) => <Textarea {...field} mt="md" classNames={{ input: 'import-textarea' }} minRows={14} maxRows={20} label="packageText" placeholder={'{\n  "schemaVersion": "review-certification/v1",\n  …\n}'} error={errors.packageText?.message} onChange={(event) => { field.onChange(event); setImportDraft(event.currentTarget.value); }} />} />
-          <Group justify="flex-end" mt="md"><Button type="button" variant="default" onClick={() => setImportOpen(false)}>Cancel</Button><Button type="submit" loading={isSubmitting} leftSection={<IconFileImport size={16} />}>Import certification package</Button></Group>
+          <div className="artifact-preview" style={{ margin: '16px 0', padding: 0, overflow: 'hidden' }}><Controller name="packageText" control={control} render={({ field }) => <Textarea {...field} mt="md" classNames={{ input: 'import-textarea' }} styles={{ input: { fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace', border: 0, background: 'transparent' } }}  minRows={14} maxRows={20} label="packageText" placeholder={'{\n  "schemaVersion": "review-certification/v1",\n  …\n}'} error={errors.packageText?.message} onChange={(event) => { field.onChange(event); setImportDraft(event.currentTarget.value); }} />} />
+          </div><Group justify="flex-end" mt="md"><Button type="button" variant="default" leftSection={<IconClipboard size={16} />} onClick={() => navigator.clipboard.writeText(ui.importDraft)}>Copy</Button><Button type="button" variant="default" onClick={() => setImportOpen(false)}>Cancel</Button><Button type="submit" loading={isSubmitting} leftSection={<IconFileImport size={16} />}>Import certification package</Button></Group>
         </form>
       </Modal>
     </>

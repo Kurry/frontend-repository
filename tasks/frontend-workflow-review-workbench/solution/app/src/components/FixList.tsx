@@ -12,19 +12,19 @@ export default function FixList({ bundle }: { bundle: ReviewBundle }) {
   if (!bundle.fixItems.length) {
     return (
       <section aria-labelledby="fix-list-title">
-        <div className="section-heading"><div><Text className="eyebrow">Ordered remediation</Text><Title id="fix-list-title" order={2}>Fix list</Title></div></div>
+        <div className="section-heading"><div><Text className="eyebrow">Ordered remediation</Text><Title id="fix-list-title" order={2}>Fix List</Title></div></div>
         <Paper className="empty-state compact-empty"><IconListCheck size={34} /><Title order={3}>No fixes are required</Title><Text>All current evidence is certification-ready; new gate evidence would populate this region if remediation became necessary.</Text></Paper>
       </section>
     );
   }
   return (
     <section aria-labelledby="fix-list-title">
-      <div className="section-heading"><div><Text className="eyebrow">Ordered remediation</Text><Title id="fix-list-title" order={2}>Fix list</Title><Text size="sm" c="dimmed">Resolve items in stable severity order; recommendation constraints update immediately.</Text></div><Text size="sm" fw={700}>{bundle.fixItems.filter((item) => item.resolved).length}/{bundle.fixItems.length} resolved</Text></div>
+      <div className="section-heading"><div><Text className="eyebrow">Ordered remediation</Text><Title id="fix-list-title" order={2}>Fix List</Title><Text size="sm" c="dimmed">Resolve items in stable severity order; recommendation constraints update immediately.</Text></div><Text size="sm" fw={700}>{bundle.fixItems.filter((item) => item.resolved).length}/{bundle.fixItems.length} resolved</Text></div>
       <ol className="fix-list">
         {bundle.fixItems.map((item, index) => {
           const open = expanded.includes(item.id);
           return (
-            <Paper component="li" key={item.id} className={`fix-item ${item.resolved ? 'resolved' : ''}`}>
+            <Paper component="li" key={item.id}  style={{ transition: 'opacity 0.25s ease, background 0.25s ease, transform 0.18s ease' }}>
               <div className="fix-position">{index + 1}</div>
               <Checkbox checked={item.resolved} onChange={(event) => toggleFix(bundle.slug, item.id, event.currentTarget.checked)} aria-label={`${item.resolved ? 'Unresolve' : 'Resolve'} ${item.title}`} />
               <div className="fix-content">

@@ -4,7 +4,7 @@ import type { CheckOutcome, FixCategory, GateResult, GateStatus, HeroState } fro
 
 export function HeroBanner({ state, compact = false }: { state: HeroState; compact?: boolean }) {
   return (
-    <div className={`hero-banner hero-${state.startsWith('READY') ? 'ready' : state.startsWith('NOT') ? 'fixable' : 'risk'} ${compact ? 'hero-compact' : ''}`} data-hero-state={state}>
+    <div style={{ transition: 'background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease' }} className={`hero-banner hero-${state.startsWith('READY') ? 'ready' : state.startsWith('NOT') ? 'fixable' : 'risk'} ${compact ? 'hero-compact' : ''}`} data-hero-state={state}>
       {state.startsWith('READY') ? <IconCheck size={compact ? 15 : 18} /> : <IconAlertTriangleFilled size={compact ? 15 : 18} />}
       <span>{state}</span>
     </div>
@@ -71,7 +71,7 @@ export function ThresholdMeter({ gate }: { gate: GateResult }) {
 export function FlagBadge({ flag }: { flag: string }) {
   return (
     <Tooltip label={flag} withArrow>
-      <Badge className="flag-badge" leftSection={<IconAlertTriangleFilled size={13} />} tabIndex={0} aria-label={`Stop early: ${flag}`}>Stop early</Badge>
+      <span className="flag-badge" tabIndex={0} role="note" aria-label={`Stop early: ${flag}`}><Badge leftSection={<IconAlertTriangleFilled size={13} />}>Stop early</Badge></span>
     </Tooltip>
   );
 }
