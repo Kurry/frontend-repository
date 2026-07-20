@@ -150,7 +150,7 @@ const [state, setState] = createStore<AppState>({
   collaborationState: 'online',
   savedProjects: savedState?.savedProjects ?? [],
   compareMode: false,
-  viewMode: 'edit',
+  viewMode: (savedState?.viewMode === 'preview' || savedState?.viewMode === 'edit') ? savedState.viewMode : 'edit',
   sharedContent: savedState?.sharedContent ?? '',
   remoteContent: savedState?.remoteContent ?? '',
   sharedContentMerged: savedState?.sharedContentMerged ?? '',
@@ -169,6 +169,7 @@ function persistState() {
     sharedContent: state.sharedContent,
     remoteContent: state.remoteContent,
     sharedContentMerged: state.sharedContentMerged,
+    viewMode: state.viewMode,
   });
 }
 
@@ -265,6 +266,11 @@ export function useAppStore() {
     
     setSelectedAnnotation(id: string | null) {
       setState('selectedAnnotationId', id);
+    },
+
+    setViewMode(mode: 'edit' | 'preview') {
+      setState('viewMode', mode);
+      persistState();
     },
     
     undo() {
