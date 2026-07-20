@@ -1,4 +1,5 @@
 <script lang="ts">
+  import confetti from 'canvas-confetti';
   import { BUILT_IN_CARDS, shuffleArray, type Card, type Category, type Intensity } from '../lib/cards';
   import { buildEventSource, deriveBonuses, type LiveEvent, type StreamStatus } from '../lib/stream';
   import { registerWebmcp, type ToolResult, type WebmcpActions } from '../lib/webmcp';
@@ -28,7 +29,7 @@
   }
 
   // ============ STATE ============
-  let phase = $state<'setup' | 'playing'>('setup');
+  let phase = $state<'setup' | 'playing' | 'finished'>('setup');
   let players = $state<string[]>([]);
   let currentPlayerIndex = $state(0);
   let scores = $state<Record<string, { points: number; forfeits: number }>>({});
@@ -44,18 +45,21 @@
   let timerEnabled = $state(false);
   let timeLeft = $state(15);
   let timerInterval = $state<ReturnType<typeof setInterval> | null>(null);
+  let turnLog = $state<{ playerName: string; outcome: 'done' | 'skip' | 'timeout'; cardPrompt: string; category: string; intensity: string; }[]>([]);
   let canUndo = $state(false);
   let undoData = $state<{
     playerIndex: number;
     scores: Record<string, { points: number; forfeits: number }>;
     card: Card | null;
     lastDrawnCardId: string | null;
+    turnLog: typeof turnLog;
   } | null>(null);
   let toasts = $state<{ id: number; message: string; type: 'success' | 'error' | 'info' }[]>([]);
   let toastCounter = $state(0);
   let showNewGameConfirm = $state(false);
   let showDeleteConfirm = $state<string | null>(null);
   let isInitialized = $state(false);
+  let hasCheckpoint = $state(false);
 
   // ---- Setup roster state (lifted so WebMCP shares the UI's code paths) ----
   let setupPlayerNames = $state<string[]>(['', '']);
@@ -73,6 +77,11 @@
 
   // ============ DERIVED ============
   let currentPlayer = $derived(players[currentPlayerIndex] ?? '');
+
+  let winner = $derived((() => {
+    const w = players.find(p => scores[p]?.points >= 10);
+    return w ?? null;
+  })());
 
   let sortedScores = $derived(
     players
@@ -213,6 +222,10 @@
 
   // ============ GAME ============
   function startGame(playerNames: string[]) {
+    try {
+      if (typeof window !== 'undefined') window.localStorage.removeItem('dare-night-checkpoint');
+    } catch { /* ignore */ }
+    hasCheckpoint = false;
     players = [...playerNames];
     currentPlayerIndex = 0;
     const newScores: Record<string, { points: number; forfeits: number }> = {};
@@ -222,6 +235,7 @@
     scores = newScores;
     deck = buildDeck();
     drawnCards = [];
+    turnLog = [];
     currentCard = null;
     lastDrawnCardId = null;
     canUndo = false;
@@ -234,6 +248,7 @@
   }
 
   function drawCard(): Card | undefined {
+    if (phase !== 'playing' || winner) return undefined;
     if (deck.length === 0) {
       deck = buildDeck();
       drawnCards = [];
@@ -290,14 +305,19 @@
       scores: JSON.parse(JSON.stringify(scores)),
       card: currentCard,
       lastDrawnCardId: lastDrawnCardId,
+      turnLog: [...turnLog],
     };
   }
 
   function handleTimerForfeit() {
+    if (phase !== 'playing' || winner) return;
     const playerName = players[currentPlayerIndex];
     if (playerName && scores[playerName]) {
       saveUndoState();
       scores = { ...scores, [playerName]: { ...scores[playerName], forfeits: scores[playerName].forfeits + 1 } };
+      if (currentCard) {
+        turnLog = [...turnLog, { playerName, outcome: 'timeout', cardPrompt: currentCard.prompt, category: currentCard.category, intensity: currentCard.intensity }];
+      }
       canUndo = true;
       showToast(`${playerName}: time's up! Forfeit recorded.`, 'error');
       advanceTurn();
@@ -306,25 +326,47 @@
   }
 
   function handleDone() {
+    if (phase !== 'playing' || winner) return;
     stopTimer();
     const playerName = players[currentPlayerIndex];
     if (playerName && scores[playerName]) {
       saveUndoState();
       scores = { ...scores, [playerName]: { ...scores[playerName], points: scores[playerName].points + 1 } };
+      if (currentCard) {
+        turnLog = [...turnLog, { playerName, outcome: 'done', cardPrompt: currentCard.prompt, category: currentCard.category, intensity: currentCard.intensity }];
+      }
       canUndo = true;
       showToast(`${playerName} scored! +1 point`, 'success');
-      updateBestRecord();
+      const setNewRecord = updateBestRecord();
+      if (scores[playerName].points >= 10) {
+        phase = 'finished';
+        currentCard = null;
+        canUndo = false;
+        stopStream();
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          confetti({ particleCount: 120, spread: 80, origin: { y: 0.55 } });
+        }
+        persistGameState();
+        return;
+      }
+      if (setNewRecord && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        confetti({ particleCount: 90, spread: 65, origin: { y: 0.6 } });
+      }
       advanceTurn();
       persistGameState();
     }
   }
 
   function handleSkip() {
+    if (phase !== 'playing' || winner) return;
     stopTimer();
     const playerName = players[currentPlayerIndex];
     if (playerName && scores[playerName]) {
       saveUndoState();
       scores = { ...scores, [playerName]: { ...scores[playerName], forfeits: scores[playerName].forfeits + 1 } };
+      if (currentCard) {
+        turnLog = [...turnLog, { playerName, outcome: 'skip', cardPrompt: currentCard.prompt, category: currentCard.category, intensity: currentCard.intensity }];
+      }
       canUndo = true;
       showToast(`${playerName} skipped. Forfeit recorded.`, 'info');
       advanceTurn();
@@ -343,6 +385,7 @@
     scores = JSON.parse(JSON.stringify(undoData.scores));
     currentCard = undoData.card;
     lastDrawnCardId = undoData.lastDrawnCardId;
+    turnLog = [...undoData.turnLog];
     if (drawnCards.length > 0) {
       drawnCards = drawnCards.slice(0, -1);
     }
@@ -353,14 +396,17 @@
     persistGameState();
   }
 
-  function updateBestRecord() {
+  function updateBestRecord(): boolean {
+    let updated = false;
     for (const playerName of players) {
       const pts = scores[playerName]?.points ?? 0;
-      if (!bestRecord || pts > bestRecord.points) {
+      if (pts > 0 && (!bestRecord || pts > bestRecord.points)) {
         bestRecord = { name: playerName, points: pts };
         safeLocalStorageSet('dare-night-best-record', bestRecord);
+        updated = true;
       }
     }
+    return updated;
   }
 
   function newGame() {
@@ -373,6 +419,7 @@
     drawnCards = [];
     currentCard = null;
     lastDrawnCardId = null;
+    turnLog = [];
     canUndo = false;
     undoData = null;
     reshuffleMessage = false;
@@ -388,6 +435,10 @@
     duplicatesIgnored = 0;
     streamStatus = 'idle';
     clearGameState();
+    try {
+      if (typeof window !== 'undefined') window.localStorage.removeItem('dare-night-checkpoint');
+    } catch { /* ignore */ }
+    hasCheckpoint = false;
   }
 
   // ============ CUSTOM CARDS ============
@@ -524,6 +575,141 @@
     return { ok: true, message: 'Live stream disconnected', status: streamStatus };
   }
 
+  // ============ EXPORT / IMPORT ============
+  function exportSession() {
+    const sessionPlayers = phase === 'setup' ? validSetupPlayers : players;
+    const payload = {
+      schemaVersion: 'dare-night-session-v1',
+      status: winner ? 'finished' : (phase === 'setup' ? 'setup' : 'playing'),
+      players: sessionPlayers.map(name => ({
+        name,
+        points: scores[name]?.points ?? 0,
+        forfeits: scores[name]?.forfeits ?? 0,
+      })),
+      categories: selectedCategories,
+      intensity: selectedIntensity,
+      roundTimer: timerEnabled,
+      currentTurnIndex: currentPlayerIndex,
+      winTarget: 10,
+      winner: winner,
+      customCards: customCards.map(({ prompt, category, intensity }) => ({ prompt, category, intensity })),
+      record: bestRecord ? { holder: bestRecord.name, points: bestRecord.points } : null,
+      turnLog,
+      exportedAt: new Date().toISOString(),
+    };
+    return payload;
+  }
+
+  function handleExportSession() {
+    const payload = exportSession();
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `dare-night-session-${Date.now()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function handleCopySession() {
+    const payload = exportSession();
+    navigator.clipboard.writeText(JSON.stringify(payload, null, 2))
+      .then(() => showToast('Copied session JSON to clipboard', 'info'))
+      .catch(() => showToast('Failed to copy session JSON', 'error'));
+  }
+
+  function handleImportSession(e: Event) {
+    const target = e.target as HTMLInputElement;
+    if (!target.files || target.files.length === 0) return;
+    const file = target.files[0];
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const text = event.target?.result as string;
+        const payload = JSON.parse(text);
+        if (payload.schemaVersion !== 'dare-night-session-v1') throw new Error('Wrong schemaVersion');
+        if (!['setup', 'playing', 'finished'].includes(payload.status) || !Array.isArray(payload.players) || !payload.categories || !payload.intensity || typeof payload.roundTimer !== 'boolean' || typeof payload.currentTurnIndex !== 'number' || payload.winTarget !== 10 || !('winner' in payload) || !Array.isArray(payload.customCards) || !Array.isArray(payload.turnLog)) {
+          throw new Error('Missing required fields');
+        }
+        if (payload.players.length < 2 || payload.players.length > 8) {
+          throw new Error('players must contain 2 to 8 entries');
+        }
+        if (!Number.isInteger(payload.currentTurnIndex) || payload.currentTurnIndex < 0 || payload.currentTurnIndex >= payload.players.length) {
+          throw new Error('currentTurnIndex must identify an imported player');
+        }
+
+        const winningPlayer = payload.players.find((player: any) => player.points >= payload.winTarget);
+        if (payload.status === 'finished' && (!winningPlayer || payload.winner !== winningPlayer.name)) {
+          throw new Error('finished status requires a matching winner at the win target');
+        }
+        if (payload.status !== 'finished' && (winningPlayer || payload.winner !== null)) {
+          throw new Error('unfinished status cannot include a winner');
+        }
+
+        // Apply imported state
+        players = payload.players.map((p: any) => p.name);
+        scores = payload.players.reduce((acc: any, p: any) => {
+          acc[p.name] = { points: p.points, forfeits: p.forfeits };
+          return acc;
+        }, {});
+        currentPlayerIndex = payload.currentTurnIndex;
+        selectedCategories = payload.categories;
+        selectedIntensity = payload.intensity;
+        timerEnabled = payload.roundTimer;
+        turnLog = payload.turnLog;
+        if (payload.record) {
+          bestRecord = { name: payload.record.holder, points: payload.record.points };
+          safeLocalStorageSet('dare-night-best-record', bestRecord);
+        }
+
+        // Custom cards
+        customCards = payload.customCards.map((c: any, i: number) => ({
+          id: `custom-${Date.now()}-${i}`,
+          prompt: c.prompt,
+          category: c.category,
+          intensity: c.intensity,
+          isCustom: true
+        }));
+        safeLocalStorageSet('dare-night-custom-cards', customCards);
+
+        phase = payload.status;
+        if (phase === 'setup') {
+          setupPlayerNames = players.length >= 2
+            ? [...players]
+            : [...players, ...Array.from({ length: 2 - players.length }, () => '')];
+        }
+
+        // Rebuild deck if necessary or just clear current state for safety as we don't serialize deck order
+        if (phase !== 'setup') {
+          deck = shuffleArray(buildDeck());
+          drawnCards = [];
+          currentCard = null;
+          eventSource = buildEventSource(players);
+          appliedEvents = [];
+          duplicatesIgnored = 0;
+          streamStatus = 'idle';
+        }
+        
+        canUndo = false;
+        undoData = null;
+        startAttempted = false;
+        try {
+          if (typeof window !== 'undefined') window.localStorage.removeItem('dare-night-checkpoint');
+        } catch { /* ignore */ }
+        hasCheckpoint = false;
+        persistGameState();
+        
+        showToast('Session imported successfully!', 'success');
+      } catch (err: any) {
+        showToast(`Import failed: invalid file (${err.message})`, 'error');
+      }
+      target.value = ''; // Reset input
+    };
+    reader.readAsText(file);
+  }
+
   // ============ PERSISTENCE ============
   function persistGameState() {
     const gameState = {
@@ -539,6 +725,7 @@
       lastDrawnCardId,
       bestRecord,
       timerEnabled,
+      turnLog,
     };
     safeLocalStorageSet('dare-night-game', gameState);
   }
@@ -552,8 +739,13 @@
   }
 
   function handleGlobalKeydown(event: KeyboardEvent) {
-    if (event.key === 'Escape' && showNewGameConfirm) {
-      showNewGameConfirm = false;
+    if (event.key === 'Escape') {
+      if (showNewGameConfirm) {
+        showNewGameConfirm = false;
+      }
+      if (showDeleteConfirm) {
+        showDeleteConfirm = null;
+      }
     }
   }
 
@@ -571,12 +763,27 @@
       bestRecord = savedRecord;
     }
 
+    const checkpoint = safeLocalStorageGet<any>('dare-night-checkpoint', null);
     const saved = safeLocalStorageGet<any>('dare-night-game', null);
-    if (saved && saved.phase === 'playing' && saved.players && saved.players.length >= 2) {
-      phase = saved.phase;
+    if (saved?.phase === 'setup' && Array.isArray(saved.players)) {
+      players = saved.players;
+      setupPlayerNames = players.length >= 2
+        ? [...players]
+        : [...players, ...Array.from({ length: 2 - players.length }, () => '')];
+      scores = saved.scores ?? {};
+      phase = 'setup';
+      selectedCategories = saved.selectedCategories ?? ['Icebreaker', 'Truth', 'Dare', 'Wild'];
+      selectedIntensity = saved.selectedIntensity ?? 'Mild';
+      bestRecord = saved.bestRecord ?? bestRecord;
+      timerEnabled = saved.timerEnabled ?? false;
+      turnLog = saved.turnLog ?? [];
+      canUndo = false;
+      undoData = null;
+    } else if (saved && (saved.phase === 'playing' || saved.phase === 'finished') && saved.players && saved.players.length >= 2) {
       players = saved.players;
       currentPlayerIndex = saved.currentPlayerIndex ?? 0;
       scores = saved.scores ?? {};
+      phase = players.some(name => scores[name]?.points >= 10) ? 'finished' : 'playing';
       selectedCategories = saved.selectedCategories ?? ['Icebreaker', 'Truth', 'Dare', 'Wild'];
       selectedIntensity = saved.selectedIntensity ?? 'Mild';
       deck = saved.deck ?? [];
@@ -586,6 +793,7 @@
       lastDrawnCardId = saved.lastDrawnCardId ?? null;
       bestRecord = saved.bestRecord ?? bestRecord;
       timerEnabled = saved.timerEnabled ?? false;
+      turnLog = saved.turnLog ?? [];
       canUndo = false;
       undoData = null;
       // Live stream is ephemeral; initialize a fresh source for the restored roster.
@@ -595,7 +803,73 @@
       streamStatus = 'idle';
     }
 
+    if (checkpoint) {
+      hasCheckpoint = true;
+    }
+
     isInitialized = true;
+  }
+
+  function handleSaveProgress() {
+    if (turnLog.length === 0 || winner) return;
+    const payload = {
+      ...exportSession(),
+      customCardState: customCards,
+      currentCard,
+      deck,
+      drawnCardIds: drawnCards.map(card => card.id),
+      lastDrawnCardId,
+    };
+    safeLocalStorageSet('dare-night-checkpoint', payload);
+    hasCheckpoint = true;
+    showToast('Saved', 'success');
+  }
+
+  function handleResumeSavedSession() {
+    const checkpoint = safeLocalStorageGet<any>('dare-night-checkpoint', null);
+    if (!checkpoint) return;
+    try {
+      players = checkpoint.players.map((p: any) => p.name);
+      scores = checkpoint.players.reduce((acc: any, p: any) => {
+        acc[p.name] = { points: p.points, forfeits: p.forfeits };
+        return acc;
+      }, {});
+      currentPlayerIndex = checkpoint.currentTurnIndex;
+      selectedCategories = checkpoint.categories;
+      selectedIntensity = checkpoint.intensity;
+      timerEnabled = checkpoint.roundTimer;
+      turnLog = checkpoint.turnLog;
+      customCards = checkpoint.customCardState ?? checkpoint.customCards.map((card: any, index: number) => ({
+          id: `custom-${Date.now()}-${index}`,
+          prompt: card.prompt,
+          category: card.category,
+          intensity: card.intensity,
+          isCustom: true,
+        }));
+      saveCustomCards();
+      if (checkpoint.record) {
+        bestRecord = { name: checkpoint.record.holder, points: checkpoint.record.points };
+        safeLocalStorageSet('dare-night-best-record', bestRecord);
+      }
+      phase = 'playing';
+      deck = checkpoint.deck ?? shuffleArray(buildDeck());
+      const availableCards = [...BUILT_IN_CARDS, ...customCards];
+      drawnCards = (checkpoint.drawnCardIds ?? [])
+        .map((id: string) => availableCards.find(card => card.id === id))
+        .filter(Boolean) as Card[];
+      currentCard = checkpoint.currentCard ?? null;
+      lastDrawnCardId = checkpoint.lastDrawnCardId ?? currentCard?.id ?? null;
+      if (currentCard && timerEnabled) startTimer();
+      else stopTimer();
+      eventSource = buildEventSource(players);
+      appliedEvents = [];
+      duplicatesIgnored = 0;
+      streamStatus = 'idle';
+      persistGameState();
+      showToast('Session resumed', 'success');
+    } catch (err) {
+      showToast('Failed to resume session', 'error');
+    }
   }
 
   initFromStorage();
@@ -713,6 +987,11 @@
       onAddCustomCard={(data) => { addCustomCard(data.prompt, data.category, data.intensity); }}
       onDeleteCustomCard={(id) => { deleteCustomCard(id); }}
       onShowDeleteConfirm={(id) => { showDeleteConfirm = id; }}
+        onExportSession={handleExportSession}
+        onCopySession={handleCopySession}
+        onImportSession={handleImportSession}
+        hasCheckpoint={hasCheckpoint}
+        onResumeSavedSession={handleResumeSavedSession}
     />
   {:else}
     <GameScreen
@@ -725,6 +1004,7 @@
       {timerEnabled}
       {timeLeft}
       {bestRecord}
+      {winner}
       streamStatus={streamStatus}
       appliedEvents={appliedEvents}
       bonuses={bonuses}
@@ -741,6 +1021,10 @@
       onStreamPause={() => { streamPause(); }}
       onStreamReconnect={() => { streamReconnect(); }}
       onStreamDeliverOutOfOrder={() => { streamDeliverOutOfOrder(); }}
+        onExportSession={handleExportSession}
+        onCopySession={handleCopySession}
+        onSaveProgress={handleSaveProgress}
+        turnLogCount={turnLog.length}
     />
   {/if}
 

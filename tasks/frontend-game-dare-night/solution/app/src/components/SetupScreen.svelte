@@ -27,6 +27,11 @@
     onAddCustomCard: (data: { prompt: string; category: Category; intensity: Intensity }) => void;
     onDeleteCustomCard: (id: string) => void;
     onShowDeleteConfirm: (id: string | null) => void;
+    onExportSession?: () => void;
+    onCopySession?: () => void;
+    onImportSession?: (e: Event) => void;
+    hasCheckpoint?: boolean;
+    onResumeSavedSession?: () => void;
   }
 
   let {
@@ -54,6 +59,11 @@
     onAddCustomCard,
     onDeleteCustomCard,
     onShowDeleteConfirm,
+    onExportSession,
+    onCopySession,
+    onImportSession,
+    hasCheckpoint,
+    onResumeSavedSession,
   }: Props = $props();
 
   const categories: Category[] = ['Icebreaker', 'Truth', 'Dare', 'Wild'];
@@ -251,6 +261,26 @@
       />
     </div>
 
+    <!-- Session controls -->
+    <div class="mb-6 flex flex-wrap justify-center gap-3">
+      <button
+        class="px-6 py-2 rounded-full text-sm font-medium bg-black text-white border-2 border-black transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black shadow-md hover:bg-gray-800"
+        onclick={onExportSession}
+      >
+        Export Session
+      </button>
+      <button
+        class="px-6 py-2 rounded-full text-sm font-medium bg-white text-black border-2 border-black transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black shadow-md hover:bg-gray-50"
+        onclick={onCopySession}
+      >
+        Copy Session JSON
+      </button>
+      <label class="px-6 py-2 rounded-full text-sm font-medium bg-white text-black border-2 border-black transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black cursor-pointer shadow-md hover:bg-gray-50">
+        Import Session
+        <input type="file" accept=".json" class="hidden" onchange={onImportSession} />
+      </label>
+    </div>
+
     <!-- Start Button -->
     <button
       class="w-full px-8 py-4 rounded-full text-lg font-bold text-white transition-all shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-lg"
@@ -260,6 +290,18 @@
     >
       Start game
     </button>
+
+    <!-- Resume Saved Session Button -->
+    {#if hasCheckpoint}
+      <div class="mt-4">
+        <button
+          class="w-full px-8 py-4 rounded-full text-lg font-bold bg-white text-black border-2 border-black transition-all shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
+          onclick={onResumeSavedSession}
+        >
+          Resume Saved Session
+        </button>
+      </div>
+    {/if}
     {#if !canStart && startAttempted}
       <p class="text-center text-red-600 text-xs mt-2 font-medium" role="alert">
         {#if validPlayers.length < 2}

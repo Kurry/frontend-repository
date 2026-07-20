@@ -13,6 +13,7 @@
   interface Props {
     players: string[];
     currentPlayer: string;
+    winner: string | null;
     sortedScores: ScoreEntry[];
     currentCard: Card | null;
     canUndo: boolean;
@@ -36,11 +37,16 @@
     onStreamPause: () => void;
     onStreamReconnect: () => void;
     onStreamDeliverOutOfOrder: () => void;
+    onExportSession?: () => void;
+    onCopySession?: () => void;
+    onSaveProgress?: () => void;
+    turnLogCount?: number;
   }
 
   let {
     players,
     currentPlayer,
+    winner,
     sortedScores,
     currentCard,
     canUndo,
@@ -64,6 +70,10 @@
     onStreamPause,
     onStreamReconnect,
     onStreamDeliverOutOfOrder,
+    onExportSession,
+    onCopySession,
+    onSaveProgress,
+    turnLogCount = 0,
   }: Props = $props();
 
   let showScoreboard = $state(false);
@@ -122,8 +132,13 @@
 
   <!-- Current Player -->
   <div class="text-center mb-4 max-w-lg mx-auto w-full">
-    <p class="text-black text-sm mb-1">Current turn</p>
-    <h2 class="text-2xl font-bold" style="color: var(--color-accent);">{currentPlayer}'s turn</h2>
+    {#if winner}
+      <p class="text-black text-sm mb-1">Game finished</p>
+      <h2 class="text-2xl font-bold" style="color: var(--color-accent);" role="status" aria-live="polite">Winner — {winner}</h2>
+    {:else}
+      <p class="text-black text-sm mb-1">Current turn</p>
+      <h2 class="text-2xl font-bold" style="color: var(--color-accent);">{currentPlayer}'s turn</h2>
+    {/if}
   </div>
 
   <!-- Reshuffle Message -->
@@ -137,7 +152,13 @@
 
   <!-- Card Area -->
   <div class="flex-1 flex flex-col items-center justify-center max-w-lg mx-auto w-full">
-    {#if currentCard}
+    {#if winner}
+      <div class="bg-white rounded-xl p-10 mb-6 text-center shadow-2xl w-full" style="border: 3px solid var(--color-accent);">
+        <span class="text-5xl" aria-hidden="true">🏆</span>
+        <p class="text-2xl font-bold mt-3" style="color: var(--color-accent);">{winner} wins Dare Night!</p>
+        <p class="text-black mt-2">First to 10</p>
+      </div>
+    {:else if currentCard}
       <!-- Card Display -->
       {#key currentCard.id}
         <div
@@ -209,7 +230,7 @@
 
   <!-- Undo Button -->
   <div class="text-center pb-4 max-w-lg mx-auto w-full">
-    {#if canUndo}
+    {#if canUndo && !winner}
       <button
         class="px-6 py-2 rounded-full text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400"
         style="background-color: white; color: black; border: 2px solid black;"
@@ -218,6 +239,31 @@
         <span aria-hidden="true">↩</span> Undo last turn
       </button>
     {/if}
+  </div>
+
+  <!-- Session Controls -->
+  <div class="flex gap-4 justify-center pb-6 max-w-lg mx-auto w-full flex-wrap">
+    <button
+      class="px-6 py-2 rounded-full text-sm font-medium text-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black shadow-md"
+      style="background-color: #1a202c;"
+      onclick={onExportSession}
+    >
+      Export Session
+    </button>
+    <button
+      class="px-6 py-2 rounded-full text-sm font-medium bg-white text-black border-2 border-black transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400"
+      onclick={onCopySession}
+    >
+      Copy Session JSON
+    </button>
+    <button
+      class="px-6 py-2 rounded-full text-sm font-medium text-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+      style="background-color: #1a202c;"
+      onclick={onSaveProgress}
+      disabled={turnLogCount === 0 || !!winner}
+    >
+      Save Progress
+    </button>
   </div>
 
   <!-- Live Event Feed -->
@@ -252,7 +298,7 @@
             ✕
           </button>
         </div>
-        <Scoreboard sortedScores={sortedScores} />
+        <Scoreboard sortedScores={sortedScores} {winner} />
       </div>
     </div>
   {/if}

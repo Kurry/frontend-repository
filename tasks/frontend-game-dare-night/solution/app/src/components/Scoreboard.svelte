@@ -7,14 +7,15 @@
 
   interface Props {
     sortedScores: ScoreEntry[];
+    winner: string | null;
   }
 
-  let { sortedScores }: Props = $props();
+  let { sortedScores, winner }: Props = $props();
 </script>
 
 <div class="space-y-2">
   {#each sortedScores as entry, index}
-    <div class="flex items-center gap-3 p-3 rounded-lg {index === 0 ? 'bg-yellow-50' : 'bg-gray-50'}">
+    <div class="flex items-center gap-3 p-3 rounded-lg {entry.name === winner ? 'bg-yellow-100 ring-2 ring-yellow-500' : index === 0 ? 'bg-yellow-50' : 'bg-gray-50'}">
       {#if index === 0}
         <span class="text-xl" aria-hidden="true">🥇</span>
         <span class="sr-only">1st place</span>
@@ -29,7 +30,10 @@
       {/if}
       
       <div class="flex-1 min-w-0">
-        <p class="font-semibold text-sm truncate" style="color: var(--color-text-primary);">{entry.name}</p>
+        <p class="font-semibold text-sm truncate" style="color: var(--color-text-primary);">
+          {entry.name}
+          {#if entry.name === winner}<span class="ml-2 text-xs text-amber-700">Winner</span>{/if}
+        </p>
       </div>
       
       <div class="flex items-center gap-4 text-sm">
