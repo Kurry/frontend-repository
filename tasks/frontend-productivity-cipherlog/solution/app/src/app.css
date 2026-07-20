@@ -11,7 +11,7 @@
   /* Derived accent roles. The base chrome uses the blue accent; a selected
      Theme Core overrides all four roles together. */
   --color-on-accent: #FEFEFE;
-  --color-accent-ink: #007AFF;
+  --color-accent-ink: #0056B3;
   --color-accent-soft: #E6EEF7;
   --color-focus: #1D1D1E;
   --color-border-strong: #6E6E73;
@@ -26,7 +26,7 @@
 .theme-neon-cyan {
   --color-accent: #00FFFF;
   --color-on-accent: #04181B;
-  --color-accent-ink: #00747F;
+  --color-accent-ink: #005C66;
   --color-accent-soft: #DCF6F8;
 }
 .theme-blood-red {

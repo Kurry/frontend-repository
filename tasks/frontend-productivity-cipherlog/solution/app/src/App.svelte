@@ -1,5 +1,13 @@
 <script>
 import { untrack, onMount } from 'svelte';
+import { createForm } from 'felte';
+import { validator } from '@felte/validator-zod';
+import { transmissionSchema, channelSchema, passcodeSchema, sessionArchiveSchema } from './stores.js';
+import { createDialog, createSelect, melt, createToaster, createToolbar } from '@melt-ui/svelte';
+import { Lock, LockOpen, Plus, Folder, Trash, Archive, Download, Upload, Copy, FileText, Check, MagnifyingGlass, Broadcast, FloppyDisk } from 'phosphor-svelte';
+import { fly, fade } from 'svelte/transition';
+import { flip } from 'svelte/animate';
+
 import {
   channels, memos, decommissioned, themeCore, themeCores, revealedIds,
   activeChannel, searchQuery, activeMemoId, showDecommissioned,
@@ -30,6 +38,97 @@ let draftData = $state(null);
 let bodyEl = $state(null);
 let renderTick = $state(0);
 let lastFocused = null;
+
+let showSessionArchive = $state(false);
+let importError = $state('');
+
+const toaster = createToaster();
+const toolbar = createToolbar();
+const channelSelectMelt = createSelect();
+const prioritySelectMelt = createSelect();
+const themeSelectMelt = createSelect();
+
+const { elements: { content: passcodeContent, overlay: passcodeOverlay, title: passcodeMeltTitle, description: passcodeMeltDesc, close: passcodeClose } } = createDialog();
+const { elements: { content: purgeContent, overlay: purgeOverlay, title: purgeMeltTitle, description: purgeMeltDesc, close: purgeClose } } = createDialog();
+const { elements: { content: archiveContent, overlay: archiveOverlay, title: archiveMeltTitle, description: archiveMeltDesc, close: archiveClose } } = createDialog();
+
+const { form: newChannelForm, errors: channelErrors } = createForm({
+  extend: validator({ schema: channelSchema }),
+  onSubmit: (values, context) => {
+    const name = values.name.trim();
+    if (allChannels.some((c) => c.name.toLowerCase() === name.toLowerCase())) {
+      context.setErrors({ name: 'Channel name already exists.' });
+      return;
+    }
+    const c = createChannel(name);
+    channels.update((cs) => [...cs, c]);
+    activeChannel.set(c.id);
+    showNewChannel = false;
+    context.reset();
+  }
+});
+
+function submitPasscodeWithValues(val, context) {
+  passcodeInput = val;
+  submitPasscode();
+}
+const { form: passcodeFelte, errors: passcodeErrors } = createForm({
+  extend: validator({ schema: passcodeSchema }),
+  onSubmit: (values, context) => {
+    submitPasscodeWithValues(values.passcode, context);
+  }
+});
+
+const { form: transmissionForm, errors: transErrors, setTouched: setTransTouched, validate: validateTrans } = createForm({
+  extend: validator({ schema: transmissionSchema }),
+  onSubmit: (values, context) => {
+    if (draftOpen) {
+      memoTitle = values.title;
+      commitDraft();
+    } else if (activeMemo) {
+      updateMemo(activeMemo.id, { title: values.title, channelId: values.channelId, priority: values.priority });
+    }
+  }
+});
+
+const { form: sessionArchiveForm, errors: sessionArchiveErrors } = createForm({
+  extend: validator({ schema: sessionArchiveSchema }),
+  onSubmit: (values, context) => {
+    try {
+      const payload = JSON.parse(values.payload);
+      if (payload.channels) channels.set(payload.channels);
+      if (payload.memos) memos.set(payload.memos);
+      if (payload.decommissioned) decommissioned.set(payload.decommissioned);
+      if (payload.themeCore !== undefined) themeCore.set(payload.themeCore);
+      showSessionArchive = false;
+      showToast('Archive imported successfully');
+    } catch (e) {
+      importError = 'Invalid JSON payload';
+    }
+  }
+});
+
+function buildSessionPayload() {
+  return { channels: $channels, memos: $memos, decommissioned: $decommissioned, themeCore: $themeCore };
+}
+
+function handleSessionExport(fmt) {
+  const payload = buildSessionPayload();
+  let content = '';
+  if (fmt === 'session-json') content = JSON.stringify(payload, null, 2);
+  else if (fmt === 'txt') content = $memos.map(m => m.title + '\n' + m.body).join('\n\n');
+  else if (fmt === 'md') content = $memos.map(m => '# ' + m.title + '\n\n' + m.body).join('\n\n');
+
+  const blob = new Blob([content], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'session_archive.' + (fmt === 'session-json' ? 'json' : fmt);
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Exported as ' + fmt);
+}
+
 
 let allChannels = $derived($channels);
 let allMemos = $derived($memos);
@@ -616,7 +715,7 @@ const WEBMCP_TOOLS = [
     name: 'entity_select_memo',
     module: 'entity-collection-v1',
     operation: 'select',
-    description: 'Open a transmission by id or exact title in the main editor, exactly as clicking its card does.',
+    description: 'Open a transmission by id or exact title in the main editor.',
     inputSchema: { type: 'object', required: ['memo'], properties: { memo: { type: 'string' } } },
     handler(args = {}) {
       const memo = resolveMemo(args.memo);
@@ -668,7 +767,7 @@ const WEBMCP_TOOLS = [
     name: 'entity_delete_memo',
     module: 'entity-collection-v1',
     operation: 'delete',
-    description: 'Decommission a transmission, removing it from the main list (requires confirm=true), exactly as the Decommission control does.',
+    description: 'Decommission a transmission, removing it from the main list (requires confirm=true).',
     inputSchema: { type: 'object', required: ['memo', 'confirm'], properties: {
       memo: { type: 'string' },
       confirm: { type: 'boolean' }
@@ -700,7 +799,7 @@ const WEBMCP_TOOLS = [
     name: 'browse_search',
     module: 'browse-query-v1',
     operation: 'search',
-    description: 'Set the memo-list search query, filtering visible memos by title or body, exactly as typing into the search field.',
+    description: 'Set the memo-list search query, filtering visible memos by title or body.',
     inputSchema: { type: 'object', required: ['query'], properties: { query: { type: 'string' } } },
     handler(args = {}) {
       searchQuery.set(String(args.query == null ? '' : args.query));
@@ -711,7 +810,7 @@ const WEBMCP_TOOLS = [
     name: 'browse_apply_filter',
     module: 'browse-query-v1',
     operation: 'apply_filter',
-    description: 'Apply the channel filter to the memo list by channel name, exactly as clicking a channel in the sidebar. filter must be "channel".',
+    description: 'Apply the channel filter to the memo list by channel name. filter must be "channel".',
     inputSchema: { type: 'object', required: ['filter', 'value'], properties: {
       filter: { type: 'string', enum: ['channel'] },
       value: { type: 'string' }
@@ -730,7 +829,7 @@ const WEBMCP_TOOLS = [
     name: 'browse_clear_filter',
     module: 'browse-query-v1',
     operation: 'clear_filter',
-    description: 'Clear the active channel filter and show all channels, exactly as the Show All Channels control.',
+    description: 'Clear the active channel filter and show all channels.',
     inputSchema: { type: 'object', properties: {} },
     handler() { handleShowAll(); return { ok: true }; }
   },
@@ -748,6 +847,51 @@ const WEBMCP_TOOLS = [
       themeCore.set(cls);
       return { ok: true, theme: String(args.theme) };
     }
+  },
+  {
+    name: 'artifact_export_session',
+    module: 'artifact-transfer-v1',
+    operation: 'export',
+    description: 'Export session archive',
+    inputSchema: { type: 'object', properties: { format: { type: 'string', enum: ['session-json', 'txt', 'md'] } } },
+    handler(args = {}) {
+      const fmt = args.format || 'session-json';
+      handleSessionExport(fmt);
+      return { ok: true, format: fmt };
+    }
+  },
+  {
+    name: 'artifact_import_session',
+    module: 'artifact-transfer-v1',
+    operation: 'import',
+    description: 'Import session archive',
+    inputSchema: { type: 'object', required: ['payload'], properties: { payload: { type: 'string' }, mode: { type: 'string', enum: ['session-json'] } } },
+    handler(args = {}) {
+      try {
+        const payload = JSON.parse(args.payload);
+        if (payload.channels) channels.set(payload.channels);
+        if (payload.memos) memos.set(payload.memos);
+        if (payload.decommissioned) decommissioned.set(payload.decommissioned);
+        if (payload.themeCore !== undefined) themeCore.set(payload.themeCore);
+        showToast('Archive imported successfully');
+        return { ok: true };
+      } catch (e) {
+        return { ok: false, error: 'Invalid JSON' };
+      }
+    }
+  },
+  {
+    name: 'artifact_copy_session',
+    module: 'artifact-transfer-v1',
+    operation: 'copy',
+    description: 'Copy session archive to clipboard',
+    inputSchema: { type: 'object', properties: {} },
+    handler(args = {}) {
+      const payload = JSON.stringify(buildSessionPayload());
+      navigator.clipboard.writeText(payload).catch(()=>{});
+      showToast('Copied to clipboard');
+      return { ok: true };
+    }
   }
 ];
 
@@ -762,7 +906,7 @@ function webmcpSessionInfo() {
   return {
     contract_version: WEBMCP_CONTRACT,
     app: 'CipherLog',
-    modules: ['entity-collection-v1', 'browse-query-v1'],
+    modules: ['entity-collection-v1', 'browse-query-v1', 'artifact-transfer-v1'],
     tool_count: WEBMCP_TOOLS.length,
     tools: WEBMCP_TOOLS.map((t) => t.name)
   };
@@ -849,15 +993,14 @@ onMount(() => {
 
   <div class="toast-container" role="status" aria-live="polite">
     {#each toastList as toast (toast.id)}
-      <div class="toast-item">{toast.message}</div>
+      <div class="toast-item" aria-live="polite">{toast.message}</div>
     {/each}
   </div>
 
   {#if showPasscodeModal}
     <div class="modal-overlay" role="presentation" onclick={closePasscodeModal}>
-      <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="passcode-title"
-           onclick={(e) => e.stopPropagation()}>
-        <h2 id="passcode-title" class="modal-title">{passcodeMode === 'set' ? 'Set passcode' : 'Enter passcode'}</h2>
+      <div class="modal-box" role="dialog" aria-modal="true" onclick={(e) => e.stopPropagation()}>
+        <h2 id="passcode-title" class="modal-title" >{passcodeMode === 'set' ? 'Set passcode' : 'Enter passcode'}</h2>
         <p id="passcode-description" class="modal-desc">
           {#if passcodeMode === 'set'}
             Enter a four-character local passcode. This only conceals the body on this device; it is not encryption or account security.
@@ -884,10 +1027,9 @@ onMount(() => {
   {/if}
 
   {#if showConfirmPurge}
-    <div class="modal-overlay" role="presentation" onclick={closePurgeModal}>
-      <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="purge-title"
-           onclick={(e) => e.stopPropagation()}>
-        <h2 id="purge-title" class="modal-title">Purge transmission</h2>
+    <div class="modal-overlay" role="presentation" onclick={closePasscodeModal}>
+      <div class="modal-box" role="dialog" aria-modal="true" onclick={(e) => e.stopPropagation()}>
+        <h2 id="purge-title" class="modal-title" >Purge transmission</h2>
         <p class="modal-desc">This action cannot be undone. The transmission will be permanently deleted.</p>
         <div class="modal-actions">
           <button class="btn-secondary modal-btn" bind:this={purgeCancelEl} onclick={closePurgeModal}>Cancel</button>
@@ -983,19 +1125,19 @@ onMount(() => {
     {#if fMemos.length === 0}
       <div class="empty-state">
         {#if allMemos.length > 0}
-          <div class="empty-icon" aria-hidden="true">&#128269;</div>
+          <div class="empty-icon" aria-hidden="true"><MagnifyingGlass size="24" aria-label="Search" /></div>
           <p class="empty-title">No matching transmissions</p>
           <p class="empty-sub">Adjust your search or channel filter to see more results.</p>
         {:else}
-          <div class="empty-icon" aria-hidden="true">&#128225;</div>
+          <div class="empty-icon" aria-hidden="true"><Broadcast size="24" aria-label="Transmission" /></div>
           <p class="empty-title">No transmissions yet</p>
-          <p class="empty-sub">Select Create New Transmission to start logging.</p>
+          <p class="empty-sub">Start logging your transmissions.</p>
         {/if}
       </div>
     {:else}
       <div class="memo-cards">
         {#each fMemos as memo (memo.id)}
-          <div class="memo-card interactive-card" role="button" tabindex="0"
+          <div class="memo-card interactive-card" transition:fade={{ duration: 150 }} animate:flip={{ duration: 150 }} role="button" tabindex="0"
                aria-label="Open {memo.title || 'transmission'}"
                onclick={() => openMemo(memo.id)}
                onkeydown={(e) => { if (e.target !== e.currentTarget) return; if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openMemo(memo.id); } }}>
@@ -1019,6 +1161,36 @@ onMount(() => {
   </div>
 {/snippet}
 
+
+{#snippet sessionArchivePanel()}
+  {#if showSessionArchive}
+    <div class="modal-overlay" role="presentation"  transition:fade={{ duration: 150 }}>
+      <div class="modal-box" role="dialog" aria-modal="true" onclick={(e) => e.stopPropagation()}>
+        <h2 id="archive-title" class="modal-title" >Session Archive</h2>
+        <p class="modal-desc">Export or import the full session archive JSON.</p>
+
+        <div class="modal-actions" style="margin-bottom: 16px;">
+          <button class="btn-primary" onclick={() => handleSessionExport('session-json')}>Export session-json</button>
+          <button class="btn-secondary" onclick={() => handleSessionExport('txt')}>Export TXT</button>
+          <button class="btn-secondary" onclick={() => handleSessionExport('md')}>Export MD</button>
+          <button class="btn-secondary" onclick={() => { navigator.clipboard.writeText(JSON.stringify(buildSessionPayload())); showToast('Copied to clipboard'); }}>Copy JSON</button>
+        </div>
+
+        <form use:sessionArchiveForm>
+          <label class="field-label" for="import-payload">Import session JSON</label>
+          <textarea name="payload" id="import-payload" class="editor-title" style="min-height: 100px; font-size: 14px; font-family: monospace;" placeholder="{`{...}`}"></textarea>
+          {#if $sessionArchiveErrors.payload}<p class="error-text" aria-live="polite">{$sessionArchiveErrors.payload[0]}</p>{/if}
+          {#if importError}<p class="error-text" aria-live="polite">{importError}</p>{/if}
+          <div class="modal-actions" style="margin-top: 12px;">
+            <button type="button" class="btn-secondary" onclick={() => showSessionArchive = false}>Close</button>
+            <button type="submit" class="btn-primary">Import</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  {/if}
+{/snippet}
+
 {#snippet decommissionedView()}
   <div class="view-root">
     <div class="view-header">
@@ -1027,14 +1199,14 @@ onMount(() => {
     </div>
     {#if allDec.length === 0}
       <div class="empty-state">
-        <div class="empty-icon" aria-hidden="true">&#128237;</div>
+        <div class="empty-icon" aria-hidden="true"><Archive size="24" aria-label="Decommissioned" /></div>
         <p class="empty-title">Nothing is decommissioned</p>
         <p class="empty-sub">Transmissions you decommission appear here for review.</p>
       </div>
     {:else}
       <div class="memo-cards">
         {#each allDec as memo (memo.id)}
-          <div class="memo-card">
+          <div class="memo-card" transition:fade={{ duration: 150 }} animate:flip={{ duration: 150 }}>
             {@render memoCardBadge(memo)}
             <div class="card-title-row">
               <h3 class="card-title">{memo.title}</h3>
@@ -1060,23 +1232,25 @@ onMount(() => {
 
 {#snippet memoEditor()}
   <div class="view-root">
+    <form use:transmissionForm class="editor-form" onsubmit={(e) => e.preventDefault()}>
     <div class="editor-top">
-      <button class="btn-secondary" onclick={handleBackToList}>Return to list</button>
+      <button type="button" class="btn-secondary" onclick={handleBackToList}>Return to list</button>
       {#if draftOpen}
-        <button class="btn-secondary" onclick={discardDraft}>Discard draft</button>
+        <button type="button" class="btn-secondary" onclick={discardDraft}>Discard draft</button>
       {/if}
     </div>
     <div class="field">
       <label class="field-label" for="memo-title-input">Title</label>
-      <input id="memo-title-input" type="text" bind:value={memoTitle} class="editor-title"
+      <input name="title" id="memo-title-input" type="text" bind:value={memoTitle} class="editor-title"
              placeholder="Transmission title" oninput={handleTitleInput}
              onkeydown={(e) => { if (e.key === 'Enter') e.target.blur(); }} />
-      {#if titleError}<p class="error-text shake" role="alert">{titleError}</p>{/if}
+      {#if $transErrors.title}<p class="error-text shake" role="alert" aria-live="polite">{$transErrors.title[0]}</p>{/if}
+      {#if titleError}<p class="error-text shake" role="alert" aria-live="polite">{titleError}</p>{/if}
     </div>
     <div class="editor-controls">
       <div class="ctrl-group">
         <label class="field-label" for="channel-select">Channel</label>
-        <select id="channel-select" class="ctrl-select" value={curChannelId}
+        <select name="channelId" id="channel-select" class="ctrl-select" value={curChannelId}
                 onchange={(e) => handleChannelChange(e.target.value)}>
           {#each allChannels as ch (ch.id)}
             <option value={ch.id}>{ch.name}</option>
@@ -1085,7 +1259,7 @@ onMount(() => {
       </div>
       <div class="ctrl-group">
         <label class="field-label" for="priority-select">Priority</label>
-        <select id="priority-select" class="ctrl-select" value={curPriority}
+        <select name="priority" id="priority-select" class="ctrl-select" value={curPriority}
                 onchange={(e) => handlePriorityChange(e.target.value)}>
           <option value="high">High</option>
           <option value="standard">Standard</option>
@@ -1113,6 +1287,7 @@ onMount(() => {
         <div class="body-editor" contenteditable="plaintext-only" role="textbox" aria-multiline="true"
              aria-labelledby="body-label" data-placeholder="Type the transmission body"
              bind:this={bodyEl} oninput={handleBodyInput}></div>
+        <input type="hidden" name="body" value={memoBody} />
         <p class="body-hint">Select text in the body to reveal the Mark Classified and Mark Priority controls.</p>
       {/if}
     </div>
@@ -1132,11 +1307,12 @@ onMount(() => {
     </div>
     {#if activeMemo}
       <div class="editor-actions">
-        <button class="btn-secondary" onclick={() => handleExport(activeMemo, 'txt')}>Export as .txt</button>
-        <button class="btn-secondary" onclick={() => handleExport(activeMemo, 'md')}>Export as .md</button>
-        <button class="btn-secondary" onclick={() => handleDecommission(activeMemo.id)}>Decommission</button>
+        <button type="button" class="btn-secondary" onclick={() => handleExport(activeMemo, 'txt')}>Export as .txt</button>
+        <button type="button" class="btn-secondary" onclick={() => handleExport(activeMemo, 'md')}>Export as .md</button>
+        <button type="button" class="btn-secondary" onclick={() => handleDecommission(activeMemo.id)}>Decommission</button>
       </div>
     {/if}
+    </form>
   </div>
 {/snippet}
 

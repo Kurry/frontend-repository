@@ -2,7 +2,7 @@
 // Uses the repo-installed Playwright (NOT the shared playwright MCP).
 // Serves the built app on :3101, exercises core workflows + WebMCP tools,
 // asserts persistence across reload, and requires zero console/page errors.
-import { chromium } from '/Users/kurrytran/frontend-repository/node_modules/playwright/index.mjs';
+import { chromium } from 'playwright/index.mjs';
 
 const URL = 'http://localhost:3101';
 const consoleErrors = [];
