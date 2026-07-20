@@ -65,6 +65,18 @@ export const useHistoryStore = defineStore('history', () => {
     { deep: true }
   )
 
+  // Style snapshots are tied to one image, so switching the active image
+  // (upload, Recent thumbnail, WebMCP select) starts a fresh undo/redo context —
+  // otherwise Undo would re-apply the previous image's look onto the new one.
+  // Created after the settings watcher so, in the flush triggered by a switch,
+  // this runs second and clears the entry that watcher just recorded.
+  watch(() => canvas.imageDataUrl, () => {
+    undoStack.value = []
+    redoStack.value = []
+    lastChangeAt = 0
+    lastField = null
+  })
+
   /** Force the next mutation to start a fresh undo entry (Apply / Import / Paste / Reset). */
   function markDiscrete() {
     lastChangeAt = 0

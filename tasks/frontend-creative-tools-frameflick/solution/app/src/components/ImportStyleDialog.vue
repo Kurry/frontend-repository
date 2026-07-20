@@ -112,6 +112,9 @@ function applyImport() {
   }
   history.markDiscrete()
   store.applySettings(result.settings)
+  // Match the preset/snapshot/palette apply paths: leave the Before baseline so
+  // the canvas shows the freshly imported look, not the stale baseline preview.
+  store.showingBefore = false
   emit('imported', { ok: true, message: 'Style recipe imported — canvas updated.' })
 }
 
