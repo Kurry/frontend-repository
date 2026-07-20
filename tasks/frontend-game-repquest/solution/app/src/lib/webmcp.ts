@@ -8,6 +8,8 @@
 // would not otherwise reach. Exposed on window as webmcp_session_info /
 // webmcp_list_tools / webmcp_invoke_tool per contract zto-webmcp-v1.
 
+import { tick } from "svelte";
+
 const CONTRACT_VERSION = "zto-webmcp-v1";
 
 type Args = Record<string, unknown>;
@@ -85,19 +87,34 @@ async function browseOpen(args: Args): Promise<Result> {
 
 async function entityCreate(args: Args): Promise<Result> {
   const reps = Number(args.reps);
-  if (!Number.isInteger(reps) || reps <= 0) {
-    return { ok: false, error: "reps must be a positive whole number" };
+  const note = String(args.note ?? "");
+  if (!Number.isInteger(reps) || reps < 1 || reps > 9999) {
+    return { ok: false, error: "reps must be a whole number from 1 through 9999" };
   }
+  if (note.length > 120) return { ok: false, error: "note must be at most 120 characters" };
   clickTab("quest");
   await nextFrame();
   ensureQuestMode();
   await nextFrame();
   const input = q<HTMLInputElement>("#rep-input");
   const button = q<HTMLButtonElement>('[data-action="log-reps"]');
+  const noteInput = q<HTMLInputElement>("#note-input");
   if (!input || !button) return { ok: false, error: "log reps control not found" };
   setNumberInput(input, reps);
+  if (noteInput) {
+    const setter = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(noteInput), "value")?.set;
+    setter?.call(noteInput, note); noteInput.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+  await nextFrame();
+  if (button.disabled) return { ok: false, error: "log reps form rejected the request" };
+  const beforeLifetime = Number(q('[data-stat="lifetime-reps"]')?.textContent || 'NaN');
   button.click();
-  return { ok: true, operation: "create", reps };
+  await tick();
+  await nextFrame();
+  const afterLifetime = Number(q('[data-stat="lifetime-reps"]')?.textContent || 'NaN');
+  return afterLifetime === beforeLifetime + reps
+    ? { ok: true, operation: "create", reps, ...(note ? { note } : {}) }
+    : { ok: false, error: "rep set was not created" };
 }
 
 async function entityDelete(args: Args): Promise<Result> {
@@ -184,25 +201,14 @@ async function sessionStop(_args: Args): Promise<Result> {
   return { ok: true, operation: "stop" };
 }
 
-// Guarded terminal transition: Reset Quest wipes all lifetime progress. Drives
-// the same two-step confirmation modal a user sees; confirm=true is required
-// to actually complete the reset (mirrors the entity-delete confirm gate).
-async function sessionRestart(args: Args): Promise<Result> {
-  const confirm = args.confirm === true;
-  clickTab("settings");
+async function sessionRestart(_args: Args): Promise<Result> {
+  clickTab("quest");
   await nextFrame();
-  const openBtn = q<HTMLButtonElement>('[data-action="reset-quest"]');
-  if (!openBtn) return { ok: false, error: "reset quest control not found" };
-  openBtn.click();
+  ensureChallengeMode();
   await nextFrame();
-  if (!confirm) {
-    const cancelBtn = q<HTMLButtonElement>('[data-action="cancel-reset"]');
-    cancelBtn?.click();
-    return { ok: false, error: "restart requires confirm=true", opened: true, cancelled: true };
-  }
-  const confirmBtn = q<HTMLButtonElement>('[data-action="confirm-reset"]');
-  if (!confirmBtn) return { ok: false, error: "reset confirmation control not found" };
-  confirmBtn.click();
+  const button = q<HTMLButtonElement>('[data-action="challenge-restart"]');
+  if (!button) return { ok: false, error: "challenge restart control not found" };
+  button.click();
   return { ok: true, operation: "restart" };
 }
 
@@ -215,6 +221,20 @@ async function sessionTriggerDemo(_args: Args): Promise<Result> {
   if (!button) return { ok: false, error: "apply scenario change control not found" };
   button.click();
   return { ok: true, operation: "trigger_demo" };
+}
+
+// ---- artifact-transfer-v1 -------------------------------------------------
+
+async function artifactAction(operation: 'export' | 'copy' | 'import', args: Args): Promise<Result> {
+  clickTab('quest'); await nextFrame(); ensureQuestMode(); await nextFrame();
+  const format = String(args.format ?? 'json');
+  const selector = operation === 'copy' ? '[data-action="copy-json"]'
+    : operation === 'import' ? '[data-action="import-json"]'
+    : format === 'csv' ? '[data-action="export-csv"]' : '[data-action="export-json"]';
+  const button = q<HTMLButtonElement>(selector);
+  if (!button) return { ok: false, error: `${operation} control not found` };
+  button.click();
+  return { ok: true, operation, ...(operation === 'export' ? { format } : {}) };
 }
 
 // ---- registry --------------------------------------------------------------
@@ -269,8 +289,7 @@ const TOOLS: { name: string; description: string; handler: Handler }[] = [
   },
   {
     name: "session-restart",
-    description:
-      "Guarded terminal transition: reset the whole quest (lifetime reps, streak, quest points, zones, gear, history). Requires args.confirm=true or it opens the modal and cancels.",
+    description: "Restart the active boss-challenge run via the real Challenge Restart control (switches to Challenge mode first).",
     handler: sessionRestart,
   },
   {
@@ -278,13 +297,16 @@ const TOOLS: { name: string; description: string; handler: Handler }[] = [
     description: "Apply a scenario change via the real 'Apply scenario change' control (branching history mandate).",
     handler: sessionTriggerDemo,
   },
+  { name: "artifact-export", description: "Export the live Quest Log as JSON or workout history as CSV via the visible export control (args.format: json|csv).", handler: (args) => artifactAction('export', args) },
+  { name: "artifact-copy", description: "Copy the live Quest Log JSON via the visible Copy JSON control.", handler: (args) => artifactAction('copy', args) },
+  { name: "artifact-import", description: "Open the visible Quest Log file picker; file selection remains Playwright-only.", handler: (args) => artifactAction('import', args) },
 ];
 
 export function initWebMcp(): void {
   const w = window as unknown as Record<string, unknown>;
   w.webmcp_session_info = () => ({
     contract_version: CONTRACT_VERSION,
-    modules: ["browse-query-v1", "entity-collection-v1", "command-session-v1"],
+    modules: ["browse-query-v1", "entity-collection-v1", "command-session-v1", "artifact-transfer-v1"],
     tools: TOOLS.map((t) => t.name),
   });
   w.webmcp_list_tools = () => TOOLS.map((t) => ({ name: t.name, description: t.description }));

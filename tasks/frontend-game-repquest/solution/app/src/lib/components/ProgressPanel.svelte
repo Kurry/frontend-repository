@@ -50,7 +50,7 @@
   <div class="mt-3 pt-3 border-t border-slate-700 grid grid-cols-2 gap-4">
     <div>
       <h3 class="text-xs font-semibold text-slate-400 tracking-wide mb-1">Lifetime reps</h3>
-      <span class="text-xl font-bold text-white">{quest.state.lifetimeReps}</span>
+      <span class="text-xl font-bold text-white" data-stat="lifetime-reps">{quest.state.lifetimeReps}</span>
     </div>
     <div>
       <h3 class="text-xs font-semibold text-slate-400 tracking-wide mb-1">Quest points</h3>

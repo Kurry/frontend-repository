@@ -146,4 +146,7 @@
     style="height: 160px; min-height: 120px;"
     aria-label="Weekly reps bar chart showing last 7 days"
   ></canvas>
+  <p class="text-xs text-slate-400 mt-2" aria-label="Weekly totals as text">
+    {getWeeklyData(quest.state).map((day) => `${day.date}: ${day.reps} reps`).join(' · ')}
+  </p>
 </div>

@@ -4,6 +4,7 @@
   const challengeRun = $derived(quest.challengeRun);
   const waypoints = $derived(quest.state.waypoints);
   const lifetimeReps = $derived(quest.state.lifetimeReps);
+  const checkpoint = $derived(quest.state.challengeCheckpoint);
 
   // Svelte coerces bind:value on a type="number" input to an actual number
   // (or '' when empty) rather than always a string, so this must accept both.
@@ -17,9 +18,9 @@
 
   function submitReps() {
     const raw = repInput;
-    const val = typeof raw === 'number' ? raw : parseInt(String(raw).trim(), 10);
-    if (raw === '' || raw === null || Number.isNaN(val) || val <= 0 || !Number.isInteger(val)) {
-      quest.feedbackMessage = 'Enter a positive whole number';
+    const val = typeof raw === 'number' ? raw : Number(String(raw).trim());
+    if (raw === '' || raw === null || Number.isNaN(val) || val < 1 || val > 9999 || !Number.isInteger(val)) {
+      quest.feedbackMessage = 'Reps must be a whole number from 1 through 9999';
       return;
     }
     quest.logChallengeReps(val);
@@ -31,7 +32,7 @@
   <div class="flex items-center justify-between">
     <h2 class="text-lg font-bold text-red-400">Boss challenge mode</h2>
     <span class="text-xs px-2 py-1 rounded bg-red-900/40 text-red-300 border border-red-800">
-      {challengeRun?.status ?? 'idle'}
+      {challengeRun?.result ?? challengeRun?.status ?? 'idle'}
     </span>
   </div>
 
@@ -39,13 +40,22 @@
     <div class="bg-slate-900 rounded-lg p-3 text-sm">
       <p class="text-white font-semibold">Boss challenge — waypoint {activeBoss.id}</p>
       <p class="text-slate-400 text-xs mt-1">
-        Requires {activeBoss.bossMinReps}+ reps in a single set · Lifetime: {lifetimeReps}/{activeBoss.repsRequired}
+        Active target: <strong class="text-white">{challengeRun?.targetReps ?? activeBoss.bossMinReps} reps</strong> · Lifetime: {lifetimeReps}/{activeBoss.repsRequired}
       </p>
       {#if activeBoss.bossDefeated}
         <p class="text-green-400 text-xs mt-2 font-semibold">Defeated</p>
       {/if}
     </div>
   {/if}
+
+  <fieldset disabled={challengeRun?.status === 'active' || challengeRun?.status === 'paused'}>
+    <legend class="text-xs font-semibold text-slate-300 mb-2">Difficulty</legend>
+    <div class="grid grid-cols-3 gap-2">
+      {#each ['Easy', 'Normal', 'Hard'] as difficulty}
+        <button onclick={() => quest.setChallengeDifficulty(difficulty as 'Easy' | 'Normal' | 'Hard')} aria-pressed={(challengeRun?.difficulty ?? 'Normal') === difficulty} class="rounded-lg py-2 text-sm border {(challengeRun?.difficulty ?? 'Normal') === difficulty ? 'bg-red-600 border-red-400 text-white' : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-red-500'}">{difficulty}</button>
+      {/each}
+    </div>
+  </fieldset>
 
   <div class="flex flex-wrap gap-2">
     <button
@@ -77,7 +87,7 @@
     </button>
     <button
       onclick={() => quest.endChallengeRun()}
-      disabled={!challengeRun || challengeRun.status === 'idle'}
+      disabled={!challengeRun || !['active', 'paused'].includes(challengeRun.status)}
       data-action="challenge-end"
       class="text-sm px-3 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white disabled:bg-slate-800 disabled:text-slate-600
              focus-visible:ring-2 focus-visible:ring-amber-400 transition-colors"
@@ -93,6 +103,12 @@
       Restart
     </button>
   </div>
+
+  <div class="grid grid-cols-2 gap-2">
+    <button onclick={() => quest.saveChallengeProgress()} disabled={!challengeRun || !['active','paused'].includes(challengeRun.status) || challengeRun.repsLogged < 1} data-action="save-progress" class="rounded-lg px-3 py-2 text-sm bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 disabled:text-slate-600">Save progress</button>
+    <button onclick={() => quest.resumeSavedRun()} disabled={!checkpoint} data-action="resume-saved" class="rounded-lg px-3 py-2 text-sm bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 disabled:text-slate-600">Resume saved run</button>
+  </div>
+  {#if checkpoint}<p class="text-xs text-indigo-300">Saved {checkpoint.difficulty} checkpoint: {checkpoint.repsLogged}/{checkpoint.targetReps} reps · {checkpoint.runStatus} · Boss {checkpoint.bossWaypointId} · {checkpoint.savedAt}</p>{/if}
 
   {#if challengeRun?.status === 'active'}
     <div class="flex gap-2">
@@ -120,4 +136,14 @@
   {#if quest.feedbackMessage}
     <p class="text-amber-300 text-xs" role="status">{quest.feedbackMessage}</p>
   {/if}
+
+  {#if challengeRun?.result}
+    <div class="result-panel rounded-xl p-4 border {challengeRun.result === 'Victory' ? 'bg-green-950/70 border-green-500 text-green-200' : 'bg-red-950/70 border-red-500 text-red-200'}" role="status" aria-live="polite">
+      <h3 class="text-xl font-black">{challengeRun.result}</h3>
+      <p>{challengeRun.repsLogged} reps logged versus {challengeRun.targetReps} target.</p>
+      <button onclick={() => quest.restartChallengeRun()} class="mt-3 rounded-lg px-4 py-2 bg-slate-900 hover:bg-slate-700">New run</button>
+    </div>
+  {/if}
 </div>
+
+<style>.result-panel{animation:result-in .28s ease-out}@keyframes result-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}</style>

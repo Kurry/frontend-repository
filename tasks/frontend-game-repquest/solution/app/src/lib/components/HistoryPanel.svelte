@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { fly } from 'svelte/transition';
   import { quest } from '../../store.svelte';
 
   const repHistory = $derived(quest.state.repHistory);
@@ -28,13 +29,15 @@
   {:else}
     <div class="max-h-64 overflow-y-auto space-y-2 pr-1">
       {#each repHistory as set (set.id)}
-        <div class="flex items-center justify-between bg-slate-900 rounded-lg px-3 py-2 group hover:bg-slate-900/80 transition-colors">
+        <div transition:fly={{ x: 18, duration: 180 }} class="flex items-center justify-between bg-slate-900 rounded-lg px-3 py-2 group hover:bg-slate-900/80 transition-colors">
           <div class="flex-1 min-w-0">
             <div class="flex items-baseline gap-2">
               <span class="text-lg font-bold text-amber-400">{set.reps}</span>
               <span class="text-xs text-slate-400">reps</span>
             </div>
             <p class="text-xs text-slate-500 truncate">{formatDate(set.timestamp)}</p>
+            <p class="text-[10px] text-slate-500">ID: {set.setId || set.id} · {set.loggedAt || new Date(set.timestamp).toISOString()}</p>
+            {#if set.note}<p class="text-sm text-slate-300 mt-1 break-words">{set.note}</p>{/if}
           </div>
           <button
             onclick={() => handleDelete(set.id)}

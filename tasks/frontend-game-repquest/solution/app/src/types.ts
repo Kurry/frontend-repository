@@ -2,8 +2,11 @@
 
 export interface RepSet {
   id: string;
+  setId: string;
   reps: number;
+  note?: string;
   timestamp: number; // epoch ms
+  loggedAt: string;
   date: string;      // YYYY-MM-DD local
 }
 
@@ -54,6 +57,7 @@ export interface QuestState {
   lastGoalMetDate: string;
   zoneUnlockMessages: string[]; // zone IDs that have shown unlock message
   nextSetId: number;
+  challengeCheckpoint: ChallengeCheckpoint | null;
 }
 
 export interface Snapshot {
@@ -71,11 +75,26 @@ export interface HistoryBranch {
 
 export type GameMode = 'quest' | 'challenge';
 
+export type Difficulty = 'Easy' | 'Normal' | 'Hard';
+export type ChallengeResult = 'Victory' | 'Defeat' | null;
+
 export interface ChallengeRun {
-  status: 'idle' | 'active' | 'paused' | 'cleared' | 'failed';
+  status: 'idle' | 'active' | 'paused' | 'ended';
   bossWaypointId: number;
+  difficulty: Difficulty;
   repsLogged: number;
+  targetReps: number;
   startedAt: number;
+  result: ChallengeResult;
+}
+
+export interface ChallengeCheckpoint {
+  runStatus: 'active' | 'paused';
+  bossWaypointId: number;
+  difficulty: Difficulty;
+  repsLogged: number;
+  targetReps: number;
+  savedAt: string;
 }
 
 export interface ScenarioPreset {

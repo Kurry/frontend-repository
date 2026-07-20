@@ -12,6 +12,7 @@
   import Notification from './lib/components/Notification.svelte';
   import GameModeBar from './lib/components/GameModeBar.svelte';
   import ChallengePanel from './lib/components/ChallengePanel.svelte';
+  import QuestArtifactPanel from './lib/components/QuestArtifactPanel.svelte';
   import { quest } from './store.svelte';
 
   type TabId = 'quest' | 'history' | 'gear' | 'settings';
@@ -27,6 +28,11 @@
 </script>
 
 <Notification />
+{#if quest.celebration}
+  <div class="confetti" aria-hidden="true">
+    {#each Array.from({length: 24}) as _, i}<i style={`--i:${i}`}></i>{/each}
+  </div>
+{/if}
 
 <div class="min-h-screen bg-slate-950">
   <!-- Header -->
@@ -83,6 +89,7 @@
             <QuestMap />
             <LogRepsForm />
             <ProgressPanel />
+            <QuestArtifactPanel />
             <WeeklyChart />
           {:else}
             <ChallengePanel />
@@ -94,7 +101,7 @@
     {:else if activeTab === 'history'}
       <!-- History Tab -->
       <div id="panel-history" role="tabpanel">
-        <HistoryPanel />
+        <div class="space-y-4"><HistoryPanel /><QuestArtifactPanel /></div>
       </div>
     {:else if activeTab === 'gear'}
       <!-- Gear Tab -->
@@ -114,3 +121,9 @@
     <p>RepQuest — Log your push-ups, advance your quest!</p>
   </footer>
 </div>
+
+<style>
+  .confetti{position:fixed;inset:0;z-index:60;pointer-events:none;overflow:hidden}
+  .confetti i{position:absolute;left:calc((var(--i) + 1) * 4%);top:-12px;width:8px;height:14px;background:hsl(calc(var(--i) * 47),90%,58%);animation:confetti-fall 1.1s ease-in forwards;animation-delay:calc(var(--i) * 12ms)}
+  @keyframes confetti-fall{to{transform:translate(calc((var(--i) - 12) * 2px),105vh) rotate(720deg);opacity:.2}}
+</style>
