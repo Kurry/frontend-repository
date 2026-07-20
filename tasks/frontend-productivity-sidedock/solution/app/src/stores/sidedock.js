@@ -66,6 +66,12 @@ export const useSidedockStore = defineStore('sidedock', () => {
   // State
   const workspaces = ref([])
   const activeWorkspaceId = ref(null)
+  const showCreateWorkspaceModal = ref(false)
+  const showCreateFolderModal = ref(false)
+  const createFolderParentId = ref(null)
+  const showExportPackageModal = ref(false)
+  const showImportPackageModal = ref(false)
+
   const expandedFolders = ref({})
   const compactMode = ref(false)
   const darkMode = ref(false)
@@ -236,12 +242,12 @@ export const useSidedockStore = defineStore('sidedock', () => {
   }
 
   // Folder operations
-  function createFolder(parentId = null) {
+  function createFolder(parentId = null, name = 'New folder') {
     if (!activeWorkspace.value) return null
     const folder = {
       id: generateId(),
       type: 'folder',
-      name: 'New folder',
+      name: name || 'New folder',
       children: [],
     }
     if (parentId) {
@@ -532,6 +538,127 @@ export const useSidedockStore = defineStore('sidedock', () => {
   }
 
   // Export Netscape bookmarks
+
+  // Import SideDock JSON package
+  function importPackage(jsonString) {
+    try {
+      const data = JSON.parse(jsonString)
+      if (data.schemaVersion !== 'sidedock-package-v1') {
+        throw new Error('invalid schemaVersion')
+      }
+
+      const validColors = ['#E54610', '#D97706', '#65A30D', '#059669', '#0891B2', '#2563EB', '#7C3AED', '#DB2777', '#6B7280']
+
+      // Validation
+      if (!Array.isArray(data.workspaces)) throw new Error('workspaces must be an array')
+      if (data.pinnedBookmarkIds && data.pinnedBookmarkIds.length > 8) throw new Error('pinnedBookmarkIds cannot be longer than 8')
+
+      let allFoundIds = new Set()
+      const collectIds = (items) => {
+        for (const item of items) {
+          if (item.type === 'bookmark') allFoundIds.add(item.id)
+          if (item.type === 'folder' && Array.isArray(item.children)) collectIds(item.children)
+        }
+      }
+
+      for (const w of data.workspaces) {
+        if (!w.id || typeof w.id !== 'string') throw new Error('workspace id missing')
+        if (!w.name || typeof w.name !== 'string' || w.name.length < 1 || w.name.length > 40) throw new Error('workspace name invalid')
+        if (!validColors.includes(w.accentColor)) throw new Error('workspace accentColor invalid')
+        if (!Array.isArray(w.items)) throw new Error('workspace items missing')
+
+        const validateItems = (items) => {
+          for (const item of items) {
+            if (!item.id || typeof item.id !== 'string') throw new Error('item id missing')
+            if (item.type === 'bookmark') {
+               if (!isValidUrl(item.url)) throw new Error('bookmark url invalid')
+               if (item.title && item.title.length > 120) throw new Error('bookmark title too long')
+            } else if (item.type === 'folder') {
+               if (!item.name || typeof item.name !== 'string' || item.name.length < 1 || item.name.length > 80) throw new Error('folder name invalid')
+               if (!Array.isArray(item.children)) throw new Error('folder children missing')
+               validateItems(item.children)
+            } else {
+               throw new Error('invalid item type')
+            }
+          }
+        }
+        validateItems(w.items)
+        collectIds(w.items)
+      }
+
+      if (data.pinnedBookmarkIds) {
+        for (const pid of data.pinnedBookmarkIds) {
+          if (!allFoundIds.has(pid)) throw new Error('pinned id missing from trees')
+        }
+      }
+
+      // Validated, apply. Map the external accentColor field onto the
+      // internal color field the UI reads for tabs / accent styling.
+      const mapWorkspace = (w) => {
+        const { accentColor, ...rest } = w
+        return { ...rest, color: accentColor }
+      }
+      workspaces.value = data.workspaces.map(mapWorkspace)
+      activeWorkspaceId.value = data.activeWorkspaceId || (data.workspaces.length > 0 ? data.workspaces[0].id : null)
+      compactMode.value = !!data.sidebarView
+
+      if (data.pinnedBookmarkIds) {
+         pinnedBookmarks.value = data.pinnedBookmarkIds.map(id => {
+           let found = null
+           for (const w of workspaces.value) {
+             const item = findItemById(id, w.items)
+             if (item) { found = item; break; }
+           }
+           if (found) return { id: found.id, url: found.url, title: found.title }
+           return null
+         }).filter(Boolean)
+      } else {
+         pinnedBookmarks.value = []
+      }
+
+      addToast('Package imported successfully', 'success')
+      return true
+    } catch (e) {
+      addToast('Import failed: ' + e.message, 'error')
+      throw e
+    }
+  }
+
+  function getPackageJson() {
+    return JSON.stringify({
+      schemaVersion: 'sidedock-package-v1',
+      sidebarView: compactMode.value,
+      activeWorkspaceId: activeWorkspaceId.value,
+      pinnedBookmarkIds: pinnedBookmarks.value.map(p => p.id),
+      // Serialize the internal `color` field as the field-contract's `accentColor`.
+      workspaces: workspaces.value.map(({ color, ...rest }) => ({ ...rest, accentColor: color }))
+    }, null, 2)
+  }
+
+  function exportPackage() {
+    const jsonStr = getPackageJson()
+    const blob = new Blob([jsonStr], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `sidedock-package-${Date.now()}.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+    addToast('Package exported', 'success')
+  }
+
+  function copyPackage() {
+    const jsonStr = getPackageJson()
+    navigator.clipboard.writeText(jsonStr).then(() => {
+      addToast('Package JSON copied to clipboard', 'success')
+    }).catch((e) => {
+      addToast('Failed to copy', 'error')
+    })
+  }
+
+
   function exportBookmarks(scope = 'current') {
     const items = scope === 'current' && activeWorkspace.value
       ? activeWorkspace.value.items
@@ -606,6 +733,11 @@ export const useSidedockStore = defineStore('sidedock', () => {
     // State
     workspaces,
     activeWorkspaceId,
+    showCreateWorkspaceModal,
+    showCreateFolderModal,
+    createFolderParentId,
+    showExportPackageModal,
+    showImportPackageModal,
     expandedFolders,
     compactMode,
     darkMode,
@@ -643,6 +775,10 @@ export const useSidedockStore = defineStore('sidedock', () => {
     reorderItem,
     importBookmarks,
     exportBookmarks,
+    importPackage,
+    exportPackage,
+    copyPackage,
+    getPackageJson,
     load10000Items,
     addToast,
     findItemById,

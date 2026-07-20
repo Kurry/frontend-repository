@@ -263,25 +263,38 @@ export function registerWebmcp(store) {
       parameters: { mode: { type: 'string', enum: ['netscape-html'] }, html: { type: 'string' } },
       handler(args) {
         args = args || {}
-        if (args.mode && args.mode !== 'netscape-html') {
-          return { ok: false, error: 'unsupported import mode', allowed: ['netscape-html'] }
+        if (args.mode && args.mode !== 'netscape-html' && args.mode !== 'sidedock-json') {
+          return { ok: false, error: 'unsupported import mode', allowed: ['netscape-html', 'sidedock-json'] }
         }
         if (typeof args.html !== 'string' || !args.html.trim()) {
           return { ok: false, error: 'html content required' }
         }
-        const count = store.importBookmarks(args.html)
-        return { ok: true, mode: 'netscape-html', imported: count }
+        if (args.mode === 'sidedock-json') {
+          try {
+            store.importPackage(args.html)
+            return { ok: true, mode: 'sidedock-json' }
+          } catch(e) {
+            return { ok: false, error: String(e.message || e) }
+          }
+        } else {
+          const count = store.importBookmarks(args.html)
+          return { ok: true, mode: 'netscape-html', imported: count }
+        }
       },
     },
     'artifact.export': {
       module: 'artifact-transfer-v1',
       operation: 'export',
       description: 'Export the current workspace or all workspaces as a Netscape-format bookmarks HTML download (same action as the Export controls).',
-      parameters: { format: { type: 'string', enum: ['netscape-html'] }, scope: { type: 'string', enum: ['current', 'all'] } },
+      parameters: { format: { type: 'string', enum: ['netscape-html', 'sidedock-json'] }, scope: { type: 'string', enum: ['current', 'all'] } },
       handler(args) {
         args = args || {}
-        if (args.format && args.format !== 'netscape-html') {
-          return { ok: false, error: 'unsupported export format', allowed: ['netscape-html'] }
+        if (args.format && args.format !== 'netscape-html' && args.format !== 'sidedock-json') {
+          return { ok: false, error: 'unsupported export format', allowed: ['netscape-html', 'sidedock-json'] }
+        }
+        if (args.format === 'sidedock-json') {
+          store.exportPackage()
+          return { ok: true, format: 'sidedock-json' }
         }
         const scope = args.scope === 'all' ? 'all' : 'current'
         store.exportBookmarks(scope)

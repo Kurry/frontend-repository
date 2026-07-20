@@ -8,6 +8,11 @@ import PinnedBookmarks from './components/PinnedBookmarks.vue'
 import SearchBar from './components/SearchBar.vue'
 import ToastContainer from './components/ToastContainer.vue'
 import EmptyState from './components/EmptyState.vue'
+import CreateWorkspaceModal from './components/CreateWorkspaceModal.vue'
+import CreateFolderModal from './components/CreateFolderModal.vue'
+import ImportPackageModal from './components/ImportPackageModal.vue'
+import ExportPackageModal from './components/ExportPackageModal.vue'
+import { NConfigProvider } from 'naive-ui'
 
 const store = useSidedockStore()
 const showSearchResults = ref(false)
@@ -18,6 +23,7 @@ watch(() => store.searchQuery, (q) => {
 </script>
 
 <template>
+  <n-config-provider :theme="store.darkMode ? null : null">
   <div class="app-shell h-screen min-h-0 flex flex-col" :class="{ 'dark-theme': store.darkMode }">
     <!-- Header -->
     <header class="flex items-center justify-between px-4 py-3 border-b" style="border-color: var(--color-border); background: var(--color-surface);">
@@ -78,7 +84,8 @@ watch(() => store.searchQuery, (q) => {
               :aria-label="`Open ${bm.title}`"
             >
               <div
-                aria-hidden="true"
+                role="img"
+                :aria-label="`Monogram icon for ${bm.title}`"
                 class="w-7 h-7 rounded flex items-center justify-center text-white text-xs font-bold"
                 :style="{ background: store.hashColor(store.getDomain(bm.url)) }"
               >
@@ -121,7 +128,7 @@ watch(() => store.searchQuery, (q) => {
           <!-- Empty workspace state -->
           <div v-if="store.activeWorkspace && store.activeWorkspace.items.length === 0" class="flex-1 flex items-center justify-center p-8">
             <div class="text-center max-w-xs mx-auto">
-              <div aria-hidden="true" class="text-5xl mb-3 opacity-50">📂</div>
+              <div role="img" aria-label="Folder empty state" class="text-5xl mb-3 opacity-50">📂</div>
               <h3 class="text-base font-semibold mb-2" style="font-family: 'Cormorant Upright', Georgia, serif;">
                 This workspace is empty
               </h3>
@@ -136,7 +143,13 @@ watch(() => store.searchQuery, (q) => {
 
     <!-- Toasts -->
     <ToastContainer />
+
+    <CreateWorkspaceModal />
+    <CreateFolderModal />
+    <ImportPackageModal />
+    <ExportPackageModal />
   </div>
+  </n-config-provider>
 </template>
 
 <style>
@@ -154,7 +167,8 @@ watch(() => store.searchQuery, (q) => {
 * { box-sizing: border-box; }
 html, body, #app { margin: 0; padding: 0; min-width: 0; min-height: 100%; }
 body, button, input, select, textarea { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-button, input, select, textarea { font-size: 15px; }
+button, input, select, textarea { font-size: 15px; font-family: Inter, sans-serif; }
+p, span, div { font-family: Inter, sans-serif; }
 .app-shell {
   background: var(--color-background);
   color: var(--color-text-primary);
@@ -201,5 +215,14 @@ button:disabled { opacity: .48; cursor: not-allowed !important; filter: grayscal
 @media (max-width: 520px) {
   header { flex-wrap: wrap; gap: 8px; }
   header > div { flex-wrap: wrap; justify-content: flex-end; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 </style>
