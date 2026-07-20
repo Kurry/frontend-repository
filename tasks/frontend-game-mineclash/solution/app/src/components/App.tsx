@@ -82,6 +82,7 @@ export const App = component$(() => {
     };
     w.__mineclashApi = mcApi;
     initWebMcp();
+    w.API = mcApi;
   });
 
   useVisibleTask$(({ track }) => {
