@@ -395,7 +395,11 @@ function DiffSurface({ diff, annotations, base, compare }) {
       <div className="unified-caption">UNIFIED CHANGES · 3 lines of context</div>
       {diff.unifiedRows.map((row) => row.separator ? <div key={row.key} className="diff-separator">•••</div> : <div key={row.key} className={`unified-row ${row.line.type}`} data-line-number={row.line.number} data-change={row.line.type === 'added' || row.line.type === 'removed' ? row.line.type : undefined}>
         <span className="gutter-sign">{row.line.type === 'added' ? '+' : row.line.type === 'removed' ? '−' : ''}</span><span className="line-number old">{row.oldNumber || (row.side === 'left' ? row.line.number : '')}</span><span className="line-number new">{row.side !== 'left' ? row.line.number : ''}</span><WordLine line={row.line} />
-        {row.side !== 'left' && annotations.filter((item) => item.lineStart === row.line.number).map((annotation) => <AnnotationMarker key={annotation.annotationId} annotation={annotation} />)}
+        {/* Match the compare number (line.number) or the base number (oldNumber on
+            context rows, line.number on removed rows) so a marker anchored from the
+            base pane still shows after switching from split to unified — mirroring
+            split, which renders the marker in both panes. */}
+        {annotations.filter((item) => item.lineStart === row.line.number || item.lineStart === row.oldNumber).map((annotation) => <AnnotationMarker key={annotation.annotationId} annotation={annotation} />)}
       </div>)}
     </div>}
   </div>;
