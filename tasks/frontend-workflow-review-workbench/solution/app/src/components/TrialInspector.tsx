@@ -20,7 +20,8 @@ function TrialDiff({ bundle }: { bundle: ReviewBundle }) {
   const trials = bundle.trials.filter((trial) => trial.model === model);
   const defaultLeft = diff.leftTrialId ?? diff.previousTrialId ?? trials[0]?.id ?? '';
   const defaultRight = diff.rightTrialId ?? trials.find((trial) => trial.id !== defaultLeft)?.id ?? '';
-  const { control, handleSubmit, formState: { errors } } = useForm<DiffValues>({ resolver: zodResolver(diffFormSchema), defaultValues: { leftTrialId: defaultLeft, rightTrialId: defaultRight } });
+  const { control, handleSubmit, watch, formState: { errors } } = useForm<DiffValues>({ resolver: zodResolver(diffFormSchema), defaultValues: { leftTrialId: defaultLeft, rightTrialId: defaultRight } });
+  const leftId = watch('leftTrialId');
   const left = trials.find((trial) => trial.id === diff.leftTrialId);
   const right = trials.find((trial) => trial.id === diff.rightTrialId);
   const flips = left && right ? CHECK_NAMES.filter((name) => left.checks.find((check) => check.name === name)?.outcome !== right.checks.find((check) => check.name === name)?.outcome) : [];

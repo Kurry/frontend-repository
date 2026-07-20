@@ -24,7 +24,7 @@ export default function FixList({ bundle }: { bundle: ReviewBundle }) {
         {bundle.fixItems.map((item, index) => {
           const open = expanded.includes(item.id);
           return (
-            <Paper component="li" key={item.id} className={`fix-item${item.resolved ? ' resolved' : ''}`} style={{ transition: 'opacity 0.25s ease, background 0.25s ease, transform 0.18s ease' }}>
+            <Paper component="li" key={item.id}  style={{ transition: 'opacity 0.25s ease, background 0.25s ease, transform 0.18s ease' }}>
               <div className="fix-position">{index + 1}</div>
               <Checkbox checked={item.resolved} onChange={(event) => toggleFix(bundle.slug, item.id, event.currentTarget.checked)} aria-label={`${item.resolved ? 'Unresolve' : 'Resolve'} ${item.title}`} />
               <div className="fix-content">

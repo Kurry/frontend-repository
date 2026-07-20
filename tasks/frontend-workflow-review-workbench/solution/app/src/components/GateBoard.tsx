@@ -24,7 +24,7 @@ function RerunProgress({ bundle, gateName }: { bundle: ReviewBundle; gateName: G
           <li key={step.name} className={`rerun-step step-${step.status}`}>
             <span className="step-node">{step.status === 'complete' ? <IconRosetteDiscountCheck size={15} style={{ animation: 'panel-in 0.2s ease' }} /> : step.status === 'failed' ? <IconX size={15} style={{ animation: 'panel-in 0.2s ease' }} /> : step.status === 'running' ? <span className="activity-dot" /> : index + 1}</span>
             <div className="rerun-step-copy">
-              <Group justify="space-between" gap="xs"><Text size="sm" fw={700}>{step.name}</Text><Badge className={`rerun-status rerun-${step.status}`} variant="light" style={{ transition: 'opacity 0.25s ease, background 0.25s ease' }}>{step.status}</Badge></Group>
+              <Group justify="space-between" gap="xs"><Text size="sm" fw={700}>{step.name}</Text><Badge variant="light"  style={{ transition: 'opacity 0.25s ease, background 0.25s ease' }}>{step.status}</Badge></Group>
               <Text size="xs" c="dimmed">Attempt {step.attempt || 0} of {step.maxAttempts}{step.timestamp ? ` · ${new Date(step.timestamp).toLocaleTimeString()}` : ''}</Text>
               {step.status === 'waiting' && <Text size="xs" className="backoff-copy">Waiting {step.backoff}s before retry {step.attempt + 1} of {step.maxAttempts}</Text>}
               {step.output && <Text size="xs" className="step-output">{step.output}</Text>}
@@ -67,33 +67,22 @@ export default function GateBoard({ bundle }: { bundle: ReviewBundle }) {
 
           if (gate.status === 'missing') {
             return (
-              <Paper key={gate.name} component="article" onClick={(event) => { if (!(event.target as HTMLElement).closest('button, input')) selectGate(gate.name, false); }} className={`gate-card ${isSelected ? 'selected-record' : ''}`} data-gate={gate.name} style={{ transition: 'transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease' }}>
+              <Paper key={gate.name} component="article" className="gate-card" data-gate={gate.name} style={{ transition: 'transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease' }}>
                 <div className="gate-order">0{index + 1}</div>
                 <Group justify="space-between" align="start" gap="sm">
                   <div className="gate-title"><Text size="xs" c="dimmed">GATE {index + 1}</Text><Title order={3}>{gate.name}</Title></div>
                   <StatusBadge status="missing" />
                 </Group>
                 <Text className="gate-summary" c="dimmed">No evidence available for {gate.name}.</Text>
-                <Group mt="sm" justify="space-between" gap="xs">
-                  <Button variant="subtle" size="compact-sm" leftSection={<IconExternalLink size={14} />} onClick={() => selectGate(gate.name, gate.name.startsWith('Difficulty'))}>
-                    {gate.name.startsWith('Difficulty') ? 'Open trial evidence' : gate.name === 'Oracle' ? 'Open oracle transcript' : 'Highlight evidence'}
-                  </Button>
-                  <Button variant="default" size="compact-sm" rightSection={open ? <IconChevronUp size={14} /> : <IconChevronDown size={14} />} onClick={() => toggle(gate.name)} aria-expanded={open}>Reasons</Button>
-                </Group>
-                <Collapse expanded={open}>
-                  <ul className="reasons-list">{gate.reasons.map((reason) => <li key={reason}>{reason}</li>)}</ul>
-                </Collapse>
                 <div className="gate-rerun-control">
-                  <Button fullWidth leftSection={<IconRefresh size={16} />} disabled={rerun?.status === 'running' || rerun?.status === 'paused'} onClick={() => startRerun(bundle.slug, gate.name)}>
-                    {rerun?.status === 'running' ? 'Re-run in progress' : rerun?.status === 'paused' ? 'Re-run paused' : 'Re-run gate'}
-                  </Button>
+                  <Button fullWidth leftSection={<IconRefresh size={16} />} onClick={() => startRerun(bundle.slug, gate.name)}>Re-run gate</Button>
                 </div>
                 <RerunProgress bundle={bundle} gateName={gate.name} />
               </Paper>
             );
           }
           return (
-            <Paper key={gate.name} component="article" tabIndex={0} aria-label={`Select ${gate.name} gate`} onKeyDown={(event) => { if (event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); selectGate(gate.name, false); } }} onClick={(event) => { if (!(event.target as HTMLElement).closest('button, input')) selectGate(gate.name, false); }} className={`gate-card ${isSelected ? 'selected-record' : ''} ${rerun?.status === 'complete' ? 'gate-recently-published' : ''}`} data-gate={gate.name}>
+            <Paper key={gate.name} component="article" tabIndex={0} aria-label={`Select ${gate.name} gate`} role="button" onClick={(event) => { if (!(event.target as HTMLElement).closest('button, input')) selectGate(gate.name, false); }} onKeyDown={(event) => { if (event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); selectGate(gate.name, false); } }} className={`gate-card ${isSelected ? 'selected-record' : ''} ${rerun?.status === 'complete' ? 'gate-recently-published' : ''}`} data-gate={gate.name}>
               <div className="gate-order">0{index + 1}</div>
               <Group justify="space-between" align="start" gap="sm">
                 <div className="gate-title"><Text size="xs" c="dimmed">GATE {index + 1}</Text><Title order={3}>{gate.name}</Title></div>

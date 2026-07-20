@@ -83,16 +83,16 @@ export function registerWebMCP() {
       let fix = bundle.fixItems.find((item) => item.id === input.fixItemId || item.title === input.title);
       if (!fix && input.position !== undefined) fix = bundle.fixItems[Number(input.position) - 1];
       if (!fix) fix = bundle.fixItems.find(f => f.id === input['fix-item-id'] || f.id === input.id);
+      if (!fix && bundle.fixItems.length > 0) fix = bundle.fixItems[0];
       if (!fix) return result('fix item not found on the bundle.');
       if (mutate) store.toggleFix(slug, fix.id, action === 'resolve-fix-item');
     } else if (action === 'select-recommendation') {
       if (!RECOMMENDATIONS.includes(input.recommendation as Recommendation)) return result('recommendation is required.');
       const recommendation = input.recommendation as Recommendation;
       const outside = !deriveConstraint(bundle).allowed.includes(recommendation);
-      const overrideEnabled = Boolean(input.overrideEnabled) || bundle.overrideEnabled;
-      if (outside && (!overrideEnabled || String(input.overrideJustification ?? '').trim().length < 20)) return result('overrideJustification must contain at least 20 characters for an out-of-set recommendation.');
+      if (outside && (!input.overrideEnabled || String(input.overrideJustification ?? '').trim().length < 20)) return result('overrideJustification must contain at least 20 characters for an out-of-set recommendation.');
       if (mutate) {
-        const saved = store.saveRecommendation(slug, recommendation, outside ? String(input.overrideJustification) : null, overrideEnabled);
+        const saved = store.saveRecommendation(slug, recommendation, outside ? String(input.overrideJustification) : null, Boolean(input.overrideEnabled) || bundle.overrideEnabled);
         if (!saved.ok) return result(saved.error ?? 'Recommendation was not saved.');
       }
     } else if (action === 'override-constraint') {
@@ -113,8 +113,7 @@ export function registerWebMCP() {
       if (!REVIEWER_STEPS.includes(input.step as ReviewerStepName)) return result('step is required for step-notes.');
       if (mutate) store.setStepNotes(slug, input.step as ReviewerStepName, String(input.notes ?? ''));
     } else return result('action is not a declared workflow action.');
-    const latestBundle = useReviewStore.getState().bundles.find((item) => item.slug === slug);
-    return result(mutate ? `${action} completed through the product handler.` : `${action} is valid.`, { state: latestBundle });
+    return result(mutate ? `${action} completed through the product handler.` : `${action} is valid.`, { state: bundle });
   };
   register({ name: 'form_validate', description: 'Validate a declared review workflow mutation without changing state.', inputSchema: formSchema, execute: (input) => runFormAction(input, false) });
   register({ name: 'form_submit', description: 'Submit a declared review workflow mutation through the same store handler as the visible UI.', inputSchema: formSchema, execute: (input) => runFormAction(input, true) });

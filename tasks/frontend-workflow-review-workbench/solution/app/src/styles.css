@@ -304,6 +304,12 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monos
 }
 
 @media (max-width: 1024px) {
+  .workspace-layout { grid-template-columns: 1fr; }
+  .step-rail { position: static; min-height: 0; padding: 12px 14px; border-right: 0; border-bottom: 1px solid var(--line); overflow-x: hidden; width: 100%; box-sizing: border-box; flex-wrap: wrap; }
+  .step-rail-heading { display: none; }
+  .step-buttons { flex-direction: row; flex-wrap: wrap; gap: 4px; }
+  .step-button { grid-template-columns: 26px max-content; width: auto; flex: 0 0 auto; padding: 7px; }
+  .step-button.active { transform: translateY(2px); }
   .inspector-grid { grid-template-columns: 1fr; display: flex; flex-direction: column; }
   .inspector-pane + .inspector-pane { border-left: 0; border-top: 1px solid var(--line); }
   .criteria-pane, .reasoning-pane, .answer-pane { scroll-margin-top: 130px; }

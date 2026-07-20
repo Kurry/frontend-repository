@@ -19,7 +19,7 @@ export function ArtifactDrawers() {
   const importPackage = useReviewStore((state) => state.importPackage);
   const setAnnouncement = useReviewStore((state) => state.setAnnouncement);
   const preview = useMemo(() => ui.exportFormat === 'json' ? reviewPackageJson(bundles, ui.exportGeneratedAt) : portfolioSummaryMarkdown(bundles, ui.exportGeneratedAt), [bundles, ui.exportFormat, ui.exportGeneratedAt]);
-  const { control, handleSubmit, setError, clearErrors, reset, formState: { errors, isSubmitting } } = useForm<{ packageText: string }>({ resolver: zodResolver(importFormSchema), defaultValues: { packageText: ui.importDraft } });
+  const { control, handleSubmit, setError, reset, formState: { errors, isSubmitting } } = useForm<{ packageText: string }>({ resolver: zodResolver(importFormSchema), defaultValues: { packageText: ui.importDraft } });
   useEffect(() => setExportPreviewText(preview), [preview, setExportPreviewText]);
   useEffect(() => { if (ui.importOpen) reset({ packageText: ui.importDraft }); }, [ui.importOpen, ui.importDraft, reset]);
 

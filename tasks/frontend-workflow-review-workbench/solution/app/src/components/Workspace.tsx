@@ -73,7 +73,7 @@ export default function Workspace() {
 
   const renderPanel = () => {
     if (panel === 'Timeline') return <Timeline bundle={bundle} />;
-    if (activeStep && locked) return <LockedStep stepName={activeStep} blockedBy={firstIncompleteBefore!} />;
+    if (activeStep && locked && panel !== 'Audit') return <LockedStep stepName={activeStep} blockedBy={firstIncompleteBefore!} />;
     if (panel === 'Resolve') return <FixList bundle={bundle} />;
     if (panel === 'Gate') return <GateBoard bundle={bundle} />;
     if (panel === 'Audit') return <TrialInspector bundle={bundle} />;
