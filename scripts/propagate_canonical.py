@@ -9,6 +9,8 @@ Surfaces:
   tests/system_prompt.md        <- scripts/canonical/system_prompt.md
   tests/webmcp_stdio_server.mjs <- scripts/canonical/mcp/webmcp_stdio_server.mjs
   tests/reward.toml             <- scripts/canonical/reward.toml
+  environment/webmcp_stdio_server.mjs <- scripts/canonical/mcp/webmcp_stdio_server.mjs
+  environment/entrypoint.sh     <- scripts/canonical/entrypoint.sh (0755)
   environment/Dockerfile        <- package_frontend_tasks.DOCKERFILE
                                    (+ reference-screenshots COPY line when the
                                     directory exists)
@@ -47,6 +49,13 @@ def desired_files(task: Path, sources: dict) -> dict[Path, bytes]:
         canon / "mcp/webmcp_stdio_server.mjs"
     ).read_bytes()
     out[task / "tests/reward.toml"] = (canon / "reward.toml").read_bytes()
+    # Same canonical bridge, twice: judge runs the tests/ copy; the environment/
+    # copy is the docker build-context file the Dockerfile bakes to /opt/webmcp.
+    out[task / "environment/webmcp_stdio_server.mjs"] = (
+        canon / "mcp/webmcp_stdio_server.mjs"
+    ).read_bytes()
+    # Baked as /opt/verifier/entrypoint.sh (shared CDP Chrome + HEALTHCHECK pair).
+    out[task / "environment/entrypoint.sh"] = (canon / "entrypoint.sh").read_bytes()
 
     dockerfile = pkg.DOCKERFILE
     if (task / "environment/reference-screenshots").is_dir():
@@ -98,7 +107,7 @@ def main() -> int:
                 if not args.check:
                     path.parent.mkdir(parents=True, exist_ok=True)
                     path.write_bytes(want)
-                    if path.name == "test.sh":
+                    if path.name in ("test.sh", "entrypoint.sh"):
                         path.chmod(0o755)
         for toml in fix_judge_cwd(task, args.check):
             drift.append(str(toml.relative_to(ROOT)))

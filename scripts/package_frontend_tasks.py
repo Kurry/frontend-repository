@@ -2767,7 +2767,7 @@ JUDGE_SYSTEM_PROMPT = textwrap.dedent(
 )
 
 DOCKERFILE = textwrap.dedent(
-    """\
+    f"""\
     FROM mcr.microsoft.com/playwright:v1.61.0-noble
     ENV DEBIAN_FRONTEND=noninteractive
 
@@ -2776,6 +2776,36 @@ DOCKERFILE = textwrap.dedent(
     RUN apt-get update && apt-get install -y --no-install-recommends build-essential \\
      && rm -rf /var/lib/apt/lists/*
 
+    # Real-world agent tooling (pins: tasks/_pins.py). Browsers ship with the
+    # base image; the cache symlink lets tools that ignore
+    # PLAYWRIGHT_BROWSERS_PATH resolve them.
+    RUN PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install -g \\
+          playwright@1.61.0 \\
+          @playwright/mcp@0.0.76 \\
+          start-server-and-test@3.0.11 \\
+     && mkdir -p /root/.cache && ln -sfn /ms-playwright /root/.cache/ms-playwright
+
+    # The judge-only rewardkit harness is deliberately NOT baked in: tests/test.sh
+    # installs it at verify time, after the builder's turn, so the agent never has
+    # the judge harness in its container to inspect or tamper with (reward-hacking
+    # surface). Pin: tasks/_pins.py HARBOR_REWARDKIT_GIT_SHA — bumping regenerates
+    # test.sh copies, no image rebuild.
+
+    # WebMCP CDP bridge (same canonical source as the judge copy in
+    # tests/webmcp_stdio_server.mjs). Baked in so the builder can smoke-test
+    # its own window.webmcp_* surface: node /opt/webmcp/webmcp_stdio_server.mjs
+    # against the shared CDP Chrome the entrypoint starts on 127.0.0.1:9222.
+    COPY webmcp_stdio_server.mjs /opt/webmcp/webmcp_stdio_server.mjs
+
+    # Entrypoint starts the shared headless CDP Chrome (judge MCP servers and
+    # builder self-tests attach to it); HEALTHCHECK goes green only when Chrome
+    # answers CDP, so `harbor run --install-only` exposes a broken judge env
+    # before any agent trial burns 45 minutes.
+    COPY entrypoint.sh /opt/verifier/entrypoint.sh
+    RUN chmod 0755 /opt/verifier/entrypoint.sh
+    ENTRYPOINT ["/opt/verifier/entrypoint.sh"]
+    HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=5 \\
+      CMD curl -fsS http://127.0.0.1:9222/json/version > /dev/null || exit 1
 
     WORKDIR /app
     EXPOSE 3000
@@ -2787,54 +2817,47 @@ TEST_SH = textwrap.dedent(
     #!/usr/bin/env bash
     set -u
     mkdir -p /logs/verifier
-    echo '{{"reward": 0.0}}' > /logs/verifier/reward.json
 
-    # Test-only deps (pins: tasks/_pins.py). Not baked into the image.
-    PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install -g \\
-      start-server-and-test@3.0.11 \\
-      playwright@1.61.0
-    npx -y @playwright/mcp@0.0.76 install-browser chrome-for-testing
-    mkdir -p /root/.cache && ln -sfn /ms-playwright /root/.cache/ms-playwright
-    npx -y playwright@1.61.0 install chromium
+    # App-caused failure: write a zero reward.json (same aggregate keys as the
+    # tests/reward.toml [[reward]] specs) and exit 0 so harbor records the score.
+    # No up-front seed: rewardkit deletes pre-existing outputs at startup
+    # (_clear_outputs), so a seed protects nothing — infra failures exit non-zero
+    # with no reward.json instead.
+    record_zero() {{
+      echo "[test] $1 — recording 0.0" >&2
+      echo '{{"reward": 0.0, "pass": 0.0}}' > /logs/verifier/reward.json
+      exit 0
+    }}
+
+    # Judge-only rewardkit harness, installed at verify time — deliberately NOT
+    # baked into the image, so the builder agent never has the judge harness in its
+    # container to inspect or tamper with (pin: tasks/_pins.py
+    # HARBOR_REWARDKIT_GIT_SHA; bumping regenerates test.sh copies, no image
+    # rebuild). Install failure is an infra error (exit 1), never a 0.0 for the app.
     uv tool install "{HARBOR_REWARDKIT_PACKAGE}" \\
-     && ln -sf /root/.local/bin/rewardkit /usr/local/bin/rewardkit
+     && ln -sf /root/.local/bin/rewardkit /usr/local/bin/rewardkit \\
+     || {{ echo "[test] rewardkit install failed (infra)" >&2; exit 1; }}
 
-    # Shared headless Chrome for the judge's MCP servers (contract in
-    # scripts/canonical/mcp/reward_mcp_servers.toml): Playwright MCP and the
-    # webmcp bridge (tests/webmcp_stdio_server.mjs) both attach via $WEBMCP_CDP_ENDPOINT. rewardkit
-    # expands these with os.path.expandvars, so they must be exported here.
-    WEBMCP_CDP_PORT=9222
-    CHROME_BIN="$(find /ms-playwright -type f \\( -name chrome -o -name chromium \\) -not -path '*headless*' 2>/dev/null | head -n1)"
-    if [ -n "$CHROME_BIN" ]; then
-      # blink-settings force (hover: hover)/(pointer: fine): headless Linux has no
-      # pointing device, which would strip every Tailwind v4 hover: style.
-      "$CHROME_BIN" --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage \\
-        --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 \\
-        --remote-debugging-address=127.0.0.1 --remote-debugging-port="$WEBMCP_CDP_PORT" \\
-        --user-data-dir=/tmp/webmcp-chrome-profile about:blank \\
-        > /logs/verifier/chrome.log 2>&1 &
-      for _ in $(seq 1 60); do
-        curl -fsS "http://127.0.0.1:$WEBMCP_CDP_PORT/json/version" > /dev/null 2>&1 && break
-        sleep 1
-      done
-    else
-      echo "[test] no Chrome binary found under /ms-playwright; judge browser will fail" >&2
-    fi
-    export WEBMCP_CDP_PORT
+    # The shared CDP Chrome is started by /opt/verifier/entrypoint.sh (Dockerfile
+    # HEALTHCHECK mirrors this gate). rewardkit expands $WEBMCP_CDP_* with
+    # os.path.expandvars, so they must be exported here.
+    export WEBMCP_CDP_PORT=9222
     export WEBMCP_CDP_ENDPOINT="http://127.0.0.1:$WEBMCP_CDP_PORT"
+    for _ in $(seq 1 30); do
+      curl -fsS "$WEBMCP_CDP_ENDPOINT/json/version" > /dev/null 2>&1 && break
+      sleep 1
+    done
+    curl -fsS "$WEBMCP_CDP_ENDPOINT/json/version" > /dev/null 2>&1 \\
+      || {{ echo "[test] judge Chrome unreachable (infra); see /logs/verifier/chrome.log" >&2; exit 1; }}
 
     # Requires /app/package.json scripts named exactly: verify:build (exit 0), start (port 3000).
     # When grading restored artifacts (harbor score), node_modules is excluded — reinstall.
     if [ -f /app/package.json ] && [ ! -d /app/node_modules ]; then
-      (cd /app && npm install --no-audit --no-fund) \\
-        || {{ echo "[test] npm install failed — app did not build; recording 0.0" >&2; exit 0; }}
+      (cd /app && npm install --no-audit --no-fund) || record_zero "npm install failed — app did not build"
     fi
-    # The delivery contract requires the agent to make verify:build pass. If it does
-    # not, the app cannot be served or judged, so the seeded 0.0 stands. exit 0 makes
-    # harbor record that 0.0 as the score (a non-zero exit reads as an infra error).
-    npm run verify:build || {{ echo "[test] verify:build failed — app did not build; recording 0.0" >&2; exit 0; }}
-    exec start-server-and-test 'npm start' tcp:localhost:3000 \\
-      'rewardkit /tests --workspace /app --output /logs/verifier/reward.json'
+    npm run verify:build || record_zero "verify:build failed — app did not build"
+    # rewardkit defaults are --workspace /app --output /logs/verifier/reward.json.
+    exec start-server-and-test 'npm start' tcp:localhost:3000 'rewardkit /tests'
     """
 )
 
@@ -3115,6 +3138,18 @@ def package_task(slug: str, spec: dict) -> list[str]:
     dockerfile_path.write_text(DOCKERFILE)
     if "/opt/webmcp-contracts" in DOCKERFILE or "webmcp-contracts" in DOCKERFILE:
         raise ValueError("Dockerfile must not vendor /opt/webmcp-contracts")
+    # Build-context copy of the bridge for the Dockerfile COPY above; the judge
+    # copy in tests/ comes from the same canonical file (zero-skew by construction).
+    shutil.copy2(
+        ROOT / "scripts" / "canonical" / "mcp" / "webmcp_stdio_server.mjs",
+        out / "environment" / "webmcp_stdio_server.mjs",
+    )
+    # Entrypoint baked as /opt/verifier/entrypoint.sh (starts the shared CDP
+    # Chrome; paired with the Dockerfile HEALTHCHECK).
+    shutil.copy2(
+        ROOT / "scripts" / "canonical" / "entrypoint.sh",
+        out / "environment" / "entrypoint.sh",
+    )
 
     solve = out / "solution" / "solve.sh"
     solve.write_text(SOLVE_SH)
@@ -3232,6 +3267,12 @@ def write_canonical_prompts() -> None:
     env_dir = canon / "environment"
     env_dir.mkdir(parents=True, exist_ok=True)
     (env_dir / "Dockerfile").write_text(DOCKERFILE)
+    bridge = canon / "mcp" / "webmcp_stdio_server.mjs"
+    if bridge.is_file():
+        shutil.copy2(bridge, env_dir / "webmcp_stdio_server.mjs")
+    entrypoint = canon / "entrypoint.sh"
+    if entrypoint.is_file():
+        shutil.copy2(entrypoint, env_dir / "entrypoint.sh")
     vendored = env_dir / "webmcp-contracts"
     if vendored.exists():
         shutil.rmtree(vendored)

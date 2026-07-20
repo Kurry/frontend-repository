@@ -173,6 +173,12 @@ def render_instruction_preamble() -> str:
         "Bindings using the same handlers as the visible UI; honor mechanics exclusions; "
         "optional self-test via `webmcp_session_info` / `webmcp_list_tools` / "
         "`webmcp_invoke_tool` only.\n"
+        "- Self-test tooling is preinstalled: the same CDP bridge the verifier runs is baked "
+        "at `/opt/webmcp/webmcp_stdio_server.mjs`, and a shared headless Chrome already "
+        "exposes CDP at `http://127.0.0.1:9222`. Open your served app in that Chrome, then "
+        "run `node /opt/webmcp/webmcp_stdio_server.mjs` (stdio MCP; defaults to that "
+        "endpoint) to exercise your registered `window.webmcp_*` tools exactly as the "
+        "verifier will.\n"
         f"{DELIVERY_CLOSE}\n"
     )
 
