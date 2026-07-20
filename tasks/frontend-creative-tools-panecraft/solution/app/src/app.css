@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  /* Brand tokens (spec names) */
   --color-primary: #E8536B;
   --color-secondary: #051441;
   --color-accent: #1ABF68;
@@ -9,9 +10,19 @@
   --color-border: #E3E6F0;
   --color-text-primary: #051441;
   --color-text-secondary: #677294;
-  --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  /* Companion aliases */
+  --color-bg: #FFFFFF;
+  --color-amber: #F59E0B;
   --radius-base: 6px;
+  --radius-md: 6px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
   --spacing-unit: 4px;
+  --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --overlay-duration: 240ms;
+  --overlay-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @theme {
@@ -38,6 +49,8 @@ body {
   padding: 0;
   background-color: var(--color-background);
   color: var(--color-text-primary);
+  font-size: 14px;
+  font-weight: 400;
   max-width: 100%;
   overflow-x: hidden;
 }
@@ -53,13 +66,234 @@ button:not(:disabled) {
   cursor: pointer;
 }
 
-/* Focus outline */
+/* Keyboard focus: 2px primary outline on every interactive control */
 *:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
-/* Custom scrollbar */
+/* ---- overlay (dialog) enter/exit: ~240ms opacity + scale -------------------- */
+.overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgb(5 20 65 / 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 50;
+  opacity: 0;
+  transition: opacity var(--overlay-duration) var(--overlay-ease);
+}
+
+.overlay-backdrop.is-open {
+  opacity: 1;
+}
+
+.overlay-panel {
+  background: var(--color-background);
+  border-radius: var(--radius-base);
+  box-shadow: 0 20px 45px rgb(5 20 65 / 0.22);
+  opacity: 0;
+  transform: scale(0.95) translateY(8px);
+  transition:
+    opacity var(--overlay-duration) var(--overlay-ease),
+    transform var(--overlay-duration) var(--overlay-ease);
+}
+
+.overlay-backdrop.is-open .overlay-panel {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+/* The Create Pane wizard is deliberately non-blocking: the page tabs stay
+   reachable so a wizard started on one page can finish on another. */
+.overlay-backdrop--soft {
+  background: rgb(5 20 65 / 0.28);
+  pointer-events: none;
+  z-index: 40;
+}
+
+.overlay-backdrop--soft .overlay-panel {
+  pointer-events: auto;
+}
+
+/* ---- pane enter / settle ---------------------------------------------------- */
+@keyframes pane-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(14px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.015) translateY(-2px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.pane-enter {
+  animation: pane-in 340ms var(--overlay-ease) both;
+}
+
+@keyframes pane-settle-glow {
+  0% {
+    box-shadow: 0 0 0 4px rgb(232 83 107 / 0.4);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(232 83 107 / 0);
+  }
+}
+
+.pane-just-created {
+  animation: pane-settle-glow 1.5s ease-out 340ms both;
+}
+
+/* ---- chart crossfade layers -------------------------------------------------- */
+@keyframes chart-layer-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes chart-layer-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.chart-layer {
+  animation: chart-layer-in 280ms ease both;
+}
+
+.chart-layer-exit {
+  animation: chart-layer-out 260ms ease both;
+}
+
+.chart-svg circle,
+.chart-svg rect {
+  transition: opacity 150ms ease;
+}
+
+/* Counter value transition: a gentle pulse when the recomputed value lands. */
+@keyframes value-pulse {
+  0% {
+    transform: scale(1.06);
+    color: var(--color-primary);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.value-updated {
+  animation: value-pulse 500ms ease both;
+}
+
+/* ---- copy feedback ------------------------------------------------------------
+   The accent-green confirmation lands instantly (the "immediately turns green"
+   beat) and clears itself after ~2s. */
+.copy-control {
+  transition: opacity 200ms ease;
+}
+
+.copy-control.copy-flash {
+  background-color: var(--color-accent) !important;
+  border-color: var(--color-accent) !important;
+  color: #fff !important;
+}
+
+/* ---- pane control row reveal --------------------------------------------------- */
+.pane-card .pane-controls {
+  opacity: 1;
+  transition: opacity 200ms ease;
+}
+
+@media (min-width: 640px) {
+  .pane-card:not(:hover):not(:focus-within) .pane-controls {
+    opacity: 0;
+  }
+}
+
+.pane-card {
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.pane-card:hover,
+.pane-card:focus-within {
+  border-color: color-mix(in srgb, var(--color-primary) 45%, var(--color-border));
+  box-shadow: 0 6px 18px rgb(5 20 65 / 0.07);
+}
+
+/* ---- mobile tap targets --------------------------------------------------------- */
+@media (max-width: 640px) {
+  .tap-target {
+    min-height: 44px;
+  }
+
+  .tap-target-x {
+    min-width: 44px;
+  }
+}
+
+/* ---- inline validation errors ---------------------------------------------------- */
+.field-error {
+  color: var(--color-primary);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.input-invalid {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+/* ---- coachmark --------------------------------------------------------------------- */
+@keyframes coachmark-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.coachmark {
+  animation: coachmark-in 240ms var(--overlay-ease) both;
+}
+
+/* ---- reduced motion: remove or substantially reduce every transition --------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .overlay-backdrop,
+  .overlay-panel {
+    transition: none !important;
+  }
+
+  .overlay-panel {
+    transform: none !important;
+  }
+}
+
+/* ---- scrollbars ---------------------------------------------------------------------- */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

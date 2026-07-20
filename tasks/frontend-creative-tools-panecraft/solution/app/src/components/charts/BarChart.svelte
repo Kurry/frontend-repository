@@ -2,67 +2,158 @@
   import * as store from '../../lib/store';
   import { getDataSourceById } from '../../data/mockData';
   import type { Pane } from '../../lib/store';
+  import { prefersReducedMotion, formatValue } from '../../lib/chartUtils';
 
   let { pane }: { pane: Pane } = $props();
-  
-  const ds = $derived(getDataSourceById(pane.dataSourceId));
+
+  let containerEl = $state<HTMLDivElement | undefined>();
+  let hover = $state<{ left: number; top: number; label: string; value: number } | null>(null);
+
+  const ds = $derived(getDataSourceById(pane.source));
   const dateRange = $derived(store.getDateRange());
-  
-  const filteredRows = $derived(ds ? store.filterRowsByDateRange(ds.rows, ds.dateColumn, dateRange) : []);
-  
-  const chartData = $derived.by(() => {
-    if (!ds || filteredRows.length === 0) return null;
-    
+
+  interface LayerData {
+    bars: { x: number; y: number; barH: number; barWidth: number; val: number; label: string; color: string }[];
+    maxVal: number;
+    padding: { top: number; right: number; bottom: number; left: number };
+    chartW: number;
+    chartH: number;
+    width: number;
+    height: number;
+    signature: string;
+  }
+
+  const colors = ['#E8536B', '#051441', '#1ABF68', '#F59E0B', '#8B5CF6', '#06B6D4', '#EC4899', '#14B8A6'];
+
+  const chartData = $derived.by((): LayerData | null => {
+    if (!ds) return null;
+    const rows = store.filterRowsByDateRange(ds.rows, ds.dateColumn, dateRange);
+    if (rows.length === 0) return null;
+
     const metric = pane.metric;
     const dimension = pane.dimension || ds.categoryColumn || 'category';
-    
+    const isCount = metric === '_count';
+
     const groups = new Map<string, number>();
-    for (const row of filteredRows) {
+    for (const row of rows) {
       const key = String(row[dimension] ?? 'N/A');
-      groups.set(key, (groups.get(key) || 0) + Number(row[metric] ?? 0));
+      groups.set(key, (groups.get(key) || 0) + (isCount ? 1 : Number(row[metric] ?? 0)));
     }
-    
+
     const sorted = Array.from(groups.entries()).sort((a, b) => b[1] - a[1]);
-    const values = sorted.map(e => store.applyJitter(e[1], pane.refreshTick));
+    const values = sorted.map((entry) => store.applyJitter(entry[1], pane.refreshTick));
     const maxVal = Math.max(...values, 1);
-    
+
     const width = 300;
     const height = 130;
-    const padding = { top: 10, right: 10, bottom: 30, left: 40 };
+    const padding = { top: 12, right: 10, bottom: 28, left: 40 };
     const chartW = width - padding.left - padding.right;
     const chartH = height - padding.top - padding.bottom;
     const barGap = chartW / sorted.length;
     const barWidth = Math.min(barGap * 0.65, 36);
-    
+
     const bars = sorted.map((entry, i) => {
       const val = store.applyJitter(entry[1], pane.refreshTick);
-      const barH = (val / maxVal) * chartH;
+      const barH = Math.max((val / maxVal) * chartH, 1);
       const x = padding.left + i * barGap + (barGap - barWidth) / 2;
       const y = padding.top + chartH - barH;
-      return { x, y, barH, barWidth, val, label: entry[0] };
+      return { x, y, barH, barWidth, val, label: entry[0], color: colors[i % colors.length]! };
     });
-    
-    return { sorted, values, maxVal, bars, padding, chartW, chartH, width, height };
+
+    return {
+      bars,
+      maxVal,
+      padding,
+      chartW,
+      chartH,
+      width,
+      height,
+      signature: `${dateRange}|${pane.source}|${metric}|${dimension}|${bars.map((b) => `${b.label}:${b.val}`).join(',')}`,
+    };
   });
-  
-  const colors = ['#E8536B', '#051441', '#1ABF68', '#F59E0B', '#8B5CF6', '#06B6D4', '#EC4899', '#14B8A6'];
+
+  let layers = $state<{ id: number; data: LayerData; exiting: boolean }[]>([]);
+  let layerId = 0;
+  let lastSignature = '';
+
+  $effect(() => {
+    const data = chartData;
+    if (!data) {
+      layers = [];
+      lastSignature = '';
+      return;
+    }
+    if (data.signature === lastSignature) return;
+    lastSignature = data.signature;
+    const entering = { id: ++layerId, data, exiting: false };
+    const previous = layers.filter((layer) => !layer.exiting);
+    if (previous.length === 0 || prefersReducedMotion()) {
+      layers = [entering];
+      return;
+    }
+    layers = [...previous.map((layer) => ({ ...layer, exiting: true })), entering];
+    const previousIds = new Set(previous.map((layer) => layer.id));
+    setTimeout(() => {
+      layers = layers.filter((layer) => !previousIds.has(layer.id));
+    }, 320);
+  });
+
+  const liveLayer = $derived(layers.find((layer) => !layer.exiting) ?? layers[layers.length - 1]);
+
+  function barHover(event: MouseEvent, label: string, value: number) {
+    const container = containerEl?.getBoundingClientRect();
+    const mark = (event.currentTarget as SVGElement).getBoundingClientRect();
+    if (!container) return;
+    hover = {
+      left: mark.left + mark.width / 2 - container.left,
+      top: mark.top - container.top,
+      label,
+      value,
+    };
+  }
 </script>
 
 {#if !chartData}
-  <div class="flex items-center justify-center h-full text-sm text-[var(--color-text-secondary)]">No data for this range</div>
+  <div class="flex flex-col items-center justify-center h-full gap-1 text-center">
+    <p class="text-sm text-[var(--color-text-secondary)]">No data for this range</p>
+    <p class="text-xs text-[var(--color-text-secondary)]">Widen the date range to bring rows back.</p>
+  </div>
 {:else}
-  <svg viewBox="0 0 {chartData.width} {chartData.height}" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-    <line x1={chartData.padding.left} y1={chartData.padding.top} x2={chartData.padding.left} y2={chartData.padding.top + chartData.chartH} stroke="#E3E6F0" stroke-width="1"/>
-    <line x1={chartData.padding.left} y1={chartData.padding.top + chartData.chartH} x2={chartData.padding.left + chartData.chartW} y2={chartData.padding.top + chartData.chartH} stroke="#E3E6F0" stroke-width="1"/>
-    
-    {#each chartData.bars as bar, i}
-      <rect x={bar.x} y={bar.y} width={bar.barWidth} height={bar.barH} rx="2" fill={colors[i % colors.length]}>
-        <title>{bar.label}: {Math.round(bar.val)}</title>
-      </rect>
-      <text x={bar.x + bar.barWidth / 2} y={chartData.padding.top + chartData.chartH + 12} text-anchor="middle" font-size="8" fill="#677294">{bar.label.substring(0, 8)}</text>
-      <text x={bar.x + bar.barWidth / 2} y={bar.y - 3} text-anchor="middle" font-size="7" fill="#677294">{Math.round(bar.val) > 0 ? Math.round(bar.val) : ''}</text>
+  <div bind:this={containerEl} class="relative w-full h-full" onmouseleave={() => (hover = null)}>
+    {#each layers as layer (layer.id)}
+      {@const d = layer.data}
+      <div class="absolute inset-0 {layer.exiting ? 'chart-layer-exit' : 'chart-layer'}" aria-hidden={layer.exiting}>
+        <svg viewBox="0 0 {d.width} {d.height}" class="chart-svg w-full h-full" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="{pane.title} bar chart">
+          <line x1={d.padding.left} y1={d.padding.top} x2={d.padding.left} y2={d.padding.top + d.chartH} stroke="#E3E6F0" stroke-width="1"/>
+          <line x1={d.padding.left} y1={d.padding.top + d.chartH} x2={d.padding.left + d.chartW} y2={d.padding.top + d.chartH} stroke="#E3E6F0" stroke-width="1"/>
+
+          {#each d.bars as bar}
+            <rect
+              x={bar.x}
+              y={bar.y}
+              width={bar.barWidth}
+              height={bar.barH}
+              rx="2"
+              fill={bar.color}
+              onmouseenter={(event) => barHover(event, bar.label, bar.val)}
+            ></rect>
+            <text x={bar.x + bar.barWidth / 2} y={d.padding.top + d.chartH + 12} text-anchor="middle" font-size="8" fill="#677294">{bar.label.length > 9 ? `${bar.label.substring(0, 8)}…` : bar.label}</text>
+          {/each}
+
+          <text x={d.padding.left - 5} y={d.padding.top + 4} text-anchor="end" font-size="9" fill="#677294">{formatValue(d.maxVal)}</text>
+        </svg>
+      </div>
     {/each}
-    
-    <text x={chartData.padding.left - 5} y={chartData.padding.top + 4} text-anchor="end" font-size="9" fill="#677294">{Math.round(chartData.maxVal)}</text>
-  </svg>
+
+    {#if hover && liveLayer}
+      <div
+        class="absolute z-10 pointer-events-none px-2 py-1 rounded-[var(--radius-base)] bg-[var(--color-secondary)] text-white text-xs shadow-lg whitespace-nowrap"
+        style="left:{hover.left}px; top:{hover.top}px; transform:translate(-50%, -130%);"
+        role="status"
+      >
+        <span class="font-semibold">{hover.label}</span>
+        <span class="opacity-80"> · {pane.metric}: {formatValue(hover.value)}</span>
+      </div>
+    {/if}
+  </div>
 {/if}

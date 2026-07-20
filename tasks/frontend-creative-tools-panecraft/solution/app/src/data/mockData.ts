@@ -131,3 +131,30 @@ export const dataSources: DataSource[] = [
 export function getDataSourceById(id: string): DataSource | undefined {
   return dataSources.find(ds => ds.id === id);
 }
+
+// Metric columns offered by the Create/Edit pane forms: the numeric columns,
+// plus a documented "_count" row-count metric for sources where a row count is
+// a sensible counter (sales orders and support tickets).
+export function metricsFor(sourceId: string): string[] {
+  const src = getDataSourceById(sourceId);
+  if (!src) return [];
+  const metrics = [...src.numericColumns];
+  if (src.id === 'support-tickets' || src.id === 'sales-sheet') metrics.push('_count');
+  return metrics;
+}
+
+// Grouping dimensions offered by the forms: the date column, the category
+// column, and any remaining non-numeric columns.
+export function dimensionsFor(sourceId: string): string[] {
+  const src = getDataSourceById(sourceId);
+  if (!src) return [];
+  const dims: string[] = [];
+  if (src.dateColumn) dims.push(src.dateColumn);
+  if (src.categoryColumn) dims.push(src.categoryColumn);
+  for (const col of src.columns) {
+    if (col !== src.dateColumn && col !== src.categoryColumn && !src.numericColumns.includes(col)) {
+      dims.push(col);
+    }
+  }
+  return [...new Set(dims)];
+}
