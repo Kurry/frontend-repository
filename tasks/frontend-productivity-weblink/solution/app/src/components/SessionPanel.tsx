@@ -2,7 +2,7 @@ import { createForm } from "@tanstack/solid-form";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Show, createEffect, on } from "solid-js";
 import { Motion } from "@motionone/solid";
-import { state, setName, joinRoom, leaveRoom } from "../store";
+import { state, setName, joinRoom, leaveRoom, setRoomIdle } from "../store";
 import { PeerIdentitySchema, JoinSessionSchema } from "../schemas";
 import { usePrefersReducedMotion } from "../reducedMotion";
 
@@ -40,6 +40,9 @@ export default function SessionPanel() {
     onSubmit: async ({ value }) => {
        if (state.room.status === "connecting" || state.room.status === "waiting") return;
        joinRoom(value.roomId);
+    },
+    onSubmitInvalid: () => {
+      setRoomIdle();
     },
   }));
 
@@ -121,6 +124,7 @@ export default function SessionPanel() {
           roomForm.handleSubmit();
         }}
         class="mb-4"
+        noValidate
       >
         <roomForm.Field
           name="roomId"
@@ -128,24 +132,28 @@ export default function SessionPanel() {
         >
           {(field) => (
             <div class="mb-2 relative">
-              <label class="mb-1 block text-xs font-medium text-slate-500" for="room-id">
+              <label class="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400" for="room-id">
                 Room / peer identifier
               </label>
               <input
                 id="room-id"
-                class="w-full rounded-lg border border-slate-300 bg-transparent px-3 py-1.5 text-sm transition focus:border-sky-400 focus:ring-2 focus:ring-sky-200 dark:border-slate-700 dark:focus:ring-sky-900"
+                class="w-full rounded-lg border border-slate-300 bg-transparent px-3 py-1.5 text-sm transition focus:border-sky-400 focus:ring-2 focus:ring-sky-300 focus-visible:outline-none dark:border-slate-700 dark:focus:ring-sky-800"
                 placeholder="e.g. sunset-otter-42"
                 value={field().state.value}
                 onInput={(e) => field().handleChange(e.target.value)}
                 onBlur={field().handleBlur}
+                aria-invalid={field().state.meta.errors.length > 0 ? "true" : "false"}
+                aria-describedby={field().state.meta.errors.length > 0 ? "roomId-error" : undefined}
                 data-testid="room-id-input"
               />
               <Show when={field().state.meta.errors.length > 0}>
                 <Motion.p
+                  id="roomId-error"
                   initial={reducedMotion() ? false : { opacity: 0, y: -5 }}
                   animate={{ opacity: 1, y: 0 }}
-                  class="mt-1 text-xs text-rose-500"
+                  class="mt-1 text-xs text-rose-600"
                   role="alert"
+                  aria-live="assertive"
                 >
                   {field().state.meta.errors[0]?.toString()}
                 </Motion.p>
@@ -157,15 +165,15 @@ export default function SessionPanel() {
         <div class="flex gap-2">
           <button
             type="submit"
-            class="flex-1 rounded-lg bg-sky-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-sky-500 hover:shadow active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
-            disabled={sessionActive() || !roomForm.state.values.roomId.trim()}
+            class="touch-target flex-1 rounded-lg bg-sky-700 px-3 py-2 text-sm font-medium text-white transition hover:bg-sky-600 hover:shadow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={sessionActive()}
             data-testid="join-room-button"
           >
             Join Room
           </button>
           <button
             type="button"
-            class="flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium transition hover:bg-slate-100 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:hover:bg-slate-800"
+            class="touch-target flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium transition hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:hover:bg-slate-800"
             disabled={!sessionActive()}
             onClick={leaveRoom}
             data-testid="leave-room-button"
