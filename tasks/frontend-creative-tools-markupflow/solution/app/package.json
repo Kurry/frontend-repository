@@ -10,10 +10,16 @@
     "verify:build": "vite build"
   },
   "dependencies": {
+    "@formkit/auto-animate": "^0.10.0",
+    "@kobalte/core": "^0.13.12",
+    "@tabler/icons-solidjs": "^3.45.0",
     "@tailwindcss/vite": "4.3.2",
+    "@tanstack/solid-form": "^1.33.2",
+    "motion": "^12.42.2",
     "solid-js": "1.9.14",
     "tailwindcss": "4.3.2",
-    "yjs": "13.6.31"
+    "yjs": "13.6.31",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "typescript": "6.0.3",
