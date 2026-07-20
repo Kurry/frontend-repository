@@ -367,7 +367,7 @@ function VariablePopover({ editorRef, variableSelectionRef }) {
       <div className="popover-arrow" />
       <div className="popover-head"><div><p className="eyebrow">Placeholder</p><h2 id="variable-popover-title">Insert variable</h2></div><Button size="sm" kind="ghost" renderIcon={Close} onClick={close} {...iconOnly('Close variable popover')} /></div>
       <form onSubmit={handleSubmit(confirm)}>
-        <TextInput id="variable-name" labelText="Name" placeholder="customer_name" invalid={!!errors.name} invalidText={errors.name?.message} {...register('name')} />
+        <TextInput id="variable-name" labelText="Name" placeholder="customer_name" invalid={!!errors.name} invalidText={errors.name?.message} aria-describedby={errors.name ? "variable-name-error" : undefined} {...register('name')} /><div id="variable-name-error" className="sr-only">{errors.name?.message}</div>
         <p className="helper">Letters, digits, and underscores; 1–64 characters.</p>
         <div className="popover-actions"><Button type="button" kind="secondary" size="sm" onClick={close}>Cancel</Button><Button type="submit" kind="primary" size="sm" disabled={!isValid}>Insert Variable</Button></div>
       </form>
@@ -493,11 +493,12 @@ function SaveModal() {
       <ModalBody>
         <p className="modal-copy">Create a reusable prompt record from the current workbench state.</p>
         <form id="save-library-form" onSubmit={handleSubmit(submit)} className="modal-form">
-          <TextInput id="save-title" labelText="Title" placeholder="Quarterly launch brief" invalid={!!errors.title} invalidText={errors.title?.message} {...register('title')} />
-          <Select id="save-technique" labelText="Technique" invalid={!!errors.technique} invalidText={errors.technique?.message} {...register('technique')}>
+          <TextInput id="save-title" labelText="Title" placeholder="Quarterly launch brief" invalid={!!errors.title} invalidText={errors.title?.message} aria-describedby={errors.title ? "save-title-error" : undefined} {...register('title')} /><div id="save-title-error" className="sr-only">{errors.title?.message}</div>
+          <Select id="save-technique" labelText="Technique" invalid={!!errors.technique} invalidText={errors.technique?.message} aria-describedby={errors.technique ? "save-technique-error" : undefined} {...register('technique')}>
             <SelectItem value="" text="Choose a technique" />
             {TECHNIQUES.map((technique) => <SelectItem key={technique} value={technique} text={technique} />)}
           </Select>
+          <div id="save-technique-error" className="sr-only">{errors.technique?.message}</div>
           {!draft && <Checkbox id="allow-empty" labelText="Save this intentionally empty draft" checked={allowEmpty} onChange={(_, data) => setAllowEmpty(data.checked)} />}
           <div className="payload-summary"><span><strong>{detectVariables(draft).length}</strong> variables</span><span><strong>{attachments.length}</strong> attachments</span><span><strong>{persona ? 1 : 0}</strong> persona</span></div>
         </form>
@@ -567,7 +568,7 @@ function ImportModal() {
       <ModalHeader title="Import JSON package" label="PromptPackage v1" closeModal={close} />
       <ModalBody>
         <form id="import-form" onSubmit={handleSubmit(submit)} className="modal-form">
-          <Controller name="json" control={control} render={({ field }) => <TextArea {...field} id="import-json" labelText="JSON package" rows={12} invalid={!!errors.json} invalidText={errors.json?.message} placeholder={'{\n  "schemaVersion": "prompt-package-v1",\n  ...\n}'} />} />
+          <Controller name="json" control={control} render={({ field }) => <><TextArea {...field} id="import-json" labelText="JSON package" rows={12} invalid={!!errors.json} invalidText={errors.json?.message} aria-describedby={errors.json ? "import-json-error" : undefined} placeholder={'{\n  "schemaVersion": "prompt-package-v1",\n  ...\n}'} /><div id="import-json-error" className="sr-only">{errors.json?.message}</div></>} />
           <label className="file-input"><Upload size={16} /><span>Load JSON file</span><input type="file" accept="application/json,.json" onChange={loadFile} /></label>
           <p className="helper">Import validates schemaVersion, messages, model, bindings, attachments, persona, and technique before changing the workbench.</p>
         </form>
@@ -632,7 +633,7 @@ function Toasts() {
   const toasts = useWorkbench((state) => state.toasts)
   const remove = useWorkbench((state) => state.removeToast)
   const live = useWorkbench((state) => state.liveMessage)
-  return <><div className="sr-only" aria-live="polite" aria-atomic="true">{live}</div><div className="toast-stack">{toasts.map((toast) => <InlineNotification key={toast.id} kind={toast.kind === 'info' ? 'info' : toast.kind === 'warning' ? 'warning' : 'success'} title={toast.message} hideCloseButton={false} onCloseButtonClick={() => remove(toast.id)} lowContrast />)}</div></>
+  return <><div className="sr-only" role="status" aria-live="polite" aria-atomic="true">{live}</div><div className="toast-stack">{toasts.map((toast) => <InlineNotification key={toast.id} kind={toast.kind === 'info' ? 'info' : toast.kind === 'warning' ? 'warning' : 'success'} title={toast.message} hideCloseButton={false} onCloseButtonClick={() => remove(toast.id)} lowContrast />)}</div></>
 }
 
 export function App() {
