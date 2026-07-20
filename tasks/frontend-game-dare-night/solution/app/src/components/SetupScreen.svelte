@@ -26,7 +26,13 @@
     onToggleTimer: () => void;
     onAddCustomCard: (data: { prompt: string; category: Category; intensity: Intensity }) => void;
     onDeleteCustomCard: (id: string) => void;
+
     onShowDeleteConfirm: (id: string | null) => void;
+    onExportJSON: () => void;
+    onImportJSON: (data: any) => void;
+    onResumeSession: () => void;
+    hasSavedSession: boolean;
+
   }
 
   let {
@@ -53,7 +59,13 @@
     onToggleTimer,
     onAddCustomCard,
     onDeleteCustomCard,
+
     onShowDeleteConfirm,
+    onExportJSON,
+    onImportJSON,
+    onResumeSession,
+    hasSavedSession,
+
   }: Props = $props();
 
   const categories: Category[] = ['Icebreaker', 'Truth', 'Dare', 'Wild'];
@@ -69,7 +81,7 @@
       'Wild': { selected: 'bg-fuchsia-500 text-white shadow-md', unselected: 'bg-white text-gray-700 border-2 border-gray-300 hover:border-fuchsia-300' },
     };
     const colors = colorMap[cat];
-    return `px-4 py-2 rounded-full text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black ${isSelected ? colors.selected : colors.unselected}`;
+    return `px-4 py-2 rounded-full text-sm font-medium transition-all focus:outline-none focus:ring-2 focus-visible:ring-offset-2 focus:outline-none focus-visible:ring-black focus:outline-none ${isSelected ? colors.selected : colors.unselected}`;
   }
 
   function getIntensityButtonClass(intensity: Intensity, isSelected: boolean): string {
@@ -79,7 +91,7 @@
       'Wild': { selected: 'bg-red-500 text-white shadow-md', unselected: 'bg-white text-gray-700 border-2 border-gray-300 hover:border-red-300' },
     };
     const colors = colorMap[intensity];
-    return `flex-1 px-4 py-3 rounded-full text-sm font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black ${isSelected ? colors.selected : colors.unselected}`;
+    return `flex-1 px-4 py-3 rounded-full text-sm font-semibold transition-all focus:outline-none focus:ring-2 focus-visible:ring-offset-2 focus:outline-none focus-visible:ring-black focus:outline-none ${isSelected ? colors.selected : colors.unselected}`;
   }
 
   function isCatSelected(cat: Category): boolean {
@@ -92,6 +104,8 @@
     <!-- Header -->
     <div class="text-center mb-8 mt-4">
       <h1 class="text-4xl font-bold mb-2" style="color: var(--color-accent);">Dare Night</h1>
+      <p class="inline-block rounded-full px-3 py-1 text-sm font-bold mb-2">First to 10</p>
+      <br/>
       <p class="inline-block rounded-full px-3 py-1 text-sm" style="color: var(--color-link); background-color: var(--color-accent);">A pass-the-device party game for friends</p>
       {#if bestRecord}
         <div class="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-black text-sm">
@@ -99,6 +113,54 @@
           <span><strong>Dare Night record:</strong> {bestRecord.name} — {bestRecord.points} pts</span>
         </div>
       {/if}
+    </div>
+
+
+    <!-- Session Controls -->
+    <div class="bg-white rounded-xl p-6 mb-6 shadow-lg">
+      <div class="flex flex-wrap gap-3 items-center justify-center">
+        {#if hasSavedSession}
+          <button
+            class="px-4 py-2 rounded-full bg-white text-sm font-medium border-2 border-black hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus-visible:ring-black focus:outline-none focus-visible:ring-offset-2 focus:outline-none"
+            onclick={onResumeSession}
+          >
+            Resume Saved Session
+          </button>
+        {/if}
+        <button
+          class="px-4 py-2 rounded-full font-medium transition-colors focus:outline-none focus:ring-2 focus-visible:ring-offset-2 focus:outline-none shadow-md"
+          style="background-color: #222; color: white;"
+          onclick={onExportJSON}
+        >
+          Export Session
+        </button>
+
+        <label class="px-4 py-2 rounded-full bg-white text-sm font-medium border-2 border-black hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus-visible:ring-black focus:outline-none focus-visible:ring-offset-2 focus:outline-none cursor-pointer inline-flex items-center">
+          Import Session
+          <input
+            type="file"
+            accept=".json,application/json"
+            class="sr-only"
+            onchange={(e) => {
+              const file = (e.target as HTMLInputElement).files?.[0];
+              if (file) {
+                const reader = new FileReader();
+                reader.onload = (re) => {
+                  try {
+                    const data = JSON.parse(re.target?.result as string);
+                    onImportJSON(data);
+                  } catch(err) {
+                    onImportJSON(null);
+                  }
+                  // Reset input so the same file can be selected again
+                  (e.target as HTMLInputElement).value = '';
+                };
+                reader.readAsText(file);
+              }
+            }}
+          />
+        </label>
+      </div>
     </div>
 
     <!-- Player Setup -->
@@ -113,7 +175,7 @@
             <input
               id="player-{index}"
               type="text"
-              class="min-w-0 flex-1 px-4 py-2 rounded-full border-2 border-gray-500 text-sm focus:outline-none focus:border-black transition-colors"
+              class="min-w-0 flex-1 px-4 py-2 rounded-full border-2 border-gray-500 text-sm focus:outline-none focus-visible:border-black focus:outline-none transition-colors"
               placeholder="Player {index + 1} name"
               value={playerNames[index]}
               oninput={(e) => { onUpdatePlayerName(index, (e.currentTarget as HTMLInputElement).value); }}
@@ -139,7 +201,7 @@
           <input
             id="add-player"
             type="text"
-            class="min-w-0 flex-1 px-4 py-2 rounded-full border-2 border-gray-500 text-sm focus:outline-none focus:border-black transition-colors"
+            class="min-w-0 flex-1 px-4 py-2 rounded-full border-2 border-gray-500 text-sm focus:outline-none focus-visible:border-black focus:outline-none transition-colors"
             placeholder="Add another player..."
             value={newPlayerInput}
             oninput={(e) => onNewPlayerInput((e.currentTarget as HTMLInputElement).value)}
@@ -147,7 +209,7 @@
             maxlength="20"
           />
           <button
-            class="px-5 py-2 rounded-full text-white font-semibold text-sm transition-all hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black shadow-md"
+            class="px-5 py-2 rounded-full text-white font-semibold text-sm transition-all hover:opacity-90 focus:outline-none focus:ring-2 focus-visible:ring-offset-2 focus:outline-none focus-visible:ring-black focus:outline-none shadow-md"
             style="background-color: var(--color-accent);"
             onclick={() => onAddPlayer(newPlayerInput)}
           >
@@ -157,7 +219,7 @@
       {/if}
 
       {#if playerError}
-        <p class="text-red-500 text-xs mt-2" role="alert">{playerError}</p>
+        <p class="text-red-500 text-xs mt-2" role="alert" aria-live="assertive">{playerError}</p>
       {/if}
     </div>
 
@@ -170,14 +232,14 @@
         </div>
         {#if selectedCategories.length > 0}
           <button
-            class="px-4 py-2 rounded-full text-sm font-medium bg-white text-black border-2 border-black transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+            class="px-4 py-2 rounded-full text-sm font-medium bg-white text-black border-2 border-black transition-all focus:outline-none focus:ring-2 focus-visible:ring-offset-2 focus:outline-none focus-visible:ring-black focus:outline-none"
             onclick={() => onSetCategories([])}
           >
             Clear all
           </button>
         {:else}
           <button
-            class="px-4 py-2 rounded-full text-sm font-medium bg-white text-black border-2 border-black transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+            class="px-4 py-2 rounded-full text-sm font-medium bg-white text-black border-2 border-black transition-all focus:outline-none focus:ring-2 focus-visible:ring-offset-2 focus:outline-none focus-visible:ring-black focus:outline-none"
             onclick={() => onSetCategories([...categories])}
           >
             Select all
@@ -190,6 +252,7 @@
             class={getCategoryButtonClass(cat, isCatSelected(cat))}
             onclick={() => onToggleCategory(cat)}
             aria-pressed={isCatSelected(cat)}
+            aria-label={cat}
           >
             {cat}
           </button>
@@ -199,7 +262,7 @@
         <p class="text-red-600 text-xs mt-2" role="alert">Select at least one category</p>
       {/if}
       {#if categoryError}
-        <p class="text-red-500 text-xs mt-2" role="alert">{categoryError}</p>
+        <p class="text-red-500 text-xs mt-2" role="alert" aria-live="assertive">{categoryError}</p>
       {/if}
     </div>
 
@@ -212,6 +275,7 @@
             class={getIntensityButtonClass(intensity, selectedIntensity === intensity)}
             onclick={() => onUpdateIntensity(intensity)}
             aria-pressed={selectedIntensity === intensity}
+            aria-label={intensity}
           >
             {intensity}
           </button>
@@ -225,7 +289,7 @@
       <div class="flex items-center justify-between">
         <p class="text-gray-600 text-sm">15-second countdown per card</p>
         <button
-          class="timer-switch relative inline-flex w-14 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+          class="timer-switch relative inline-flex w-14 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus-visible:ring-offset-2 focus:outline-none focus-visible:ring-black focus:outline-none"
           style={timerEnabled ? 'background-color: var(--color-accent);' : 'background-color: #6B7280;'}
           onclick={onToggleTimer}
           role="switch"
@@ -253,7 +317,7 @@
 
     <!-- Start Button -->
     <button
-      class="w-full px-8 py-4 rounded-full text-lg font-bold text-white transition-all shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-lg"
+      class="w-full px-8 py-4 rounded-full text-lg font-bold text-white transition-all shadow-lg focus:outline-none focus:ring-2 focus-visible:ring-offset-2 focus:outline-none focus-visible:ring-black focus:outline-none hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-lg"
       style="background-color: var(--color-accent);"
       disabled={!canStart}
       onclick={onStartGame}

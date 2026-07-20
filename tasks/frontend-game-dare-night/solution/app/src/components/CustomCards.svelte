@@ -1,5 +1,7 @@
 <script lang="ts">
   import type { Card, Category, Intensity } from '../lib/cards';
+  import { flip } from 'svelte/animate';
+  import { fade, slide } from 'svelte/transition';
 
   interface Props {
     customCards: Card[];
@@ -31,8 +33,8 @@
       formError = 'Enter a prompt for the card';
       return;
     }
-    if (prompt.length < 5) {
-      formError = 'Enter at least 5 characters';
+    if (prompt.length < 8) {
+      formError = 'prompt must be at least 8 characters';
       return;
     }
     formError = '';
@@ -101,10 +103,10 @@
   <!-- Custom Cards List -->
   <div class="space-y-2">
     {#if customCards.length === 0}
-      <p class="text-gray-600 text-sm text-center py-4">No custom cards yet. Select Add custom card to create one.</p>
+      <p class="text-gray-600 text-sm text-center py-4">Your custom card list is empty. Fill out the prompt, select a category and intensity above, then click Add custom card to create one.</p>
     {:else}
       {#each customCards as card (card.id)}
-        <div class="flex items-center gap-2 p-3 rounded-lg bg-gray-50">
+        <div class="flex items-center gap-2 p-3 rounded-lg bg-gray-50" out:fade={{ duration: 300 }} in:fade={{ duration: 300 }} animate:flip={{ duration: 300 }}>
           <div class="flex-1 min-w-0">
             <p class="text-sm truncate">{card.prompt}</p>
             <p class="text-xs text-gray-500">{card.category} • {card.intensity}</p>

@@ -1,17 +1,8 @@
+import * as fs from 'fs';
+let content = fs.readFileSync('tasks/frontend-game-dare-night/solution/app/src/styles/global.css', 'utf-8');
 
+const baseSpacing = `
 @tailwind base;
-
-@theme {
-  --spacing-1: 10px;
-  --spacing-2: 20px;
-  --spacing-3: 30px;
-  --spacing-4: 40px;
-  --spacing-5: 50px;
-  --spacing-6: 60px;
-  --spacing-8: 80px;
-  --spacing-10: 100px;
-}
-
 @tailwind components;
 @tailwind utilities;
 
@@ -49,3 +40,7 @@ body {
 .timer-warning {
   animation: pulse 1s infinite;
 }
+`;
+
+content = baseSpacing;
+fs.writeFileSync('tasks/frontend-game-dare-night/solution/app/src/styles/global.css', content);

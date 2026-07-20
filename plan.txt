@@ -1,0 +1,57 @@
+[1.4] accessibility: Inline validation errors and the Winner announcement are announced to assistive technology (live region).
+[1.n1] accessibility: Keyboard navigation for primary play or export controls. Focus management.
+[1.n2] accessibility: Focused interactive controls show no visible focus indicator. (Missing :focus-visible)
+[1.n3] accessibility: Category chips or intensity buttons lack selected-state semantics (aria-pressed).
+[1.n4] accessibility: Selected category/intensity or Winner state is conveyed by color alone with no text or semantic cue.
+[1.n5] accessibility: Open confirmation dialogs allow Tab to escape. Focus trap in dialogs.
+
+[14.1] behavioral: Starting a game with 3 named players... then reloading: the same players in the same order...
+[14.6] behavioral: Export JSON points/forfeits.
+[14.8] behavioral: Custom card empty-state.
+[14.n2] behavioral: Done/Skip points/forfeits updates correctly.
+[14.n3] behavioral: Export JSON byte-identical -> Fix export to use live turn log.
+[14.n4] behavioral: View scores stays stale. Fix derived state.
+
+[1.12] core: Deck reshuffle automatically. Confirmation. Same cards.
+[1.15] core: Winner record, start new game.
+[1.17] core: Roster caps at 8 players, empty name never added.
+[1.18] core: Deck filtering when changing category.
+[1.19] core: Intensity weights deck.
+[1.20] core: 3 surfaces update without reload.
+
+[3.1] design: 10px spacing.
+[3.4] design: selected fills, winner banner, scoreboard sorting.
+
+[4.4] edge: Feedback for actions.
+[4.9] edge: Malformed JSON.
+[4.n1] edge: Duplicate player name inline error.
+[4.n2] edge: Custom card prompt length inline error.
+[4.n3] edge: Save Progress stays enabled too early/late.
+[4.n5] edge: Done/Skip changes score after winner declared.
+
+[11.2] innovation: Export/Copy preview.
+[11.4] innovation: Empty states plain language.
+
+[3.2] motion: Transient toast for point/forfeit/reshuffle/custom card.
+[3.4] motion: Scoreboard rows ease.
+[3.8] motion: Custom card animates in/out.
+[3.9] motion: Toggling category/intensity transitions.
+[3.11] motion: Confetti burst.
+[3.12] motion: prefers-reduced-motion.
+
+[9.4] performance: Countdown ticks and feed never freeze UI.
+[9.10] performance: Storage unavailable doesn't crash.
+
+[7.10] responsiveness: Winner banner and Export/Import visible.
+[7.n6] responsiveness: Fixed chrome obscures.
+[7.n7] responsiveness: Overlapping buttons.
+
+[4.1] technical: Full workflow.
+[4.2] technical: Custom card persists.
+[4.3] technical: Restore same players.
+[4.5] technical: Timer/toggles spam.
+[4.10] technical: Keyboard reachable, visible focus.
+[4.13] technical: Cold load < 2s.
+
+[2.8] visual: Feed status.
+[2.11] visual: Icons for primary controls.
