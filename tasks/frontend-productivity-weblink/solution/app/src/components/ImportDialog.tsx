@@ -1,6 +1,6 @@
 import { createSignal, Show } from "solid-js";
 import { Dialog } from "@kobalte/core/dialog";
-import { cancelPendingJoin, state, setState, persist } from "../store";
+import { setState, persist, cancelPendingJoin, clearAllTransferIntervals } from "../store";
 import { SessionPackSchema } from "../schemas";
 
 export default function ImportDialog() {
@@ -35,7 +35,6 @@ export default function ImportDialog() {
       }
 
       // Apply to store
-      cancelPendingJoin();
       setState("identity", "name", pack.peer.displayName);
       setState("identity", "clientId", pack.peer.clientId);
       setState("room", "roomId", pack.roomId);
@@ -50,16 +49,25 @@ export default function ImportDialog() {
       }));
       setState("chat", "messages", mappedMessages);
 
-      setState("files", "queue", pack.fileQueue.map((file) => ({
-        id: file.id,
-        name: file.name,
-        size: file.sizeBytes,
-        status: file.status,
-        bytesTransferred: file.bytesTransferred,
-      })));
+      // Normalize file queue rows to the store shape (sizeBytes -> size)
+      const mappedQueue = pack.fileQueue.map(f => ({
+        id: f.id,
+        name: f.name,
+        size: f.sizeBytes,
+        status: f.status,
+        bytesTransferred: f.bytesTransferred,
+      }));
+      // Stop any timers still ticking for the outgoing queue before it's
+      // replaced: a stale interval that resolves by id against the new
+      // queue could otherwise double-advance bytesTransferred once a
+      // matching row is resumed.
+      clearAllTransferIntervals();
+      setState("files", "queue", mappedQueue);
       setState("transferLog", pack.transferLog);
 
-      // Connection badge resets to idle
+      // Connection badge resets to idle; cancel any pending join attempt so
+      // its timer cannot flip the badge back to "waiting" after import.
+      cancelPendingJoin();
       setState("room", "status", "idle");
 
       persist();

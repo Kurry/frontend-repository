@@ -48,7 +48,7 @@ export default function SessionPanel() {
     nameForm.handleSubmit();
   }));
 
-  // Imports can replace the identity after the form has mounted.
+  // Keep name form in sync if state.identity.name changes externally (e.g. Session Pack import)
   createEffect(on(() => state.identity.name, (newName) => {
     if (nameForm.state.values.displayName !== newName) {
       nameForm.setFieldValue("displayName", newName);

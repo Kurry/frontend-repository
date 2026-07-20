@@ -139,11 +139,6 @@ export function persist() {
 
 let pendingTimer: ReturnType<typeof setTimeout> | undefined;
 
-export function cancelPendingJoin() {
-  clearTimeout(pendingTimer);
-  pendingTimer = undefined;
-}
-
 export function joinRoom(roomId: string) {
   const trimmed = roomId.trim();
   setState("room", "roomId", trimmed);
@@ -161,9 +156,17 @@ export function joinRoom(roomId: string) {
 }
 
 export function leaveRoom() {
-  cancelPendingJoin();
+  clearTimeout(pendingTimer);
   setState("room", "status", "disconnected");
   persist();
+}
+
+// Cancel a pending join attempt without touching the connection status.
+// Used by Session Pack import, which resets the badge to idle and must not
+// let a stale joinRoom timer later flip it to "waiting".
+export function cancelPendingJoin() {
+  clearTimeout(pendingTimer);
+  pendingTimer = undefined;
 }
 
 export function sendMessage(text: string) {
@@ -194,19 +197,12 @@ export function logEvent(fileName: string, event: TransferLogEvent) {
   persist();
 }
 
-// File objects cannot live in the serializable Solid store. Keep the local
-// byte sources beside it so transfer progress can be driven by bytes actually
-// read from the selected file.
-const queuedFileSources = new Map<string, Blob>();
-
-export function queueFile(name: string, size: number, source?: Blob) {
-  const id = randomId("file");
-  if (source) queuedFileSources.set(id, source);
+export function queueFile(name: string, size: number) {
   setState(
     "files",
     "queue",
     produce((list) => {
-      list.push({ id, name, size, status: "not-started", bytesTransferred: 0 });
+      list.push({ id: randomId("file"), name, size, status: "not-started", bytesTransferred: 0 });
     }),
   );
   logEvent(name, "queued");
@@ -223,129 +219,137 @@ export function toggleTheme() {
   persist();
 }
 
-// A unique token owns each active transfer. Removing or replacing it pauses
-// the async reader after its current slice without relying on a stale index.
-const activeTransfers = new Map<string, symbol>();
+// Simulated transfers map to hold interval references
+const transferIntervals = new Map<string, ReturnType<typeof setInterval>>();
 
-function queueIndex(id: string) {
-  return state.files.queue.findIndex((file) => file.id === id);
-}
-
-function sourceFor(id: string, size: number): Pick<Blob, "slice"> {
-  const selectedFile = queuedFileSources.get(id);
-  if (selectedFile) return selectedFile;
-
-  // Imported/restored queue metadata has no browser File object. Supply local
-  // zero-filled slices so those rows remain operable without fabricating a
-  // single timer-based byte count.
-  return {
-    slice(start = 0, end = size) {
-      return new Blob([new Uint8Array(Math.max(0, end - start))]);
-    },
-  };
-}
-
-const waitForPaint = () => new Promise<void>((resolve) => setTimeout(resolve, 120));
-
-async function readTransfer(id: string, token: symbol) {
-  while (activeTransfers.get(id) === token) {
-    const index = queueIndex(id);
-    if (index === -1) break;
-
-    const current = state.files.queue[index];
-    if (current.status !== "transferring") break;
-
-    const chunkSize = Math.max(1, Math.min(4 * 1024 * 1024, Math.ceil(current.size / 20)));
-    const end = Math.min(current.size, current.bytesTransferred + chunkSize);
-    const bytes = await sourceFor(id, current.size)
-      .slice(current.bytesTransferred, end)
-      .arrayBuffer();
-
-    if (activeTransfers.get(id) !== token) break;
-    const latestIndex = queueIndex(id);
-    if (latestIndex === -1) break;
-    const latest = state.files.queue[latestIndex];
-    if (latest.status !== "transferring") break;
-
-    const nextBytes = Math.min(latest.size, latest.bytesTransferred + bytes.byteLength);
-    setState("files", "queue", latestIndex, "bytesTransferred", nextBytes);
-
-    if (nextBytes >= latest.size) {
-      setState("files", "queue", latestIndex, "status", "completed");
-      logEvent(latest.name, "completed");
-      activeTransfers.delete(id);
-      persist();
-      return;
-    }
-
-    persist();
-    await waitForPaint();
-  }
-}
-
-export function startTransfer(id: string) {
-  const index = queueIndex(id);
-  if (index === -1) return;
+export function startTransfer(id: string): boolean {
+  const index = state.files.queue.findIndex(f => f.id === id);
+  if (index === -1) return false;
   const file = state.files.queue[index];
-  if (file.status !== "not-started" && file.status !== "paused") return;
-  const event = file.status === "not-started" ? "started" : "resumed";
+  if (file.status !== "not-started" && file.status !== "paused") return false;
+
+  // Defensively stop any stale timer still registered for this id (e.g. one
+  // left running by a Session Pack import that swapped the queue out from
+  // under it) so resuming never ends up with two intervals racing on the
+  // same row.
+  const staleInterval = transferIntervals.get(id);
+  if (staleInterval) {
+    clearInterval(staleInterval);
+    transferIntervals.delete(id);
+  }
 
   setState("files", "queue", index, "status", "transferring");
-  logEvent(file.name, event);
+  logEvent(file.name, file.status === "not-started" ? "started" : "resumed");
 
   if (file.size === 0) {
      setState("files", "queue", index, "status", "completed");
      setState("files", "queue", index, "bytesTransferred", 0);
      logEvent(file.name, "completed");
      persist();
-     return;
+     return true;
   }
 
-  const token = Symbol(id);
-  activeTransfers.set(id, token);
-  void readTransfer(id, token);
+  const chunk = Math.max(1, Math.floor(file.size / 20)); // Transfer in 20 steps
+
+  const interval = setInterval(() => {
+    // Re-resolve the row index by id on every tick: the queue can be
+    // reordered mid-transfer, so a captured index would write to the wrong row.
+    const currentIndex = state.files.queue.findIndex(f => f.id === id);
+    const current = currentIndex === -1 ? undefined : state.files.queue[currentIndex];
+    if (!current || current.status !== "transferring") {
+      clearInterval(interval);
+      transferIntervals.delete(id);
+      return;
+    }
+
+    let nextBytes = current.bytesTransferred + chunk;
+    if (nextBytes >= current.size) {
+      nextBytes = current.size;
+      setState("files", "queue", currentIndex, "bytesTransferred", nextBytes);
+      setState("files", "queue", currentIndex, "status", "completed");
+      logEvent(current.name, "completed");
+      clearInterval(interval);
+      transferIntervals.delete(id);
+    } else {
+      setState("files", "queue", currentIndex, "bytesTransferred", nextBytes);
+    }
+    persist();
+  }, 200);
+
+  transferIntervals.set(id, interval);
+  return true;
 }
 
-export function pauseTransfer(id: string) {
+export function pauseTransfer(id: string): boolean {
   const index = state.files.queue.findIndex(f => f.id === id);
-  if (index === -1) return;
+  if (index === -1) return false;
   const file = state.files.queue[index];
-  if (file.status !== "transferring") return;
+  if (file.status !== "transferring") return false;
 
   setState("files", "queue", index, "status", "paused");
   logEvent(file.name, "paused");
 
-  activeTransfers.delete(id);
+  const interval = transferIntervals.get(id);
+  if (interval) {
+    clearInterval(interval);
+    transferIntervals.delete(id);
+  }
   persist();
+  return true;
 }
 
-export function resumeTransfer(id: string) {
-   startTransfer(id);
-}
-
-export function cancelTransfer(id: string) {
+export function resumeTransfer(id: string): boolean {
+  // Resume is only valid from "paused" — unlike startTransfer, it must not
+  // silently accept a "not-started" row (that's what session_start/Start is
+  // for), otherwise WebMCP's session_resume could begin a transfer the UI's
+  // Resume control would never allow.
   const index = state.files.queue.findIndex(f => f.id === id);
-  if (index === -1) return;
+  if (index === -1) return false;
+  if (state.files.queue[index].status !== "paused") return false;
+  return startTransfer(id);
+}
+
+export function cancelTransfer(id: string): boolean {
+  const index = state.files.queue.findIndex(f => f.id === id);
+  if (index === -1) return false;
   const file = state.files.queue[index];
-  if (file.status === "completed" || file.status === "canceled") return;
+  if (file.status === "completed" || file.status === "canceled") return false;
 
   setState("files", "queue", index, "status", "canceled");
   logEvent(file.name, "canceled");
 
-  activeTransfers.delete(id);
+  const interval = transferIntervals.get(id);
+  if (interval) {
+    clearInterval(interval);
+    transferIntervals.delete(id);
+  }
   persist();
+  return true;
 }
 
-export function retryTransfer(id: string) {
+// Session Pack import replaces the entire file queue wholesale, so any
+// timers still ticking for the old rows (which never went through
+// pauseTransfer/cancelTransfer) would otherwise keep resolving by id
+// against the new queue and double-advance bytesTransferred if the user
+// resumes a row that reuses an old id.
+export function clearAllTransferIntervals() {
+  for (const interval of transferIntervals.values()) {
+    clearInterval(interval);
+  }
+  transferIntervals.clear();
+}
+
+export function retryTransfer(id: string): boolean {
   const index = state.files.queue.findIndex(f => f.id === id);
-  if (index === -1) return;
+  if (index === -1) return false;
   const file = state.files.queue[index];
-  if (file.status !== "canceled" && file.status !== "completed") return;
+  if (file.status !== "canceled" && file.status !== "completed") return false;
 
   setState("files", "queue", index, "status", "not-started");
   setState("files", "queue", index, "bytesTransferred", 0);
   logEvent(file.name, "retried");
   persist();
+  return true;
 }
 
 export function removeSelectedFiles(ids: string[]) {
@@ -364,8 +368,11 @@ export function removeSelectedFiles(ids: string[]) {
     })
   );
   for (const id of ids) {
-    activeTransfers.delete(id);
-    queuedFileSources.delete(id);
+    const interval = transferIntervals.get(id);
+    if (interval) {
+      clearInterval(interval);
+      transferIntervals.delete(id);
+    }
   }
   for (const name of deletedNames) {
      logEvent(name, "removed");

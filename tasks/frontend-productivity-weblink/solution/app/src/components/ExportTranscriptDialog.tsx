@@ -6,9 +6,13 @@ export default function ExportTranscriptDialog() {
   const [open, setOpen] = createSignal(false);
   const [copied, setCopied] = createSignal(false);
 
+  // Shared generator with WebMCP's artifact_export("transcript-markdown") so
+  // the dialog preview and the WebMCP export always match.
+  const generateMarkdown = () => generateTranscriptMarkdown();
+
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(generateTranscriptMarkdown());
+      await navigator.clipboard.writeText(generateMarkdown());
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
@@ -17,7 +21,7 @@ export default function ExportTranscriptDialog() {
   };
 
   const handleDownload = () => {
-    const blob = new Blob([generateTranscriptMarkdown()], { type: "text/markdown" });
+    const blob = new Blob([generateMarkdown()], { type: "text/markdown" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -53,7 +57,7 @@ export default function ExportTranscriptDialog() {
 
             <div class="flex-1 overflow-y-auto mb-6 rounded-lg bg-slate-50 border border-slate-200 dark:bg-slate-950 dark:border-slate-800 p-4">
                <pre class="text-xs text-slate-600 dark:text-slate-400 font-mono whitespace-pre-wrap break-words">
-                 {open() ? generateTranscriptMarkdown() : ""}
+                 {open() ? generateMarkdown() : ""}
                </pre>
             </div>
 

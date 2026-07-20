@@ -94,7 +94,7 @@ const TOOLS: ToolDescriptor[] = [
   },
   {
     name: "artifact_export",
-    description: "Return a preview of the session JSON or transcript MD.",
+    description: "Return a preview of the session JSON or transcript markdown.",
     module: "artifact-transfer-v1",
     operation: "export",
     parameters: {
@@ -127,22 +127,6 @@ function listTools() {
   return TOOLS;
 }
 
-function invokeTransfer(
-  id: string,
-  allowedStatuses: string[],
-  action: (fileId: string) => void,
-) {
-  const before = state.files.queue.find((file) => file.id === id);
-  if (!before) return { ok: false, error: "file not found", file_id: id };
-  if (!allowedStatuses.includes(before.status)) {
-    return { ok: false, error: `invalid status: ${before.status}`, file_id: id, status: before.status };
-  }
-
-  action(id);
-  const after = state.files.queue.find((file) => file.id === id);
-  return { ok: true, file_id: id, status: after?.status, bytes_transferred: after?.bytesTransferred };
-}
-
 function invokeTool(name: string, args: Record<string, unknown> = {}) {
   switch (name) {
     case "session_connect": {
@@ -159,19 +143,24 @@ function invokeTool(name: string, args: Record<string, unknown> = {}) {
       return { ok: true, status: state.room.status, peer_connected: false };
     }
     case "session_start": {
-      return invokeTransfer(String(args.file_id), ["not-started", "paused"], startTransfer);
+      const ok = startTransfer(String(args.file_id));
+      return ok ? { ok: true } : { ok: false, error: "unknown file_id or file is not startable in its current status" };
     }
     case "session_pause": {
-      return invokeTransfer(String(args.file_id), ["transferring"], pauseTransfer);
+      const ok = pauseTransfer(String(args.file_id));
+      return ok ? { ok: true } : { ok: false, error: "unknown file_id or file is not transferring" };
     }
     case "session_resume": {
-      return invokeTransfer(String(args.file_id), ["paused"], resumeTransfer);
+      const ok = resumeTransfer(String(args.file_id));
+      return ok ? { ok: true } : { ok: false, error: "unknown file_id or file is not resumable in its current status" };
     }
     case "session_stop": {
-      return invokeTransfer(String(args.file_id), ["not-started", "transferring", "paused"], cancelTransfer);
+      const ok = cancelTransfer(String(args.file_id));
+      return ok ? { ok: true } : { ok: false, error: "unknown file_id or file is already completed/canceled" };
     }
     case "session_restart": {
-      return invokeTransfer(String(args.file_id), ["canceled", "completed"], retryTransfer);
+      const ok = retryTransfer(String(args.file_id));
+      return ok ? { ok: true } : { ok: false, error: "unknown file_id or file is not canceled/completed" };
     }
     case "artifact_import": {
       const before = state.files.queue.length;
@@ -179,6 +168,8 @@ function invokeTool(name: string, args: Record<string, unknown> = {}) {
       return { ok: true, queued_count: state.files.queue.length, added: state.files.queue.length - before };
     }
     case "artifact_export": {
+      // Bound to the same generators the Export dialogs render, so the tool
+      // preview always matches the UI artifacts.
       if (args.format === "session-json") {
          return { ok: true, format: "session-json", preview: generateSessionPack() };
       } else if (args.format === "transcript-markdown") {

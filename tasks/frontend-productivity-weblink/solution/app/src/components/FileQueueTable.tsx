@@ -1,7 +1,7 @@
 import { For, Show, createSignal } from "solid-js";
 import { Motion } from "@motionone/solid";
-import { usePrefersReducedMotion } from "../reducedMotion";
 import { state, startTransfer, pauseTransfer, resumeTransfer, cancelTransfer, retryTransfer, removeSelectedFiles, retrySelectedFiles, reorderFiles, type QueuedFile } from "../store";
+import { usePrefersReducedMotion } from "../reducedMotion";
 
 export function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -161,9 +161,7 @@ export default function FileQueueTable() {
         <tbody>
           <For each={state.files.queue}>
             {(f, idx) => {
-              const progressPercent = () => f.size === 0
-                ? (f.status === "completed" ? 100 : 0)
-                : Math.floor((f.bytesTransferred / f.size) * 100);
+              const progressPercent = () => f.size === 0 ? (f.status === "completed" ? 100 : 0) : Math.floor((f.bytesTransferred / f.size) * 100);
 
               return (
                 <Motion.tr

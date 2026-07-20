@@ -62,10 +62,13 @@ export const TransferLogEntrySchema = z.object({
 export const SessionPackSchema = z.object({
   schemaVersion: z.literal("weblink-session-v2"),
   exportedAt: z.string().datetime({ offset: true }), // ISO-8601
-  peer: PeerIdentitySchema.extend({
+  peer: z.object({
+    displayName: PeerIdentitySchema.shape.displayName,
     clientId: z.string(),
   }),
-  roomId: JoinSessionSchema.shape.roomId.or(z.literal("")),
+  // May be empty when never joined; a non-empty value must satisfy the
+  // JoinSession roomId rules (length and character set)
+  roomId: z.union([z.literal(""), JoinSessionSchema.shape.roomId]),
   theme: z.enum(["light", "dark"]),
   messages: z.array(
     z.object({

@@ -9,7 +9,7 @@ export default function FilePanel() {
     const input = e.currentTarget as HTMLInputElement;
     const files = input.files;
     if (!files) return;
-    Array.from(files).forEach((f) => queueFile(f.name, f.size, f));
+    Array.from(files).forEach((f) => queueFile(f.name, f.size));
     input.value = "";
   };
 

@@ -6,9 +6,13 @@ export default function ExportDialog() {
   const [open, setOpen] = createSignal(false);
   const [copied, setCopied] = createSignal(false);
 
+  // Shared generator maps store rows to the Session Pack field contract
+  // (size -> sizeBytes, mid-transfer rows serialize as paused).
+  const generatePack = () => generateSessionPack();
+
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(generateSessionPack());
+      await navigator.clipboard.writeText(generatePack());
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
@@ -17,7 +21,7 @@ export default function ExportDialog() {
   };
 
   const handleDownload = () => {
-    const blob = new Blob([generateSessionPack()], { type: "application/json" });
+    const blob = new Blob([generatePack()], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -57,7 +61,7 @@ export default function ExportDialog() {
 
             <div class="flex-1 overflow-y-auto mb-6 rounded-lg bg-slate-50 border border-slate-200 dark:bg-slate-950 dark:border-slate-800 p-4">
                <pre class="text-xs text-slate-600 dark:text-slate-400 font-mono whitespace-pre-wrap break-words">
-                 {open() ? generateSessionPack() : ""}
+                 {open() ? generatePack() : ""}
                </pre>
             </div>
 
