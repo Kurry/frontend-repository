@@ -1,0 +1,58 @@
+
+> start
+> npx --yes serve -l 3000 -n
+
+ UPDATE  The latest version of `serve` is 14.2.6
+ INFO  Accepting connections at http://localhost:3000
+ HTTP  7/20/2026 2:38:12 PM ::1 GET /
+ HTTP  7/20/2026 2:38:12 PM ::1 Returned 200 in 279 ms
+ HTTP  7/20/2026 2:38:12 PM ::1 GET /assets/app.css
+ HTTP  7/20/2026 2:38:12 PM ::1 Returned 200 in 2 ms
+ HTTP  7/20/2026 2:38:12 PM ::1 GET /assets/app.js
+ HTTP  7/20/2026 2:38:12 PM ::1 GET /assets/scenes/scene-01.webp
+ HTTP  7/20/2026 2:38:12 PM ::1 GET /assets/scenes/scene-02.webp
+ HTTP  7/20/2026 2:38:12 PM ::1 Returned 200 in 5 ms
+ HTTP  7/20/2026 2:38:12 PM ::1 Returned 200 in 5 ms
+ HTTP  7/20/2026 2:38:12 PM ::1 Returned 200 in 5 ms
+ HTTP  7/20/2026 2:38:12 PM ::1 GET /assets/scenes/scene-03.webp
+ HTTP  7/20/2026 2:38:12 PM ::1 GET /assets/scenes/scene-04.webp
+ HTTP  7/20/2026 2:38:12 PM ::1 Returned 200 in 3 ms
+ HTTP  7/20/2026 2:38:12 PM ::1 Returned 200 in 4 ms
+ HTTP  7/20/2026 2:38:12 PM ::1 GET /assets/scenes/scene-05.webp
+ HTTP  7/20/2026 2:38:12 PM ::1 GET /assets/scenes/scene-06.webp
+ HTTP  7/20/2026 2:38:12 PM ::1 GET /assets/scenes/scene-07.webp
+ HTTP  7/20/2026 2:38:12 PM ::1 GET /assets/scenes/scene-08.webp
+ HTTP  7/20/2026 2:38:12 PM ::1 Returned 200 in 4 ms
+ HTTP  7/20/2026 2:38:12 PM ::1 Returned 200 in 5 ms
+ HTTP  7/20/2026 2:38:12 PM ::1 Returned 200 in 5 ms
+ HTTP  7/20/2026 2:38:12 PM ::1 Returned 200 in 9 ms
+ HTTP  7/20/2026 2:38:13 PM ::1 GET /assets/favicon.svg
+ HTTP  7/20/2026 2:38:13 PM ::1 Returned 200 in 3 ms
+ HTTP  7/20/2026 2:38:13 PM ::1 GET /assets/fonts/gabarito-400.woff2
+ HTTP  7/20/2026 2:38:13 PM ::1 Returned 200 in 2 ms
+ HTTP  7/20/2026 2:38:27 PM ::1 GET /
+ HTTP  7/20/2026 2:38:27 PM ::1 Returned 200 in 2 ms
+ HTTP  7/20/2026 2:38:27 PM ::1 GET /assets/app.css
+ HTTP  7/20/2026 2:38:27 PM ::1 GET /assets/scenes/scene-01.webp
+ HTTP  7/20/2026 2:38:27 PM ::1 GET /assets/scenes/scene-02.webp
+ HTTP  7/20/2026 2:38:27 PM ::1 GET /assets/app.js
+ HTTP  7/20/2026 2:38:27 PM ::1 Returned 200 in 2 ms
+ HTTP  7/20/2026 2:38:27 PM ::1 Returned 200 in 2 ms
+ HTTP  7/20/2026 2:38:27 PM ::1 Returned 200 in 2 ms
+ HTTP  7/20/2026 2:38:27 PM ::1 Returned 200 in 2 ms
+ HTTP  7/20/2026 2:38:27 PM ::1 GET /assets/scenes/scene-03.webp
+ HTTP  7/20/2026 2:38:27 PM ::1 GET /assets/scenes/scene-04.webp
+ HTTP  7/20/2026 2:38:27 PM ::1 GET /assets/scenes/scene-05.webp
+ HTTP  7/20/2026 2:38:27 PM ::1 GET /assets/scenes/scene-06.webp
+ HTTP  7/20/2026 2:38:27 PM ::1 GET /assets/scenes/scene-07.webp
+ HTTP  7/20/2026 2:38:27 PM ::1 GET /assets/scenes/scene-08.webp
+ HTTP  7/20/2026 2:38:27 PM ::1 Returned 200 in 2 ms
+ HTTP  7/20/2026 2:38:27 PM ::1 Returned 200 in 2 ms
+ HTTP  7/20/2026 2:38:27 PM ::1 Returned 200 in 2 ms
+ HTTP  7/20/2026 2:38:27 PM ::1 Returned 200 in 2 ms
+ HTTP  7/20/2026 2:38:27 PM ::1 Returned 200 in 2 ms
+ HTTP  7/20/2026 2:38:27 PM ::1 Returned 200 in 1 ms
+ HTTP  7/20/2026 2:38:27 PM ::1 GET /assets/favicon.svg
+ HTTP  7/20/2026 2:38:27 PM ::1 Returned 200 in 0 ms
+ HTTP  7/20/2026 2:38:27 PM ::1 GET /assets/fonts/gabarito-400.woff2
+ HTTP  7/20/2026 2:38:27 PM ::1 Returned 200 in 1 ms
