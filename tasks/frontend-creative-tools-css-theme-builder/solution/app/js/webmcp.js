@@ -202,7 +202,7 @@ export function registerWebMCP(api) {
           return { error: "editor_update_property requires properties token and value" };
         }
         try {
-          const patch =
+          const rawPatch =
             args.token === "name"
               ? { name: String(args.value) }
               : { [String(args.token)]: args.value };
@@ -210,6 +210,7 @@ export function registerWebMCP(api) {
             const nameError = validateThemeName(String(args.value));
             if (nameError) return { error: nameError };
           }
+          const patch = validatePatch(rawPatch);
           mutateActive(patch, { historyKey: `mcp:${args.token}` });
           return { success: true, token: args.token, value: state.active[args.token] ?? args.value };
         } catch (error) {
@@ -245,7 +246,7 @@ export function registerWebMCP(api) {
         }
         if (!Object.keys(patch).length) return { error: "Nothing to update — pass name and/or tokens" };
         try {
-          mutateActive(patch, { historyKey: "mcp:update" });
+          mutateActive(validatePatch(patch), { historyKey: "mcp:update" });
           return { success: true, id: state.active.id, name: state.active.name };
         } catch (error) {
           return { error: error instanceof Error ? error.message : "Invalid theme update" };
