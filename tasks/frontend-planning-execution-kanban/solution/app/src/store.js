@@ -54,10 +54,6 @@ export const useBoardStore = create((set, get) => ({
   promptPanelId: null,
   exportOpen: false,
   exportFormat: 'json',
-  exportDraft: {
-    json: compileJSON(initialExportSource),
-    markdown: compileMarkdown(initialExportSource),
-  },
   importDraft: '',
   importError: '',
 
@@ -74,11 +70,6 @@ export const useBoardStore = create((set, get) => ({
   clearToast: () => set({ toast: null }),
   notify: (kind, title, subtitle) => set({ toast: { id: uid('toast'), kind, title, subtitle } }),
   announce: (announcement) => set({ announcement }),
-
-  syncExportDraft: () => {
-    const state = get()
-    set({ exportDraft: { json: compileJSON(state), markdown: compileMarkdown(state) } })
-  },
 
   createCard: (payload) => {
     const state = get()
@@ -99,8 +90,15 @@ export const useBoardStore = create((set, get) => ({
     const nextOrder = clone(state.order)
     nextOrder[payload.column] = [id, ...nextOrder[payload.column]]
     set(historyCommit(state, { cards: { ...state.cards, [id]: newCard }, order: nextOrder }))
-    get().notify('success', 'Card created', `${newCard.title} was added to ${columns.find((column) => column.id === payload.column)?.name}.`)
+    const targetName = columns.find((column) => column.id === payload.column)?.name
+    get().notify('success', 'Card created', `${newCard.title} was added to ${targetName}.`)
     get().announce(`Card ${newCard.title} created.`)
+
+    const limit = state.wipLimits[payload.column]
+    if (limit !== null && limit !== undefined && nextOrder[payload.column].length > limit) {
+      get().announce(`WIP limit breached in ${targetName}.`)
+    }
+
     return id
   },
 
@@ -148,6 +146,12 @@ export const useBoardStore = create((set, get) => ({
     set(historyCommit(state, { order: nextOrder, cards: nextCards }))
     const targetName = columns.find((column) => column.id === targetColumn)?.name
     get().announce(`${card.title} moved to ${targetName}, position ${position + 1}.`)
+
+    const limit = state.wipLimits[targetColumn]
+    if (limit !== null && limit !== undefined && nextOrder[targetColumn].length > limit) {
+      get().announce(`WIP limit breached in ${targetName}.`)
+    }
+
     return true
   },
 
@@ -301,10 +305,18 @@ export const useBoardStore = create((set, get) => ({
       get().notify('success', 'Execution complete', `${get().cards[cardId]?.title} completed successfully.`)
       return true
     } catch (error) {
-      set((state) => ({
-        cards: updateCardRecord(state.cards, cardId, (value) => ({ ...value, status: 'failed' })),
-        announcement: `Execution failed: ${error.message}`,
-      }))
+      set((state) => {
+        const card = state.cards[cardId]
+        const activeIndex = card?.tasks.findIndex((t) => t.status !== 'complete') ?? -1
+        return {
+          cards: updateCardRecord(state.cards, cardId, (value) => ({
+            ...value,
+            status: 'failed',
+            tasks: value.tasks.map((t, i) => i === activeIndex ? { ...t, status: 'failed', error: error.message } : t)
+          })),
+          announcement: `Execution failed: ${error.message}`,
+        }
+      })
       get().notify('error', 'Execution failed', 'Retry resumes from the failed task item.')
       return false
     } finally {
