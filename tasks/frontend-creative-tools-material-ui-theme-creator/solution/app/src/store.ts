@@ -347,6 +347,14 @@ export const useStore = create<State>((set, get) => {
     },
 
     renameTheme: (id, name) => {
+      // The rename panel is non-modal and stays open across tab switches, so
+      // the target can be deleted while it is open — fail instead of silently
+      // reporting a rename that matched no theme.
+      if (!get().savedThemes.some((t) => t.id === id)) {
+        const msg = 'That theme no longer exists';
+        get().announce(msg);
+        return { ok: false, error: msg, field: 'name' };
+      }
       const trimmed = (name ?? '').trim();
       if (!trimmed) {
         get().announce('name is required');
