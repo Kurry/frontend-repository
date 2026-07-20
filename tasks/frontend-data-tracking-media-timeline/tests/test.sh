@@ -41,8 +41,11 @@ export WEBMCP_CDP_ENDPOINT="http://127.0.0.1:$WEBMCP_CDP_PORT"
 # When grading restored artifacts (harbor score), node_modules is excluded — reinstall.
 if [ -f /app/package.json ] && [ ! -d /app/node_modules ]; then
   (cd /app && npm install --no-audit --no-fund) \
-    || { echo "[test] npm install failed; leaving safety reward" >&2; exit 0; }
+    || { echo "[test] npm install failed — app did not build; recording 0.0" >&2; exit 0; }
 fi
-npm run verify:build || { echo "[test] build failed; leaving safety reward" >&2; exit 0; }
+# The delivery contract requires the agent to make verify:build pass. If it does
+# not, the app cannot be served or judged, so the seeded 0.0 stands. exit 0 makes
+# harbor record that 0.0 as the score (a non-zero exit reads as an infra error).
+npm run verify:build || { echo "[test] verify:build failed — app did not build; recording 0.0" >&2; exit 0; }
 exec start-server-and-test 'npm start' tcp:localhost:3000 \
   'rewardkit /tests --workspace /app --output /logs/verifier/reward.json'
