@@ -187,6 +187,8 @@ kbd { min-width: 19px; padding: 2px 4px; color: #393939; background: #e8e8e8; bo
 .timeline-row.status-complete .timeline-icon { color: #198038; background: #defbe6; }
 .timeline-row.status-failed .timeline-icon { color: #da1e28; background: #fff1f1; }
 .timeline-row.status-retrying .timeline-icon { color: #8e6a00; background: #fff8d6; }
+.cds--tag--warm-gray { background-color: #fdf5df; color: #8e6a00; border-color: #8e6a00; }
+.cds--tag--warm-gray svg { fill: #8e6a00; }
 .timeline-copy { min-width: 0; }
 .timeline-copy strong { display: block; overflow: hidden; font-size: 11px; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
 .timeline-copy > span { display: block; margin-top: 2px; overflow: hidden; color: #6f6f6f; font-size: 9.5px; text-overflow: ellipsis; white-space: nowrap; }
@@ -267,4 +269,26 @@ kbd { min-width: 19px; padding: 2px 4px; color: #393939; background: #e8e8e8; bo
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   .workflow-node.is-running { animation: none; border-color: #0f62fe; box-shadow: 0 0 0 3px rgb(15 98 254 / 18%); }
   .react-flow__edge.animated path { animation: none; stroke: #0f62fe !important; stroke-dasharray: none; }
+}
+
+@media (max-width: 375px) {
+  .toolbar-actions { flex-wrap: wrap; overflow-x: visible; }
+  .toolbar-actions .cds--btn { min-height: 44px; min-width: 44px; }
+  .palette-panel:not(.open) .palette-item { min-height: 44px; min-width: 44px; }
+  .panel-heading .cds--btn { min-height: 44px; min-width: 44px; }
+  .timeline-filters .cds--tag { min-height: 44px; display: flex; align-items: center; }
+}
+
+@media (max-width: 768px) {
+  .artifact-modal .cds--modal-container {
+    position: absolute;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-height: 50vh;
+    transform: none;
+    border-top: 1px solid #c6c6c6;
+  }
 }

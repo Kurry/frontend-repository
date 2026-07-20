@@ -18,6 +18,15 @@ let executionToken = 0;
 let elapsedTimer = null;
 let toastTimer = null;
 const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+const isRunActive = (run) => ['running', 'pausing', 'paused'].includes(run.phase);
+
+const historySnapshot = ({ nodes, edges, run, timeline, activeWorkflowName }) => ({
+  nodes: structuredClone(nodes),
+  edges: structuredClone(edges),
+  run: structuredClone(run),
+  timeline: structuredClone(timeline),
+  activeWorkflowName,
+});
 
 const blankRun = () => ({
   phase: 'idle',
@@ -56,7 +65,7 @@ function stopElapsed() {
 }
 
 function getTopologicalOrder(nodes, edges) {
-  if (!nodes.length) return { error: 'There is nothing to run.' };
+  if (!nodes.length) return { error: 'There is nothing to run. Drag a node from the palette onto the canvas to get started.' };
   const nodeIds = new Set(nodes.map((node) => node.id));
   const validEdges = edges.filter((edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target));
   if (nodes.length > 1 && validEdges.length === 0) return { error: 'Connect the nodes into a valid source-to-sink path before running.' };
@@ -115,10 +124,55 @@ function timestamp() {
 }
 
 export const useWorkflowStore = create((set, get) => ({
+  past: [],
+  future: [],
+  pushHistory: () => {
+    const state = get();
+    if (isRunActive(state.run)) {
+      get().showToast('error', 'Finish the current run before editing the workflow.');
+      return false;
+    }
+    const snapshot = historySnapshot(state);
+    set((state) => ({ past: [...state.past, snapshot], future: [] }));
+    return true;
+  },
+  undo: () => {
+    const { past, run } = get();
+    if (!past.length || isRunActive(run)) return;
+    const previous = past[past.length - 1];
+    set((state) => ({
+      past: state.past.slice(0, -1),
+      future: [historySnapshot(state), ...state.future],
+      nodes: previous.nodes.map((node) => ({ ...node, selected: false })),
+      edges: previous.edges.map((edge) => ({ ...edge, selected: false })),
+      run: structuredClone(previous.run),
+      timeline: structuredClone(previous.timeline),
+      activeWorkflowName: previous.activeWorkflowName,
+      selectedNodeId: null,
+      selectedEdgeId: null,
+    }));
+  },
+  redo: () => {
+    const { future, run } = get();
+    if (!future.length || isRunActive(run)) return;
+    const next = future[0];
+    set((state) => ({
+      past: [...state.past, historySnapshot(state)],
+      future: state.future.slice(1),
+      nodes: next.nodes.map((node) => ({ ...node, selected: false })),
+      edges: next.edges.map((edge) => ({ ...edge, selected: false })),
+      run: structuredClone(next.run),
+      timeline: structuredClone(next.timeline),
+      activeWorkflowName: next.activeWorkflowName,
+      selectedNodeId: null,
+      selectedEdgeId: null,
+    }));
+  },
   nodes: createSeedNodes(),
   edges: createSeedEdges(),
   selectedNodeId: null,
   selectedEdgeId: null,
+  nodeDragInProgress: false,
   savedWorkflows: [],
   timeline: [],
   timelineFilter: 'all',
@@ -136,8 +190,26 @@ export const useWorkflowStore = create((set, get) => ({
     artifactMode: 'json',
   },
 
-  onNodesChange: (changes) => set((state) => ({ nodes: applyNodeChanges(changes, state.nodes) })),
-  onEdgesChange: (changes) => set((state) => ({ edges: applyEdgeChanges(changes, state.edges) })),
+  onNodesChange: (changes) => {
+    const dragEnded = changes.some((change) => change.type === 'position' && change.dragging === false);
+    const allowedChanges = isRunActive(get().run)
+      ? changes.filter((change) => change.type === 'select' || change.type === 'dimensions')
+      : changes;
+    if (!allowedChanges.length) {
+      if (dragEnded) set({ nodeDragInProgress: false });
+      return;
+    }
+    const dragStarted = allowedChanges.some((change) => change.type === 'position' && change.dragging === true);
+    if (dragStarted && !get().nodeDragInProgress) get().pushHistory();
+    set((state) => ({
+      nodes: applyNodeChanges(allowedChanges, state.nodes),
+      nodeDragInProgress: dragEnded ? false : (dragStarted ? true : state.nodeDragInProgress),
+    }));
+  },
+  onEdgesChange: (changes) => {
+    const allowedChanges = isRunActive(get().run) ? changes.filter((change) => change.type === 'select') : changes;
+    if (allowedChanges.length) set((state) => ({ edges: applyEdgeChanges(allowedChanges, state.edges) }));
+  },
 
   selectNode: (id) => set((state) => ({
     selectedNodeId: id,
@@ -173,6 +245,7 @@ export const useWorkflowStore = create((set, get) => ({
 
   addNode: (type, position = null) => {
     if (!NODE_TYPES.includes(type)) return null;
+    if (!get().pushHistory()) return null;
     const id = `${type.toLowerCase()}-${Date.now().toString(36)}`;
     const existing = get().nodes.length;
     const node = {
@@ -224,30 +297,41 @@ export const useWorkflowStore = create((set, get) => ({
       return false;
     }
     const edge = { ...connection, id: connection.id || `edge-${source.id}-${target.id}-${Date.now().toString(36)}`, sourceHandle: 'out', targetHandle: 'in', type: 'smoothstep' };
+    if (!get().pushHistory()) return false;
     set((current) => ({ edges: addEdge(edge, current.edges) }));
     return true;
   },
 
   deleteSelected: () => {
-    const { selectedNodeId, selectedEdgeId } = get();
-    if (selectedNodeId) {
-      set((state) => ({
-        nodes: state.nodes.filter((node) => node.id !== selectedNodeId),
-        edges: state.edges.filter((edge) => edge.source !== selectedNodeId && edge.target !== selectedNodeId),
-        selectedNodeId: null,
-      }));
-    } else if (selectedEdgeId) {
-      set((state) => ({ edges: state.edges.filter((edge) => edge.id !== selectedEdgeId), selectedEdgeId: null }));
-    }
+    const state = get();
+    const selectedNodeIds = new Set(state.nodes.filter((node) => node.selected).map((node) => node.id));
+    const selectedEdgeIds = new Set(state.edges.filter((edge) => edge.selected).map((edge) => edge.id));
+    if (state.selectedNodeId) selectedNodeIds.add(state.selectedNodeId);
+    if (state.selectedEdgeId) selectedEdgeIds.add(state.selectedEdgeId);
+    if (selectedNodeIds.size === 0 && selectedEdgeIds.size === 0) return false;
+    if (!get().pushHistory()) return false;
+    set((current) => ({
+      nodes: current.nodes.filter((node) => !selectedNodeIds.has(node.id)),
+      edges: current.edges.filter((edge) => !selectedEdgeIds.has(edge.id) && !selectedNodeIds.has(edge.source) && !selectedNodeIds.has(edge.target)),
+      selectedNodeId: null,
+      selectedEdgeId: null,
+    }));
+    return true;
   },
   deleteObject: (kind, id) => {
+    if (!get().pushHistory()) return false;
     if (kind === 'edge') set((state) => ({ edges: state.edges.filter((edge) => edge.id !== id), selectedEdgeId: null }));
     else set((state) => ({ nodes: state.nodes.filter((node) => node.id !== id), edges: state.edges.filter((edge) => edge.source !== id && edge.target !== id), selectedNodeId: null }));
+    return true;
   },
-  updateNode: (id, values) => set((state) => ({
-    nodes: state.nodes.map((node) => node.id === id ? { ...node, data: { ...node.data, title: values.title ?? node.data.title, config: { ...node.data.config, ...values.config } } } : node),
-    announcement: 'Node configuration saved',
-  })),
+  updateNode: (id, values) => {
+    if (!get().pushHistory()) return false;
+    set((state) => ({
+      nodes: state.nodes.map((node) => node.id === id ? { ...node, data: { ...node.data, title: values.title ?? node.data.title, config: { ...node.data.config, ...values.config } } } : node),
+      announcement: 'Node configuration saved',
+    }));
+    return true;
+  },
   toggleNodeExpanded: (id) => set((state) => ({ nodes: state.nodes.map((node) => node.id === id ? { ...node, data: { ...node.data, expanded: !node.data.expanded } } : node) })),
 
   openModal: (modal, options = {}) => set((state) => ({ ui: { ...state.ui, modal, modalNodeId: options.nodeId || null, pendingWorkflowId: options.workflowId || state.ui.pendingWorkflowId } })),
@@ -282,6 +366,8 @@ export const useWorkflowStore = create((set, get) => ({
     executionToken += 1;
     stopElapsed();
     set((current) => ({
+      past: [],
+      future: [],
       nodes: saved.nodes.map(fromContractNode),
       edges: saved.edges.map((edge) => ({ ...edge, type: 'smoothstep' })),
       selectedNodeId: null,
@@ -313,6 +399,7 @@ export const useWorkflowStore = create((set, get) => ({
   confirmImport: () => {
     const definition = get().ui.pendingImport;
     if (!definition) return false;
+    if (!get().pushHistory()) return false;
     executionToken += 1;
     stopElapsed();
     set((state) => ({

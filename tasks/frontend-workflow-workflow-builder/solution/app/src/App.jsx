@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {  useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Background,
   BackgroundVariant,
@@ -52,6 +52,8 @@ import {
   Time,
   TrashCan,
   Upload,
+  Undo,
+  Redo,
   WarningFilled,
 } from '@carbon/icons-react';
 import { useForm } from 'react-hook-form';
@@ -151,6 +153,8 @@ function WorkflowNode({ id, type, data, selected }) {
 const nodeTypes = Object.fromEntries(NODE_TYPES.map((type) => [type, WorkflowNode]));
 
 function Palette({ open, onToggle }) {
+  // landmark role region or aside
+
   const addNode = useWorkflowStore((state) => state.addNode);
   return (
     <aside className={`palette-panel ${open ? 'open' : 'closed'}`} aria-label="Node palette">
@@ -195,6 +199,10 @@ function Palette({ open, onToggle }) {
 
 function Toolbar() {
   const run = useWorkflowStore((state) => state.run);
+  const undo = useWorkflowStore((state) => state.undo);
+  const redo = useWorkflowStore((state) => state.redo);
+  const canUndo = useWorkflowStore((state) => state.past.length > 0);
+  const canRedo = useWorkflowStore((state) => state.future.length > 0);
   const nodes = useWorkflowStore((state) => state.nodes);
   const edges = useWorkflowStore((state) => state.edges);
   const startRun = useWorkflowStore((state) => state.startRun);
@@ -203,8 +211,11 @@ function Toolbar() {
   const retryFailed = useWorkflowStore((state) => state.retryFailed);
   const openModal = useWorkflowStore((state) => state.openModal);
   const cycleNodeSelection = useWorkflowStore((state) => state.cycleNodeSelection);
+  const deleteSelected = useWorkflowStore((state) => state.deleteSelected);
+  const hasSelection = useWorkflowStore((state) => state.nodes.some(n => n.selected) || state.edges.some(e => e.selected) || state.selectedNodeId || state.selectedEdgeId);
   const rollup = getRollup({ nodes, run });
   const busy = run.phase === 'running' || run.phase === 'pausing';
+  const historyLocked = busy || run.phase === 'paused';
   const elapsed = `${(rollup.elapsedMs / 1000).toFixed(1)}s`;
 
   return (
@@ -215,9 +226,12 @@ function Toolbar() {
         {run.phase === 'paused' && <Button kind="secondary" size="sm" renderIcon={Play} onClick={resumeRun}>Resume</Button>}
         {run.phase === 'failed' && <Button kind="danger--tertiary" size="sm" renderIcon={Restart} onClick={retryFailed}>Retry from failed node</Button>}
         <div className="toolbar-divider" />
+        <Button kind="ghost" size="sm" renderIcon={Undo} onClick={undo} disabled={!canUndo || historyLocked} iconDescription="Undo (Ctrl+Z)" hasIconOnly />
+        <Button kind="ghost" size="sm" renderIcon={Redo} onClick={redo} disabled={!canRedo || historyLocked} iconDescription="Redo (Ctrl+Y)" hasIconOnly />
         <Button kind="tertiary" size="sm" renderIcon={Save} onClick={() => openModal('save')}>Save</Button>
         <Button kind="ghost" size="sm" renderIcon={Export} onClick={() => openModal('artifact')}>Export</Button>
         <Button hasIconOnly iconDescription="Import workflow" renderIcon={Upload} kind="ghost" size="sm" onClick={() => openModal('import')} />
+        <Button hasIconOnly iconDescription="Delete selected" renderIcon={TrashCan} kind="ghost" size="sm" onClick={deleteSelected} disabled={!hasSelection} />
         <Button hasIconOnly iconDescription="Cycle node selection (Alt+N)" renderIcon={DataConnected} kind="ghost" size="sm" onClick={cycleNodeSelection} />
       </div>
       <div className="rollup" aria-label={`${rollup.complete} of ${rollup.total} nodes complete, ${rollup.failures} failures, ${elapsed} elapsed`}>
@@ -441,7 +455,9 @@ function ConfigurationModal() {
   }, [node, reset]);
   if (!node) return null;
   const configErrors = errors.config || {};
-  const submit = handleSubmit((values) => { updateNode(node.id, values); close(); });
+  const submit = handleSubmit((values) => {
+    if (updateNode(node.id, values)) close();
+  });
   return (
     <Modal
       open={ui.modal === 'configure'}
@@ -546,15 +562,16 @@ function ArtifactModal() {
     setTimeout(() => URL.revokeObjectURL(url), 0);
   };
   return (
-    <Modal passiveModal open={open} modalHeading="Export workflow" modalLabel="Live artifact preview" onRequestClose={close} size="lg">
+    <Modal passiveModal open={open} modalHeading="Export workflow" modalLabel="Live artifact preview" onRequestClose={close} size="lg" className="artifact-modal">
+      {nodes.length === 0 && <p className="empty-artifact-state">The canvas is empty. Add nodes from the palette to export a workflow.</p>}
       <div className="artifact-tabs" role="tablist" aria-label="Export format">
         <Button kind={mode === 'json' ? 'secondary' : 'ghost'} size="sm" renderIcon={Code} onClick={() => setMode('json')} role="tab" aria-selected={mode === 'json'}>JSON</Button>
         <Button kind={mode === 'mermaid' ? 'secondary' : 'ghost'} size="sm" renderIcon={Flow} onClick={() => setMode('mermaid')} role="tab" aria-selected={mode === 'mermaid'}>Mermaid</Button>
       </div>
       <pre className="artifact-preview" aria-label={`${mode} artifact preview`}>{content}</pre>
       <div className="artifact-actions">
-        <Button kind="primary" size="sm" renderIcon={Download} onClick={download}>{mode === 'json' ? 'Download workflow.json' : 'Download workflow.mmd'}</Button>
-        <Button kind="tertiary" size="sm" renderIcon={Copy} onClick={copy}>{mode === 'json' ? 'Copy JSON' : 'Copy Mermaid'}</Button>
+        <Button kind="primary" size="sm" renderIcon={Download} onClick={download} disabled={nodes.length === 0}>{mode === 'json' ? 'Download workflow.json' : 'Download workflow.mmd'}</Button>
+        <Button kind="tertiary" size="sm" renderIcon={Copy} onClick={copy} disabled={nodes.length === 0}>{mode === 'json' ? 'Copy JSON' : 'Copy Mermaid'}</Button>
       </div>
     </Modal>
   );
@@ -605,13 +622,14 @@ function ToastLayer() {
 }
 
 function App() {
+  const [coachmarkVisible, setCoachmarkVisible] = useState(true);
   const paletteOpen = useWorkflowStore((state) => state.ui.paletteOpen);
   const togglePalette = useWorkflowStore((state) => state.togglePalette);
   const announcement = useWorkflowStore((state) => state.announcement);
   const activeName = useWorkflowStore((state) => state.activeWorkflowName);
   const activeModal = useWorkflowStore((state) => state.ui.modal);
   const selectedNodeId = useWorkflowStore((state) => state.selectedNodeId);
-  const selectedEdgeId = useWorkflowStore((state) => state.selectedEdgeId);
+  const hasSelection = useWorkflowStore((state) => state.nodes.some((node) => node.selected) || state.edges.some((edge) => edge.selected) || state.selectedNodeId || state.selectedEdgeId);
   const cycleNodeSelection = useWorkflowStore((state) => state.cycleNodeSelection);
   const deleteSelected = useWorkflowStore((state) => state.deleteSelected);
   const openModal = useWorkflowStore((state) => state.openModal);
@@ -634,9 +652,19 @@ function App() {
         return;
       }
       if (typing || activeModal) return;
-      if ((event.key === 'Delete' || event.key === 'Backspace') && (selectedNodeId || selectedEdgeId)) {
+      if ((event.key === 'Delete' || event.key === 'Backspace') && hasSelection) {
         event.preventDefault();
         deleteSelected();
+      }
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
+        event.preventDefault();
+        if (event.shiftKey) useWorkflowStore.getState().redo(); else useWorkflowStore.getState().undo();
+        return;
+      }
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'y') {
+        event.preventDefault();
+        useWorkflowStore.getState().redo();
+        return;
       }
       if (event.key === 'Enter' && selectedNodeId) {
         event.preventDefault();
@@ -645,13 +673,13 @@ function App() {
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [activeModal, cycleNodeSelection, deleteSelected, openModal, selectedEdgeId, selectedNodeId]);
+  }, [activeModal, cycleNodeSelection, deleteSelected, hasSelection, openModal, selectedNodeId]);
 
   return (
     <div className="app-shell">
       <header className="app-header">
         <div className="brand-mark"><Flow size={20} /></div>
-        <div className="brand-copy"><strong>Orchestrate</strong><span>Studio</span></div>
+        <h1 className="brand-copy"><strong>Orchestrate</strong><span>Studio</span></h1>
         <div className="header-divider" />
         <div className="workflow-identity"><span className="live-dot" />{activeName}</div>
         <div className="header-meta">AI agent workspace</div>
@@ -660,6 +688,7 @@ function App() {
         <Palette open={paletteOpen} onToggle={togglePalette} />
         <div className="center-column">
           <Toolbar />
+          {coachmarkVisible && <div className="coachmark"><InlineNotification kind="info" title="Welcome to Orchestrate Studio" subtitle="Drag a Prompt node from the palette to begin, or click Import to load an existing workflow. Run the orchestration using the toolbar." hideCloseButton={false} onCloseButtonClick={() => setCoachmarkVisible(false)} /></div>}
           <Canvas />
           <Timeline />
         </div>
