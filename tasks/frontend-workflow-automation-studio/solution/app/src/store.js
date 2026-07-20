@@ -79,6 +79,9 @@ function finishRun(set, get, runStatus = 'pass') {
     liveRun: { ...live, status: runStatus === 'fail' ? 'failed' : 'complete', finishedAt: isoNow(), totals },
     announcement: runStatus === 'fail' ? 'Run failed. Retry is available.' : `Run complete. ${totals.passed} of ${script.steps.length} steps passed.`,
   })
+  if (runStatus === 'pass' && totals.failed === 0 && totals.passed > 0) {
+    get().toastMessage(`All ${totals.passed} steps passed — great run!`)
+  }
 }
 
 async function executeRun(set, get, token, startIndex = 0, forceCurrentPass = false) {
@@ -105,12 +108,11 @@ async function executeRun(set, get, token, startIndex = 0, forceCurrentPass = fa
         stepResults: { ...live.stepResults, [step.id]: { stepId: step.id, order: step.order, type: step.type, label: step.label, status: 'running', attempts: attempt, timestamp: isoNow() } } } })
       addEvent(set, get, step, 'running', `${step.label}: Running (attempt ${attempt})`)
       addConsole(set, get, 'running', `[${step.type}] ${step.label} — attempt ${attempt}`, step.id)
-      if (!(await runDelay(get, token, step.type === 'wait' ? Math.min(Number(step.params.ms) || 300, 900) : 360))) return
+      if (!(await runDelay(get, token, step.type === 'wait' ? Math.min(Number(step.params.ms) || 300, 900) : 240))) return
 
       const invalid = !paramSchemas[step.type].safeParse(step.params).success
       const forcedFailure = String(step.params.selector || '').includes('missing') || String(step.params.expected_text || '').toLowerCase().includes('force fail')
-      const transient = !forceCurrentPass && attempt === 1 && step.type === 'assert_text' && Number(initial.id.slice(-1).charCodeAt(0)) % 2 === 0
-      const failed = invalid || forcedFailure || transient
+      const failed = invalid || forcedFailure
       if (!failed) {
         passed = true
         const value = step.type === 'extract' ? `${step.params.variable}_${Math.random().toString(36).slice(2, 8)}` : undefined
@@ -151,10 +153,12 @@ async function executeRun(set, get, token, startIndex = 0, forceCurrentPass = fa
   finishRun(set, get, 'pass')
 }
 
+export const enabledSteps = script => script?.steps.filter(step => !step.disabled) ?? []
+
 export const useStudio = create((set, get) => ({
   scripts: clone(seededScripts), selectedScriptId: seededScripts[0].id, view: 'step-editor', sidebarOpen: false,
   selectedScripts: [], selectedSteps: [], selectedRuns: [], selectedVersion: null,
-  editActions: [], historyCursor: 0,
+  editActions: [], historyCursor: 0, historyOpen: false, creatingScript: false,
   paletteOpen: false, paletteQuery: '', paletteIndex: 0,
   consoleTheme: 'Midnight', consoleFollowing: true, consoleLines: [], liveRun: null,
   timelineFilter: 'all', highlightedStepId: null,
@@ -164,7 +168,10 @@ export const useStudio = create((set, get) => ({
 
   selectedScript: () => get().scripts.find(s => s.id === get().selectedScriptId),
   setView: view => set({ view, sidebarOpen: false }),
-  selectScript: id => set({ selectedScriptId: id, selectedVersion: null, selectedSteps: [], highlightedStepId: null, sidebarOpen: false }),
+  selectScript: id => {
+    if (!get().scripts.some(s => s.id === id)) return
+    set({ selectedScriptId: id, selectedVersion: null, selectedSteps: [], highlightedStepId: null, sidebarOpen: false })
+  },
   toggleSidebar: () => set(s => ({ sidebarOpen: !s.sidebarOpen })),
   setUi: values => set(values),
   toastMessage: message => { set({ toast: { id: makeId('toast'), message } }); setTimeout(() => set({ toast: null }), 2600) },
@@ -201,10 +208,18 @@ export const useStudio = create((set, get) => ({
   },
   deleteScripts: ids => {
     if (!ids.length) return
+    const liveScriptId = get().liveRun?.scriptId
     applyCommit(set, get, `Deleted ${ids.length} script${ids.length === 1 ? '' : 's'}`, draft => {
       draft.scripts = draft.scripts.filter(s => !ids.includes(s.id))
-      if (ids.includes(draft.selectedScriptId)) draft.selectedScriptId = null
+      if (ids.includes(draft.selectedScriptId)) draft.selectedScriptId = draft.scripts[0]?.id ?? null
     })
+    const patch = {}
+    if (ids.includes(liveScriptId)) {
+      engineToken += 1
+      patch.liveRun = null
+      patch.consoleLines = []
+    }
+    if (Object.keys(patch).length) set(patch)
     get().toastMessage(`Deleted ${ids.length} script${ids.length === 1 ? '' : 's'} and related run data`)
   },
   updateScriptMeta: (property, value) => {
@@ -301,16 +316,28 @@ export const useStudio = create((set, get) => ({
   },
 
   startRun: (scriptId = get().selectedScriptId, trigger = 'manual') => {
-    if (['running', 'paused', 'retrying'].includes(get().liveRun?.status)) return false
-    const script = get().scripts.find(s => s.id === scriptId); if (!script || !script.steps.length) return false
-    engineToken += 1; const token = engineToken; const id = makeId('run')
+    const active = get().liveRun
+    if (active && ['running', 'paused', 'retrying'].includes(active.status)) return false
+    const script = get().scripts.find(s => s.id === scriptId)
+    if (!script || !script.steps.length) return false
+    engineToken += 1
+    const token = engineToken
+    const id = makeId('run')
     set({
-      selectedScriptId: scriptId, view: 'step-editor', selectedVersion: null,
-      liveRun: { id, scriptId, trigger, start_time: isoNow(), status: 'running', currentIndex: 0, currentStepId: null, attempt: 0, retryCount: 0, stepResults: {}, timeline: [], totals: { passed: 0, failed: 0, skipped: 0, retries: 0 } },
+      selectedScriptId: scriptId,
+      view: 'step-editor',
+      selectedVersion: null,
+      consoleLines: [],
+      consoleFollowing: true,
+      timelineFilter: 'all',
+      liveRun: {
+        id, scriptId, trigger, start_time: isoNow(), status: 'running', currentIndex: 0, currentStepId: null,
+        attempt: 0, retryCount: 0, stepResults: {}, timeline: [], totals: { passed: 0, failed: 0, skipped: 0, retries: 0 },
+      },
       announcement: `Run started for ${script.name}`,
     })
     addConsole(set, get, 'system', `Run ${id} started · ${trigger} trigger`, null)
-    executeRun(set, get, token)
+    void executeRun(set, get, token)
     return true
   },
   pauseRun: () => {

@@ -32,6 +32,13 @@ const fuzzy = (text, query) => {
   return true
 }
 
+function useFocusReturn(open, returnRef) {
+  useEffect(() => {
+    if (open) return
+    returnRef?.current?.focus?.()
+  }, [open, returnRef])
+}
+
 function StatusTag({ status, small = true }) {
   if (!status) return null
   const types = { pass: 'green', fail: 'red', skipped: 'gray', running: 'blue', retrying: 'purple', paused: 'cool-gray', failed: 'red', complete: 'green', pending: 'gray' }
@@ -39,7 +46,7 @@ function StatusTag({ status, small = true }) {
   return <Tag size={small ? 'sm' : 'md'} type={types[status] || 'gray'}>{labels[status] || status}</Tag>
 }
 
-function Sidebar() {
+function Sidebar({ newScriptRef }) {
   const scripts = useStudio(s => s.scripts)
   const selectedId = useStudio(s => s.selectedScriptId)
   const selected = useStudio(s => s.selectedScripts)
@@ -51,7 +58,7 @@ function Sidebar() {
     <aside className={`sidebar ${open ? 'open' : ''}`} aria-label="Script library">
       <div className="sidebar-brand">
         <div className="flex items-center"><span className="sidebar-brand-mark">T</span><div className="leading-tight"><div className="text-lg font-semibold">Ternwave</div><div className="text-xs text-slate-400">Automation studio</div></div></div>
-        <Button className="mt-5 w-full" size="sm" renderIcon={Add} onClick={() => setUi({ newScriptModal: true })}>New Script</Button>
+        <Button ref={newScriptRef} className="mt-5 w-full" size="sm" renderIcon={Add} onClick={() => setUi({ newScriptModal: true })}>New Script</Button>
       </div>
       {selected.length > 0 && <div className="sidebar-bulk" aria-label="Script bulk actions">
         <div className="mb-2 text-xs font-semibold">{selected.length} selected</div>
@@ -63,7 +70,7 @@ function Sidebar() {
       <div className="px-5 pb-2 pt-5 text-[11px] font-semibold uppercase tracking-[.12em] text-slate-400">Saved scripts · {scripts.length}</div>
       <nav>
         {scripts.map(script => <div key={script.id} className={`script-row ${selectedId === script.id ? 'active' : ''}`}>
-          <Checkbox id={`script-${script.id}`} labelText="" hideLabel checked={selected.includes(script.id)} onChange={() => toggleScriptSelection(script.id)} />
+          <Checkbox id={`script-${script.id}`} labelText={`Select ${script.name}`} checked={selected.includes(script.id)} onChange={() => toggleScriptSelection(script.id)} />
           <div className="script-main" role="button" tabIndex={0} onClick={() => selectScript(script.id)} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); selectScript(script.id) } }}>
             <div className="flex items-center gap-2">
               <span className="script-name">{script.name}</span>
@@ -120,17 +127,18 @@ function Toolbar() {
   </header>
 }
 
-function NewScriptModal() {
+function NewScriptModal({ launcherRef }) {
   const open = useStudio(s => s.newScriptModal)
   const creating = useStudio(s => s.creatingScript)
   const { createScript, setUi } = useStudio()
   const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm({ resolver: zodResolver(newScriptSchema), mode: 'onChange', defaultValues: { name: '', target_url: '', description: '' } })
+  useFocusReturn(open, launcherRef)
   const close = () => { reset(); setUi({ newScriptModal: false }) }
   const submit = handleSubmit(values => { if (!creating) { createScript(values); reset() } })
-  return <Modal open={open} modalHeading="Create a new script" modalLabel="Script library" primaryButtonText="Create script" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid || creating} onRequestClose={close} onRequestSubmit={submit}>
+  return <Modal open={open} modalHeading="Create a new script" modalLabel="Script library" primaryButtonText="Create script" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid || creating} onRequestClose={close} onRequestSubmit={submit} launcherButtonRef={launcherRef} selectorPrimaryFocus="#new-name">
     <div className="grid gap-5 pt-2">
       <TextInput id="new-name" labelText="Script name" invalid={!!errors.name} invalidText={errors.name?.message} {...register('name')} />
-      <TextInput id="new-url" labelText="Target URL" invalid={!!errors.target_url} invalidText={errors.target_url?.message} {...register('target_url')} />
+      <TextInput id="new-url" labelText="Target URL" invalid={!!errors.target_url} invalidText={errors.target_url?.message || 'Target URL must be a valid URL'} {...register('target_url')} />
       <TextArea id="new-description" labelText="Description (optional)" rows={3} {...register('description')} />
     </div>
   </Modal>
@@ -145,10 +153,12 @@ function ScheduleModal() {
   const enabled = watch('enabled')
   return <Modal open={open} modalHeading="Recurring schedule" modalLabel={script?.name} primaryButtonText="Save schedule" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={() => setUi({ scheduleOpen: false })} onRequestSubmit={handleSubmit(updateSchedule)}>
     <div className="grid gap-5 pt-2">
-      <Toggle id="schedule-enabled" labelText="Schedule" labelA="Off" labelB="On" toggled={!!enabled} onToggle={value => { setValue('enabled', value, { shouldValidate: true }); if (!value) updateSchedule({ ...script.schedule, enabled: false }) }} />
+      <div className="schedule-toggle-row">
+        <Toggle id="schedule-enabled" labelText="Schedule" labelA="Off" labelB="On" toggled={!!enabled} onToggle={value => setValue('enabled', value, { shouldValidate: true })} />
+      </div>
       {enabled && <>
-        <TextInput id="schedule-time" type="time" labelText="Schedule time" invalid={!!errors.time} invalidText={errors.time?.message} {...register('time')} />
-        <Select id="schedule-interval" labelText="Repeat interval" invalid={!!errors.interval} invalidText={errors.interval?.message} {...register('interval')}>
+        <TextInput id="schedule-time" type="time" labelText="Schedule time" invalid={!!errors.time} invalidText={errors.time?.message || 'Schedule time is required'} {...register('time')} />
+        <Select id="schedule-interval" labelText="Repeat interval" invalid={!!errors.interval} invalidText={errors.interval?.message || 'Schedule interval is required'} {...register('interval')}>
           <SelectItem value="" text="Choose interval" /><SelectItem value="hourly" text="Hourly" /><SelectItem value="daily" text="Daily" /><SelectItem value="weekly" text="Weekly" />
         </Select>
       </>}
@@ -211,7 +221,7 @@ function StepParams({ step }) {
   if (step.type === 'click') return <StepField step={step} name="selector" label="CSS selector" />
   if (step.type === 'type') return <><StepField step={step} name="selector" label="CSS selector" /><StepField step={step} name="text" label="Text" /></>
   if (step.type === 'extract') return <><StepField step={step} name="selector" label="CSS selector" /><StepField step={step} name="variable" label="Variable name" /></>
-  if (step.type === 'wait') return <StepField step={step} name="ms" label="Milliseconds" type="number" />
+  if (step.type === 'wait') return <StepField step={step} name="ms" label="Milliseconds" type="text" />
   if (step.type === 'assert_text') return <><StepField step={step} name="selector" label="CSS selector" /><StepField step={step} name="expected_text" label="Expected text" /></>
   return <div className="flex min-h-9 items-center text-xs text-slate-500">No parameters required</div>
 }
@@ -253,7 +263,7 @@ function SortableStep({ step }) {
     <div className="step-actions">
       <Button kind="ghost" size="sm" hasIconOnly renderIcon={step.disabled ? Checkmark : Close} iconDescription={step.disabled ? 'Enable step' : 'Disable step'} onClick={() => updateStep(step.id, 'disabled', !step.disabled)} />
       <Button kind="danger--ghost" size="sm" hasIconOnly renderIcon={TrashCan} iconDescription="Delete step" onClick={() => setConfirm(true)} />
-      {confirm && <div className="inline-confirm"><span>Delete step?</span><button className="font-semibold text-red-700" onClick={() => deleteSteps([step.id])}>Delete</button><button onClick={() => setConfirm(false)}>Cancel</button></div>}
+      {confirm && <div className="inline-confirm"><span>Delete step?</span><button type="button" className="font-semibold text-red-700" onClick={() => { deleteSteps([step.id]); setConfirm(false) }}>Delete</button><button type="button" onClick={() => setConfirm(false)}>Cancel</button></div>}
       {result?.status === 'fail' && <Button size="sm" kind="tertiary" renderIcon={Renew} onClick={useStudio.getState().retryFailed}>Retry</Button>}
     </div>
   </div>
@@ -312,10 +322,10 @@ function RunRollup({ script }) {
   useEffect(() => { if (!live || ['complete','failed'].includes(live.status)) return; const id = setInterval(() => tick(v => v + 1), 250); return () => clearInterval(id) }, [live?.status])
   const elapsed = live ? Date.now() - Date.parse(live.start_time) : 0
   return <div className="rollup-grid">
-    <div className="metric"><span className="eyebrow">Passed</span><strong>{rollup.passed} of {script.steps.length}</strong></div>
-    <div className="metric"><span className="eyebrow">Elapsed</span><strong>{formatDuration(elapsed)}</strong></div>
-    <div className="metric"><span className="eyebrow">Retries</span><strong>{rollup.retries}</strong></div>
-    <div className="metric"><span className="eyebrow">Failures</span><strong>{rollup.failed}</strong></div>
+    <div className="metric"><span className="metric-label">Pass</span><strong>{rollup.passed} of {script.steps.length}</strong></div>
+    <div className="metric"><span className="metric-label">Elapsed</span><strong>{formatDuration(elapsed)}</strong></div>
+    <div className="metric"><span className="metric-label">Retrying</span><strong>{rollup.retries}</strong></div>
+    <div className="metric"><span className="metric-label">Fail</span><strong>{rollup.failed}</strong></div>
   </div>
 }
 
@@ -333,7 +343,7 @@ function RunConsole() {
     <div className="console-toolbar"><div className="flex items-center gap-2"><Terminal size={17} /><strong className="text-sm">Run console</strong><span className="text-xs opacity-60">{lines.length} events</span></div>
       <Select id="console-theme" hideLabel labelText="Console theme" size="sm" value={theme} onChange={e => setTheme(e.target.value)}><SelectItem value="Midnight" text="Midnight" /><SelectItem value="Ocean" text="Ocean" /><SelectItem value="Solar" text="Solar" /></Select>
     </div>
-    <div ref={scrollRef} className="console-body" onScroll={e => { const el = e.currentTarget; setFollowing(el.scrollHeight - el.scrollTop - el.clientHeight < 28) }}>
+    <div ref={scrollRef} className="console-body" onScroll={e => { const el = e.currentTarget; const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 8; setFollowing(atBottom) }}>
       {!lines.length && <div className="opacity-70">Ready. Run a script to stream step events.</div>}
       {lines.map(line => <div key={line.id}><div className={`console-line ${line.level}`}><span className="opacity-60">{timeOnly(line.timestamp)}</span><span>{line.text}</span></div>{line.screenshot && <button className="screenshot-thumb" onClick={() => setUi({ screenshotModal: { label: line.screenshotLabel } })}><DataView size={30} /><strong>Screenshot captured</strong><span>Open full-size preview</span></button>}</div>)}
       {!following && <button className="jump-latest" onClick={() => { setFollowing(true); if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight }}><ArrowDown size={13} className="mr-1 inline" />Jump to latest</button>}
@@ -365,14 +375,14 @@ function EditorView() {
   const [stepMenu, setStepMenu] = useState(false)
   if (!script) return <div className="panel empty-state"><h1 className="page-title text-slate-900">No script selected</h1><p className="mt-3">Choose a script from the library or create a new script to open the editor.</p><Button className="mt-6" renderIcon={Add} onClick={() => setUi({ newScriptModal: true })}>New Script</Button></div>
   const running = live?.scriptId === script.id && ['running','retrying','paused'].includes(live.status)
-  const canRun = script.steps.length > 0
+  const canRun = script.steps.some(step => !step.disabled)
   return <>
     <div className="editor-grid">
       <section className="panel min-w-0">
         <div className="panel-header">
           <div className="min-w-[240px] flex-1"><div className="eyebrow">Script editor · v{script.version} {script.unsaved && <span className="ml-2 text-amber-700">● Unsaved changes</span>}</div>
-            <TextInput id="script-name" hideLabel labelText="Script name" value={script.name} onChange={e => updateScriptMeta('name', e.target.value)} />
-            <div className="muted mt-2 truncate text-xs">{script.target_url}</div>
+            <TextInput id="script-name" labelText="Script name" value={script.name} onChange={e => updateScriptMeta('name', e.target.value)} />
+            <div className="mt-2"><TextInput id="script-target-url" labelText="Target URL" value={script.target_url} onChange={e => updateScriptMeta('target_url', e.target.value)} /></div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Button size="sm" kind="tertiary" renderIcon={Time} onClick={() => setUi({ scheduleOpen: true })}>{script.schedule.enabled ? 'Edit schedule' : 'Schedule'}</Button>
@@ -382,7 +392,7 @@ function EditorView() {
         </div>
         <RunRollup script={script} />
         <div className="flex items-center justify-between border-y border-slate-200 px-4 py-2">
-          <div><strong className="text-sm">Steps</strong>{' '}<span className="muted ml-2 text-xs">· {script.steps.length} total</span></div>
+          <div className="text-sm"><span className="font-semibold">Steps</span><span className="muted"> · {script.steps.length} total</span></div>
           <div className="relative"><Button size="sm" kind="ghost" renderIcon={Add} onClick={() => setStepMenu(!stepMenu)}>Add Step <ChevronDown size={13} className="ml-1" /></Button>
             {stepMenu && <div className="absolute right-0 z-20 mt-1 w-44 rounded border border-slate-200 bg-white p-1 shadow-xl">{stepTypes.map(type => <button key={type} className="block w-full rounded px-3 py-2 text-left text-sm hover:bg-slate-100" onClick={() => { addStep(type); setStepMenu(false) }}>{typeLabels[type]}</button>)}</div>}
           </div>
@@ -439,7 +449,7 @@ function PlaygroundView() {
 
 function RunReadOnly({ run }) {
   if (!run) return <div className="empty-state">Select a run to inspect its step outcomes and extracted values.</div>
-  return <div><div className="rollup-grid p-4"><div className="metric"><span className="eyebrow">Status</span><div className="mt-2"><StatusTag status={run.status} /></div></div><div className="metric"><span className="eyebrow">Duration</span><strong>{formatDuration(run.duration)}</strong></div><div className="metric"><span className="eyebrow">Passed</span><strong>{run.totals.passed}</strong></div><div className="metric"><span className="eyebrow">Failed</span><strong>{run.totals.failed}</strong></div></div>
+  return <div><div className="rollup-grid p-4"><div className="metric"><span className="metric-label">Status</span><div className="mt-2"><StatusTag status={run.status} /></div></div><div className="metric"><span className="metric-label">Duration</span><strong>{formatDuration(run.duration)}</strong></div><div className="metric"><span className="metric-label">Pass</span><strong>{run.totals.passed}</strong></div><div className="metric"><span className="metric-label">Fail</span><strong>{run.totals.failed}</strong></div></div>
     <div className="table-wrap"><table className="data-table"><thead><tr><th>Step</th><th>Type</th><th>Status</th><th>Attempts</th><th>Output</th></tr></thead><tbody>{run.steps.map(step => <tr key={`${step.stepId}-${step.order}`}><td>{step.order}. {step.label}</td><td>{typeLabels[step.type]}</td><td><StatusTag status={step.status} /></td><td>{step.attempts}</td><td>{step.error_reason || step.extracted_value || '—'}</td></tr>)}</tbody></table></div>
   </div>
 }
@@ -512,7 +522,7 @@ function ExportView() {
   const setUi = useStudio(s => s.setUi)
   const value = JSON.stringify(tab === 'definition' ? definitionFor(script) : reportFor(script), null, 2)
   const copy = async () => { await navigator.clipboard.writeText(value); setUi({ copied: true }); setTimeout(() => setUi({ copied: false }), 1800) }
-  return <section><div className="mb-5 flex flex-wrap items-end justify-between gap-3"><div><div className="eyebrow">API-shaped artifacts</div><h1 className="page-title">Export center</h1><p className="muted mt-2 text-sm">The visible payload compiles live from the current Zustand session.</p></div><Button renderIcon={copied ? Checkmark : Copy} onClick={copy}>{copied ? 'Copied' : 'Copy export'}</Button></div>
+  return <section><div className="mb-5 flex flex-wrap items-end justify-between gap-3"><div><div className="eyebrow">API-shaped artifacts</div><h1 className="page-title">Export center</h1><p className="muted mt-2 text-sm">The visible payload compiles live from the current Zustand session.</p></div><Button className={`copy-export-btn${copied ? ' copied' : ''}`} onClick={copy}><span className="copy-icon inline-flex items-center gap-2">{copied ? <Checkmark size={16} /> : <Copy size={16} />}{copied ? 'Copied' : 'Copy export'}</span></Button></div>
     <div className="panel overflow-hidden"><div className="panel-header"><div className="flex gap-1"><button className={`view-tab ${tab === 'definition' ? 'active' : ''}`} onClick={() => setUi({ exportTab: 'definition' })}>Definition JSON</button><button className={`view-tab ${tab === 'report' ? 'active' : ''}`} onClick={() => setUi({ exportTab: 'report' })}>Run report</button></div><div className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-green-500" /><span className="text-xs font-semibold text-green-700">Compiled from session state</span></div></div><pre className="export-code" aria-label="Export preview">{value}</pre></div>
   </section>
 }
@@ -530,21 +540,29 @@ function App() {
   const setUi = useStudio(s => s.setUi)
   const undo = useStudio(s => s.undo)
   const redo = useStudio(s => s.redo)
+  const newScriptRef = useRef(null)
   useEffect(() => {
     const onKey = event => {
       const meta = event.ctrlKey || event.metaKey
       if (meta && event.key.toLowerCase() === 'k') { event.preventDefault(); setUi({ paletteOpen: true, paletteQuery: '', paletteIndex: 0 }) }
       if (meta && event.key.toLowerCase() === 'z' && !event.shiftKey) { event.preventDefault(); undo() }
       if (meta && event.key.toLowerCase() === 'z' && event.shiftKey) { event.preventDefault(); redo() }
-      if (event.key === 'Escape' && useStudio.getState().paletteOpen) setUi({ paletteOpen: false })
+      if (event.key === 'Escape') {
+        const state = useStudio.getState()
+        if (state.paletteOpen) { setUi({ paletteOpen: false }); return }
+        if (state.newScriptModal) { setUi({ newScriptModal: false }); return }
+        if (state.scheduleOpen) { setUi({ scheduleOpen: false }); return }
+        if (state.screenshotModal) { setUi({ screenshotModal: null }); return }
+        if (state.historyOpen) { setUi({ historyOpen: false }) }
+      }
     }
     window.addEventListener('keydown', onKey); return () => window.removeEventListener('keydown', onKey)
   }, [])
   const page = { 'step-editor': <EditorView />, playground: <PlaygroundView />, runs: <RunsView />, 'scheduled-queue': <ScheduledView />, export: <ExportView /> }[view]
-  return <div className="app-shell"><Sidebar /><div className="workspace"><Toolbar /><main className="content">{page}</main></div>
-    <HistoryDrawer /><NewScriptModal /><ScheduleModal /><ScreenshotModal /><AnimatePresence><CommandPalette /></AnimatePresence>
+  return <div className="app-shell"><Sidebar newScriptRef={newScriptRef} /><div className="workspace"><Toolbar /><main className="content">{page}</main></div>
+    <HistoryDrawer /><NewScriptModal launcherRef={newScriptRef} /><ScheduleModal /><ScreenshotModal /><AnimatePresence><CommandPalette /></AnimatePresence>
     <AnimatePresence>{toast && <motion.div className="toast-stack" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }}><InlineNotification lowContrast kind="success" title={toast.message} /></motion.div>}</AnimatePresence>
-    <div className="sr-only" aria-live="assertive">{announcement}</div>
+    <div className="sr-only" aria-live="assertive" aria-atomic="true">{announcement}</div>
   </div>
 }
 
