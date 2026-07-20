@@ -1,0 +1,32 @@
+<div class="export-drawer">
+  <h2>Export / Import</h2>
+  <mat-tab-group>
+    <mat-tab label="JSON">
+      <div class="tab-content">
+        <button mat-button color="primary" (click)="downloadJson()">Download Budget report JSON</button>
+        <button mat-button color="accent" (click)="copyJson()">Copy JSON</button>
+        <mat-divider></mat-divider>
+        <h3>Import</h3>
+        <input type="file" (change)="importJson($event)" accept=".json" />
+      </div>
+    </mat-tab>
+    <mat-tab label="CSV">
+      <div class="tab-content">
+        <button mat-button color="primary" (click)="downloadCsv()">Download Transactions CSV</button>
+        <button mat-button color="accent" (click)="copyCsv()">Copy CSV</button>
+        <mat-divider></mat-divider>
+        <h3>Import</h3>
+        <input type="file" (change)="importCsv($event)" accept=".csv" />
+
+        <div class="diagnostic" *ngIf="csvDiagnostics.length > 0">
+           <h4>CSV Import Diagnostic</h4>
+           <div *ngFor="let d of csvDiagnostics">
+               Row {{d.row}}: <span [style.color]="d.valid ? 'green' : 'red'">{{ d.message }}</span>
+           </div>
+           <br />
+           <button mat-button color="primary" (click)="commitCsv()" [disabled]="pendingCsvExpenses.length === 0">Commit Valid Rows</button>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

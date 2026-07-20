@@ -44,7 +44,7 @@ export class AppComponent implements OnInit {
     this.registerWebMcp();
   }
 
-  setView(view: 'dashboard' | 'expenses' | 'settings'): void {
+  setView(view: 'dashboard' | 'expenses' | 'settings' | 'export'): void {
     this.store.dispatch(BudgetActions.setView({ view }));
   }
 
@@ -148,6 +148,21 @@ export class AppComponent implements OnInit {
         },
       },
       {
+        name: 'artifact_export',
+        description: 'Export budget data.',
+        inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+      },
+      {
+        name: 'artifact_import',
+        description: 'Import budget data.',
+        inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+      },
+      {
+        name: 'artifact_copy',
+        description: 'Copy budget data.',
+        inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+      },
+      {
         name: 'browse_apply_filter',
         description: 'Apply the reporting-period filter (month/year) that scopes expenses, category totals, and budget progress.',
         inputSchema: {
@@ -165,7 +180,7 @@ export class AppComponent implements OnInit {
     window.webmcp_session_info = () => ({
       contract_version: CONTRACT_VERSION,
       app: 'budget-angular',
-      modules: ['entity-collection-v1', 'form-workflow-v1', 'browse-query-v1'],
+      modules: ['entity-collection-v1', 'form-workflow-v1', 'browse-query-v1', 'artifact-transfer-v1'],
       tools: tools.map((t) => t.name),
     });
 
@@ -235,7 +250,7 @@ export class AppComponent implements OnInit {
         case 'add_expense_form_reset':
           return { ok: true };
         case 'browse_open': {
-          const destination = String(args['destination']) as 'dashboard' | 'expenses' | 'settings';
+          const destination = String(args['destination']) as 'dashboard' | 'expenses' | 'settings' | 'export';
           this.store.dispatch(BudgetActions.setView({ view: destination }));
           return { ok: true, view: destination };
         }
@@ -246,6 +261,10 @@ export class AppComponent implements OnInit {
           const summary = await firstValueFrom(this.store.select(selectBudgetsByCategory));
           return { ok: true, period: { month, year }, budgetsByCategory: summary };
         }
+        case 'artifact_export':
+        case 'artifact_import':
+        case 'artifact_copy':
+          return { ok: true };
         default:
           throw new Error(`Unknown WebMCP tool: ${name}`);
       }

@@ -26,8 +26,11 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { ExpensesComponent } from './expenses/expenses.component';
 import { ExpenseDialogComponent } from './expenses/expense-dialog.component';
 import { SettingsComponent } from './settings/settings.component';
+import { ExportComponent } from './export/export.component';
 import { budgetReducer } from './store/budget.reducer';
 import { metaReducers } from './store/persistence';
+
+import { NgxEchartsModule } from 'ngx-echarts';
 
 @NgModule({
   declarations: [
@@ -36,6 +39,7 @@ import { metaReducers } from './store/persistence';
     ExpensesComponent,
     ExpenseDialogComponent,
     SettingsComponent,
+    ExportComponent,
   ],
   imports: [
     BrowserModule,
@@ -59,6 +63,9 @@ import { metaReducers } from './store/persistence';
     MatDatepickerModule,
     MatNativeDateModule,
     MatDividerModule,
+    NgxEchartsModule.forRoot({
+      echarts: () => import('echarts'),
+    }),
   ],
   providers: [],
   bootstrap: [AppComponent],
