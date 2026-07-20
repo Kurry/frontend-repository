@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { MODELS, queueSnapshotSchema, firstZodError } from './schemas'
+import { MODELS, queueSnapshotSchema, firstZodError } from './schemas.js'
 
 export const MODEL_PROVIDER = {
   'cobalt-4': 'northgale-compute',

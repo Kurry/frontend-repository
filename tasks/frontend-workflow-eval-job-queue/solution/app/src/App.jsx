@@ -90,7 +90,7 @@ function RateBadge({ rate }) {
 
 function FieldError({ id, message }) {
   if (!message) return null
-  return <p id={id} className="field-error"><WarningCircle size={14} weight="fill" />{message}</p>
+  return <p id={id} className="field-error" role="alert" aria-live="polite"><WarningCircle size={14} weight="fill" aria-hidden="true" />{message}</p>
 }
 
 function DialogShell({ open, onOpenChange, title, description, children, size = 'lg' }) {
@@ -106,7 +106,7 @@ function DialogShell({ open, onOpenChange, title, description, children, size = 
                 {description && <Dialog.Description className="dialog-description">{description}</Dialog.Description>}
               </div>
               <Dialog.CloseTrigger asChild>
-                <button className="icon-button" aria-label={`Close ${title}`}><X size={18} /></button>
+                <button className="icon-button" aria-label={`Close ${title}`}><X size={18} aria-hidden="true" /></button>
               </Dialog.CloseTrigger>
             </div>
             {children}
@@ -131,7 +131,7 @@ function Header() {
   return (
     <header className="app-header">
       <div className="brand-lockup">
-        <div className="brand-mark" aria-hidden="true"><Pulse size={21} weight="bold" /></div>
+        <div className="brand-mark" aria-hidden="true"><Pulse size={21} weight="bold" aria-hidden="true" /></div>
         <div>
           <div className="eyebrow">Relaydeck console</div>
           <h1>Evaluation queue</h1>
@@ -140,17 +140,17 @@ function Header() {
 
       <Tabs.Root value={activeView} onValueChange={(details) => setActiveView(details.value)} className="view-tabs">
         <Tabs.List className="view-tab-list" aria-label="Queue views">
-          <Tabs.Trigger value="jobs"><Queue size={16} />Jobs</Tabs.Trigger>
-          <Tabs.Trigger value="aggregates"><Gauge size={16} />Aggregates</Tabs.Trigger>
-          <Tabs.Trigger value="timeline"><ListBullets size={16} />Timeline</Tabs.Trigger>
+          <Tabs.Trigger value="jobs"><Queue size={16} aria-hidden="true" />Jobs</Tabs.Trigger>
+          <Tabs.Trigger value="aggregates"><Gauge size={16} aria-hidden="true" />Aggregates</Tabs.Trigger>
+          <Tabs.Trigger value="timeline"><ListBullets size={16} aria-hidden="true" />Timeline</Tabs.Trigger>
           <Tabs.Indicator className="tab-indicator" />
         </Tabs.List>
       </Tabs.Root>
 
       <div className="header-actions">
-        <Button className="button button-ghost" onClick={() => setChrome('importOpen', true)}><CloudArrowUp size={17} />Import queue</Button>
-        <Button className="button button-ghost" onClick={openExport}><Export size={17} />Export queue</Button>
-        <Button className="button button-primary" onClick={() => setChrome('submitOpen', true)}><Plus size={17} weight="bold" />Submit job</Button>
+        <Button className="button button-ghost" onClick={() => setChrome('importOpen', true)}><CloudArrowUp size={17} aria-hidden="true" />Import queue</Button>
+        <Button className="button button-ghost" onClick={openExport}><Export size={17} aria-hidden="true" />Export queue</Button>
+        <Button className="button button-primary" onClick={() => setChrome('submitOpen', true)}><Plus size={17} weight="bold" aria-hidden="true" />Submit job</Button>
       </div>
     </header>
   )
@@ -204,7 +204,7 @@ function ProviderLanes() {
             <section className={`lane-card ${paused ? 'lane-paused' : ''}`} key={provider.id}>
               <div className="lane-topline">
                 <div className="provider-identity">
-                  <span className="provider-glyph"><Database size={17} /></span>
+                  <span className="provider-glyph"><Database size={17} aria-hidden="true" /></span>
                   <div><h3>{provider.name}</h3><span>{provider.id}</span></div>
                 </div>
                 <RateBadge rate={provider.rateLimit} />
@@ -219,7 +219,7 @@ function ProviderLanes() {
                     : requestConfirm({ type: 'pause', providerId: provider.id, title: `Pause ${provider.name}?`, body: 'Running trials will freeze at their current checkpoint. Completed results remain unchanged.' })}
                   aria-label={`${paused ? 'Resume' : 'Pause'} ${provider.name}`}
                 >
-                  {paused ? <Play size={15} weight="fill" /> : <Pause size={15} weight="fill" />}
+                  {paused ? <Play size={15} weight="fill" aria-hidden="true" /> : <Pause size={15} weight="fill" aria-hidden="true" />}
                   {paused ? 'Resume' : 'Pause'}
                 </button>
               </div>
@@ -227,7 +227,7 @@ function ProviderLanes() {
                 <div className="queue-mini-list" aria-label={`${provider.name} queued jobs`}>
                   {queued.slice(0, 2).map((job, index) => <span key={job.id}><b>#{index + 1}</b>{job.id}</span>)}
                 </div>
-              ) : <div className="lane-clear"><Check size={14} />No waiting jobs</div>}
+              ) : <div className="lane-clear"><Check size={14} aria-hidden="true" />No waiting jobs</div>}
             </section>
           )
         })}
@@ -248,12 +248,12 @@ function Filters({ resultCount }) {
 
   return (
     <form className="filter-toolbar" aria-label="Job filters" onSubmit={(event) => event.preventDefault()}>
-      <div className="filter-title"><FunnelSimple size={16} /><span>Filter jobs</span></div>
+      <div className="filter-title"><FunnelSimple size={16} aria-hidden="true" /><span>Filter jobs</span></div>
       <label className="compact-field"><span>Status</span><NativeSelect.Root size="sm"><NativeSelect.Field aria-label="Filter by status" {...bind('status')}><option value="">All statuses</option>{STATUSES.map((status) => <option key={status} value={status}>{statusLabel(status)}</option>)}</NativeSelect.Field><NativeSelect.Indicator /></NativeSelect.Root></label>
       <label className="compact-field"><span>Model</span><NativeSelect.Root size="sm"><NativeSelect.Field aria-label="Filter by model" {...bind('model')}><option value="">All models</option>{MODELS.map((model) => <option key={model}>{model}</option>)}</NativeSelect.Field><NativeSelect.Indicator /></NativeSelect.Root></label>
       <label className="compact-field"><span>Dataset</span><NativeSelect.Root size="sm"><NativeSelect.Field aria-label="Filter by dataset" {...bind('dataset')}><option value="">All datasets</option>{DATASETS.map((dataset) => <option key={dataset}>{dataset}</option>)}</NativeSelect.Field><NativeSelect.Indicator /></NativeSelect.Root></label>
       <span className="result-count">{resultCount} result{resultCount === 1 ? '' : 's'}</span>
-      {active && <button type="button" className="clear-button" onClick={clearFilters}><X size={14} />Clear filters</button>}
+      {active && <button type="button" className="clear-button" onClick={clearFilters}><X size={14} aria-hidden="true" />Clear filters</button>}
     </form>
   )
 }
@@ -316,8 +316,8 @@ function JobsTable() {
                   <Table.Cell><time className="submitted-time" dateTime={job.submittedAt}>{shortTime(job.submittedAt)}<small>{new Date(job.submittedAt).toLocaleDateString('en', { month: 'short', day: '2-digit' })}</small></time></Table.Cell>
                   <Table.Cell textAlign="end">
                     <div className="row-actions">
-                      {['queued', 'running'].includes(job.status) && <button className="action-button danger-action" onClick={(event) => { event.stopPropagation(); requestConfirm({ type: 'cancel', jobId: job.id, title: `Cancel ${job.id}?`, body: 'Unfinished trials will stop. Completed rewards and durations will remain available.' }) }}><Stop size={15} />Cancel</button>}
-                      <button className="row-open" aria-label={`View ${job.id}`} onClick={(event) => { event.stopPropagation(); setSelectedJob(job.id) }}><CaretRight size={18} /></button>
+                      {['queued', 'running'].includes(job.status) && <button className="action-button danger-action" onClick={(event) => { event.stopPropagation(); requestConfirm({ type: 'cancel', jobId: job.id, title: `Cancel ${job.id}?`, body: 'Unfinished trials will stop. Completed rewards and durations will remain available.' }) }}><Stop size={15} aria-hidden="true" />Cancel</button>}
+                      <button className="row-open" aria-label={`View ${job.id}`} onClick={(event) => { event.stopPropagation(); setSelectedJob(job.id) }}><CaretRight size={18} aria-hidden="true" /></button>
                     </div>
                   </Table.Cell>
                 </Table.Row>
@@ -326,7 +326,7 @@ function JobsTable() {
           </Table.Body>
         </Table.Root>
         {visibleJobs.length === 0 && (
-          <div className="empty-state"><FunnelSimple size={28} /><h3>No jobs match these filters</h3><p>Clear the filters to return to the full evaluation queue.</p><Button className="button button-secondary" onClick={clearFilters}>Clear filters</Button></div>
+          <div className="empty-state" role="status" aria-live="polite"><FunnelSimple size={28} aria-hidden="true" /><h3>No jobs match these filters</h3><p>Clear the filters to return to the full evaluation queue.</p><Button className="button button-secondary" onClick={clearFilters}>Clear filters</Button></div>
         )}
       </div>
       <JobDetail />
@@ -344,7 +344,7 @@ function JobDetail() {
     <section className="job-detail" aria-labelledby="job-detail-title">
       <div className="detail-header">
         <div><p className="section-kicker">Trial inspection</p><h3 id="job-detail-title">{job.id} <StatusBadge status={job.status} /></h3><p>{job.dataset} · {job.agent} · {job.model}</p></div>
-        <button className="icon-button" aria-label="Close job detail" onClick={() => setSelectedJob(null)}><X size={18} /></button>
+        <button className="icon-button" aria-label="Close job detail" onClick={() => setSelectedJob(null)}><X size={18} aria-hidden="true" /></button>
       </div>
       <div className="trial-grid">
         {job.trials.map((trial) => (
@@ -359,9 +359,9 @@ function JobDetail() {
               <div className="trial-failure">
                 <Badge className="error-chip">{trial.errorCategory}</Badge>
                 {typeof trial.backoff === 'number' && trial.backoff > 0 ? (
-                  <div className="backoff-indicator"><ClockCountdown size={16} /><span>Automatic retry {trial.retryCount + 1} in</span><strong>{trial.backoff}s</strong></div>
+                  <div className="backoff-indicator"><ClockCountdown size={16} aria-hidden="true" /><span>Automatic retry {trial.retryCount + 1} in</span><strong>{trial.backoff}s</strong></div>
                 ) : trial.retryCount >= 3 ? (
-                  <Button className="button retry-button" onClick={() => manualRetry(job.id, trial.id)}><ArrowClockwise size={15} />Retry trial</Button>
+                  <Button className="button retry-button" onClick={() => manualRetry(job.id, trial.id)}><ArrowClockwise size={15} aria-hidden="true" />Retry trial</Button>
                 ) : null}
               </div>
             )}
@@ -410,14 +410,14 @@ function AggregatesView() {
         </div>
       </section>
       <section className="panel cost-panel">
-        <div className="cost-icon"><Gauge size={25} /></div>
+        <div className="cost-icon"><Gauge size={25} aria-hidden="true" /></div>
         <p>Total evaluation cost</p>
         <strong>${aggregates.totalCost.toFixed(2)}</strong>
         <span>Derived live from completed trials</span>
         <div className="model-cost-list">{MODELS.map((model) => <div key={model}><i style={{ background: MODEL_COLORS[model] }} /><span>{model}</span><b>{jobs.flatMap((job) => job.model === model ? job.trials : []).filter((trial) => trial.status === 'completed').length} trials</b></div>)}</div>
       </section>
       <section className="panel aggregate-context">
-        <div><ArrowsClockwise size={20} /><span>Live calculation</span></div><p>Rewards and cost update the moment a running trial completes. Hidden chart series remain in the queue snapshot.</p>
+        <div><ArrowsClockwise size={20} aria-hidden="true" /><span>Live calculation</span></div><p>Rewards and cost update the moment a running trial completes. Hidden chart series remain in the queue snapshot.</p>
       </section>
     </div>
   )
@@ -434,8 +434,8 @@ function TimelineView() {
     <section className="panel timeline-panel">
       <form className="panel-heading timeline-heading" onSubmit={(event) => event.preventDefault()}><div><p className="section-kicker">Event stream</p><h2>Completions timeline</h2></div><label className="compact-field"><span>Status</span><NativeSelect.Root size="sm"><NativeSelect.Field aria-label="Filter timeline by status" {...register('status', { onChange: (event) => setFilter('timelineStatus', event.target.value) })}><option value="">All events</option>{STATUSES.map((status) => <option key={status} value={status}>{statusLabel(status)}</option>)}</NativeSelect.Field><NativeSelect.Indicator /></NativeSelect.Root></label></form>
       <div className="timeline-list">
-        {visible.map((event) => <article className="timeline-event" key={event.id}><div className={`timeline-marker marker-${event.status}`}>{event.kind === 'job' ? <Queue size={16} /> : <Check size={16} />}</div><div><div className="event-top"><StatusBadge status={event.status} /><Badge className="kind-badge">{event.kind}</Badge></div><h3>{event.label}</h3><time dateTime={event.timestamp}>{fullTime(event.timestamp)} UTC</time></div></article>)}
-        {!visible.length && <div className="empty-state"><ClockCountdown size={28} /><h3>No timeline events match</h3><p>Clear the status filter to restore the full event stream.</p><Button className="button button-secondary" onClick={() => setFilter('timelineStatus', '')}>Clear filter</Button></div>}
+        {visible.map((event) => <article className="timeline-event" key={event.id}><div className={`timeline-marker marker-${event.status}`}>{event.kind === 'job' ? <Queue size={16} aria-hidden="true" /> : <Check size={16} aria-hidden="true" />}</div><div><div className="event-top"><StatusBadge status={event.status} /><Badge className="kind-badge">{event.kind}</Badge></div><h3>{event.label}</h3><time dateTime={event.timestamp}>{fullTime(event.timestamp)} UTC</time></div></article>)}
+        {!visible.length && <div className="empty-state" role="status" aria-live="polite"><ClockCountdown size={28} aria-hidden="true" /><h3>No timeline events match</h3><p>Clear the status filter to restore the full event stream.</p><Button className="button button-secondary" onClick={() => setFilter('timelineStatus', '')}>Clear filter</Button></div>}
       </div>
     </section>
   )
@@ -457,7 +457,7 @@ function ConfigPreview({ values }) {
     window.setTimeout(() => setCopied(false), 1800)
   }
   return (
-    <section className="config-preview"><div className="preview-heading"><div><Code size={17} /><span>Configuration preview</span></div><button type="button" onClick={copy}>{copied ? <Check size={15} /> : <Clipboard size={15} />}{copied ? 'Copied' : 'Copy'}</button></div><pre>{text}</pre><p>API-shaped create payload</p></section>
+    <section className="config-preview"><div className="preview-heading"><div><Code size={17} aria-hidden="true" /><span>Configuration preview</span></div><button type="button" onClick={copy}>{copied ? <Check size={15} aria-hidden="true" /> : <Clipboard size={15} aria-hidden="true" />}{copied ? 'Copied' : 'Copy'}</button></div><pre>{text}</pre><p>API-shaped create payload</p></section>
   )
 }
 
@@ -487,7 +487,7 @@ function SubmitDialog() {
           <label className="form-field"><span>Sweep model <b>Optional</b></span><NativeSelect.Root><NativeSelect.Field aria-invalid={Boolean(errors.sweepModel)} aria-describedby={described('sweepModel')} {...register('sweepModel')}><option value="">No sweep model</option>{MODELS.map((value) => <option key={value}>{value}</option>)}</NativeSelect.Field><NativeSelect.Indicator /></NativeSelect.Root><FieldError id="sweepModel-error" message={errors.sweepModel?.message} /><small>Creates one job for each selected model.</small></label>
         </div>
         <ConfigPreview values={values} />
-        <div className="dialog-actions submit-actions"><Button type="button" className="button button-ghost" onClick={() => setChrome('submitOpen', false)}>Cancel</Button><Button type="submit" className="button button-primary" disabled={!isValid || isSubmitting || submitting}>{isSubmitting || submitting ? <span className="spinner" /> : <Plus size={17} />}Submit job</Button></div>
+        <div className="dialog-actions submit-actions"><Button type="button" className="button button-ghost" onClick={() => setChrome('submitOpen', false)}>Cancel</Button><Button type="submit" className="button button-primary" disabled={!isValid || isSubmitting || submitting}>{isSubmitting || submitting ? <span className="spinner" /> : <Plus size={17} aria-hidden="true" />}Submit job</Button></div>
       </form>
     </DialogShell>
   )
@@ -511,9 +511,9 @@ function ExportDialog() {
   }
   return (
     <DialogShell open={open} onOpenChange={(value) => setChrome('exportOpen', value)} title="Export queue" description="A live, API-shaped Queue Snapshot compiled from this session." size="xl">
-      <div className="snapshot-meta"><span><Code size={16} />eval-queue-v1</span><span>{jobs.length} jobs</span><span>{providers.length} providers</span><span>{timeline.length} events</span></div>
+      <div className="snapshot-meta"><span><Code size={16} aria-hidden="true" />eval-queue-v1</span><span>{jobs.length} jobs</span><span>{providers.length} providers</span><span>{timeline.length} events</span></div>
       <div className="code-surface export-code"><pre aria-label="Queue snapshot JSON preview">{preview}</pre></div>
-      <div className="dialog-actions"><Button className="button button-ghost" onClick={copy}>{copied ? <Check size={17} /> : <Clipboard size={17} />}{copied ? 'Copied' : 'Copy'}</Button><Button className="button button-primary" onClick={download}><DownloadSimple size={17} />Download</Button></div>
+      <div className="dialog-actions"><Button className="button button-ghost" onClick={copy}>{copied ? <Check size={17} aria-hidden="true" /> : <Clipboard size={17} aria-hidden="true" />}{copied ? 'Copied' : 'Copy'}</Button><Button className="button button-primary" onClick={download}><DownloadSimple size={17} aria-hidden="true" />Download</Button></div>
     </DialogShell>
   )
 }
@@ -535,8 +535,8 @@ function ImportDialog() {
       <form onSubmit={handleSubmit(submit)} className="import-form">
         <label className="form-field"><span>Queue Snapshot JSON <b>Required</b></span><textarea className="import-textarea" spellCheck="false" aria-invalid={Boolean(errors.snapshot || importError)} aria-describedby="import-error" placeholder={'{\n  "schemaVersion": "eval-queue-v1",\n  ...\n}'} {...register('snapshot')} /></label>
         <FieldError id="import-error" message={errors.snapshot?.message || importError} />
-        <div className="import-notice"><WarningCircle size={17} /><p><strong>Replace current queue</strong><span>Malformed or out-of-contract documents leave the current session unchanged.</span></p></div>
-        <div className="dialog-actions"><Button type="button" className="button button-ghost" onClick={() => setChrome('importOpen', false)}>Cancel</Button><Button type="submit" className="button button-primary" disabled={!isValid}><CloudArrowUp size={17} />Import queue</Button></div>
+        <div className="import-notice"><WarningCircle size={17} aria-hidden="true" /><p><strong>Replace current queue</strong><span>Malformed or out-of-contract documents leave the current session unchanged.</span></p></div>
+        <div className="dialog-actions"><Button type="button" className="button button-ghost" onClick={() => setChrome('importOpen', false)}>Cancel</Button><Button type="submit" className="button button-primary" disabled={!isValid}><CloudArrowUp size={17} aria-hidden="true" />Import queue</Button></div>
       </form>
     </DialogShell>
   )
@@ -553,8 +553,8 @@ function ConfirmDialog() {
   }
   return (
     <DialogShell open={Boolean(confirm)} onOpenChange={(value) => { if (!value) close() }} title={confirm?.title || 'Confirm action'} description={confirm?.body} size="sm">
-      <div className="confirm-visual"><span className={confirm?.type === 'cancel' ? 'confirm-danger' : 'confirm-warning'}>{confirm?.type === 'cancel' ? <Stop size={24} weight="fill" /> : <Pause size={24} weight="fill" />}</span><p>{confirm?.type === 'cancel' ? 'This action stops all unfinished work for the job.' : 'This lane will not advance until you resume it.'}</p></div>
-      <div className="dialog-actions"><Button className="button button-ghost" onClick={close}>Keep {confirm?.type === 'cancel' ? 'job' : 'running'}</Button><Button className={`button ${confirm?.type === 'cancel' ? 'button-danger' : 'button-primary'}`} onClick={proceed}>{confirm?.type === 'cancel' ? <Stop size={16} /> : <Pause size={16} />}{confirm?.type === 'cancel' ? 'Cancel job' : 'Pause lane'}</Button></div>
+      <div className="confirm-visual"><span className={confirm?.type === 'cancel' ? 'confirm-danger' : 'confirm-warning'}>{confirm?.type === 'cancel' ? <Stop size={24} weight="fill" aria-hidden="true" /> : <Pause size={24} weight="fill" aria-hidden="true" />}</span><p>{confirm?.type === 'cancel' ? 'This action stops all unfinished work for the job.' : 'This lane will not advance until you resume it.'}</p></div>
+      <div className="dialog-actions"><Button className="button button-ghost" onClick={close}>Keep {confirm?.type === 'cancel' ? 'job' : 'running'}</Button><Button className={`button ${confirm?.type === 'cancel' ? 'button-danger' : 'button-primary'}`} onClick={proceed}>{confirm?.type === 'cancel' ? <Stop size={16} aria-hidden="true" /> : <Pause size={16} aria-hidden="true" />}{confirm?.type === 'cancel' ? 'Cancel job' : 'Pause lane'}</Button></div>
     </DialogShell>
   )
 }
@@ -573,7 +573,7 @@ function AppToaster() {
   }, [toasts])
   return (
     <Toaster toaster={toaster}>
-      {(toast) => <Toast.Root className="app-toast"><Toast.Indicator /><Toast.Title>{toast.title}</Toast.Title><Toast.CloseTrigger /></Toast.Root>}
+      {(toast) => <Toast.Root className="app-toast" key={toast.id}><Toast.Indicator /><Toast.Title>{toast.title}</Toast.Title><Toast.CloseTrigger /></Toast.Root>}
     </Toaster>
   )
 }
