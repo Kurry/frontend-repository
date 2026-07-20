@@ -1,0 +1,27 @@
+{
+  "name": "larkspur-releases",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "vite --host 0.0.0.0 --port 3000",
+    "verify:build": "vite build"
+  },
+  "dependencies": {
+    "@phosphor-icons/vue": "^2.2.1",
+    "@tailwindcss/vite": "4.3.2",
+    "@vee-validate/zod": "^4.15.1",
+    "@vueuse/core": "^13.9.0",
+    "pinia": "^3.0.3",
+    "reka-ui": "^2.4.1",
+    "shadcn-vue": "^2.8.0",
+    "tailwindcss": "4.3.2",
+    "vee-validate": "^4.15.1",
+    "vue": "^3.5.22",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.1",
+    "vite": "^7.1.9"
+  }
+}
