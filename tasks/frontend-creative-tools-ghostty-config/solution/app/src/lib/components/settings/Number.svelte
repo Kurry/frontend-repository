@@ -96,6 +96,20 @@
         }
     }
 
+    // Out-of-bound typed values are clamped AND surface an inline message naming the setting
+    // and its accepted range — the same contract the generated config enforces.
+    let rangeWarning = $state("");
+    let warningTimer: ReturnType<typeof setTimeout> | undefined;
+
+    function warnOutOfRange(attempted: number) {
+        const field = setting?.settingKey ?? "value";
+        if (min !== undefined && max !== undefined) rangeWarning = `${field} must be between ${min} and ${max} (typed ${attempted})`;
+        else if (min !== undefined) rangeWarning = `${field} must be at least ${min} (typed ${attempted})`;
+        else if (max !== undefined) rangeWarning = `${field} must be at most ${max} (typed ${attempted})`;
+        clearTimeout(warningTimer);
+        warningTimer = setTimeout(() => {rangeWarning = "";}, 5000);
+    }
+
     function handleInput(event: Event) {
         const target = event.target as HTMLInputElement;
         const inputText = target.value;
@@ -111,8 +125,11 @@
 
         if (!isNaN(numValue)) {
             let constrainedValue = isActuallyInteger ? Math.round(numValue) : numValue;
+            const outOfBounds = (min !== undefined && constrainedValue < min) || (max !== undefined && constrainedValue > max);
             if (min !== undefined && constrainedValue < min) constrainedValue = min;
             if (max !== undefined && constrainedValue > max) constrainedValue = max;
+            if (outOfBounds) warnOutOfRange(numValue);
+            else rangeWarning = "";
             commit(constrainedValue);
         }
         else {
@@ -146,8 +163,10 @@
 </script>
 
 
+<div class="number-wrap">
+{#if rangeWarning}<p class="range-error" role="alert">{rangeWarning}</p>{/if}
 <div class="number-input">
-    <input aria-labelledby={setting?.labelId}
+    <input id={setting?.controlId} aria-labelledby={setting?.labelId}
         type="text"
         value={displayValue}
         {size}
@@ -155,6 +174,7 @@
         oninput={handleInput}
         onkeydown={handleKeyDown}
         onblur={onBlur}
+        aria-invalid={rangeWarning ? "true" : undefined}
         {disabled}
     />
     <div class="steppers">
@@ -166,9 +186,26 @@
         </button>
     </div>
 </div>
+</div>
 
 
 <style>
+.number-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.range-error {
+    margin: 0;
+    color: var(--color-danger);
+    font-size: 0.72rem;
+    font-weight: 500;
+    text-align: right;
+    max-width: 220px;
+}
+
 .number-input {
     position: relative;
     display: inline-flex;

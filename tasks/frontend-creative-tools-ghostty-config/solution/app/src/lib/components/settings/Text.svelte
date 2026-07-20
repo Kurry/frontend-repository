@@ -19,7 +19,7 @@
     }
 </script>
 
-<input aria-labelledby={setting?.labelId} class:blank class:empty={value === ""} class={align} type="text" {placeholder} style:width={size ? `${size}ch` : "auto"} onclick={click} onchange={change} {onfocus} bind:value />
+<input id={setting?.controlId} aria-labelledby={setting?.labelId} class:blank class:empty={value === ""} class={align} type="text" {placeholder} style:width={size ? `${size}ch` : "auto"} onclick={click} onchange={change} {onfocus} bind:value />
 
 <style>
 input {

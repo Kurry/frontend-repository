@@ -6,6 +6,7 @@
     import Badge from "../Badge.svelte";
     import {searchState} from "$lib/stores/search.svelte";
     import {setSetting} from "$lib/contexts";
+    import {registry} from "$lib/settings/registry";
 
     interface Props {
         name?: string;
@@ -25,6 +26,7 @@
 
     const {name = "", note = "", platform, since, description, settingId, children, onReset, isNonDefault = false, inline = true, themeBadge}: Props = $props();
     const labelId = $derived(settingId ? `${settingId}-label` : undefined);
+    const controlId = $derived(settingId ? `control-${settingId}` : undefined);
     const tooltipAttachment = createTooltipAttachment("Reset to default");
 
 
@@ -88,7 +90,10 @@
 
     // Give the setting context so that child components can access the setting info if needed
     // svelte-ignore state_referenced_locally
-    setSetting({name, note, platform, since, description: description || "", labelId});
+    setSetting({
+        name, note, platform, since, description: description || "", labelId, controlId,
+        settingKey: settingId ? registry[settingId as keyof typeof registry]?.key : undefined
+    });
 </script>
 
 <div
@@ -101,7 +106,11 @@
     <div class="row">
         {#if name}
         <div class="row-left">
-            <span id={labelId} class="setting-name">{name}</span>
+            {#if controlId}
+                <label id={labelId} class="setting-name" for={controlId}>{name}</label>
+            {:else}
+                <span id={labelId} class="setting-name">{name}</span>
+            {/if}
             {#if infoBadges.length > 0 || (isNonDefault && onReset)}
                 <div class="setting-extra">
                     {#each infoBadges as badge (badge.label)}

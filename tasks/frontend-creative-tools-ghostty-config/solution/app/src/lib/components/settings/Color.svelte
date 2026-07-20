@@ -14,10 +14,11 @@
         disabled?: boolean;
         resetMessage?: string; // right-click toast override, e.g. "now follows the theme" while a theme is active
         tooltip?: string; // hover tooltip on the swatch, e.g. its theme-inheritance state
+        inputId?: string; // explicit id for the picker input (palette swatches need unique ids)
     }
 
     // eslint-disable-next-line prefer-const
-    let {value = $bindable(), size = 20, label = "", defaultValue, disabled = false, resetMessage, tooltip}: Props = $props();
+    let {value = $bindable(), size = 20, label = "", defaultValue, disabled = false, resetMessage, tooltip, inputId}: Props = $props();
     const swatchTooltip = createTooltipAttachment(() => tooltip ?? "");
     const borderColor = $derived(`rgba(255, 255, 255, ${(value ? luminosity(value) : 0) * 0.0027451 + 0.3})`);
     const labelColor = $derived(value && isDark(value) ? `var(--font-color)` : "black");
@@ -53,7 +54,7 @@
 
 <div class="color-wrap" style:width="{size}px" style:height="{size}px" style:background-color={value} style:border-color={borderColor} class:disabled {@attach swatchTooltip}>
     {#if label}<span class="label" style:color={labelColor}>{label}</span>{/if}
-    <input aria-labelledby={setting?.labelId} type="color" bind:value style:width="{size}px" style:height="{size}px" onclick={click} oncontextmenu={reset} {disabled} />
+    <input id={inputId ?? setting?.controlId} aria-labelledby={setting?.labelId} type="color" bind:value style:width="{size}px" style:height="{size}px" onclick={click} oncontextmenu={reset} {disabled} />
 </div>
 
 {#if popoutOpen}
