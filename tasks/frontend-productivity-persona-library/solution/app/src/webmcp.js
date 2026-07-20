@@ -63,7 +63,26 @@ const definitions = [
   { name: 'artifact_convert', description: 'Switch between the two live export representations.', inputSchema: objectSchema({ mode: stringEnum(['persona-pack-json', 'comparison-report-text']) }, ['mode']), execute: ({ mode }) => { useAppStore.getState().setUI({ exportOpen: true, exportTab: mode === 'persona-pack-json' ? 'pack' : 'report' }); return ok(`Visible artifact converted to ${mode}.`) } },
 ]
 
+function invokeDefinition(name, args = {}) {
+  const definition = definitions.find((item) => item.name === name)
+  if (!definition) throw new Error(`Unknown WebMCP tool: ${name}`)
+  const result = definition.execute(args)
+  if (result.isError) throw new Error(result.content[0].text)
+  return { ok: true, message: result.content[0].text }
+}
+
 export function registerWebMCP() {
+  if (!window.webmcp_session_info) {
+    window.webmcp_action_contract = 'zto-webmcp-v1'
+    window.webmcp_session_info = () => ({
+      contractVersion: 'zto-webmcp-v1',
+      modules: ['browse-query-v1', 'entity-collection-v1', 'command-session-v1', 'artifact-transfer-v1'],
+      toolNames: definitions.map((definition) => definition.name),
+    })
+    window.webmcp_list_tools = () => definitions.map(({ name, description, inputSchema }) => ({ name, description, inputSchema }))
+    window.webmcp_invoke_tool = async (name, args = {}) => invokeDefinition(name, args)
+  }
+
   let attempts = 0
   const register = () => {
     attempts += 1

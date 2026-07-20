@@ -2,6 +2,7 @@ import React, { useEffect, useMemo } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Modal, Select, SelectItem, Slider, TextInput, Tag } from '@carbon/react'
+import { restoreFocus } from '../focus'
 import { TRAITS, deepCopy, useAppStore } from '../store'
 import { composeSchema } from '../schema'
 import TraitRadar from './TraitRadar'
@@ -50,10 +51,16 @@ export default function ComposeModal() {
       examples, promptBody, traits, variants, activeVariant: 'direct', activeIteration: null,
     }, { blended: true, blendSources: [first.id, second.id], weight: Number(data.weight) })
     setUI({ composeOpen: false })
+    restoreFocus()
   })
 
+  const requestClose = () => {
+    setUI({ composeOpen: false })
+    restoreFocus()
+  }
+
   return (
-    <Modal open={open} size="lg" modalLabel="Composition builder" modalHeading="Compose a blended persona" primaryButtonText="Save blend" secondaryButtonText="Cancel" primaryButtonDisabled={!valid} onRequestClose={() => { document.activeElement?.blur(); setUI({ composeOpen: false }) }} onRequestSubmit={submit}>
+    <Modal open={open} size="lg" modalLabel="Composition builder" modalHeading="Compose a Blended Persona" primaryButtonText="Save blend" secondaryButtonText="Cancel" primaryButtonDisabled={!valid} onRequestClose={requestClose} onRequestSubmit={submit}>
       <form className="compose-form" onSubmit={submit}>
         <div className="form-grid form-grid--2">
           <Select id="blend-source-a" labelText="First persona *" {...register('sourceA')} invalid={Boolean(errors.sourceA)} invalidText={errors.sourceA?.message}>{personas.map((p) => <SelectItem key={p.id} value={p.id} text={p.name} />)}</Select>

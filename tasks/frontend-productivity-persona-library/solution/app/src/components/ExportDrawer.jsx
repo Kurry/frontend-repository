@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef } from 'react'
 import { Button, CodeSnippet } from '@carbon/react'
 import { Checkmark, Close, Copy, Download } from '@carbon/icons-react'
+import { restoreFocus } from '../focus'
 import { TRAITS, toPayload, useAppStore, visiblePersonas } from '../store'
 
 function reportFor(first, second) {
@@ -26,19 +27,22 @@ export default function ExportDrawer() {
   const toast = useAppStore((s) => s.toast)
   const closeRef = useRef(null)
   const drawerRef = useRef(null)
-  const previousFocus = useRef(null)
   const first = personas.find((p) => p.id === slots[0])
   const second = personas.find((p) => p.id === slots[1])
   const pack = useMemo(() => JSON.stringify({ schemaVersion: 1, personas: visible.map(toPayload), generatedAt: new Date().toISOString() }, null, 2), [visible, open])
   const report = useMemo(() => reportFor(first, second), [first, second, open])
   const text = tab === 'pack' ? pack : report
 
+  const closeDrawer = () => {
+    setUI({ exportOpen: false })
+    restoreFocus()
+  }
+
   useEffect(() => {
     if (!open) return undefined
-    previousFocus.current = document.activeElement
     closeRef.current?.focus()
     const key = (e) => {
-      if (e.key === 'Escape') setUI({ exportOpen: false })
+      if (e.key === 'Escape') closeDrawer()
       if (e.key === 'Tab' && drawerRef.current) {
         const focusable = [...drawerRef.current.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')].filter((node) => !node.disabled)
         if (!focusable.length) return
@@ -47,7 +51,7 @@ export default function ExportDrawer() {
       }
     }
     document.addEventListener('keydown', key)
-    return () => { document.removeEventListener('keydown', key); previousFocus.current?.focus?.() }
+    return () => document.removeEventListener('keydown', key)
   }, [open])
 
   if (!open) return null
@@ -66,9 +70,9 @@ export default function ExportDrawer() {
     toast('Export downloaded')
   }
   return (
-    <div className="drawer-layer" role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setUI({ exportOpen: false }) }}>
+    <div className="drawer-layer" role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) closeDrawer() }}>
       <aside ref={drawerRef} className="side-drawer export-drawer" role="dialog" aria-modal="true" aria-labelledby="export-title">
-        <header><div><p className="eyebrow">LIVE ARTIFACT</p><h2 id="export-title">Export workspace</h2></div><Button ref={closeRef} kind="ghost" hasIconOnly renderIcon={Close} iconDescription="Close export drawer" onClick={() => setUI({ exportOpen: false })} /></header>
+        <header><div><p className="eyebrow">LIVE ARTIFACT</p><h2 id="export-title">Export Workspace</h2></div><Button ref={closeRef} kind="ghost" hasIconOnly renderIcon={Close} iconDescription="Close export drawer" onClick={closeDrawer} /></header>
         <div className="export-tabs" role="tablist"><button role="tab" aria-selected={tab === 'pack'} className={tab === 'pack' ? 'active' : ''} onClick={() => setUI({ exportTab: 'pack' })}>Persona pack</button><button role="tab" aria-selected={tab === 'report'} className={tab === 'report' ? 'active' : ''} onClick={() => setUI({ exportTab: 'report' })}>Comparison report</button></div>
         <div className="export-meta"><span>{tab === 'pack' ? `${visible.length} filtered personas` : `${first && second ? '2 personas compared' : 'Comparison incomplete'}`}</span><span className="valid-indicator"><Checkmark /> Live state</span></div>
         <pre className="export-code" aria-label="Visible export text">{text}</pre>
