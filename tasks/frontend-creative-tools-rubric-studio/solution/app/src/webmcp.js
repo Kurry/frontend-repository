@@ -11,25 +11,15 @@ export function registerWebMCP(store) {
     { name: 'editor_add', description: 'Add a CriterionUpsert object to the open rubric.', inputSchema: schema({ objectType: enumString(['criterion']), criterion: { type: 'object', description: 'Complete CriterionUpsert request body.' } }, ['objectType', 'criterion']) },
     { name: 'editor_delete', description: 'Begin the version-gated deletion of a criterion.', inputSchema: schema({ objectType: enumString(['criterion']), id: { type: 'string' } }, ['objectType', 'id']) },
     { name: 'editor_update_property', description: 'Update one declared editor property through the same store commands as the UI.', inputSchema: schema({ objectType: enumString(['criterion', 'labelled-case', 'sample-verdict']), id: { type: 'string' }, property: enumString(['id', 'name', 'description', 'type', 'likert-min', 'likert-max', 'weight', 'importance', 'version', 'judge-model', 'aggregation-mode', 'include', 'pass-threshold', 'verdict']), value: {}, version: { type: 'string' } }, ['objectType', 'property', 'value']) },
-    { name: 'editor_set_content', description: 'Set criterion description content and open the required version gate.', inputSchema: schema({ id: { type: 'string' }, content: { type: 'string' } }, ['id', 'content']) },
     { name: 'editor_switch_mode', description: 'Switch the visible editor mode.', inputSchema: schema({ mode: enumString(['criteria', 'tune', 'preview']) }, ['mode']) },
     { name: 'editor_preview', description: 'Open the sample submission preview panel.', inputSchema: schema() },
     { name: 'browse_open', description: 'Open one bounded rubric or studio destination.', inputSchema: schema({ destination: enumString(destinations) }, ['destination']) },
-    { name: 'browse_search', description: 'Search the bounded rubric library by name and open an exact single match.', inputSchema: schema({ query: { type: 'string' } }, ['query']) },
-    { name: 'browse_apply_filter', description: 'Filtering is not declared for this rubric library.', inputSchema: schema() },
-    { name: 'browse_clear_filter', description: 'Filtering is not declared for this rubric library.', inputSchema: schema() },
-    { name: 'browse_sort', description: 'Sorting is not declared; rail order is package order.', inputSchema: schema() },
-    { name: 'browse_set_locale', description: 'Locale switching is not declared for this studio.', inputSchema: schema() },
-    { name: 'browse_set_theme', description: 'Theme switching is not declared for this studio.', inputSchema: schema() },
     { name: 'artifact_import', description: 'Open the package JSON import surface. File and artifact contents remain browser-driven.', inputSchema: schema({ mode: enumString(['package-json']) }, ['mode']) },
     { name: 'artifact_export', description: 'Open an export format preview without returning artifact contents.', inputSchema: schema({ format: enumString(formats) }, ['format']) },
     { name: 'artifact_copy', description: 'Open the selected format so clipboard interaction can remain browser-driven.', inputSchema: schema({ format: enumString(formats) }, ['format']) },
-    { name: 'artifact_print_preview', description: 'Print preview is not declared for this studio.', inputSchema: schema() },
-    { name: 'artifact_convert', description: 'Conversion is not declared for this studio.', inputSchema: schema() },
   ]
 
   const ok = (message, state = {}) => ({ ok: true, message, visibleState: state })
-  const unsupported = (operation) => ({ ok: false, message: `${operation} is not declared in the Rubric Studio bindings.` })
   const handlers = {
     editor_select({ objectType, id }) {
       if (objectType === 'criterion') {
@@ -75,7 +65,6 @@ export function registerWebMCP(store) {
       }
       return ok(`${store.pendingChange.kind} bump required before updating ${property}`, { versionGateOpen: true, pendingKind: store.pendingChange.kind })
     },
-    editor_set_content({ id, content }) { return handlers.editor_update_property({ objectType: 'criterion', id, property: 'description', value: content }) },
     editor_switch_mode({ mode }) { return store.setView(mode) ? ok(`Switched to ${mode}`, { activeView: mode }) : { ok: false, message: 'Invalid mode' } },
     editor_preview() { store.setView('preview'); return ok('Preview panel opened', { activeView: 'preview' }) },
     browse_open({ destination }) {
@@ -87,22 +76,9 @@ export function registerWebMCP(store) {
       else if (['export', 'export-center'].includes(destination)) store.openExport()
       return ok(`Opened ${destination}`, { destination })
     },
-    browse_search({ query }) {
-      const normalized = String(query).trim().toLowerCase()
-      const matches = store.rubrics.filter((item) => item.name.toLowerCase().includes(normalized))
-      if (matches.length === 1) store.selectRubric(matches[0].slug)
-      return ok(`Found ${matches.length} rubric${matches.length === 1 ? '' : 's'}`, { matches: matches.map((item) => ({ slug: item.slug, name: item.name })) })
-    },
-    browse_apply_filter() { return unsupported('apply_filter') },
-    browse_clear_filter() { return unsupported('clear_filter') },
-    browse_sort() { return unsupported('sort') },
-    browse_set_locale() { return unsupported('set_locale') },
-    browse_set_theme() { return unsupported('set_theme') },
     artifact_import() { store.ui.importOpen = true; return ok('Package import surface opened', { importOpen: true }) },
     artifact_export({ format }) { store.ui.exportTab = format; store.openExport(); return ok(`${format} preview opened`, { exportOpen: true, format }) },
     artifact_copy({ format }) { store.ui.exportTab = format; store.openExport(); return ok(`${format} opened for browser clipboard interaction`, { exportOpen: true, format }) },
-    artifact_print_preview() { return unsupported('print_preview') },
-    artifact_convert() { return unsupported('convert') },
   }
 
   const invoke = async ({ name, arguments: args = {} } = {}) => {

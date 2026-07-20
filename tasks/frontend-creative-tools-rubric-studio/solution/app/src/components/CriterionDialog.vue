@@ -1,5 +1,5 @@
 <script setup>
-import { computed, nextTick, watch } from 'vue'
+import { computed, nextTick, watch, onBeforeUnmount } from 'vue'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import Dialog from 'primevue/dialog'
@@ -36,12 +36,22 @@ const duplicateId = computed(() => {
 })
 const canSubmit = computed(() => meta.value.valid && meta.value.dirty && !duplicateId.value)
 
+function onEscape(event) {
+  if (event.key !== 'Escape' || !props.open) return
+  // If a PrimeVue overlay (select dropdown) is open, let it handle Escape first.
+  if (document.querySelector('.p-select-overlay, .p-autocomplete-overlay')) return
+  event.stopPropagation()
+  emit('close')
+}
 watch(() => props.open, async (open) => {
+  if (open) document.addEventListener('keydown', onEscape, true)
+  else document.removeEventListener('keydown', onEscape, true)
   if (!open) return
   resetForm({ values: props.criterion ? { ...props.criterion } : blank() })
   await nextTick()
   await validate()
 })
+onBeforeUnmount(() => document.removeEventListener('keydown', onEscape, true))
 watch(type, (value) => {
   if (value === 'binary') {
     setFieldValue('likertMin', null, true)
@@ -59,53 +69,53 @@ const submit = handleSubmit((values) => emit('submitted', CriterionSchema.parse(
   <Dialog :visible="open" modal :header="mode === 'add' ? 'Add criterion' : 'Edit criterion'" class="form-dialog" :style="{ width: 'min(680px, calc(100vw - 24px))' }" @update:visible="!$event && emit('close')">
     <form class="criterion-form" novalidate @submit.prevent="submit">
       <div class="field-grid two-col">
-        <label class="field-block">
-          <span>ID</span>
-          <InputText v-model="id" v-bind="idAttrs" aria-describedby="criterion-id-error" :invalid="!!errors.id || duplicateId" autocomplete="off" />
+        <div class="field-block">
+          <label for="criterion-id">ID</label>
+          <InputText id="criterion-id" v-model="id" v-bind="idAttrs" aria-describedby="criterion-id-error" :invalid="!!errors.id || duplicateId" autocomplete="off" />
           <small id="criterion-id-error" class="field-error">{{ duplicateId ? 'ID is already in use; choose a unique ID' : errors.id }}</small>
-        </label>
-        <label class="field-block">
-          <span>Name</span>
-          <InputText v-model="name" v-bind="nameAttrs" aria-describedby="criterion-name-error" :invalid="!!errors.name" autocomplete="off" />
+        </div>
+        <div class="field-block">
+          <label for="criterion-name">Name</label>
+          <InputText id="criterion-name" v-model="name" v-bind="nameAttrs" aria-describedby="criterion-name-error" :invalid="!!errors.name" autocomplete="off" />
           <small id="criterion-name-error" class="field-error">{{ errors.name }}</small>
-        </label>
+        </div>
       </div>
 
-      <label class="field-block">
-        <span>Description</span>
-        <Textarea v-model="description" v-bind="descriptionAttrs" rows="5" auto-resize aria-describedby="criterion-description-error" :invalid="!!errors.description" />
+      <div class="field-block">
+        <label for="criterion-description">Description</label>
+        <Textarea id="criterion-description" v-model="description" v-bind="descriptionAttrs" rows="5" auto-resize aria-describedby="criterion-description-error" :invalid="!!errors.description" />
         <small id="criterion-description-error" class="field-error">{{ errors.description }}</small>
-      </label>
+      </div>
 
       <div class="field-grid three-col">
-        <label class="field-block">
-          <span>Type</span>
-          <Select v-model="type" v-bind="typeAttrs" :options="['binary', 'likert']" aria-label="Type" aria-describedby="criterion-type-error" :invalid="!!errors.type" />
+        <div class="field-block">
+          <label for="criterion-type">Type</label>
+          <Select v-model="type" v-bind="typeAttrs" :options="['binary', 'likert']" input-id="criterion-type" aria-label="Type" aria-describedby="criterion-type-error" :invalid="!!errors.type" />
           <small id="criterion-type-error" class="field-error">{{ errors.type }}</small>
-        </label>
-        <label class="field-block">
-          <span>Weight</span>
-          <InputNumber v-model="weight" v-bind="weightAttrs" :min="0.5" :max="5" :step="0.5" :min-fraction-digits="1" :max-fraction-digits="1" input-id="criterion-weight" aria-label="Weight" aria-describedby="criterion-weight-error" :invalid="!!errors.weight" />
+        </div>
+        <div class="field-block">
+          <label for="criterion-weight">Weight</label>
+          <InputNumber v-model="weight" v-bind="weightAttrs" :step="0.5" :min-fraction-digits="1" :max-fraction-digits="1" input-id="criterion-weight" aria-label="Weight" aria-describedby="criterion-weight-error" :invalid="!!errors.weight" />
           <small id="criterion-weight-error" class="field-error">{{ errors.weight }}</small>
-        </label>
-        <label class="field-block">
-          <span>Importance</span>
-          <Select v-model="importance" v-bind="importanceAttrs" :options="['must-have', 'nice-to-have']" aria-label="Importance" aria-describedby="criterion-importance-error" :invalid="!!errors.importance" />
+        </div>
+        <div class="field-block">
+          <label for="criterion-importance">Importance</label>
+          <Select v-model="importance" v-bind="importanceAttrs" :options="['must-have', 'nice-to-have']" input-id="criterion-importance" aria-label="Importance" aria-describedby="criterion-importance-error" :invalid="!!errors.importance" />
           <small id="criterion-importance-error" class="field-error">{{ errors.importance }}</small>
-        </label>
+        </div>
       </div>
 
       <div v-if="type === 'likert'" class="field-grid two-col range-fields">
-        <label class="field-block">
-          <span>Likert min</span>
-          <InputNumber v-model="likertMin" v-bind="likertMinAttrs" :min="1" :max="10" aria-label="Likert min" aria-describedby="criterion-min-error" :invalid="!!errors.likertMin" />
+        <div class="field-block">
+          <label for="criterion-min">Likert min</label>
+          <InputNumber v-model="likertMin" v-bind="likertMinAttrs" :min="1" :max="10" input-id="criterion-min" aria-label="Likert min" aria-describedby="criterion-min-error" :invalid="!!errors.likertMin" />
           <small id="criterion-min-error" class="field-error">{{ errors.likertMin }}</small>
-        </label>
-        <label class="field-block">
-          <span>Likert max</span>
-          <InputNumber v-model="likertMax" v-bind="likertMaxAttrs" :min="1" :max="10" aria-label="Likert max" aria-describedby="criterion-max-error" :invalid="!!errors.likertMax" />
+        </div>
+        <div class="field-block">
+          <label for="criterion-max">Likert max</label>
+          <InputNumber v-model="likertMax" v-bind="likertMaxAttrs" :min="1" :max="10" input-id="criterion-max" aria-label="Likert max" aria-describedby="criterion-max-error" :invalid="!!errors.likertMax" />
           <small id="criterion-max-error" class="field-error">{{ errors.likertMax }}</small>
-        </label>
+        </div>
       </div>
 
       <div class="dialog-actions">

@@ -19,6 +19,8 @@ const historyEntry = (id, version, timestamp, summary, kind, criterionId, before
   id, version, timestamp, summary, diff: { kind, criterionId, before, after },
 })
 
+const retiredVerbosity = criterion('verbosity-penalty', 'Verbosity penalty', 'Penalized responses purely for length. Retired because length is already captured by concise structure and task completion.', 'binary', 2, 'nice-to-have')
+
 const seededRubrics = [
   {
     slug: 'response-quality', name: 'Response Quality', version: '2.1.0', arbiterModel: 'quartz-arbiter-2', aggregationMode: 'weighted-mean',
@@ -27,6 +29,7 @@ const seededRubrics = [
       historyEntry('rq-210', '2.1.0', '2026-07-15T09:40:00Z', 'Changed description of criterion clarity-check', 'changed', 'clarity-check', { ...clarity, description: 'The response is easy to understand and avoids unnecessary detours.' }, clarity),
       historyEntry('rq-200', '2.0.0', '2026-06-28T14:10:00Z', 'Added criterion evidence-use', 'added', 'evidence-use', null, evidence),
       historyEntry('rq-130', '1.3.0', '2026-06-02T11:25:00Z', 'Changed weight of criterion complete-answer', 'changed', 'complete-answer', { ...completeness, weight: 2.5 }, completeness),
+      historyEntry('rq-120', '1.2.0', '2026-05-19T16:05:00Z', 'Removed criterion verbosity-penalty', 'removed', 'verbosity-penalty', retiredVerbosity, null),
     ],
   },
   {
@@ -349,7 +352,7 @@ export const useStudioStore = defineStore('studio', () => {
     return {
       schemaVersion: 'rubric-document-v1', name: rubric.name, version: rubric.version,
       arbiterModel: rubric.arbiterModel, aggregationMode: rubric.aggregationMode,
-      criteria: clone(rubric.criteria), history: clone(rubric.history || []),
+      criteria: clone(rubric.criteria),
     }
   }
   const rubricDocument = computed(() => documentFor(activeRubric.value))

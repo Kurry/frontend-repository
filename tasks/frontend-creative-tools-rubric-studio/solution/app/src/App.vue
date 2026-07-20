@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, onBeforeUnmount } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import Toast from 'primevue/toast'
 import Button from 'primevue/button'
@@ -28,7 +28,25 @@ import { registerWebMCP } from './webmcp'
 
 const store = useStudioStore()
 const toast = useToast()
-onMounted(() => registerWebMCP(store))
+
+// Phosphor renders bare <svg> icons. Icons that stand alone next to their own
+// text label are decorative, so hide them from assistive tech; icons that ARE
+// the only content of a control keep the control's accessible name. This keeps
+// meaningful/standalone SVGs from surfacing as unnamed graphics.
+function markDecorativeIcons() {
+  document.querySelectorAll('svg:not([aria-hidden]):not([aria-label])').forEach((svg) => {
+    svg.setAttribute('aria-hidden', 'true')
+    svg.setAttribute('focusable', 'false')
+  })
+}
+let iconObserver = null
+onMounted(() => {
+  registerWebMCP(store)
+  markDecorativeIcons()
+  iconObserver = new MutationObserver(() => markDecorativeIcons())
+  iconObserver.observe(document.body, { childList: true, subtree: true })
+})
+onBeforeUnmount(() => iconObserver?.disconnect())
 
 const models = [
   { label: 'quartz-arbiter-2', value: 'quartz-arbiter-2' },
@@ -36,7 +54,7 @@ const models = [
   { label: 'cinder-panel-1', value: 'cinder-panel-1' },
 ]
 const aggregations = [
-  { label: 'weighted mean', value: 'weighted-mean' },
+  { label: 'weighted-mean', value: 'weighted-mean' },
   { label: 'required-pass', value: 'required-pass' },
   { label: 'all-pass', value: 'all-pass' },
 ]
@@ -202,7 +220,7 @@ function valueLabel(value) {
             <div v-else-if="store.activeView === 'criteria'" class="criteria-view surface-enter">
               <div class="section-heading row-heading">
                 <div><span class="section-kicker">Scoring framework</span><h2>Criteria</h2><p>Expand a row to review its guidance and rationale.</p></div>
-                <Button label="Add criterion" @click="openAdd"><template #icon><Plus :size="17" weight="bold" /></template></Button>
+                <Button label="Add criterion" aria-label="Add criterion" @click="openAdd"><template #icon><Plus :size="17" weight="bold" /></template></Button>
               </div>
               <Accordion v-if="store.activeRubric.criteria.length" multiple :value="store.ui.expandedCriteria" class="criteria-accordion" @update:value="store.ui.expandedCriteria = $event">
                 <AccordionPanel v-for="item in store.activeRubric.criteria" :key="item.id" :value="item.id" class="criterion-panel" :class="{ 'load-bearing': item.weight >= 3, 'new-row': store.ui.newCriterionId === item.id }">
@@ -212,7 +230,7 @@ function valueLabel(value) {
                       <div class="criterion-meta">
                         <span class="type-chip">{{ item.type === 'likert' ? `likert ${item.likertMin}-${item.likertMax}` : 'binary' }}</span>
                         <span class="weight-chip" :class="{ heavy: item.weight >= 3 }">weight {{ formatWeight(item.weight) }}</span>
-                        <span class="importance-chip" :class="item.importance">{{ item.importance === 'must-have' ? 'must have' : 'nice to have' }}</span>
+                        <span class="importance-chip" :class="item.importance">{{ item.importance }}</span>
                       </div>
                     </div>
                   </AccordionHeader>
@@ -265,7 +283,7 @@ function valueLabel(value) {
                 <div class="suggestion-row"><span>Suggestions</span><button type="button" class="suggestion-chip" @click="store.applyVerdictPattern('all-pass')"><CheckCircle :size="15" />All pass</button><button type="button" class="suggestion-chip" @click="store.applyVerdictPattern('all-fail')"><X :size="15" />All fail</button><button type="button" class="suggestion-chip" @click="store.applyVerdictPattern('must-haves')"><Sparkle :size="15" />Must-haves only</button></div>
                 <div class="preview-layout">
                   <div class="verdict-list">
-                    <label v-for="item in store.activeRubric.criteria" :key="item.id" class="verdict-row"><span class="verdict-copy"><code>{{ item.id }}</code><strong>{{ item.name }}</strong><small>{{ item.importance === 'must-have' ? 'Must have' : 'Nice to have' }} · weight {{ formatWeight(item.weight) }}</small></span><span class="verdict-control" :class="{ pass: store.verdicts[store.activeSlug][item.id] }"><b>{{ store.verdicts[store.activeSlug][item.id] ? 'Pass' : 'Fail' }}</b><ToggleSwitch :model-value="store.verdicts[store.activeSlug][item.id]" :aria-label="`Verdict for ${item.name}`" @update:model-value="store.setVerdict(item.id, $event)" /></span></label>
+                    <label v-for="item in store.activeRubric.criteria" :key="item.id" class="verdict-row"><span class="verdict-copy"><code>{{ item.id }}</code><strong>{{ item.name }}</strong><small>{{ item.importance }} · weight {{ formatWeight(item.weight) }}</small></span><span class="verdict-control" :class="{ pass: store.verdicts[store.activeSlug][item.id] }"><b>{{ store.verdicts[store.activeSlug][item.id] ? 'Pass' : 'Fail' }}</b><ToggleSwitch :model-value="store.verdicts[store.activeSlug][item.id]" :aria-label="`Verdict for ${item.name}`" @update:model-value="store.setVerdict(item.id, $event)" /></span></label>
                   </div>
                   <aside class="aggregate-card">
                     <span>Aggregate score</span><strong :key="Math.round(store.aggregate * 10)" class="aggregate-value">{{ Math.round(store.aggregate) }}<small>%</small></strong>

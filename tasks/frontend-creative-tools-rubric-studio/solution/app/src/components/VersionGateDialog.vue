@@ -46,9 +46,12 @@ const submit = handleSubmit(({ version: candidate }) => {
         <InputText v-model="version" v-bind="versionAttrs" placeholder="MAJOR.MINOR.PATCH" aria-describedby="version-error" :invalid="!!errors.version || !!violation" autocomplete="off" />
         <small id="version-error" class="field-error">{{ errors.version || violation }}</small>
       </label>
-      <div class="dialog-actions">
-        <Button type="button" label="Cancel change" severity="secondary" text @click="emit('close')" />
-        <Button type="submit" :label="store.pendingChange?.action === 'delete' ? 'Delete and save' : 'Save change'" :disabled="!meta.valid || !bumpValid" />
+      <div class="save-gate-row">
+        <p v-if="!bumpValid" class="save-hint" role="note">{{ violation || `Save is disabled until you enter a ${kind} bump — try ${suggestion}.` }}</p>
+        <div class="dialog-actions">
+          <Button type="button" label="Cancel change" severity="secondary" text @click="emit('close')" />
+          <Button type="submit" :label="store.pendingChange?.action === 'delete' ? 'Delete and save' : 'Save change'" :disabled="!meta.valid || !bumpValid" />
+        </div>
       </div>
     </form>
   </Dialog>
