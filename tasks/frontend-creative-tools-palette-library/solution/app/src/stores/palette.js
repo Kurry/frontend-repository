@@ -15,7 +15,14 @@ const SEED_PALETTES = [
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
 let uidCounter = 0;
-const uid = () => `p${Date.now().toString(36)}${(uidCounter++).toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+// CSPRNG-backed suffix (Wiz SAST: insecure randomness) — these ids are not
+// security tokens, but crypto.getRandomValues is universally available and
+// costs nothing over Math.random.
+const uid = () =>
+  `p${Date.now().toString(36)}${(uidCounter++).toString(36)}${Array.from(
+    crypto.getRandomValues(new Uint8Array(4)),
+    (b) => b.toString(16).padStart(2, '0'),
+  ).join('')}`;
 
 export const usePaletteStore = defineStore('palette', () => {
   // ---- Collection + browse facets -------------------------------------
