@@ -193,7 +193,7 @@ function PipelineView() {
         <Select value={sort} onValueChange={setSort} ariaLabel="Sort pull requests" options={[{ value: 'newest', label: 'Newest first' }, { value: 'oldest', label: 'Oldest first' }]} />
       </div>
       <Card className="table-card">
-        {prs.length ? <div className="table-scroll">
+        {allPrs.length === 0 ? <EmptyState title="No pull requests" description="This repository has no pull requests in the pipeline." /> : prs.length ? <div className="table-scroll">
           <table className="pipeline-table">
             <thead><tr><th style={{ width: 66 }}>PR</th><th style={{ width: 280 }}>Merged change</th><th style={{ width: 82 }}>Files</th><th style={{ width: 130 }}>Issue / result</th><th>Factory stages</th></tr></thead>
             <tbody>
