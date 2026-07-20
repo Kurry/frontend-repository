@@ -1,1 +1,0 @@
-import{v as r}from"./core.min-C6O5v62Y.js";import{g as a}from"./store-CcC-Cn2p.js";import"./preloader-Bns9QiKi.js";import"./types-BMbUCgPc.js";const v=()=>{const[o,e,t,m]=r();a(m.state,m.history,{quote:e.value,name:o.value,role:t.value}),e.value="",o.value="",t.value=""};export{v as s_6N1jTOHd3tE};

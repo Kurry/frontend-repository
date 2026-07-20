@@ -1,1 +1,0 @@
-import{v as s}from"./core.min-C6O5v62Y.js";import{x as f}from"./core.min-C6O5v62Y.js";import{p as r,s as p}from"./store-CcC-Cn2p.js";import"./preloader-Bns9QiKi.js";import"./types-BMbUCgPc.js";const n=()=>{const[t,o]=s();r(t,o.content,"Apply Scenario Change"),p(o)};export{f as _hW,n as s_Rop3kZlKnB4};

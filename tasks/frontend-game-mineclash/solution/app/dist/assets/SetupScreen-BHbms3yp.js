@@ -1,1 +1,0 @@
-import{_ as s}from"./preload-helper-CVfkMyKi.js";import{y as e,L as a}from"./core.min-DGtNB905.js";const m={easy:"Easy",medium:"Medium",hard:"Hard"},d={easy:"8×8 grid · 10 mines",medium:"10×10 grid · 16 mines",hard:"12×12 grid · 24 mines"},o=e(a(()=>s(()=>import("./SetupScreen.tsx_SetupScreen_component_YWDa0BbEeyI-DtEyyVFv.js"),[]),"s_YWDa0BbEeyI"));export{m as D,o as S,d as a};

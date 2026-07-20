@@ -1,1 +1,0 @@
-import{v as r}from"./core.min-C6O5v62Y.js";import{e as s}from"./store-CcC-Cn2p.js";import"./preloader-Bns9QiKi.js";import"./types-BMbUCgPc.js";const n=()=>{const[o,t]=r();return s(o.state,t)};export{n as s_m84dc1aLEjs};

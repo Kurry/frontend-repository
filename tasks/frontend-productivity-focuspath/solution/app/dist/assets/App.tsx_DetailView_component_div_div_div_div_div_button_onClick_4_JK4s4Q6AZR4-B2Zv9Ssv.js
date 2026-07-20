@@ -1,1 +1,0 @@
-import{v as i}from"./core.min-DB8N_m9v.js";import"./preloader-Bns9QiKi.js";const a=()=>{const[t,o]=i();o.goal.motivation=t.motivationDraft.trim(),t.editingMotivation=!1,o.persist$()};export{a as s_JK4s4Q6AZR4};

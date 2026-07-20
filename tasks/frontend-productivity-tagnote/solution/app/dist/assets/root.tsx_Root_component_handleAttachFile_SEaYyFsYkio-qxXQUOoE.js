@@ -1,1 +1,0 @@
-import{v as s}from"./core.min-Dne1Y5Yk.js";import{x}from"./core.min-Dne1Y5Yk.js";import{i}from"./store-CK9GeNlI.js";import"./preloader-Bns9QiKi.js";import"./utils-ah47JOmW.js";const f=(t,o)=>{const[a,e,r]=s();a(i(e.present,t,o),"Attached file"),r("File attached")};export{x as _hW,f as s_SEaYyFsYkio};

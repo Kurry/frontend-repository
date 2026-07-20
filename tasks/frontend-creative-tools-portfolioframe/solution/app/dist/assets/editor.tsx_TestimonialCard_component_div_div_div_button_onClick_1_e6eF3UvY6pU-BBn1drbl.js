@@ -1,1 +1,0 @@
-import{v as o}from"./core.min-C6O5v62Y.js";import{q as e}from"./store-CcC-Cn2p.js";import"./preloader-Bns9QiKi.js";import"./types-BMbUCgPc.js";const p=()=>{const[t]=o();return e(t.state,t.history,t.testimonial.id)};export{p as s_e6eF3UvY6pU};

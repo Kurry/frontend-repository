@@ -1,1 +1,0 @@
-import{v as o}from"./core.min-DB8N_m9v.js";import{f as i}from"./store-B4tRoc3j.js";import"./preloader-Bns9QiKi.js";const r=()=>{const[e]=o(),s=e.milestone.steps.findIndex(t=>t.id===e.step.id);s!==-1&&e.milestone.steps.splice(s,1),e.milestone.completed=i(e.milestone),e.persist$()};export{r as s_rgCLQq5pa0c};

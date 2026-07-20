@@ -1,1 +1,0 @@
-import{v as o}from"./core.min-C6O5v62Y.js";import{p}from"./store-CcC-Cn2p.js";import"./preloader-Bns9QiKi.js";import"./types-BMbUCgPc.js";const m=()=>{const[t]=o();p(t.history,t.state.content,"Edit profile title")};export{m as s_0tA0p4s6O0Y};

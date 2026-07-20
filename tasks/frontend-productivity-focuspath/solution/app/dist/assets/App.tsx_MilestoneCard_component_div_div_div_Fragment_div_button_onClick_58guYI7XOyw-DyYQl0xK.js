@@ -1,1 +1,0 @@
-import{v as t}from"./core.min-DB8N_m9v.js";import"./preloader-Bns9QiKi.js";const m=()=>{const[o,e]=t();if(!o)return;const s=e.goal.milestones[e.milestoneIdx-1];e.goal.milestones[e.milestoneIdx-1]=e.milestone,e.goal.milestones[e.milestoneIdx]=s,e.persist$()};export{m as s_58guYI7XOyw};

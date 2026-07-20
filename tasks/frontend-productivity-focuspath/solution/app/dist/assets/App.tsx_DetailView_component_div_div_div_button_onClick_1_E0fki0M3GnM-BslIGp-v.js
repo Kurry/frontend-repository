@@ -1,1 +1,0 @@
-import{v as o}from"./core.min-DB8N_m9v.js";import"./preloader-Bns9QiKi.js";const i=()=>{const[e]=o();e.showAddMilestone=!e.showAddMilestone,e.newMilestoneTitle="",e.newMilestoneDate="",e.milestoneError=""};export{i as s_E0fki0M3GnM};

@@ -1,1 +1,0 @@
-import{v as s}from"./core.min-C6O5v62Y.js";import{i as r}from"./store-CcC-Cn2p.js";import"./preloader-Bns9QiKi.js";import"./types-BMbUCgPc.js";const p=()=>{const[a,t,e]=s();a.value.trim()&&(r(t.state,a.value),e.value=`Draft "${a.value.trim()}" saved.`,a.value="",window.setTimeout(()=>{e.value=""},3e3))};export{p as s_EYs08n3XYPA};

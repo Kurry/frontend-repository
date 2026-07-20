@@ -59,3 +59,6 @@ venv/
 # directly (razorpay's dist is hand-patched), even though dist/ is ignored globally.
 !tasks/*/solution/app/dist/
 /.harden-locks
+
+# Built oracle output — rebuilt by verify:build, never committed
+tasks/*/solution/app/dist/

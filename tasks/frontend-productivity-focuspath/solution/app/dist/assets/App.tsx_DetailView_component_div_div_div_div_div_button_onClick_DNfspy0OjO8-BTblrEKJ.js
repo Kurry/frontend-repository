@@ -1,1 +1,0 @@
-import{v as e}from"./core.min-DB8N_m9v.js";import"./preloader-Bns9QiKi.js";const s=()=>{const[t,i]=e();t.titleDraft.trim()&&(i.goal.title=t.titleDraft.trim()),t.editingTitle=!1,i.persist$()};export{s as s_DNfspy0OjO8};

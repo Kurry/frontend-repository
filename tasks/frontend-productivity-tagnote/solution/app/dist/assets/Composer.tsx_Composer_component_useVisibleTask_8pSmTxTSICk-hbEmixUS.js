@@ -1,1 +1,0 @@
-import{v as r}from"./core.min-Dne1Y5Yk.js";import{x as s}from"./core.min-Dne1Y5Yk.js";import"./preloader-Bns9QiKi.js";const l=({track:o})=>{const[t,e]=r();o(()=>e.editText.value),e.editText.value&&(t.text=e.editText.value.text,t.error="",t.attachedFile=null)};export{s as _hW,l as s_8pSmTxTSICk};

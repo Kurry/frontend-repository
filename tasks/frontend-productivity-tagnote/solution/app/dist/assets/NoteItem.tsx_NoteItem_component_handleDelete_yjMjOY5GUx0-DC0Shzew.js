@@ -1,1 +1,0 @@
-import{v as r}from"./core.min-Dne1Y5Yk.js";import{x as m}from"./core.min-Dne1Y5Yk.js";import"./preloader-Bns9QiKi.js";const p=()=>{const[o]=r();return o.onDelete(o.note.id)};export{m as _hW,p as s_yjMjOY5GUx0};

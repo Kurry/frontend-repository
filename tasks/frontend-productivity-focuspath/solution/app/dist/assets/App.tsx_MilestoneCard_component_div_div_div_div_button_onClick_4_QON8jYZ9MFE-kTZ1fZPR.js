@@ -1,1 +1,0 @@
-import{v as e}from"./core.min-DB8N_m9v.js";import"./preloader-Bns9QiKi.js";const p=()=>{const[s]=e(),o=s.goal.milestones.findIndex(i=>i.id===s.milestone.id);o!==-1&&s.goal.milestones.splice(o,1),s.persist$()};export{p as s_QON8jYZ9MFE};

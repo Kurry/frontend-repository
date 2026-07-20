@@ -1,1 +1,0 @@
-import{v as r}from"./core.min-Dne1Y5Yk.js";import{x as n}from"./core.min-Dne1Y5Yk.js";import"./preloader-Bns9QiKi.js";const m=({track:t})=>{const[e]=r();if(t(()=>e.value),e.value){const o=setTimeout(()=>{e.value=""},2500);return()=>clearTimeout(o)}};export{n as _hW,m as s_E6V4uTaJnTY};
