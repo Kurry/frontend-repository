@@ -63,10 +63,10 @@ export function registerWebMCP() {
     const difficulty = arg(args, 'difficulty')
     const language = arg(args, 'language')
     const store = useAppStore.getState()
-    const item = store.packages.find((entry) => matchPackage(entry, repository, prNumber, createdDate, difficulty, language))
-    if (!item) return result('No matching library-package is visible.', { isError: true })
-    store.selectPackage(item)
-    return result(`Selected library-package ${item.repo} PR ${item.pr_number}.`)
+    const matches = store.packages.filter((entry) => matchPackage(entry, repository, prNumber, createdDate, difficulty, language))
+    if (matches.length !== 1) return result(matches.length ? 'Selection requires a unique library-package match.' : 'No matching library-package is visible.', { isError: true })
+    store.selectPackage(matches[0])
+    return result(`Selected library-package ${matches[0].repo} PR ${matches[0].pr_number}.`)
   })
 
   addTool(toolShape('entity_delete_library_package', 'Delete exactly one library-package. Explicit confirm=true is required.', {
@@ -268,7 +268,6 @@ export function registerWebMCP() {
       return result('BatchRunReport is visible and ready for its Download report control.')
     }
     const item = store.packages.find((entry) => matchPackage(entry, repository, prNumber))
-      || store.packages[0]
     if (!item) return result('No matching TaskPackageBundle is available.', { isError: true })
     store.selectPackage(item)
     return result(`${format} is visible and ready for its export control.`)

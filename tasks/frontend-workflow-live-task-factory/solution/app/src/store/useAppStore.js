@@ -213,6 +213,7 @@ async function executePipeline(runId, fromStage = 'fetch', manualRetry = false) 
       setStage(runId, 'package', { status: 'running', attempt: 1, startedAt: now(), error: null }, 'running', 'Assembling portable task package')
       await waitWhilePaused(runId, 500)
       const latestRun = useAppStore.getState().run
+      if (!latestRun || latestRun.id !== runId) return
       const instruction = stripCredentialMaterial(latestRun.stages.find((stage) => stage.id === 'generate').output)
       const bundle = taskPackageSchema.parse({ ...packageFor(repo.name, pr, repo.language, deterministicCreatedAt(repo.name, pr.number)), instruction })
       useAppStore.getState().addPackage(bundle)

@@ -319,7 +319,7 @@ function TriageCard({ item, column }) {
     const result = startRun(item.repo, item.pr.number)
     if (!result.ok) toast('Pipeline blocked', result.error)
   }
-  return <article className="triage-card">
+  return <article className="triage-card" data-repo={item.repo} data-pr-number={item.pr.number}>
     <div className="triage-card-meta"><span className="mono">{item.repo.split('/')[1]} · #{item.pr.number}</span><span>{sourceCount(item.pr)} source files</span></div>
     <h3 className="triage-card-title">{item.pr.title}</h3>
     <div className="triage-card-meta"><span>{item.language}</span><span>{item.pr.linkedIssue ? `Issue #${item.pr.linkedIssue.number}` : 'No linked issue'}</span></div>
@@ -565,11 +565,11 @@ export default function App() {
       if (activeView !== 'triage' || event.metaKey || event.ctrlKey || event.altKey) return
       const focused = document.activeElement?.closest('.triage-card')
       if (!focused) return
-      const card = focused.querySelector('.triage-card-title')?.textContent
-      const item = useAppStore.getState().repositories.flatMap((repo) => repo.prs.map((pr) => ({ repo: repo.name, pr }))).find((entry) => entry.pr.title === card)
-      if (!item) return
-      if (event.key.toLowerCase() === 'a') { event.preventDefault(); triagePr(item.repo, item.pr.number, 'accepted') }
-      if (event.key.toLowerCase() === 'r') { event.preventDefault(); triagePr(item.repo, item.pr.number, 'rejected', 'too-few-files') }
+      const repo = focused.getAttribute('data-repo')
+      const prNumber = Number(focused.getAttribute('data-pr-number'))
+      if (!repo || !prNumber) return
+      if (event.key.toLowerCase() === 'a') { event.preventDefault(); triagePr(repo, prNumber, 'accepted') }
+      if (event.key.toLowerCase() === 'r') { event.preventDefault(); triagePr(repo, prNumber, 'rejected', 'too-few-files') }
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
