@@ -191,15 +191,16 @@ export const useCanvasStore = defineStore('canvas', () => {
     captionColor.value = s.captionColor
     watermarkEnabled.value = s.watermarkEnabled
     watermarkText.value = s.watermarkText
-    if (s.watermarkColor) watermarkColor.value = s.watermarkColor
+    // Fields added after the first schema may be absent from older persisted
+    // entries; fall back to the default instead of skipping, so a value from the
+    // previously active image can't leak through after a switch.
+    watermarkColor.value = s.watermarkColor || '#ffffff'
     watermarkOpacity.value = s.watermarkOpacity
     watermarkCorner.value = s.watermarkCorner
     zoom.value = s.zoom
     posX.value = s.posX
     posY.value = s.posY
-    if (s.exportScale === 1 || s.exportScale === 2 || s.exportScale === 3) {
-      exportScale.value = s.exportScale
-    }
+    exportScale.value = (s.exportScale === 1 || s.exportScale === 2 || s.exportScale === 3) ? s.exportScale : 2
   }
 
   function resetPosition() {

@@ -41,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useCanvasStore } from '../stores/canvas'
 import { usePresetsStore } from '../stores/presets'
 import { useSnapshotsStore } from '../stores/snapshots'
@@ -108,6 +108,11 @@ const visible = computed(() => {
   if (!q) return commands.value
   return commands.value.filter(c => c.label.toLowerCase().includes(q) || c.group.toLowerCase().includes(q))
 })
+
+// The filtered list is recomputed as the query changes, so re-anchor the
+// selection to the first match — a stale index would run the wrong command (or
+// none, once the list shrinks below it).
+watch(filter, () => { cursor.value = 0 })
 
 function run(cmd: Command) {
   cmd.action()
