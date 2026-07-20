@@ -1,8 +1,8 @@
 {
-  "name": "docuseal-oracle",
+  "name": "docuseal-reference solution",
   "private": true,
   "version": "1.0.0",
-  "description": "Static self-contained oracle for the frontend-docuseal good-app eval (PDF form builder / document signing workspace).",
+  "description": "Static self-contained reference solution for the frontend-docuseal good-app eval (PDF form builder / document signing workspace).",
   "scripts": {
     "start": "node server.js",
     "verify:build": "node -e \"require('fs').accessSync('index.html'); require('fs').accessSync('app.js'); require('fs').accessSync('styles.css'); console.log('verify:build ok');\"",
