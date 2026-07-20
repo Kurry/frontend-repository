@@ -487,18 +487,28 @@ export const useWorkflowStore = create((set, get) => ({
   },
   runSeededWorkflowDemo: async () => {
     const state = get();
+    if (isRunActive(state.run)) {
+      executionToken += 1;
+      stopElapsed();
+      set({ run: blankRun() });
+    }
     const agent = state.nodes.find((node) => node.id === 'agent-1');
     if (agent && agent.data.config.agent !== 'Atlas Agent') {
-      get().updateNode('agent-1', { config: { ...agent.data.config, agent: 'Atlas Agent' } });
+      if (!get().updateNode('agent-1', { config: { ...agent.data.config, agent: 'Atlas Agent' } })) return false;
     }
     return get().startRun();
   },
   runRetryFromFailedDemo: async () => {
     const state = get();
     if (state.run.phase === 'failed') return get().retryFailed();
+    if (isRunActive(state.run)) {
+      executionToken += 1;
+      stopElapsed();
+      set({ run: blankRun() });
+    }
     const agent = state.nodes.find((node) => node.id === 'agent-1' || node.type === 'Agent');
     if (agent) {
-      get().updateNode(agent.id, { config: { ...agent.data.config, agent: 'Faultline Agent' } });
+      if (!get().updateNode(agent.id, { config: { ...agent.data.config, agent: 'Faultline Agent' } })) return false;
     }
     return get().startRun();
   },

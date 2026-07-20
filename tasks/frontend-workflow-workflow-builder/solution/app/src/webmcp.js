@@ -90,10 +90,12 @@ const tools = [
     handler: async ({ demo }) => {
       const state = useWorkflowStore.getState();
       if (demo === 'seeded-workflow-run') {
-        state.runSeededWorkflowDemo();
+        const started = await state.runSeededWorkflowDemo();
+        if (!started) throw new Error('Seeded workflow demo could not start. Finish or reset the current run and try again.');
         return result('Seeded workflow run demo started. Observe retries on Atlas Agent and the run rollup.');
       }
-      state.runRetryFromFailedDemo();
+      const started = await state.runRetryFromFailedDemo();
+      if (!started) throw new Error('Retry-from-failed demo could not start. Ensure a failed run is visible or reset the active run.');
       return result('Retry-from-failed-node demo started. Faultline Agent exhausts retries; use Retry from failed node or observe the failed run.');
     },
   },
