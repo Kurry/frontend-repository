@@ -121,7 +121,7 @@ export function ComposerModal() {
 
   const { register, handleSubmit, setValue, watch, reset, formState: { errors, isValid, isSubmitting } } = useForm<ComposerValues>({
     resolver: zodResolver(composerSchema),
-    mode: 'onChange',
+    mode: 'all',
     defaultValues: defaults,
   })
 

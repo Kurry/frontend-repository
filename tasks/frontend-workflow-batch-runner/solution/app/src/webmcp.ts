@@ -121,24 +121,9 @@ const tools: ToolDefinition[] = [
       return { ok: true, message: `Cleared ${String(args.filter)}.`, visibleState: visibleSelection() }
     },
   },
-  {
-    name: 'browse_sort',
-    description: 'Sort the bounded jobs query and visibly select its first result without changing job records.',
-    inputSchema: objectSchema({ sort: stringEnum(['name', 'created-date', 'status']), direction: stringEnum(['ascending', 'descending']) }, ['sort']),
-    execute: (args = {}) => {
-      const sort = String(args.sort)
-      const direction = args.direction === 'descending' ? -1 : 1
-      const jobs = [...useBatchStore.getState().jobs].sort((a, b) => {
-        const av = sort === 'created-date' ? a.createdAt : sort === 'status' ? a.status : a.name
-        const bv = sort === 'created-date' ? b.createdAt : sort === 'status' ? b.status : b.name
-        return av.localeCompare(bv) * direction
-      })
-      if (jobs[0]) useBatchStore.getState().selectJob(jobs[0].id)
-      return { ok: true, message: `Sorted jobs by ${sort}; selected the first result.`, visibleState: { firstJobId: jobs[0]?.id ?? null, ...visibleSelection() } }
-    },
-  },
-  { name: 'browse_set_locale', description: 'Report locale availability for this single-locale operator.', inputSchema: objectSchema({ locale: { type: 'string' } }, ['locale']), execute: () => ({ ok: false, message: 'Locale was not changed.', error: 'No locale switch is declared for this product.' }) },
-  { name: 'browse_set_theme', description: 'Report theme availability for the fixed Carbon operator theme.', inputSchema: objectSchema({ theme: { type: 'string' } }, ['theme']), execute: () => ({ ok: false, message: 'Theme was not changed.', error: 'No theme switch is declared for this product.' }) },
+  
+  
+  
 
   {
     name: 'form_validate',
@@ -172,10 +157,9 @@ const tools: ToolDefinition[] = [
   sessionTool('resume', 'Resume the selected paused run from its checkpoint.', () => useBatchStore.getState().resumeJob()),
   sessionTool('stop', 'Stop pending and running items while preserving completed outputs.', () => useBatchStore.getState().stopJob()),
   sessionTool('restart', 'Retry only failed items of the selected run.', () => useBatchStore.getState().retryFailed()),
-  sessionTool('advance', 'Advance the selected simulation by one scheduler tick.', () => { const { job } = selectedEntities(); if (job) useBatchStore.getState().tickJob(job.id) }),
   sessionTool('trigger_demo', 'Trigger the declared simulate-window-start demo.', () => useBatchStore.getState().simulateWindowStart(), objectSchema({ demo: stringEnum(['simulate-window-start']) })),
-  { name: 'session_connect', description: 'Report connection availability for this backend-free simulation.', inputSchema: objectSchema(), execute: () => ({ ok: false, message: 'No connection was created.', error: 'This inference runner is an in-memory simulation with no remote connection.' }) },
-  { name: 'session_disconnect', description: 'Report connection availability for this backend-free simulation.', inputSchema: objectSchema(), execute: () => ({ ok: false, message: 'No connection was changed.', error: 'This inference runner has no remote connection.' }) },
+  
+  
 
   { name: 'artifact_import', description: 'Open the visible Run Report import surface; artifact contents remain a Playwright responsibility.', inputSchema: objectSchema(), execute: () => { useBatchStore.getState().setUi({ importOpen: true }); return { ok: true, message: 'Import run dialog opened.', visibleState: { importOpen: true } } } },
   {
@@ -199,8 +183,8 @@ const tools: ToolDefinition[] = [
       return { ok: true, message: `Opened ${format}; activate its visible Copy control to place exact text on the clipboard.`, visibleState: { format, previewVisible: true } }
     },
   },
-  { name: 'artifact_print_preview', description: 'Open the run artifact preview without changing store state.', inputSchema: objectSchema(), execute: () => { useBatchStore.getState().setUi({ exportOpen: true, exportTimestamp: new Date().toISOString() }); return { ok: true, message: 'Run report preview opened.', visibleState: { exportOpen: true } } } },
-  { name: 'artifact_convert', description: 'Open the export surface where JSON and CSV forms of the same run are available.', inputSchema: objectSchema({ conversion: stringEnum(['run-report-json-to-csv']) }, ['conversion']), execute: () => { useBatchStore.getState().setUi({ exportOpen: true, exportTimestamp: new Date().toISOString() }); return { ok: true, message: 'JSON and CSV export controls are visible.', visibleState: { exportOpen: true } } } },
+  
+  
 ]
 
 function composerInputSchema(required: boolean) {

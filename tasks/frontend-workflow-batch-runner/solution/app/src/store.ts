@@ -305,7 +305,7 @@ function stopTimer(jobId: string) {
 
 const initialJobs = makeSeedJobs()
 
-export const useBatchStore = create<Store>((set, get) => ({
+export const useBatchStore = create<Store>()((set, get) => ({
   jobs: initialJobs,
   selectedJobId: 'job-quarterly-corpus',
   selectedRunId: null,

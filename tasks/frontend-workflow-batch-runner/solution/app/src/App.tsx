@@ -357,10 +357,13 @@ function TokenDiff({ expected, actual }: { expected: string; actual: string }) {
   const actualTokens = actual.split(/(\s+)/)
   const max = Math.max(expectedTokens.length, actualTokens.length)
   return <div>{Array.from({ length: max }, (_, index) => {
-    const token = actualTokens[index] ?? `∅ ${expectedTokens[index] ?? ''}`
+    const act = actualTokens[index]
+    const exp = expectedTokens[index]
+    const token = act !== undefined ? act : `∅ ${exp || ''}`
     if (/^\s+$/.test(token)) return <span key={index}>{token}</span>
-    const match = token === expectedTokens[index]
-    return <span key={index} className={`diff-token ${match ? 'match' : 'different'}`} title={match ? 'Matching segment' : `Different from expected: ${expectedTokens[index] ?? 'nothing'}`}>{match ? '✓ ' : '≠ '}{token}</span>
+    const match = act === exp
+    const title = match ? 'Matching segment' : (exp !== undefined ? `Different from expected: ${exp}` : 'Extra output not in expected')
+    return <span key={index} className={`diff-token ${match ? 'match' : 'different'}`} title={title}>{match ? '✓ ' : '≠ '}{token}</span>
   })}</div>
 }
 
