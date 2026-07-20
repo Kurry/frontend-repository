@@ -102,7 +102,7 @@ const referenceFiles = (task) => [
 const trialFiles = (task) => [
   { path: 'README.md', type: 'markdown', content: `# ${task.name}\n\nThe repair preserves the public contract and documents the **${task.focus}** invariant.`, change: 'Modified', step: 4 },
   { path: 'src/engine.ts', type: 'code', language: 'typescript', content: `type Entry = { value: number; touchedAt: number }\n\nexport function reconcile(entries: Entry[]) {\n  return entries\n    .sort((a, b) => a.touchedAt - b.touchedAt)\n    .reduce((sum, entry) => sum + entry.value, 0)\n}\n`, before: `export function reconcile(input: number[]) {\n  return input.reduce((total, value) => total + value, 0)\n}\n`, change: 'Added', step: 2 },
-  { path: 'tests/engine.spec.ts', type: 'code', language: 'typescript', content: `import { reconcile } from '../src/engine'\n\ntest('keeps deterministic order', () => {\n  expect(reconcile([{ value: 4, touchedAt: 1 }])).toBe(4)\n})`, change: 'Modified', step: 7 },
+  { path: 'tests/engine.spec.ts', type: 'code', language: 'typescript', content: `import { reconcile } from '../src/engine'\n\ntest('keeps deterministic order', () => {\n  expect(reconcile([{ value: 4, touchedAt: 1 }])).toBe(4)\n})`, change: 'Modified', step: 8 },
   { path: 'assets/reference-state.png', type: 'image', content: '/trial-capture.svg' },
   { path: 'data/expected.csv', type: 'table', content: 'case,status,value\nbaseline,pass,12', change: 'Truncated', step: 10 },
   { path: 'docs/legacy-notes.md', type: 'markdown', content: '# Legacy notes\n\nThis file was removed by the agent.', change: 'Deleted', step: 11 },

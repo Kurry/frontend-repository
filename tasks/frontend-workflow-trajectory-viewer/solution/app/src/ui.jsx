@@ -31,7 +31,7 @@ export function Textarea({ className = '', ...props }) {
 
 export function RadixSelect({ value, onValueChange, placeholder, options, ariaLabel }) {
   return (
-    <Select.Root value={value || undefined} onValueChange={onValueChange}>
+    <Select.Root value={value || ""} onValueChange={onValueChange}>
       <Select.Trigger aria-label={ariaLabel} className="focusable flex h-10 w-full items-center justify-between rounded-md border border-ink-600 bg-ink-900 px-3 text-left text-sm text-mist-100 data-[placeholder]:text-mist-500">
         <Select.Value placeholder={placeholder} /><Select.Icon><CaretDown size={14} /></Select.Icon>
       </Select.Trigger>
