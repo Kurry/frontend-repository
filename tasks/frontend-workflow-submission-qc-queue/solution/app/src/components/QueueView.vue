@@ -112,19 +112,19 @@ function rowProps(row) {
         <div class="filter-controls">
           <label class="filter-field" :class="{ active: filters.stage }">
             <span>Stage</span>
-            <select :value="filters.stage || ''" aria-label="Filter by stage" @change="store.setFilter('stage', $event.target.value)" class="filter-select"><option v-for="opt in stageOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option></select>
+            <NSelect :value="filters.stage || ''" :options="stageOptions" aria-label="Filter by stage" @update:value="store.setFilter('stage', $event)" />
           </label>
           <label class="filter-field" :class="{ active: filters.tier }">
             <span>Finding tier</span>
-            <select :value="filters.tier || ''" aria-label="Filter by finding tier" @change="store.setFilter('tier', $event.target.value)" class="filter-select"><option v-for="opt in tierOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option></select>
+            <NSelect :value="filters.tier || ''" :options="tierOptions" aria-label="Filter by finding tier" @update:value="store.setFilter('tier', $event)" />
           </label>
           <label class="filter-field contributor-filter" :class="{ active: filters.contributor }">
             <span>Contributor</span>
-            <select :value="filters.contributor || ''" aria-label="Filter by contributor" @change="store.setFilter('contributor', $event.target.value)" class="filter-select"><option v-for="opt in contributorOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option></select>
+            <NSelect :value="filters.contributor || ''" :options="contributorOptions" aria-label="Filter by contributor" @update:value="store.setFilter('contributor', $event)" />
           </label>
           <label class="filter-field sort-field">
             <span><IconSort /> Sort</span>
-            <select :value="sort" aria-label="Sort by open finding count" @change="store.setSort($event.target.value)" class="filter-select"><option v-for="opt in sortOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option></select>
+            <NSelect :value="sort" :options="sortOptions" aria-label="Sort by open finding count" @update:value="store.setSort" />
           </label>
           <NButton v-if="activeFilterCount" class="clear-filter" quaternary @click="store.clearFilters"><IconX /> Clear {{ activeFilterCount }}</NButton>
         </div>
@@ -149,7 +149,7 @@ function rowProps(row) {
         :row-key="(row) => row.id"
         :row-props="rowProps"
         :bordered="false"
-        :single-line="false" :scroll-x="900"
+        :single-line="false"
         class="queue-table"
       />
       <div v-else class="designed-empty table-empty">
