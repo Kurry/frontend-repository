@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useAutoAnimate } from '@formkit/auto-animate/react'
+import { useEffect, useMemo, useState, memo } from 'react'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
@@ -36,7 +37,7 @@ function Section({ eyebrow, title, children }) {
   )
 }
 
-function DynamicRow({ index, title, onRemove, children }) {
+const DynamicRow = memo(function DynamicRow({ index, title, onRemove, children }) {
   return (
     <div className="dynamic-row">
       <div className="dynamic-row__header">
@@ -46,7 +47,7 @@ function DynamicRow({ index, title, onRemove, children }) {
           type="button"
           kind="ghost"
           size="sm"
-          renderIcon={TrashCan}
+          renderIcon={(props) => <TrashCan {...props} aria-hidden="true" />}
           onClick={onRemove}
           aria-label={`Remove ${title.toLowerCase()} ${index + 1}`}
         >
@@ -56,7 +57,7 @@ function DynamicRow({ index, title, onRemove, children }) {
       <div className="dynamic-row__body">{children}</div>
     </div>
   )
-}
+})
 
 function TextAreaField({ name, label, required, register, errors, watch, placeholder, rows = 5 }) {
   const error = errors[name]
@@ -146,6 +147,8 @@ export default function TechniqueForm({ technique }) {
   const successCriteria = useFieldArray({ control, name: 'successCriteria' })
   const constraints = useFieldArray({ control, name: 'constraints' })
   const values = watch()
+
+  const [parent] = useAutoAnimate()
 
   useEffect(() => {
     trigger()
@@ -251,7 +254,7 @@ export default function TechniqueForm({ technique }) {
             <TextAreaField name="taskDescription" label="Task description" required register={register} errors={errors} watch={watch} placeholder="What pattern should the model learn?" />
           </Section>
           <Section eyebrow="02 · Demonstrations" title="Build an example set">
-            <div className="dynamic-stack">
+            <div className="dynamic-stack" ref={parent}>
               {examples.fields.map((field, index) => (
                 <DynamicRow key={field.id} index={index} title="Example" onRemove={() => examples.remove(index)}>
                   <div className="field-grid">
@@ -264,7 +267,7 @@ export default function TechniqueForm({ technique }) {
             <ArrayMessage visible={examples.fields.length === 0 || Boolean(arrayError('examples'))}>
               {arrayError('examples') || 'At least one example is required.'}
             </ArrayMessage>
-            <Button type="button" kind="tertiary" size="sm" renderIcon={Add} onClick={() => examples.append({ input: '', output: '' })}>Add example</Button>
+            <Button type="button" kind="tertiary" size="sm" renderIcon={(props) => <Add {...props} aria-hidden="true" />} onClick={() => examples.append({ input: '', output: '' })}>Add example</Button>
           </Section>
           <Section eyebrow="03 · Context" title="Add source material">
             <AttachmentsField selected={values.attachments || []} onChange={(next) => setValue('attachments', next, { shouldDirty: true, shouldValidate: true })} />
@@ -279,14 +282,14 @@ export default function TechniqueForm({ technique }) {
           </Section>
           <Section eyebrow="02 · Reasoning" title="Outline useful steps">
             <p className="section-help">Optional guidance. Blank steps are omitted from the assembled prompt.</p>
-            <div className="dynamic-stack">
+            <div className="dynamic-stack" ref={parent}>
               {reasoningSteps.fields.map((field, index) => (
                 <DynamicRow key={field.id} index={index} title="Reasoning step" onRemove={() => reasoningSteps.remove(index)}>
                   <TextField name={`reasoningSteps.${index}.step`} label={`Step ${index + 1}`} register={register} errors={errors} placeholder="Describe a reasoning checkpoint" />
                 </DynamicRow>
               ))}
             </div>
-            <Button type="button" kind="tertiary" size="sm" renderIcon={Add} onClick={() => reasoningSteps.append({ step: '' })}>Add reasoning step</Button>
+            <Button type="button" kind="tertiary" size="sm" renderIcon={(props) => <Add {...props} aria-hidden="true" />} onClick={() => reasoningSteps.append({ step: '' })}>Add reasoning step</Button>
             <Controller
               name="scratchpad"
               control={control}
@@ -307,7 +310,7 @@ export default function TechniqueForm({ technique }) {
             <TextAreaField name="goal" label="Goal" required register={register} errors={errors} watch={watch} placeholder="Describe the end state you want…" />
           </Section>
           <Section eyebrow="02 · Success" title="Make success measurable">
-            <div className="dynamic-stack">
+            <div className="dynamic-stack" ref={parent}>
               {successCriteria.fields.map((field, index) => (
                 <DynamicRow key={field.id} index={index} title="Success criterion" onRemove={() => successCriteria.remove(index)}>
                   <TextField name={`successCriteria.${index}.text`} label={`Criterion ${index + 1}`} required register={register} errors={errors} placeholder="What must be true for this to succeed?" />
@@ -317,7 +320,7 @@ export default function TechniqueForm({ technique }) {
             <ArrayMessage visible={successCriteria.fields.length === 0 || Boolean(arrayError('successCriteria'))}>
               {arrayError('successCriteria') || 'At least one success criterion is required.'}
             </ArrayMessage>
-            <Button type="button" kind="tertiary" size="sm" renderIcon={Add} onClick={() => successCriteria.append({ text: '' })}>Add success criterion</Button>
+            <Button type="button" kind="tertiary" size="sm" renderIcon={(props) => <Add {...props} aria-hidden="true" />} onClick={() => successCriteria.append({ text: '' })}>Add success criterion</Button>
             <SelectField name="measurement" label="Measurement" required register={register} errors={errors} options={[
               ['qualitative', 'Qualitative review'], ['score', 'Numeric score'], ['percentage', 'Percentage'], ['pass-fail', 'Pass / fail'],
             ]} />
@@ -348,7 +351,7 @@ export default function TechniqueForm({ technique }) {
             <TextAreaField name="taskDescription" label="Task description" required register={register} errors={errors} watch={watch} placeholder="What should the model produce?" />
           </Section>
           <Section eyebrow="02 · Boundaries" title="Set explicit constraints">
-            <div className="dynamic-stack">
+            <div className="dynamic-stack" ref={parent}>
               {constraints.fields.map((field, index) => (
                 <DynamicRow key={field.id} index={index} title="Constraint" onRemove={() => constraints.remove(index)}>
                   <div className="constraint-grid">
@@ -367,7 +370,7 @@ export default function TechniqueForm({ technique }) {
             <ArrayMessage visible={constraints.fields.length === 0 || Boolean(arrayError('constraints'))}>
               {arrayError('constraints') || 'At least one constraint is required.'}
             </ArrayMessage>
-            <Button type="button" kind="tertiary" size="sm" renderIcon={Add} onClick={() => constraints.append({ type: 'length', text: '' })}>Add constraint</Button>
+            <Button type="button" kind="tertiary" size="sm" renderIcon={(props) => <Add {...props} aria-hidden="true" />} onClick={() => constraints.append({ type: 'length', text: '' })}>Add constraint</Button>
           </Section>
         </>
       )}
@@ -382,7 +385,7 @@ export default function TechniqueForm({ technique }) {
             type="button"
             kind="ghost"
             size="md"
-            renderIcon={Reset}
+            renderIcon={(props) => <Reset {...props} aria-hidden="true" />}
             onClick={() => {
               setChrome({ assetPickerOpen: false })
               resetTechnique(technique)
@@ -390,7 +393,7 @@ export default function TechniqueForm({ technique }) {
           >
             Reset
           </Button>
-          <Button type="submit" kind="primary" size="md" renderIcon={ArrowRight} disabled={!isValid}>
+          <Button type="submit" kind="primary" size="md" renderIcon={(props) => <ArrowRight {...props} aria-hidden="true" />} disabled={!isValid}>
             Generate prompt
           </Button>
         </div>

@@ -67,6 +67,16 @@ function unavailable(operation) {
   return { ok: false, unavailable: `${operation} is not available in this product workflow.` }
 }
 
+function visibleLibraryIndex(state, index) {
+  if (!Number.isInteger(index) || index < 0) return null
+  const visibleLibrary = state.library
+    .map((record, originalIndex) => ({ record, originalIndex }))
+    .sort((a, b) => state.sortOrder === 'asc'
+      ? a.record.title.localeCompare(b.record.title)
+      : b.record.title.localeCompare(a.record.title))
+  return visibleLibrary[index]?.originalIndex ?? null
+}
+
 async function invoke(name, args = {}) {
   const state = studioActions()
   if (name.startsWith('form_')) {
@@ -79,6 +89,10 @@ async function invoke(name, args = {}) {
     else if (techniqueIds.includes(args.destination)) state.selectTechnique(args.destination)
     else throw new Error('Destination is not declared.')
     return { ok: true, destination: args.destination }
+  }
+  if (name === 'browse_sort') {
+    state.toggleSortOrder()
+    return { ok: true }
   }
   if (name.startsWith('browse_')) return unavailable(name.slice(7))
 
@@ -102,14 +116,16 @@ async function invoke(name, args = {}) {
     return { ok: Boolean(saved), title: saved?.title }
   }
   if (name === 'entity_select') {
-    if (!state.library[args.index]) throw new Error('Library prompt index is out of range.')
-    state.openLibraryEntry(args.index)
+    const originalIndex = visibleLibraryIndex(state, args.index)
+    if (originalIndex === null) throw new Error('Library prompt index is out of range.')
+    state.openLibraryEntry(originalIndex)
     return { ok: true, index: args.index }
   }
   if (name === 'entity_delete') {
     if (args.confirm !== true) throw new Error('Delete requires confirm=true.')
-    if (!state.library[args.index]) throw new Error('Library prompt index is out of range.')
-    state.deleteLibraryEntry(args.index)
+    const originalIndex = visibleLibraryIndex(state, args.index)
+    if (originalIndex === null) throw new Error('Library prompt index is out of range.')
+    state.deleteLibraryEntry(originalIndex)
     return { ok: true, remaining: studioActions().library.length }
   }
   if (name.startsWith('entity_')) return unavailable(name.slice(7))

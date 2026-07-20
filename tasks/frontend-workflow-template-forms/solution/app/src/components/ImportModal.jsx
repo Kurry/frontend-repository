@@ -47,10 +47,14 @@ export default function ImportModal() {
   }
 
   function confirm({ documentText }) {
-    const document = libraryDocumentSchema.parse(JSON.parse(documentText))
-    replaceLibrary(document.entries)
-    close()
-    showToast('success', 'Library imported', `${document.entries.length} prompts restored from the validated document.`)
+    try {
+      const document = libraryDocumentSchema.parse(JSON.parse(documentText))
+      replaceLibrary(document.entries)
+      close()
+      showToast('success', 'Library imported', `${document.entries.length} prompts restored from the validated document.`)
+    } catch (error) {
+      showToast('error', 'Import failed', 'The document contains invalid schema properties.')
+    }
   }
 
   async function addFile(_event, { addedFiles }) {
@@ -62,7 +66,7 @@ export default function ImportModal() {
   }
 
   return (
-    <Modal
+    <Modal focusTrap={true}
       open={open}
       modalHeading="Import library JSON"
       modalLabel="Validated replacement"

@@ -505,8 +505,8 @@ a:focus-visible,
 .row-open { min-width: 0; height: 100%; display: flex; align-items: center; gap: 15px; border: 0; padding: 14px 12px; color: inherit; background: transparent; text-align: left; cursor: pointer; }
 .row-icon { flex: none; width: 40px; height: 40px; display: grid; place-items: center; color: #0f62fe; border: 1px solid #b9cdf4; background: #f1f6ff; font-family: var(--font-mono); font-size: 11px; }
 .row-copy { min-width: 0; display: flex; flex-direction: column; gap: 5px; }
-.row-copy strong { overflow: hidden; font-size: 14px; font-weight: 550; text-overflow: ellipsis; white-space: nowrap; }
-.row-copy small { display: -webkit-box; overflow: hidden; color: #6c7480; font-size: 11px; line-height: 1.35; -webkit-box-orient: vertical; -webkit-line-clamp: 1; }
+.row-copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 550; text-overflow: ellipsis; white-space: nowrap; }
+.row-copy small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #6c7480; font-size: 11px; line-height: 1.35; -webkit-box-orient: vertical; -webkit-line-clamp: 1; }
 .row-time { display: flex; flex-direction: column; gap: 3px; }
 .row-time strong { color: #3e4652; font-size: 11px; font-weight: 500; }
 .row-time span { color: #777f8b; font-size: 10px; }
@@ -599,8 +599,27 @@ a:focus-visible,
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     scroll-behavior: auto !important;
-    animation-duration: .001ms !important;
+    animation: none !important; animation-duration: .001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: .001ms !important;
   }
 }
+
+.cds--form-requirement {
+  animation: form-error-in 150ms var(--ease-out);
+}
+@keyframes form-error-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cds--form-requirement {
+    animation: none !important;
+  }
+}
+
+@font-face { font-family: 'IBM Plex Sans'; src: local('IBM Plex Sans'), local('Helvetica Neue'), local('Arial'); font-weight: 300; }
+@font-face { font-family: 'IBM Plex Sans'; src: local('IBM Plex Sans'), local('Helvetica Neue'), local('Arial'); font-weight: 400; }
+@font-face { font-family: 'IBM Plex Sans'; src: local('IBM Plex Sans'), local('Helvetica Neue'), local('Arial'); font-weight: 600; }
+@font-face { font-family: 'IBM Plex Mono'; src: local('IBM Plex Mono'), local('Menlo'), local('monospace'); font-weight: 400; }
